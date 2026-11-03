@@ -16,6 +16,7 @@ namespace
 using namespace horde::gameplay;
 using namespace horde::gameplay::simulation;
 
+bool tutorialEnabledForRoute = true;
 constexpr float kFixedDelta = 1.0f / 60.0f;
 constexpr float kPositionTolerance = 0.035f;
 
@@ -88,6 +89,7 @@ struct SwordRouteEvidence
     std::uint64_t attachmentSequence = 0u;
     bool sawStowedTransition = false;
     bool sawCompletedHandAttachment = false;
+    bool sawSequentialWaitingActor = false;
 };
 
 bool MoveByOrdinaryAxes(GameSimulation& simulation,
@@ -146,7 +148,7 @@ void StepToward(GameSimulation& simulation,
     const float dx = target.x - before.playerX;
     const float dz = target.z - before.playerZ;
     const float distance = std::hypot(dx, dz);
-    InputSnapshot input;
+    InputSnapshot input; input.tutorialEnabled=tutorialEnabledForRoute;
     input.yawRadians = 0.0f;
     input.pitchRadians = 0.0f;
     input.damageEnabled = damageEnabled;
@@ -399,7 +401,7 @@ bool MoveByOrdinaryAxes(GameSimulation& simulation,
         const float distance = std::hypot(dx, dz);
         if (distance <= kPositionTolerance) return true;
 
-        InputSnapshot input;
+        InputSnapshot input; input.tutorialEnabled=tutorialEnabledForRoute;
         input.yawRadians = 0.0f;
         input.pitchRadians = 0.0f;
         input.damageEnabled = damageEnabled;
@@ -413,6 +415,9 @@ bool MoveByOrdinaryAxes(GameSimulation& simulation,
         if (swordEvidence != nullptr)
             ObserveSwordRoute(simulation, *swordEvidence);
         const SimulationSnapshot& after = simulation.Snapshot();
+        if(swordEvidence && after.combatTeaching.safePractice && after.activeEnemyKind==EnemyKind::Skeleton &&
+           after.skeletonEnemies[0].animation==EnemyAnimation::Walking && after.skeletonEnemies[1].animation==EnemyAnimation::Idle)
+            swordEvidence->sawSequentialWaitingActor=true;
         if (IsWaterfallSkeletonRoom(after.playerX, after.playerZ))
         {
             guardsStayedBehindWetline = guardsStayedBehindWetline && PairBehindWetline(after);
@@ -542,6 +547,8 @@ int main(int argc, char** argv)
     GameSimulationConfig config = ProductionGameSimulationConfig();
     if (argc == 2 && std::string_view(argv[1]) == "--legacy-contact-policy")
         config.combatFoundation1_7 = false;
+    else if (argc == 2 && std::string_view(argv[1]) == "--tutorial-off")
+        tutorialEnabledForRoute=false;
     else if (argc != 1)
         return 2;
     checks.Require(config.waterfallSkeletonEncounter,
@@ -637,8 +644,10 @@ int main(int argc, char** argv)
                    "guards remain behind the wetline throughout ordinary route movement");
     checks.Require(reentryMovedContinuously,
                    "arena re-entry advances guards from retained positions without teleport");
-    checks.Require(sawDistinctWalkingPhase,
-                   "approach observes both live guards walking with their authored distinct gait phase");
+    const bool sequential=config.combatFoundation1_7 && config.sequentialPractice1_7 && tutorialEnabledForRoute;
+    checks.Require(sequential?swordEvidence.sawSequentialWaitingActor:sawDistinctWalkingPhase,
+                   sequential?"tutorial approach moves the active guard while the second waits idle":
+                   "tutorial-off/legacy approach observes both guards walking with authored distinct gait phase");
     checks.Require(swordEvidence.sawStowedTransition &&
                    swordEvidence.warningSequence != 0u &&
                    swordEvidence.drawSequence != 0u &&

@@ -81,4 +81,11 @@ bool CarryOpeningBenchmarkSeeds(OpeningBenchmarkTransfer& transfer,const VulkanS
 void TraceOpeningMenuStage(const char* stage)
 {
     if(gOpeningBenchmarkMenuValidation)std::cerr<<"HORDE_OPENING_MENU_STAGE "<<stage<<'\n';
+    std::error_code error;
+    const auto directory=ExecutableDirectory()/"reports";
+    std::filesystem::create_directories(directory,error);
+    if(!error) {
+        std::ofstream trace(directory/"windows_startup.log",std::ios::app);
+        trace<<GetTickCount64()<<" "<<stage<<'\n';
+    }
 }

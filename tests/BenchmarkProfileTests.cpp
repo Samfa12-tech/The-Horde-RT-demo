@@ -104,6 +104,36 @@ int main()
         "no current profile can claim ranking or validated fairness");
     TestLifecycle(BenchmarkProfileId::MobileProvisionalV1, GraphicsPlatform::Android);
     TestLifecycle(BenchmarkProfileId::WindowsProvisionalV1, GraphicsPlatform::Windows);
+    TestLifecycle(BenchmarkProfileId::MobileStandardV2, GraphicsPlatform::Android);
+    Check(ParseBenchmarkProfile("mobile-rt-standard-v2")==BenchmarkProfileId::MobileStandardV2 &&
+          BenchmarkProfileClassificationName(BenchmarkProfileId::MobileStandardV2)=="standard-unranked",
+          "rotation-aware standard has its own versioned contract and remains unranked");
+    for(std::uint32_t transform=0;transform<8;++transform) {
+        auto personal=Personal(GraphicsPlatform::Android);personal.presentationTransform=transform;
+        personal.cameraAspect=RtPresentationCameraAspect(personal.internal.width,personal.internal.height,
+            RtPresentationTransformFromIndex(transform));
+        const auto original=personal;
+        BenchmarkProfileRun run;
+        Check(run.Begin(BenchmarkProfileId::MobileStandardV2,personal),"standard accepts a valid current surface orientation");
+        const bool swapped=RtPresentationTransformSwapsAxes(RtPresentationTransformFromIndex(transform));
+        Check(personal.presentationTransform==transform &&
+            personal.internal==(swapped?GraphicsExtent{360,640}:GraphicsExtent{640,360}) &&
+            personal.output==(swapped?GraphicsExtent{720,1280}:GraphicsExtent{1280,720}) &&
+            MatchesBenchmarkProfile(BenchmarkProfileId::MobileStandardV2,personal),
+            "standard preserves actual transform and transposed image extents for the same upright view");
+        if(transform)Check(!MatchesBenchmarkProfile(BenchmarkProfileId::MobileProvisionalV1,personal),
+            "legacy identity-only V1 is not relabelled or broadened");
+        auto wrong=personal;++wrong.internal.width;
+        wrong.cameraAspect=RtPresentationCameraAspect(wrong.internal.width,wrong.internal.height,
+            RtPresentationTransformFromIndex(transform));
+        Check(!MatchesBenchmarkProfile(BenchmarkProfileId::MobileStandardV2,wrong),
+            "rotation-aware matching still rejects a one-pixel dispatch deviation");
+        Check(run.Observe(personal) && run.Complete() && personal==original,
+            "all orientations observe actual state and restore the complete personal configuration");
+        BenchmarkProfileRun cancelled;Check(cancelled.Begin(BenchmarkProfileId::MobileStandardV2,personal),
+            "rotated cancellation case starts");cancelled.Cancel();
+        Check(personal==original,"rotated cancellation preserves all non-default settings and projection");
+    }
     auto c = Personal(GraphicsPlatform::Android); const auto saved = c;
     BenchmarkProfileRun wrong;
     Check(!wrong.Begin(BenchmarkProfileId::WindowsProvisionalV1, c) && c == saved,

@@ -65,8 +65,7 @@ bool WindowsCampaignMenu::CanChoose(unsigned index) const {
     if(view_.writeUncertain && page_!=Page::Load)return false;
     if(index>=3)return false;
     if(page_==Page::Load)return cp::SelectSlotRecord(view_.catalogue,index).has_value();
-    if(page_==Page::NewGame) return view_.catalogue[index*2].status!=cp::CatalogueStatus::Checking &&
-        view_.catalogue[index*2+1].status!=cp::CatalogueStatus::Checking;
+    if(page_==Page::NewGame) return cp::CanStartNewGame(view_.catalogue,index);
     const auto& entry=view_.catalogue[index*2];
     if(view_.catalogue[index*2+1].status==cp::CatalogueStatus::Checking)return false;
     return view_.state.hasLatestCheckpoint && (entry.status==cp::CatalogueStatus::Empty || Valid(entry));
@@ -152,6 +151,9 @@ void WindowsCampaignMenu::Render() {
             else if(view_.catalogue[i*2].status==cp::CatalogueStatus::Checking || view_.catalogue[i*2+1].status==cp::CatalogueStatus::Checking)text+="Checking saves...";
             else if(view_.catalogue[i*2].status==cp::CatalogueStatus::Empty && view_.catalogue[i*2+1].status==cp::CatalogueStatus::Empty)text+="Empty";
             else text+="Save unavailable - your files have been kept";
+            if(page_==Page::NewGame && !cp::CanStartNewGame(view_.catalogue,i) &&
+               view_.catalogue[i*2].status!=cp::CatalogueStatus::Checking && view_.catalogue[i*2+1].status!=cp::CatalogueStatus::Checking)
+                text+=". Choose another slot for a new game.";
         }
         set(FirstChoiceId+i,text,visible_ && i<3,!confirmation_ && CanChoose(i));
     }

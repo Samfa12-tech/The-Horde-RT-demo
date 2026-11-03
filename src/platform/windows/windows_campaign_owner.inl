@@ -63,13 +63,30 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     scene.SetDevelopmentSupportFixture(false);
     const auto root=ResolveAssetRoot();
     std::string diagnostic;
+    auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
+    std::vector<horde::scene::SkinnedClipBinding> bindings;
+#if HORDE_RT_REVIVAL_ADMITTED
+    skeletonPath=(ExecutableDirectory()/"private_revival/skeleton.glb").string();
+    std::string standHash;
+    if(!Sha256File(skeletonPath,standHash,diagnostic) || standHash!=horde::gameplay::simulation::kPrivateStandSha256)
+        return CampaignPreparationFailure(ctx,"stand-binding","Pinned revival stand unavailable for campaign scene.");
+    const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
+    bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+#endif
+#if HORDE_RT_FLASK_ADMITTED
+    const auto utilityPath=(ExecutableDirectory()/"private_flask/player.glb").string();
+    std::string utilityHash;
+    if(!Sha256File(utilityPath,utilityHash,diagnostic) || utilityHash!=horde::gameplay::simulation::kFlaskCandidateSha256 ||
+       !scene.SetPlayerUtilityCandidateAsset(utilityPath))
+        return CampaignPreparationFailure(ctx,"flask-binding","Pinned flask binding unavailable for campaign scene.");
+#endif
     const bool ready=scene.Initialise(ctx.instance,ctx.physicalDevice,ctx.device,ctx.graphicsQueue,
         ctx.commandPool,ScaledRenderExtent(ctx.swapchainExtent,ctx.renderScale),ctx.swapchainFormat,
-        (root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string(),
+        skeletonPath,
         (root/"models/enemies/meshy/lich_placeholder_merged_animations_v01.glb").string(),
         (root/"textures/polyhaven/mobile_1k").string(),(root/"textures/meshy/lich_placeholder_v01").string(),
         diagnostic,{},root.string(),ctx.executionBackend,
-        horde::vulkan::raytracing::RtSceneProfile::Showcase,ctx.requestedGlassEnabled,ctx.pipelineCache);
+        horde::vulkan::raytracing::RtSceneProfile::Showcase,ctx.requestedGlassEnabled,ctx.pipelineCache,nullptr,bindings);
     std::cerr<<"HORDE_WINDOWS_CAMPAIGN prepare ready="<<ready<<" previous_scene_retained=1 diagnostic="<<diagnostic<<'\n';
     if(!DrainCampaignResources(ctx))return false;
     if(!ready){ctx.campaignPreparedScene.reset();ctx.campaignMessage=diagnostic;return CampaignPreparationFailure(ctx,"scene-initialise",diagnostic);}
@@ -228,14 +245,15 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                         ctx.campaignPhase=CampaignMenu::Phase::Reading;ctx.campaignStarted=std::chrono::steady_clock::now();ctx.campaignMessage.clear();
                     } else fail("Load could not start. Current game retained.");
                 } else if(command.action==CampaignMenu::Action::BeginNewGame){
-                    if(ctx.simulation.Snapshot().staticDetailLease.resourceGeneration){fail("World detail is restoring. Retry after it has completed.");}
+                    if(!horde::gameplay::campaign::CanStartNewGame(ctx.campaign->Catalogue(),command.slot)){fail("This slot cannot store new progress. Your files have been kept; choose another slot.");}
+                    else if(ctx.simulation.Snapshot().staticDetailLease.resourceGeneration){fail("World detail is restoring. Retry after it has completed.");}
                     else if(!ctx.campaignBarrier.Begin(++ctx.campaignSerial,ctx.campaignSurfaceGeneration)) {
                         CampaignPreparationFailure(ctx,"new-game-barrier","Request not admitted.");
                         fail("New game resources could not prepare. Current game retained.");
                     }
                     else if(!PrepareCampaignResources(ctx))fail("New game resources could not prepare. Current game retained.");
                     else {
-                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::ProductionGameSimulationConfig());
+                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::PrivateRevivalApplicationConfig());
                         candidate->StartLiveDevelopmentRescueJourney(true);
                         if(!DrainCampaignResources(ctx) || !ctx.campaign->BeginNewGame(command.slot))fail("New game could not start. Current game retained.");
                         else {ctx.simulation=std::move(*candidate);ctx.campaignNewGame=true;FinishCampaignCommit(ctx);}

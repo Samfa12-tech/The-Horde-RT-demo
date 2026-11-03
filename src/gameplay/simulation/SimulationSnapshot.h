@@ -29,6 +29,7 @@
 #include "gameplay/simulation/AttackWarningPresentation.h"
 #include "gameplay/simulation/SkeletonRevivalBridge.h"
 #include "gameplay/simulation/CombatContactTrace.h"
+#include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 
@@ -72,6 +73,7 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::uint64_t tickIndex = 0;
     CombatContactTraceSnapshot combatContactTrace{};
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     std::uint64_t inputPublicationSequence = 0;
     // Diagnostic observation of the coherent publication consumed by this
     // snapshot, including zero-tick and pause synchronization frames.
@@ -123,6 +125,7 @@ struct SimulationSnapshot
     AttackWarningPresentation attackWarning{};
     SkeletonRevivalSnapshot skeletonRevival{};
     bool skeletonRevivalPresentationReady = false;
+    bool skeletonRevivalVisualReady = false; // Current clip can render a frozen rise while audio reloads.
     float skeletonRevivalDeadDurationSeconds = 0.0f;
     float skeletonRevivalStandDurationSeconds = 0.0f;
     float keeperRepelRemainingSeconds = 0.0f;
@@ -158,6 +161,8 @@ struct SimulationSnapshot
 
     TorchFailureSnapshot torchFailure{};
     horde::gameplay::effects::WaterContactSnapshot waterContact{};
+    float swordSheathHoldProgress=0;
+    bool swordIntentionallyStowed=false;
     horde::gameplay::items::HeldItemStates heldItems =
         horde::gameplay::items::MakeDefaultHeldItemStates();
     horde::gameplay::items::HeldItemKinematicsState heldItemKinematics{};
@@ -178,6 +183,10 @@ struct SimulationSnapshot
     bool flaskDrinkEligible = false;
     // Zero means unavailable; otherwise the existing earned checkpoint ID.
     std::uint32_t flaskRestAnchor = 0;
+    // Discovery is independent of usable-now. Only a previously earned, nearby
+    // boundary on this side/height can advertise its basin while moving.
+    std::uint32_t flaskNearbyRestAnchor = 0;
+    healing::FlaskHint flaskHint = healing::FlaskHint::Ready;
     std::uint64_t lastConsumedDrinkFlaskSequence = 0,lastConsumedRestSequence = 0;
     std::uint64_t flaskCompletionTick = 0;
     // Owner handoffs, not persisted progress or filesystem acknowledgements.

@@ -47,9 +47,9 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 30 -or $definition.capacities.tlasInstances -ne 107 -or $definition.capacities.primitives -ne 38 -or
+    if ($definition.capacities.instanceMetadata -ne 30 -or $definition.capacities.tlasInstances -ne 111 -or $definition.capacities.primitives -ne 38 -or
         $definition.capacities.staticAssets -ne 15 -or $definition.capacities.materials -ne 34 -or $definition.capacities.textureLayers -ne 18 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 107u;' -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 111u;' -or
         $capacityCpu -notmatch 'kRtOrdinaryShowcaseInstanceCount = 31u;' -or
         $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 30u;' -or
         $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 38u;' -or
@@ -59,11 +59,11 @@ try {
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
         $generatedGlsl -notmatch 'const uint kRtInstanceMetadataCapacity = 30u;' -or
-        $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 107u;' -or
+        $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 111u;' -or
         $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 38u;' -or
         $generatedGlsl -notmatch 'const uint kRtMaterialCapacity = 34u;' -or
         $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
-        throw 'Generated joint owners must admit 107 TLAS storage slots, 30 metadata records, 38 primitive records, 15 static assets, 34 materials, 18 texture layers, and four fire storage records.'
+        throw 'Generated joint owners must admit 111 TLAS storage slots, 30 metadata records, 38 primitive records, 15 static assets, 34 materials, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },

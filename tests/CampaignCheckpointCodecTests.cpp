@@ -59,7 +59,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==4?177u:(c.schema==3?168u:(c.schema==2?163u:162u))) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==5?185u:(c.schema==4?177u:(c.schema==3?168u:(c.schema==2?163u:162u)))) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -67,6 +67,34 @@ void RoundTrip(const cp::Checkpoint& c) {
 }
 }
 int main() {
+    // Schema5 is used only when a safe exterior save must retain bypassed
+    // guards. Their health and defeated bits are independent authoritative data.
+    for(int a:{0,1,2})for(int b:{0,1,2}) {
+        auto c=Upper();c.schema=5;c.guardHealth={a,b};
+        c.defeatedGuards=(a==0?1u:0u)|(b==0?2u:0u);
+        c.flaskRecorded=true;c.flask={false,1};c.savedAtUnixSeconds=1793314800;
+        RoundTrip(c);
+        const auto bytes=Encode(c);
+        for(std::size_t offset:{177u,181u}) {
+            auto bad=bytes;Put(bad,offset,3);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+            bad=bytes;Put(bad,offset,0xffffffffu);Rechecksum(bad);Reject(bad,codec::Error::InvalidCheckpoint);
+        }
+        auto conflict=bytes;Put(conflict,60,c.defeatedGuards^1u);Rechecksum(conflict);
+        Reject(conflict,codec::Error::InvalidCheckpoint);
+        for(std::size_t length:{177u,181u,184u}) {
+            auto shortBytes=bytes;shortBytes.resize(length);Put(shortBytes,12,static_cast<std::uint32_t>(length-20));
+            Rechecksum(shortBytes);Reject(shortBytes,codec::Error::Malformed);
+        }
+        if(c.defeatedGuards!=3) {
+            auto lower=c;lower.id=cp::CheckpointId::LowerClaimed;lower.zone=sim::WorldZoneId::Dungeon;
+            lower.position=tr::kLowerLanding;lower.firstAscentCompleted=false;lower.dialogue={};
+            Check(!cp::Validate(lower),"live tomb guards cannot produce a lower-room recovery point");
+        }
+        auto legacy=c;legacy.schema=4;
+        Check(c.defeatedGuards==3 ? cp::Validate(legacy):!cp::Validate(legacy),
+              "legacy schema4 cannot silently gain surviving-guard semantics");
+    }
+
     for(auto seconds:{0ULL,1793314800ULL,253402300799ULL}) {
         auto dated=Upper();dated.schema=4;dated.flaskRecorded=true;dated.savedAtUnixSeconds=seconds;dated.halfHeart=true;dated.flask={true,2};RoundTrip(dated);
     }
@@ -131,7 +159,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,5);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,6);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -213,6 +241,10 @@ int main() {
         c.dialogue.activeLine=dlg::Line::ReunionProof;c.dialogue.continuationCount=2;
         c.dialogue.continuations[0]=dlg::Line::ReunionFirstPiece;c.dialogue.continuations[1]=dlg::Line::ReunionDepart;RoundTrip(c);
         c.dialogue.activeLine=dlg::Line::None;c.dialogue.continuationCount=0;c.dialogue.continuations={};RoundTrip(c);
+        c.dialogue.activeLine=dlg::Line::ReunionDepart;
+        c.dialogue.continuationCount=1;c.dialogue.continuations[0]=dlg::Line::FlaskEmpty;RoundTrip(c);
+        c.dialogue.activeLine=dlg::Line::FlaskTopup;
+        c.dialogue.continuationCount=0;c.dialogue.continuations={};RoundTrip(c);
         c.dialogue.activeLine=dlg::Line::ForestNight;c.dialogue.forestNightConsumed=true;
         c.dialogue.continuationCount=2;c.dialogue.continuations[0]=dlg::Line::ForestWaystone;
         c.dialogue.continuations[1]=dlg::Line::ForestClue;RoundTrip(c);
@@ -248,7 +280,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,5u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,6u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,3u,0xffffffffu}) {
@@ -293,7 +325,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=5;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=6;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

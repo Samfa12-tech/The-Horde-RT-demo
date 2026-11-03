@@ -1,11 +1,11 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.6.2
+HORDE LANTERN RT - SHOWCASE ALPHA 1.7.0 CANDIDATE
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
-Package version: 1.6.2; Android companion versionCode: 10.
-Android and Windows tomb update. Hardware ray tracing is required.
-Canonical downloads and current availability: https://samfa12.itch.io/the-horde
+Package version: 1.7.0; proposed Android companion versionCode: 11.
+This candidate is not the published 1.6.2 download. Hardware ray tracing is required.
+Published downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
 - Windows 10 or 11, 64-bit
@@ -27,13 +27,13 @@ CONTROLS
   D-pad menus, A select,
   Menu / Start pause
 - Esc: pause / resume
-- R: restart route
+- Restart route: explicit pause-menu action; R does not reset normal gameplay
 - F1: controls
 - F2: RT diagnostics
 - Alt+Enter: fullscreen / windowed
 
 SETTINGS
-- Render resolution: 50-100%, with experimental 33% and 40%; desktop default 100%
+- Render resolution: 25-100% slider; desktop default 100%
 - Lower percentages reduce RT ray count and upscale to the full window
 - Independent Music and SFX volume, look sensitivity, display mode, and render scale persist beside the demo
 - Per-Monitor V2 DPI scaling keeps menus and overlays crisp across display scales
@@ -78,11 +78,11 @@ KNOWN ALPHA LIMITS
 - The lich is a CC0 Meshy placeholder with visible source-rig limitations.
 - Larger hordes remain deferred.
 - Remaining High physical-glass contact/near-edge defects are deferred future investigation.
-- Android fresh/reset defaults to 50% RT resolution; sustained 30 FPS is not achieved in the measured
+- Android fresh/reset defaults to 33% RT resolution; sustained 30 FPS is not achieved in the measured
   current phone workloads. No sustained 30 FPS or causal performance saving is guaranteed.
 - Current exact-device evidence is scoped to SM-S948B; S24 is deferred and S25 unverified.
 - Graphics options provide an RT preview, resolution/effect choices, and explicit save/restore.
-- Dust Low is the fresh/reset default; saved Off/custom settings are preserved.
+- Windows particles Standard is the fresh/reset default; saved Off/custom settings are preserved.
 - Sword damage uses forgiving range/cone resolution; visible contact can differ.
 - Minor torch-arm motion, shafts and seamless music handover remain deferred.
 - Only tested RT-capable hardware paths are supported.

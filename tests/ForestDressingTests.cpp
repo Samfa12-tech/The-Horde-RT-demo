@@ -3,11 +3,14 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestSurroundings.h"
+#include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
 #include "scene/ForestDeadwood.h"
 #include "scene/ForestRoadClue.h"
+#include "scene/FlaskRestBasins.h"
 #include "scene/BellwetherShell.h"
 #include "scene/GraveyardDressing.h"
 #include "scene/ChapterTerrainSurface.h"
@@ -31,6 +34,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <set>
+#include <deque>
 
 namespace
 {
@@ -39,6 +44,7 @@ using namespace horde::scene;
 using namespace horde::scene::assets;
 namespace gameplay = horde::gameplay;
 int failures = 0;
+bool auditRestBasins=false;
 const std::filesystem::path kRoot{HORDE_RT_SOURCE_DIR};
 
 void Check(bool condition, std::string_view message)
@@ -969,7 +975,342 @@ void TestNativeTerrainAndTrailClearance()
     }
 }
 
-void TestNativeChapterPrimitiveOwnership()
+void TestF01NorthPrototype()
+{
+    using Surface=gameplay::simulation::TriangleSupportSurface;
+    std::string diagnostic;auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const Surface> terrain;
+    GraveyardDressingReport graves;TombDressingBuildReport tomb;
+    const bool ready=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic);
+    Check(ready,diagnostic.empty()?"prototype imports actual terrain and prior graveyard collision":diagnostic.c_str());if(!ready)return;
+    std::shared_ptr<const PreparedForestDressing> roots;
+    Check(PrepareForestDressing(kRoot/"assets",roots,diagnostic,terrain.get()),"unchanged64 prepare against native terrain");if(!roots)return;
+    const auto originals=roots->placements;
+    const auto oldContact=terrain->NonWalkableTriangleCount(),oldSteps=terrain->StepTriangleCount();
+    std::shared_ptr<const F01NorthGrovePrototype> grove;
+    Check(PrepareF01NorthGrovePrototype(roots,terrain,grove,diagnostic),diagnostic.empty()?"atomic prototype publication":diagnostic.c_str());
+    if(!grove)return;
+    Check(&grove->Prepared()==roots.get() && grove->Placements().size()==4 && grove->Terrain()!=terrain &&
+        grove->Terrain()->TriangleCount()==terrain->TriangleCount() && grove->Terrain()->StepTriangleCount()==oldSteps &&
+        terrain->NonWalkableTriangleCount()==oldContact &&
+        grove->Terrain()->NonWalkableTriangleCount()==oldContact+grove->CollisionTriangles(),
+        "actual bark collision attaches without mutating original ground, steps or prior contact");
+    unsigned collided=0;std::size_t tips=0;
+    for(std::size_t i=0;i<4;++i) {
+        const auto& p=grove->Placements()[i];
+        const auto g=terrain->Query(p.placement.origin[0],p.placement.origin[2]);
+        const auto h=grove->Terrain()->Query(p.placement.origin[0],p.placement.origin[2]);
+        Check(g.found && h.found && h.worldY==g.worldY && p.placement.supportY==g.worldY &&
+            p.trunkBounds.minimum[1]>=g.worldY-.0001f && p.trunkBounds.maximum[1]<=g.worldY+2.0001f,
+            "visual root and collision height share the same actual imported terrain");
+        Check(!gameplay::simulation::ResolveWorldRouteSupport(p.placement.origin[0],p.placement.origin[2]).grounded,
+            "prototype fixture is genuinely outside the old narrow support ribbon");
+        for(const auto& old:originals)Check(old.origin[0]!=p.placement.origin[0] || old.origin[2]!=p.placement.origin[2],"no duplicate original root");
+        for(std::size_t j=0;j<i;++j)Check(grove->Placements()[j].placement.origin!=p.placement.origin,"four prototype roots are unique");
+        const float x=p.placement.origin[0],z=p.placement.origin[2];
+        const bool blocked=!grove->Terrain()->NonWalkableVolumeClear(x-2,z,x+2,z,g.worldY+.08f,g.worldY+1.6f,.24f);
+        collided+=blocked;Check(blocked,"ordinary swept body meets grounded native prototype bark");tips+=p.rootTipSamples;
+    }
+    Check(collided==4 && tips>=72 && grove->CollisionTriangles()>0,"all four grounded trunks participate in collision");
+    Check(std::memcmp(roots->placements.data(),originals.data(),sizeof(originals))==0,"original64 immutable pose/support identity survives preparation");
+    auto repeated=grove;
+    Check(!PrepareF01NorthGrovePrototype(roots,terrain,repeated,diagnostic) && repeated==grove,"duplicate activation rejects atomically");
+    std::shared_ptr<const F01NorthGrovePrototype> rejected;
+    Check(!PrepareF01NorthGrovePrototype(roots,{},rejected,diagnostic) && !rejected,"missing real terrain cannot fall back to ribbon");
+    auto mismatched=std::make_shared<PreparedForestDressing>(*roots);
+    mismatched->placements[0].supportY+=5.f;mismatched->placements[0].origin[1]+=5.f;
+    Check(!PrepareF01NorthGrovePrototype(mismatched,terrain,rejected,diagnostic) && !rejected,
+        "internally coherent64 transforms from another terrain cannot enter the prototype");
+    auto baseline=owner,candidate=owner;ForestDressingBuildReport before,after;
+    Check(AppendPreparedForestDressing(*roots,baseline,before,diagnostic) &&
+        AppendPreparedF01NorthGrove(*grove,candidate,after,diagnostic),"independent64 and68 native bakes");
+    Check(before.placedInstances==64 && after.placedInstances==68 && after.addedTriangles-before.addedTriangles==20102 &&
+        after.addedVertices-before.addedVertices==22438 && after.addedMaterials==before.addedMaterials && after.addedPrimitives==before.addedPrimitives,
+        "four sources account for exact geometry within unchanged material/primitive owners");
+    for(std::size_t i=0;i<64;++i)Check(after.placements[i].origin==before.placements[i].origin &&
+        after.placements[i].yawRadians==before.placements[i].yawRadians && after.placements[i].trunkBounds.minimum==before.placements[i].trunkBounds.minimum &&
+        after.placements[i].trunkBounds.maximum==before.placements[i].trunkBounds.maximum,"all original64 root/render/collision receipts remain exact");
+    for(std::size_t p=owner.primitives.size();p<baseline.primitives.size();++p) {
+        const auto& a=baseline.primitives[p];const auto& b=candidate.primitives[p];
+        const auto end=p+1<baseline.primitives.size()?baseline.primitives[p+1].vertexOffset:baseline.vertices.size();
+        Check(std::memcmp(baseline.vertices.data()+a.vertexOffset,candidate.vertices.data()+b.vertexOffset,
+            (end-a.vertexOffset)*sizeof(StaticRtVertex))==0 &&
+            std::equal(baseline.indices.begin()+a.indexOffset,baseline.indices.begin()+a.indexOffset+a.indexCount,
+                candidate.indices.begin()+b.indexOffset),"all original64 vertex attributes and local indices stay byte-exact within each family");
+    }
+    auto repeatOwner=owner;ForestDressingBuildReport repeatReport;
+    Check(AppendPreparedF01NorthGrove(*grove,repeatOwner,repeatReport,diagnostic) && repeatOwner.indices==candidate.indices &&
+        repeatOwner.vertices.size()==candidate.vertices.size() &&
+        std::memcmp(repeatOwner.vertices.data(),candidate.vertices.data(),candidate.vertices.size()*sizeof(StaticRtVertex))==0,
+        "same immutable terrain/roots produce deterministic complete geometry");
+    const auto beforeRepeat=candidate.indices.size();
+    Check(!AppendPreparedF01NorthGrove(*grove,candidate,after,diagnostic) && candidate.indices.size()==beforeRepeat,"already populated owner rejects duplicate prototype bake");
+    for(std::size_t segment=2;segment+1<gameplay::simulation::kWorldRoutePoints.size();++segment) {
+        const auto a=gameplay::simulation::kWorldRoutePoints[segment],b=gameplay::simulation::kWorldRoutePoints[segment+1];
+        for(unsigned n=0;n<=40;++n) {
+            const float t=float(n)/40,x=a.x+(b.x-a.x)*t,z=a.z+(b.z-a.z)*t;
+            const auto g=terrain->Query(x,z),h=grove->Terrain()->Query(x,z);
+            Check(g.found==h.found && g.worldY==h.worldY,"old trail support/navigation remains unchanged");
+            if(g.found)Check(terrain->NonWalkableVolumeClear(x,z,x,z,g.worldY+.1f,g.worldY+1.6f,.24f)==
+                grove->Terrain()->NonWalkableVolumeClear(x,z,x,z,g.worldY+.1f,g.worldY+1.6f,.24f),"old trail capsule clearance remains unchanged");
+        }
+    }
+    std::cout<<"F01 north68: extraTriangles=20102 extraVertices=22438 collisionTriangles="<<grove->CollisionTriangles()<<" rootTips="<<tips<<"; actual-source CPU proof, not GPU/visual acceptance\n";
+}
+
+bool auditContainment=false;
+void AuditBoundary(const gameplay::simulation::TriangleSupportSurface& terrain,bool expectContained=true) {
+    using namespace gameplay::traversal;
+    const auto inside=[](float x,float z) {
+        bool hit=false;
+        for(const auto& e:surroundings_layout::edges)if((e.a[2]>z)!=(e.b[2]>z) &&
+            x<(e.b[0]-e.a[0])*(z-e.a[2])/(e.b[2]-e.a[2])+e.a[0])hit=!hit;
+        return hit;
+    };
+    std::size_t moves=0;
+    const auto traverse=[&](float ax,float az,float bx,float bz,float height,float stride,float radius=.22f) {
+        auto start=ChapterExteriorStepSupport(terrain,ax,az,radius,height);
+        if(!start.grounded)return false;
+        const auto steps=std::max(1,int(std::ceil(std::hypot(bx-ax,bz-az)/stride)));
+        float x=ax,z=az,y=start.worldY;
+        for(int step=1;step<=steps;++step) {
+            const float nx=ax+(bx-ax)*float(step)/steps,nz=az+(bz-az)*float(step)/steps;
+            ++moves;
+            if(OnRescueLanding(x,z)||OnRescueLanding(nx,nz)) {
+                const auto support=ChapterExteriorSupport(&terrain,nx,nz);
+                if(!support.grounded || !ChapterExteriorMovementClear(terrain,x,z,nx,nz,y,radius))return false;
+                y=support.worldY;
+            } else {
+                const auto next=ResolveChapterStepMovement(terrain,x,z,nx,nz,y,radius,height);
+                if(!next.accepted)return false;
+                y=next.support.worldY;
+            }
+            x=nx;z=nz;
+        }
+        return true;
+    };
+    // Real 60Hz displacement ceilings: run3.2m/s; dodge.9m/.2s;
+    // crouched movement1m/s. Test oblique crossings and endpoint seams.
+    std::size_t attempted=0,leaks=0;
+    if(expectContained)for(std::size_t edge=0;edge<surroundings_layout::edges.size();++edge) {
+        const auto& e=surroundings_layout::edges[edge];
+        const float dx=e.b[0]-e.a[0],dz=e.b[2]-e.a[2],len=std::hypot(dx,dz);
+        for(int i=0;i<=int(std::ceil(len/.2f));++i) {
+            const float t=std::min(1.f,float(i)*.2f/len),x=e.a[0]+dx*t,z=e.a[2]+dz*t;
+            for(float oblique:{-.7f,0.f,.7f})for(int mode=0;mode<3;++mode) {
+                const float nx=(dz+oblique*dx)/len,nz=(-dx+oblique*dz)/len;
+                const float height=mode==2?1.2f:1.8f,stride=mode==0?3.2f/60:mode==1?4.5f/60:1.f/60;
+                ++attempted;
+                if(traverse(x-nx*1.5f,z-nz*1.5f,x+nx*1.5f,z+nz*1.5f,height,stride,gameplay::kPlayerCollisionRadius)) {
+                    if(leaks++<8)std::cerr<<"Boundary movement leak edge="<<edge<<" t="<<t<<" mode="<<mode<<" angle="<<oblique<<'\n';
+                }
+            }
+        }
+    }
+    Check(leaks==0,"all normal/diagonal/seam approaches reject actual run, dodge and crouch movement");
+    // Independent flood of actual collision movement, not inferred from section
+    // counts. Eight directions include corner cuts; gradual .05m substeps allow
+    // traversable banks to be climbed instead of assuming a long sweep stops them.
+    std::set<std::pair<int,int>> seen{{0,0}};
+    std::deque<std::pair<int,int>> queue{{0,0}};
+    bool escaped=false;std::size_t visited=0;
+    constexpr std::array<std::array<float,2>,7> sentinels{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},{-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f},{22.3f,50.2f}}};
+    std::array<bool,7> reached{};
+    while(!queue.empty() && visited<20000 && !escaped) {
+        const auto [ix,iz]=queue.front();queue.pop_front();++visited;
+        const float x=-33.7f+ix*.35f,z=-12.8f+iz*.35f;
+        for(std::size_t i=0;i<sentinels.size();++i)if(std::hypot(x-sentinels[i][0],z-sentinels[i][1])<.7f)reached[i]=true;
+        for(int dx=-1;dx<=1;++dx)for(int dz=-1;dz<=1;++dz) {
+            if((!dx&&!dz)||seen.contains({ix+dx,iz+dz}))continue;
+            const float nx=x+dx*.35f,nz=z+dz*.35f;
+            if(!traverse(x,z,nx,nz,.75f,.05f))continue;
+            seen.insert({ix+dx,iz+dz});queue.emplace_back(ix+dx,iz+dz);
+            if(!inside(nx,nz)) {std::cerr<<"Flood escaped at "<<nx<<","<<nz<<" from "<<x<<","<<z<<'\n';escaped=true;}
+        }
+    }
+    Check(expectContained?(!escaped && queue.empty() && visited>20):escaped,expectContained?"crouched reachable flood cannot leave closed forest/arrival endpoint, including wraparound":"independent flood must detect an escape on the uncontained original scene");
+    if(expectContained)for(std::size_t i=0;i<reached.size();++i)Check(reached[i],("flood reaches connected route sentinel "+std::to_string(i)).c_str());
+    std::cout<<"Containment audit: sentinels="<<std::count(reached.begin(),reached.end(),true)<<" approaches="<<attempted<<" leaks="<<leaks<<" floodCells="<<visited<<" movementSteps="<<moves<<'\n';
+}
+
+void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+    namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
+    cp::Checkpoint record;record.contentRevision=2;record.id=cp::CheckpointId::ForestEndpoint;
+    record.zone=sim::WorldZoneId::Lookout;record.firstAscentCompleted=true;
+    record.guards={cp::GuardPose{-4.f,-15.2f,.3f},cp::GuardPose{-6.f,-16.f,-.7f}};
+    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(anchor.x,anchor.z);
+    record.position={anchor.x,ground.worldY,anchor.z};record.yaw=2.57f;
+    record.dialogue.grateConsumed=record.dialogue.rescueConsumed=record.dialogue.reunionStarted=true;
+    record.dialogue.proofAccepted=record.dialogue.forestNightConsumed=record.dialogue.forestWaystoneConsumed=true;
+    record.dialogue.forestClueConsumed=record.dialogue.forestVillageConsumed=true;
+    Check(cp::Validate(record),"canonical old forest save remains valid with new demo endpoint");
+    auto outside=record;outside.position.x=40;outside.position.z=60;
+    Check(!cp::Validate(outside),"old arbitrary off-trail position cannot be a valid persistent checkpoint");
+    sim::GameSimulation simulation(sim::ProductionGameSimulationConfig());std::uint64_t sequence=100;
+    const auto inside=[](float x,float z){bool hit=false;for(const auto& e:surroundings_layout::edges)
+        if((e.a[2]>z)!=(e.b[2]>z)&&x<(e.b[0]-e.a[0])*(z-e.a[2])/(e.b[2]-e.a[2])+e.a[0])hit=!hit;return hit;};
+    for(unsigned cycle=0;cycle<3;++cycle) {
+        const auto token=simulation.BeginCampaignRestore(record);
+        Check(token && simulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,{},sequence),
+              "repeat load/retry commits canonical lookout on actual final support");
+        if(!token)return;
+        // Match PublishDevelopmentWorldReadiness: the final native fixture owns
+        // the whole scene, not only the restored destination zone.
+        for(std::size_t zone=0;zone<sim::kWorldZones.size();++zone) {
+            const sim::WorldZoneToken ready{token->worldGeneration,static_cast<sim::WorldZoneId>(zone)};
+            if(zone==0)simulation.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
+            else simulation.PublishChapterTerrain(ready,terrain);
+        }
+        gameplay::simulation::InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=record.yaw;
+        simulation.StepFixed(neutral,1.f/60.f,++sequence);
+        bool contained=true,sawDodge=false,sawCrouch=false;float maxSpeed=0;
+        gameplay::simulation::InputSnapshot input;input.damageEnabled=false;input.moveForward=1;input.runHeld=true;input.yawRadians=2.570255f;
+        for(unsigned tick=0;tick<600;++tick) {
+            if(cycle==1 && tick>=420){input.runHeld=false;input.crouchHeld=true;}
+            if(cycle==2 && tick%40==0) {++input.commands.dodge;}
+            simulation.StepFixed(input,1.f/60.f,++sequence);
+            const auto& snap=simulation.Snapshot();contained=contained&&inside(snap.playerX,snap.playerZ)&&snap.playerGrounded;
+            maxSpeed=std::max(maxSpeed,snap.playerMovementSpeedMetresPerSecond);sawDodge|=snap.dodgeActive;sawCrouch|=snap.crouchActive;
+        }
+        Check(contained,"actual held-run/crouch/repeated-dodge simulation cannot cross temporary closure");
+        Check(std::hypot(simulation.Snapshot().playerX-anchor.x,simulation.Snapshot().playerZ-anchor.z)>17.5f,
+              "movement reaches the temporary barrier beyond arrival waypoint");
+        std::cout<<"Endpoint cycle="<<cycle<<" position="<<simulation.Snapshot().playerX<<","<<simulation.Snapshot().playerZ<<" maxSpeed="<<maxSpeed<<'\n';
+        if(cycle==1)Check(sawCrouch,"crouch input reaches authoritative lowered posture");
+        if(cycle==2)Check(sawDodge,"dodge input reaches authoritative dodge motion");
+        if(cycle==0)Check(maxSpeed>3.19f,"endpoint approach exercises actual maximum run speed");
+        input={};input.damageEnabled=false;input.moveForward=1;input.runHeld=true;
+        for(unsigned tick=0;tick<700;++tick) {
+            const auto& snap=simulation.Snapshot();const float dx=anchor.x-snap.playerX,dz=anchor.z-snap.playerZ;
+            if(std::hypot(dx,dz)<.4f)break;
+            input.yawRadians=std::atan2(dx,-dz);simulation.StepFixed(input,1.f/60.f,++sequence);
+        }
+        Check(std::hypot(simulation.Snapshot().playerX-anchor.x,simulation.Snapshot().playerZ-anchor.z)<.5f,
+              "temporary endpoint permits return/backtracking to persistent lookout anchor");
+        Check(simulation.LatestCampaignBoundary() && cp::Validate(*simulation.LatestCampaignBoundary()),
+              "movement does not replace the canonical safe checkpoint with a blocked/off-trail position");
+    }
+}
+
+void TestFullSurroundings()
+{
+    std::string diagnostic;
+    auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain;
+    std::shared_ptr<const PreparedForestDressing> original;
+    TombDressingBuildReport tomb; GraveyardDressingReport graves; ForestDressingBuildReport forest;
+    ForestUnderstoryReport understory; ForestRockReport rocks; ForestDeadwoodReport wood; ForestRoadClueReport clue;
+    const bool ready=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        PrepareForestDressing(kRoot/"assets",original,diagnostic,terrain.get()) &&
+        AppendPreparedForestDressing(*original,owner,forest,diagnostic) &&
+        AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic) &&
+        AppendPreparedForestRocks(kRoot/"assets",owner,terrain,rocks,diagnostic) &&
+        AppendPreparedForestDeadwood(kRoot/"assets",owner,terrain,wood,diagnostic) &&
+        AppendForestRoadClue(kRoot/"assets",owner,terrain,clue,diagnostic) &&
+        ConsolidateWorldBakedMaterialFamilies(owner,diagnostic);
+    Check(ready,diagnostic);if(!ready)return;
+    const auto baseline=owner;const auto baselineTerrain=terrain;
+    const auto originalPlacements=original->placements;
+    std::shared_ptr<const PreparedForestSurroundings> result;
+    const bool accepted=AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic);
+    Check(accepted,diagnostic);if(!accepted)return;
+    const auto& r=result->report;
+    if(auditContainment) {AuditBoundary(*baselineTerrain,false);AuditBoundary(*terrain);TestEndpointRecovery(terrain);}
+    Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && r.boundaryContained && r.arrivalPortalRuns==0 &&
+          r.fenceRuns+r.naturalBankRuns+r.rockRuns==surroundings_layout::edges.size() && r.openWoodlandRuns==0 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8+r.rockTriangles,
+          "full study owns exact additional trees and closed rendered boundary and temporary endpoint after mapped arrival approach");
+    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560,"every candidate includes real lower tree contact and bounded understory");
+    Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
+          owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
+          "full study reuses all existing material/primitive/asset roles without capacity growth");
+    Check(terrain!=baselineTerrain && terrain->TriangleCount()==baselineTerrain->TriangleCount() &&
+          terrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+r.boundaryCollisionTriangles+r.treeContactTriangles &&
+          result->terrain==terrain && original->placements.size()==originalPlacements.size(),
+          "immutable boundary publication retains original ground and existing nonwalkable geometry");
+    // Compare the playable corridor to the original support, rather than
+    // declaring every pre-existing obstruction a new fence regression.
+    constexpr std::array<std::array<float,2>,7> route{{{-33.7f,-12.8f},{-28.7f,-5.8f},{-15.7f,.2f},
+        {-17.7f,15.2f},{-3.7f,20.2f},{13.3f,36.2f},{22.3f,50.2f}}};
+    bool clearance=true;std::size_t clearanceProbes=0;
+    for(std::size_t segment=1;segment<route.size();++segment) {
+        const auto a=route[segment-1],b=route[segment];const float dx=b[0]-a[0],dz=b[1]-a[1],len=std::hypot(dx,dz);
+        const int steps=int(std::ceil(len/.15f));
+        for(int i=0;i<=steps;++i)for(float lateral:{-1.2f,0.f,1.2f}) {
+            const float x=a[0]+dx*float(i)/steps-dz/len*lateral,z=a[1]+dz*float(i)/steps+dx/len*lateral;
+            const auto ground=baselineTerrain->Query(x,z);if(!ground.found)continue;
+            for(float height:{.75f,1.8f}) {
+                const bool oldClear=baselineTerrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
+                const bool newClear=terrain->NonWalkableVolumeClear(x,z,x,z,ground.worldY+.05f,ground.worldY+height,.22f);
+                if(oldClear && !newClear && clearance)std::cerr<<"New route obstruction at "<<x<<","<<z<<" height="<<height<<'\n';
+                clearance=clearance && (!oldClear || newClear);++clearanceProbes;
+            }
+        }
+    }
+    Check(clearance,"actual new boundary solids retain standing/crouched route width wherever the original scene was clear");
+    std::size_t treeApproachProbes=0;
+    for(const auto& tree:horde::scene::surroundings_layout::trees) {
+        const auto ground=baselineTerrain->Query(tree.x,tree.z);
+        for(unsigned angle=0;angle<16;++angle)for(float height:{.75f,1.8f}) {
+            const float theta=float(angle)*6.28318530718f/16;
+            const bool clear=terrain->NonWalkableVolumeClear(tree.x+std::cos(theta)*1.5f,tree.z+std::sin(theta)*1.5f,
+                tree.x,tree.z,ground.worldY+.05f,ground.worldY+height,.22f);
+            Check(!clear,"every added root/trunk blocks standing and crouched radial approach, including open-arrival-accessible trees");
+            ++treeApproachProbes;
+        }
+    }
+    Check(treeApproachProbes==13312,"all416 added tree contacts receive32 approach probes");
+    using namespace horde::vulkan::raytracing;
+    const auto flags=static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    RtStaticMeshSlot packed;
+    Check(packed.Initialize(std::array{StaticRtAssetRegistration{0,100,flags,0,&owner}},diagnostic),diagnostic);
+    const auto source=std::make_shared<const RtStaticMeshSlot>(packed);
+    // Exercise source-specific removal/restore plumbing with a fresh exact set.
+    // This is deliberately NOT an admitted ray-contributor/visibility proof.
+    std::vector<std::uint32_t> omissions;
+    for(const auto& primitive:source->PrimitiveMetadata())for(std::size_t i=primitive.indexOffset;i<primitive.indexOffset+primitive.indexCount;i+=3) {
+        bool far=source->TriangleRegions()[i/3]==StaticTriangleRegion::ExteriorDressing;
+        for(unsigned c=0;c<3;++c)far=far && source->Vertices()[primitive.vertexOffset+source->Indices()[i+c]].position[2]>60.f;
+        if(far)omissions.push_back(static_cast<std::uint32_t>(i/3));
+    }
+    auto proof=RtStaticTriangleOmissions::Create(source,0,omissions,diagnostic);
+    Check(proof && !omissions.empty(),"fresh480 exact-source subset passes CPU structural admission only");
+    auto copy=[&](bool reduced) {
+        RtStaticMeshCopy op;
+        bool good=op.Begin(source,diagnostic,reduced?0u:UINT32_MAX,kAllStaticTriangleRegions,reduced?proof:nullptr,true);
+        for(unsigned turn=0;good&&!op.Ready()&&turn<512;++turn)good=op.Advance(1024*1024,diagnostic);
+        Check(good && op.Ready(),"bounded candidate source copy reaches complete publication");return op.Take();
+    };
+    auto reduced=copy(true);auto restored=copy(false);
+    Check(reduced && reduced->Indices().size()+omissions.size()*3==source->Indices().size() &&
+          restored && restored->Indices()==source->Indices() && restored->SharesVertexPayloadWith(*source),
+          "fresh480 source removal and full restoration preserve exact index/immutable vertex ownership");
+    RtStaticMeshSlot foreign;Check(foreign.Initialize(std::array{StaticRtAssetRegistration{0,100,flags,0,&baseline}},diagnostic),diagnostic);
+    RtStaticMeshCopy rejectForeign;
+    Check(!rejectForeign.Begin(std::make_shared<const RtStaticMeshSlot>(foreign),diagnostic,0,kAllStaticTriangleRegions,proof,true),
+          "candidate480 subset cannot be reused for original64 geometry");
+    auto recreatedOwner=baseline;auto recreatedTerrain=baselineTerrain;std::shared_ptr<const PreparedForestSurroundings> recreated;
+    Check(AppendPreparedForestSurroundings(kRoot/"assets",*original,recreatedOwner,recreatedTerrain,recreated,diagnostic) &&
+          ForestRepresentationDigest(recreatedOwner,{})==ForestRepresentationDigest(owner,{}),
+          "independent native recreation rebuilds identical full candidate geometry/material/provenance");
+    const auto digest=ForestRepresentationDigest(owner,{});const auto retained=terrain;const auto prior=result;
+    Check(!AppendPreparedForestSurroundings(kRoot/"assets",*original,owner,terrain,result,diagnostic) &&
+          ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
+          "repeated append cannot combine two populations or duplicate boundary colliders");
+
+    Check(!AppendPreparedForestSurroundings(kRoot/"missing-assets",*original,owner,terrain,result,diagnostic) &&
+          ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
+          "failed candidate preparation preserves all already published geometry/support/receipts");
+    std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
+             <<" retainedSupportBytes="<<terrain->RetainedBytes()<<" baseline64SupportBytes="<<baselineTerrain->RetainedBytes()<<" rocks="<<r.rockRuns<<" rockTriangles="<<r.rockTriangles<<" totalSupport="<<terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()<<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
+             <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
+}
+
+void TestNativeChapterPrimitiveOwnership(bool f01North=false)
 {
     using namespace horde::vulkan::raytracing;
     std::string diagnostic;
@@ -1007,7 +1348,17 @@ void TestNativeChapterPrimitiveOwnership()
                 ForestDressingBuildReport rejected;
                 return AppendPreparedForestDressing(kRoot/"assets",invalid,rejected,diagnostic,terrain.get());
             });
-            return AppendPreparedForestDressing(kRoot/"assets",owner,forest,diagnostic,terrain.get());}() &&
+            if(!f01North)return AppendPreparedForestDressing(kRoot/"assets",owner,forest,diagnostic,terrain.get());
+              std::shared_ptr<const PreparedForestDressing> roots;
+              std::shared_ptr<const F01NorthGrovePrototype> grove;
+              if(!PrepareForestDressing(kRoot/"assets",roots,diagnostic,terrain.get()) ||
+                 !PrepareF01NorthGrovePrototype(roots,terrain,grove,diagnostic) ||
+                 !AppendPreparedF01NorthGrove(*grove,owner,forest,diagnostic))return false;
+              terrain=grove->Terrain();
+              Check(forest.placedInstances==68 && forest.addedTriangles==343366,
+                    "fresh full native ownership proof selects exactly prototype68 geometry");
+              PrintForestDigest("f01-north68",owner,forest);
+              return true;}() &&
         [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
                 ForestUnderstoryReport rejected;
                 return AppendPreparedForestUnderstory(kRoot/"assets",invalid,*terrain,rejected,diagnostic);
@@ -1123,6 +1474,42 @@ void TestNativeChapterPrimitiveOwnership()
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
+    if(auditRestBasins) {
+        const auto prior=terrain;auto baseline=owner;
+        const auto materials=owner.materials.size(),indices=owner.indices.size();
+        std::array<FlaskRestBasinPlacement,2> basins;
+        const bool appended=AppendFlaskRestBasins(owner,terrain,basins,diagnostic);
+        Check(appended,diagnostic);if(!appended)return;
+        Check(ConsolidateWorldBakedMaterialFamilies(owner,diagnostic) &&
+            owner.materials.size()==materials && owner.primitives.size()==baseline.primitives.size() &&
+            owner.indices.size()==indices+648 && owner.HasValidTriangleProvenance(),
+            "actual complete chapter merges basins into its same masonry rows and retains all contributors");
+        const horde::vulkan::raytracing::StaticRtAssetRegistration registration{0u,1u,
+            static_cast<std::uint32_t>(horde::vulkan::raytracing::RtInstanceFlag::StaticPbr),0u,&owner};
+        horde::vulkan::raytracing::RtStaticMeshSlot packed;
+        Check(packed.Initialize(std::span(&registration,1),diagnostic),diagnostic);
+        const auto lower=gameplay::traversal::kLowerLanding;
+        for(float offset:{-.5f,0.f,.5f}) {
+            const bool before=prior->NonWalkableVolumeClear(lower.x+offset,lower.z,
+                lower.x+offset,lower.z,lower.y+.001f,lower.y+1.8f,gameplay::kPlayerCollisionRadius);
+            const bool after=terrain->NonWalkableVolumeClear(lower.x+offset,lower.z,
+                lower.x+offset,lower.z,lower.y+.001f,lower.y+1.8f,gameplay::kPlayerCollisionRadius);
+            Check(before==after,"removing the boss-room basin leaves lower combat contact unchanged");
+        }
+        for(std::size_t i=0;i<basins.size();++i) {
+            const auto p=basins[i].anchor;
+            for(float from:{-1.25f,-.5f,0.f,.5f,1.25f}) {
+                const bool before=prior->NonWalkableVolumeClear(p.x,p.z+from,p.x,p.z,
+                    p.y+.001f,p.y+1.8f,gameplay::kPlayerCollisionRadius);
+                const bool after=terrain->NonWalkableVolumeClear(p.x,p.z+from,p.x,p.z,
+                    p.y+.001f,p.y+1.8f,gameplay::kPlayerCollisionRadius);
+                Check(before==after,"basins preserve swept canonical rope/arrival approach contact");
+            }
+        }
+        std::cout<<"Rest basin full chapter packing: triangles=216 materials="<<materials
+            <<" primitives="<<owner.primitives.size()<<" no GPU/image claim\n";
+        return;
+    }
     Check(understory.placements.size()==18 && understory.triangles==17712,
           "real exported terrain supports all bounded understory clumps before native owner packing");
     Check(deadwood.placements.size()==10 && deadwood.triangles==11904 && deadwood.nonWalkableTriangles==11884 && deadwood.stepTriangles==20,
@@ -1337,6 +1724,7 @@ void TestNativeChapterPrimitiveOwnership()
         // forest owner. No rounded report envelope or asset-name bounds certify
         // the omitted triangle list. This remains host geometry, not GPU proof.
         std::size_t omittedCount=0;bool exterior=true,bitExact=true;
+        std::vector<std::uint32_t> exactOmissions;
         DetailBox omitted{{INFINITY,INFINITY,INFINITY},{-INFINITY,-INFINITY,-INFINITY}};
         const auto& registryOwner=complete.InstanceMetadata()[21];
         for(std::size_t p=0;p<registryOwner.primitiveCount;++p) {
@@ -1349,7 +1737,7 @@ void TestNativeChapterPrimitiveOwnership()
                 for(std::size_t k=0;k<3;++k)
                     selected=selected&&complete.Vertices()[primitive.vertexOffset+complete.Indices()[primitive.indexOffset+n+k]].position[2]>24.f;
                 if(!selected)continue;
-                ++omittedCount;
+                ++omittedCount;exactOmissions.push_back(static_cast<std::uint32_t>((primitive.indexOffset+n)/3u));
                 exterior=exterior&&complete.TriangleRegions()[(primitive.indexOffset+n)/3]==StaticTriangleRegion::ExteriorDressing;
                 for(std::size_t k=0;k<3;++k) {
                     const auto& v=complete.Vertices()[primitive.vertexOffset+complete.Indices()[primitive.indexOffset+n+k]].position;
@@ -1366,6 +1754,38 @@ void TestNativeChapterPrimitiveOwnership()
               "actual ordinary omission roster retains all 84219 exterior-only registry triangles and float-bit source identities");
         Check(DetailRegionalWaterQueriesSeparated(omitted,ChapterRegionalWaterTriangles()),
               "actual packed omission bounds preserve old opaque/source-prism proof plus regional water bounded-query closure");
+        if(f01North) {
+            // Fresh source/IDs are constructed from this candidate, never the
+            // original64 or private crown certificate. GPU retirement stays OFF.
+            auto source=std::make_shared<const RtStaticMeshSlot>(complete);
+            auto proof=RtStaticTriangleOmissions::Create(source,21u,exactOmissions,diagnostic);
+            Check(proof && proof->Triangles().size()==84219,"fresh68 omission IDs pass the actual immutable-owner validator");
+            RtStaticMeshCopy retained;
+            const bool began=proof && retained.Begin(source,diagnostic,21u,kAllStaticTriangleRegions,proof,true);
+            Check(began,"fresh candidate selection owns its exact source and IDs");
+            unsigned turns=0;
+            while(began && !retained.Ready() && turns++<128)if(!retained.Advance(1024u*1024u,diagnostic))break;
+            auto selected=retained.Take();
+            Check(selected && selected->Indices().size()+exactOmissions.size()*3==complete.Indices().size() &&
+                selected->Vertices().size()==complete.Vertices().size() &&
+                std::memcmp(selected->Vertices().data(),complete.Vertices().data(),complete.Measurements().vertexBytes)==0,
+                "fresh68 retained-source selection preserves complete vertex bytes and exact index count");
+            if(selected)for(std::size_t p=0;p<complete.PrimitiveMetadata().size();++p) {
+                const auto& a=complete.PrimitiveMetadata()[p];const auto& b=selected->PrimitiveMetadata()[p];
+                std::size_t target=b.indexOffset;
+                for(std::size_t n=a.indexOffset;n<a.indexOffset+a.indexCount;n+=3u) {
+                    if(std::binary_search(exactOmissions.begin(),exactOmissions.end(),static_cast<std::uint32_t>(n/3u)))continue;
+                    for(unsigned k=0;k<3;++k)Check(complete.Indices()[n+k]==selected->Indices()[target++],
+                        "each retained68 contributor index is byte-exact and ordered");
+                }
+                Check(target==b.indexOffset+b.indexCount,"fresh proof accounts for every retained triangle once");
+            }
+            std::uint64_t digest=14695981039346656037ull;
+            for(auto id:exactOmissions)for(unsigned shift=0;shift<32;shift+=8){digest^=(id>>shift)&255u;digest*=1099511628211ull;}
+            std::cout<<"F01_FRESH_CPU_RETENTION ids="<<exactOmissions.size()<<" idsFnv1a64="<<digest<<" bounds="
+                <<omitted.min[0]<<','<<omitted.min[1]<<','<<omitted.min[2]<<';'
+                <<omitted.max[0]<<','<<omitted.max[1]<<','<<omitted.max[2]<<"; no GPU cutover admission\n";
+        }
     }
     {
         auto unclassified = owner;
@@ -1589,8 +2009,16 @@ void TestTriangleRegionFailures()
 
 } // namespace
 
-int main()
+int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--flask-basins") {auditRestBasins=true;TestNativeChapterPrimitiveOwnership();return failures?1:0;}
+    if(argc==2 && std::string_view(argv[1])=="--containment") {auditContainment=true;TestFullSurroundings();return failures?1:0;}
+    if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }
+    if(argc==2 && std::string_view(argv[1])=="--f01-north68") {
+        TestF01NorthPrototype();TestNativeChapterPrimitiveOwnership(true);
+        std::cout<<"F01 prototype failures="<<failures<<'\n';return failures?1:0;
+    }
+    if(argc!=1)return 2;
     TestNativeTreePairAndAppend();
     TestCleanFailures();
     TestPreparedMasterOwnership();

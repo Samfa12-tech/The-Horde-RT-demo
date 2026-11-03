@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "sourceCommits": {
+    "serializerAndLabel": "50df3f1ab9982e552f49ffadc011e33b7c2b18a9",
+    "androidOpeningSummary": "71e68fa52de1159f4f86533cbb4e56061df1d185"
+  },
+  "windows": {
+    "sourceCommit": "50df3f1ab9982e552f49ffadc011e33b7c2b18a9",
+    "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-windows-acceptance-20261101-summary\\HordeLanternRT.exe",
+    "bytes": 5003264,
+    "sha256": "ad05c6148ed475e8cf18dcf5d55ea14c0721366b539a16eefbd9665c3f60f036",
+    "baseRuntimeFiles": 192,
+    "baseRuntimeIdentical": true,
+    "privateRevival": true,
+    "unlaunched": false
+  },
+  "previousSerializerOnlyAndroid": {
+    "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-summary-fixed-20261101.apk",
+    "bytes": 251536730,
+    "sha256": "9508cec5c7e8da8c221692305e61deb8b2bc783e53379950ef021dede57cc85f",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "privateRevival": true,
+    "installed": false,
+    "launched": false
+  },
+  "androidOpeningSummaryCandidate": {
+    "sourceCommit": "71e68fa52de1159f4f86533cbb4e56061df1d185",
+    "path": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-opening-summary-20261101.apk",
+    "bytes": 251538250,
+    "sha256": "9511fed946b1a9498efe7f424fc904932f0f5e637e006cb27ad6dc52c6899b9d",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a",
+      "x86",
+      "x86_64"
+    ],
+    "installed": true,
+    "launched": true
+  },
+  "windowsNativePublicCapture": {
+    "platform": "Windows",
+    "artifactPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\horde-windows-acceptance-20261101-summary\\HordeLanternRT.exe",
+    "artifactBytes": 5003264,
+    "artifactSha256": "ad05c6148ed475e8cf18dcf5d55ea14c0721366b539a16eefbd9665c3f60f036",
+    "sourceCommit": "50df3f1ab9982e552f49ffadc011e33b7c2b18a9",
+    "nativeSerializerFile": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\windows-native-public.json",
+    "nativeSerializerBytes": 9075,
+    "nativeSerializerSha256": "58a6ebb7242de606ae9213a8d2da662efef454eb68ba03587da35d7b1029b077",
+    "tuplePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\windows-catalog-tuple.json",
+    "tupleSha256": "0fdffc9e8680d47d5eb7251b88affc3dc26f19b816aa49c5ddb1a69d7c428c9d",
+    "normalBenchmark": {
+      "warmupLaps": 1,
+      "measuredLaps": 1,
+      "completedLaps": 2,
+      "rtPresentedEveryMeasuredFrame": true
+    },
+    "localPrepareOnly": true,
+    "sendOrPublicationApproved": false
+  },
+  "windowsNativePublicTupleAvailable": true,
+  "androidNativePublicTupleAvailable": true,
+  "focusedHostSummaryTests": "PASS",
+  "existingNativeOpeningOwnerChecks": 77,
+  "focusedAndroidTests": 41,
+  "focusedAndroidFailures": 0,
+  "normalCourseSyntheticBytes": {
+    "privateLocal": 10617,
+    "publicPreview": 8163
+  },
+  "unchangedCaps": 16384,
+  "phoneOriginalFilesRestored": 27,
+  "allOriginalPhoneHashesMatch": true,
+  "phoneReleased": true,
+  "ownerParkedFiles": 151,
+  "ownerParkedChanged": [],
+  "sendOrPublicationApproved": false,
+  "reportTransmitted": false,
+  "standardWindowsApplyFailure": "actual prior gate rejected; exact failed Win32 call not recorded; no retry",
+  "androidNativePublicCapture": {
+    "platform": "Android",
+    "artifactPath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\benchmark-opening-summary-20261101.apk",
+    "artifactBytes": 251538250,
+    "artifactSha256": "9511fed946b1a9498efe7f424fc904932f0f5e637e006cb27ad6dc52c6899b9d",
+    "sourceCommit": "71e68fa52de1159f4f86533cbb4e56061df1d185",
+    "nativeBuildIdentity": "g:71e68fa52de1159f4f86533cbb4e56061df1d185;i:34aba11c0c183e31dbce78aae68fcefd0e9b61feee04afc6ad5532d528256ad0;c:D;s:C",
+    "nativeSerializerFile": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\android-final\\android-native-public.json",
+    "nativeSerializerBytes": 9296,
+    "nativeSerializerSha256": "63cb9ebb2845fc23b489e7356615ac4cff53f760b2b29becdcdcec33459ff752",
+    "tuplePath": "C:\\Users\\sam_s\\Documents\\the Horde RT Demo\\.worktrees\\horde-1.7-wp2-vertical-proof\\reports\\catalog-native-fixed-20261101\\android-final\\android-catalog-tuple.json",
+    "tupleSha256": "83a689ff408eab3ea7e9ef73e3c6010b4e942f9717d4791362271cae0fa68670",
+    "normalBenchmark": {
+      "warmupLaps": 1,
+      "measuredLaps": 1,
+      "completedLaps": 2,
+      "rtPresentedEveryMeasuredFrame": true,
+      "waypointsReached": 26,
+      "measuredFrames": 1838,
+      "owningCounts": {
+        "expected": 1838,
+        "completed": 1838,
+        "rejected": 0,
+        "cancelled": 0,
+        "cpuAccepted": 1838,
+        "cpuRejected": 0,
+        "outstanding": 0
+      }
+    },
+    "inputReceipt": "Actual normal More > Custom UI; Public Preview; separate local prepare consent/basic hardware; exact native Prepare; Save reviewed JSON through local Downloads picker. Saved bytes equal exact UI preview.",
+    "originalPhoneFilesRestored": 27,
+    "allOriginalPhoneHashesMatch": true,
+    "debugStopped": true,
+    "homeConfirmed": true,
+    "productionUntouched": true,
+    "localPrepareOnly": true,
+    "sendOrPublicationApproved": false,
+    "reportTransmitted": false
+  },
+  "phoneHomeConfirmed": true
+}

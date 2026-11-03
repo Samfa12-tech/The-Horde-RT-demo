@@ -135,6 +135,11 @@ bool MotionEvidenceLedger::AppendState(std::uint64_t now,
     row.simulationSeconds = scenario.SimulationSeconds(); row.stage = scenario.Stage(); row.input = input;
     row.player = {{state.playerX, state.playerZ, state.playerYawRadians, state.playerPitchRadians, state.walkTime, state.walkAmount}};
     row.keeper = state.lich; row.torch = state.torchFailure; row.combat = state.playerCombat;
+    row.waterInStream = state.waterContact.inStream;
+    row.waterWetGround = state.waterContact.wetGround;
+    row.activeWaterDroplets = static_cast<std::uint32_t>(std::count_if(
+        state.waterContact.droplets.begin(), state.waterContact.droplets.end(),
+        [](const auto& droplet) { return droplet.active; }));
     row.torchParent = state.heldItems[0].parentMode;
     row.torchItemPosition = {{state.heldItems[0].worldFromItem[12],
                              state.heldItems[0].worldFromItem[13],
@@ -331,6 +336,9 @@ void MotionEvidenceLedger::WriteJson(std::ostream& output,
                << ",\"active\":" << (r.sword.active ? "true" : "false") << '}'
                << ",\"chestPhase\":" << static_cast<int>(r.chest.phase) << ",\"lid\":" << r.chest.lidOpenProgress
                << ",\"heldKind\":" << static_cast<int>(r.heldLight.heldLightKind) << ",\"heldPose\":" << static_cast<int>(r.heldLight.heldLightPose)
+               << ",\"waterContact\":{\"activeDroplets\":" << r.activeWaterDroplets
+               << ",\"inStream\":" << (r.waterInStream ? "true" : "false")
+               << ",\"wetGround\":" << (r.waterWetGround ? "true" : "false") << '}'
                << ",\"finalePhase\":" << static_cast<int>(r.finale.phase) << ",\"roof\":" << r.finale.skylightOpenProgress
                << ",\"dawn\":" << r.finale.dawnRevealProgress << ",\"fire\":[";
         for (std::size_t j = 0u; j < r.fire.size(); ++j) { if (j) output << ','; output << '['; for (std::size_t k = 0u; k < 4u; ++k) { if (k) output << ','; output << r.fire[j][k]; } output << ']'; }

@@ -17,12 +17,12 @@ bool MakeWindowsBenchmarkUuid(std::string& id)
 }
 
 constexpr wchar_t kSummaryReviewWindowClass[] = L"HordeLanternBenchmarkSummaryReview";
-constexpr int kSummaryIntro = 100, kSummaryConsent = 101, kSummaryHardware = 102;
+constexpr int kSummaryIntro = 100, kSummaryHardware = 102;
 constexpr int kSummaryCoolingLabel = 103, kSummaryCooling = 104, kSummaryPrepare = 105;
 constexpr int kSummaryPreviewLabel = 106, kSummaryPreview = 107, kSummaryStatus = 108;
 constexpr int kSummaryCopy = 109, kSummarySave = 110, kSummaryClose = IDCANCEL;
 constexpr int kSummaryBodyPanel = 111, kSummaryAudience = 112;
-constexpr int kSummarySendConsent = 113, kSummarySendPreview = 114, kSummarySend = 115, kSummaryCancelSend = 116;
+constexpr int kSummarySendConsent = 113, kSummarySendPreview = 114, kSummarySend = 115, kSummaryCancelSend = 116, kSummaryDetails = 117;
 constexpr UINT_PTR kSummarySendTimer = 444u;
 struct WindowsBenchmarkSummaryReviewState
 {
@@ -34,6 +34,7 @@ struct WindowsBenchmarkSummaryReviewState
     HFONT font = nullptr;
     bool saved = false;
     int scrollOffset = 0;
+    bool detailsExpanded = false;
 };
 
 HWND SummaryReviewControl(HWND window, const int id)
@@ -98,7 +99,10 @@ void RefreshWindowsSummarySend(HWND window, WindowsBenchmarkSummaryReviewState& 
 {
     const bool available = state.submission.Available(state.prepared.IsPublicPreview());
     SetWindowTextW(SummaryReviewControl(window, kSummarySend), available ?
-        L"Send / check receipt (local test only)" : L"Sending unavailable");
+        (state.submission.services.synthetic ? L"Send / check receipt (local test only)" :
+            state.prepared.IsPublicPreview() ?
+                (state.submission.Result() == horde::platform::windows::WindowsPlaytestSubmissionResult::Queued ?
+                    L"Check publication (verify again)" : L"Verify and publish to website") : L"Verify and send privately") : L"Sending unavailable");
     EnableWindow(SummaryReviewControl(window, kSummarySendConsent), available && state.prepared.IsReady() && !state.submission.Busy());
     EnableWindow(SummaryReviewControl(window, kSummarySend), state.submission.CanSend());
     EnableWindow(SummaryReviewControl(window, kSummaryCancelSend), state.submission.Busy());
@@ -115,11 +119,10 @@ void LayoutWindowsSummaryReview(HWND window)
     const int buttonY = client.bottom - margin - button, buttonWidth = (width - gap * 2) / 3;
     const int viewport = std::max(1, buttonY - gap - margin);
     MoveWindow(SummaryReviewControl(window, kSummaryBodyPanel), margin, margin, width, viewport, TRUE);
-    const int header = SummaryReviewScale(window, 72) + gap + button + gap + 4 * line + 3 * gap + button + gap + line;
-    const int previewHeight = std::max(SummaryReviewScale(window, 100), viewport - header - gap - 2 * line);
-    const int contentHeight = header + previewHeight + gap + 5 * line + 2 * button + 4 * gap + SummaryReviewScale(window, 100);
     auto* state = reinterpret_cast<WindowsBenchmarkSummaryReviewState*>(GetWindowLongPtrW(window, GWLP_USERDATA));
     if (!state) return;
+    const int detailsHeight = state->detailsExpanded ? SummaryReviewScale(window, 260) + 2 * gap : 0;
+    const int contentHeight = SummaryReviewScale(window, 72) + 10 * line + 5 * button + 11 * gap + detailsHeight;
     state->scrollOffset = std::clamp(state->scrollOffset, 0, std::max(0, contentHeight - viewport));
     SCROLLINFO scroll{sizeof(SCROLLINFO), SIF_RANGE | SIF_PAGE | SIF_POS};
     scroll.nMin = 0; scroll.nMax = contentHeight - 1; scroll.nPage = static_cast<UINT>(viewport); scroll.nPos = state->scrollOffset;
@@ -130,18 +133,22 @@ void LayoutWindowsSummaryReview(HWND window)
     int y = 0;
     place(kSummaryIntro, y, SummaryReviewScale(window, 72)); y += SummaryReviewScale(window, 72) + gap;
     place(kSummaryAudience, y, button); y += button + gap;
-    place(kSummaryConsent, y, line); y += line + gap;
     place(kSummaryHardware, y, line); y += line + gap;
     place(kSummaryCoolingLabel, y, line); y += line;
     place(kSummaryCooling, y, line + SummaryReviewScale(window, 100)); y += line + gap;
     place(kSummaryPrepare, y, button); y += button + gap;
-    place(kSummaryPreviewLabel, y, line); y += line;
-    place(kSummaryPreview, y, previewHeight); y += previewHeight + gap;
-    place(kSummaryStatus, y, line * 3); y += line * 3 + gap;
-    place(kSummarySendConsent, y, line * 2); y += line * 2 + gap;
-    place(kSummarySendPreview, y, SummaryReviewScale(window, 100)); y += SummaryReviewScale(window, 100) + gap;
+    place(kSummaryPreviewLabel, y, 2 * line); y += 2 * line + gap;
+    place(kSummarySendConsent, y, 2 * line); y += 2 * line + gap;
     place(kSummarySend, y, button); y += button + gap;
-    place(kSummaryCancelSend, y, button);
+    place(kSummaryStatus, y, 3 * line); y += 3 * line + gap;
+    place(kSummaryCancelSend, y, button); y += button + gap;
+    place(kSummaryDetails, y, button); y += button + gap;
+    ShowWindow(SummaryReviewControl(window, kSummaryPreview), state->detailsExpanded ? SW_SHOW : SW_HIDE);
+    ShowWindow(SummaryReviewControl(window, kSummarySendPreview), state->detailsExpanded ? SW_SHOW : SW_HIDE);
+    if (state->detailsExpanded) {
+        place(kSummaryPreview, y, SummaryReviewScale(window, 160)); y += SummaryReviewScale(window, 160) + gap;
+        place(kSummarySendPreview, y, SummaryReviewScale(window, 100));
+    }
     int x = margin;
     for (const int id : {kSummaryCopy, kSummarySave, kSummaryClose})
     { MoveWindow(SummaryReviewControl(window, id), x, buttonY, buttonWidth, button, TRUE); x += buttonWidth + gap; }
@@ -188,26 +195,28 @@ void SelectWindowsSummaryAudience(HWND window, WindowsBenchmarkSummaryReviewStat
     state.submission.Clear(); KillTimer(window, kSummarySendTimer);
     state.prepared.SelectPublic(publicPreview);
     state.preview.clear(); state.saved = false;
-    SetWindowTextW(window, publicPreview ? L"Public statistics preview - local only" : L"Review statistics - local JSON");
+    state.scrollOffset = 0; state.detailsExpanded = false;
+    SetWindowTextW(window, publicPreview ? L"Publish to Horde results website" : L"Send privately to developer");
     SetWindowTextW(SummaryReviewControl(window, kSummaryIntro), publicPreview ?
-        L"Local preview of aggregate public statistics. Nothing is uploaded or published. Private IDs and raw frame rows are omitted. Results are unverified and unranked; measured thermals and display FPS are unavailable." :
-        L"Review a completed benchmark as local JSON. Nothing is sent. Prepare consent and hardware inclusion start OFF. Optional hardware contains only the Vulkan GPU/API; PC model is Unknown.");
+        L"Share this benchmark on the public Horde results website. Preview first, then approve publication. A brief anti-spam verification opens when sending. No personal identifiers or raw frame rows are shared. Community results are unverified and unranked." :
+        L"Send this benchmark privately to the developer. It will not appear on the results website. Preview first, then approve sending. Hardware labels are optional; no PC identifier is shared.");
     SetWindowTextW(SummaryReviewControl(window, kSummaryAudience), publicPreview ?
-        L"Review private statistics instead" : L"Preview public statistics instead");
-    SetWindowTextW(SummaryReviewControl(window, kSummaryConsent), publicPreview ?
-        L"I consent to prepare a local public preview (does not publish)" : L"I consent to prepare this local statistics report");
+        L"Send privately to developer instead" : L"Publish to results website instead");
     SetWindowTextW(SummaryReviewControl(window, kSummaryPreview), L"");
     SetWindowTextW(SummaryReviewControl(window, kSummarySendPreview), L"");
     SetWindowTextW(SummaryReviewControl(window, kSummarySendConsent), publicPreview ?
-        L"Separately approve this public projection for publication (Send payload below; token excluded)" :
-        L"Separately approve private developer delivery (Send payload below; never public)");
+        L"I agree to publish this reviewed benchmark on the public results website." :
+        L"I agree to send this reviewed benchmark privately to the developer.");
     SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_SETCHECK, BST_UNCHECKED, 0);
-    SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryHardware), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryCooling), CB_SETCURSEL, 0, 0);
-    for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling}) EnableWindow(SummaryReviewControl(window, id), TRUE);
-    for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
-    SetSummaryReviewStatus(window, L"Review type selected. Consent, hardware and cooling choices reset. Nothing was sent.");
+    for (const int id : {kSummaryHardware, kSummaryCooling}) EnableWindow(SummaryReviewControl(window, id), TRUE);
+    for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
+    EnableWindow(SummaryReviewControl(window, kSummaryPrepare), TRUE);
+    SetWindowTextW(SummaryReviewControl(window, kSummaryPreviewLabel), L"Choose optional details, then review the report. Nothing has been sent.");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryDetails), L"Show technical details (JSON)");
+    SetSummaryReviewStatus(window, L"Not sent. Previewing does not publish or send anything.");
+    LayoutWindowsSummaryReview(window);
     RefreshWindowsSummarySend(window, state);
 }
 
@@ -222,39 +231,40 @@ bool CreateWindowsSummaryReviewControls(HWND window, WindowsBenchmarkSummaryRevi
         return CreateWindowExW(extra, kind, text, WS_CHILD | WS_VISIBLE | style, 0, 0, 10, 10, parent,
             reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), GetModuleHandleW(nullptr), nullptr) != nullptr;
     };
-    if (!add(L"STATIC", L"Review a completed benchmark as local JSON. Nothing is sent. Prepare consent and hardware inclusion start OFF. Optional hardware contains only the Vulkan GPU/API; PC model is Unknown.", SS_LEFT | SS_NOPREFIX, kSummaryIntro) ||
+    if (!add(L"STATIC", L"Send this benchmark privately to the developer. It will not appear on the results website. Preview first, then approve sending. Hardware labels are optional; no PC identifier is shared.", SS_LEFT | SS_NOPREFIX, kSummaryIntro) ||
         !add(L"BUTTON", L"Preview public statistics instead", BS_PUSHBUTTON | WS_TABSTOP, kSummaryAudience) ||
-        !add(L"BUTTON", L"I consent to prepare this local statistics report", BS_AUTOCHECKBOX | WS_TABSTOP, kSummaryConsent) ||
         !add(L"BUTTON", L"Include basic hardware labels (optional)", BS_AUTOCHECKBOX | WS_TABSTOP, kSummaryHardware) ||
         !add(L"STATIC", L"Cooling declaration (optional; not a sensor measurement)", SS_LEFT | SS_NOPREFIX, kSummaryCoolingLabel) ||
         !add(L"COMBOBOX", L"", CBS_DROPDOWNLIST | WS_TABSTOP | WS_VSCROLL, kSummaryCooling) ||
-        !add(L"BUTTON", L"Prepare JSON for review", BS_PUSHBUTTON | WS_TABSTOP, kSummaryPrepare) ||
-        !add(L"STATIC", L"Exact prepared JSON (read-only)", SS_LEFT, kSummaryPreviewLabel) ||
+        !add(L"BUTTON", L"Review report", BS_PUSHBUTTON | WS_TABSTOP, kSummaryPrepare) ||
+        !add(L"STATIC", L"Choose optional details, then review the report.", SS_LEFT | SS_NOPREFIX, kSummaryPreviewLabel) ||
         !add(L"EDIT", L"", ES_READONLY | ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP, kSummaryPreview, WS_EX_CLIENTEDGE) ||
         !add(L"STATIC", L"Choose consent, then Prepare. Copy and Save remain separate explicit actions.", SS_LEFT | SS_NOPREFIX, kSummaryStatus) ||
-        !add(L"BUTTON", L"Separately approve private developer delivery (Send payload below; never public)", BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP, kSummarySendConsent) ||
+        !add(L"BUTTON", L"I agree to send this reviewed benchmark privately to the developer.", BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP, kSummarySendConsent) ||
         !add(L"EDIT", L"", ES_READONLY | ES_MULTILINE | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP, kSummarySendPreview, WS_EX_CLIENTEDGE) ||
         !add(L"BUTTON", L"Sending unavailable", BS_PUSHBUTTON | WS_TABSTOP, kSummarySend) ||
         !add(L"BUTTON", L"Cancel send attempt", BS_PUSHBUTTON | WS_TABSTOP, kSummaryCancelSend) ||
+        !add(L"BUTTON", L"Show technical details (JSON)", BS_PUSHBUTTON | WS_TABSTOP, kSummaryDetails) ||
         !add(L"BUTTON", L"Copy JSON", BS_PUSHBUTTON | WS_TABSTOP, kSummaryCopy) ||
         !add(L"BUTTON", L"Save JSON...", BS_PUSHBUTTON | WS_TABSTOP, kSummarySave) ||
         !add(L"BUTTON", L"Close", BS_PUSHBUTTON | WS_TABSTOP, kSummaryClose)) return false;
-    SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_SETCHECK, BST_UNCHECKED, 0);
     SendMessageW(SummaryReviewControl(window, kSummaryHardware), BM_SETCHECK, BST_UNCHECKED, 0);
     HWND cooling = SummaryReviewControl(window, kSummaryCooling);
     for (const wchar_t* choice : {L"Unknown / not declared", L"No external cooling declared", L"External cooling declared"})
         SendMessageW(cooling, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(choice));
     SendMessageW(cooling, CB_SETCURSEL, 0, 0);
-    for (const int id : {kSummaryPrepare, kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
-    if (state.submission.Available(false)) SetWindowTextW(SummaryReviewControl(window, kSummarySend), L"Send / check receipt (local test only)");
+    for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), FALSE);
+    if (state.submission.Available(false)) SetWindowTextW(SummaryReviewControl(window, kSummarySend),
+        state.submission.services.synthetic ? L"Send / check receipt (local test only)" : L"Send to developer / check receipt");
     RefreshWindowsSummarySend(window, state);
-    ApplyWindowsSummaryReviewFont(window, state); LayoutWindowsSummaryReview(window); return true;
+    ApplyWindowsSummaryReviewFont(window, state);
+    SelectWindowsSummaryAudience(window, state, state.prepared.IsPublicPreview()); return true;
 }
 
 void PrepareWindowsSummaryReview(HWND window, WindowsBenchmarkSummaryReviewState& state)
 {
-    if (state.prepared.IsReady() || !state.frozen.IsReady() ||
-        SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_GETCHECK, 0, 0) != BST_CHECKED) return;
+    // The explicit Review report action authorizes local preparation only.
+    if (state.prepared.IsReady() || !state.frozen.IsReady()) return;
     const bool hardware = SendMessageW(SummaryReviewControl(window, kSummaryHardware), BM_GETCHECK, 0, 0) == BST_CHECKED;
     const LRESULT cooling = SendMessageW(SummaryReviewControl(window, kSummaryCooling), CB_GETCURSEL, 0, 0);
     if (cooling < 0 || cooling > 2) { SetSummaryReviewStatus(window, L"Choose a valid cooling declaration."); return; }
@@ -277,9 +287,13 @@ void PrepareWindowsSummaryReview(HWND window, WindowsBenchmarkSummaryReviewState
     if (!accepted)
     { SetSummaryReviewStatus(window, L"The bounded statistics report could not be prepared. Nothing was copied or saved."); return; }
     SetWindowTextW(SummaryReviewControl(window, kSummaryPreview), state.preview.c_str());
-    for (const int id : {kSummaryConsent, kSummaryHardware, kSummaryCooling, kSummaryPrepare}) EnableWindow(SummaryReviewControl(window, id), FALSE);
+    for (const int id : {kSummaryHardware, kSummaryCooling, kSummaryPrepare}) EnableWindow(SummaryReviewControl(window, id), FALSE);
     for (const int id : {kSummaryCopy, kSummarySave}) EnableWindow(SummaryReviewControl(window, id), TRUE);
-    SetSummaryReviewStatus(window, L"Review these fixed bytes. Copy or Save only when you choose; nothing is sent.");
+    const std::wstring summary = L"Ready to share: " + std::to_wstring(state.frozen.Data().overall.frames) +
+        L" measured frames; aggregate timings and graphics settings. " +
+        (hardware ? L"GPU/API labels included." : L"Optional hardware labels excluded.");
+    SetWindowTextW(SummaryReviewControl(window, kSummaryPreviewLabel), summary.c_str());
+    SetSummaryReviewStatus(window, L"Not sent. Check the consent box, then choose Publish or Send. Exact data is under Technical details.");
     RefreshWindowsSummarySend(window, state);
 }
 
@@ -357,18 +371,22 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
                 RefreshWindowsSummarySend(window, *state); return 0;
             }
             case kSummarySend:
-                if (SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED && state->submission.Send(window))
-                    SetSummaryReviewStatus(window, L"Local test request started. No real report is being sent.");
+                if (SendMessageW(SummaryReviewControl(window, kSummarySendConsent), BM_GETCHECK, 0, 0) == BST_CHECKED) {
+                    if (state->submission.Send(window))
+                        SetSummaryReviewStatus(window, state->submission.services.synthetic ? L"Local test request started. No real report is being sent." : L"Sending the reviewed payload. Cancellation cannot prove it was not accepted.");
+                    else SetSummaryReviewStatus(window, L"Verification cancelled or unavailable. Choose Send to try again; no new request started.");
+                }
                 RefreshWindowsSummarySend(window, *state); return 0;
             case kSummaryCancelSend:
                 state->submission.CancelAttempt(); RefreshWindowsSummarySend(window, *state);
                 SetSummaryReviewStatus(window, L"Attempt cancelled; acceptance may be unknown. Retry explicitly with the same payload."); return 0;
             case kSummaryAudience:
                 SelectWindowsSummaryAudience(window, *state, !state->prepared.IsPublicPreview()); return 0;
-            case kSummaryConsent:
-                if (!state->prepared.IsReady()) EnableWindow(SummaryReviewControl(window, kSummaryPrepare),
-                    SendMessageW(SummaryReviewControl(window, kSummaryConsent), BM_GETCHECK, 0, 0) == BST_CHECKED);
-                return 0;
+            case kSummaryDetails:
+                state->detailsExpanded = !state->detailsExpanded;
+                SetWindowTextW(SummaryReviewControl(window, kSummaryDetails), state->detailsExpanded ?
+                    L"Hide technical details" : L"Show technical details (JSON)");
+                LayoutWindowsSummaryReview(window); return 0;
             case kSummaryPrepare: PrepareWindowsSummaryReview(window, *state); return 0;
             case kSummaryCopy:
                 SetSummaryReviewStatus(window, CopyWindowsSummaryJson(window, *state) ?
@@ -401,7 +419,8 @@ LRESULT CALLBACK WindowsSummaryReviewWindowProc(HWND window, UINT message, WPARA
     return DefWindowProcW(window, message, wParam, lParam);
 }
 
-void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::FrozenBenchmarkSummary& frozen) noexcept
+void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::FrozenBenchmarkSummary& frozen,
+    horde::platform::windows::WindowsStatisticsSendServices services = {}, bool publicWebsite = false) noexcept
 {
     if (!frozen.IsReady() || !IsWindow(owner)) return;
     HWND window = nullptr;
@@ -411,6 +430,8 @@ void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::Froze
     {
         state = std::make_unique<WindowsBenchmarkSummaryReviewState>();
         state->frozen = frozen;
+        state->prepared.SelectPublic(publicWebsite);
+        state->submission.services=std::move(services);
         WNDCLASSEXW cls{}; cls.cbSize = sizeof(cls); cls.lpfnWndProc = WindowsSummaryReviewWindowProc;
         cls.hInstance = GetModuleHandleW(nullptr); cls.hCursor = LoadCursorW(nullptr, MAKEINTRESOURCEW(32512));
         cls.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_BTNFACE + 1); cls.lpszClassName = kSummaryReviewWindowClass;
@@ -429,7 +450,7 @@ void ShowWindowsBenchmarkSummaryReview(HWND owner, const horde::telemetry::Froze
             x, y, width, height, owner, nullptr, GetModuleHandleW(nullptr), state.get());
         if (!window) return;
         EnableWindow(owner, FALSE); ShowWindow(window, SW_SHOW); UpdateWindow(window);
-        SetFocus(SummaryReviewControl(window, kSummaryConsent));
+        SetFocus(SummaryReviewControl(window, kSummaryPrepare));
         MSG message{};
         while (IsWindow(window) && IsWindow(owner))
         {

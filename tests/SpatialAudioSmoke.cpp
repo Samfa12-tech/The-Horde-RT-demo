@@ -13,6 +13,7 @@
 #include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/SpatialAudio.h"
 #include "audio/LichRevivalAudio.h"
+#include "audio/ChapterDialogueSpatial.h"
 #include <limits>
 #include "gameplay/simulation/BoundedTransportQueue.h"
 #include "gameplay/simulation/GameplayEvent.h"
@@ -75,6 +76,37 @@ int main()
     using horde::gameplay::simulation::GameplayEvent;
     using horde::gameplay::simulation::GameplayEventType;
     using horde::gameplay::simulation::EntityId;
+    {
+        GameplayEvent contact;
+        contact.type=GameplayEventType::PlayerGuardBlocked;
+        contact.source=EntityId::Player;contact.target=EntityId::SkeletonB;
+        contact.sequence=0x12345678u;contact.worldY=.41f;contact.listenerY=.76f;
+        auto packed=horde::platform::android::PackGameplayEventMetadata(contact);
+        check(static_cast<unsigned>(contact.type)==37 && (packed&255)==37 &&
+              ((packed>>24)&255)==static_cast<unsigned>(CombatAudioCue::GuardBlock) &&
+              (packed>>32)==contact.sequence,
+              "guard contact appends one ID and preserves the semantic cue/sequence words");
+        check(CombatCueForEvent(contact)==CombatAudioCue::GuardBlock &&
+              CombatCueForEvent(contact,false)==CombatAudioCue::None &&
+              std::string(CombatAudioClip(CombatCueForEvent(contact)))=="sword_hit_1.wav",
+              "an actual guard contact selects the admitted non-parry impact cue");
+        contact.type=GameplayEventType::EnemyHit;
+        check(CombatCueForEvent(contact)==CombatAudioCue::SkeletonHit,
+              "either skeleton selects its hit cue from target identity");
+        contact.target=EntityId::Lich;
+        check(CombatCueForEvent(contact)==CombatAudioCue::KeeperHit,
+              "Keeper hits retain their own hurt/impact rather than a fencing layer");
+        contact.source=EntityId::SkeletonA;
+        check(CombatCueForEvent(contact)==CombatAudioCue::None,
+              "incoming damage cannot masquerade as a successful outgoing hit");
+        contact.source=EntityId::Player;
+        for(auto type:{GameplayEventType::PlayerParrySucceeded,GameplayEventType::PlayerSwing,
+                       GameplayEventType::ParryPrepareCue,GameplayEventType::EnemyDefeated}) {
+            contact.type=type;
+            check(CombatCueForEvent(contact)==CombatAudioCue::None,
+                  "preparation, swing, parry and delayed fall retain separate cue ownership");
+        }
+    }
     for (const auto [type, expectedId] : {
              std::pair{GameplayEventType::ParryPrepareCue, 24u},
              std::pair{GameplayEventType::LichDischargeWarning, 25u}})
@@ -423,6 +455,10 @@ int main()
     {
         const std::string windowsSource =
             ReadTextFile(root / "src/platform/windows/DiagnosticWindow.cpp");
+        const std::string windowsRetrySource =
+            ReadTextFile(root / "src/platform/windows/windows_player_retry.inl");
+        const std::string combatFeedbackSource =
+            ReadTextFile(root / "src/gameplay/CombatFeedback.h");
         const std::string androidSource = ReadTextFile(
             root / "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java");
         const std::string androidBuildSource = ReadTextFile(root / "android/app/build.gradle");
@@ -439,6 +475,32 @@ int main()
             return start == std::string::npos || stop == std::string::npos
                 ? std::string{} : source.substr(start, stop - start);
         };
+        const auto androidCombat = section(androidSource,
+            "case PLATFORM_EVENT_ENEMY_HIT:", "case PLATFORM_EVENT_ENEMY_DEFEATED:");
+        check(androidCombat.find("CombatAudioFeedback.soundKey(")!=std::string::npos &&
+              androidCombat.find("case CombatAudioFeedback.GUARD_BLOCK_EVENT:")!=std::string::npos &&
+              androidCombat.find("!menuVisible")!=std::string::npos &&
+              androidCombat.find("swingVariant")==std::string::npos &&
+              androidCombat.find("performHaptic")==std::string::npos,
+              "Android consumes native contact cues with active-owner gating and no free parry haptic");
+        const auto windowsCombat = section(windowsSource,
+            "case GameplayEventType::EnemyHit:", "case GameplayEventType::EnemyDefeated:");
+        check(windowsCombat.find("PlayerGuardBlocked")!=std::string::npos &&
+              windowsCombat.find("CombatCueForEvent(event,")!=std::string::npos &&
+              windowsCombat.find("IsDesktopGameplayAvailable(context)")!=std::string::npos &&
+              windowsCombat.find("CombatAudioClip(cue)")!=std::string::npos,
+              "Windows routes the same contact identity through the existing positional/SFX owner");
+        horde::gameplay::dialogue::Snapshot speech{};
+        speech.source={2.f,0.f,0.f};speech.listener={0.f,0.f,0.f};
+        speech.line=horde::gameplay::dialogue::Line::RescueFound;
+        const auto rescueSpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        speech.line=horde::gameplay::dialogue::Line::Grate;
+        const auto ordinarySpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        check(StereoPower(rescueSpeech)>StereoPower(ordinarySpeech) && rescueSpeech.right>rescueSpeech.left,
+              "shared rescue speech increases near-shaft audibility while retaining world panning");
+        speech.source.x=20.f;
+        const auto beyondSpeech=horde::audio::ChapterDialogueSpatial(speech,SpatialAudioDomain::DungeonRoute);
+        check(StereoPower(beyondSpeech)==0.f,"shared dialogue retains bounded world range");
         const auto chapterPublish = section(androidBridgeSource,
             "void PublishSimulationUiState()", "gKeeperTitleOpacity.store(");
         const auto lockedChapterPublish = section(chapterPublish,
@@ -454,7 +516,7 @@ int main()
               lockedChapterRead.find("snapshot = gChapterDialogueUiSnapshot;") != std::string::npos &&
               lockedChapterRead.find("domain = gChapterDialogueUiAudioDomain;") != std::string::npos &&
               chapterRead.find("static_cast<jlong>(snapshot.generation) != generation) return 0;") != std::string::npos &&
-              chapterRead.find("snapshot.listenerYaw, snapshot.listener.y}, domain)") != std::string::npos,
+              chapterRead.find("horde::audio::ChapterDialogueSpatial(snapshot, domain)") != std::string::npos,
               "Android dialogue domain and frozen tuple cross the same mutex publication and retain the line-generation guard");
         const auto windowsChapter = section(windowsSource,
             "void UpdateChapterDialogueAudio(", "void RefreshChapterSubtitle(");
@@ -462,9 +524,9 @@ int main()
               windowsChapter.find("const auto& dialogue = simulation.chapterDialogue;") != std::string::npos &&
               windowsChapter.find("horde::gameplay::ResolveSpatialAudioDomain(") != std::string::npos &&
               windowsChapter.find("simulation.developmentRescueJourney, simulation.worldRoute.current") != std::string::npos &&
-              windowsChapter.find(".36f, 1.0f, 14.0f, dialogue.source.y}") != std::string::npos &&
-              chapterRead.find("0.36f, 1.0f, 14.0f, snapshot.source.y}") != std::string::npos,
-              "both dialogue consumers opt into the same authoritative domain without changing speech gain or frozen positions");
+              windowsChapter.find("horde::audio::ChapterDialogueSpatial(dialogue,") != std::string::npos &&
+              chapterRead.find("horde::audio::ChapterDialogueSpatial(snapshot, domain)") != std::string::npos,
+              "both dialogue consumers use the shared speech policy with the authoritative domain and frozen snapshot");
         const auto updateDialogueMatrix = section(windowsSource,
             "void UpdateDialogueSpatial(", "void UpdateOwnedGain(");
         check(updateDialogueMatrix.find("if (line == 0u || generation == 0u) return;") != std::string::npos &&
@@ -481,7 +543,7 @@ int main()
         const auto sameVoiceReturn = windowsChapter.find("if (sameVoice) return;");
         check(windowsChapter.find("const bool sameVoice = context.playingDialogueLine == lineId &&") != std::string::npos &&
               windowsChapter.find("context.playingDialogueGeneration == dialogue.generation;") != std::string::npos &&
-              windowsChapter.find("CalculateSpatialAudio(") < windowsChapter.find("UpdateDialogueSpatial(") &&
+              windowsChapter.find("ChapterDialogueSpatial(") < windowsChapter.find("UpdateDialogueSpatial(") &&
               windowsChapter.find("UpdateDialogueSpatial(lineId, dialogue.generation, gains.left, gains.right)") <
                   windowsChapter.find("PauseDialogue(paused)") &&
               windowsChapter.find("if (paused) return;") < sameVoiceReturn &&
@@ -535,11 +597,13 @@ int main()
               windowsSource.find("context.delayedFeedback.DrainDue(GetTickCount64()") != std::string::npos &&
               windowsSource.find("PlayPositionalSoundEffect(context, \"skeleton_falling_bones.wav\", 0.36f, event, \"pixabay\")") != std::string::npos &&
               windowsSource.find("GetTickCount64() + horde::gameplay::kEnemyImpactFallDelayMilliseconds") != std::string::npos &&
-              section(windowsSource, "void ResetRoute(", "bool ApplyPlayerRetryCheckpoint(")
+              section(windowsSource, "void ResetRoute(", "void TryGrantRtLabUnlock(")
                   .find("context.delayedFeedback.Clear();") != std::string::npos &&
-              section(windowsSource, "bool ApplyPlayerRetryCheckpoint(", "const char* PresentModeName(")
-                  .find("context.delayedFeedback.Clear();") != std::string::npos &&
-              windowsSource.find("PlayPositionalSoundEffect(context, \"sword_hit_1.wav\"") != std::string::npos,
+              windowsRetrySource.find("bool ApplyPlayerRetryCheckpoint(") != std::string::npos &&
+              windowsRetrySource.find("context.delayedFeedback.Clear();") != std::string::npos &&
+              windowsSource.find("CombatCueForEvent(event,") != std::string::npos &&
+              windowsSource.find("PlayPositionalSoundEffect(context, clip, gain, event);") != std::string::npos &&
+              combatFeedbackSource.find("return \"sword_hit_1.wav\";") != std::string::npos,
               "Windows must retain positional sword impact, ordered licensed bones fall, 140 ms scheduling and reset/retry cancellation");
         check(androidSource.find("case PLATFORM_EVENT_ENEMY_DEFEATED:") != std::string::npos &&
               androidSource.find("ENEMY_IMPACT_FALL_DELAY_MILLISECONDS") != std::string::npos &&
@@ -680,7 +744,7 @@ int main()
         using namespace horde::gameplay::simulation;
         GameplayEvent cry;cry.type=GameplayEventType::LichRevivalCry;cry.source=EntityId::Lich;cry.target=EntityId::Player;
         cry.worldX=-32.2f;cry.worldZ=-13.1f;cry.listenerX=-5.5f;cry.listenerZ=-15.2f;
-        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==37u && horde::audio::IsLichRevivalCry(cry),
+        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==38u && horde::audio::IsLichRevivalCry(cry),
               "revival appends ID36/count37 without reusing damage or reveal IDs");
         const auto emitted=horde::audio::LichRevivalEmitter(cry);
         const auto routed=CalculateSpatialAudio(emitted,{cry.listenerX,cry.listenerZ,0.f,cry.listenerY});

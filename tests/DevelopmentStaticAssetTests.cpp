@@ -69,8 +69,30 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 111u,
-          "development registry retains prior views and adds two bounded retention views");
+    Check(kDevelopmentCheckpoints.size() == 118u,
+          "development registry retains prior views and adds authoritative ring and accepted-hit views");
+    {
+        simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
+        const auto* hit=FindDevelopmentCheckpoint(238);
+        Check(hit && StageDevelopmentCheckpointSimulation(staged,*hit) && staged.Snapshot().enemyHitParticles.Active(),
+              "hit feedback capture requires a real successful sword damage burst");
+    }
+    for(int id=234;id<=237;++id) {
+        const auto* view=FindDevelopmentCheckpoint(id);
+        simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
+        Check(view && StageDevelopmentCheckpointSimulation(staged,*view) &&
+              staged.Snapshot().attackWarning.source!=simulation::EntityId::Invalid &&
+              !staged.Snapshot().combatTeaching.enabled,
+              "ring capture reaches a real authoritative attack with lessons disabled");
+    }
+    for(const auto name : {"chapter-demo-endpoint", "chapter-demo-endpoint-return"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && view->stagesRescueExterior && view->exteriorRouteStation==7u &&
+              view->walksBeyondExteriorStation &&
+              std::abs(view->cameraX-simulation::kPrivateChapterDemoEndpoint.x)<.00001f &&
+              std::abs(view->cameraZ-simulation::kPrivateChapterDemoEndpoint.z)<.00001f,
+              "endpoint views walk from F04 to the mapped turnaround through simulation");
+    }
     for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
         const auto* view=FindDevelopmentCheckpoint(name);
         Check(view && view->id>=230 && view->id<=231 &&

@@ -1,5 +1,9 @@
 # Horde 1.7 current design index
 
+**31 October contact-feedback checkpoint:** [ordinary guard-contact audio and deterministic enemy-hit cues](../evidence/2026-10-31-combat-contact-feedback/README.md) have source/host/build evidence, with manual listening pending. Directional particles and material-strike feedback remain unfinished; no visual acceptance or phone-performance result follows from the audio slice.
+
+**31 October bounded follow-up:** the [roadmap owner refinement](../ROADMAP.md#17---beyond-the-tomb) records combat feedback, 360-degree woodland and input switching priorities. The first [Windows keyboard-to-mouse-look handoff candidate](../evidence/2026-10-31-windows-input-handoff/README.md) has source/host/build evidence only; native controller-to-keyboard/mouse acceptance remains pending. No new renderer experiment or normal feature gate is enabled.
+
 **30 October integration:** [PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27) merged to main at `f0cea47b`; it is no longer an open/conflicted draft. Full 1.7 remains unfinished and unreleased; normal experimental gates remain OFF. The merge receipt records the targeted R15 torch-drop/death/Retry owner pass; it does not certify universal crash freedom or the whole chapter. Earlier conflict/pending statements below are dated history. The [current experiment ledger](../PERFORMANCE_EXPERIMENT_LEDGER.md) includes the later [28 October actor-worker phone result](../evidence/2026-10-28-actor-worker-phone/README.md): no causal gain and no normal worker admission.
 
 28October: the [Android actor-worker preparation](../evidence/2026-10-28-actor-worker-android/README.md)
@@ -1973,3 +1977,9 @@ all sixteen fresh shader artifacts are checked locally, with retained sandbox
 and readiness failures. Exact CI belongs to its new pushed SHA. Ordinary
 incremental zone streaming and the remaining chapter presentation/physical
 gates remain open; the full-owner diagnostic does not establish eviction.
+
+- [31 October enemy-hit particle source candidate](../evidence/2026-10-31-enemy-hit-particles/README.md): bounded successful-contact bone/dark-drop fans on the shared mote path; native visual/phone cost unaccepted, no forest change.
+
+- [31 October F01 north68 prototype](../evidence/2026-10-31-f01-north68/README.md): exclusive four-tree baked stand, same-terrain native bark collision and fresh CPU retention-source proof; normal64 unchanged, actual RT/motion/device cost acceptance pending.
+
+- [31 October whole-route woodland source candidate](../evidence/2026-10-31-forest-surroundings-source/README.md): map-grounded480-tree composition, original64 intact,96 middle/320 far, original timber module and visible boundary plan. Off-corridor trees need no collision only after actual boundaries constrain access. Source/native asset intake is separate from scene/retention/RT/lifecycle/cost acceptance; no production activation or runtime LOD/capacity change.

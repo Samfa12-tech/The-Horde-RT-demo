@@ -68,6 +68,12 @@ constexpr std::array<F01AuthoringRoot,12u> kF01GroupedRootsR4{{
     {1,-53,-32,.4f},{0,-57,-34,2.4f},{0,-58,-30,1.f},{1,-60,-36,3.1f},
 }};
 
+// Independent four-root prototype authoring. Older76 layouts above remain
+// frozen controls; selection is exclusive even though the north stand coincides.
+constexpr std::array<F01AuthoringRoot,4u> kF01NorthGroveRoots{{
+    {0,-39,-34,.2f},{1,-42,-36,1.1f},{0,-37,-39,2.f},{0,-43,-41,.8f},
+}};
+
 bool SameForestMaterial(const assets::StaticMaterial& a,const assets::StaticMaterial& b)
 {
     const auto fields=[](const assets::StaticMaterial& m) {
@@ -226,7 +232,7 @@ void IncludePoint(ForestDressingBounds& bounds, const std::array<float, 3u>& poi
     }
 }
 
-void IncludeTrunkTriangle(ForestDressingBounds& bounds,
+std::vector<std::array<float,3u>> ClipTrunkTriangle(
                           std::vector<std::array<float,3u>> polygon, float floor)
 {
     // Clip actual bark surfaces to the collision slab. Merely dropping
@@ -246,7 +252,12 @@ void IncludeTrunkTriangle(ForestDressingBounds& bounds,
         }
         polygon=std::move(clipped);
     }
-    for(const auto& point:polygon)IncludePoint(bounds,point);
+    return polygon;
+}
+void IncludeTrunkTriangle(ForestDressingBounds& bounds,
+                          std::vector<std::array<float,3u>> polygon,float floor)
+{
+    for(const auto& point:ClipTrunkTriangle(std::move(polygon),floor))IncludePoint(bounds,point);
 }
 
 bool MeasureForestPlacementBounds(const PreparedForestDressing& prepared,
@@ -638,13 +649,16 @@ bool PrepareF01BackgroundForestDressing(ForestDressingSharedLayout& layout,
     diagnostic.clear();return true;
 }
 
-bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
+namespace {
+bool AppendForestPopulation(const PreparedForestDressing& prepared,
+                                 std::span<const ForestDressingSupplementalPlacement> extra,
                                  assets::StaticMeshAsset& existingOwner,
                                  ForestDressingBuildReport& report,
                                  std::string& diagnostic)
 {
     report={};
-    if(!CanAppendForest(existingOwner,diagnostic))return false;
+    if(!CanAppendForest(existingOwner,diagnostic) || !ValidSharedForestPrepared(prepared,diagnostic))return false;
+    if(!extra.empty() && extra.size()!=4u) { diagnostic="F01 prototype requires exactly four extra roots.";return false; }
     const auto& sources=prepared.masters;
     const auto& familyMaterials=prepared.materialFamilies;
     for(std::size_t tree=0;tree<sources.size();++tree) {
@@ -665,13 +679,22 @@ bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
     std::array<std::vector<assets::StaticRtVertex>, static_cast<std::size_t>(MaterialFamily::Count)> groupedVertices;
     std::array<std::vector<std::uint32_t>, static_cast<std::size_t>(MaterialFamily::Count)> groupedIndices;
     ForestDressingBuildReport candidate{};
+    candidate.placements.resize(prepared.placements.size()+extra.size());
     candidate.addedBounds.minimum.fill(std::numeric_limits<float>::max());
     candidate.addedBounds.maximum.fill(std::numeric_limits<float>::lowest());
 
-    for (std::size_t placementIndex=0;placementIndex<prepared.placements.size();++placementIndex)
+    for (std::size_t placementIndex=0;placementIndex<candidate.placements.size();++placementIndex)
     {
-        const auto& contract=gameplay::simulation::kForestTreePlacementContract[placementIndex];
-        const auto& rigid=prepared.placements[placementIndex];
+        const bool supplemental=placementIndex>=prepared.placements.size();
+        const auto extraIndex=supplemental?placementIndex-prepared.placements.size():0u;
+        const auto& rigid=supplemental?extra[extraIndex].placement:prepared.placements[placementIndex];
+        gameplay::simulation::ForestTreePlacementContract contract{};
+        if(supplemental) {
+            const auto& root=kF01NorthGroveRoots[extraIndex];
+            contract.species=root.master==0?gameplay::simulation::ForestTreeSpecies::Pine:gameplay::simulation::ForestTreeSpecies::Alder;
+            contract.x=root.x;contract.z=root.z;contract.yawRadians=root.yaw;
+            contract.rootBurialMetres=extra[extraIndex].rootBurialMetres;
+        }else contract=gameplay::simulation::kForestTreePlacementContract[placementIndex];
         const auto treeIndex=rigid.masterIndex;
         const auto expected=contract.species==gameplay::simulation::ForestTreeSpecies::Pine?0u:1u;
         if(treeIndex>=sources.size() || treeIndex!=expected || rigid.origin[0]!=contract.x || rigid.origin[2]!=contract.z ||
@@ -841,6 +864,90 @@ bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
     report = candidate;
     diagnostic.clear();
     return true;
+}
+
+} // namespace
+bool PrepareF01NorthGrovePrototype(std::shared_ptr<const PreparedForestDressing> prepared,
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain,
+    std::shared_ptr<const F01NorthGrovePrototype>& result,std::string& diagnostic)
+{
+    if(result || !prepared || !terrain || !ValidSharedForestPrepared(*prepared,diagnostic)) {
+        diagnostic="F01 north prototype requires fresh original64 preparation and actual terrain.";return false;
+    }
+    // The original64 must also match this terrain, not merely internally
+    // consistent transforms prepared against another support snapshot.
+    for(const auto& p:prepared->placements) {
+        const auto ground=terrain->Query(p.origin[0],p.origin[2]);
+        ForestRootMeasurement measured;
+        if(!ground.found || std::abs(ground.worldY-p.supportY)>.0001f ||
+           !MeasureForestRootFootprint(prepared->masters[p.masterIndex],p.origin[0],p.origin[2],p.yawRadians,
+               ground.worldY,*terrain,measured,diagnostic) || !AdmittedForestRootFootprint(measured) ||
+           std::abs(measured.fittedOriginY-p.origin[1])>.002f) {
+            diagnostic="Original64 preparation does not match the prototype terrain snapshot.";return false;
+        }
+    }
+    auto candidate=std::shared_ptr<F01NorthGrovePrototype>(new F01NorthGrovePrototype);
+    candidate->prepared_=prepared;
+    using Surface=gameplay::simulation::TriangleSupportSurface;
+    std::vector<Surface::Triangle> collision;
+    for(std::size_t i=0;i<candidate->placements_.size();++i) {
+        const auto& root=kF01NorthGroveRoots[i];
+        for(const auto& old:prepared->placements)if(old.origin[0]==root.x && old.origin[2]==root.z) {
+            diagnostic="F01 prototype duplicates an original root.";return false;
+        }
+        for(std::size_t j=0;j<i;++j)if(kF01NorthGroveRoots[j].x==root.x && kF01NorthGroveRoots[j].z==root.z) {
+            diagnostic="F01 prototype contains duplicate roots.";return false;
+        }
+        const auto ground=terrain->Query(root.x,root.z);
+        ForestRootMeasurement measured;
+        const auto& master=prepared->masters[root.master];
+        if(!ground.found || !MeasureForestRootFootprint(master,root.x,root.z,root.yaw,ground.worldY,*terrain,measured,diagnostic) ||
+            !AdmittedForestRootFootprint(measured)) {
+            diagnostic="F01 prototype root is not admitted by its actual terrain footprint.";return false;
+        }
+        auto& receipt=candidate->placements_[i];
+        receipt.placement={root.master,{root.x,measured.fittedOriginY,root.z},root.yaw,ground.worldY};
+        receipt.rootBurialMetres=measured.unburiedOriginY-measured.fittedOriginY;
+        receipt.rootTipSamples=measured.tipCount;
+        if(!MeasureForestPlacementBounds(*prepared,receipt,diagnostic))return false;
+        const float c=std::cos(root.yaw),s=std::sin(root.yaw);
+        const auto world=[&](std::size_t index) {
+            const auto& v=master.vertices[index].position;
+            return Surface::Point{c*v[0]+s*v[2]+root.x,v[1]+receipt.placement.origin[1],-s*v[0]+c*v[2]+root.z};
+        };
+        const auto start=collision.size();
+        for(std::size_t p=0;p<master.primitives.size();++p) {
+            if(prepared->primitiveFamilies[root.master][p]!=static_cast<unsigned>(MaterialFamily::Bark))continue;
+            const auto& primitive=master.primitives[p];
+            for(std::size_t n=0;n<primitive.indexCount;n+=3) {
+                std::vector<Surface::Point> triangle;
+                for(unsigned k=0;k<3;++k)triangle.push_back(world(primitive.vertexOffset+master.indices[primitive.indexOffset+n+k]));
+                const auto polygon=ClipTrunkTriangle(std::move(triangle),ground.worldY);
+                for(std::size_t k=1;k+1<polygon.size();++k) {
+                    const auto a=polygon[0],b=polygon[k],d=polygon[k+1];
+                    const double ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=d[0]-a[0],vy=d[1]-a[1],vz=d[2]-a[2];
+                    if(std::hypot(std::hypot(uy*vz-uz*vy,uz*vx-ux*vz),ux*vy-uy*vx)<=1e-10)continue;
+                    collision.push_back({{a,b,d},gameplay::simulation::SupportSurface::Earth});
+                }
+            }
+        }
+        if(collision.size()==start) {diagnostic="F01 prototype has no grounded trunk contact triangles.";return false;}
+    }
+    candidate->terrain_=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
+    if(!candidate->terrain_)return false;
+    candidate->collisionTriangles_=collision.size();
+    result=std::move(candidate);diagnostic.clear();return true;
+}
+
+bool AppendPreparedForestDressing(const PreparedForestDressing& prepared,
+    assets::StaticMeshAsset& owner,ForestDressingBuildReport& report,std::string& diagnostic)
+{
+    return AppendForestPopulation(prepared,{},owner,report,diagnostic);
+}
+bool AppendPreparedF01NorthGrove(const F01NorthGrovePrototype& prototype,
+    assets::StaticMeshAsset& owner,ForestDressingBuildReport& report,std::string& diagnostic)
+{
+    return AppendForestPopulation(prototype.Prepared(),prototype.Placements(),owner,report,diagnostic);
 }
 
 bool AppendPreparedForestDressing(const std::filesystem::path& assetRoot,

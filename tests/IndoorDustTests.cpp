@@ -1,4 +1,7 @@
 #include "scene/ShowcaseIndoorDust.h"
+#include "scene/atmosphere/HitParticleDust.h"
+#include "scene/atmosphere/ForestFireflies.h"
+#include "scene/atmosphere/ChimneySmoke.h"
 #include <iostream>
 #include <limits>
 #include <cstring>
@@ -57,5 +60,122 @@ int main(){
     check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"re-enable repopulates safely");
     cache.Commit(zones,DustQuality::Low,camera,1);cache.Invalidate();
     check(cache.Build(zones,DustQuality::Low,camera,1,frame,work)==DustUploadDecision::Changed,"lifecycle reset never reuses stale storage");
+    using namespace horde::gameplay::effects;
+    using horde::gameplay::simulation::EntityId;
+    EnemyHitParticles hits;
+    check(!hits.Active() && !hits.Add(0,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"no anonymous or preparation burst");
+    check(!hits.Add(1,EntityId::Player,{0,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{NAN,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{0,1,-2},{0,0,0}),"bad identity or contact tuple fails closed");
+    check(hits.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}) &&
+        !hits.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"one burst per accepted semantic contact");
+    hits.Step(.1f); auto frozen=hits;
+    check(HitParticlePosition(hits.bursts[0],0)[0]>0 &&
+        HitParticlePosition(hits.bursts[0],0)==HitParticlePosition(frozen.bursts[0],0),"fan follows frozen cut direction independent of render cadence");
+    auto negative=hits.bursts[0];negative.direction={-1,0,0};
+    check(HitParticlePosition(negative,0)[0]<0,"opposite cut reverses travel");
+    check(hits.Add(2,EntityId::Lich,{.1f,1,-2},{0,0,-1}),"Keeper uses second bounded burst");
+    BuildDustFrame(zones,DustQuality::Standard,camera,1,frame,work);
+    const auto bytesBefore=frame;
+    OverlayHitParticles(hits,DustQuality::Off,camera,frame,work);
+    check(std::memcmp(&frame,&bytesBefore,sizeof(frame))==0,"Off adds no contact upload or work");
+    OverlayHitParticles(hits,DustQuality::Low,camera,frame,work);
+    check(work.combatMotes==8 && frame.motes[56].response[2]==1 && frame.motes[60].response[2]==2,"Low keeps four chips/drops per real contact with distinct material tags");
+    BuildDustFrame(overlaps,DustQuality::Standard,camera,1,frame,work);
+    OverlayHitParticles(hits,DustQuality::Standard,camera,frame,work);
+    check(work.combatMotes==16 && work.combatReplacedMotes==16,"Standard shares 64 slots with explicit ambient displacement accounting");
+    unsigned references=0;
+    for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){++references;check(id<64,"combat never creates fifth tile candidate or invalid upload index");}
+    check(references==work.tileReferences,"tile accounting remains exact after displacement");
+    const auto anchor=hits.bursts[0].origin;
+    auto rotated=camera;rotated.yaw=.6f;rotated.aspect=.6f;
+    BuildDustFrame(zones,DustQuality::Low,rotated,1,repeat,again);
+    OverlayHitParticles(hits,DustQuality::Low,rotated,repeat,again);
+    check(repeat.motes[56].positionRadius==frame.motes[48].positionRadius && hits.bursts[0].origin==anchor,"camera/portrait projection never moves world burst");
+    auto copy=hits;hits.Step(kHitBurstLifetime);
+    check(!hits.Active() && copy.Active(),"all bursts expire bounded; immutable snapshot copy remains owned");
+    copy.Clear();check(!copy.Active() && !copy.Add(1,EntityId::SkeletonA,{0,1,-2},{1,0,0}),"pause/reset cancels particles and cannot replay an old semantic contact");
+    DustCamera forestCamera{{kForestFireflyPockets[0][0],1.3f,kForestFireflyPockets[0][1]+5.f},0,0,16.f/9};
+    unsigned groundCalls=0;
+    const auto ground=[&](float,float)->std::optional<float>{++groundCalls;return 0.f;};
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,frame,work);
+    const auto emptyFrame=frame;
+    for(auto q:{DustQuality::Off,DustQuality::Low}) {
+        check(OverlayForestFireflies(q,forestCamera,2,ground,frame,work)==0 && groundCalls==0 &&
+            std::memcmp(&frame,&emptyFrame,sizeof(frame))==0,"Low/Off fireflies do no ground queries or uploads");
+    }
+    const auto flies=OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
+    check(flies==4 && work.generatedMotes==4 && work.projectedMotes>0,"nearby forest pocket produces only four bounded fireflies");
+    for(const auto& pocket:kForestFireflyPockets) {
+        auto approach=forestCamera;approach.origin={pocket[0],1.3f,pocket[1]-5.f};approach.yaw=3.14159265359f;
+        DustFrame routeFrame;DustWork routeWork;
+        BuildDustFrame({},DustQuality::Standard,approach,2,routeFrame,routeWork);
+        check(OverlayForestFireflies(DustQuality::Standard,approach,2,ground,routeFrame,routeWork)==4 && routeWork.projectedMotes>0,
+            "each current forest-route pocket projects its existing four motes from the forward approach");
+    }
+    const auto firstFlies=frame;
+    for(unsigned i=0;i<flies;++i)check(frame.motes[i].response[2]==3 && frame.motes[i].positionRadius[1]>.5f &&
+        frame.motes[i].positionRadius[1]<1.6f,"fireflies follow real ground and carry emissive type");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,repeat,again);
+    auto nearbyCamera=forestCamera;nearbyCamera.origin[0]+=.1f;
+    OverlayForestFireflies(DustQuality::Standard,nearbyCamera,2,ground,repeat,again);
+    check(repeat.motes[0].positionRadius==firstFlies.motes[0].positionRadius,"fireflies are world anchored, not camera following");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2.01,repeat,again);
+    OverlayForestFireflies(DustQuality::Standard,forestCamera,2.01,ground,repeat,again);
+    const auto p0=firstFlies.motes[0].positionRadius,p1=repeat.motes[0].positionRadius;
+    check(p0!=p1 && std::abs(p0[0]-p1[0])<.002f && std::abs(p0[1]-p1[1])<.002f &&
+        std::abs(p0[2]-p1[2])<.002f,"firefly motion is gentle and simulation-time driven");
+    BuildDustFrame({},DustQuality::Standard,forestCamera,2,repeat,again);
+    check(OverlayForestFireflies(DustQuality::Standard,forestCamera,2,
+        [](float,float)->std::optional<float>{return std::nullopt;},repeat,again)==0 && again.generatedMotes==0,
+        "missing ground produces no invented firefly height");
+    DustCamera distant=forestCamera;distant.origin[0]+=100;
+    groundCalls=0;
+    check(OverlayForestFireflies(DustQuality::Standard,distant,2,ground,repeat,again)==0 && groundCalls==0,
+        "distant forest skips ground work entirely");
+    // Dense ambient input plus contact feedback must retain the64-slot contract.
+    BuildDustFrame(overlaps,DustQuality::Standard,camera,2,frame,work);
+    OverlayForestFireflies(DustQuality::Standard,forestCamera,2,ground,frame,work);
+    EnemyHitParticles mixed;
+    mixed.Add(1,EntityId::SkeletonA,{kForestFireflyPockets[0][0],1,kForestFireflyPockets[0][1]+2.f},{1,0,0});
+    mixed.Add(2,EntityId::Lich,{kForestFireflyPockets[0][0],1,kForestFireflyPockets[0][1]+2.f},{1,0,0});
+    OverlayHitParticles(mixed,DustQuality::Standard,forestCamera,frame,work);
+    check(work.generatedMotes<=64 && work.combatMotes==16 && frame.motes[48].response[2]==1 &&
+        frame.motes[56].response[2]==2,"fireflies preserve contact priority and fixed upload capacity");
+    references=0;
+    for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){++references;check(id<64,"firefly tile indices bounded");}
+    check(references==work.tileReferences,"firefly/contact tile references remain exactly accounted");
+    BuildDustFrame({},DustQuality::Low,forestCamera,2,repeat,again);
+    check(again.generatedMotes==0,"Standard to Low rebuild clears fireflies");
+    const DustCamera townCamera{{80.f,8.f,80.f},2.8f,-.10f,16.f/9.f};
+    for(auto q:{DustQuality::Off,DustQuality::Low,DustQuality::Standard}) {
+        frame={};for(auto& tile:frame.tiles)tile.fill(kDustEmptyCandidate);
+        BuildDustFrame({},q,townCamera,4,frame,work);
+        const auto untouched=frame;
+        const auto emitted=OverlayChimneySmoke(q,townCamera,4,frame,work);
+        check(q==DustQuality::Off ? emitted==0 && std::memcmp(&untouched,&frame,sizeof(frame))==0 :
+            emitted>0 && emitted<=(q==DustQuality::Low?9u:15u),"smoke has bounded quality counts and a byte-neutral Off path");
+        check(work.smokeMotes==emitted && work.generatedMotes<48,"smoke reserves combat slots");
+        references=0;
+        for(auto tile:frame.tiles)for(auto id:tile)if(id!=kDustEmptyCandidate){
+            ++references;check(id<work.generatedMotes,"smoke projection indices belong to live slots");}
+        check(references==work.tileReferences,"smoke tile references accounted exactly");
+        for(unsigned i=0;i<emitted;++i)check(frame.motes[i].response[2]==0 && frame.motes[i].response[0]<=.28f,
+            "smoke reuses lit particles, not emissive fireflies");
+        const auto frozen=frame;
+        repeat={};for(auto& tile:repeat.tiles)tile.fill(kDustEmptyCandidate);
+        BuildDustFrame({},q,townCamera,4,repeat,again);
+        OverlayChimneySmoke(q,townCamera,4,repeat,again);
+        check(std::memcmp(&frozen,&repeat,sizeof(frame))==0,"recreation at fixed simulation time is deterministic");
+    }
+    BuildDustFrame({},DustQuality::Standard,townCamera,4,frame,work);
+    check(OverlayChimneySmoke(DustQuality::Standard,townCamera,std::numeric_limits<double>::quiet_NaN(),frame,work)==0,
+        "nonfinite smoke time fails closed");
+    auto farTown=townCamera;farTown.origin[0]=-1000;
+    check(!ChimneySmokeNearby(farTown) && OverlayChimneySmoke(DustQuality::Standard,farTown,4,frame,work)==0,
+        "distant smoke has no projection/upload work");
+    work.generatedMotes=48;
+    check(OverlayChimneySmoke(DustQuality::Standard,townCamera,4,frame,work)==0 && work.generatedMotes==48,
+        "smoke never overwrites full ambient or contact reservations");
     std::cout<<"IndoorDust failures="<<failures<<'\n'; return failures?1:0;
 }

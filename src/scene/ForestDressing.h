@@ -40,7 +40,7 @@ struct ForestDressingBuildReport
     std::size_t addedMaterials = 0u;
     std::size_t placedInstances = 0u;
     ForestDressingBounds addedBounds{};
-    std::array<ForestDressingPlacement, gameplay::simulation::kForestTreePlacementContract.size()> placements{};
+    std::vector<ForestDressingPlacement> placements; // bounded original64 or explicit prototype68 report
 };
 
 struct ForestDressingRigidPlacement
@@ -81,6 +81,30 @@ struct ForestDressingSupplementalPlacement
     float rootBurialMetres = 0.0f;
     std::size_t rootTipSamples = 0u;
 };
+
+// One explicit baked 68-tree candidate. Original64 and both older 12-root
+// trial rosters stay unchanged; this object cannot be combined with them.
+class F01NorthGrovePrototype {
+public:
+    const PreparedForestDressing& Prepared() const { return *prepared_; }
+    const auto& Placements() const { return placements_; }
+    auto Terrain() const { return terrain_; }
+    std::size_t CollisionTriangles() const { return collisionTriangles_; }
+private:
+    F01NorthGrovePrototype()=default;
+    std::shared_ptr<const PreparedForestDressing> prepared_;
+    std::array<ForestDressingSupplementalPlacement,4> placements_{};
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain_;
+    std::size_t collisionTriangles_=0;
+    friend bool PrepareF01NorthGrovePrototype(std::shared_ptr<const PreparedForestDressing>,
+        std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>,
+        std::shared_ptr<const F01NorthGrovePrototype>&,std::string&);
+};
+bool PrepareF01NorthGrovePrototype(std::shared_ptr<const PreparedForestDressing> prepared,
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain,
+    std::shared_ptr<const F01NorthGrovePrototype>& result,std::string& diagnostic);
+bool AppendPreparedF01NorthGrove(const F01NorthGrovePrototype& prototype,
+    assets::StaticMeshAsset& owner,ForestDressingBuildReport& report,std::string& diagnostic);
 
 // One mixed-space CPU owner: the common prefix remains world-space; each
 // appended master range stays in its normalized local metre space. Keep these

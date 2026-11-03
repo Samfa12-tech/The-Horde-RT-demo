@@ -26,12 +26,16 @@ final class PrivateLichRevivalAudio {
         File wave=file(appDirectory);
         if(!wave.isFile())return "Missing private debug_audio/lich_revival.wav; no substitute is used.";
         if(wave.length()!=BYTES)return "Private revival WAV size differs from the approved draft.";
+        return validatePinnedFile(wave,BYTES,SHA256);
+    }
+    static String validatePinnedFile(File wave,long expectedBytes,String expectedHash) {
+        if(!wave.isFile() || wave.length()!=expectedBytes)return "Private revival asset is missing or has the wrong size.";
         try(FileInputStream in=new FileInputStream(wave)) {
             MessageDigest hash=MessageDigest.getInstance("SHA-256");byte[] bytes=new byte[16384];int read;
             while((read=in.read(bytes))!=-1)hash.update(bytes,0,read);
             StringBuilder hex=new StringBuilder();for(byte value:hash.digest())hex.append(String.format(java.util.Locale.ROOT,"%02x",value&255));
-            return matchesPinnedIdentity(wave.length(),hex.toString())?null:"Private revival WAV checksum differs from the approved mono 48 kHz PCM16 draft.";
-        } catch(IOException | java.security.NoSuchAlgorithmException unavailable) {return "Private revival WAV could not be verified: "+unavailable.getClass().getSimpleName();}
+            return expectedHash.equals(hex.toString())?null:"Private revival asset checksum differs.";
+        } catch(IOException | java.security.NoSuchAlgorithmException unavailable) {return "Private revival asset could not be verified.";}
     }
     private boolean observeLifetime(long next) {
         if(next<0 || seenLifetime && next<lifetime)return false;

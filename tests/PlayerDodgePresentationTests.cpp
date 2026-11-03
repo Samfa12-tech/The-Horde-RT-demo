@@ -126,9 +126,9 @@ void TestFourDirectionsAndChangingAim()
                   Near(a.dodgeElapsedSeconds,b.dodgeElapsedSeconds) && a.dodgeActive==b.dodgeActive &&
                   a.acceptedDodgeSequence==1 && b.acceptedDodgeSequence==1,
                   "released stick and changing aim preserve accepted dodge travel, timer and identity");
-            Check(a.dodgeInvulnerable==(tick>=2 && tick<10) && b.dodgeInvulnerable==a.dodgeInvulnerable &&
+            Check(a.dodgeInvulnerable==(tick>=2 && tick<11) && b.dodgeInvulnerable==a.dodgeInvulnerable &&
                   a.dodgeProtectedHitCount==0 && b.dodgeProtectedHitCount==0,
-                  "visual dodge preserves the existing half-open protection window without contact tests");
+                  "visual dodge preserves the current half-open protection window without contact tests");
             Check(!a.runActive && !a.runToggleActive && !b.runActive && !b.runToggleActive,
                   "dodge retains existing run cancellation");
             Check(SameEvents(fixed->Events(),turned->Events()),"aim-only pose rebasing leaves gameplay event semantics unchanged");

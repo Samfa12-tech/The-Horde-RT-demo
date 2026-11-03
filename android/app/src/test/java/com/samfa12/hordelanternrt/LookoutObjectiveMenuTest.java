@@ -35,7 +35,7 @@ public final class LookoutObjectiveMenuTest {
         static long[] entryState;
         static boolean paused,entry,crouch;
         static float strafe,forward;
-        static int resets,campaignRequests,attacks,parries,dodges,interacts,lanterns;
+        static int lastCampaignAction,lastCampaignKind,resets,campaignRequests,attacks,parries,dodges,interacts,lanterns;
         static final List<String> order=new ArrayList<>();
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static long[] getLookoutObjectiveState(long generation){return objective==null?null:objective.clone();}
@@ -53,7 +53,7 @@ public final class LookoutObjectiveMenuTest {
             if(enabled!=entry && entryState!=null)entryState[4]=0;
             entry=enabled;order.add("entry");
         }
-        @Implementation protected static long requestCampaign(int action,int slot,int kind,long generation){campaignRequests++;return 1;}
+        @Implementation protected static long requestCampaign(int action,int slot,int kind,long generation){campaignRequests++;lastCampaignAction=action;lastCampaignKind=kind;return 1;}
         @Implementation protected static void requestRouteReset(){resets++;}
         @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
         @Implementation protected static void requestAttack(){attacks++;}
@@ -161,7 +161,9 @@ public final class LookoutObjectiveMenuTest {
         Bridge.entryState=new long[]{31,2,0,0,1}; // Retained old Entry publication cannot certify a new request.
         open();find("Return to menu").performClick();
         assertTrue(Bridge.paused);assertTrue(Bridge.entry);assertTrue(field("entryMenuEnabled").getBoolean(a));
-        assertEquals(0,Bridge.resets);assertEquals(0,Bridge.campaignRequests);assertEquals(0,actionCount());
+        assertEquals(0,Bridge.resets);assertEquals(1,Bridge.campaignRequests);assertEquals(0,actionCount());
+        assertEquals("return releases ownership only; it does not save/load/reset",CampaignMenuState.END_GAME,Bridge.lastCampaignAction);
+        assertEquals("ordinary return never acknowledges a failed save automatically",0,Bridge.lastCampaignKind);
         assertEquals(before,a.getSharedPreferences("lookout-menu",Context.MODE_PRIVATE).getAll());
         assertEquals("request invalidates old same-generation presentation",0,Bridge.entryState[4]);
         assertTrue("return publishes the request but waits for the Entry frame",field("startupUiVisible").getBoolean(a));

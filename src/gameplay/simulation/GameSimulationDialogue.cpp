@@ -23,6 +23,8 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     }
     c.lanternLow=interactionState_.heldLightPose==interactions::HeldLightPose::Low;
     c.lanternHigh=interactionState_.heldLightPose==interactions::HeldLightPose::High;
+    c.flaskGuideEnabled=config_.healingFlask1_7;
+    c.flaskCharges=healingFlask_.Snapshot().resources.charges;
     c.manualRaiseSequence=lastConsumedToggleHeldLightPoseSequence_;
     // Platform feedback can only match a consumed manual edge. The internal
     // acknowledgement is the preferred path and never trusts a stale sequence.
@@ -39,13 +41,21 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         c.companionSource.reset();
         if(c.exterior && kit.grounded)
             c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight,kit.z};
+        const auto basin=kWorldRoutePoints[2];
+        c.companionAtBasin=kit.basinGuide && kit.basinArrived && kit.grounded;
+        c.playerNearBasin=c.exterior &&
+            std::hypot(playerX_-basin.x,playerZ_-basin.z)<=3.f;
     };
     bindCompanion();
     chapterDialogue_.Step(seconds,c);
+    const bool guidePending=config_.healingFlask1_7 && chapterDialogue_.BasinGuidePending();
+    const bool readyToLead=chapterDialogue_.State().line!=Line::ReunionProof &&
+        chapterDialogue_.State().line!=Line::ReunionFirstPiece;
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
-        chapterDialogue_.State().proofAccepted,c.paused,
+        chapterDialogue_.State().proofAccepted && (!guidePending || readyToLead),c.paused,
         chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr,
-        config_.authoredChapterTerrain,c.alive&&!c.traversing);
+        config_.authoredChapterTerrain,c.alive&&!c.traversing,
+        guidePending && readyToLead);
     bindCompanion();
     chapterDialogue_.RefreshCompanionSpatial(c);
     chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,

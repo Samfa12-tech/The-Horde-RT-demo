@@ -34,7 +34,7 @@ public:
         state_.recognitionActive=recognitionSeconds_>=0;
         float headPitch=0,headYaw=0,chestPitch=0;
         // Grate/rescue calls remain unseen; Keeper speech never animates Kit.
-        const bool talking=body && speech.line>=Line::ReunionQuestion && speech.line<=Line::ForestVillage &&
+        const bool talking=body && speech.line>=Line::ReunionQuestion && speech.line<=Line::FlaskTopup &&
             std::isfinite(speech.elapsed) && std::isfinite(speech.duration) && speech.duration>0;
         if(talking) {
             const float t=std::clamp(speech.elapsed,0.0f,speech.duration);

@@ -29,6 +29,38 @@ public final class StatisticsReportSendControlsTest {
     }
     static void idle(){Shadows.shadowOf(Looper.getMainLooper()).idle();}
     static LinearLayout panel(Activity activity){LinearLayout panel=new LinearLayout(activity);panel.setOrientation(LinearLayout.VERTICAL);activity.setContentView(panel);return panel;}
+    @Test public void livePublicServicesRequireSeparateConsentAndExplicitPublishWithoutExtraReview() {
+        Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
+        StatisticsReportSendControls.Services services=StatisticsReportSendControls.Services.production(activity);
+        assertFalse(services.synthetic);assertNotNull(services.verification);
+        assertTrue(services.transport.admitsPrivateDeveloperReports());assertTrue(services.transport.admitsPublicBenchmarkReports());
+        StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),Runnable::run,
+            PublicBenchmarkReportFlowTest.review(),services);
+        assertFalse(controls.send.isEnabled());assertFalse(controls.consent.isChecked());
+        controls.consent.setChecked(true);assertTrue(controls.send.isEnabled());
+        assertEquals(android.view.View.GONE,controls.review.getVisibility());
+        assertEquals(PlaytestReportSubmission.State.DRAFT,controls.submission.state());
+        assertNull(controls.submission.statisticsJsonForReview());
+        assertEquals(activity.getString(R.string.statistics_public_available),controls.status.getText().toString());
+        controls.consent.setChecked(false);assertFalse(controls.send.isEnabled());
+        controls.close();activity.finish(); // Never requests a real token or opens the network.
+    }
+
+    @Test public void publicDraftNeedsPreparedPreviewAndPublicTransportCapability() {
+        Activity activity=Robolectric.buildActivity(Activity.class).setup().get();Verification verifier=new Verification();
+        PlaytestReportSubmission.Transport unavailable=body->{fail("must not open private transport");return null;};
+        StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),work->fail("must not enqueue"),
+            PublicBenchmarkReportFlowTest.review(),StatisticsReportSendControls.Services.localValidation(unavailable,verifier));
+        controls.consent.setChecked(true);controls.send.performClick();
+        assertFalse(controls.send.isEnabled());assertEquals(0,verifier.requests);assertNull(controls.submission.statisticsJsonForReview());controls.close();
+        BenchmarkSummaryReview unprepared=new BenchmarkSummaryReview(PublicBenchmarkReportFlowTest.RUN,true);
+        controls=StatisticsReportSendControls.benchmark(activity,panel(activity),work->fail("must not enqueue"),unprepared,
+            StatisticsReportSendControls.Services.localValidation(new PublicBenchmarkReportFlowTest.PublicRelay(),verifier));
+        assertFalse(controls.consent.isEnabled());controls.consent.setChecked(true);controls.send.performClick();
+        assertFalse(controls.send.isEnabled());assertEquals(0,verifier.requests);assertNull(controls.submission.statisticsJsonForReview());
+        controls.close();activity.finish();
+    }
+
     private void publicUiRoundTrip(){
         Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
         PublicBenchmarkReportFlowTest.Worker worker=new PublicBenchmarkReportFlowTest.Worker();
@@ -38,19 +70,28 @@ public final class StatisticsReportSendControlsTest {
             StatisticsReportSendControls.Services.localValidation(relay,verifier));
         assertFalse(controls.consent.isChecked());assertFalse(controls.review.isEnabled());assertFalse(controls.send.isEnabled());
         controls.send.performClick();idle();assertEquals(0,verifier.requests);
-        controls.consent.setChecked(true);assertTrue(controls.review.isEnabled());controls.review.performClick();
-        assertFalse(controls.consent.isEnabled());assertTrue(controls.send.isEnabled());
+        controls.consent.setChecked(true);assertFalse(controls.review.isEnabled());assertTrue(controls.send.isEnabled());
+        assertTrue(controls.consent.isEnabled());assertEquals(PlaytestReportSubmission.State.DRAFT,controls.submission.state());
+        assertTrue(controls.canChangeDestination());
+        assertNull(controls.submission.statisticsJsonForReview());assertEquals(0,verifier.requests);assertEquals(0,relay.publicOpens);
+        controls.consent.setChecked(false);assertFalse(controls.send.isEnabled());controls.send.performClick();assertEquals(0,verifier.requests);
+        controls.consent.setChecked(true);controls.send.performClick();assertEquals(1,verifier.requests);assertEquals("horde_benchmark_publish",verifier.purposes.get(0));
+        assertFalse(controls.consent.isEnabled());assertFalse(controls.send.isEnabled());
+        assertFalse(controls.canChangeDestination());
         assertTrue(controls.preview.getText().toString().contains("\"consentToPublish\":true"));
         assertFalse(controls.preview.getText().toString().contains("turnstileToken"));assertArrayEquals(original,local.exactJsonBytes());
-        controls.send.performClick();assertEquals(1,verifier.requests);assertEquals("horde_benchmark_publish",verifier.purposes.get(0));
         assertTrue(worker.jobs.isEmpty());verifier.complete();idle();worker.drain();idle();
         assertEquals(PlaytestReportSubmission.State.QUEUED,controls.submission.state());
+        assertFalse(controls.canChangeDestination());
         assertEquals(activity.getString(R.string.statistics_mock_pending),controls.status.getText().toString());
         assertEquals(activity.getString(R.string.statistics_check_publication),controls.send.getText().toString());
         assertTrue(controls.send.isEnabled());assertEquals(1,relay.publicOpens);idle();assertEquals(1,relay.publicOpens);
         relay.next=PublicBenchmarkReportFlowTest.ack(200,"published","public-board","public-benchmark-result",PublicBenchmarkReportFlowTest.ID);
         controls.send.performClick();assertEquals(2,verifier.requests);verifier.complete();idle();worker.drain();idle();
         assertEquals(PlaytestReportSubmission.State.PUBLISHED,controls.submission.state());assertFalse(controls.send.isEnabled());
+        assertFalse(controls.canChangeDestination());
+        assertEquals(PublicBenchmarkReportFlowTest.frozen(relay.requests.get(0)),PublicBenchmarkReportFlowTest.frozen(relay.requests.get(1)));
+        assertNotEquals(relay.requests.get(0),relay.requests.get(1)); // Fresh verification, same result identity/body.
         assertEquals(activity.getString(R.string.statistics_mock_published),controls.status.getText().toString());
         assertEquals(0,relay.privateOpens);assertArrayEquals(original,local.exactJsonBytes());
         assertTrue(controls.send.getMinHeight()>=48*activity.getResources().getDisplayMetrics().density);
@@ -84,18 +125,36 @@ public final class StatisticsReportSendControlsTest {
             PublicBenchmarkReportFlowTest.review(),StatisticsReportSendControls.Services.localValidation(relay,verifier));
         controls.consent.setChecked(true);controls.review.performClick();controls.send.performClick();verifier.complete();idle();worker.drain();idle();
         assertEquals(PlaytestReportSubmission.State.RETRYABLE,controls.submission.state());
+        assertFalse(controls.canChangeDestination());
         assertEquals(activity.getString(R.string.statistics_mock_uncertain),controls.status.getText().toString());
         assertEquals(1,relay.publicOpens);assertTrue(controls.send.isEnabled());controls.close();activity.finish();
     }
-    @Test public void productionUnavailableStillAllowsExactSeparatePreviewWithoutSending(){
+    @Test public void cancelledVerificationBeforeHttpCanSwitchButKnownRejectionMustKeepItsStatus() {
+        Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
+        PublicBenchmarkReportFlowTest.Worker worker=new PublicBenchmarkReportFlowTest.Worker();
+        PublicBenchmarkReportFlowTest.PublicRelay relay=new PublicBenchmarkReportFlowTest.PublicRelay();Verification verifier=new Verification();
+        StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),worker::execute,
+            PublicBenchmarkReportFlowTest.review(),StatisticsReportSendControls.Services.localValidation(relay,verifier));
+        controls.consent.setChecked(true);controls.send.performClick();assertFalse(controls.canChangeDestination());
+        verifier.pending.completed(null);idle();
+        assertEquals(PlaytestReportSubmission.State.READY,controls.submission.state());
+        assertTrue(controls.canChangeDestination());assertEquals(0,relay.publicOpens);
+        relay.next=PublicBenchmarkReportFlowTest.ack(422,"rejected","public-board","public-benchmark-result",PublicBenchmarkReportFlowTest.ID);
+        controls.send.performClick();verifier.complete();idle();worker.drain();idle();
+        assertEquals(PlaytestReportSubmission.State.REJECTED,controls.submission.state());
+        assertTrue(controls.canChangeDestination());
+        assertEquals(activity.getString(R.string.statistics_mock_rejected),controls.status.getText().toString());
+        controls.close();activity.finish();
+    }
+    @Test public void productionUnavailablePreservesLocalPreviewWithoutConstructingOrSendingRemoteEnvelope(){
         Activity activity=Robolectric.buildActivity(Activity.class).setup().get();
         BenchmarkSummaryReview local=PublicBenchmarkReportFlowTest.review();byte[] original=local.exactJsonBytes();
         StatisticsReportSendControls controls=StatisticsReportSendControls.benchmark(activity,panel(activity),work->fail("must not enqueue"),
             local,StatisticsReportSendControls.Services.unavailable());
         controls.consent.setChecked(true);controls.review.performClick();assertFalse(controls.send.isEnabled());
         assertEquals(activity.getString(R.string.statistics_send_unavailable),controls.status.getText().toString());
-        assertTrue(controls.preview.getText().toString().contains("consentToPublish"));
-        assertArrayEquals(original,local.exactJsonBytes());controls.send.performClick();assertEquals(PlaytestReportSubmission.State.READY,controls.submission.state());
+        assertNull(controls.submission.statisticsJsonForReview());assertEquals("",controls.preview.getText().toString());
+        assertArrayEquals(original,local.exactJsonBytes());controls.send.performClick();assertEquals(PlaytestReportSubmission.State.DRAFT,controls.submission.state());
         controls.close();activity.finish();
     }
     @Test public void privateCompatibilityUsesIndependentConsentPurposeAndCannotBecomePublic(){

@@ -35,7 +35,7 @@ inline constexpr std::size_t kRopeNodeCount = 12;
 inline constexpr float kRopeLength = 4.8f;
 inline constexpr float kRopeSegmentRestLength = kRopeLength / (kRopeNodeCount - 1);
 inline constexpr float kMaximumRopeTension = 400.0f;
-inline constexpr float kRescueApproachRadius = 0.75f;
+inline constexpr float kRescueApproachRadius = 1.125f;
 inline constexpr float kRescueMaximumApproachStep = 0.025f;
 
 enum class RopeDeploymentPhase : std::uint8_t {

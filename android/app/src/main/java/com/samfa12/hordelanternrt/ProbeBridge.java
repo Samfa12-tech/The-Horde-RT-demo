@@ -66,6 +66,7 @@ public final class ProbeBridge {
     public static native void requestAttack();
     public static native void requestParry();
     /** Coherent hold publication; only false-to-true opens a fresh parry window. */
+    public static native void setAttackHeld(boolean held,int source);
     public static native void setGuardHeld(boolean held);
     public static native void requestDodge();
     public static native void setCombatTeachingOptions(boolean enabled, boolean slowdown);
@@ -166,6 +167,9 @@ public final class ProbeBridge {
     // Custom/unranked opening-menu owner. Course completion alone is not Entry restoration.
     public static native long requestOpeningBenchmark(long surfaceGeneration);
     public static native long requestOpeningProvisionalBenchmark(long surfaceGeneration);
+    // Fresh per-run summary identity is queued atomically with the normal owner.
+    public static native long requestOpeningBenchmarkWithSummaryId(long surfaceGeneration,
+            boolean provisional, String summaryRunUuid, String rawModel);
     public static native void cancelOpeningBenchmark(long requestSerial, long requestSurfaceGeneration);
     // request, current generation, phase(0..6), result(0/2/3/4 unavailable), Entry presented, origin generation.
     public static native long[] getOpeningBenchmarkState();
@@ -193,5 +197,6 @@ public final class ProbeBridge {
     public static native String getBenchmarkReport();
     public static native int getRuntimeState();
     public static native long getWaterfallStereoGains();
+    public static native void setRevivalAudioReady(long generation, boolean ready);
     public static native long[] drainPlatformEvents();
 }

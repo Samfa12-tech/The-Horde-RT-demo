@@ -140,7 +140,13 @@ public:
     }
 
     static constexpr float kInitialStepDistanceMetres = 0.24f;
-    static constexpr float kStepIntervalMetres = 0.72f;
+    // The imported Walking clip completes one left/right stride in 25/24 s.
+    // The simulation advances its locomotion sample by accepted distance / 1.9 m/s,
+    // so one audible contact per half-cycle stays with the planted feet.
+    static constexpr float kAuthoredWalkingCycleSeconds = 25.0f / 24.0f;
+    static constexpr float kReferenceWalkSpeedMetresPerSecond = 1.9f;
+    static constexpr float kStepIntervalMetres =
+        kAuthoredWalkingCycleSeconds * kReferenceWalkSpeedMetresPerSecond * 0.5f;
 
 private:
     float metresUntilStep_ = kInitialStepDistanceMetres;

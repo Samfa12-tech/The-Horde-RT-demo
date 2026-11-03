@@ -161,6 +161,7 @@ bool CharacterRenderSlot::LoadAssets(const std::string& skeletonAssetPath,
         return false;
     }
     skeletonDeadClipDuration_ = skeletonModel_.ClipDuration(horde::scene::SkeletonClip::Dead);
+    skeletonStandClipDuration_ = skeletonClipBindings.size()>4u ? skeletonModel_.ClipDuration(static_cast<horde::scene::SkinnedClip>(4u)) : 0.f;
     if (skeletonDeadClipDuration_ <= 0.0f)
     {
         diagnostic = "The skeleton Dead clip has no usable duration.";
@@ -488,7 +489,7 @@ void CharacterRenderSlot::DestroyGpuResources(const RtGpuResources& resources)
     lastLichClip_ = -1;
     pendingRefit_ = CharacterBlasRefit::None;
     skeletonPoseBucketCount_ = 0u;
-    skeletonDeadClipDuration_ = 0.0f;
+    skeletonDeadClipDuration_ = skeletonStandClipDuration_ = 0.0f;
     cachedFramePlan_ = {};
     lichStaffLocalSample_ = {{0.94f, 0.79f, 0.64f}};
 }

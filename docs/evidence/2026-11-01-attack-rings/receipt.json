@@ -1,0 +1,474 @@
+{
+  "schema": 1,
+  "baseCommit": "5f28aa9f6b22e5e10ff745710ed4888578ad30dc",
+  "apk": {
+    "sha256": "7c0e118d663dfe94cdaf251ce40531baa179055688ba884ec5f4120f31e6ec84",
+    "package": "com.samfa12.hordelanternrt.debug",
+    "path": "/data/app/~~KK0lhWKX2RHiH3-UMok9HQ==/com.samfa12.hordelanternrt.debug-gYhkQJZzzXl8eANSci1rVQ==/base.apk"
+  },
+  "phone": {
+    "ro.product.model": "SM-S948B",
+    "ro.build.version.release": "17",
+    "ro.build.version.sdk": "37",
+    "ro.build.display.id": "CP2A.260605.016.S948BXXS4BZIG"
+  },
+  "phoneReleasedUtc": "2026-11-01T07:30:14.768281+00:00",
+  "originalPreferencesCareerFiles": 6,
+  "originalFilesRestoredExactly": true,
+  "parkedOwnerFilesUnchanged": 151,
+  "normalPlayAcceptance": false,
+  "hitFragmentVisibilityAccepted": false,
+  "libraryUpload": "Blocked before upload: Library prepare_uploads is not available; no IDs",
+  "checks": {
+    "androidUnits": {
+      "tests": 540,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "suites": 70
+    },
+    "package": "PASS exact final APK",
+    "hostRelevantRegressions": "8 initial passes plus corrected resource fixtures 2/2",
+    "diffCheck": "PASS"
+  },
+  "captures": {
+    "yellow-fixed": {
+      "status": "capture-ready",
+      "checkpoint": "attack-ring-yellow-windup",
+      "generation": 2,
+      "renderScale": 0.25,
+      "presented": true,
+      "captureStableFrames": 12,
+      "attackWarning": {
+        "source": 2,
+        "kind": 1,
+        "phase": 1,
+        "elapsed": 0.5667,
+        "duration": 1.12
+      },
+      "player": {
+        "x": -3.4,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "halfHeart": false,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false,
+        "safePractice": false
+      }
+    },
+    "red-fixed": {
+      "status": "capture-ready",
+      "checkpoint": "attack-ring-red-windup",
+      "generation": 1,
+      "renderScale": 0.25,
+      "presented": true,
+      "captureStableFrames": 12,
+      "attackWarning": {
+        "source": 3,
+        "kind": 2,
+        "phase": 1,
+        "elapsed": 0.6,
+        "duration": 1.2
+      },
+      "player": {
+        "x": -31.2,
+        "z": -15.2,
+        "yaw": -1.5708,
+        "pitch": -0.05,
+        "vitality": 3,
+        "halfHeart": false,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false,
+        "safePractice": false
+      }
+    },
+    "endpoint-cold": {
+      "status": "capture-ready",
+      "checkpoint": "chapter-demo-endpoint",
+      "generation": 1,
+      "renderScale": 0.25,
+      "presented": true,
+      "captureStableFrames": 12,
+      "attackWarning": {
+        "source": 0,
+        "kind": 0,
+        "phase": 0,
+        "elapsed": 0.0,
+        "duration": 0.0
+      },
+      "player": {
+        "x": 22.2981,
+        "z": 50.1971,
+        "yaw": 2.57,
+        "pitch": -0.1,
+        "vitality": 3,
+        "halfHeart": false,
+        "maxVitality": 3,
+        "lifePhase": "alive",
+        "damageEnabled": false,
+        "safePractice": false
+      }
+    }
+  },
+  "localEvidence": [
+    {
+      "path": "reports/ring-closeout-20261101/after.json",
+      "bytes": 695,
+      "sha256": "ab5657bbc69a70e843cb45f35da557f877bc402d9777b45ca460bc03cfc93f31"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/android-build-tests.log",
+      "bytes": 3701,
+      "sha256": "d18eb5e9eee8a3d14da2ffa693cfd0c3eefcbdcc8a051e8e281f2646872d7baf"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/android-capture-fix-build.log",
+      "bytes": 2691,
+      "sha256": "75f2dd0a6cfe95977bfe58e02fafb9e3973ab1ae1f3eab9c3e12e37a765b1f28"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/android-final-build-tests.log",
+      "bytes": 3192,
+      "sha256": "9feb197140924a9b22d1941919746a0f63a2b7b2d0d4c1cf0415fa118f8edcd8"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/android-unit-summary.json",
+      "bytes": 90,
+      "sha256": "4a234107015811ff3686b2addff0ce76de71dd5d8199cc30846493f267f3159f"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/before.json",
+      "bytes": 695,
+      "sha256": "ab5657bbc69a70e843cb45f35da557f877bc402d9777b45ca460bc03cfc93f31"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/cold-menu.png",
+      "bytes": 3121760,
+      "sha256": "11ed540bd041df654322685edb817377f09e782134403a39e7e7bd4d8e215b55"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/debug-build.log",
+      "bytes": 4116,
+      "sha256": "c0e14128734620fc3ecc8b86da0930e33eb58167b70ce09c582030b459f46cef"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/debug-build2.log",
+      "bytes": 1926,
+      "sha256": "18072ea00d203ab66f7e0f2db3ed6656ce28d2516415d9ea221e80d218f8e2d3"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/debug-hit-build.log",
+      "bytes": 1876,
+      "sha256": "75e00b128225c5cac8b341a74499132f906f40ae241649e38b068364533950e4"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/device.json",
+      "bytes": 167,
+      "sha256": "cd0ccfc13ba2529ba83d248a59657dbe2160e005b9ffdcdd593b872e7c4affc9"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/endpoint-cold-state.json",
+      "bytes": 8091,
+      "sha256": "eea67563462bc50c057e889bfea3f680e2900838d9d28e5bbb4ebbd26c33a032"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/endpoint-cold.png",
+      "bytes": 2565953,
+      "sha256": "07c8495edc2334ceeedb2e92c586527b4a4a15a78ee86c28f09bfe71ca14b0be"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/endpoint-state.json",
+      "bytes": 8117,
+      "sha256": "6a14e39e236cbd37ca3b258067300c5dbca1af4d20185dee02e9c899d7b30b28"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/endpoint.png",
+      "bytes": 1201600,
+      "sha256": "b0ec3b214cf9e6d05a3f4915a44a05722f7b347a4a69ada0fb9cc261a0455781"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/final-package-corrected.log",
+      "bytes": 183,
+      "sha256": "6567fb23239b71777fe6b7debfbcb0077ab0df3cc5761c33ebfe80a827e8dcf0"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/final-package.log",
+      "bytes": 577,
+      "sha256": "92cedf6cbdcf40e34b29caa1aa157ca7867d3cdc4626502b6ead4e3305b6daec"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/focused-build.log",
+      "bytes": 2203,
+      "sha256": "6f62b29085ae764ca587e4a0942ed5ce920d12c41f9d3b1da3361d2bea66c423"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/focused-tests.log",
+      "bytes": 655,
+      "sha256": "102e37979f87519fe82007d5259e8929fa515a6a4fa6fabbf9df0fd38d406c5c"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-low.process.json",
+      "bytes": 1372,
+      "sha256": "fa4f9de4b3e8e053e5fbe7c4b9648543575190798bd690f9c2ddf6157b606adb"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-low.stderr.log",
+      "bytes": 410,
+      "sha256": "0582307de26adc9ebf5cb713a776bf1f133a10693e3a54051b4991e2e654c385"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-low.stdout.log",
+      "bytes": 18027,
+      "sha256": "e74727eeefee286687120069d8663af036f7b08d057d6f9b334cb1fd551e961b"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-off.process.json",
+      "bytes": 1373,
+      "sha256": "6e9cc2797a8b1b1a2bbc7e98daafcbeeee76d024b5aef9cdb63ef3c088fe3890"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-off.stderr.log",
+      "bytes": 410,
+      "sha256": "0582307de26adc9ebf5cb713a776bf1f133a10693e3a54051b4991e2e654c385"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-off.stdout.log",
+      "bytes": 18025,
+      "sha256": "d7f72d21fce38ba883e0c2df35d9a72158b649fe7fa9d5faff026eebb2e5cfca"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-staging-build.log",
+      "bytes": 749,
+      "sha256": "5e27aa61f8a9a356d22b8a71e14caea3459065bbfe3f3e0862393a733151c442"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-staging-tests.log",
+      "bytes": 511,
+      "sha256": "f225ff4c045e6aca2276402d3c8a62c53524741bccadc63015bae06dadeaeb3b"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/installed-readback.json",
+      "bytes": 252,
+      "sha256": "3a4eb7f4ae142e82330c03da57b5d6e4b664e6d9e3d61d06f6842fdb9cf7b581"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/inventory-fix-build.log",
+      "bytes": 2237,
+      "sha256": "50139d32c84d592f475dfe50bff653983ca78921d303491307167450483dc92d"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/inventory-fix-tests.log",
+      "bytes": 647,
+      "sha256": "6102bd7d163b70fe32d6d6f99b04fc8aa16f29b675639600c3c190320aaa6061"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/live-normal.png",
+      "bytes": 3447601,
+      "sha256": "a5af4347ddcdb900ee07debe840e686c360d2afd9bcb21028b8e0053ada41f1f"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/live-practice-attempt.mp4",
+      "bytes": 15188289,
+      "sha256": "b08dc0c830a272f82e2927d457088d30dc74b370937a7ff5fa6343de9b867dd4"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/live-practice.png",
+      "bytes": 5294313,
+      "sha256": "cc8d1c90344e3d4b41b8f3ae80b4a1451751e5adc1a8dd8d3fa1cb7791a11220"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/owner-custody.json",
+      "bytes": 42,
+      "sha256": "9fcdc76c1f741576ef7ceb37288bc74167335653e66ce2be0f77add3e9a4099a"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/phone-red-state.json",
+      "bytes": 8159,
+      "sha256": "000375f988db227c56abe562eb1658fae90e9897c203528d9b79d8fba3884201"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/phone-red.png",
+      "bytes": 5294313,
+      "sha256": "cc8d1c90344e3d4b41b8f3ae80b4a1451751e5adc1a8dd8d3fa1cb7791a11220"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/phone-yellow-state.json",
+      "bytes": 8097,
+      "sha256": "d5e5d036e52cb4c6557c61c187dc69e627fd9d3fdf6e83feb27a7f0950642b15"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/phone-yellow.png",
+      "bytes": 3121150,
+      "sha256": "debdbe226cefd542d26e1ee15896c757232acd5e1a624baa87b2f7aeec529c08"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/practice-ready.png",
+      "bytes": 3505228,
+      "sha256": "cdc2594e05d14cee5f097f56f03985c712fc41ab1fc0cfc9867776658ad9fa61"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-contact.process.json",
+      "bytes": 1380,
+      "sha256": "199707148f61ca47ec35ac69b0d332a755ca68f3a5ac0e408b806e2e49d75759"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-contact.stderr.log",
+      "bytes": 422,
+      "sha256": "64bf3a02d74f3ee9ad8bacd9f019760fca6a506a40d7a22170ef1564df572ab2"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-contact.stdout.log",
+      "bytes": 2840,
+      "sha256": "ad7898e8c773a83bd6752a77610faa7f764799e5540d73fdefabe965c3ad965c"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-fixed-state.json",
+      "bytes": 8139,
+      "sha256": "8267c5338d77373afb043b5a062ea5b060362fc4787e47475f6c2ad660a5048f"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-fixed.png",
+      "bytes": 5279880,
+      "sha256": "f3a183425f5a8d26a035f1df4e7653503e702229a2707a97f1b251aa4d1be4d5"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-windup.process.json",
+      "bytes": 1379,
+      "sha256": "7c827ec0dccc6b8451bc34253b430833fc1775114d2262b8bbab7d51a2d8b342"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-windup.stderr.log",
+      "bytes": 419,
+      "sha256": "b7d2e18ecf04ae3e8db3cee595fa2022805320cb2b50c8a2d883052d99cff33d"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-windup.stdout.log",
+      "bytes": 2836,
+      "sha256": "05cb6cf7688affb867f1bb3f17af248fd605958a307bedf2fb61faad89216a18"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/regression-build.log",
+      "bytes": 6676,
+      "sha256": "802f58f96cf388884c4f16b1eba95b7a46df66dc6809d9532f669a8c98c7d17d"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/regression-tests.log",
+      "bytes": 3930,
+      "sha256": "1e8ab914c99d22bfc9487a683aba636eb551125e6be328f2b10b6cb61bacc007"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/staging-build.log",
+      "bytes": 1026,
+      "sha256": "3e4742715bec39bd4c869629b98ce032ffd1b9b94be7e6684ba1f8e8480166a8"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/staging-tests.log",
+      "bytes": 635,
+      "sha256": "7cc8326f556fe81f79ecfb4b0c74db99b0067c29de6349d545c97a7935306b79"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-contact.process.json",
+      "bytes": 1387,
+      "sha256": "2b77ce3bcc44fa4312a8402902223a881bccc2731961506680e9bf77dbc7063c"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-contact.stderr.log",
+      "bytes": 431,
+      "sha256": "5eba25d106a02052ab195b68e6b398d6c48765cb20c87297d3f8ed9015a15425"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-contact.stdout.log",
+      "bytes": 2852,
+      "sha256": "10411792a79c3cd49b1bbf60c779c2a918cb1b5e5eaf4aae144d19ef6b13f759"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-fixed-state.json",
+      "bytes": 8117,
+      "sha256": "0d4ddaf0fae8a00e647133c25a9a35dc8b1aaa4998c47c0d5247de56808a154d"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-fixed.png",
+      "bytes": 3090321,
+      "sha256": "d1766a4dd27163910c84a4380cdcc971451d1ffabbf1813778e46e71d85d64a2"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-windup.process.json",
+      "bytes": 1384,
+      "sha256": "6e3f6d140bf612bc1803c7bb1bcbc3f0c5ddb80c38128082d9bcb3d055c907a1"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-windup.stderr.log",
+      "bytes": 428,
+      "sha256": "90f18b10723663f3f85e79d2dc274083a455d3bf4d0eb42954f671375e46d898"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-windup.stdout.log",
+      "bytes": 2848,
+      "sha256": "2de7e09e4cbf5da8b4b17a3fbaa6c07b62a207d9f948684a83248a3e7a7c5cbc"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-low/238-enemy-hit-fragments.png",
+      "bytes": 725640,
+      "sha256": "0f8e9c219e979d3f489e6b19310a37905b0e3c52cb644337d4189aa202f239a1"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-low/capture-manifest.json",
+      "bytes": 24729,
+      "sha256": "852ee5feca526c0e29158541c3ce030cdb64be6ff4c8a37cfa64b05453aa7e2d"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-off/238-enemy-hit-fragments.png",
+      "bytes": 725557,
+      "sha256": "c52bf104ff7653667a7eae03b74ab298c82ecf6de0a30a694adea537c08a1351"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/hit-off/capture-manifest.json",
+      "bytes": 24726,
+      "sha256": "2d037e5a004192df5a1560239d61ef2b9bba09a9e6f70a99fd01b920218452f7"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-contact/237-attack-ring-red-contact.png",
+      "bytes": 956978,
+      "sha256": "fbf2a1da21c4f1ace4ceffc27e0d3f6a68b33dcf52479b15e7c6104a7060b733"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-contact/capture-manifest.json",
+      "bytes": 24819,
+      "sha256": "7726226f3d38b8c17a4a2d6e8812d91eec1385abe624e013584f6ea2861b0567"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-windup/236-attack-ring-red-windup.png",
+      "bytes": 922961,
+      "sha256": "46ce43b6858d7507a5966b6135c43d86ac3330b93ea0984546a6ee4df5f2eafb"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/red-windup/capture-manifest.json",
+      "bytes": 24813,
+      "sha256": "983dd64f1fc0968230375f62c73e8f566bbc5852483fe4ed96cea80df7ab9f82"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-contact/235-attack-ring-yellow-contact.png",
+      "bytes": 739386,
+      "sha256": "0d19c322ce9d5c9817d6f1d32b073566393b981b158a2ca398eb6cb055a39003"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-contact/capture-manifest.json",
+      "bytes": 24755,
+      "sha256": "7e8318cfa85193c74b31befb82dd970cb26ff076b027f0f903cb91055fcea7fa"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-windup/234-attack-ring-yellow-windup.png",
+      "bytes": 763532,
+      "sha256": "d01ba898c6b7162a828a5ae3449fddd68aea855d517860014af65c941db0ae83"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/yellow-windup/capture-manifest.json",
+      "bytes": 24751,
+      "sha256": "2e899d3fd2f992741b535abe898571b8c3e05aaa5fea5c867a844980d3214032"
+    }
+  ]
+}

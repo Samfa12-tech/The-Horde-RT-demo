@@ -1,5 +1,7 @@
 #include "gameplay/simulation/GameSimulation.h"
 #include "scene/ChapterTerrainSurface.h"
+#include "scene/FlaskRestBasins.h"
+#include "gameplay/dialogue/CompanionRouteFixture.h"
 #include "scene/assets/AssetManifest.h"
 #include <filesystem>
 #include <iostream>
@@ -207,8 +209,92 @@ int main(int argc,char** argv) {
         TestUtilityOwner(terrain);std::cout<<"flask utility checks="<<checks<<" failures="<<failures<<'\n';return failures?1:0;
     }
     if(argc!=1)return 2;
+    {
+        // Actual imported chapter support, synthetic owner metadata only: this
+        // proves placement/contact and addressing, not GPU appearance.
+        auto owner=mesh;owner.materials[0].name="MedievalWall02";
+        const auto beforeVertices=owner.vertices.size(),beforeIndices=owner.indices.size();
+        const auto beforeMaterials=owner.materials.size();auto support=terrain;
+        std::array<horde::scene::FlaskRestBasinPlacement,2> basins;
+        const bool appended=horde::scene::AppendFlaskRestBasins(owner,support,basins,error);
+        if(!appended)std::cerr<<error<<'\n';
+        Check(appended,"both exterior rest basins fit actual anchor support");
+        if(appended) {
+            horde::gameplay::dialogue::CompanionRouteFixture guide(true);
+            unsigned ticks=0;
+            for(;ticks<1000 && !guide.State().basinArrived;++ticks) {
+                const auto old=guide.State();
+                guide.Step(1.f/60.f,old.x,old.z,true,true,false,support.get(),true,true,true);
+            }
+            Check(ticks<1000 && guide.State().grounded &&
+                std::hypot(guide.State().x-basins[0].centre.x,
+                           guide.State().z-basins[0].centre.z)<2.f,
+                "Kit reaches the upper-rope basin alongside its actual solid furniture");
+            ticks=0;
+            for(;ticks<1200 && guide.State().waypoint<4;++ticks) {
+                const auto old=guide.State();
+                guide.Step(1.f/60.f,old.x,old.z,true,true,false,support.get(),true,true,false);
+            }
+            Check(ticks<1200 && guide.State().grounded && guide.State().waypoint>=4,
+                "after the basin cue Kit can return to the existing forest route past its solid furniture");
+            horde::gameplay::dialogue::CompanionRouteFixture restored(true);
+            restored.RestoreCampaignBasin(basins[0].anchor.x,basins[0].anchor.z,
+                support.get(),guide.State().generation);
+            Check(restored.State().grounded && restored.State().basinGuide &&
+                restored.State().basinArrived &&
+                std::hypot(restored.State().x-basins[0].centre.x,
+                           restored.State().z-basins[0].centre.z)<2.f,
+                "an interrupted spoken basin cue restores Kit beside the same solid basin");
+            Check(basins[0].anchor.x==tr::kExteriorLanding.x &&
+                basins[0].anchor.z==tr::kExteriorLanding.z &&
+                basins[1].anchor.x==kWorldRoutePoints.back().x &&
+                std::hypot(basins[0].centre.x-tr::kLowerLanding.x,
+                    basins[0].centre.z-tr::kLowerLanding.z)>1.f,
+                "first furniture belongs above the rope, with no boss-room basin");
+            Check(owner.materials.size()==beforeMaterials && owner.indices.size()==beforeIndices+2*9*12*3 &&
+                owner.vertices.size()==beforeVertices+2*9*24 && owner.HasValidTriangleProvenance(),
+                "two bounded324-triangle basins share existing material/address/provenance ownership");
+            for(const auto& basin:basins) {
+                Check(std::hypot(basin.anchor.x-basin.centre.x,basin.anchor.z-basin.centre.z)<1.f,
+                    "canonical saved anchor remains within reach of its visible basin");
+                Check(support->NonWalkableVolumeClear(basin.anchor.x,basin.anchor.z,basin.anchor.x,
+                    basin.anchor.z,basin.anchor.y+.001f,basin.anchor.y+1.8f,kPlayerCollisionRadius),
+                    "rest furniture never occupies canonical spawn/rope landing body column");
+                Check(!support->NonWalkableVolumeClear(basin.centre.x,basin.centre.z,basin.centre.x,
+                    basin.centre.z,basin.centre.y+.001f,basin.centre.y+.8f,.05f),
+                    "visible basin contributes real solid contact");
+                const float side=basin.centre.x>basin.anchor.x?1.f:-1.f;
+                // A real capsule fits around this outer corner; a .45m axial
+                // offset would still overlap the .23m rim + .24m player radius.
+                tr::Vec3 outer{basin.centre.x+side*.4f,basin.centre.y,basin.centre.z+.45f};
+                const auto outerSupport=tr::ChapterExteriorSupport(support.get(),outer.x,outer.z);
+                outer.y=outerSupport.worldY;
+                Check(std::hypot(outer.x-basin.anchor.x,outer.z-basin.anchor.z)>1.f &&
+                    outerSupport.grounded &&
+                    support->NonWalkableVolumeClear(outer.x,outer.z,outer.x,outer.z,
+                        outer.y+.001f,outer.y+1.8f,kPlayerCollisionRadius) &&
+                    heal::FlaskRestReachClear(*support,outer,basin.centre),
+                    "outer solid-basin approach is reachable even outside the invisible checkpoint-centred metre");
+                Check(!heal::FlaskRestReachClear(*support,
+                    {basin.centre.x+side*1.01f,basin.centre.y,basin.centre.z},basin.centre) &&
+                    !heal::FlaskRestReachClear(*support,
+                    {outer.x,basin.centre.y+.36f,outer.z},basin.centre),
+                    "basin interaction rejects remote and wrong-height positions");
+                using Surface=TriangleSupportSurface;
+                const float wallX=(outer.x+basin.centre.x)*.5f,y=basin.anchor.y,z=basin.centre.z;
+                std::array<Surface::Triangle,2> wall;
+                wall[0].points={{{wallX,y+.8f,z-.4f},{wallX,y+1.1f,z-.4f},{wallX,y+1.1f,z+.4f}}};
+                wall[1].points={{{wallX,y+.8f,z-.4f},{wallX,y+1.1f,z+.4f},{wallX,y+.8f,z+.4f}}};
+                const auto occluded=Surface::WithAdditionalNonWalkableGeometry(*support,wall,error);
+                Check(occluded && !heal::FlaskRestReachClear(*occluded,outer,basin.centre),
+                    "a physical intervening barrier blocks refill even inside basin interaction reach");
+            }
+            Check(!horde::scene::AppendFlaskRestBasins(owner,support,basins,error),
+                "repeat preparation rejects duplicate furniture transactionally");
+        }
+    }
     Check(!ProductionGameSimulationConfig().healingFlask1_7,"normal gameplay does not admit the diagnostic flask");
-    for(auto id:{cp::CheckpointId::LowerClaimed,cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
+    for(auto id:{cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
         GameSimulation game(Config());const auto old=Record(id,*terrain);
         Check(Restore(game,old,terrain),"each old safe boundary restores on actual terrain");
         auto input=Neutral(game);Tick(game,input);
@@ -250,6 +336,16 @@ int main(int argc,char** argv) {
         }
     }
     {
+        auto lower=Record(cp::CheckpointId::LowerClaimed,*terrain);lower.schema=3;lower.flask={false,0};
+        GameSimulation game(Config());Check(Restore(game,lower,terrain),"boss-room checkpoint remains loadable");
+        auto input=Neutral(game);Tick(game,input,3);
+        Check(!game.Snapshot().flaskRestAnchor && !game.Snapshot().flaskNearbyRestAnchor,
+            "boss room has no refill point or basin interaction during combat");
+        ++input.commands.rest;Tick(game,input,130);
+        Check(Health(game)==2 && game.Snapshot().healingFlask.resources.charges==0,
+            "rest command cannot heal or refill at the removed boss-room basin");
+    }
+    {
         cp::Checkpoint legacy;legacy.vitality=1;
         legacy.torchDropX=-2.48f;legacy.torchDropZ=-16.4f; // old accepted trigger edge, not a player spawn
         GameSimulation game(Config());Check(Restore(game,legacy,terrain),"legacy trigger-edge record restores without moving progress");
@@ -264,13 +360,13 @@ int main(int argc,char** argv) {
         }
         input.dialogueCompletionLine=0;input.dialogueCompletionGeneration=0;
         Check(game.Snapshot().chapterDialogue.line==dialogue::Line::None &&
-              game.Snapshot().flaskRestAnchor==static_cast<unsigned>(cp::CheckpointId::LowerClaimed),
-              "ordinary matching dialogue completions expose recovery without new story flags");
+              !game.Snapshot().flaskRestAnchor,
+              "dialogue completion cannot expose the removed boss-room refill point");
         ++input.commands.rest;Tick(game,input,120);
-        Check(Health(game)==6 && game.Snapshot().healingFlask.resources.charges==2 &&
+        Check(Health(game)==2 && game.Snapshot().healingFlask.resources.charges==0 &&
               game.Snapshot().torchFailure.droppedX==legacy.torchDropX &&
               game.Snapshot().torchFailure.droppedZ==legacy.torchDropZ,
-              "legacy edge data retains the same earned reachable Rest route");
+              "legacy edge data remains intact without a boss-room refill");
     }
     {
         auto c=Record(cp::CheckpointId::LowerClaimed,*terrain);c.schema=3;c.halfHeart=true;c.flask={true,1};
@@ -283,6 +379,8 @@ int main(int argc,char** argv) {
         Check(Health(game)==1 && game.Snapshot().healingFlask.resources==initial &&
               game.Snapshot().healingFlask.action==heal::FlaskAction::Idle,
               "fresh defensive intent cancels before a drink completion tie");
+        Check(game.Snapshot().flaskHint==heal::FlaskHint::Interrupted,
+            "accepted defensive cancellation publishes immediate no-charge retry feedback");
         input.guardHeld=false;Tick(game,input,40);
         ++input.commands.drinkFlask;Tick(game,input,75);
         Check(Health(game)==3 && game.Snapshot().healingFlask.resources==heal::FlaskResources{true,0},
@@ -386,6 +484,27 @@ int main(int argc,char** argv) {
         Check(!game.Snapshot().flaskDrinkEligible && game.Snapshot().healingFlask.action==heal::FlaskAction::Idle &&
               Health(game)==2 && game.Snapshot().healingFlask.resources.charges==2,
               "active blocked dodge rejects a drink request without healing or consuming");
+    }
+    {
+        for(const auto id:{cp::CheckpointId::SafeExit,cp::CheckpointId::ForestEndpoint}) {
+            auto c=Record(id,*terrain);c.schema=3;c.flask={false,0};
+            GameSimulation game(Config());Check(Restore(game,c,terrain),"discovery restores actual earned anchor");
+            auto input=Neutral(game);Tick(game,input,2);
+            Check(game.Snapshot().flaskNearbyRestAnchor==static_cast<unsigned>(id) &&
+                game.Snapshot().flaskHint==heal::FlaskHint::Empty,
+                "empty flask still publishes nearby earned refill discovery");
+            input.guardHeld=true;Tick(game,input);
+            Check(!game.Snapshot().flaskRestAnchor && game.Snapshot().flaskNearbyRestAnchor==static_cast<unsigned>(id),
+                "guard blocks Rest but cannot erase earned basin discovery");
+            ++input.commands.rest;Tick(game,input,130);
+            Check(game.Snapshot().healingFlask.resources.charges==0,"discovery alone never authorizes refill");
+            input.guardHeld=false;Tick(game,input);++input.commands.rest;Tick(game,input,120);
+            Check(game.Snapshot().healingFlask.resources.charges==2,"fresh eligible rest refills at same canonical anchor");
+        }
+        GameSimulation fresh(Config());auto input=Neutral(fresh);Tick(fresh,input);
+        Check(!fresh.Snapshot().flaskNearbyRestAnchor && !fresh.Snapshot().flaskRestAnchor &&
+            fresh.Snapshot().healingFlask.resources.charges==2,
+            "new-game flask ownership is full but unearned basins never advertise refill");
     }
     {
         GameSimulation off(Config(false));const auto old=Record(cp::CheckpointId::LowerClaimed,*terrain);

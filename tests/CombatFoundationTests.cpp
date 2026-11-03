@@ -22,7 +22,94 @@ void Check(bool value,const char* message) {
 }
 bool Near(float a,float b,float epsilon=.0001f) { return std::abs(a-b)<=epsilon; }
 GameSimulationConfig Rules() {
-    auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; return c;
+    // Historical free-practice combat fixtures exercise kills and out-of-order skills.
+    // FourSkillPracticeAndExit explicitly enables the current novice policy.
+    auto c=ProductionGameSimulationConfig(); c.swordStartsStowed=false; c.sequentialPractice1_7=false; return c;
+}
+void CheckContactBurst(const SimulationSnapshot& state,const GameplayEvent& event) {
+    bool matched=false;
+    for(const auto& b:state.enemyHitParticles.bursts)
+        matched|=b.eventSequence==event.sequence && b.target==event.target && b.age==0 &&
+            b.origin[1]>kRouteFloorWorldY+.3f;
+    Check(matched,"actual successful skeleton/Keeper contact owns a matching target/sequence surface-proxy burst");
+}
+void ThreatBoundedDodgeLesson() {
+    for(int scenario=0;scenario<7;++scenario) {
+        CombatTeaching teaching; CombatSnapshot combat; LichSnapshot keeper;
+        teaching.SetSequentialPractice(true); teaching.Reset(true);
+        combat.aliveCount=1; combat.combatantCount=1; combat.attackerIndex=0;
+        auto& actor=combat.combatants[0]; actor.health=2; actor.x=0; actor.z=-4.65f;
+        actor.action=EnemyCombatAction::AttackWindup; actor.actionTime=CombatTimeline::kSkeletonAttackWindupSeconds-.3f;
+        actor.attackKind=EnemyAttackKind::Unblockable;
+        teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+        teaching.BlockSucceeded(); teaching.ParrySucceeded();
+        if(scenario==3) actor.attackKind=EnemyAttackKind::Normal;
+        if(scenario==4) actor.actionTime=0;
+        const float startZ=scenario==1 ? -1.f : -3.4f;
+        teaching.ObserveDodge(combat,0,startZ,1,true);
+        if(scenario==5) teaching.CancelTransient();
+        if(scenario==6) teaching.Skip();
+        const float escapedZ=scenario==2 ? startZ : startZ+.6f;
+        teaching.ObserveDodge(combat,0,escapedZ,1,true);
+        actor.action=EnemyCombatAction::AttackActive;
+        teaching.ObserveDodge(combat,0,escapedZ,1,false);
+        Check(teaching.Snapshot().dodgeLearned==(scenario==0),
+              "only moving evasion of a nearby committed red threat earns dodge; remote/blocked/early/non-red/cancel/Skip reject");
+        if(scenario==0) {
+            teaching.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+            Check(teaching.Snapshot().cue==CombatTeachingCue::Accepted &&
+                horde::platform::windows::CombatTeachingPromptText(teaching.Snapshot(),true).find("Good! Next:")!=std::string::npos,
+                "earned dodge immediately acknowledges success with the next controller lesson");
+        }
+    }
+}
+void AttackHoldSheathContract() {
+    AttackHoldToSheath hold;
+    for(int i=0;i<44;++i)Check(!hold.Step(true,1,true,true,1.f/60),"hold cannot stow before .75 seconds");
+    Check(hold.Step(true,1,true,true,1.f/60),"deliberate .75 second hold requests exactly one stow");
+    for(int i=0;i<100;++i)Check(!hold.Step(true,1,true,true,1.f/60),"continued hold cannot repeat a consumed request");
+    hold.Step(false,1,true,true,1.f/60);
+    for(int i=0;i<60;++i)Check(!hold.Step(true,1,true,false,1.f/60),"guard/recovery cannot admit a stow request");
+    Check(hold.Step(true,1,true,true,1.f/60),"completed gesture waits for a real safe boundary");
+    hold.Reset();hold.Step(true,1,true,true,.3f);hold.Cancel();
+    for(int i=0;i<60;++i)Check(!hold.Step(true,1,true,true,1.f/60),"cancel requires a physical release before another hold");
+    hold.Step(false,1,true,true,1.f/60);hold.Step(true,1,true,true,.05f);
+    for(int i=0;i<60;++i)Check(!hold.Step(true,2,true,true,1.f/60),"input source switching cannot inherit a held gesture");
+    hold.Step(false,2,true,true,1.f/60);
+    for(int i=0;i<44;++i)hold.Step(true,2,true,true,1.f/60);
+    Check(hold.Step(true,2,true,true,1.f/60),"fresh release rearms controller hold independently");
+
+    auto cfg=ProductionGameSimulationConfig();cfg.playerStartX=-7.6f;cfg.playerStartZ=-15.2f;cfg.playerStartYawRadians=1.57079632679f;
+    GameSimulation game(cfg);InputSnapshot input;input.yawRadians=cfg.playerStartYawRadians;input.damageEnabled=false;input.tutorialEnabled=false;
+    auto step=[&](int n){for(int i=0;i<n;++i){game.StepFixed(input);game.ClearEvents();}};
+    step(60);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().heldItems[1].transition.active,
+        "real waterfall encounter draws the sword before manual hold testing");
+    input.attackInputSource=1;input.attackHeld=true;++input.commands.attack;step(1);
+    Check(game.Snapshot().playerCombat.action!=PlayerCombatAction::Idle,"tap still starts its immediate ordinary attack");
+    step(4);input.attackHeld=false;step(100);
+    Check(!game.Snapshot().swordIntentionallyStowed && game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket,
+        "a normal attack tap never requests a sheath");
+    input.attackHeld=true;++input.commands.attack;step(20);
+    Check(game.Snapshot().swordSheathHoldProgress>0 && !game.Snapshot().swordIntentionallyStowed,"immutable snapshot publishes in-progress hold feedback");
+    step(100);
+    Check(game.Snapshot().swordIntentionallyStowed && game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::BodyStow,
+        "actual held attack completes the existing sheath after recovery and suppresses proximity redraw");
+    const auto sequence=game.Snapshot().heldItems[1].transition.semanticEdgeSequence;step(100);
+    Check(game.Snapshot().heldItems[1].transition.semanticEdgeSequence==sequence && game.Snapshot().swordIntentionallyStowed,
+        "held input and the active encounter cannot repeatedly stow or redraw");
+    input.attackHeld=false;step(1);input.guardHeld=true;++input.commands.parry;step(40);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().swordIntentionallyStowed,
+        "explicit parry redraws an intentionally sheathed sword");
+    input.guardHeld=false;input.attackHeld=false;step(30);input.attackHeld=true;++input.commands.attack;step(15);
+    input.paused=true;step(1);input.paused=false;step(100);
+    Check(!game.Snapshot().swordIntentionallyStowed && game.Snapshot().swordSheathHoldProgress==0,
+        "menu/focus pause cannot resume a partially held sheath without release");
+    input.attackHeld=false;step(1);input.attackHeld=true;++input.commands.attack;step(100);
+    Check(game.Snapshot().swordIntentionallyStowed,"release and a fresh hold recover after cancellation");
+    input.attackHeld=false;step(1);++input.commands.attack;step(60);
+    Check(game.Snapshot().heldItems[1].parentMode==items::HeldItemParentMode::HandSocket && !game.Snapshot().swordIntentionallyStowed,
+        "explicit attack redraws and preserves the queued first cut");
 }
 void PracticePromptWaitsForSword() {
     GameSimulation sim(ProductionGameSimulationConfig());
@@ -345,7 +432,7 @@ void InPlacePairRevivalContract() {
 }
 void WindowAndLifecycle() {
     for (int tick=0;tick<=13;++tick)
-        Check(DodgeProtectionWindow::Contains(tick/60.0f,true)==(tick>=2&&tick<10),
+        Check(DodgeProtectionWindow::Contains(tick/60.0f,true)==(tick>=2&&tick<11),
               "half-open protection boundaries match the documented gameplay ticks");
     Check(!DodgeProtectionWindow::Contains(.1f,false)&&
           !DodgeProtectionWindow::Contains(NAN,true),"rejected/nonfinite dodge cannot protect");
@@ -354,7 +441,7 @@ void WindowAndLifecycle() {
     for(int tick=1;tick<=13;++tick) {
         if(tick==4) input.commands.dodge=20; // spam cannot restart duration
         sim.StepFixed(input);
-        Check(sim.Snapshot().dodgeInvulnerable==(tick>=2&&tick<10),
+        Check(sim.Snapshot().dodgeInvulnerable==(tick>=2&&tick<11),
               "accepted dodge publishes protection once; spam never extends it");
         Check(sim.Snapshot().acceptedDodgeSequence==1,"spam does not replace accepted identity");
     }
@@ -371,6 +458,37 @@ void WindowAndLifecycle() {
     sim.ApplyShowcaseCheckpoint(0); input.commands.dodge=22;
     sim.StepFixed(input); sim.StepFixed(input);
     Check(!sim.Snapshot().dodgeInvulnerable,"historical capture imports preserve their legacy rule identity");
+}
+void BoundedOpeningPractice() {
+    Check(ProductionGameSimulationConfig().sequentialPractice1_7 && !GameSimulationConfig{}.sequentialPractice1_7,
+          "live application selects novice practice while historical fixtures remain explicit");
+    CombatTeaching lesson; CombatSnapshot combat; LichSnapshot keeper;
+    lesson.SetSequentialPractice(true);lesson.Reset(true);lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    lesson.ParrySucceeded();lesson.DodgeSucceeded();
+    Check(lesson.Snapshot().stage==TutorialStage::Block && !lesson.Snapshot().parryLearned && !lesson.Snapshot().dodgeLearned,
+          "future skills cannot skip the current novice step");
+    lesson.LeaveOpeningEncounter();
+    lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);
+    Check(lesson.Snapshot().safePractice && lesson.Snapshot().exitPending,
+          "leaving opening warns before removing actual damage protection");
+    for(int i=0;i<190;++i) {lesson.AdvanceOpeningExit(1.f/60.f,false);lesson.Update(true,false,false,combat,keeper,EnemyKind::Skeleton);}
+    Check(!lesson.Snapshot().safePractice && lesson.Snapshot().stage==TutorialStage::Skipped,
+          "opening protection and practice prompt end together after bounded warning");
+    SwordCombat sword;sword.Reset(2,{0,-4.65f},nullptr,1);sword.SetPracticeLesson(true,EnemyAttackKind::GuardBreak);
+    bool attackSeen=false;int practiceContacts=0;
+    for(int i=0;i<360;++i) {
+        if(i%60==0)sword.RequestAttack();
+        const auto& state=sword.Update(1.f/60.f,-.75f,-3.5f,0.f);
+        if(state.playerContactPulse)++practiceContacts;
+        Check(state.aliveCount==2,"practice strikes cannot kill either lesson actor");
+        Check(state.combatants[1].action!=EnemyCombatAction::AttackWindup && state.combatants[1].action!=EnemyCombatAction::AttackActive,
+              "second skeleton waits during one-actor lesson");
+        if(state.combatants[0].action==EnemyCombatAction::AttackWindup) {
+            attackSeen=true;Check(state.combatants[0].attackKind==EnemyAttackKind::GuardBreak,"lesson owns a single attack kind");
+        }
+    }
+    Check(attackSeen,"bounded lesson test observed actual warning phase");
+    Check(practiceContacts>=3,"accepted practice contacts survive the health floor for guard lesson and hit feedback");
 }
 void TeachingContract() {
     CombatTeaching teaching; CombatSnapshot combat; LichSnapshot keeper;
@@ -509,8 +627,8 @@ void AttackWarningPresentationContract() {
           empty.phase==AttackWarningPhase::None && empty.phaseElapsedSeconds==0.f &&
           empty.phaseDurationSeconds==0.f && empty.contactBoundarySeconds==0.f,
           "absent warning clears source kind phase and all clock data together");
-    Check(!ProductionGameSimulationConfig().specialSkeletonAttacks1_7,
-          "warning description does not enable the normal yellow attack policy");
+    Check(ProductionGameSimulationConfig().specialSkeletonAttacks1_7 && !GameSimulationConfig{}.specialSkeletonAttacks1_7,
+          "live special attacks pair with RT warnings while historical fixtures remain explicit");
     CombatSnapshot combat; LichSnapshot keeper;
     combat.attackerIndex=0;
     auto& first=combat.combatants[0];
@@ -1004,7 +1122,7 @@ void HeldGuardDamageContract() {
         GameSimulation sim(config); InputSnapshot input;
         input.tutorialEnabled=false; input.yawRadians=config.playerStartYawRadians;
         input.guardHeld=true; input.commands.parry=1;
-        int contacts=0, damageEvents=0, successfulParries=0; bool sawGuard=false;
+        int contacts=0, damageEvents=0, successfulParries=0, guardEvents=0; bool sawGuard=false;
         const int desiredHits=frontal?2:1;
         for(int tick=0;tick<900 && contacts<desiredHits;++tick) {
             // A malicious/repeated command stream must not turn a held input
@@ -1013,9 +1131,19 @@ void HeldGuardDamageContract() {
             sim.StepFixed(input);
             const auto& state=sim.Snapshot();
             sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
+            std::uint64_t guardSequence=0;
             for(const auto& event:sim.Events().Events()) {
                 if(event.type==GameplayEventType::PlayerParrySucceeded) ++successfulParries;
                 if(event.type==GameplayEventType::PlayerDamaged) ++damageEvents;
+                if(event.type==GameplayEventType::PlayerGuardBlocked) {
+                    ++guardEvents; guardSequence=event.sequence;
+                    Check(event.source==EntityId::Player &&
+                          (event.target==EntityId::SkeletonA || event.target==EntityId::SkeletonB) &&
+                          event.tickIndex==state.tickIndex && Near(event.worldX,state.playerX) &&
+                          Near(event.worldZ,state.playerZ) && Near(event.listenerX,state.playerX) &&
+                          Near(event.listenerZ,state.playerZ) && Near(event.worldY,event.listenerY),
+                          "guard feedback freezes the actual guarding player, attacker and fixed-tick spatial tuple");
+                }
             }
             if(state.swordCombat.playerHitPulse) {
                 ++contacts;
@@ -1024,7 +1152,8 @@ void HeldGuardDamageContract() {
                 if(frontal)
                     Check(state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
                           state.playerVitals.invulnerabilityRemaining==0.f &&
-                          sample.outcome==CombatContactOutcome::GuardBlocked,
+                          sample.outcome==CombatContactOutcome::GuardBlocked &&
+                          guardSequence!=0 && sample.semanticEventSequence==guardSequence,
                           "each actual normal frontal guard contact fully blocks without granting post-hit immunity");
                 else
                     Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart &&
@@ -1035,8 +1164,10 @@ void HeldGuardDamageContract() {
             sim.ClearEvents();
         }
         Check(sawGuard && contacts==desiredHits && successfulParries==0 &&
-              damageEvents==(frontal?0:1),
+              damageEvents==(frontal?0:1) && guardEvents==(frontal?contacts:0),
               "held guard blocks real normal contacts without edge-spam parries or fake damage feedback");
+        input.paused=true;sim.AdvanceFrame(input,.5);
+        Check(sim.Events().Events().empty(),"pause cannot manufacture another held-guard contact cue");
     }
 
     GameSimulation red(Rules()); InputSnapshot redInput; redInput.tutorialEnabled=false;
@@ -1047,13 +1178,15 @@ void HeldGuardDamageContract() {
     }
     Check(ticks<600,"held-guard red-attack fixture completes real Keeper recognition");
     redInput.guardHeld=true; redInput.commands.parry=1;
-    bool sawGuard=false, sawRedHit=false; int redParries=0;
+    bool sawGuard=false, sawRedHit=false; int redParries=0, redBlocks=0;
     for(int tick=0;tick<600 && !sawRedHit;++tick) {
         red.StepFixed(redInput);
         const auto& state=red.Snapshot();
         sawGuard=sawGuard || state.playerCombat.action==PlayerCombatAction::Guard;
-        for(const auto& event:red.Events().Events())
+        for(const auto& event:red.Events().Events()) {
             if(event.type==GameplayEventType::PlayerParrySucceeded) ++redParries;
+            if(event.type==GameplayEventType::PlayerGuardBlocked) ++redBlocks;
+        }
         if(state.lich.damagePulse) {
             sawRedHit=true;
             Check(state.playerVitals.vitality==2 && !state.playerVitals.halfHeart,
@@ -1061,7 +1194,7 @@ void HeldGuardDamageContract() {
         }
         red.ClearEvents();
     }
-    Check(sawGuard && sawRedHit && redParries==0,
+    Check(sawGuard && sawRedHit && redParries==0 && redBlocks==0,
           "red-attack rejection is witnessed while guard has actually been active");
 
     auto legacyConfig=Rules(); legacyConfig.combatFoundation1_7=false;
@@ -1107,6 +1240,9 @@ void YellowGuardBreakAndDefences() {
             const auto& sample=trace.samples[(trace.nextIndex+trace.kCapacity-1)%trace.kCapacity];
             broke=sample.guardBroken && sample.incomingAttackKind==EnemyAttackKind::GuardBreak &&
                 sample.outcome==CombatContactOutcome::DamageAccepted;
+            for(const auto& event:held.Events().Events())
+                Check(event.type!=GameplayEventType::PlayerGuardBlocked,
+                      "an actual yellow guard break cannot play a successful block cue");
         }
         held.ClearEvents();
     }
@@ -1167,7 +1303,7 @@ void YellowGuardBreakAndDefences() {
 }
 
 void FourSkillPracticeAndExit() {
-    auto config=Rules(); config.waterfallSkeletonEncounter=false;
+    auto config=Rules(); config.waterfallSkeletonEncounter=false; config.sequentialPractice1_7=true;
     config.playerStartX=0; config.playerStartZ=-3.75f;
     GameSimulation sim(config); InputSnapshot input;
     Check(LearnBlockFromRealContact(sim,input) && sim.Snapshot().combatTeaching.stage==TutorialStage::Parry,
@@ -1189,6 +1325,44 @@ void FourSkillPracticeAndExit() {
     }
     Check(sim.Snapshot().combatTeaching.parryLearned && sim.Snapshot().combatTeaching.stage==TutorialStage::Dodge,
           "real successful parry advances the protected lesson to dodge");
+    // Both keyboard axes and controller axes use the same owner and accepted edge.
+    for(bool analogue:{false,true}) {
+        auto liveConfig=Rules(); liveConfig.sequentialPractice1_7=true;
+        liveConfig.playerStartX=-7.6f; liveConfig.playerStartZ=-15.2f; liveConfig.playerStartYawRadians=1.57079632679f;
+        GameSimulation evasion(liveConfig); InputSnapshot control; control.yawRadians=liveConfig.playerStartYawRadians;
+        Check(LearnBlockFromRealContact(evasion,control),"normal waterfall practice learns actual block before evasion probe");
+        for(int tick=0;tick<600;++tick) {
+            const auto& state=evasion.Snapshot(); const auto index=state.swordCombat.attackerIndex;
+            if(index>=0 && state.swordCombat.combatants[index].action==EnemyCombatAction::AttackWindup &&
+                state.swordCombat.combatants[index].actionTime>=CombatTimeline::kSkeletonAttackWindupSeconds-.1f)break;
+            evasion.StepFixed(control);
+        }
+        ++control.commands.parry;
+        for(int tick=0;tick<20 && !evasion.Snapshot().combatTeaching.parryLearned;++tick)evasion.StepFixed(control);
+        Check(evasion.Snapshot().combatTeaching.parryLearned,"normal waterfall practice learns actual parry before evasion probe");
+        control.guardHeld=false; control.analogueMovement=analogue;
+        bool red=false;
+        for(int tick=0;tick<600 && !red;++tick) {
+            const auto& state=evasion.Snapshot(); const auto index=state.swordCombat.attackerIndex;
+            red=index>=0 && state.swordCombat.combatants[index].attackKind==EnemyAttackKind::Unblockable &&
+                state.swordCombat.combatants[index].action==EnemyCombatAction::AttackWindup &&
+                state.swordCombat.combatants[index].actionTime>=CombatTimeline::kSkeletonAttackWindupSeconds-.3f;
+            if(!red)evasion.StepFixed(control);
+        }
+        Check(red,"evasion test reaches a real nearby red attack without staging actor state");
+        const auto protectedBefore=evasion.Snapshot().dodgeProtectedHitCount;
+        control.moveForward=-1; ++control.commands.dodge;
+        for(int tick=0;tick<35;++tick) {
+            if(tick==12)control.moveForward=0;
+            evasion.StepFixed(control);
+        }
+        std::cout<<"Evasion analogue="<<analogue<<" learned="<<evasion.Snapshot().combatTeaching.dodgeLearned
+            <<" protected="<<evasion.Snapshot().dodgeProtectedHitCount-protectedBefore<<" player="<<evasion.Snapshot().playerX<<","<<evasion.Snapshot().playerZ
+            <<" accepted="<<evasion.Snapshot().acceptedDodgeSequence<<" actor="<<evasion.Snapshot().swordCombat.combatants[0].x<<","<<evasion.Snapshot().swordCombat.combatants[0].z<<"\n";
+        Check(evasion.Snapshot().combatTeaching.dodgeLearned &&
+              evasion.Snapshot().dodgeProtectedHitCount==protectedBefore,
+              "keyboard/controller outward dodge learns through real spatial evasion without any invulnerability contact");
+    }
     Check(reachTell(5.f/60),"four-skill practice waits for the next real attack before its outward dodge");
     input.moveStrafe=1; ++input.commands.dodge;
     for(int tick=0;tick<30;++tick) {
@@ -1210,7 +1384,9 @@ void FourSkillPracticeAndExit() {
     ++input.commands.attack; bool actualHit=false;
     for(int tick=0;tick<100 && !sim.Snapshot().combatTeaching.attackFromGuardLearned;++tick) {
         sim.StepFixed(input);
-        for(const auto& event:sim.Events().Events()) actualHit=actualHit || event.type==GameplayEventType::EnemyHit;
+        for(const auto& event:sim.Events().Events()) if(event.type==GameplayEventType::EnemyHit) {
+            actualHit=true;CheckContactBurst(sim.Snapshot(),event);
+        }
         sim.ClearEvents();
     }
     const auto ready=sim.Snapshot().combatTeaching;
@@ -1548,7 +1724,9 @@ void IntegratedKeeperRepelAndReward() {
     int hits=0, defeated=0, unlocked=0;
     auto collect=[&] {
         for(const auto& event:sim.Events().Events()) {
-            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) ++hits;
+            if(event.type==GameplayEventType::EnemyHit && event.target==EntityId::Lich) {
+                ++hits;CheckContactBurst(sim.Snapshot(),event);
+            }
             if(event.type==GameplayEventType::LichDefeated && event.target==EntityId::Lich) {
                 ++defeated; defeatedSequence=event.sequence;
             }
@@ -1582,6 +1760,27 @@ void IntegratedKeeperRepelAndReward() {
           "integrated retry restores full mist with the living Keeper");
 }
 }
+void SuccessfulHitParticleLifecycle() {
+    auto config=ProductionGameSimulationConfig();config.swordStartsStowed=false;
+    config.playerStartX=-4.5f;config.playerStartZ=-15.3f;config.playerStartYawRadians=-2.275290391f;
+    GameSimulation sim(config);InputSnapshot input;input.tutorialEnabled=false;input.damageEnabled=false;
+    input.yawRadians=config.playerStartYawRadians;
+    sim.StepFixed(input);sim.ClearEvents();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"idle enemy proximity cannot create particles");
+    ++input.commands.attack;bool hit=false;
+    for(int n=0;n<45 && !hit;++n) {
+        sim.StepFixed(input);
+        for(const auto& e:sim.Events().Events())if(e.type==GameplayEventType::EnemyHit) {
+            CheckContactBurst(sim.Snapshot(),e);hit=true;
+        }
+        sim.ClearEvents();
+    }
+    Check(hit && sim.Snapshot().enemyHitParticles.Active(),"real production-pair accepted sword contact creates a burst");
+    sim.SynchronizePausedInput(input,1,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"pause before expiry clears actual emitted burst");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry restores gameplay without old contact particles");
+}
 void OutgoingTraceContract() {
     GameSimulation sim(Rules()); InputSnapshot input; input.damageEnabled=false;
     sim.BeginCombatPractice(EnemyKind::Skeleton);
@@ -1596,6 +1795,12 @@ void OutgoingTraceContract() {
         if(sample.tick!=state.tickIndex || sample.cut==PlayerAttackCut::None) continue;
         Check(sample.hasSwordTransform && sample.worldFromSword==state.heldItems[1].worldFromItem,
               "contact trace samples the actual published sword attachment on its owning fixed tick");
+        if(sample.outcome==CombatContactOutcome::AcceptedSwordContact) {
+            bool matched=false;
+            for(const auto& b:state.enemyHitParticles.bursts)
+                matched|=b.eventSequence==sample.semanticEventSequence && b.target==sample.target && b.age==0;
+            Check(matched,"actual accepted damage publishes exactly its matching target/sequence burst on the contact tick");
+        }
         Check(!sample.hasBlade&&!sample.hasSeparation,
               "forgiving contact policy cannot fabricate physical blade/triangle measurements");
         if(sample.cut==PlayerAttackCut::DownwardCut) {
@@ -1611,6 +1816,9 @@ void OutgoingTraceContract() {
     Check(sawDown&&sawUp&&downId!=0&&upId!=downId,
           "each cut has a distinct identity across a buffered continuation");
     sim.SynchronizePausedInput(input,2,PausedInputPolicy::DiscardAllCommands);
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"lifecycle pause cancels published particles without delayed replay");
+    sim.RetryEncounter();
+    Check(!sim.Snapshot().enemyHitParticles.Active(),"retry begins with no old hit burst");
     Check(sim.Snapshot().combatContactTrace.count==0,
           "lifecycle cancellation cannot replay old contact observations");
 }
@@ -2218,8 +2426,10 @@ struct RevivalIntegrationFixture {
     }
     GameSimulation sim{Config()};
     InputSnapshot input{};
-    int cries=0, defeats=0;
-    RevivalIntegrationFixture() {
+    int cries=0, defeats=0, keeperReveals=0;
+    bool naturalPath=false;
+    RevivalIntegrationFixture(bool natural=false) : sim([&]{auto cfg=Config();cfg.naturalPracticeRevival1_7=natural;
+        if(natural)cfg.sequentialPractice1_7=true;return cfg;}()), naturalPath(natural) {
         input.yawRadians=1.57079632679f; input.tutorialSlowdownEnabled=false;
         Check(sim.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
               "revival integration admits the exact Dead89/30 and Stand1.5 owner receipt");
@@ -2230,6 +2440,7 @@ struct RevivalIntegrationFixture {
             for(const auto& event:sim.Events().Events()) {
                 cries+=event.type==GameplayEventType::LichRevivalCry ? 1 : 0;
                 defeats+=event.type==GameplayEventType::EnemyDefeated ? 1 : 0;
+                keeperReveals+=event.type==GameplayEventType::KeeperRevealStarted ? 1 : 0;
             }
             sim.ClearEvents();
         }
@@ -2285,6 +2496,7 @@ struct RevivalIntegrationFixture {
         Check(learned.blockLearned && learned.parryLearned && learned.dodgeLearned &&
               learned.attackFromGuardLearned && learned.stage==TutorialStage::Ready && learned.safePractice,
               "revival integration earns all four lessons through actual contacts and guard-attack recovery");
+        if(naturalPath)return true;
         if(!Tell(.30f)) return false;
         ++input.commands.tutorialSkip; Step();
         Check(sim.Snapshot().combatTeaching.exitPending && sim.Snapshot().combatTeaching.safePractice,
@@ -2464,6 +2676,35 @@ void RevivalIntegrationEarnedPath() {
             <<" lich-phase="<<int(state.lich.phase)<<" reveal-phase="<<int(state.lich.revealPhase)
             <<" reveal-started="<<state.lich.revealStarted<<" reveal-complete="<<state.lich.revealComplete<<'\n';
     };
+    // Abandoning the optional lesson is not a victory over its live guards.
+    // It only removes the separate Keeper-admission blocker after safe exit.
+    RevivalIntegrationFixture abandoned(true); abandoned.input.damageEnabled=false;
+    keeperArrival(abandoned);
+    Check(abandoned.Until([&]{return abandoned.sim.Snapshot().lich.revealStarted;},720),
+          "walking from an unfinished lesson into the real settled-torch Keeper arrival admits its reveal");
+    const auto abandonedArrival=abandoned.sim.Snapshot();
+    Check(abandonedArrival.combatTeaching.stage==TutorialStage::Skipped &&
+          !abandonedArrival.combatTeaching.safePractice && !abandonedArrival.combatTeaching.exitPending &&
+          abandonedArrival.swordCombat.aliveCount==2 && !abandonedArrival.openingEncounterComplete &&
+          abandoned.cries==0 && abandoned.defeats==0 && abandoned.keeperReveals==1,
+          "abandoned lesson ends protection without inventing guard deaths, revival or opening completion");
+    abandoned.Stage(-7.6f,-15.2f,1.57079632679f);
+    keeperArrival(abandoned); abandoned.Step(60);
+    Check(abandoned.keeperReveals==1 && abandoned.cries==0 && abandoned.defeats==0 &&
+          abandoned.sim.Snapshot().swordCombat.aliveCount==2 &&
+          !abandoned.sim.Snapshot().openingEncounterComplete,
+          "repeated Keeper entry retains live guards and does not replay reveal or revival cues");
+    abandoned.input.damageEnabled=true;
+    Check(abandoned.Until([&]{return !abandoned.sim.Snapshot().playerAlive;},1800),
+          "Keeper admitted after abandoned lessons has real lethal damage authority");
+    abandoned.sim.RetryEncounter();
+    Check(abandoned.sim.Snapshot().playerAlive && abandoned.sim.Snapshot().zone==ShowcaseZone::Finale &&
+          abandoned.sim.Snapshot().retryCheckpoint==9 &&
+          std::abs(abandoned.sim.Snapshot().playerX-kKeeperRetryPosition.x)<.001f &&
+          std::abs(abandoned.sim.Snapshot().playerZ-kKeeperRetryPosition.z)<.001f &&
+          abandoned.sim.Snapshot().swordCombat.aliveCount==2 &&
+          !abandoned.sim.Snapshot().openingEncounterComplete && abandoned.cries==0,
+          "abandoned-lesson Keeper death Retry returns to the Keeper checkpoint without fabricating guard defeat");
     auto keeperBefore=f;
     keeperArrival(keeperBefore); keeperBefore.Step(720); printKeeperGate(keeperBefore);
     Check(!keeperBefore.sim.Snapshot().lich.revealStarted && !keeperBefore.sim.Snapshot().openingEncounterComplete,
@@ -2514,9 +2755,72 @@ void RevivalIntegrationReplayAndOptOut() {
           !disabled.ConfigureSkeletonRevivalPresentation(1,kRevivalDeadSeconds,kRevivalStandSeconds),
           "the normal default remains revival-OFF even if a presentation receipt is offered");
 }
+void NaturalRevivalIntegration() {
+    using Phase=SkeletonRevivalPhase;
+    RevivalIntegrationFixture f(true);
+    Check(f.LearnAndFinish(),"natural private path earns all four actual outcomes without Finish");
+    Check(f.input.commands.tutorialSkip==0 && f.sim.Snapshot().combatTeaching.safePractice &&
+        f.sim.Snapshot().combatTeaching.stage==TutorialStage::Ready,
+        "four skills retain protection and proceed directly to real practice kills");
+    f.sim.ConfigureSkeletonRevivalPresentation(2,kRevivalDeadSeconds,kRevivalStandSeconds,false);
+    if(!f.KillPair())return;
+    f.Step(240);
+    Check(f.cries==0 && f.sim.Snapshot().skeletonRevival.phase==Phase::FirstFight &&
+        f.sim.Snapshot().combatTeaching.safePractice && f.sim.Snapshot().playerVitals.vitality==3,
+        "actual protected practice kills cannot consume a cry before aggregate resource/audio readiness");
+    f.sim.ConfigureSkeletonRevivalPresentation(3,kRevivalDeadSeconds,kRevivalStandSeconds);
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Signal;},10) && f.cries==1,
+        "settled real practice corpses automatically emit one authoritative lich cue without a menu command");
+    auto signalRetry=f;signalRetry.sim.RetryEncounter();
+    Check(signalRetry.sim.Snapshot().skeletonRevival.phase==Phase::Live &&
+        signalRetry.sim.Snapshot().combatTeaching.stage==TutorialStage::Complete &&
+        !signalRetry.sim.Snapshot().combatTeaching.safePractice && signalRetry.cries==1,
+        "retry after consuming the cry immediately restores the live fight without stale practice protection");
+    f.input.paused=true; const auto phaseTime=f.sim.Snapshot().skeletonRevival.phaseSeconds; f.Step(20);
+    Check(f.sim.Snapshot().skeletonRevival.phaseSeconds==phaseTime && f.cries==1,
+        "pause preserves the consumed signal without advancing or repeating it");
+    f.input.paused=false;
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Rising;},60),"natural rise follows the single cry lead");
+    f.sim.ConfigureSkeletonRevivalPresentation(4,kRevivalDeadSeconds,kRevivalStandSeconds,false,true);
+    const auto frozenRise=f.sim.Snapshot().skeletonRevival.phaseSeconds;f.Step(60);
+    Check(f.sim.Snapshot().skeletonRevival.phaseSeconds==frozenRise && !f.sim.Snapshot().skeletonRevivalPresentationReady &&
+        f.sim.Snapshot().skeletonRevivalVisualReady && f.cries==1,
+        "audio reload freezes the authoritative rise while current visual clips can present its frozen pose");
+    f.sim.ConfigureSkeletonRevivalPresentation(5,kRevivalDeadSeconds,kRevivalStandSeconds);
+    Check(f.Until([&]{return f.sim.Snapshot().skeletonRevival.phase==Phase::Live;},600) && f.cries==1 &&
+        f.sim.Snapshot().swordCombat.aliveCount==2 && !f.sim.Snapshot().combatTeaching.safePractice &&
+        f.sim.Snapshot().combatTeaching.stage==TutorialStage::Complete,
+        "visible reverse/stand/rearm clocks precede atomic revival and automatic protection exit");
+    Check(horde::platform::windows::CombatTeachingPromptText(f.sim.Snapshot().combatTeaching,true).find("LIVE FIGHT:")!=std::string::npos,
+        "the exact shared live publication explicitly announces damage eligibility");
+    auto notice=f;
+    notice.input.damageEnabled=false; notice.input.paused=true;
+    const auto noticeTime=notice.sim.Snapshot().skeletonRevival.phaseSeconds;
+    notice.Step(420);
+    Check(notice.sim.Snapshot().skeletonRevival.phaseSeconds==noticeTime,
+        "paused live handoff does not consume the short damage notice");
+    notice.input.paused=false; notice.Step(420);
+    Check(notice.sim.Snapshot().skeletonRevival.phase==Phase::Live &&
+        !notice.sim.Snapshot().combatTeaching.liveFightNotice &&
+        horde::platform::windows::CombatTeachingPromptText(notice.sim.Snapshot().combatTeaching,true).find("LIVE FIGHT:")==std::string::npos,
+        "live damage continues but the transition notice expires without killing guards or leaving the room");
+    auto retry=f; retry.sim.RetryEncounter();retry.Step();
+    Check(retry.sim.Snapshot().skeletonRevival.consumed && retry.sim.Snapshot().skeletonRevival.phase==Phase::Live && retry.cries==1,
+        "retry retains one-time consumption and learned completion without a repeated revival");
+    f.NearActor(0); const auto health=f.sim.Snapshot().playerVitals.vitality;
+    Check(f.Until([&]{return f.sim.Snapshot().playerVitals.vitality<health || f.sim.Snapshot().playerVitals.halfHeart;},600),
+        "the actual revived attacker deals live damage after the protected-to-live HUD handoff");
+    f.input.damageEnabled=false;
+    if(f.KillPair()) {f.Step();Check(f.sim.Snapshot().openingEncounterComplete && f.cries==1,
+        "only final pair defeat completes the natural opening and never replays the cue");}
+    RevivalIntegrationFixture skip(true); ++skip.input.commands.tutorialSkip;
+    Check(skip.Until([&]{return skip.sim.Snapshot().skeletonRevival.phase==Phase::Live;},300) && skip.cries==0 &&
+        skip.sim.Snapshot().combatTeaching.stage==TutorialStage::Skipped,
+        "natural private candidate retains the explicit Skip opt-out without a forced revival");
+}
 void RevivalIntegrationProfile() {
     std::cout<<"revival integration: actual outcomes with unit-staged player poses; not a natural playthrough\n";
-    RevivalIntegrationEarnedPath(); RevivalIntegrationReplayAndOptOut();
+    RevivalIntegrationEarnedPath(); RevivalIntegrationReplayAndOptOut(); NaturalRevivalIntegration();
 }
 } // namespace
 
@@ -2528,6 +2832,9 @@ int main(int argc,char** argv) {
     }
     if(argc!=1) { std::cerr<<"unknown combat foundation profile\n"; return 2; }
     SkeletonRevivalBridgeContract();
+    BoundedOpeningPractice();
+    ThreatBoundedDodgeLesson();
+    AttackHoldSheathContract();
     PracticePromptWaitsForSword();
     InPlacePairRevivalContract();
     RulesEligibilityDoesNotChoosePracticeExit();
@@ -2535,6 +2842,7 @@ int main(int argc,char** argv) {
     HeldGuardDamageContract(); GuardAttackAndReleaseAtContact(); GuardInterruptionRearm();
     YellowGuardBreakAndDefences(); FourSkillPracticeAndExit();
     IntegratedKeeperRepelAndReward();
+    SuccessfulHitParticleLifecycle();
     OutgoingTraceContract();
     EnemyAttackKindAuthority();
     NonfatalPairHitPreservesIndependentActions();

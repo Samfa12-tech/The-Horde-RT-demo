@@ -1,0 +1,13 @@
+# Windows keyboard-to-mouse-look handoff candidate
+
+Base: main `1b119d52`, including PR27 and the experiment-ledger reconciliation. Work uses a new development branch; the merged PR27 branch and parked owner files are preserved.
+
+The owner reported difficulty returning from controller to keyboard/mouse after the R15 test. Source inspection establishes that mouse look is acquired only by a separate click, while fresh keyboard gameplay actions do not acquire it. This is an identified handoff gap, not proof of the complete native focus failure's cause.
+
+A fresh focused gameplay W/A/S/D, run-toggle or currently available action now requests mouse look through the same native acquisition routine as the existing click. Existing capture is not repeatedly hidden/warped. Menus, inactive/root-child focus, shortcuts, repeat events, unavailable lantern/flask bindings and hidden validation modes cannot acquire it. The centering warp is seeded as zero look delta. A failed focus/capture attempt clears input and consumes that key; it cannot republish a hold after cancellation. First acquisition clicks remain action-free. Pause/focus-loss release, controller mappings, shared gameplay rules and Android are unchanged.
+
+The new policy/negative checks compile and the initial native-wiring assertion fails before integration. This is a source-contract red test, not an observed Windows gameplay reproduction. Windows Release builds and the affected desktop-controller/source-graphics checks pass after integration. No foreground application, phone, real controller input, save/settings or live report transmission is used for this slice. Native acceptance is still required: controller play → fresh keyboard movement plus mouse look, repeated device switching, pause/menu, Alt+Tab and held guard release. Do not mark the owner's complete switching report fixed from these host checks.
+
+Open issue reconciliation: #25 still requires live reporting/website/E2E; #33 opening-grate repetition lacks a verified exact-phone fix; #35 pause cards/speaker names/readability remain incomplete; #28 mist correction is deferred/unadmitted; #34 phone performance is ongoing, not a fixed-FPS veto; #13 public-source asset rights remain unresolved. Previously closed #23/#24 retain their own evidence. No issue is closed by this source-only candidate.
+
+Next order after review: bounded grounded combat feedback, then a coherent all-direction forest content pass within admitted RT ownership, preserving existing world layout. Keep source/cost proof separate from native visual acceptance. No merge, release or deployment is included.

@@ -87,12 +87,22 @@ bool PrepareCampaignResources(SwapchainContext& context)
     const auto extent=ScaledRenderExtent(context.swapchainExtent,context.renderScale);
     const auto root=context.reportDirectory+"/..";
     std::string diagnostic;
+    auto skeletonPath=root+"/skeleton_biped_merged_animations_v01.glb";
+    std::vector<horde::scene::SkinnedClipBinding> bindings;
+#if HORDE_RT_REVIVAL_ADMITTED
+    skeletonPath=root+"/private_revival/skeleton.glb";
+    const auto& ordinary=horde::scene::SkeletonCombatClipSet().clips;
+    bindings.assign(ordinary.begin(),ordinary.end());bindings.push_back({"SkeletonProof|StandDead0ToIdle",false,true});
+#endif
+#if HORDE_RT_FLASK_ADMITTED
+    if(!scene.SetPlayerUtilityCandidateAsset(root+"/private_flask/player.glb"))return false;
+#endif
     const bool ready=scene.Initialise(context.instance,context.physicalDevice,context.device,
         context.graphicsQueue,context.commandPool,extent,context.swapchainFormat,
-        root+"/skeleton_biped_merged_animations_v01.glb",root+"/lich_placeholder_merged_animations_v01.glb",
+        skeletonPath,root+"/lich_placeholder_merged_animations_v01.glb",
         root,root,diagnostic,{},root,context.executionBackend,
         horde::vulkan::raytracing::RtSceneProfile::Showcase,context.graphicsSettings.glassEnabled,
-        context.pipelineCache,context.compiledPipelineCache?&context.compiledPipelineCache->cache:nullptr);
+        context.pipelineCache,context.compiledPipelineCache?&context.compiledPipelineCache->cache:nullptr,bindings);
     __android_log_print(ready?ANDROID_LOG_INFO:ANDROID_LOG_ERROR,kTag,
         "HORDE_CAMPAIGN_RESOURCE_PREP request=%llu ready=%d previous_scene_retained=1 diagnostic=%s",
         static_cast<unsigned long long>(gCampaignOwnerRequest),ready?1:0,diagnostic.c_str());
@@ -140,6 +150,8 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         if(!CampaignRootMatches(configured,context)){gCampaignPhase=8;gCampaignError=11;PublishCampaignOnOwner(context);return;}
         // Configuration is admitted only between Activity-owned surface sessions.
         // No owner directory is scanned, migrated, removed or created here.
+        gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
         gCampaignSession=std::make_unique<campaign::PlaySession>(gGameSimulation,configured);
         gCampaignOwnerRoot=configured;gCampaignPhase=1;gCampaignError=0;
         gCampaignRetryOperationRevision=0;gCampaignConfirmedRetry=false;
@@ -161,6 +173,8 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         if(command->generation!=context.surfaceGeneration || !gSurfaceSessions.IsCurrent(command->generation)) {
             gCampaignError=8;
         } else if(command->action==4) {
+            gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
             if(!gCampaignBarrier.State().loaded || !gCampaignBarrier.KeepsPaused()) {
                 // Consume an already-published retry before cancelling, even if
                 // this command beat its automatic operation activation.
@@ -174,6 +188,10 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
             // camera/presentation handshake while Java keeps its menu visible.
         } else if(gCampaignBarrier.State().loaded && gCampaignBarrier.KeepsPaused()) {
             gCampaignError=2;
+        } else if(command->action==6) {
+            // The logical end intent survives surface recreation, but closure
+            // below still requires fresh Entry controls for the current owner.
+            gCampaignEndRequested.store(true,std::memory_order_release);
         } else if(command->action==1) {
             gCampaignSession->RefreshCatalogue();gCampaignError=0;
             gCampaignLastAction=1;gCampaignPhase=1;
@@ -193,7 +211,10 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
             } else FailCampaignOnOwner(2);
         } else if(command->action==5) {
             gCampaignLastAction=5;gCampaignError=0;
-            if(gGameSimulation.Snapshot().staticDetailLease.resourceGeneration) {
+            if(!campaign::CanStartNewGame(gCampaignSession->Catalogue(),command->slot)) {
+                gCampaignPhase=8;gCampaignError=12;
+                gCampaignPauseGate.store(false,std::memory_order_release);
+            } else if(gGameSimulation.Snapshot().staticDetailLease.resourceGeneration) {
                 std::lock_guard lock(gCampaignMutex);
                 if(!gCampaignCommand)gCampaignCommand=command;
                 gCampaignPhase=4;gCampaignPauseGate.store(true,std::memory_order_release);
@@ -207,8 +228,7 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
                    (gCampaignCommand && gCampaignCommand->action==4)) {
                     gCampaignPhase=8;gCampaignError=8;gCampaignPauseGate.store(false,std::memory_order_release);
                 } else if(gCampaignSession->BeginNewGame(command->slot)) {
-                gGameSimulation= horde::gameplay::simulation::GameSimulation(
-                    horde::gameplay::simulation::ProductionGameSimulationConfig());
+                gGameSimulation=horde::gameplay::simulation::CreateApplicationGameSimulation();
                 gGameSimulation.StartLiveDevelopmentRescueJourney(true);
                 gGameSimulation.SynchronizePausedInput(gInputPublisherState,gInputMailbox.PublishedSequence());
                 gCampaignNewGameYaw=gGameSimulation.Snapshot().playerYawRadians;
@@ -348,6 +368,32 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
        !gCampaignPauseGate.load(std::memory_order_acquire) && !context.captureActive &&
        !context.routeReplayActive && !context.inAppBenchmark.IsRunning() && !context.benchmarkSampling)
         gCampaignSession->ObserveSafeBoundary();
+    if(gCampaignEndRequested.load(std::memory_order_acquire)) {
+        bool currentEntry=false;
+        {
+            std::lock_guard lock(gGraphicsMutex);
+            currentEntry=gEntryControls.enabled && !gEntryControls.play &&
+                horde::graphics::CurrentEntryMenuControls(gEntryControls,context.surfaceGeneration);
+        }
+        // Poll/completion handling above owns write success and failure first.
+        // Never erase a newly failed write while automatically returning.
+        const auto ending=gCampaignSession->State();
+        if(ending.outcome==campaign::PlayOutcome::Failed &&
+           !gCampaignEndFailureAcknowledged.load(std::memory_order_acquire)) {
+            gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
+            gCampaignPhase=8;gCampaignError=CampaignStorageError(ending.result);gCampaignLastAction=6;
+        } else if(currentEntry && !gCampaignPreparation && !gCampaignPreparedScene &&
+                  !gCampaignBarrier.HasPendingCommittedLoad()) {
+            if(gCampaignSession->TryEndActiveGame()) {
+                gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
+                gCampaignPhase=1;gCampaignError=0;gCampaignLastAction=6;
+                gCampaignShowcaseOverride.store(false,std::memory_order_release);
+                gCampaignPauseGate.store(false,std::memory_order_release);
+            } else {gCampaignPhase=2;gCampaignError=0;gCampaignLastAction=6;}
+        }
+    }
     PublishCampaignOnOwner(context);
 }
 

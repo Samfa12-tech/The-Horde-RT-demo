@@ -1,0 +1,50 @@
+{
+  "sourceParent": "a2ccf862be6525426884252ea7f96817e3e46f1f",
+  "scope": "Working-tree smoke/menu changes in this commit; frozen Debug native RT image, not natural gameplay or a performance run. No private save or report contents included.",
+  "captures": [
+    {
+      "particles": "standard",
+      "executableSha256": "6cec1a36546430839e9ade5e785e5ca886a567f1e813f1e5b6dcbfcc3ca92093",
+      "imageSha256": "d0134a9902cf7b9097076db5a49416ead6ae14a5062013c0fda79e28611518d1",
+      "complete": true,
+      "source": "rt-storage-image",
+      "executionBackend": "RayTracingPipeline",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "9af136e444bf1f5bb519477d935fb3b201103e163cd5f78d10bd6eb47e5e5222"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "e4c7cf34d67cc6f74d919452c812383a1abd3f4fcbc9ae6632e2743c6c1c9e6a"
+        }
+      },
+      "exitCode": 0,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true
+    },
+    {
+      "particles": "off",
+      "executableSha256": "6cec1a36546430839e9ade5e785e5ca886a567f1e813f1e5b6dcbfcc3ca92093",
+      "imageSha256": "8f669565fa0a13c7aacc9065b30af23d7762a338a25fe2c98c33920e1d5f16a5",
+      "complete": true,
+      "source": "rt-storage-image",
+      "executionBackend": "RayTracingPipeline",
+      "shaderPair": {
+        "opaqueFast": {
+          "key": "diagnostic_high_opaque_fast",
+          "sha256": "9af136e444bf1f5bb519477d935fb3b201103e163cd5f78d10bd6eb47e5e5222"
+        },
+        "genericDielectric": {
+          "key": "diagnostic_high_generic_dielectric",
+          "sha256": "e4c7cf34d67cc6f74d919452c812383a1abd3f4fcbc9ae6632e2743c6c1c9e6a"
+        }
+      },
+      "exitCode": 0,
+      "foregroundUnchanged": true,
+      "settingsUnchanged": true,
+      "campaignUnchanged": true
+    }
+  ]
+}

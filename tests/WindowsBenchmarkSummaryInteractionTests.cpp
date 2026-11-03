@@ -144,15 +144,16 @@ bool Capture(HWND window,const wchar_t* name)
 }
 void CheckDefaults(HWND form)
 {
-    for(int id:{kSummaryConsent,kSummaryHardware})Check(Send(SummaryReviewControl(form,id),BM_GETCHECK)==BST_UNCHECKED,"consent/hardware must reset OFF");
+    for(int id:{kSummarySendConsent,kSummaryHardware})Check(Send(SummaryReviewControl(form,id),BM_GETCHECK)==BST_UNCHECKED,"send consent/hardware must reset OFF");
     Check(Send(SummaryReviewControl(form,kSummaryCooling),CB_GETCURSEL)==0,"cooling must reset Unknown");
-    for(int id:{kSummaryPrepare,kSummaryCopy,kSummarySave})Check(!IsWindowEnabled(SummaryReviewControl(form,id)),"preparation/export enabled before consent");
+    for(int id:{kSummaryCopy,kSummarySave,kSummarySend})Check(!IsWindowEnabled(SummaryReviewControl(form,id)),"export/send enabled before review and send consent");
+    Check(IsWindowEnabled(SummaryReviewControl(form,kSummaryPrepare))!=FALSE,"explicit local review action unavailable");
+    Check(!IsWindowVisible(SummaryReviewControl(form,kSummaryPreview))&&!IsWindowVisible(SummaryReviewControl(form,kSummarySendPreview)),"technical JSON must start collapsed");
     Check(Text(SummaryReviewControl(form,kSummaryPreview)).empty(),"prior exact bytes remain visible after new review");
 }
 void Prepare(HWND form)
 {
-    Send(SummaryReviewControl(form,kSummaryConsent),BM_SETCHECK,BST_CHECKED);Click(form,kSummaryConsent);
-    Check(IsWindowEnabled(SummaryReviewControl(form,kSummaryPrepare))!=FALSE,"fresh consent did not enable Prepare");
+    Check(IsWindowEnabled(SummaryReviewControl(form,kSummaryPrepare))!=FALSE,"explicit local review must be available without remote consent");
     Click(form,kSummaryPrepare);
 }
 }
@@ -184,9 +185,18 @@ void TestStatisticsReceipts(const horde::telemetry::FrozenBenchmarkSummary& froz
     Check(flow.Send(nullptr)&&PumpStatistics(nullptr,flow)&&flow.Result()==WindowsPlaytestSubmissionResult::Queued&&flow.CanSend(),
         "accepted public intake remains pending and offers an explicit receipt recheck");
     Check(std::wstring_view(flow.StatusText()).find(L"NOT published")!=std::wstring_view::npos,"queued status must not claim publication");
+    flow.services.synthetic=false;
+    Check(std::wstring_view(flow.StatusText()).find(L"AWAITING REVIEW")!=std::wstring_view::npos &&
+        std::wstring_view(flow.StatusText()).find(L"NOT published")!=std::wstring_view::npos,
+        "live queued copy must distinguish verification/intake from publication");
+    flow.services.synthetic=true;
     Check(flow.Send(nullptr)&&PumpStatistics(nullptr,flow)&&flow.Result()==WindowsPlaytestSubmissionResult::Published&&!flow.CanSend(),
         "only a matching published receipt completes public flow");
     const auto withoutToken=[](const std::string& body){auto at=body.rfind(",\"turnstileToken\":");return at==body.npos?std::string{}:body.substr(0,at)+"}";};
+    flow.services.synthetic=false;
+    Check(std::wstring_view(flow.StatusText()).find(L"PUBLISHED -") == 0,
+        "only the matching published receipt may display the live published heading");
+    flow.services.synthetic=true;
     Check(verification==2&&publicCalls==2&&privateCalls==0&&bodies[0]!=bodies[1]&&
         withoutToken(bodies[0])==flow.Json()&&withoutToken(bodies[1])==flow.Json()&&
         local.Json().find("consentToPublish")==std::string_view::npos,
@@ -234,14 +244,19 @@ int RunWindowsBenchmarkSummaryInteractionTests(const char* directory)
     if(!form){Gdiplus::GdiplusShutdown(token);return 2;}
     ShowWindow(form,SW_SHOWNOACTIVATE);UpdateWindow(form);
     const UINT dpi=GetDpiForWindow(form);Check(GetForegroundWindow()!=form,"fixture must not activate foreground");
-    CheckDefaults(form);Click(form,kSummaryPrepare);Click(form,kSummaryCopy);Click(form,kSummarySave);
-    Check(!state.prepared.IsReady()&&copies==0&&saves==0,"unchecked actions reached a destination");
+    CheckDefaults(form);Click(form,kSummaryCopy);Click(form,kSummarySave);Click(form,kSummarySend);
+    Check(!state.prepared.IsReady()&&copies==0&&saves==0,"actions before review/remote consent reached a destination");
     Send(SummaryReviewControl(form,kSummaryHardware),BM_SETCHECK,BST_CHECKED);
     Send(SummaryReviewControl(form,kSummaryCooling),CB_SETCURSEL,2);
     Prepare(form);Check(state.prepared.IsReady(),"private native preparation failed");
     const std::string privateJson(state.prepared.Json());
     Check(privateJson.find("Test GPU")!=privateJson.npos,"explicit synthetic hardware choice was not retained");
     Check(Text(SummaryReviewControl(form,kSummaryPreview))==state.preview,"preview differs from actual fixed bytes");
+    Check(Text(SummaryReviewControl(form,kSummaryPreviewLabel)).find(L"measured frames")!=std::wstring::npos,"human-readable review summary absent");
+    Click(form,kSummaryDetails);
+    Check(IsWindowVisible(SummaryReviewControl(form,kSummaryPreview))&&IsWindowVisible(SummaryReviewControl(form,kSummarySendPreview)),"explicit technical disclosure did not reveal exact bytes");
+    Click(form,kSummaryDetails);
+    Check(!IsWindowVisible(SummaryReviewControl(form,kSummaryPreview)),"technical details did not collapse");
     Click(form,kSummaryCopy);Check(copies==1&&ClipboardBytes().empty(),"failed Copy did not remain explicit/retryable");
     copyAccepted=true;Click(form,kSummaryCopy);Check(ClipboardBytes()==privateJson,"Copy changed private UTF-8 bytes");
     Check(ClipboardText()==state.preview,"Copy changed Unicode preview text");
@@ -308,6 +323,20 @@ int RunWindowsBenchmarkSummaryInteractionTests(const char* directory)
         std::ifstream file(outputDirectory/("approved-"+std::to_string(attempt)+".json"),std::ios::binary);
         const std::string disk((std::istreambuf_iterator<char>(file)),std::istreambuf_iterator<char>());
         Check(file.is_open()&&disk==saved[attempt-1],"isolated file bytes differ from approved native export");
+    }
+    state.prepared.SelectPublic(true);
+    form=CreateWindowExW(WS_EX_NOACTIVATE|WS_EX_CONTROLPARENT,kSummaryReviewWindowClass,L"Direct public fixture",
+        WS_OVERLAPPEDWINDOW|WS_CLIPCHILDREN|WS_VSCROLL,16,16,800,800,nullptr,nullptr,GetModuleHandleW(nullptr),&state);
+    Check(form!=nullptr,"direct public form creation failed");
+    if(form) {
+        ShowWindow(form,SW_SHOWNOACTIVATE);UpdateWindow(form);CheckDefaults(form);
+        Check(state.prepared.IsPublicPreview() && Text(form)==L"Publish to Horde results website",
+            "direct public entry must not start on the private destination");
+        Check(Capture(form,L"direct-public-start.png"),"direct public preview capture unavailable");
+        Prepare(form);
+        Check(state.submission.Json().empty() && !state.submission.CanSend(),
+            "local Review action must not grant publication consent or create a remote request");
+        Click(form,kSummaryClose);
     }
     ClearFixtureClipboard();Gdiplus::GdiplusShutdown(token);
     std::cout<<"Native summary control interaction "<<(passed?"PASS":"FAIL")<<" dpi="<<dpi<<" saves="<<saves<<" copies="<<copies

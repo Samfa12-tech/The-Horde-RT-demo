@@ -398,6 +398,27 @@ establish physical playback/performance acceptance.
   or production replacement is asserted.
 
 
+### 1.7 whole-route woodland source candidates (2026-10-31)
+
+`assets/models/world/source/forest-surroundings-v1/` contains original project-
+authored middle/far pine/alder geometry and a modular three-rail timber boundary.
+The recipes derive from the owned tree-pair trunk/root centreline records and
+reuse its exact original embedded PBR image bytes. Original models, maps, source
+rosters and their rights notices remain unchanged. The source receipt pins model,
+centreline and output SHA256 values. No bought/provider/third-party geometry or
+new texture is introduced; existing owner asset rights remain, with no blanket
+MIT, CC0 or other asset licence assigned. The 480-tree composition and boundary
+data are original Horde scene-authoring derivatives of the preserved approved
+world reference. The 1 November integration copies the six exact authored GLBs
+into `assets/models/world/runtime/forest-surroundings-v1/` with a pinned runtime
+manifest/roster for the private 1.7 chapter on Windows and Android. This includes
+an original 588-triangle low fern, using the same owned material/image bytes.
+This private content admission is not release or device-performance acceptance.
+
+The 1 November forest composition revision retains those same rights and exact
+embedded images; its broader silhouettes and lower branch/spray arrangement are
+original authoring derivatives. No new external asset or texture was introduced.
+
 ### 1.7 development tomb native candidates (2026-10-10)
 
 - **T02 skull/jaw, femur and humerus**: recovered from the public immutable source archive at `93bdbd54016de6c4c7381a29b909d4049e4bf528`, `assets/source/beyond_the_tomb/funerary/t02-skeletal-source-v1`. Gord Goodwin's Simple Rigged Skeleton is **CC0-1.0**; retained source credit, licence notice, source-page check and checksum rosters accompany the recovered kit. Three selected GLBs have a runtime-only UV0 addition for the native importer; positions, topology, authored normals and source masters remain unchanged. The exact recipe and source/runtime hashes are in `models/world/runtime/prepared-funerary-v01/t02-native-import-candidates/derivation-receipt.json`. Coarse alternatives remain source candidates, not runtime LOD admission. This is static burial dressing, not reuse of the animated enemy mesh.
@@ -428,6 +449,22 @@ these audio files are not blanket MIT-licensed by the repository code licence.
 No new generation, acquisition or spending occurred. Exact-candidate positional
 listening, Voice/SFX balance and Android playback/lifecycle acceptance remain
 pending. The visible Kit model remains unadmitted.
+
+### Kit flask guidance cuts (2 November 2026)
+
+The owner separately confirmed public game and repository distribution rights
+for the two newly generated Mureka Kit cuts, `flask.empty` and `flask.topup`,
+under the same scope as the original thirteen. This is owner-confirmed
+permission, not blanket MIT relicensing or a provider legal opinion. The
+owner-provided MP3 masters remain outside this repository, unmodified. Only
+derived mono PCM16 24 kHz WAVs are included at
+`assets/audio/kit/runtime/flask.empty.wav` and `flask.topup.wav`; their source
+MP3 and runtime SHA-256 hashes, exact words, sample counts and conversion
+method are pinned in `flask-guidance.manifest.json`. The generation used 40
+existing Mureka Gold credits under the owner's 100-credit cap; no top-up or
+subscription change occurred. The bounded Kit-to-basin route now has native
+terrain/collision and save-restore tests; rendered staging, runtime voice
+balance and physical Windows/Android listening remain acceptance gates.
 
 
 ### Kit visual source intake (11 October 2026)
@@ -677,7 +714,7 @@ A private full-duration mono 48 kHz PCM16 draft is 175,104 frames / 3.648 second
 Its conversion is an equal L/2+R/2 downmix, without amplification, trimming,
 pitch or timing change. Conversion alone does not grant standalone redistribution.
 
-Neither source nor draft is in public assets, runtime manifests, or packages.
+At the 25 October audition checkpoint, neither source nor draft was in public assets, runtime manifests, or packages. The explicit private game candidate admission below supersedes only that private-package boundary.
 Only an explicit Debug local-file audition can load the exact pinned draft from
 `debug_audio/lich_revival.wav` within the isolated Windows application directory
 or Android app-private files directory. Missing or changed files are diagnosed;
@@ -686,6 +723,35 @@ Actual listening, mix, encounter admission and any game-distribution decision ar
 still pending. Current terms (checked 2026-10-25) distinguish an integrated new
 creative work from standalone content distribution; this note does not admit the
 standalone audio to the public repository.
+
+## Private owner revival game integration (1 November 2026)
+
+The exact full-duration revival WAV above is admitted only to the explicit private
+owner game candidate, integrated with the one-time lich event and shared encounter.
+The source MP3 and original recordings remain external. No audio bytes or standalone
+sound download are added to public Git/LFS. The local Android Debug property and
+isolated Windows acceptance option verify the pinned WAV and stand derivative;
+ordinary/public build defaults remain unchanged. This is game-integration admission
+for the authorised private test, not public asset redistribution, listening approval,
+a release decision or a change to the existing owner-controlled skeleton rights.
+
+The private stand derivative SHA-256 is
+`800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259`.
+Its original geometry/static data and eleven clips are unchanged; the appended
+`SkeletonProof|StandDead0ToIdle` is original project authoring. Existing skeleton
+Hotstrike/Meshy provenance and restrictions remain. The accepted native and RT
+proof is recorded in `docs/evidence/2026-10-25-skeleton-stand-native/README.md`.
+No rejected generic blend is admitted. Private package source/runtime identities,
+checks and remaining physical acceptance are recorded in the current revival receipt.
+
+On 2 November 2026 the owner separately approved including the exact pinned
+revival WAV and appended skeleton stand derivative **inside the public 1.7 game
+packages**. This supersedes the private-package-only distribution decision for
+those two runtime derivatives, not the provenance or terms above. It does not
+approve publishing the source MP3, editable Blend, source models or standalone
+asset downloads in the public repository. The ordinary package must pin their
+hashes, retain the integrated-game use and existing skeleton/Pixabay notices,
+and pass final Windows/Android asset and gameplay acceptance before release.
 
 ## Healing flask r1 - original source-only study, 26 October 2026
 
@@ -769,3 +835,59 @@ This source-folder candidate is excluded from Android/runtime packages and is
 not normal-play or release admission. Its explicit native CPU binding, exact
 receipt and remaining cancellation/RT gates are recorded in
 `docs/evidence/2026-10-26-flask-native-binding/README.md`.
+
+## Explicit flask application candidate - 2 November 2026
+
+The owner-authorised 1.7 application integration trial may stage the exact
+`56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014`
+native player derivative above as `private_flask/player.glb` in an isolated
+Windows acceptance package or explicit Android Debug candidate. Only that
+runtime derivative is copied from the retained source study; Blend files,
+recipes and previews remain excluded. Existing player/gauntlet/sword rights
+and attribution remain unchanged. No new provider input or blanket licence is
+introduced. The owned runtime flask prop retains the provenance recorded above.
+
+This extends the prior CPU-only boundary to an executable validation candidate.
+It does not certify RT hand/contact/reflection/shadow joins, touch/controller
+feel, lifecycle or normal-play/release admission. Ordinary packaging explicitly
+disables this trial and the private revival trial, including cached build options.
+
+The owner subsequently approved the exact pinned runtime derivative for
+integrated public 1.7 game packages, alongside the pinned revival derivatives
+above. The original source study, editable Blend, recipes and previews remain
+outside those packages and public Git. Ordinary 1.7 packaging now requires
+explicit local input and exact-hash validation for all three derivatives;
+the private Debug acceptance path remains separate. Source admission does not
+replace final signed-package, animation/RT or device acceptance.
+
+
+## Original earned flask rest basins - 2 November 2026
+
+`src/scene/FlaskRestBasins.h` is original code-authored hollow stone basin and
+carved bottle geometry, repeated only at the upper-rope and forest-lookout
+earned anchors. The boss-room basin was removed to keep combat space clear.
+No imported mesh, provider generation, new audio,
+texture bytes, paid input or standalone source asset is used. The existing
+`MedievalWall02` masonry material and its recorded texture rights remain in force.
+No new blanket licence or exclusive copyright claim is assigned. The 216 new
+triangles share the existing static PBR owner and their exact render triangles
+supply nonwalkable contact; no new light, water shader, BLAS or material owner is
+introduced. Furniture is selected only by the explicit native flask candidate.
+Source/CPU integration and build checks do not admit ordinary shipping or prove
+native visual, touch, audio or lifecycle acceptance.
+
+
+## Original Android flask control icon - 2 November 2026
+
+`android/app/src/main/res/drawable/ic_flask_drink.xml` is original project-authored
+vector artwork: cork, narrow neck, rounded bottle and a small liquid band. It
+introduces no imported image, font glyph, provider asset, paid input or new
+third-party rights. Existing application attribution and rights remain; no
+blanket external licence or exclusive copyright warranty is assigned.
+
+
+The compact dynamic gauge follow-up uses original code-authored bottle paths in
+`FlaskGaugeDrawable.java` and `WindowsFlaskGauge.h`, with liquid clipped to the
+actual owned charge fraction and persistent outline/divisions. The static icon
+above remains source artwork, not the current charge indicator. No imported
+asset, new rights claim or rendering-material ownership is introduced.

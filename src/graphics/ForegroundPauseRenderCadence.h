@@ -39,8 +39,8 @@ struct ForegroundPauseRenderAggregate
     std::uint64_t exitedFallback = 0u;
 };
 
-// This policy only suppresses redundant RT frames in a foreground paused
-// Showcase. Platforms continue to own their existing background behavior and
+// This policy suppresses redundant RT frames in a paused Showcase, including
+// loss of foreground while already paused. Platforms own other background behavior and
 // their live Entry/Preview cap. It intentionally makes no FPS claim.
 class ForegroundPauseRenderCadence
 {
@@ -62,9 +62,9 @@ public:
     ForegroundPauseRenderDecision Evaluate(const Clock::time_point now,
                                            const ForegroundPauseRenderInput& input) noexcept
     {
-        const bool pausedFallback = input.foreground && input.paused &&
+        const bool pausedFallback = input.paused &&
             input.scene == ForegroundPauseScene::Showcase;
-        if (generation_ != input.surfaceGeneration || pausedFallback_ != pausedFallback)
+        if (generation_ != input.surfaceGeneration || pausedFallback_ != pausedFallback || foreground_ != input.foreground)
         {
             if (pausedFallback_ && !pausedFallback) SaturatingIncrement(aggregate_.exitedFallback);
             if (!pausedFallback_ && pausedFallback)
@@ -73,6 +73,7 @@ public:
                 if (aggregateStart_ == Clock::time_point{}) aggregateStart_ = now;
             }
             generation_ = input.surfaceGeneration;
+            foreground_ = input.foreground;
             pausedFallback_ = pausedFallback;
             nextRenderDue_ = now;
         }
@@ -124,6 +125,7 @@ private:
 
     std::uint64_t generation_ = UINT64_MAX;
     bool pausedFallback_ = false;
+    bool foreground_ = true;
     Clock::time_point nextRenderDue_{};
     Clock::time_point aggregateStart_{};
     ForegroundPauseRenderAggregate aggregate_{};

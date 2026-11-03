@@ -21,6 +21,16 @@ The [linked world-map atlas](design/world/atlas/README.md) locates the preserved
 | Proposal | Reviewable implementation, count, verse, layout or optional idea; no commitment. |
 | Unresolved decision | Explicit choice or evidence gap that must be settled before the affected work is accepted. |
 
+## 1 November 2026 - normal resolution control
+
+Owner-approved 1.7 settings simplification: one continuous 25–100% resolution
+slider, no separate 33%/40% experimental buttons or labels. Existing saved
+percentages and fresh Android 33% / Windows 100% defaults remain unchanged.
+Implementation and focused host checks are recorded in
+[evidence/2026-11-01-resolution-slider/README.md](evidence/2026-11-01-resolution-slider/README.md).
+This is an explicit user quality option, not a mobile performance claim or a
+resumption of the paused optimisation investigation.
+
 ## Update overview
 
 | Update | Purpose and current status |
@@ -65,6 +75,12 @@ Abbey and Foundry are playable **in either order**. Proposed delivery numbering 
 ## 1.7 - Beyond the Tomb
 
 **Purpose:** turn the existing tomb into a deliberate prologue, then deliver a physical rescue, visible Kit reunion and short moonlit forest journey ending at the lookout toward Bellwether, within a complete authored low-detail world.
+
+**Owner refinement, 30–31 October 2026 — approved 1.7 work, not completed features:** prioritize grounded combat feedback and convincing surrounding woodland in every viewing direction, rather than a few route-side trees separated by blank fields. Preserve the shared terrain/town layout, protected routes and actual RT contributors. Content still needs moving-view and lifecycle acceptance; asset-ready and resource-sharing proofs do not establish forest depth.
+
+The requested feedback includes directional white bone fragments for skeleton hits, black goo for Keeper hits, stone-strike sparks and sound, dull wood/tree impacts, readable block feedback, and small dirt-footstep dust. Reuse shared event/effects/material systems and existing licensed resources where suitable. Quality/cost must scale coherently; richer Windows presentation is a likely option, not a blanket exclusion of phones without testing. Hit-stop remains a tentative idea, not an approved timing change. Seamless controller/keyboard-mouse return is also queued. Implement small reviewed slices rather than all effects at once; preserve accepted guard/attack transitions and combat authority.
+
+This refinement does not reopen deferred renderer experiments or authorize release, new paid assets, an engine rewrite, silent quality cuts or enabling unaccepted ring/flask/revival/shared64/worker candidates. Reporting delivery, tutorial/subtitles, Kit repetition, mist correctness and public-source asset rights remain separately tracked outstanding work. Sustained phone optimization is ongoing, not a fixed-FPS release veto.
 
 **Approved update scope and locked decisions:**
 

@@ -174,6 +174,8 @@ public class MainActivity extends Activity {
     private CheckBox benchmarkSummaryConsent, benchmarkSummaryHardware;
     private Spinner benchmarkSummaryCooling;
     private TextView benchmarkSummaryStatus, benchmarkSummaryJson;
+    private LinearLayout benchmarkSummaryTechnical;
+    private Button benchmarkSummaryDetails, benchmarkSummaryDestination;
     private Button benchmarkSummaryPrepare, benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit;
     private final ThreadPoolExecutor reportExecutor = new ThreadPoolExecutor(1, 1, 0L,
             TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2), runnable -> {
@@ -294,6 +296,8 @@ public class MainActivity extends Activity {
     private long chapterVoiceGeneration = Long.MIN_VALUE;
     private int chapterVoiceStream;
     private PrivateLichRevivalAudio privateLichRevivalAudio;
+    private int privateRevivalSoundId;
+    private long privateRevivalAudioGeneration;
     private int chapterAmbienceStream;
     private boolean chapterAmbienceDialogueActive;
     private boolean chapterVoicePaused;
@@ -334,6 +338,14 @@ public class MainActivity extends Activity {
     private TextView developerOverlay;
     private Button menuButton;
     private TextView vitalityStatus;
+    private LinearLayout flaskPanel, flaskTouchActions;
+    private TextView flaskStatus, flaskHint;
+    private Button drinkFlaskButton, restButton;
+    private long flaskLessonUntil;
+    private int flaskPreviousCapacity, flaskLessonResource, flaskPreviousCharges=-1,
+            flaskPreviousAction,flaskPreviousHint=-1;
+    private boolean flaskFirstLessonShown, flaskPickupLessonShown, flaskLayoutListenerInstalled;
+    private int flaskLayoutWidth=-1,flaskLayoutTop=-1,flaskLayoutStart=-1,flaskLayoutBacking;
     private TextView keeperRevealTitle;
     private Button attackButton;
     private Button parryButton;
@@ -350,7 +362,8 @@ public class MainActivity extends Activity {
     private boolean parryRequestedOnTouchDown;
     private boolean parryTouchActive;
     private int parryTouchPointerId = -1;
-    private boolean publishedGuardHeld;
+    private boolean publishedGuardHeld,publishedAttackHeld;
+    private int publishedAttackSource;
     private boolean keyboardGuardHeld;
     private SoundPool soundPool;
     private HordeAmbiencePlayback waterfallPlayback;
@@ -410,6 +423,7 @@ public class MainActivity extends Activity {
     private boolean openingBenchmarkRecovered, openingBenchmarkRecoveredComplete;
     private boolean openingBenchmarkRecoveryRejected, openingBenchmarkRecoveryLaunch, openingBenchmarkRecoveryStoragePending;
     private boolean benchmarkStatusExpanded;
+    private String benchmarkProgressLabel="", benchmarkProgressRaw="";
     private boolean benchmarkReportVisible;
     private View.OnLayoutChangeListener configurationLayoutListener;
     private String latestBenchmarkReport = "";
@@ -491,6 +505,9 @@ public class MainActivity extends Activity {
     private long startupAssetsAttempt,entryMenuAdmittedGeneration, startupCompatibilityAttempt;
     private int startupShownRuntime=-1;
     private boolean retryPending, confirmedRetryPending;
+    private long campaignEndRequest,campaignEndRequestGeneration;
+    private boolean campaignEndPending,campaignEndFromDeath,campaignEndFromEnding;
+    private AlertDialog campaignEndFailureDialog;
     private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
     private boolean updatePromptShown;
@@ -569,6 +586,7 @@ public class MainActivity extends Activity {
             if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
             if (openingBenchmarkPending()) return; // The separate owner poll cannot complete campaign Play.
             if(campaignMenuVisible) { handler.postDelayed(this,200L); return; }
+            if(pollCampaignEndForEntry()) { handler.postDelayed(this,200L); return; }
             final EntryMenuState state;
             try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
             catch (RuntimeException | LinkageError unavailable) {
@@ -678,6 +696,7 @@ public class MainActivity extends Activity {
         interactButton = findViewById(R.id.interact_button);
         toggleHeldLightPoseButton = findViewById(R.id.toggle_held_light_pose_button);
         vitalityStatus = findViewById(R.id.vitality_status);
+        bindHealingFlaskHud();
         controllerPrompt = findViewById(R.id.controller_prompt);
         combatTeachingPrompt = findViewById(R.id.combat_teaching_prompt);
         appRoot = findViewById(R.id.root);
@@ -710,7 +729,11 @@ public class MainActivity extends Activity {
         interactButton.setContentDescription(getString(R.string.interact));
         toggleHeldLightPoseButton.setContentDescription(getString(R.string.lower_lantern));
         updateVitalityHud(3, 3);
-        rtStatus.setOnClickListener(view -> { if(!benchmarkRunning) showDiagnostics(false); });
+        rtStatus.setOnClickListener(view -> {
+            if(benchmarkRunning || openingBenchmarkPending()) {
+                toggleBenchmarkProgressDetails();
+            } else showDiagnostics(false);
+        });
         if (isDebuggableApp()) {
             rtStatus.setOnLongClickListener(view -> {
                 developerOverlayVisible = !developerOverlayVisible;
@@ -923,6 +946,16 @@ public class MainActivity extends Activity {
     /** Only the existing closed runtime cache roster; no reports, settings or save storage. */
     private boolean[] stageRuntimeAssetCache() {
             final boolean skeletonStaged = stageAsset(SKELETON_ASSET, SKELETON_FILE);
+            if((BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && (!stageAsset("private_revival/skeleton.glb","private_revival/skeleton.glb") ||
+                !stageAsset("private_revival/lich_revival.wav","debug_audio/lich_revival.wav") ||
+                PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_revival/skeleton.glb"),31672176L,
+                    "800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259")!=null ||
+                PrivateLichRevivalAudio.validate(getFilesDir())!=null))
+                throw new IllegalStateException("Pinned private revival assets failed staging or identity verification.");
+            if((BuildConfig.FLASK_CANDIDATE || BuildConfig.SHIPPING17_CONTENT) && (!stageAsset("private_flask/player.glb","private_flask/player.glb") ||
+                PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_flask/player.glb"),2719368L,
+                    "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
+                throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
@@ -1036,6 +1069,14 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
                     stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/alder-middle.glb", "models/world/runtime/forest-surroundings-v1/alder-middle.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/asset.manifest.json", "models/world/runtime/forest-surroundings-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/boundary-panel.glb", "models/world/runtime/forest-surroundings-v1/boundary-panel.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/pine-far.glb", "models/world/runtime/forest-surroundings-v1/pine-far.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/pine-middle.glb", "models/world/runtime/forest-surroundings-v1/pine-middle.glb") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/runtime-roster.json", "models/world/runtime/forest-surroundings-v1/runtime-roster.json") &&
+                    stageAsset("models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb", "models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/asset.manifest.json", "models/world/runtime/forest-understory-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb") &&
                     stageAsset("models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb", "models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb");
@@ -1145,7 +1186,7 @@ public class MainActivity extends Activity {
         menuScrim.setBackgroundColor(0xFF050403);
         diagnosticsPanel.setVisibility(View.GONE);
         for(View control:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,
-                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,developerOverlay})
+                interactButton,toggleHeldLightPoseButton,rtStatus,vitalityStatus,flaskPanel,developerOverlay})
             if(control!=null)control.setVisibility(View.GONE);
         int runtime=0;
         try {if(surfaceRequestGeneration>0)runtime=ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration);}
@@ -1395,6 +1436,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -1436,7 +1478,7 @@ public class MainActivity extends Activity {
                 getString(R.string.check_for_updates), () -> checkForUpdates(true));
         addMenuButtonRow(panel,
                 getString(R.string.credits), this::showCredits,
-                getString(R.string.quit), this::finishAndRemoveTask);
+                getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
@@ -1464,8 +1506,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
         lookoutObjectivePanel=panel;
-        addBody(panel,"The village lies beyond the trees. Continue exploring the lookout with Kit.");
-        addBody(panel,"The onward journey to the village belongs to a future chapter.");
+        addBody(panel,"The 1.7 demo ends at the timber road closure ahead. Bellwether opens in a future chapter; this is a temporary endpoint. You can explore the lookout with Kit or return to the tomb.");
         final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
         panel.addView(exploring,menuButtonLayoutParams());
         addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));
@@ -1483,12 +1524,125 @@ public class MainActivity extends Activity {
             showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
         }
         invalidateLookoutObjective();clearTouchState();
-        if(returnToMenu) {
-            entryMenuAdmittedGeneration=0; // Showcase output cannot certify a newly requested Entry scene.
-            entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
-            publishEntryMenuState(); // Native synchronously invalidates the prior scene's presented flag.
-            showEntryMenu(false);
-        } else hideMenu();
+        if(returnToMenu) returnGameplayToMainMenu();
+        else hideMenu();
+    }
+
+    private void returnGameplayToMainMenu() {
+        // Complete storage transactions before changing scene ownership. This
+        // navigation neither resets the route nor creates/overwrites a save.
+        if(openingBenchmarkPending() || openingBenchmarkRecoveryRejected || campaignBusy()) return;
+        if(!requestCampaignEnd(false)) return;
+        campaignEndFromDeath=deathOverlayVisible;campaignEndFromEnding=endingOverlayVisible;
+        setGameplayPaused(true);
+        clearTouchState();pauseChapterVoice(true);
+        ++delayedGameplayFeedbackGeneration;
+        cancelCombatTeachingPromptPoll();clearCombatTeachingPrompt();
+        invalidateLookoutObjective();closeBenchmarkSummaryReview();
+        deathOverlayVisible=false;endingOverlayVisible=false;
+        retryPending=false;confirmedRetryPending=false;
+        campaignMenuVisible=false;campaignRequest=0;campaignLoadedReady=false;
+        campaignFromDeath=false;campaignDeathLoadCommitted=false;campaignDeathMessage=null;
+        handler.removeCallbacks(refreshCampaignMenu);
+        rtLabVisible=false;rtLabTelemetry=null;handler.removeCallbacks(refreshRtLabTelemetry);
+        graphicsVisible=false;diagnosticsVisible=false;benchmarkReportVisible=false;
+        setBenchmarkStatusExpanded(false);
+        entryMenuAdmittedGeneration=0; // Showcase cannot certify the new Entry scene.
+        entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
+        publishEntryMenuState(); // Existing native retirement and fresh-presentation gate.
+        showEntryMenu(false);
+    }
+
+    private boolean requestCampaignEnd(boolean acknowledgeFailure) {
+        return requestCampaignEnd(acknowledgeFailure,false);
+    }
+
+    private boolean requestCampaignEnd(boolean acknowledgeFailure,boolean quiet) {
+        if(!resumed || surfaceRequestGeneration<=0)return false;
+        long request=0;
+        try { request=ProbeBridge.requestCampaign(CampaignMenuState.END_GAME,0,
+                acknowledgeFailure?1:0,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { request=0; }
+        if(request<=0) {
+            if(!quiet)android.widget.Toast.makeText(this,"Please wait for the current operation to finish, then try again.",android.widget.Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        campaignEndRequest=request;campaignEndRequestGeneration=surfaceRequestGeneration;
+        campaignEndPending=true;
+        return true;
+    }
+
+    private boolean pollCampaignEndForEntry() {
+        final CampaignMenuState end;
+        try { end=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+        catch(RuntimeException | LinkageError unavailable) { return campaignEndPending; }
+        if(end==null || !end.current(surfaceRequestGeneration))return campaignEndPending;
+        if(!campaignEndPending) {
+            // Activity recreation can discard Java fields while the native
+            // owner is still finishing the user's explicit return request.
+            if(end.lastOperation!=CampaignMenuState.END_GAME || end.activeSlot<0 ||
+               (end.phase!=CampaignMenuState.SAVING && end.phase!=CampaignMenuState.FAILED))return false;
+            campaignEndPending=true;campaignEndRequest=end.ackRequest;
+            campaignEndRequestGeneration=surfaceRequestGeneration;
+        }
+        if(end.ackRequest>=campaignEndRequest && end.lastOperation==CampaignMenuState.END_GAME) {
+            if(end.phase==CampaignMenuState.FAILED) {
+                showCampaignEndFailure();return true;
+            }
+            if(end.phase==CampaignMenuState.READY && end.activeSlot<0 && end.error==0) {
+                if(campaignState!=null && campaignState.surfaceGeneration==end.surfaceGeneration &&
+                        end.revision<campaignState.revision)return true;
+                // Benchmark admission reads this cache after the normal save-menu
+                // poll has stopped. Publish the acknowledged closed state first.
+                campaignState=end;campaignPublicationValid=true;
+                campaignEndPending=false;campaignEndRequest=0;return false;
+            }
+        }
+        // A lifecycle replacement requires current generation admission. The
+        // native logical intent persists; do not automatically acknowledge a failure.
+        if(campaignEndRequestGeneration!=surfaceRequestGeneration && !end.loadBarrier())
+            requestCampaignEnd(false,true);
+        return true;
+    }
+
+    private void showCampaignEndFailure() {
+        if(!resumed || isFinishing() || (campaignEndFailureDialog!=null && campaignEndFailureDialog.isShowing()))return;
+        final AlertDialog dialog=new AlertDialog.Builder(this)
+                .setTitle("Latest save not confirmed")
+                .setMessage("Your existing save files have not been cleared. The latest save could not be confirmed. Stay in the paused game to review your saves, or explicitly return without relying on this new save.")
+                .setPositiveButton("Return without new save",null)
+                .setNegativeButton("Stay in paused game",null)
+                .setCancelable(false).create();
+        campaignEndFailureDialog=dialog;
+        dialog.setOnDismissListener(ignored -> {if(campaignEndFailureDialog==dialog)campaignEndFailureDialog=null;});
+        dialog.setOnShowListener(ignored -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+                // This is the only path that acknowledges the native save failure.
+                if(requestCampaignEnd(true))dialog.dismiss();
+            });
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(view -> {
+                if(cancelCampaignEndToPausedGame())dialog.dismiss();
+            });
+        });
+        dialog.show();
+    }
+
+    private boolean cancelCampaignEndToPausedGame() {
+        if(!resumed || surfaceRequestGeneration<=0)return false;
+        final long cancelled;
+        try { cancelled=ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { return false; }
+        if(cancelled<=0)return false;
+        campaignEndPending=false;campaignEndRequest=0;
+        handler.removeCallbacks(refreshEntryMenu);
+        entryMenuEnabled=false;entryMenuSidePage=false;entryPlayRequested=false;
+        try { ProbeBridge.setEntryMenu(false,false,isReducedMotionEnabled(),false,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Retain the paused game and its saves. */ }
+        setGameplayPaused(true);clearTouchState();firstMenu=false;
+        if(campaignEndFromDeath)renderDeathOverlay();
+        else if(campaignEndFromEnding) {menuVisible=false;showEndingOverlay();}
+        else showMainMenu(false);
+        return true;
     }
 
     private boolean isReducedMotionEnabled() {
@@ -1544,6 +1698,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -1779,9 +1934,10 @@ public class MainActivity extends Activity {
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
         addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
+        addBody(panel,getString(R.string.benchmark_standard_scope));
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
         openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
-        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,"Mobile provisional benchmark (unranked)",this::requestOpeningProvisionalBenchmark,false);
+        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,getString(R.string.benchmark_standard),this::requestOpeningProvisionalBenchmark,false);
         openingBenchmarkProvisionalButton.setEnabled(canRequestOpeningBenchmark());
         addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
@@ -1892,6 +2048,8 @@ public class MainActivity extends Activity {
             slotPanel.addView(slotTitle,matchWrap());
             addBody(slotPanel,shown==null ? "Checking saves..." : shown.slotDescription(slot));
             if(wideSlots)slotPanel.getChildAt(slotPanel.getChildCount()-1).setMinimumHeight(dp(64));
+            if(campaignMenuAction==CampaignMenuState.NEW_GAME && shown!=null && shown.hasUnreadable() && !shown.canStartNewGame(slot))
+                addBody(slotPanel,"This slot cannot store new progress. Your files have been kept; choose another slot.");
             final int selectedKind=shown==null ? -1 : shown.selectedKind(slot);
             final int chosenAction=campaignMenuAction;
             final String action=chosenAction==CampaignMenuState.LOAD ? "Continue" :
@@ -1903,7 +2061,7 @@ public class MainActivity extends Activity {
             boolean checked=shown!=null && shown.status(slot,0)>=CampaignMenuState.EMPTY && shown.status(slot,1)>=CampaignMenuState.EMPTY;
             boolean writable=shown!=null && (shown.status(slot,0)==CampaignMenuState.EMPTY || shown.status(slot,0)==CampaignMenuState.VALID);
             choose.setEnabled(ready && checked && (chosenAction==CampaignMenuState.LOAD ? selectedKind>=0 :
-                    chosenAction==CampaignMenuState.NEW_GAME || (shown.canSaveLatest && writable)));
+                    chosenAction==CampaignMenuState.NEW_GAME ? shown.canStartNewGame(slot) : (shown.canSaveLatest && writable)));
         }
         if(campaignLocalMessage!=null || (shown!=null && (shown.error!=0 || shown.phase==CampaignMenuState.FAILED || shown.hasUnreadable()))) {
             Button refresh=addEntryMenuButton(panel,"Try again",
@@ -1922,6 +2080,7 @@ public class MainActivity extends Activity {
         if(action==CampaignMenuState.LOAD && (shown.status(slot,kind)!=CampaignMenuState.VALID || shown.selectedKind(slot)!=kind)) return;
         if(action==CampaignMenuState.SAVE_MANUAL && (!shown.canSaveLatest ||
                 (shown.status(slot,0)!=CampaignMenuState.EMPTY && shown.status(slot,0)!=CampaignMenuState.VALID))) return;
+        if(action==CampaignMenuState.NEW_GAME && !shown.canStartNewGame(slot))return;
         boolean confirm=action==CampaignMenuState.NEW_GAME ? shown.occupied(slot) :
                 action==CampaignMenuState.SAVE_MANUAL && shown.occupied(slot);
         if(!confirm) { sendCampaignRequest(action,slot,kind); return; }
@@ -2388,7 +2547,7 @@ public class MainActivity extends Activity {
         menuVisible=true;entryPlayRequested=false;
         if(menuScrim!=null){menuScrim.removeAllViews();menuScrim.setVisibility(View.GONE);}
         for(View view:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,interactButton,
-                toggleHeldLightPoseButton,vitalityStatus,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
+                toggleHeldLightPoseButton,vitalityStatus,flaskPanel,developerOverlay,diagnosticsPanel})if(view!=null)view.setVisibility(View.GONE);
         if(rtStatus!=null){rtStatus.setVisibility(View.VISIBLE);rtStatus.setText(
             "Benchmark recovery could not identify its renderer owner. No surface or other run was changed. Close this screen and reopen after that run ends.");}
     }
@@ -2418,14 +2577,15 @@ public class MainActivity extends Activity {
         if(!canRequestOpeningBenchmark()) return;
         final FrameLayout.LayoutParams original=provisional?OpeningBenchmarkOutput.snapshot(surfaceView):null;
         if(provisional && original==null) {
-            Toast.makeText(this,"Provisional unavailable; choose Custom.",Toast.LENGTH_LONG).show(); return;
+            Toast.makeText(this,R.string.benchmark_standard_unavailable,Toast.LENGTH_LONG).show(); return;
         }
         final long origin=surfaceRequestGeneration,request;
-        try { request=provisional?ProbeBridge.requestOpeningProvisionalBenchmark(origin):ProbeBridge.requestOpeningBenchmark(origin); }
+        try { request=ProbeBridge.requestOpeningBenchmarkWithSummaryId(origin,provisional,
+                UUID.randomUUID().toString(),Build.MODEL); }
         catch(RuntimeException | LinkageError unavailable) {
-            Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
+            Toast.makeText(this,provisional?getString(R.string.benchmark_standard_unavailable):getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
         }
-        if(request<=0) { Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
+        if(request<=0) { Toast.makeText(this,provisional?getString(R.string.benchmark_standard_unavailable):getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
         openingBenchmarkRequest=request; openingBenchmarkRequestGeneration=origin;
         openingBenchmarkProvisional=provisional;
         openingBenchmarkOutput=provisional?new OpeningBenchmarkOutput(request,origin,original):null;
@@ -2510,7 +2670,7 @@ public class MainActivity extends Activity {
     }
 
     private String openingBenchmarkLabel() {
-        return openingBenchmarkProvisional?"Mobile provisional benchmark (unranked)":"Custom benchmark (unranked)";
+        return openingBenchmarkProvisional?getString(R.string.benchmark_standard):"Custom benchmark (unranked)";
     }
 
     private void showOpeningBenchmarkProgress() {
@@ -2518,13 +2678,14 @@ public class MainActivity extends Activity {
         menuVisible=false; benchmarkReportVisible=false; diagnosticsVisible=false;
         entryPlayRequested=false;
         if(menuScrim!=null) { menuScrim.removeAllViews(); menuScrim.setVisibility(View.GONE); }
-        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,developerOverlay})
+        for(View action:new View[]{menuButton,attackButton,parryButton,dodgeButton,runButton,crouchButton,vitalityStatus,flaskPanel,developerOverlay})
             if(action!=null) action.setVisibility(View.GONE);
         if(diagnosticsPanel!=null) diagnosticsPanel.setVisibility(View.GONE);
         if(rtStatus!=null) {
             rtStatus.setVisibility(View.VISIBLE);
-            rtStatus.setText(openingBenchmarkBlocked ? "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
-                openingBenchmarkCancelRequested ? "Returning to opening menu..." : openingBenchmarkLabel()+". Back cancels.");
+            updateBenchmarkProgress(openingBenchmarkLabel(),openingBenchmarkBlocked ?
+                "Benchmark stopped. Could not return to the opening menu. Close and reopen The Horde." :
+                openingBenchmarkCancelRequested ? "Returning to opening menu..." : getString(R.string.benchmark_starting));
         }
         // This leaves campaign Play disabled. The native benchmark owner alone
         // advances Showcase and requires a fresh Entry frame before releasing UI.
@@ -2560,10 +2721,10 @@ public class MainActivity extends Activity {
         }
         if(!returned) {
             if(rtStatus!=null && state.phase==OpeningBenchmarkState.RETURNING)
-                rtStatus.setText("Returning to opening menu...");
+                updateBenchmarkProgress(openingBenchmarkLabel(),"Returning to opening menu...");
             if(rtStatus!=null && !openingBenchmarkCancelRequested && state.phase==OpeningBenchmarkState.RUNNING) {
                 final String progress=ProbeBridge.getBenchmarkProgress();
-                if(!progress.isEmpty()) rtStatus.setText(openingBenchmarkLabel()+"\n"+progress);
+                if(!progress.isEmpty()) updateBenchmarkProgress(openingBenchmarkLabel(),progress);
             }
             return;
         }
@@ -2574,7 +2735,7 @@ public class MainActivity extends Activity {
         openingBenchmarkCancelRequested=openingBenchmarkBlocked=false;
         openingBenchmarkOutput=null; openingBenchmarkProvisional=false;
         clearOpeningBenchmarkClient();openingBenchmarkRecovered=openingBenchmarkRecoveredComplete=false;
-        benchmarkRunning=false; entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
+        benchmarkRunning=false; setBenchmarkStatusExpanded(false); entryMenuEnabled=true; entryMenuSidePage=false; entryPlayRequested=false;
         handler.removeCallbacks(refreshOpeningBenchmark);
         if(openingBenchmarkRecoveryStoragePending){openingBenchmarkRecoveryStoragePending=false;configureCampaignStorage();}
         if(completed) {
@@ -2583,7 +2744,7 @@ public class MainActivity extends Activity {
             showBenchmarkReport(true);
         } else {
             showMainMenu(false);
-            Toast.makeText(this,unavailable?"Provisional unavailable; choose Custom.":
+            Toast.makeText(this,unavailable?getString(R.string.benchmark_standard_unavailable):
                 "Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
         }
     }
@@ -2619,8 +2780,9 @@ public class MainActivity extends Activity {
         latestBenchmarkReport = "";
         firstMenu = false;
         hideMenu();
-        setBenchmarkStatusExpanded(benchmarkAutomationId == null);
+        setBenchmarkStatusExpanded(false);
         menuButton.setVisibility(View.GONE);
+        updateBenchmarkProgress(getString(R.string.benchmark_running_label),getString(R.string.benchmark_starting));
         attackButton.setVisibility(View.GONE);
         parryButton.setVisibility(View.GONE);
         if (dodgeButton != null) dodgeButton.setVisibility(View.GONE);
@@ -2628,6 +2790,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.VISIBLE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         rtStatus.setText(R.string.benchmark_starting);
     }
 
@@ -2781,6 +2944,7 @@ public class MainActivity extends Activity {
         developerOverlay.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
         menuScrim.removeAllViews();
@@ -2788,8 +2952,8 @@ public class MainActivity extends Activity {
         final LinearLayout panel = createPanel(getString(R.string.benchmark_report),
                 completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
         if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
-            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
             addMenuButton(panel, getString(R.string.benchmark_public_preview), () -> showBenchmarkSummaryReview(true));
+            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
         }
         final TextView report = new TextView(this);
         report.setText(latestBenchmarkReport);
@@ -2835,10 +2999,19 @@ public class MainActivity extends Activity {
                         ? R.string.benchmark_public_preview : R.string.benchmark_summary_review),
                 getString(R.string.benchmark_summary_local_only));
         addBody(panel, getString(owner.isPublicPreview() ? R.string.benchmark_public_scope : R.string.benchmark_summary_scope));
+        benchmarkSummaryDestination=createMenuButton(getString(owner.isPublicPreview()?
+                R.string.benchmark_switch_private:R.string.benchmark_switch_public),
+                benchmarkSummaryAction(owner,generation,() -> {
+                    if(benchmarkSummarySendControls!=null && !benchmarkSummarySendControls.canChangeDestination()) {
+                        Toast.makeText(this,R.string.statistics_destination_busy,Toast.LENGTH_LONG).show();return;
+                    }
+                    showBenchmarkSummaryReview(!owner.isPublicPreview());
+                }));
         benchmarkSummaryConsent = new CheckBox(this);
         benchmarkSummaryConsent.setText(owner.isPublicPreview() ? R.string.benchmark_public_consent : R.string.benchmark_summary_consent);
         stylePlaytestConsent(benchmarkSummaryConsent);
         benchmarkSummaryConsent.setMinHeight(dp(48));
+        benchmarkSummaryConsent.setVisibility(owner.isPublicPreview()?View.GONE:View.VISIBLE);
         panel.addView(benchmarkSummaryConsent, matchWrap());
         benchmarkSummaryHardware = new CheckBox(this);
         benchmarkSummaryHardware.setText(R.string.benchmark_summary_hardware);
@@ -2857,10 +3030,10 @@ public class MainActivity extends Activity {
         benchmarkSummaryPrepare = createMenuButton(getString(R.string.benchmark_summary_prepare),
                 benchmarkSummaryAction(owner, generation, this::prepareBenchmarkSummary));
         benchmarkSummaryPrepare.setMinHeight(dp(48));
-        benchmarkSummaryPrepare.setEnabled(false);
+        benchmarkSummaryPrepare.setEnabled(owner.isPublicPreview());
         panel.addView(benchmarkSummaryPrepare, menuButtonLayoutParams());
         benchmarkSummaryConsent.setOnCheckedChangeListener((button, checked) -> {
-            if (isCurrentBenchmarkSummaryForm(owner, generation))
+            if (isCurrentBenchmarkSummaryForm(owner, generation) && !owner.isPublicPreview())
                 benchmarkSummaryPrepare.setEnabled(checked && !owner.isPrepared());
         });
         benchmarkSummaryJson = new TextView(this);
@@ -2868,7 +3041,9 @@ public class MainActivity extends Activity {
         benchmarkSummaryJson.setTextSize(14);
         benchmarkSummaryJson.setTypeface(Typeface.MONOSPACE);
         benchmarkSummaryJson.setTextIsSelectable(true);
-        panel.addView(benchmarkSummaryJson, matchWrap());
+        benchmarkSummaryTechnical=new LinearLayout(this);
+        benchmarkSummaryTechnical.setOrientation(LinearLayout.VERTICAL);
+        benchmarkSummaryTechnical.setVisibility(View.GONE);
         benchmarkSummaryCopy = createMenuButton(getString(R.string.benchmark_summary_copy),
                 benchmarkSummaryAction(owner, generation, this::copyBenchmarkSummary));
         benchmarkSummarySave = createMenuButton(getString(R.string.benchmark_summary_save),
@@ -2878,13 +3053,31 @@ public class MainActivity extends Activity {
         for (Button button : new Button[]{benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit}) {
             button.setMinHeight(dp(48));
             button.setVisibility(View.GONE);
-            panel.addView(button, menuButtonLayoutParams());
+            benchmarkSummaryTechnical.addView(button, menuButtonLayoutParams());
         }
+        benchmarkSummaryTechnical.addView(benchmarkSummaryJson, matchWrap());
         benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
-                owner, StatisticsReportSendControls.Services.unavailable());
+                owner, StatisticsReportSendControls.Services.production(this), benchmarkSummaryTechnical);
+        benchmarkSummaryDetails=createMenuButton(getString(R.string.benchmark_technical_details),
+                benchmarkSummaryAction(owner,generation,() -> {
+                    setBenchmarkTechnicalExpanded(benchmarkSummaryTechnical.getVisibility()!=View.VISIBLE);
+                }));
+        benchmarkSummaryDetails.setMinHeight(dp(48));benchmarkSummaryDetails.setVisibility(View.GONE);
+        if(android.os.Build.VERSION.SDK_INT>=28)benchmarkSummaryDetails.setAccessibilityHeading(true);
+        setBenchmarkTechnicalExpanded(false);
+        panel.addView(benchmarkSummaryDetails,menuButtonLayoutParams());
+        panel.addView(benchmarkSummaryTechnical,matchWrap());
+        panel.addView(benchmarkSummaryDestination,menuButtonLayoutParams());
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);
+    }
+
+    private void setBenchmarkTechnicalExpanded(boolean expanded) {
+        benchmarkSummaryTechnical.setVisibility(expanded?View.VISIBLE:View.GONE);
+        benchmarkSummaryDetails.setText(expanded?R.string.benchmark_technical_hide:R.string.benchmark_technical_details);
+        if(android.os.Build.VERSION.SDK_INT>=30)benchmarkSummaryDetails.setStateDescription(
+            getString(expanded?R.string.benchmark_technical_expanded:R.string.benchmark_technical_collapsed));
     }
 
     private boolean isCurrentBenchmarkSummaryForm(BenchmarkSummaryReview owner, long generation) {
@@ -2898,7 +3091,8 @@ public class MainActivity extends Activity {
 
     private void prepareBenchmarkSummary() {
         final BenchmarkSummaryReview owner = benchmarkSummaryReview;
-        if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() || !benchmarkSummaryConsent.isChecked()) return;
+        if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() ||
+                (!owner.isPublicPreview() && !benchmarkSummaryConsent.isChecked())) return;
         final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
         final BenchmarkSummaryReview.Preparer preparer = owner.isPublicPreview()
@@ -2912,12 +3106,27 @@ public class MainActivity extends Activity {
         benchmarkSummaryHardware.setEnabled(false);
         benchmarkSummaryCooling.setEnabled(false);
         benchmarkSummaryPrepare.setEnabled(false);
-        benchmarkSummaryStatus.setText(R.string.benchmark_summary_prepared);
+        benchmarkSummaryStatus.setText(owner.isPublicPreview()?benchmarkPublicPreparedSummary(owner):getString(R.string.benchmark_summary_prepared));
         benchmarkSummaryJson.setText(owner.json()); // Literal exact native UTF-8 JSON; never reserialized.
+        benchmarkSummaryDetails.setVisibility(View.VISIBLE);
         benchmarkSummaryCopy.setVisibility(View.VISIBLE);
         benchmarkSummarySave.setVisibility(View.VISIBLE);
         benchmarkSummaryEdit.setVisibility(View.VISIBLE);
         if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.refresh();
+    }
+
+    private String benchmarkPublicPreparedSummary(BenchmarkSummaryReview owner) {
+        String summary=getString(R.string.benchmark_public_prepared);
+        try {
+            // Presentation only: never replace, canonicalise or submit these parsed values.
+            final JSONObject result=new JSONObject(owner.json()).getJSONObject("result");
+            final int frames=result.getJSONObject("overall").getInt("measuredFrames");
+            final int scale=result.getJSONObject("configuration").getInt("renderScalePercent");
+            if(frames>0 && scale>=25 && scale<=100)
+                summary=getString(R.string.benchmark_public_summary,frames,scale)+"\n"+summary;
+        } catch(Exception unavailable) { /* The exact native preview remains available in Technical details. */ }
+        return summary+"\n"+getString(benchmarkSummaryHardware.isChecked()?
+                R.string.benchmark_hardware_included:R.string.benchmark_hardware_omitted);
     }
 
     private void copyBenchmarkSummary() {
@@ -2930,6 +3139,9 @@ public class MainActivity extends Activity {
 
     private void editBenchmarkSummary() {
         if (!benchmarkSummaryVisible || benchmarkSummaryReview == null) return;
+        if(benchmarkSummarySendControls!=null && !benchmarkSummarySendControls.canChangeDestination()) {
+            Toast.makeText(this,R.string.statistics_edit_busy,Toast.LENGTH_LONG).show();return;
+        }
         final PlaytestReportExport export = benchmarkSummaryReview.exportOwner();
         if (export != null && (export.state() == PlaytestReportExport.State.CHOOSING ||
                 export.state() == PlaytestReportExport.State.WRITING)) return;
@@ -3021,10 +3233,13 @@ public class MainActivity extends Activity {
         benchmarkSummaryReview = null;
         benchmarkSummaryVisible = false;
         benchmarkSummaryConsent = null;
+        benchmarkSummaryDestination = null;
         benchmarkSummaryHardware = null;
         benchmarkSummaryCooling = null;
         benchmarkSummaryStatus = null;
         benchmarkSummaryJson = null;
+        benchmarkSummaryTechnical = null;
+        benchmarkSummaryDetails = null;
         benchmarkSummaryPrepare = null;
         benchmarkSummaryCopy = null;
         benchmarkSummarySave = null;
@@ -3820,6 +4035,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel(getString(R.string.credits), "ASSET PROVENANCE");
         addLinkedBody(panel, getString(R.string.credits_body));
+        addLinkedBody(panel, getString(R.string.credits_night_audio));
         addMenuButton(panel, getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
     }
@@ -4130,7 +4346,7 @@ public class MainActivity extends Activity {
             if (soundId == null) return;
             synchronized (loadedSounds) { if (!loadedSounds.contains(soundId)) return; }
             final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
-            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) / 100.0f;
             final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
             final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
             chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
@@ -4145,7 +4361,7 @@ public class MainActivity extends Activity {
         }
         if (chapterVoiceStream != 0 && !paused) {
             final long gains = ProbeBridge.getChapterDialogueStereoGains(generation);
-            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70) / 100.0f;
+            final float voiceGain = preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) / 100.0f;
             final float left = clamp(Float.intBitsToFloat((int) gains), 0.0f, 1.0f);
             final float right = clamp(Float.intBitsToFloat((int) (gains >>> 32)), 0.0f, 1.0f);
             soundPool.setVolume(chapterVoiceStream, voiceGain * left, voiceGain * right);
@@ -4183,7 +4399,7 @@ public class MainActivity extends Activity {
         int left = insetLeft + dp(18), right = width - insetRight - dp(18);
         int topStart = insetTop + dp(8), bottomEnd = height - insetBottom - dp(8);
         final int divider = topStart + Math.max(0, bottomEnd - topStart) * 55 / 100;
-        final View[] topObstacles = {rtStatus, vitalityStatus, keeperRevealTitle,
+        final View[] topObstacles = {rtStatus, vitalityStatus, flaskPanel, keeperRevealTitle,
                 developerOverlay, menuButton};
         final View[] bottomObstacles = {controllerPrompt, attackButton, parryButton,
                 dodgeButton, interactButton, runButton, crouchButton};
@@ -4345,7 +4561,7 @@ public class MainActivity extends Activity {
 
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
-        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 70), 0, 100,
+        addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100), 0, 100,
                 value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
         addBody(panel, "Chapter subtitles");
         final CheckBox subtitlesEnabled = new CheckBox(this);
@@ -4491,7 +4707,7 @@ public class MainActivity extends Activity {
                             .putBoolean(PREF_CHAPTER_SUBTITLES, true)
                             .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
                             .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
-                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 70)
+                            .putInt(PREF_CHAPTER_VOICE_VOLUME, 100)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
                             .putBoolean(CombatTeachingPreferences.ENABLED, true)
@@ -4598,25 +4814,11 @@ public class MainActivity extends Activity {
         graphicsTelemetry.setText("Checking RT settings");
         graphicsTelemetry.setPadding(dp(6), dp(2), dp(6), dp(2));
         addGraphicsSectionLabel(panel, "Resolution and scene");
-        if (graphicsDraft.scale >= 50) {
-            addSlider(panel, getString(R.string.render_scale), graphicsDraft.scale, 50, 100, value -> {
-                graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, value);
-            });
-        } else {
-            addBody(panel, "Resolution: " + GraphicsPreviewOptions.resolutionLabel(graphicsDraft.scale));
-            addGraphicsButton(panel, "Return to 50% resolution", () -> {
-                graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, 50);
-                showGraphicsPage();
-            });
-        }
-        if (GraphicsPreferences.MIN_RENDER_SCALE_PERCENT == 33) {
-            for (int scale : new int[]{33,40}) {
-                addGraphicsButton(panel, "Resolution: " + GraphicsPreviewOptions.resolutionLabel(scale), () -> {
-                    graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, scale);
-                    showGraphicsPage();
-                });
-            }
-        }
+        addSlider(panel, getString(R.string.render_scale),
+                GraphicsPreviewOptions.resolutionSliderPosition(graphicsDraft.scale, GraphicsPreferences.MIN_RENDER_SCALE_PERCENT),
+                0, GraphicsPreviewOptions.resolutionSliderMaximum(GraphicsPreferences.MIN_RENDER_SCALE_PERCENT), value -> {
+            graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.RESOLUTION, value);
+        }, position -> GraphicsPreviewOptions.resolutionFromSlider(position, GraphicsPreferences.MIN_RENDER_SCALE_PERCENT));
         addGraphicsButton(panel, "Water: " + waterName(graphicsDraft.water), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.WATER, (graphicsDraft.water + 1) % 3);
             showGraphicsPage();
@@ -4648,7 +4850,7 @@ public class MainActivity extends Activity {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.MIST, graphicsDraft.mistEnabled ? 0 : 1);
             showGraphicsPage();
         });
-        addGraphicsButton(panel, "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust), () -> {
+        addGraphicsButton(panel, "Particles: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust), () -> {
             graphicsDraft = GraphicsPreviewOptions.withChoice(graphicsDraft, GraphicsPreviewOptions.DUST,
                     (graphicsDraft.dust + 1) % 3);
             showGraphicsPage();
@@ -4782,11 +4984,11 @@ public class MainActivity extends Activity {
     private void showGraphicsSettingsDetails() {
         dismissGraphicsPreviewDetails();
         final TextView details = new TextView(this);
-        details.setText("Resolution controls RT render scale. Water Off omits water appearance; Mobile uses reduced reflected detail; High adds a reflected scene query. " +
+        details.setText("Resolution controls RT render scale. Water Off hides water. Mobile keeps water and ripples with reduced reflections and no splash droplets. High adds scene reflections and splash droplets. " +
                 "Fire detail changes volume steps while preserving emitters, lights and gameplay. Menu / preview cap controls their frame cap. " +
                 "Glass enables only glass supported by this build; mobile lantern panes remain absent. Shadows select Current or Higher RT sampling. " +
                 "Mist toggles keeper-room ground mist; fire, smoke and electricity stay enabled. The compact authored preview has no ground mist.\n" +
-                "Indoor dust controls the bounded room effect; the preview reports uploaded quality even where no motes are visible.\n\n" +
+                "Particles controls room motes and brief enemy-hit fragments. Standard adds forest fireflies. Low uses fewer particles and no fireflies; Off disables all.\n\n" +
                 "Changing a choice edits the draft. Apply saves it automatically only after the exact requested settings appear in a successful RT presentation. " +
                 "Back, Restore or backgrounding cancels an outstanding Apply. Interrupted or failed changes restore Saved settings. Preview measurements are not full-game performance guarantees." +
                 (graphicsDetailedStatus.isEmpty() ? "" : "\n\nCurrent status\n" + graphicsDetailedStatus));
@@ -4886,7 +5088,7 @@ public class MainActivity extends Activity {
             case GraphicsPreviewOptions.GLASS: return "Glass: " + (graphicsDraft.glassEnabled ? "On" : "Off");
             case GraphicsPreviewOptions.SHADOW: return "Shadows: " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow);
             case GraphicsPreviewOptions.MIST: return "Mist: " + (graphicsDraft.mistEnabled ? "On" : "Off");
-            case GraphicsPreviewOptions.DUST: return "Indoor dust: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust);
+            case GraphicsPreviewOptions.DUST: return "Particles: " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust);
             default: return "Cap: " + graphicsDraft.cap + " Hz";
         }
     }
@@ -5587,6 +5789,32 @@ public class MainActivity extends Activity {
             updateVitalityHud(lastPlayerVitality, lastPlayerMaxVitality, lastPlayerHalfHeart);
             vitalityStatus.setBackground(HordeUiTokens.plate(this,interfaceBacking(v,HordeUiTokens.CHARCOAL),HordeUiTokens.IRON,1));
         }
+        layoutHealingFlaskHud();
+    }
+
+    private void layoutHealingFlaskHud() {
+        if(flaskPanel==null || preferences==null)return;
+        final View root=findViewById(R.id.root);
+        final android.graphics.Rect safe=HudSafeArea.read(root);
+        final int width=root!=null && root.getWidth()>0?root.getWidth():getResources().getDisplayMetrics().widthPixels;
+        final InterfacePreferences.Values values=InterfacePreferences.read(preferences);
+        FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)flaskPanel.getLayoutParams();
+        final int vitalityHeight=vitalityStatus!=null && vitalityStatus.getHeight()>0?vitalityStatus.getHeight():dp(44);
+        final int top=dp(24)+safe.top+vitalityHeight,start=dp(16)+safe.left;
+        final int plateWidth=Math.max(dp(80),Math.min(dp(168),width/2-safe.left-dp(24)));
+        final int backing=interfaceBacking(values,HordeUiTokens.SLATE);
+        if(flaskLayoutWidth==plateWidth && flaskLayoutTop==top && flaskLayoutStart==start && flaskLayoutBacking==backing)return;
+        flaskLayoutWidth=plateWidth;flaskLayoutTop=top;flaskLayoutStart=start;flaskLayoutBacking=backing;
+        p.gravity=Gravity.TOP|Gravity.START;p.setMarginStart(start);p.topMargin=top;p.width=plateWidth;
+        p.height=FrameLayout.LayoutParams.WRAP_CONTENT;flaskPanel.setLayoutParams(p);
+        // Only the touch target has a backing; the gauge/count never becomes a prose plate.
+        flaskPanel.setPadding(0,0,0,0);flaskPanel.setBackground(null);
+        flaskTouchActions.setOrientation(LinearLayout.HORIZONTAL);
+        drinkFlaskButton.setLayoutParams(new LinearLayout.LayoutParams(dp(56),dp(56)));
+        restButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+        restButton.setMinHeight(dp(48));restButton.setMinWidth(dp(48));restButton.setAllCaps(false);
+        for(Button b:new Button[]{drinkFlaskButton,restButton})
+            styleGameplayActionButton(b,backing,HordeUiTokens.PARCHMENT,false);
     }
 
     private void layoutRtStatus(boolean compact) {
@@ -5778,19 +6006,19 @@ public class MainActivity extends Activity {
                         waterName(graphicsDraft.water) + " / fire " + GraphicsPreviewOptions.fireLabel(graphicsDraft.fire) +
                         " / glass " + (graphicsDraft.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsDraft.shadow) + " / mist " + (graphicsDraft.mistEnabled ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust) +
+                        " / particles " + GraphicsPreviewOptions.dustLabel(graphicsDraft.dust) +
                         (presented ? " / planned " + ((a[9] * graphicsDraft.scale + 50) / 100) + " x " +
                         ((a[10] * graphicsDraft.scale + 50) / 100) : " / planned extent unavailable") +
                         "\nSaved: " + (graphicsConfirmed == null ? "unavailable" : graphicsConfirmed.scale + "% / water " + waterName(graphicsConfirmed.water) +
                         " / fire " + GraphicsPreviewOptions.fireLabel(graphicsConfirmed.fire) + " / glass " + (graphicsConfirmed.glassEnabled ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel(graphicsConfirmed.shadow) + " / mist " + (graphicsConfirmed.mistEnabled ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel(graphicsConfirmed.dust) +
+                        " / particles " + GraphicsPreviewOptions.dustLabel(graphicsConfirmed.dust) +
                         " / cap " + graphicsConfirmed.cap + " Hz") +
                         "\nEffective: " + (presented ? a[3] + "% / " + a[7] + " x " + a[8] + " internal / " +
                         a[9] + " x " + a[10] + " output / water " + waterName((int)a[4]) + " / fire " +
                         GraphicsPreviewOptions.fireLabel((int)a[5]) + " / glass " + (a[20] == 1 ? "On" : "Off") +
                         " / shadows " + GraphicsPreviewOptions.shadowLabel((int)a[22]) + " / mist " + (a[24] == 1 ? "On" : "Off") +
-                        " / indoor dust " + GraphicsPreviewOptions.dustLabel((int)a[26]) : "not yet presented") + "\n" +
+                        " / particles " + GraphicsPreviewOptions.dustLabel((int)a[26]) : "not yet presented") + "\n" +
                         (presented ? (a[11] == 1 ? getString(R.string.graphics_optics_high) : getString(R.string.graphics_optics_mobile)) :
                         "Optical profile: unavailable until an RT frame presents.") + "\nBackend: " +
                         (presented ? (a[12] == 2 ? "RayQueryCompute" : "RayTracingPipeline") : "not yet presented");
@@ -5809,14 +6037,49 @@ public class MainActivity extends Activity {
         return Math.max(0, Math.min(100, preferences.getInt(PREF_MUSIC_VOLUME, 70)));
     }
 
+    private void updateReadyRtLabel() {
+        // Benchmark progress/return handling owns this shared label for its
+        // entire lifetime. The periodic generic RT poll must not flash over it.
+        if (benchmarkRunning) return;
+        layoutRtStatus(true);
+        rtStatus.setText(R.string.rt_active_compact);
+        rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
+    }
+
+    private void toggleBenchmarkProgressDetails() {
+        if(!benchmarkRunning && !openingBenchmarkPending())return;
+        benchmarkStatusExpanded=!benchmarkStatusExpanded;
+        updateBenchmarkProgress(benchmarkProgressLabel,benchmarkProgressRaw);
+    }
+
+    private void updateBenchmarkProgress(String label,String progress) {
+        if(rtStatus==null)return;
+        benchmarkProgressLabel=label;benchmarkProgressRaw=progress;
+        final boolean returning=openingBenchmarkBlocked || openingBenchmarkCancelRequested;
+        final int hint=returning?(benchmarkStatusExpanded?R.string.benchmark_progress_hide_only:R.string.benchmark_progress_details_only):
+            benchmarkStatusExpanded?R.string.benchmark_progress_hide:R.string.benchmark_progress_details;
+        final String visible=label+"\n"+(benchmarkStatusExpanded?progress:BenchmarkProgressText.compact(progress))+"\n"+getString(hint);
+        if(!android.text.TextUtils.equals(rtStatus.getText(),visible))rtStatus.setText(visible);
+        rtStatus.setContentDescription(label+". "+progress+". "+getString(hint));
+        setBenchmarkStatusExpanded(benchmarkStatusExpanded);
+    }
+
     private void setBenchmarkStatusExpanded(boolean expanded) {
         if (rtStatus == null) return;
-        layoutRtStatus(false);
         benchmarkStatusExpanded = expanded;
-        rtStatus.setMaxLines(expanded ? 3 : 1);
-        final ViewGroup.LayoutParams layout = rtStatus.getLayoutParams();
-        layout.height = expanded ? ViewGroup.LayoutParams.WRAP_CONTENT : dp(40);
-        rtStatus.setLayoutParams(layout);
+        if(benchmarkRunning || openingBenchmarkPending()) {
+            android.graphics.Rect safe=HudSafeArea.read(findViewById(R.id.root));
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
+            p.gravity=Gravity.TOP|Gravity.CENTER_HORIZONTAL;p.width=ViewGroup.LayoutParams.MATCH_PARENT;
+            p.height=ViewGroup.LayoutParams.WRAP_CONTENT;p.topMargin=safe.top+dp(16);
+            p.leftMargin=safe.left+dp(16);p.rightMargin=safe.right+dp(16);p.setMarginEnd(p.rightMargin);
+            rtStatus.setLayoutParams(p);rtStatus.setMinWidth(0);rtStatus.setMaxWidth(Integer.MAX_VALUE);
+            rtStatus.setMaxLines(Integer.MAX_VALUE);rtStatus.setTextSize(13);
+        } else {
+            layoutRtStatus(false);rtStatus.setMaxLines(1);
+            FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)rtStatus.getLayoutParams();
+            p.height=dp(40);p.leftMargin=p.rightMargin=0;rtStatus.setLayoutParams(p);
+        }
     }
 
     private void setGameplayPaused(boolean paused) {
@@ -5868,6 +6131,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         refreshDiagnosticsText();
         diagnosticsPanel.setVisibility(View.VISIBLE);
@@ -5928,7 +6192,7 @@ public class MainActivity extends Activity {
     }
 
     private void showDeathOverlay() {
-        if (deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
+        if (entryMenuEnabled || deathOverlayVisible || graphicsVisible || playtestReportVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         renderDeathOverlay();
     }
 
@@ -5946,6 +6210,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -5957,12 +6222,12 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.retry_encounter), this::retryEncounter,
                 getString(R.string.restart_route), this::restartAfterDeath);
-        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        addMenuButton(panel, getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
     private void showEndingOverlay() {
-        if (endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
+        if (entryMenuEnabled || endingOverlayVisible || endingOverlayDismissed || deathOverlayVisible ||
                 menuVisible || graphicsVisible || playtestReportVisible || rtLabVisible || benchmarkRunning || debugCaptureUiSuppressed) return;
         endingOverlayVisible = true;
         menuVisible = true;
@@ -5976,6 +6241,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -5992,7 +6258,7 @@ public class MainActivity extends Activity {
         addMenuButtonRow(panel,
                 getString(R.string.continue_label), this::continueAfterEnding,
                 getString(R.string.begin_again), this::restartAfterEnding);
-        addMenuButton(panel, getString(R.string.quit), this::finishAndRemoveTask);
+        addMenuButton(panel, getString(R.string.quit_to_main_menu), this::returnGameplayToMainMenu);
         attachPanel(panel);
     }
 
@@ -6024,6 +6290,7 @@ public class MainActivity extends Activity {
         menuButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         diagnosticsPanel.setVisibility(View.GONE);
         menuScrim.setVisibility(View.VISIBLE);
@@ -6533,9 +6800,7 @@ public class MainActivity extends Activity {
                 if (musicPlayback != null) musicPlayback.setSuspended(!resumed || !surfaceStarted ||
                         state != 1 || menuVisible || diagnosticsVisible || debugMotionActive || pendingDebugMotion != null);
                 if (state == 1) {
-                    if(!benchmarkRunning) layoutRtStatus(true);
-                    rtStatus.setText(benchmarkRunning?R.string.rt_active:R.string.rt_active_compact);
-                    rtStatus.setContentDescription(getString(R.string.rt_active)+"; opens diagnostics");
+                    updateReadyRtLabel();
                     rtStatus.setTextColor(0xFFFFD07A);
                     // Both values come from one immutable simulation publication.
                     final long vitalityState = ProbeBridge.getPlayerVitalityState();
@@ -6677,7 +6942,8 @@ public class MainActivity extends Activity {
                     final int benchmarkStatus = ProbeBridge.getBenchmarkStatus();
                     if (benchmarkStatus == 1) {
                         final String progress = ProbeBridge.getBenchmarkProgress();
-                        rtStatus.setText(progress.isEmpty() ? getString(R.string.benchmark_starting) : progress);
+                        updateBenchmarkProgress(getString(R.string.benchmark_running_label),
+                            progress.isEmpty()?getString(R.string.benchmark_starting):progress);
                         rtStatus.setVisibility(View.VISIBLE);
                         menuButton.setVisibility(View.GONE);
                         attackButton.setVisibility(View.GONE);
@@ -6687,6 +6953,7 @@ public class MainActivity extends Activity {
                         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
                         updateContextualControls(false);
                         vitalityStatus.setVisibility(View.GONE);
+                        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
                     } else if (benchmarkStatus == 2 || benchmarkStatus == 3) {
                         latestBenchmarkReport = ProbeBridge.getBenchmarkReport();
                         if (latestBenchmarkReport.isEmpty()) {
@@ -6801,16 +7068,19 @@ public class MainActivity extends Activity {
                             }
                             break;
                         case PLATFORM_EVENT_ENEMY_HIT:
-                            if (targetEntity == ENTITY_LICH) {
-                                // The hurt source includes its own impact; layering the
-                                // fencing hit masks the short vocal reaction.
-                                playSpatialSound("lich_hurt", 0.82f, stereoGains, verticalMetadata);
-                            } else {
-                                playSpatialSound((swingVariant & 1) == 0 ?
-                                        "sword_hit_1" : "sword_hit_2", 0.32f,
+                        case CombatAudioFeedback.GUARD_BLOCK_EVENT: {
+                            final String combatKey = CombatAudioFeedback.soundKey(eventType, eventAudioCue,
+                                    !menuVisible && !diagnosticsVisible && !graphicsVisible &&
+                                    !rtLabVisible && !playtestReportVisible && !benchmarkRunning &&
+                                    !deathOverlayVisible && !endingOverlayVisible);
+                            if (combatKey != null) {
+                                // The Keeper cue contains its own impact; no fencing
+                                // layer. A held block never claims the parry haptic.
+                                playSpatialSound(combatKey, CombatAudioFeedback.gain(eventType,eventAudioCue),
                                         stereoGains, verticalMetadata);
                             }
                             break;
+                        }
                         case PLATFORM_EVENT_ENEMY_DEFEATED:
                             // Preserve the authored separation between the sword impact
                             // and the fall cue while retaining the event's spatial gains.
@@ -7022,6 +7292,13 @@ public class MainActivity extends Activity {
             case "chapter-stone-wall-corner": return 200;
             case "chapter-forest-first-bend": return 201;
             case "chapter-forest-second-bend": return 202;
+            case "chapter-demo-endpoint": return 232;
+            case "chapter-demo-endpoint-return": return 233;
+            case "attack-ring-yellow-windup": return 234;
+            case "attack-ring-yellow-contact": return 235;
+            case "attack-ring-red-windup": return 236;
+            case "attack-ring-red-contact": return 237;
+            case "enemy-hit-fragments": return 238;
             case "chapter-forest-lookout": return 203;
             case "chapter-forest-lookout-left": return 228;
             case "chapter-forest-lookout-right": return 229;
@@ -7342,6 +7619,7 @@ public class MainActivity extends Activity {
         if (crouchButton != null) crouchButton.setVisibility(View.GONE);
         rtStatus.setVisibility(View.GONE);
         vitalityStatus.setVisibility(View.GONE);
+        if(flaskPanel!=null)flaskPanel.setVisibility(View.GONE);
         developerOverlay.setVisibility(View.GONE);
         clearTouchState();
     }
@@ -7366,6 +7644,10 @@ public class MainActivity extends Activity {
             case 229: return new float[]{3.2953981634f, -0.15f};
             case 230: return new float[]{-1.57079632679f, .014f};
             case 231: return new float[]{1.57079632679f, .014f};
+            case 232: return new float[]{2.57f, -.10f};
+            case 233: return new float[]{-.57f, -.30f};
+            case 234: case 235: case 236: case 237: case 238:
+                return new float[]{-1.57079632679f, -.05f};
             case 204: return new float[]{-1.57079632679f, -0.35f};
             case 205: return new float[]{-1.57079632679f, -0.35f};
             case 206: return new float[]{-1.57079632679f, -0.35f};
@@ -7445,8 +7727,10 @@ public class MainActivity extends Activity {
                 .setUsage(AudioAttributes.USAGE_GAME)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                 .build();
+        synchronized(loadedSounds){loadedSounds.clear();}
         soundPool = new SoundPool.Builder().setMaxStreams(5).setAudioAttributes(attributes).build();
         soundPool.setOnLoadCompleteListener((pool, soundId, status) -> {
+            if(pool!=soundPool)return;
             if (status == 0) {
                 synchronized (loadedSounds) {
                     loadedSounds.add(soundId);
@@ -7595,11 +7879,14 @@ public class MainActivity extends Activity {
     }
 
     private void initialisePrivateLichRevivalAudio() {
-        if(!PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
+        if(!(BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && !PrivateLichRevivalAudio.enabled(BuildConfig.DEBUG,getIntent()!=null &&
                 getIntent().getBooleanExtra(PrivateLichRevivalAudio.INTENT_OPT_IN,false)))return;
         String error=PrivateLichRevivalAudio.validate(getFilesDir());
         if(error!=null){Log.e(TAG,error);return;}
+        privateRevivalAudioGeneration=android.os.SystemClock.elapsedRealtimeNanos();
+        ProbeBridge.setRevivalAudioReady(privateRevivalAudioGeneration,false);
         final int id=soundPool.load(PrivateLichRevivalAudio.file(getFilesDir()).getAbsolutePath(),1);
+        privateRevivalSoundId=id;
         if(id==0){Log.e(TAG,"SoundPool rejected the verified private revival WAV.");return;}
         privateLichRevivalAudio=new PrivateLichRevivalAudio(new PrivateLichRevivalAudio.Sink() {
             public int start(float left,float right) {
@@ -7621,6 +7908,10 @@ public class MainActivity extends Activity {
         catch(RuntimeException | LinkageError unavailable){return 0.f;}
     }
     private void updatePrivateLichRevivalAudio(int state) {
+        if((BuildConfig.PRIVATE_REVIVAL || BuildConfig.SHIPPING17_CONTENT) && privateRevivalAudioGeneration>0) {
+            boolean ready; synchronized(loadedSounds){ready=soundPool!=null && privateRevivalSoundId!=0 && loadedSounds.contains(privateRevivalSoundId);}
+            ProbeBridge.setRevivalAudioReady(privateRevivalAudioGeneration,ready);
+        }
         if(privateLichRevivalAudio!=null)privateLichRevivalAudio.update(delayedGameplayFeedbackGeneration,
             privateRevivalAudible(state),preferences.getInt("sfx_volume",70)/100.f,privateRevivalDuck());
     }
@@ -7845,8 +8136,12 @@ public class MainActivity extends Activity {
     private interface IntSettingListener { void onChanged(int value); }
 
     private void addSlider(final LinearLayout panel, final String title, final int value, final int min, final int max, final IntSettingListener listener) {
+        addSlider(panel, title, value, min, max, listener, number -> number);
+    }
+    private void addSlider(final LinearLayout panel, final String title, final int value, final int min, final int max,
+                           final IntSettingListener listener, final java.util.function.IntUnaryOperator displayValue) {
         final TextView label = new TextView(this);
-        label.setText(title + "  " + value + "%");
+        label.setText(title + "  " + displayValue.applyAsInt(value) + "%");
         label.setTextColor(0xFFFFE5BA);
         label.setTextSize(15);
         label.setPadding(0, dp(8), 0, 0);
@@ -7856,10 +8151,10 @@ public class MainActivity extends Activity {
         slider.setMax(max - min);
         slider.setProgress(value - min);
         slider.setMinimumHeight(dp(48));
-        slider.setContentDescription(title+", "+value+"%");
+        slider.setContentDescription(title+", "+displayValue.applyAsInt(value)+"%");
         slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
-                final int current = progress + min;
+                final int current = displayValue.applyAsInt(progress + min);
                 label.setText(title + "  " + current + "%");
                 slider.setContentDescription(title+", "+current+"%");
                 listener.onChanged(current);
@@ -7908,8 +8203,9 @@ public class MainActivity extends Activity {
         if(combat)CombatActionControl.apply(button,button.getId()==R.id.attack_button);
         button.setStateListAnimator(null);
         button.setTextColor(HordeUiTokens.label(text));
-        button.setMinHeight(dp(48));
-        if(!circular && !combat && button.getId()!=R.id.interact_button)button.setPadding(dp(6),0,dp(6),0);
+        button.setMinHeight(dp(button.getId()==R.id.drink_flask_button?56:48));
+        if(!circular && !combat && button.getId()!=R.id.interact_button && button.getId()!=R.id.drink_flask_button)
+            button.setPadding(dp(6),0,dp(6),0);
     }
     private LinearLayout.LayoutParams matchWrap() {
         return new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -7923,7 +8219,18 @@ public class MainActivity extends Activity {
         pushGuardHold();
     }
 
+    private void pushAttackHold() {
+        final boolean allowed=canSendGameplayAction() && resumed && controllerHasFocusedWindow();
+        if(!allowed)controllerInput.clearAttackHold();
+        if(!allowed && !publishedAttackHeld)return;
+        final int source=controllerMode?2:3;
+        final boolean held=allowed && (controllerMode?controllerInput.attackHeld():swingTouch!=null && swingTouch.held());
+        if(held==publishedAttackHeld && source==publishedAttackSource)return;
+        ProbeBridge.setAttackHeld(held,source);publishedAttackHeld=held;publishedAttackSource=source;
+    }
+
     private void pushGuardHold() {
+        pushAttackHold();
         final boolean allowed = canSendGameplayAction() && resumed && controllerHasFocusedWindow();
         if (!allowed) {
             keyboardGuardHeld = false;
@@ -7939,10 +8246,11 @@ public class MainActivity extends Activity {
     }
 
     private void configureGameplayActionButtons() {
+        bindHealingFlaskHud();
         swingTouch = new PressActionButton(attackButton, this::canSendGameplayAction, () -> {
             clearRunIntent();
             ProbeBridge.requestAttack();
-        });
+        },this::pushAttackHold);
         dodgeTouch = new PressActionButton(dodgeButton, this::canSendGameplayAction, () -> {
             clearRunIntent();
             ProbeBridge.requestDodge();
@@ -8294,11 +8602,6 @@ public class MainActivity extends Activity {
         String prompt="";
         if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
-        HealingFlaskUiState flask=readHealingFlaskState();
-        if(flask!=null && flask.enabled) {
-            prompt+="\n"+getString(R.string.controller_flask_drink,flask.charges,flask.capacity);
-            if(flask.restAnchor!=0)prompt+="\n"+getString(R.string.controller_flask_rest);
-        }
         prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
         controllerPrompt.setVisibility(prompt.isEmpty()?View.GONE:View.VISIBLE);
@@ -8340,6 +8643,116 @@ public class MainActivity extends Activity {
         toggleHeldLightPoseButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
     }
 
+    private void bindHealingFlaskHud() {
+        flaskPanel=findViewById(R.id.flask_panel);
+        flaskStatus=findViewById(R.id.flask_status);flaskHint=findViewById(R.id.flask_hint);
+        flaskTouchActions=findViewById(R.id.flask_touch_actions);
+        drinkFlaskButton=findViewById(R.id.drink_flask_button);restButton=findViewById(R.id.rest_button);
+        if(drinkFlaskButton!=null) {
+            FlaskDrinkControl.apply(drinkFlaskButton);
+            drinkFlaskButton.setOnClickListener(view -> requestHealingFlaskAction(false));
+        }
+        if(restButton!=null)restButton.setOnClickListener(view -> requestHealingFlaskAction(true));
+        if(flaskPanel!=null && !flaskLayoutListenerInstalled) {
+            flaskLayoutListenerInstalled=true;
+            flaskPanel.addOnLayoutChangeListener((view,l,t,r,b,oldL,oldT,oldR,oldB) -> {
+                positionFlaskTeachingPrompt();reflowChapterDialoguePlacement();
+            });
+        }
+    }
+
+    private void positionFlaskTeachingPrompt() {
+        if(combatTeachingPrompt==null)return;
+        FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)combatTeachingPrompt.getLayoutParams();
+        int top=dp(148);
+        if(flaskPanel!=null && flaskPanel.getVisibility()==View.VISIBLE)
+            top=Math.max(top,flaskPanel.getBottom()+dp(8));
+        if(p.topMargin!=top) {p.topMargin=top;combatTeachingPrompt.setLayoutParams(p);}
+    }
+
+    private void updateHealingFlaskHud(boolean controlsAllowed) {
+        if(flaskPanel==null)return;
+        final HealingFlaskUiState flask=controlsAllowed?readHealingFlaskState():null;
+        if(flask==null || !flask.enabled) {
+            flaskPanel.setVisibility(View.GONE);positionFlaskTeachingPrompt();return;
+        }
+        final boolean touch=!controllerMode && latestSubtitleInputMode==SUBTITLE_INPUT_TOUCH;
+        final long now=SystemClock.uptimeMillis();
+        final boolean quiet=(combatTeachingPrompt==null || combatTeachingPrompt.getVisibility()!=View.VISIBLE) &&
+                (chapterSubtitlePanel==null || chapterSubtitlePanel.getVisibility()!=View.VISIBLE) &&
+                (keeperRevealTitle==null || keeperRevealTitle.getVisibility()!=View.VISIBLE);
+        // Lessons/notices are transient presentation, never resource ownership or a saved entitlement.
+        if(flaskPreviousCapacity>0 && flask.capacity>flaskPreviousCapacity)
+            showBriefFlaskHint(R.string.flask_upgrade_lesson,now);
+        else if(flaskPreviousAction==2 && flask.action==0 && flask.charges>flaskPreviousCharges)
+            showBriefFlaskHint(R.string.flask_refilled_hint,now);
+        else if(flask.hint!=flaskPreviousHint && (flask.hint==2 || flask.hint==5))
+            showBriefFlaskHint(flaskHintResource(flask),now);
+        flaskPreviousCapacity=flask.capacity;flaskPreviousCharges=flask.charges;
+        flaskPreviousAction=flask.action;flaskPreviousHint=flask.hint;
+        if(quiet && !flaskPickupLessonShown && (ProbeBridge.getContextualControlState()&CONTEXTUAL_FLASK_UPGRADE)!=0) {
+            flaskPickupLessonShown=true;showBriefFlaskHint(R.string.flask_pickup_lesson,now);
+        } else if(quiet && now>=flaskLessonUntil && !flaskFirstLessonShown) {
+            flaskFirstLessonShown=true;showBriefFlaskHint(R.string.flask_first_lesson,now);
+        }
+        final String charges=flask.charges+"/"+flask.capacity;
+        String status=charges;
+        if(!touch)status+=controllerMode?"\nD-pad \u2191":" H";
+        if(!touch && flask.nearbyRestAnchor!=0)status+=controllerMode?"\nD-pad \u2193 Rest":"\nJ Rest";
+        if(!android.text.TextUtils.equals(flaskStatus.getText(),status))flaskStatus.setText(status);
+        final String resourceDescription=flask.empty()?getString(R.string.flask_empty,flask.capacity):
+                getString(flask.full()?R.string.flask_full:R.string.flask_charges,flask.charges,flask.capacity);
+        final int reason=flaskHintResource(flask);
+        final String actionDescription=getString(R.string.flask_drink)+". "+resourceDescription+
+                (reason==0?"":". "+getString(reason));
+        if(touch) {
+            // One bottle only: the Drink target is also its charge gauge.
+            FlaskDrinkControl.apply(drinkFlaskButton,flask.charges,flask.capacity);
+            if(flaskStatus.getCompoundDrawables()[0]!=null)flaskStatus.setCompoundDrawables(null,null,null,null);
+            flaskStatus.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            flaskStatus.setContentDescription(null);
+        } else {
+            FlaskDrinkControl.applyGauge(flaskStatus,flask.charges,flask.capacity,24);
+            flaskStatus.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
+            flaskStatus.setContentDescription(actionDescription+". "+getString(controllerMode?
+                    R.string.flask_controller_guidance:R.string.flask_keyboard_guidance)+
+                    (flask.nearbyRestAnchor==0?"":". "+getString(controllerMode?
+                            R.string.flask_rest_controller_guidance:R.string.flask_rest_keyboard_guidance)));
+        }
+        String hint="";
+        if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
+        else if(flask.hint==5 && now<flaskLessonUntil)hint=getString(flaskLessonResource);
+        else if(flask.nearbyRestAnchor!=0 && !flask.allows(true))hint=getString(R.string.flask_rest_wait_hint);
+        else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
+        if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
+        flaskHint.setContentDescription(hint);flaskHint.setVisibility(hint.isEmpty()?View.GONE:View.VISIBLE);
+        flaskTouchActions.setVisibility(View.VISIBLE);
+        drinkFlaskButton.setVisibility(touch?View.VISIBLE:View.GONE);
+        drinkFlaskButton.setEnabled(flask.allows(false));drinkFlaskButton.setContentDescription(actionDescription);
+        restButton.setVisibility(touch && flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
+        restButton.setEnabled(flask.allows(true));
+        restButton.setContentDescription(getString(R.string.flask_rest)+". "+getString(flask.restAnchor!=0?
+                R.string.flask_rest_touch_guidance:R.string.flask_rest_wait_hint));
+        flaskPanel.setVisibility(View.VISIBLE);layoutHealingFlaskHud();positionFlaskTeachingPrompt();
+    }
+
+    private void showBriefFlaskHint(int resource,long now) {
+        flaskLessonResource=resource;flaskLessonUntil=now+4500;
+    }
+
+    private static int flaskHintResource(HealingFlaskUiState state) {
+        switch(state.hint) {
+            case 1:return R.string.flask_health_full_hint;
+            case 2:return R.string.flask_empty_hint;
+            case 3:return R.string.flask_still_hint;
+            case 4:return R.string.flask_returning_hint;
+            case 5:return R.string.flask_interrupted_hint;
+            case 6:return R.string.flask_drinking_hint;
+            case 7:return R.string.flask_resting_hint;
+            default:return state.empty()?R.string.flask_empty_hint:0;
+        }
+    }
+
     private HealingFlaskUiState readHealingFlaskState() {
         try {return HealingFlaskUiState.decode(ProbeBridge.getHealingFlaskState(),surfaceRequestGeneration);}
         catch(RuntimeException | LinkageError unavailable) {return null;}
@@ -8347,7 +8760,12 @@ public class MainActivity extends Activity {
     private void requestHealingFlaskAction(boolean rest) {
         if(!resumed || !controllerHasFocusedWindow() || !canSendGameplayAction())return;
         final HealingFlaskUiState state=readHealingFlaskState();
-        if(state==null || !state.allows(rest))return;
+        if(state==null)return;
+        if(!state.allows(rest)) {
+            int reason=rest?R.string.flask_rest_wait_hint:flaskHintResource(state);
+            if(reason!=0) {showBriefFlaskHint(reason,SystemClock.uptimeMillis());updateHealingFlaskHud(true);}
+            return;
+        }
         if(rest)ProbeBridge.requestRest();else ProbeBridge.requestDrinkFlask();
     }
 
@@ -8412,6 +8830,7 @@ public class MainActivity extends Activity {
     }
 
     private void updateContextualControls(final boolean controlsAllowed) {
+        updateHealingFlaskHud(controlsAllowed);
         if (controllerPrompt != null) controllerPrompt.setVisibility(View.GONE);
         if (!controlsAllowed) {
             positionContextualPrompt(false);
@@ -8990,6 +9409,7 @@ public class MainActivity extends Activity {
             super.onDestroy();
             return;
         }
+        if(campaignEndFailureDialog!=null)campaignEndFailureDialog.dismiss();
         retainOpeningBenchmarkClient(); // Includes finish/swipe paths with no Bundle callback.
         if(openingBenchmarkRecoveryRejected) {
             handler.removeCallbacksAndMessages(null);

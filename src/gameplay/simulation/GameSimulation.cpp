@@ -1,6 +1,7 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/healing/FlaskRestSites.h"
 
 #include <algorithm>
 #include <cmath>
@@ -252,6 +253,8 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         ActivateScheduledCombatEdges();
     const bool flaskCompeting=FlaskCompetingIntent(input);
     if(config_.healingFlask1_7 && flaskCompeting) {
+        if(!input.paused && healingFlask_.Snapshot().action!=healing::FlaskAction::Idle)
+            flaskInterruptedUntilTick_=tickIndex_+180;
         CancelFlaskUtility();
         healingFlask_.Cancel();
     }
@@ -264,12 +267,22 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         return;
     }
 
+    if(config_.sequentialPractice1_7 && config_.developmentRescueJourney && rescueTraversal_.Snapshot().exteriorSide)
+        combatTeaching_.LeaveOpeningEncounter();
+    // The opening lesson must not grant immunity throughout the Keeper fight.
+    // Existing explicit Keeper practice is retained by the lesson owner.
+    if(config_.sequentialPractice1_7 && activeEnemyKind_==EnemyKind::Lich)
+        combatTeaching_.LeaveOpeningEncounter();
+    combatTeaching_.SetSequentialPractice(config_.sequentialPractice1_7);
+    combatTeaching_.SetNaturalContinuation(config_.naturalPracticeRevival1_7 && UsesSkeletonRevival());
+    combatTeaching_.AdvanceOpeningExit(fixedDeltaSeconds,input.paused);
     combatTeaching_.Update(input.tutorialEnabled,
         input.tutorialSlowdownEnabled, input.paused ||
             playerVitals_.Snapshot().phase != PlayerLifePhase::Alive ||
             IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase),
         combatSnapshot_, lichEncounter_.Snapshot(), activeEnemyKind_, CurrentCombatRules());
     gameplayTimeScale_ = combatTeaching_.Snapshot().simulationTimeScale;
+    const float gestureSeconds=fixedDeltaSeconds; // Input hold duration is not dilated combat time.
     fixedDeltaSeconds *= gameplayTimeScale_;
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
@@ -308,6 +321,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     }
     if (!input.paused && playerAlive)
     {
+        enemyHitParticles_.Step(fixedDeltaSeconds);
         walkTime_ += fixedDeltaSeconds;
         const float previousWalkCycleTime = walkCycleTime_;
         walkCycleTime_ += fixedDeltaSeconds;
@@ -333,8 +347,10 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                  torchFailureSnapshot_.droppedZ);
         }
         UpdateEncounters(input, fixedDeltaSeconds);
+        UpdateSwordSheathHold(input,gestureSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         ResolveHeldItems();
+        RecordSuccessfulHitParticles();
         RecordSwordContactTrace();
         if (interactionState_.heldLightKind ==
             horde::gameplay::interactions::HeldLightKind::RewardLantern)
@@ -774,6 +790,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 
 void GameSimulation::ResetRoute()
 {
+    enemyHitParticles_.Clear();
     forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
@@ -782,7 +799,7 @@ void GameSimulation::ResetRoute()
     }
     skeletonRevivalWorkshopBypass_ = false; revivedIdlePhaseZero_ = false;
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 && config_.waterfallSkeletonEncounter);
-    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;}
+    if(config_.healingFlask1_7){healingFlask_.ResetNewGame();flaskCompletionTick_=0;flaskInterruptedUntilTick_=0;}
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
@@ -887,6 +904,8 @@ void GameSimulation::RetryEncounter()
             skeletonRevival_.Retry(lesson.stage == TutorialStage::Complete, skipped);
             (void)skeletonRevival_.AcknowledgeLivePair(skeletonRevival_.Snapshot().generation,
                 combatSnapshot_.aliveCount == kSkeletonEnemyCapacity, combatSnapshot_.encounterComplete);
+            if (config_.naturalPracticeRevival1_7 && skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Live)
+                combatTeaching_.CompleteNaturalPractice();
         }
         RefreshSnapshot(lastInput_);
     }
@@ -1523,6 +1542,7 @@ bool GameSimulation::ConsumeWorldCommand()
 
 bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 {
+    enemyHitParticles_.Clear();
     if(staticDetailLease_.resourceGeneration) { staticDetailLease_.restoreRequested=true;RefreshSnapshot(lastInput_);return false; }
     const ShowcaseCheckpoint* checkpoint = FindShowcaseCheckpoint(checkpointId);
     if (checkpoint == nullptr)
@@ -1720,6 +1740,30 @@ void GameSimulation::ResolveHeldItems()
     ApplyRescuePresentation();
 }
 
+void GameSimulation::RecordSuccessfulHitParticles()
+{
+    if (swordHitEventThisTick_ != 0 && swordHitTargetThisTick_ != EntityId::Invalid)
+    {
+        const bool keeper=swordHitTargetThisTick_==EntityId::Lich;
+        const auto index=swordHitTargetThisTick_==EntityId::SkeletonB ? 1u : 0u;
+        const float x=keeper?lichEncounter_.Snapshot().x:combatSnapshot_.combatants[index].x;
+        const float z=keeper?lichEncounter_.Snapshot().z:combatSnapshot_.combatants[index].z;
+        const float root=keeper?lichEncounter_.Snapshot().y:kRouteFloorWorldY;
+        const float dx=x-playerX_, dz=z-playerZ_, distance=std::hypot(dx,dz);
+        if(distance>.001f) {
+            const float forwardX=dx/distance,forwardZ=dz/distance;
+            const bool upward=combatSnapshot_.player.action==PlayerCombatAction::UpwardSliceActive;
+            // The authoritative range/cone hit has no measured mesh intersection.
+            // Use a named torso surface proxy on its player-facing side, not the
+            // actor's feet or the live camera. Cut direction follows its latched
+            // sword action; this does not claim skinned-triangle contact.
+            enemyHitParticles_.Add(swordHitEventThisTick_,swordHitTargetThisTick_,
+                {x-forwardX*.22f,root+1.05f,z-forwardZ*.22f},
+                {forwardX*.55f+forwardZ*.75f,upward?.7f:-.35f,forwardZ*.55f-forwardX*.75f});
+        }
+    }
+}
+
 void GameSimulation::RecordSwordContactTrace()
 {
     if (!CurrentCombatRules()) return;
@@ -1777,6 +1821,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
                                      const bool blocksDefenseDuringDraw)
 {
     using namespace horde::gameplay::items;
+    if (reasonPayload==3 && swordIntentionallyStowed_)return false;
     if (FlaskUtilityBusy() || !config_.swordStartsStowed || SwordDefenseReady())
         return false;
 
@@ -1788,6 +1833,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
     {
         return false;
     }
+    swordIntentionallyStowed_=false;
     automaticSwordDrawBlocksDefense_ = blocksDefenseDuringDraw;
     Emit(GameplayEventType::PlayerSwordDrawStarted,
          EntityId::Player,
@@ -1801,6 +1847,7 @@ bool GameSimulation::RequestSwordDraw(const std::int32_t reasonPayload,
 
 void GameSimulation::ResetSwordEquipment()
 {
+    swordSheathHold_.Reset();swordIntentionallyStowed_=false;
     ResetFlaskUtility();
     using namespace horde::gameplay::items;
     HeldItemState& sword = heldItems_[1];
@@ -1829,6 +1876,22 @@ void GameSimulation::AdvanceSwordEquipment(const float fixedDeltaSeconds)
         EmitSwordAttachmentChange();
     if (!heldItems_[1].transition.active)
         automaticSwordDrawBlocksDefense_ = false;
+}
+
+void GameSimulation::UpdateSwordSheathHold(const InputSnapshot& input,float seconds)
+{
+    const bool eligible=CurrentCombatRules() && config_.swordStartsStowed && !input.paused &&
+        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && !input.guardHeld &&
+        !FlaskUtilityBusy() && !rescueTraversal_.IsActive() && !rescueMovementSuppressedThisTick_ &&
+        !IsKeeperRevealing(lichEncounter_.Snapshot().revealPhase) && dodgeRemainingSeconds_<=0 &&
+        heldItems_[1].parentMode==items::HeldItemParentMode::HandSocket && !heldItems_[1].transition.active;
+    const bool safe=combatSnapshot_.player.action==PlayerCombatAction::Idle && !pendingAttackCommands_ &&
+        !pendingParryCommands_ && !queuedDrawAttack_;
+    if(!swordSheathHold_.Step(input.attackHeld,input.attackInputSource,eligible,safe,seconds))return;
+    const auto request=items::RequestHeldItemTransition(heldItems_[1],items::HeldItemTransitionKind::Sheath,tickIndex_);
+    if(request.status==items::HeldItemTransitionRequestStatus::Started) {
+        swordIntentionallyStowed_=true;ClearRunIntent();ClearQueuedDrawAttack();
+    }
 }
 
 void GameSimulation::EmitSwordAttachmentChange()
@@ -2281,22 +2344,35 @@ bool GameSimulation::OpeningEncounterComplete() const
         : combatSnapshot_.encounterComplete;
 }
 
+bool GameSimulation::KeeperOpeningAdmission() const
+{
+    const auto& lesson = combatTeaching_.Snapshot();
+    // Leaving the optional opening lesson admits the Keeper, not a skeleton
+    // victory. Guards and opening Retry remain live; a later earned exterior
+    // checkpoint can preserve their actual surviving state after the Keeper.
+    return !UsesSkeletonRevival() || OpeningEncounterComplete() ||
+        (config_.sequentialPractice1_7 && lesson.stage == TutorialStage::Skipped &&
+         !lesson.exitPending && !lesson.safePractice);
+}
+
 bool GameSimulation::ConfigureSkeletonRevivalPresentation(std::uint64_t generation,
-    float deadSeconds, float standSeconds, bool ready)
+    float deadSeconds, float standSeconds, bool ready, bool visualReady)
 {
     if (!config_.skeletonRevival1_7 || !generation || generation < skeletonRevivalResourceGeneration_)
         return false;
-    if (ready && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
+    if ((ready || visualReady) && (!std::isfinite(deadSeconds) || deadSeconds <= 0.f ||
                   !std::isfinite(standSeconds) || standSeconds <= 0.f)) return false;
-    if (ready && skeletonRevival_.Snapshot().SuppressesActors() &&
+    if ((ready || visualReady) && skeletonRevival_.Snapshot().SuppressesActors() &&
         (deadSeconds != skeletonRevivalDeadDurationSeconds_ || standSeconds != skeletonRevivalStandDurationSeconds_))
         return false;
     skeletonRevivalResourceGeneration_ = generation;
     skeletonRevivalPresentationReady_ = ready;
-    if (ready) {
+    skeletonRevivalVisualReady_ = ready || visualReady;
+    if (ready || visualReady) {
         skeletonRevivalDeadDurationSeconds_ = deadSeconds;
         skeletonRevivalStandDurationSeconds_ = standSeconds;
-    } else skeletonRevival_.CancelTransient();
+    }
+    if(!ready) skeletonRevival_.CancelTransient();
     RefreshSnapshot(lastInput_);
     return true;
 }
@@ -2306,7 +2382,8 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
     if (!UsesSkeletonRevival()) { skeletonRevival_.CancelTransient(); return; }
     const auto& teaching = combatTeaching_.Snapshot();
     SkeletonRevivalInput bridge;
-    bridge.practiceFinished = teaching.stage == TutorialStage::Complete;
+    bridge.practiceFinished = teaching.stage == TutorialStage::Complete ||
+        (config_.naturalPracticeRevival1_7 && teaching.stage==TutorialStage::Ready && !teaching.exitPending);
     // Initial tutorial OFF is an actual opt-out too. Eligibility/pause alone is
     // never Skip, and a deliberate disable must finish its protected safe exit.
     bridge.practiceSkipped = teaching.stage == TutorialStage::Skipped ||
@@ -2333,6 +2410,7 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
     }
     if (state.revivePulse) {
         if (swordCombat_.ReviveDefeatedPairInPlace(skeletonRevivalDeadDurationSeconds_)) {
+            if(config_.naturalPracticeRevival1_7) combatTeaching_.CompleteNaturalPractice();
             combatSnapshot_ = swordCombat_.Snapshot();
             revivedIdlePhaseZero_ = true; // Both new-life clocks start at the admitted Idle0 join.
             (void)skeletonRevival_.AcknowledgeLivePair(state.generation,
@@ -2349,6 +2427,8 @@ void GameSimulation::UpdateSkeletonRevival(const InputSnapshot& input, float del
 
 void GameSimulation::CancelCombatTransients()
 {
+    swordSheathHold_.Cancel();
+    enemyHitParticles_.Clear();
     guardReleaseRequired_ = guardReleaseRequired_ || lastInput_.guardHeld;
     swordCombat_.SetGuardHeld(false);
     combatSnapshot_.player = swordCombat_.Snapshot().player;
@@ -2452,7 +2532,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
-    const bool openingAllowsKeeper = !UsesSkeletonRevival() || OpeningEncounterComplete();
+    const bool openingAllowsKeeper = KeeperOpeningAdmission();
     const auto& keeperBeforeActions = lichEncounter_.Snapshot();
     const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
         (!keeperBeforeActions.revealStarted && openingAllowsKeeper && activeEnemyKind_ == EnemyKind::Lich &&
@@ -2586,6 +2666,13 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     swordHitTargetThisTick_ = EntityId::Invalid;
     swordHitEventThisTick_ = 0;
     swordCombat_.SetSpecialAttacksEnabled(CurrentCombatRules() && config_.specialSkeletonAttacks1_7);
+    const auto& lesson=combatTeaching_.Snapshot();
+    const bool practice=config_.sequentialPractice1_7 && CurrentCombatRules() && lesson.safePractice && activeEnemyKind_==EnemyKind::Skeleton &&
+        !(config_.naturalPracticeRevival1_7 && UsesSkeletonRevival() && lesson.stage==TutorialStage::Ready);
+    swordCombat_.SetPracticeLesson(practice,
+        lesson.stage==TutorialStage::Parry ? EnemyAttackKind::GuardBreak :
+        lesson.stage==TutorialStage::Dodge ? EnemyAttackKind::Unblockable : EnemyAttackKind::Normal);
+
     combatSnapshot_ = swordCombat_.Update(deltaSeconds,
                                            playerX_,
                                            playerZ_,
@@ -2594,6 +2681,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                                            config_.waterfallSkeletonEncounter &&
                                                IsWaterfallSkeletonArena(playerX_, playerZ_),
                                            config_.waterfallSkeletonEncounter);
+    if (CurrentCombatRules() && activeEnemyKind_==EnemyKind::Skeleton)
+        combatTeaching_.ObserveDodge(combatSnapshot_,playerX_,playerZ_,acceptedDodgeSequence_,
+            dodgeProtectionAccepted_ && dodgeRemainingSeconds_>0.f);
     EntityId skeletonDamageSource = EntityId::Invalid;
     EnemyAttackKind incomingAttackKind = EnemyAttackKind::Unblockable;
     if (queuedUpCutCommandSequence_ != 0 &&
@@ -2622,7 +2712,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
                  current.x,
                  current.z);
         }
-        if (activeEnemyKind_ == EnemyKind::Skeleton && current.health < previous.health)
+        if (activeEnemyKind_ == EnemyKind::Skeleton && (current.health < previous.health ||
+            (practice && combatSnapshot_.playerContactPulse &&
+             combatSnapshot_.playerContactTargetId==static_cast<std::int32_t>(index))))
         {
             swordHitTargetThisTick_ = entity;
             swordHitEventThisTick_ = Emit(GameplayEventType::EnemyHit,
@@ -2860,6 +2952,9 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
             // An actual eligible ordinary contact is blocked, not reduced damage
             // or a practice-suppressed miss. It consumes no health/invulnerability.
             damageSample.outcome = CombatContactOutcome::GuardBlocked;
+            damageSample.semanticEventSequence = Emit(GameplayEventType::PlayerGuardBlocked,
+                EntityId::Player, damageSample.target, playerX_, playerZ_, 1.0f, 0,
+                PlayerEyeWorldY(playerSupport_.worldY) - posture_.drop);
             if (playerVitals_.Snapshot().invulnerabilityRemaining <= 0.00001f)
                 combatTeaching_.BlockSucceeded();
         }
@@ -3149,21 +3244,64 @@ std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() 
 {
     if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
-    const auto id=!rescueTraversal_.Snapshot().exteriorSide?campaign::CheckpointId::LowerClaimed:
-        (std::hypot(playerX_-traversal::kExteriorLanding.x,playerZ_-traversal::kExteriorLanding.z)<=1.f?
-         campaign::CheckpointId::SafeExit:campaign::CheckpointId::ForestEndpoint);
-    const auto x=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.x:
-        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.x:endpoint.x;
-    const auto z=id==campaign::CheckpointId::LowerClaimed?traversal::kLowerLanding.z:
-        id==campaign::CheckpointId::SafeExit?traversal::kExteriorLanding.z:endpoint.z;
-    if(std::hypot(playerX_-x,playerZ_-z)>1.f)return std::nullopt;
-    // Reuse the earned boundary's actual terrain/story/contact predicates;
-    // only our own transient recovery action is excluded from serialization.
-    const auto earned=BuildCampaignCheckpoint(id,true,true);
-    if(!earned)return std::nullopt;
-    const double dy=double(playerSupport_.worldY)-earned->position.y;
-    if(std::hypot(std::hypot(double(playerX_)-x,double(playerZ_)-z),dy)>1.0)return std::nullopt;
-    return id;
+    if(!rescueTraversal_.Snapshot().exteriorSide)return std::nullopt;
+    for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
+        auto anchor=traversal::kExteriorLanding;
+        if(id==campaign::CheckpointId::ForestEndpoint) {
+            const auto support=traversal::ChapterExteriorSupport(chapterTerrain_.get(),endpoint.x,endpoint.z);
+            if(!support.grounded)continue;
+            anchor={endpoint.x,support.worldY,endpoint.z};
+        }
+        const auto centre=healing::FlaskRestBasinCentre(anchor,id==campaign::CheckpointId::ForestEndpoint);
+        if(!healing::FlaskRestReachClear(*chapterTerrain_,{playerX_,playerSupport_.worldY,playerZ_},centre))continue;
+        // Keep all earned story/contact predicates and canonical saved spawn;
+        // only the action's physical reach follows the visible furniture.
+        if(BuildCampaignCheckpoint(id,true,true))return id;
+    }
+    return std::nullopt;
+}
+
+std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
+{
+    if(!config_.healingFlask1_7 || !chapterTerrain_ || !campaignBoundary_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation || !playerSupport_.grounded ||
+       rescueTraversal_.IsActive() || pendingCampaignRestore_ ||
+       playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)return 0;
+    // A latched campaign record proves the story was actually earned. Do not
+    // rerun usable-now checks here: walking/guarding must not erase discovery.
+    const bool exterior=rescueTraversal_.Snapshot().exteriorSide;
+    for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
+        if(!exterior || !rescueTraversal_.Snapshot().firstAscentCompleted ||
+           (id==campaign::CheckpointId::ForestEndpoint &&
+            (campaignBoundary_->contentRevision<2 || !campaign::CompletedForestProgress(chapterDialogue_.ExportProgress()))) ||
+           worldRoute_.readiness[static_cast<std::size_t>(campaign::Destination(id))]!=ZoneReadiness::Ready)continue;
+        auto p=traversal::kExteriorLanding;
+        if(id==campaign::CheckpointId::ForestEndpoint) {
+            const auto end=kWorldRoutePoints.back();const auto ground=chapterTerrain_->Query(end.x,end.z);
+            if(!ground.found || !ground.walkable)continue;
+            p={end.x,ground.worldY,end.z};
+        }
+        p=healing::FlaskRestBasinCentre(p,id==campaign::CheckpointId::ForestEndpoint);
+        if(std::hypot(playerX_-p.x,playerZ_-p.z)<=3.f &&
+           std::abs(playerSupport_.worldY-p.y)<=.35f)return static_cast<std::uint32_t>(id);
+    }
+    return 0;
+}
+
+void GameSimulation::RefreshFlaskGuidance(const InputSnapshot& input)
+{
+    snapshot_.flaskNearbyRestAnchor=NearbyFlaskRestAnchor();
+    if(snapshot_.flaskRestAnchor)snapshot_.flaskNearbyRestAnchor=snapshot_.flaskRestAnchor;
+    using healing::FlaskHint;
+    const auto& flask=healingFlask_.Snapshot();
+    const auto context=FlaskContextFor(input,false,false);
+    snapshot_.flaskHint=flask.action==healing::FlaskAction::Drinking?FlaskHint::Drinking:
+        flask.action==healing::FlaskAction::Resting?FlaskHint::Resting:
+        FlaskUtilityBusy()?FlaskHint::Returning:
+        tickIndex_<flaskInterruptedUntilTick_?FlaskHint::Interrupted:
+        flask.resources.charges==0?FlaskHint::Empty:
+        context.healthHalfUnits>=6?FlaskHint::FullHealth:
+        !context.drinkEligible?FlaskHint::StandStill:FlaskHint::Ready;
 }
 
 healing::FlaskContext GameSimulation::FlaskContextFor(const InputSnapshot& input,
@@ -3232,6 +3370,9 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
         else (void)healingFlask_.BeginRest(context);
     }
     const auto completion=healingFlask_.Step(gameplaySeconds,context);
+    if(before.action!=healing::FlaskAction::Idle && !completion.completed &&
+       healingFlask_.Snapshot().action==healing::FlaskAction::Idle)
+        flaskInterruptedUntilTick_=tickIndex_+180;
     if(utilityDrink) {
         if(completion.completed) {
             flaskHandReturn_=proposedHand;
@@ -3261,6 +3402,7 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
         snapshot_.healingFlask.resources.charges>0;
     const auto anchor=context.restEligible?EligibleFlaskRestAnchor():std::nullopt;
     snapshot_.flaskRestAnchor=anchor?static_cast<std::uint32_t>(*anchor):0u;
+    RefreshFlaskGuidance(input);
 }
 
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
@@ -3271,6 +3413,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.chapterCompanion=chapterCompanion_.State();
     snapshot_.tickIndex = tickIndex_;
     snapshot_.combatContactTrace = combatContactTrace_;
+    snapshot_.enemyHitParticles = enemyHitParticles_;
     snapshot_.inputPublicationSequence = inputPublicationSequence_;
     snapshot_.inputMoveForward = input.moveForward;
     snapshot_.inputMoveStrafe = input.moveStrafe;
@@ -3315,8 +3458,16 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
     snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
+    snapshot_.combatTeaching.naturalContinuation = config_.naturalPracticeRevival1_7 && UsesSkeletonRevival();
+    snapshot_.combatTeaching.continuationPhase = static_cast<std::uint8_t>(skeletonRevival_.Snapshot().phase);
+    snapshot_.combatTeaching.liveFightNotice = snapshot_.combatTeaching.naturalContinuation &&
+        skeletonRevival_.Snapshot().phase == SkeletonRevivalPhase::Live &&
+        skeletonRevival_.Snapshot().phaseSeconds < 6.f && activeEnemyKind_ == EnemyKind::Skeleton &&
+        !rescueTraversal_.Snapshot().exteriorSide &&
+        playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     snapshot_.skeletonRevival = UsesSkeletonRevival() ? skeletonRevival_.Snapshot() : SkeletonRevivalSnapshot{};
     snapshot_.skeletonRevivalPresentationReady = UsesSkeletonRevival() && skeletonRevivalPresentationReady_;
+    snapshot_.skeletonRevivalVisualReady = UsesSkeletonRevival() && skeletonRevivalVisualReady_;
     snapshot_.skeletonRevivalDeadDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalDeadDurationSeconds_ : 0.f;
     snapshot_.skeletonRevivalStandDurationSeconds = UsesSkeletonRevival() ? skeletonRevivalStandDurationSeconds_ : 0.f;
     const auto recovery=FlaskContextFor(input,false,false);
@@ -3324,6 +3475,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         healingFlask_.Snapshot().resources.charges>0;
     const auto rest=recovery.restEligible?EligibleFlaskRestAnchor():std::nullopt;
     snapshot_.flaskRestAnchor=rest?static_cast<std::uint32_t>(*rest):0u;
+    RefreshFlaskGuidance(input);
     // Recompute from the phases just advanced on this authoritative tick, not
     // the pre-step teaching cue. Readability survives disabled/completed lessons.
     snapshot_.combatTeaching.attackReadability = EvaluateAttackReadability(
@@ -3403,6 +3555,9 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.torchFailure = torchFailureSnapshot_;
     snapshot_.waterContact = waterContact_.Snapshot();
     snapshot_.heldItems = heldItems_;
+    snapshot_.swordSheathHoldProgress=swordSheathHold_.Progress();
+    snapshot_.swordIntentionallyStowed=swordIntentionallyStowed_ && !heldItems_[1].transition.active &&
+        heldItems_[1].parentMode==items::HeldItemParentMode::BodyStow;
     snapshot_.automaticSwordDrawBlocksDefense = SwordDrawBlocksDefense();
     snapshot_.heldItemKinematics = heldItemFixedStepState_.kinematics;
     snapshot_.playerAnimation = playerAnimationState_.Snapshot();

@@ -113,6 +113,10 @@ using WindowsPlaytestExchange = std::function<WindowsPlaytestHttpResponse(
     std::string_view requestBody, std::chrono::steady_clock::time_point deadline,
     HANDLE cancellationEvent);
 
+[[nodiscard]] WindowsPlaytestHttpResponse ExchangeWindowsPublicBenchmarkReport(
+    std::string_view requestBody, std::chrono::steady_clock::time_point deadline,
+    HANDLE cancellationEvent);
+
 inline constexpr UINT kWindowsPlaytestSubmissionCompletedMessage = WM_APP + 59u;
 
 // One process-wide worker and at most one queued attempt back these foreground

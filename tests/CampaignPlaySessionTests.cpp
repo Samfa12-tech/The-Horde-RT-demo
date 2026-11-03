@@ -108,8 +108,18 @@ bool PlainFile(const fs::path& path){std::error_code ec;const auto s=fs::symlink
 bool FixtureLocation() {
     if(FixtureToken().empty())return false;
     std::error_code ec;const auto base=fs::path(HORDE_RT_PLAY_SESSION_FIXTURE_BASE);
-    return fs::weakly_canonical(base,ec)==base.lexically_normal() && !ec &&
-        !fs::is_symlink(fs::symlink_status(FixtureRoot(),ec));
+    const auto canonical=fs::weakly_canonical(base,ec);
+    if(ec || !fs::equivalent(base,canonical,ec) || ec)return false;
+    // A substituted short build drive resolves to its physical path during
+    // canonicalization. Reject real filesystem links component by component
+    // without rejecting that benign drive alias.
+    for(auto component=base; !component.empty(); component=component.parent_path()) {
+        if(fs::is_symlink(fs::symlink_status(component,ec)) || ec)return false;
+        if(component==component.root_path())break;
+    }
+    const auto fixtureStatus=fs::symlink_status(FixtureRoot(),ec);
+    return !fs::is_symlink(fixtureStatus) &&
+        (!ec || ec==std::errc::no_such_file_or_directory);
 }
 bool OwnedFixture(){return FixtureLocation() && PlainFile(FixtureRoot()/"owner.txt") &&
     Text(FixtureRoot()/"owner.txt")==FixtureOwner();}
@@ -748,7 +758,7 @@ int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>
     auto config=sim::ProductionGameSimulationConfig();config.healingFlask1_7=true;
     sim::GameSimulation game(config);cp::PlaySession play(game,directory.path,&faults);
     Check(play.BeginNewGame(0),"flask recovery selects only the first independent slot");
-    auto saved=Record(1);saved.schema=3;saved.halfHeart=true;saved.flask={true,1};
+    auto saved=Record(1,true);saved.schema=3;saved.halfHeart=true;saved.flask={true,1};
     if(!Seed(game,saved,terrain)){Check(false,"exact half-heart flask record restores on actual support");return 1;}
     Check(play.ObserveSafeBoundary() && Until(play,[&]{return play.State().outcome==cp::PlayOutcome::Succeeded;}),
         "actual first checkpoint publication is acknowledged before retry admission");
@@ -792,7 +802,7 @@ int FlaskConfirmedRetry(const std::shared_ptr<const sim::TriangleSupportSurface>
     // Publication identities belong to the owner, not elapsed test ticks.
     for(int i=0;i<600 && !game.Snapshot().flaskRestAnchor;++i)step();
     Check(game.Snapshot().flaskRestAnchor==static_cast<unsigned>(saved.id),
-        "restored lower checkpoint has an actual eligible recovery point");
+        "restored upper-rope checkpoint has an actual eligible recovery point");
     const auto revision=game.CampaignBoundaryRevision(),rest=game.Snapshot().completedRestGeneration;
     ++input.commands.rest;for(int i=0;i<130;++i)step();
     Check(game.Snapshot().completedRestGeneration==rest+1 &&
@@ -923,6 +933,108 @@ int main(int argc,char** argv){
         std::cout<<checks<<" opt-in earned-route diagnosis checks, "<<failures<<" failures\n";
         return failures?1:0;
     }
+    {
+        // Persistence regression for an honestly recorded exterior escape.
+        // This seeded logical record tests IO, not natural victory acceptance.
+        Directory bypassDirectory;auto config=sim::ProductionGameSimulationConfig();
+        config.healingFlask1_7=true;config.skeletonRevival1_7=true;config.sequentialPractice1_7=true;
+        sim::GameSimulation bypass(config);cp::PlaySession bypassPlay(bypass,bypassDirectory.path);
+        auto escaped=Record(2,true);escaped.schema=5;escaped.flaskRecorded=true;escaped.flask={false,1};
+        escaped.defeatedGuards=1;escaped.guardHealth={0,1};
+        Check(bypassPlay.BeginNewGame(2) && Seed(bypass,escaped,terrain) && bypassPlay.ObserveSafeBoundary(),
+              "valid exterior escape with one surviving injured guard becomes latest checkpoint");
+        Check(Until(bypassPlay,[&]{return bypassPlay.State().operation==cp::PlayOperation::Autosave &&
+              bypassPlay.State().outcome==cp::PlayOutcome::Succeeded;}),"exterior escape writes real selected-slot autosave");
+        Check(bypassPlay.SaveManual(2) && Done(bypassPlay) && bypassPlay.State().outcome==cp::PlayOutcome::Succeeded,
+              "exterior escape can be manually saved without returning to kill optional guards");
+        const auto saved=Read(bypassDirectory,2,cp::SaveKind::Manual);
+        Check(saved.checkpoint.schema==5 && saved.checkpoint.savedAtUnixSeconds>0 &&
+              saved.checkpoint.defeatedGuards==1 && saved.checkpoint.guardHealth==escaped.guardHealth &&
+              saved.checkpoint.flask==escaped.flask,"dated save preserves exact living health, death mask and flask resources");
+        Check(!fs::exists(Path(bypassDirectory,0,cp::SaveKind::Manual)) &&
+              !fs::exists(Path(bypassDirectory,1,cp::SaveKind::Manual)),"bypass regression never touches other manual slots");
+        sim::GameSimulation cold(config);cp::PlaySession coldPlay(cold,bypassDirectory.path);
+        Check(coldPlay.Load(2,cp::SaveKind::Manual) && Until(coldPlay,[&]{return coldPlay.State().phase==cp::SessionPhase::LoadReady;}),
+              "fresh owner reads the real stored exterior escape");
+        const auto prepared=coldPlay.PrepareLoad();sim::InputSnapshot neutral;
+        Check(prepared && coldPlay.CommitLoad(*prepared,prepared->destination,terrain,neutral,1),
+              "fresh owner commits survivor record through actual terrain/readiness gate");
+        Check(cold.Snapshot().skeletonEnemies[0].dead && !cold.Snapshot().skeletonEnemies[1].dead &&
+              cold.Snapshot().skeletonEnemies[1].health==1 && cold.Snapshot().healingFlask.resources==escaped.flask &&
+              cold.Snapshot().rescue.exteriorSide && !cold.Snapshot().openingEncounterComplete,
+              "cold load returns safely outside without granting kills, revival, healing or flask charges");
+        const auto retained=Raw(Path(bypassDirectory,2,cp::SaveKind::Manual));
+        for(int tick=0;tick<20;++tick)coldPlay.Poll();
+        Check(retained==saved.encoded && Raw(Path(bypassDirectory,2,cp::SaveKind::Manual))==retained,
+              "reading survivor record performs no write-on-read migration");
+        // Retry must use the confirmed schema5 record, not newer unconfirmed
+        // logical actor/resource state or the old all-defeated restore policy.
+        auto unconfirmed=escaped;unconfirmed.vitality=3;unconfirmed.flask.charges=2;
+        unconfirmed.defeatedGuards=0;unconfirmed.guardHealth={2,2};
+        Check(Seed(cold,unconfirmed,terrain),"unconfirmed live actor/resources may differ from acknowledged exterior record");
+        Check(coldPlay.RetryConfirmedCheckpoint() && coldPlay.State().fromConfirmedRecord &&
+              coldPlay.State().operationSlot==2,"schema5 retry retains the adopted slot's confirmed record ownership");
+        const auto retry=coldPlay.PrepareLoad();
+        Check(retry && retry->fromConfirmedRecord &&
+              coldPlay.CommitLoad(*retry,retry->destination,terrain,neutral,10),
+              "schema5 confirmed Retry passes normal terrain and apply gates");
+        Check(cold.Snapshot().playerVitals.vitality==escaped.vitality &&
+              cold.Snapshot().healingFlask.resources==escaped.flask &&
+              cold.Snapshot().skeletonEnemies[0].dead && cold.Snapshot().skeletonEnemies[0].health==0 &&
+              !cold.Snapshot().skeletonEnemies[1].dead && cold.Snapshot().skeletonEnemies[1].health==1 &&
+              !cold.Snapshot().openingEncounterComplete,
+              "Retry restores confirmed health/charges and individual guard deaths without new healing or kills");
+        neutral.damageEnabled=false;neutral.tutorialEnabled=false;
+        neutral.yawRadians=cold.Snapshot().playerYawRadians;neutral.pitchRadians=cold.Snapshot().playerPitchRadians;
+        for(std::uint64_t publication=11;publication<31;++publication)cold.StepFixed(neutral,1.f/60.f,publication);
+        bool retryCry=false;
+        for(const auto& event:cold.Events().Events())retryCry|=event.type==sim::GameplayEventType::LichRevivalCry;
+        Check(!retryCry && cold.Snapshot().skeletonEnemies[1].health==1 &&
+              !cold.Snapshot().skeletonEnemies[1].dead && !cold.Snapshot().openingEncounterComplete &&
+              cold.Snapshot().healingFlask.resources==escaped.flask &&
+              Raw(Path(bypassDirectory,2,cp::SaveKind::Manual))==retained,
+              "post-Retry ticks preserve surviving guard ownership with no revival cry, refill or record rewrite");
+    }
+    {
+        Directory ending;
+        sim::GameSimulation endingGame(sim::ProductionGameSimulationConfig());
+        cp::PlaySession endingPlay(endingGame,ending.path);
+        Check(endingPlay.BeginNewGame(0) && Seed(endingGame,Record(2),terrain) &&
+              endingPlay.ObserveSafeBoundary(),"return fixture has an earned autosave queued");
+        Check(!endingPlay.TryEndActiveGame() && endingPlay.State().activeSlot==0,
+              "return cannot discard queued autosave before owner polling");
+        Check(Until(endingPlay,[&]{return endingPlay.State().operation==cp::PlayOperation::Autosave &&
+              endingPlay.State().outcome==cp::PlayOutcome::Succeeded;}),"return drains queued autosave normally");
+        Check(endingPlay.SaveManual(0),"return fixture starts explicit manual save");
+        const auto savingRevision=endingPlay.State().operationRevision;
+        Check(!endingPlay.TryEndActiveGame() && endingPlay.State().outcome==cp::PlayOutcome::Pending,
+              "return cannot cancel an unacknowledged manual write");
+        Check(Done(endingPlay) && endingPlay.State().outcome==cp::PlayOutcome::Succeeded,
+              "pending manual write reaches its normal completion before return");
+        const auto manual=Raw(Path(ending,0,cp::SaveKind::Manual));
+        const auto automatic=Raw(Path(ending,0,cp::SaveKind::Autosave));
+        const auto before=endingGame.Snapshot();
+        Check(endingPlay.TryEndActiveGame() && !endingPlay.State().activeSlot &&
+              endingPlay.State().phase==cp::SessionPhase::Closed && !endingPlay.LatestCheckpoint(),
+              "completed return releases active game ownership and closes storage session");
+        Check(!endingPlay.TakeCompletion() && Raw(Path(ending,0,cp::SaveKind::Manual))==manual &&
+              Raw(Path(ending,0,cp::SaveKind::Autosave))==automatic && !manual.empty() && !automatic.empty(),
+              "return preserves both exact records without replaying a stale operation receipt");
+        const auto after=endingGame.Snapshot();
+        Check(before.tickIndex==after.tickIndex && before.playerX==after.playerX && before.playerZ==after.playerZ &&
+              before.playerVitals.vitality==after.playerVitals.vitality,
+              "session return does not reset or advance simulation");
+        Check(endingPlay.TryEndActiveGame() && endingPlay.BeginNewGame(2),
+              "repeated return is idempotent and a subsequent New Game can select another slot");
+        Check(Seed(endingGame,Record(1,true),terrain) && endingPlay.ObserveSafeBoundary() &&
+              Until(endingPlay,[&]{return endingPlay.State().operation==cp::PlayOperation::Autosave &&
+                  endingPlay.State().outcome==cp::PlayOutcome::Succeeded;}),
+              "second game keeps normal earned autosave behavior after menu return");
+        Check(endingPlay.State().operationRevision>savingRevision &&
+              Raw(Path(ending,0,cp::SaveKind::Manual))==manual &&
+              Raw(Path(ending,0,cp::SaveKind::Autosave))==automatic && endingPlay.TryEndActiveGame(),
+              "second game has fresh operation identity and cannot overwrite the previous slot");
+    }
     Directory directory;Faults faults;
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Manual)),Record(1)).status==io::Status::Committed,"seed first manual");
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),Record(2,true)).status==io::Status::Committed,"seed third manual");
@@ -948,6 +1060,10 @@ int main(int argc,char** argv){
           "catalogue distinguishes six fixed records with actual checkpoint/hearts");
     Check(!play.State().activeSlot && game.Snapshot().tickIndex==0 && Raw(Path(directory,1,cp::SaveKind::Manual))==corrupt,
           "catalogue is read-only and does not select a game, apply a load or repair corrupt data");
+    Check(cp::CanStartNewGame(play.Catalogue(),0) && !cp::CanStartNewGame(play.Catalogue(),1) &&
+          cp::CanStartNewGame(play.Catalogue(),2), "new-game admission rejects corrupt/read-error destinations while valid slots remain usable");
+    Check(Raw(Path(directory,1,cp::SaveKind::Manual))==corrupt && Raw(Path(directory,0,cp::SaveKind::Manual))==firstManual &&
+          !play.State().activeSlot, "rejected destination admission preserves invalid bytes, valid progress and active selection");
     faults.failRead=true;play.RefreshCatalogue();
     Check(Until(play,[&]{return CatalogueDone(play);}) && play.Catalogue()[0].status==cp::CatalogueStatus::ReadError &&
           Raw(Path(directory,0,cp::SaveKind::Manual))==firstManual,"read failure is visible and preserves valid bytes");

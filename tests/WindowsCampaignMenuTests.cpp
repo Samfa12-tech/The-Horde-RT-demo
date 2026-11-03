@@ -101,6 +101,9 @@ int main() {
         Check(commands.empty() && Shown(parent,Menu::ConfirmId),
             "populated slot requires overwrite confirmation even when only auto exists");
         commands.clear();menu.Open(Menu::Page::NewGame,Menu::Origin::Entry);
+        Check(!Enabled(parent,4111),"new game blocks corrupt/read-error slot");
+        Click(parent,4111);Check(commands.empty() && !Shown(parent,Menu::ConfirmId),"blocked new game cannot dispatch or offer overwrite confirmation");
+        Check(Text(parent,4111).find("Choose another slot")!=std::string::npos,"blocked destination explains recovery choice");
         view.catalogue[1].status=cp::CatalogueStatus::Checking;++view.catalogueRevision;menu.Refresh(view);
         Check(!Enabled(parent,4110),"new game waits for both record checks");
         view.catalogue[1].status=cp::CatalogueStatus::Empty;++view.catalogueRevision;menu.Refresh(view);

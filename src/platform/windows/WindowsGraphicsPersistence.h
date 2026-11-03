@@ -9,6 +9,18 @@
 
 namespace horde::platform::windows
 {
+// Only an actual old display preference selects legacy defaults. Missing
+// settings use the same LOW particles as the explicit Reset command.
+inline horde::graphics::GraphicsSettings WindowsGraphicsStartupFallback(
+    const std::filesystem::path& path, const horde::graphics::LegacyGraphicsSettings& legacy)
+{
+    char value[32]{}; const auto filename=path.string();
+    const bool oldDisplay=GetPrivateProfileStringA("display","renderScale","",value,32,filename.c_str())>0 ||
+        GetPrivateProfileStringA("display","waterQuality","",value,32,filename.c_str())>0;
+    return oldDisplay ? horde::graphics::MigrateLegacyGraphicsSettings(legacy,horde::graphics::GraphicsPlatform::Windows) :
+        horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
+}
+
 // Read the same INI tuple used by the ordinary owner. Legacy schemas cannot
 // opt into new enum values through stale keys; malformed new keys are explicit.
 inline std::optional<horde::graphics::GraphicsPersistenceRecord> LoadGraphicsPersistenceRecord(

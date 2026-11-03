@@ -1,4 +1,5 @@
 #include "scene/BellwetherShell.h"
+#include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include <cstring>
 #include <cmath>
@@ -26,6 +27,16 @@ int main() {
             "accepted geometry prefix remains byte-identical");
         check(world.bounds.maximum[0]>120 && world.bounds.maximum[2]>170,
             "town retains the map's southeast footprint");
+        for(const auto& cap:atmosphere::kBellwetherChimneyCaps) {
+            unsigned topCorners=0;
+            for(std::size_t i=before.vertices.size();i<world.vertices.size();++i) {
+                const auto& vertex=world.vertices[i];const auto& p=vertex.position;
+                if(vertex.normal[1]>.99f && std::abs(p[1]-cap[1])<.001f &&
+                   std::abs(std::abs(p[0]-cap[0])-.55f)<.001f &&
+                   std::abs(std::abs(p[2]-cap[2])-.5f)<.001f)++topCorners;
+            }
+            check(topCorners==4,"each smoke origin matches four actual native chimney cap corners");
+        }
         bool slopingNormal=false;
         for(std::size_t i=before.vertices.size();i<world.vertices.size();++i) {
             const auto& n=world.vertices[i].normal;

@@ -162,6 +162,38 @@ inline bool StageDevelopmentCheckpointSimulation(
         return staged;
     };
 
+    if(checkpoint.combatFeedbackCapture) {
+        if(checkpoint.combatFeedbackCapture>5u || !gameSimulation.config_.combatFoundation1_7 ||
+           !gameSimulation.config_.specialSkeletonAttacks1_7)return finalize(false);
+        const bool hit=checkpoint.combatFeedbackCapture==5u;
+        const bool red=checkpoint.combatFeedbackCapture==3u || checkpoint.combatFeedbackCapture==4u;
+        const bool contact=checkpoint.combatFeedbackCapture%2u==0u;
+        gameSimulation.BeginCombatPractice(red?EnemyKind::Lich:EnemyKind::Skeleton);
+        simulation::InputSnapshot cueInput;
+        cueInput.damageEnabled=false;cueInput.tutorialEnabled=false;
+        cueInput.hasAuthoritativePlayerPose=true;
+        cueInput.authoritativePlayerX=checkpoint.cameraX;cueInput.authoritativePlayerZ=checkpoint.cameraZ;
+        cueInput.yawRadians=checkpoint.yaw;cueInput.pitchRadians=checkpoint.pitch;
+        stepFixed(cueInput,0.f,gameSimulation.Snapshot().inputPublicationSequence+1u);
+        cueInput.hasAuthoritativePlayerPose=false;
+        for(unsigned tick=0;tick<1800u;++tick) {
+            if(hit && tick%45u==0u)cueInput.commands.attack=gameSimulation.Snapshot().lastConsumedAttackSequence+1u;
+            stepFixed(cueInput,1.f/60.f,gameSimulation.Snapshot().inputPublicationSequence+1u);
+            if(hit && gameSimulation.Snapshot().enemyHitParticles.Active()) {
+                for(unsigned settle=0;settle<6u;++settle)
+                    stepFixed(cueInput,1.f/60.f,gameSimulation.Snapshot().inputPublicationSequence+1u);
+                return finalize(gameSimulation.Snapshot().enemyHitParticles.Active());
+            }
+            if(hit)continue;
+            const auto& warning=gameSimulation.Snapshot().attackWarning;
+            if(warning.kind==(red?EnemyAttackKind::Unblockable:EnemyAttackKind::GuardBreak) &&
+               warning.phase==(contact?simulation::AttackWarningPhase::Contact:simulation::AttackWarningPhase::Windup) &&
+               warning.phaseElapsedSeconds >= (contact?.025f:warning.phaseDurationSeconds*.5f))
+                return finalize(true);
+        }
+        return finalize(false);
+    }
+
     if(checkpoint.stagesRescueExterior) {
         // A diagnostic exterior seed is a new authored chapter presentation,
         // even in a process which has already walked this route. Retaining the
@@ -249,6 +281,22 @@ inline bool StageDevelopmentCheckpointSimulation(
             for(int tick=0;tick<2600;++tick) {
                 const auto& state=gameSimulation.Snapshot();
                 const float dx=destination.x-state.playerX,dz=destination.z-state.playerZ;
+                const float distance=std::hypot(dx,dz);
+                if(distance<.008f) {reached=true;break;}
+                routeInput.yawRadians=std::atan2(dx,-dz);
+                routeInput.moveForward=std::min(1.0f,distance/.055f);
+                routeInput.runHeld=distance>.3f;
+                advance();
+            }
+            if(!reached)return finalize(false);
+        }
+        // A mapped approach capture continues from F04 using the same motor;
+        // the camera target is never used as an authoritative teleport.
+        if(checkpoint.walksBeyondExteriorStation) {
+            bool reached=false;
+            for(int tick=0;tick<2600;++tick) {
+                const auto& state=gameSimulation.Snapshot();
+                const float dx=checkpoint.cameraX-state.playerX,dz=checkpoint.cameraZ-state.playerZ;
                 const float distance=std::hypot(dx,dz);
                 if(distance<.008f) {reached=true;break;}
                 routeInput.yawRadians=std::atan2(dx,-dz);

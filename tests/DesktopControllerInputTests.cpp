@@ -546,7 +546,7 @@ int main()
             windowsSource.find("lastRtLabTelemetryTick < 250u") != std::string::npos,
             "Windows RT Lab must expose completion actions, authored reset, and four-Hz live telemetry");
     const std::size_t endingMenuBegin = windowsSource.find("void ShowEndingMenu(");
-    const std::size_t endingMenuEnd = windowsSource.find("bool ApplyPlayerRetryCheckpoint(", endingMenuBegin);
+    const std::size_t endingMenuEnd = windowsSource.find("const char* PresentModeName(", endingMenuBegin);
     Require(endingMenuBegin != std::string::npos && endingMenuEnd != std::string::npos &&
             windowsSource.substr(endingMenuBegin, endingMenuEnd - endingMenuBegin)
                     .find("context.rtLabVisible") != std::string::npos,
@@ -672,6 +672,27 @@ int main()
     using horde::platform::windows::DesktopKeyAction;
     using horde::platform::windows::ResolveDesktopLeftClick;
     using horde::platform::windows::ResolveDesktopGameplayKey;
+    using horde::platform::windows::ShouldAcquireDesktopMouseLookForKey;
+    for (unsigned key : {unsigned('W'),unsigned('A'),unsigned('S'),unsigned('D'),
+                         unsigned('Q'),unsigned('E'),0x20u,0x14u})
+    {
+        Require(ShouldAcquireDesktopMouseLookForKey(key,true,false,false,false,true),
+                "fresh movement/action intent reacquires mouse look after controller or menu use");
+        Require(!ShouldAcquireDesktopMouseLookForKey(key,false,false,false,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,true,false,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,false,true,false,true) &&
+                !ShouldAcquireDesktopMouseLookForKey(key,true,false,false,true,true),
+                "inactive focus, existing capture, held repeat and shortcuts cannot recapture the pointer");
+    }
+    for (unsigned key : {0x1bu,0x09u,0x12u,0x11u,unsigned('C'),unsigned('F')})
+        Require(!ShouldAcquireDesktopMouseLookForKey(key,true,false,false,false,true),
+                "menu/modifier and retired keys do not steal mouse capture");
+    Require(!ShouldAcquireDesktopMouseLookForKey('E',true,false,false,false,false) &&
+            !ShouldAcquireDesktopMouseLookForKey('H',true,false,false,false,true) &&
+            ShouldAcquireDesktopMouseLookForKey('H',true,false,false,false,true,true),
+            "unavailable lantern/flask actions cannot capture input; enabled bindings can");
+    Require(windowsSource.find("ShouldAcquireDesktopMouseLookForKey(") != std::string::npos,
+            "the native keyboard handler must wire the tested capture handoff policy");
     Require(ResolveDesktopLeftClick(true, false, ChestRewardPrompt::OpenChest) == DesktopClickAction::AcquireCapture &&
             ResolveDesktopLeftClick(true, false, ChestRewardPrompt::None) == DesktopClickAction::AcquireCapture,
             "initial focus/capture click never publishes interaction or attack");
@@ -762,6 +783,21 @@ int main()
             windowsSource.find("DiscardDesktopPendingCommands(*sceneContext)")!=std::string::npos &&
             windowsSource.find("(wParam == VK_RETURN || wParam == VK_SPACE)")!=std::string::npos,
             "native owner wires tested admission, reserved right mouse, cancellation and menu Space");
+
+    const auto moreBegin=windowsSource.find("case kEntryMoreButtonId:");
+    const auto moreEnd=windowsSource.find("case kEntryBackButtonId:",moreBegin);
+    const auto more=windowsSource.substr(moreBegin,moreEnd-moreBegin);
+    Require(more.find("entryMoreVisible = true")!=std::string::npos &&
+        more.find("kRunBenchmarkButtonId : kControlsButtonId")!=std::string::npos &&
+        windowsSource.find("{kRunBenchmarkButtonId,kCampaignLoadButtonId,kControlsButtonId")!=std::string::npos &&
+        windowsSource.find("createButton(kEntryMoreButtonId, \"MORE / BENCHMARK\")")!=std::string::npos,
+        "More names Benchmark, places it first and focuses it when eligible");
+    const auto chooserBack=windowsSource.find("case kBenchmarkChoiceBackId:");
+    const auto chooserRun=windowsSource.find("case kBenchmarkChoiceRunId:",chooserBack);
+    const auto back=windowsSource.substr(chooserBack,chooserRun-chooserBack);
+    Require(back.find("benchmarkChooserVisible=false")!=std::string::npos &&
+        back.find("kRunBenchmarkButtonId")!=std::string::npos && back.find("owner.Queue")==std::string::npos,
+        "Benchmark Back returns focus without queuing a run or resetting gameplay");
 
     horde::platform::windows::GuardHoldLatch guardHold;
     guardHold.Reseed(true);

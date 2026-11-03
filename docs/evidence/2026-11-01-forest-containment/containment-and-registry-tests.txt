@@ -1,0 +1,57 @@
+Internal ctest changing into directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+UpdateCTestConfiguration  from :C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Parse Config file:C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release/DartConfiguration.tcl
+Test project C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 56
+    Start  56: horde_rt_campaign_checkpoint_tests
+
+56: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_campaign_checkpoint_tests.exe"
+56: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+56: Test timeout computed to be: 60
+56: Kit reunion anchor: listener=(-33.7,-12.8) actor=(-27.7,-5.8) oldDistance=3.27567 newDistance=9.21955 oldLR=0.109187,0.012507 newLR=0.0383516,0.00733917
+56: Kit nearby reminder: listener=(-28.7023,-5.80325) actor=(-27.7,-5.8) oldDistance=5.33736 newDistance=1.00233 oldLR=0.0459493,0.0493765 newLR=0.35525,0.0528804
+56: 1199 campaign checkpoint checks, 0 failures
+1/3 Test  #56: horde_rt_campaign_checkpoint_tests ........   Passed    1.37 sec
+test 126
+    Start 126: horde_rt_development_static_asset_tests
+
+126: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_development_static_asset_tests.exe"
+126: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+126: Test timeout computed to be: 1500
+126: rect-niche displacement-components walkTime=0->0 walkAmount=0 speed=0 authoritativeTravel=37.9770966 crouch=0 crouchDrop=0 equipmentStowed=0 ropeHands=0 torso=-0,-0,0 baseToAuthoredDistance=37.9770966
+126: rect-niche restage-components staged=1 tick=1->2 walkTime=0->0 locomotionTime=0->0 camera=1 support=1 hinge=1 pendulum=1 eventsEmpty=1
+126: rect-niche projection-inputs yaw=-1.57079637 pitch=-0.319999993 supportY=-0.949999988 left=-0.466763765,-0.0719899163,0.212070361 right=0.230000004,-0.340000004,0.33270824 visibility=NOT_EVALUATED
+126: Development static asset policy passed
+2/3 Test #126: horde_rt_development_static_asset_tests ...   Passed    1.07 sec
+test 139
+    Start 139: horde_rt_forest_containment_tests
+
+139: Test command: "C:\Users\sam_s\Documents\the Horde RT Demo\.worktrees\horde-1.7-wp2-vertical-proof\build\presets\windows-x64-release\Release\horde_rt_forest_dressing_tests.exe" "--containment"
+139: Working Directory: C:/Users/sam_s/Documents/the Horde RT Demo/.worktrees/horde-1.7-wp2-vertical-proof/build/presets/windows-x64-release
+139: Test timeout computed to be: 180
+139: Flood escaped at -38.25,-6.85 from -37.9,-7.2
+139: Flood escaped at -37.9,-6.85 from -37.9,-7.2
+139: Containment audit: sentinels=1 approaches=0 leaks=0 floodCells=521 movementSteps=7337
+139: Containment audit: sentinels=7 approaches=16668 leaks=0 floodCells=5319 movementSteps=277613
+139: Endpoint cycle=0 position=24.1874,53.1364 maxSpeed=3.2
+139: Endpoint cycle=1 position=24.1964,53.1504 maxSpeed=3.2
+139: Endpoint cycle=2 position=24.1854,53.133 maxSpeed=1.9
+139: Surroundings native: trees=480 fences=24 natural=47 retainedSupportBytes=9351784 baseline64SupportBytes=4469016 rocks=155 rockTriangles=58486 totalSupport=131884 treeContact=10648 openWoodland=0 understoryTriangles=70560 fenceTriangles=1188 boundaryCollision=58990 crossingProbes=3337 routeClearanceProbes=3768 cpuSubsetTriangles=17389 addedRawBytes=26535992 sourceWitness=8980520670790461166
+3/3 Test #139: horde_rt_forest_containment_tests .........   Passed   21.61 sec
+
+The following tests passed:
+	horde_rt_campaign_checkpoint_tests
+	horde_rt_development_static_asset_tests
+	horde_rt_forest_containment_tests
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =  24.09 sec

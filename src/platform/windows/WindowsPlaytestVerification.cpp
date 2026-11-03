@@ -215,6 +215,7 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 struct Session final : std::enable_shared_from_this<Session>
 {
     HWND owner = nullptr;
+    bool publicBoard = false;
     HWND window = nullptr;
     HWND status = nullptr;
     HWND cancel = nullptr;
@@ -379,7 +380,7 @@ struct Session final : std::enable_shared_from_this<Session>
                 [weak, expectedGeneration = generation](HRESULT error, LPCWSTR) -> HRESULT {
                     auto self = weak.lock();
                     if (!self || self->generation != expectedGeneration || self->IsTerminalOrQueued() || !self->webview) return S_OK;
-                    if (FAILED(error) || FAILED(self->webview->Navigate(kWindowsPlaytestVerificationPageUrl)))
+                    if (FAILED(error) || FAILED(self->webview->Navigate(self->publicBoard ? kWindowsPublicBenchmarkVerificationPageUrl : kWindowsPlaytestVerificationPageUrl)))
                         self->QueueFinish(WindowsPlaytestVerificationStatus::Unavailable);
                     return S_OK;
                 }).Get());
@@ -407,7 +408,8 @@ struct Session final : std::enable_shared_from_this<Session>
             [weak](ICoreWebView2*, ICoreWebView2NavigationStartingEventArgs* args) -> HRESULT {
                 LPWSTR uri = nullptr;
                 if (FAILED(args->get_Uri(&uri))) { args->put_Cancel(TRUE); return S_OK; }
-                const bool allowed = IsAllowedWindowsPlaytestVerificationPageUrl(Wide(uri));
+                auto current = weak.lock();
+                const bool allowed = current && IsAllowedWindowsPlaytestVerificationPageUrl(Wide(uri), current->publicBoard);
                 CoTaskMemFree(uri);
                 if (!allowed) args->put_Cancel(TRUE);
                 else if (auto self = weak.lock()) {
@@ -432,7 +434,7 @@ struct Session final : std::enable_shared_from_this<Session>
                 BOOL success = FALSE;
                 LPWSTR source = nullptr;
                 if (FAILED(args->get_IsSuccess(&success)) || !success || FAILED(sender->get_Source(&source)) ||
-                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source))) {
+                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source), self->publicBoard)) {
                     CoTaskMemFree(source);
                     self->QueueFinish(WindowsPlaytestVerificationStatus::Failed);
                     return S_OK;
@@ -460,7 +462,7 @@ struct Session final : std::enable_shared_from_this<Session>
                 if (!self || self->IsTerminalOrQueued() || !self->pageNavigationStarted) return S_OK;
                 LPWSTR source = nullptr;
                 const bool allowed = SUCCEEDED(sender->get_Source(&source)) &&
-                    IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source));
+                    IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source), self->publicBoard);
                 CoTaskMemFree(source);
                 if (!allowed) self->QueueFinish(WindowsPlaytestVerificationStatus::Failed);
                 return S_OK;
@@ -484,8 +486,8 @@ struct Session final : std::enable_shared_from_this<Session>
                 const HRESULT currentResult = sender->get_Source(&currentSource);
                 const HRESULT messageResult = args->get_WebMessageAsJson(&raw);
                 if (FAILED(sourceResult) || FAILED(currentResult) || FAILED(messageResult) ||
-                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(eventSource)) ||
-                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(currentSource))) {
+                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(eventSource), self->publicBoard) ||
+                    !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(currentSource), self->publicBoard)) {
                     CoTaskMemFree(eventSource); CoTaskMemFree(currentSource);
                     if (raw) { SecureZeroMemory(raw, wcslen(raw) * sizeof(wchar_t)); CoTaskMemFree(raw); }
                     return S_OK;
@@ -557,7 +559,8 @@ struct Session final : std::enable_shared_from_this<Session>
                     bool allowed = false;
                     if (SUCCEEDED(args->get_Request(&request)) && request && SUCCEEDED(request->get_Uri(&uri))) {
                         const std::wstring value = Wide(uri);
-                        allowed = IsAllowedWindowsPlaytestVerificationPageUrl(value) ||
+                        auto current = weak.lock();
+                        allowed = (current && IsAllowedWindowsPlaytestVerificationPageUrl(value, current->publicBoard)) ||
                             IsAllowedWindowsPlaytestVerificationChallengeUrl(value);
                     }
                     CoTaskMemFree(uri);
@@ -578,7 +581,7 @@ struct Session final : std::enable_shared_from_this<Session>
     {
         if (IsTerminalOrQueued() || !webview || handshakeSent) return;
         LPWSTR source = nullptr;
-        if (FAILED(webview->get_Source(&source)) || !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source))) {
+        if (FAILED(webview->get_Source(&source)) || !IsAllowedWindowsPlaytestVerificationPageUrl(Wide(source), publicBoard)) {
             CoTaskMemFree(source); QueueFinish(WindowsPlaytestVerificationStatus::Failed); return;
         }
         CoTaskMemFree(source);
@@ -725,9 +728,9 @@ LRESULT CALLBACK WindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lPa
 
 } // namespace
 
-bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url) noexcept
+bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url, bool publicBoard) noexcept
 {
-    return url == kWindowsPlaytestVerificationPageUrl;
+    return url == (publicBoard ? kWindowsPublicBenchmarkVerificationPageUrl : kWindowsPlaytestVerificationPageUrl);
 }
 
 bool IsAllowedWindowsPlaytestVerificationFrameUrl(std::wstring_view url) noexcept
@@ -805,7 +808,7 @@ bool WindowsPlaytestVerificationOneShot::TryComplete(const WindowsPlaytestVerifi
     return true;
 }
 
-WindowsPlaytestVerificationResult ShowWindowsPlaytestVerification(HWND owner)
+WindowsPlaytestVerificationResult ShowWindowsPlaytestVerification(HWND owner, bool publicBoard)
 {
     WindowsPlaytestVerificationResult unavailable;
     if (owner && (!IsWindow(owner) || GetCurrentThreadId() != GetWindowThreadProcessId(owner, nullptr))) return unavailable;
@@ -813,6 +816,7 @@ WindowsPlaytestVerificationResult ShowWindowsPlaytestVerification(HWND owner)
     if (FAILED(com)) return unavailable;
     auto session = std::make_shared<Session>();
     session->owner = owner;
+    session->publicBoard = publicBoard;
     session->comInitialized = SUCCEEDED(com);
     session->CreateWindowAndStart();
     while (session->window && IsWindow(session->window) && !session->terminal) {

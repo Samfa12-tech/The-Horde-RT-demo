@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "package": "horde-kit-flask-guidance-v1",
+  "provider": "Mureka",
+  "language": "en",
+  "rights": {
+    "license": "LicenseRef-Mureka-Owner-Confirmed-Game-Repository",
+    "publicGameRepositoryDistributionConfirmed": true,
+    "evidenceClass": "owner-explicit-confirmation",
+    "confirmedOn": "2026-11-02",
+    "scope": ["public Horde game runtime packages", "public Horde repository"],
+    "notCovered": "No grant for unrelated assets or blanket MIT relicensing."
+  },
+  "processing": "Owner-provided MP3 decoded with FFmpeg 9.0 to mono PCM16 24000 Hz; Python wave wrote canonical 44-byte PCM RIFF headers. No gain or denoise adjustment.",
+  "cuts": [
+    {
+      "stableId": "flask.empty",
+      "text": "Is your flask empty? Fill it here.",
+      "sourceMp3Sha256": "dedc62d5d5c2b97452fb78f34f11930dbd0ae023c076c9e359f50c8dc3af1d16",
+      "runtimeFile": "flask.empty.wav",
+      "sha256": "e4ddbf8cb72eb0375635379f6e3c6f8222148c7030dec30be284bf23bce8b6d2",
+      "bytes": 116172,
+      "frames": 58064,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "durationSeconds": 2.4193333333333333
+    },
+    {
+      "stableId": "flask.topup",
+      "text": "Don't forget to top your flask up here if you need it.",
+      "sourceMp3Sha256": "eb9cd9898512da7e3f25ae12a63de9b8c1c740b5a3552250e8d7fa3b4add3628",
+      "runtimeFile": "flask.topup.wav",
+      "sha256": "7e367cebb77329cd490e2f48b6bd09e782c50c3d7de4e2376d841d286981a71b",
+      "bytes": 141132,
+      "frames": 70544,
+      "sampleRate": 24000,
+      "channels": 1,
+      "bitsPerSample": 16,
+      "durationSeconds": 2.9393333333333334
+    }
+  ]
+}

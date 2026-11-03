@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp" android:height="32dp" android:viewportWidth="32" android:viewportHeight="32">
+    <!-- Original project flask: cork, narrow neck and rounded bottle body. -->
+    <path android:fillColor="#20272B" android:strokeColor="#FFF0CA" android:strokeWidth="1.8"
+        android:strokeLineJoin="round" android:strokeLineCap="round"
+        android:pathData="M12,5 L20,5 L20,10 C20,12 26,14 26,22 C26,28 22,30 16,30 C10,30 6,28 6,22 C6,14 12,12 12,10 Z" />
+    <path android:fillColor="#E8B15B" android:pathData="M11,1 L21,1 L21,5 L11,5 Z M9,21 C11,19 14,21 16,21 C19,21 21,19 23,21 L23,23 C23,27 20,27 16,27 C12,27 9,27 9,23 Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#FFF0CA" android:strokeWidth="1.5"
+        android:strokeLineCap="round" android:pathData="M12,9 L20,9 M11,16 L10,18" />
+</vector>

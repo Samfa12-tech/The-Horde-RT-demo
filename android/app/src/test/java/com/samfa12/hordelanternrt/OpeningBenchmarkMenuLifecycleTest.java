@@ -36,18 +36,25 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         static long[] entry,opening,output;
         static int requests,provisionalRequests,legacyCancels,plays,settingsWrites,starts;
         static boolean paused,accept;
+        static String readySummary;
         static final List<String> cancels=new ArrayList<>();
+        static final List<String> summaryIds=new ArrayList<>();
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static long[] getEntryMenuState(){return entry;}
         @Implementation protected static long requestOpeningBenchmark(long generation){++requests;return accept?7:0;}
         @Implementation protected static long requestOpeningProvisionalBenchmark(long generation){++provisionalRequests;return accept?7:0;}
+        @Implementation protected static long requestOpeningBenchmarkWithSummaryId(long generation,boolean provisional,String uuid,String model){
+            assertTrue(BenchmarkSummaryReview.validUuid(uuid));assertEquals(android.os.Build.MODEL,model);
+            summaryIds.add(uuid);
+            return provisional?requestOpeningProvisionalBenchmark(generation):requestOpeningBenchmark(generation);
+        }
         @Implementation protected static void cancelOpeningBenchmark(long request,long origin){cancels.add(request+":"+origin);}
         @Implementation protected static long[] getOpeningBenchmarkState(){return opening;}
         @Implementation protected static long[] getOpeningBenchmarkOutputState(){return output;}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
         @Implementation protected static String getBenchmarkProgress(){return "1 / 2";}
         @Implementation protected static String getBenchmarkReport(){return "Custom, unranked, local report";}
-        @Implementation protected static String getReadyBenchmarkSummaryRunId(){return "";}
+        @Implementation protected static String getReadyBenchmarkSummaryRunId(){return readySummary;}
         @Implementation protected static void cancelBenchmark(){++legacyCancels;}
         @Implementation protected static void setEntryMenu(boolean enabled,boolean side,boolean reduced,boolean play,long generation){if(play)++plays;}
         @Implementation protected static boolean setDiagnosticSurfaceSuspended(long generation,boolean suspended){return true;}
@@ -69,8 +76,9 @@ public final class OpeningBenchmarkMenuLifecycleTest {
     private Object callBundle(String name,Bundle value)throws Exception {Method m=MainActivity.class.getDeclaredMethod(name,Bundle.class);m.setAccessible(true);return m.invoke(activity,value);}
     @Before public void prepare()throws Exception {
         Bridge.entry=new long[]{31,2,0,0,1}; Bridge.opening=new long[]{7,31,1,0,0,31};Bridge.output=new long[0];
-        Bridge.requests=Bridge.provisionalRequests=Bridge.legacyCancels=Bridge.plays=0;Bridge.paused=false;Bridge.accept=true;Bridge.cancels.clear();
+        Bridge.requests=Bridge.provisionalRequests=Bridge.legacyCancels=Bridge.plays=0;Bridge.paused=false;Bridge.accept=true;Bridge.cancels.clear();Bridge.summaryIds.clear();
         Bridge.settingsWrites=Bridge.starts=0;field("openingBenchmarkClientFallback").set(null,null);
+        Bridge.readySummary="";
         prepareViews();
     }
     private void prepareViews()throws Exception {
@@ -97,12 +105,75 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         ((ExecutorService)field("updateExecutor").get(activity)).shutdownNow();
         field("openingBenchmarkClientFallback").set(null,null);
     }
+    @Test public void compactProgressWrapsAndDetailsRetainNativeDiagnosticsWithoutPollFlicker()throws Exception {
+        Method update=MainActivity.class.getDeclaredMethod("updateBenchmarkProgress",String.class,String.class);update.setAccessible(true);
+        String raw="RT loop 42.0 FPS | mean 23.8ms\nlast 120 frames; not display Hz\nBENCHMARK 1/2  |  WAYPOINT 3/13  |  Shadow corridor";
+        TextView label=(TextView)field("rtStatus").get(activity);View root=activity.findViewById(R.id.root);
+        set("benchmarkRunning",true);
+        for(float scale:new float[]{1f,2f})for(int[] size:new int[][]{{1080,1800},{1800,1080}}) {
+            android.content.res.Configuration config=new android.content.res.Configuration(activity.getResources().getConfiguration());config.fontScale=scale;
+            activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+            set("benchmarkStatusExpanded",false);update.invoke(activity,"Custom benchmark (unranked)",raw);
+            root.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));root.layout(0,0,size[0],size[1]);
+            assertTrue(label.getText().toString().contains("Lap 1/2 / Waypoint 3/13"));assertFalse(label.getText().toString().contains("42.0 FPS"));
+            assertTrue(label.getMeasuredWidth()<=size[0]);assertTrue(label.getMeasuredHeight()<size[1]);
+            assertTrue(label.getMeasuredHeight()>=label.getLayout().getHeight()+label.getCompoundPaddingTop()+label.getCompoundPaddingBottom());
+            assertTrue(label.getContentDescription().toString().contains("not display Hz"));
+            call("toggleBenchmarkProgressDetails");assertTrue(label.getText().toString().contains(raw));
+            String owned=label.getText().toString();call("updateReadyRtLabel");assertEquals(owned,label.getText().toString());
+            call("toggleBenchmarkProgressDetails");assertFalse(label.getText().toString().contains("42.0 FPS"));
+        }
+        set("openingBenchmarkBlocked",true);update.invoke(activity,"Custom benchmark (unranked)","Could not return");
+        assertFalse(label.getText().toString().contains("Back cancels"));
+        assertFalse(label.getContentDescription().toString().contains("Back cancels"));
+        call("toggleBenchmarkProgressDetails");assertTrue(label.getText().toString().contains("Tap to hide details."));
+        assertEquals(0,Bridge.starts);assertEquals(0,Bridge.requests);assertTrue(Bridge.cancels.isEmpty());
+    }
+
+    @Test public void genericReadyPollPreservesBenchmarkProgressAndReturnLabel()throws Exception {
+        TextView label=(TextView)field("rtStatus").get(activity);
+        set("benchmarkRunning",true);
+        for(String owned:new String[]{"Custom benchmark (unranked)\n1 / 2","Returning to opening menu..."}) {
+            label.setText(owned);label.setContentDescription(owned);
+            call("updateReadyRtLabel");
+            assertEquals(owned,label.getText().toString());
+            assertEquals(owned,label.getContentDescription().toString());
+        }
+        set("benchmarkRunning",false);call("updateReadyRtLabel");
+        assertEquals(activity.getString(R.string.rt_active_compact),label.getText().toString());
+    }
+    @Test public void rejectedOpeningRequestCannotReuseSummaryIdentityOnRetry()throws Exception {
+        Bridge.accept=false;call("requestOpeningCustomBenchmark");
+        assertEquals(0L,field("openingBenchmarkRequest").getLong(activity));
+        Bridge.accept=true;start();
+        assertEquals(2,Bridge.summaryIds.size());assertNotEquals(Bridge.summaryIds.get(0),Bridge.summaryIds.get(1));
+        call("cancelOpeningBenchmarkRequest");
+        assertTrue(Bridge.cancels.contains("7:31"));assertEquals(2,Bridge.summaryIds.size());
+    }
     private void start()throws Exception {call("requestOpeningCustomBenchmark");assertEquals(7L,field("openingBenchmarkRequest").getLong(activity));}
     private boolean hasBenchmarkButton(View view) {
         if(view instanceof Button && ((Button)view).getText().toString().toLowerCase(java.util.Locale.ROOT).contains("benchmark")) return true;
         if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)
             if(hasBenchmarkButton(((ViewGroup)view).getChildAt(i))) return true;
         return false;
+    }
+    private void buttons(View view,List<Button> output) {
+        if(view instanceof Button)output.add((Button)view);
+        if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)buttons(((ViewGroup)view).getChildAt(i),output);
+    }
+    @Test public void completedResultsOfferWebsiteFirstAndOpenPublicFormWithoutConsentOrSend()throws Exception {
+        Bridge.readySummary=BenchmarkSummaryReviewTest.RUN;
+        call("showBenchmarkReport",true);
+        List<Button> actions=new ArrayList<>();buttons((View)field("menuScrim").get(activity),actions);
+        assertEquals("Share on the website",actions.get(0).getText().toString());
+        assertEquals("Send privately to developer",actions.get(1).getText().toString());
+        actions.get(0).performClick();
+        BenchmarkSummaryReview owner=(BenchmarkSummaryReview)field("benchmarkSummaryReview").get(activity);
+        assertTrue(owner.isPublicPreview());assertFalse(owner.isPrepared());
+        StatisticsReportSendControls remote=(StatisticsReportSendControls)field("benchmarkSummarySendControls").get(activity);
+        assertFalse(remote.consent.isChecked());assertFalse(remote.send.isEnabled());
+        assertEquals(PlaytestReportSubmission.State.DRAFT,remote.submission.state());assertNull(remote.submission.statisticsJsonForReview());
+        call("closeBenchmarkSummaryReview");
     }
     @Test public void entryMoreActionPublishesCustomRequestThroughActualButton()throws Exception {
         call("showEntryMorePage");
@@ -120,14 +191,14 @@ public final class OpeningBenchmarkMenuLifecycleTest {
     @Test public void provisionalHasSeparateActionAndUnavailableNeverFallsBackToCustom()throws Exception {
         call("showEntryMorePage");
         Button action=(Button)field("openingBenchmarkProvisionalButton").get(activity);
-        assertEquals("Mobile provisional benchmark (unranked)",action.getText().toString());
+        assertEquals("Standard benchmark (fixed settings)",action.getText().toString());
         action.performClick();
         assertEquals(1,Bridge.provisionalRequests);assertEquals(0,Bridge.requests);
         assertTrue(field("openingBenchmarkProvisional").getBoolean(activity));
         Bridge.opening=new long[]{7,31,5,4,1,31};call("pollOpeningBenchmark");
         assertEquals(0,Bridge.requests);assertFalse(field("benchmarkRunning").getBoolean(activity));
         assertFalse(field("benchmarkReportVisible").getBoolean(activity));
-        assertEquals("Provisional unavailable; choose Custom.",ShadowToast.getTextOfLatestToast());
+        assertEquals("Standard benchmark unavailable. You can still choose Custom.",ShadowToast.getTextOfLatestToast());
     }
     @Test public void onlyCurrentPresentedEntryCanPublishInteractiveRequest()throws Exception {
         Bridge.entry=new long[]{30,2,0,0,1};call("requestOpeningCustomBenchmark");assertEquals(0,Bridge.requests);

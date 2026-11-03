@@ -9,6 +9,39 @@ import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 
+// Explicit private owner candidate; binaries stay outside Git and public runtime assets.
+def privateRevivalDirectory = providers.gradleProperty('hordePrivateRevivalDir').orNull
+if(privateRevivalDirectory) {
+    def privateRoot=file(privateRevivalDirectory)
+    def privateFiles=[]
+    privateRoot.eachFileRecurse(groovy.io.FileType.FILES) { privateFiles.add(privateRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    if(privateFiles.sort()!=['private_revival/lich_revival.wav','private_revival/skeleton.glb'])
+        throw new GradleException('Private revival directory must contain only the two pinned runtime derivatives; no source audio/models.')
+    ['skeleton.glb':'800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259',
+     'lich_revival.wav':'1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521'].each { name,expected ->
+        def asset=new File(privateRoot,'private_revival/'+name)
+        if(!asset.isFile() || java.security.MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString()!=expected)
+            throw new GradleException('Private revival requires the exact admitted local '+name)
+    }
+}
+
+// Explicit application integration trial; source folders remain excluded.
+def flaskCandidateDirectory=providers.gradleProperty('hordeFlaskCandidateDir').orNull
+if(flaskCandidateDirectory) {
+    def flaskRoot=file(flaskCandidateDirectory)
+    def flaskFiles=[]
+    flaskRoot.eachFileRecurse(groovy.io.FileType.FILES) { flaskFiles.add(flaskRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    def flaskFile=new File(flaskRoot,'private_flask/player.glb')
+    if(flaskFiles!=['private_flask/player.glb'] || !flaskFile.isFile() ||
+       MessageDigest.getInstance('SHA-256').digest(flaskFile.bytes).encodeHex().toString()!=
+       '56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014')
+        throw new GradleException('Flask candidate requires only the exact pinned runtime derivative, no source files.')
+}
+
+// Public game-package permission covers only these three pinned derivatives.
+// The source MP3, editable Blender files and previews never enter an APK.
+def hordeShipping17AssetDirectory=providers.gradleProperty('hordeShipping17AssetDir').orNull
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -51,6 +84,23 @@ if (hordeActiveAssignmentCount != 1) {
 def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionName)]
 if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
+}
+if (hordeShipping17AssetDirectory) {
+    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory)
+        throw new GradleException('Ordinary 1.7 assets cannot share a private Debug admission or another version.')
+    def assetRoot=file(hordeShipping17AssetDirectory)
+    if (!assetRoot.isDirectory()) throw new GradleException('Ordinary 1.7 asset root is missing.')
+    def actual=[]
+    assetRoot.eachFileRecurse(groovy.io.FileType.FILES) { actual.add(assetRoot.toPath().relativize(it.toPath()).toString().replace('\\','/')) }
+    def pinned=['private_flask/player.glb':'56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014',
+                'private_revival/skeleton.glb':'800632b9b1dbe53bd4f6508a6d167e52e940c6bdb4e902af752429e96d7fe259',
+                'private_revival/lich_revival.wav':'1e1891010f4c89e6f20ec5fba90191aa0f0999c0bd95a4df3fe36659beb9e521']
+    if (actual.sort()!=pinned.keySet().toList().sort()) throw new GradleException('Ordinary 1.7 assets require exactly three pinned runtime derivatives.')
+    pinned.each { relative,expected ->
+        def asset=new File(assetRoot,relative)
+        if (!asset.isFile() || MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString()!=expected)
+            throw new GradleException("Ordinary 1.7 asset differs: ${relative}")
+    }
 }
 
 def runtimeAssetsDir = layout.buildDirectory.dir('generated/runtimeAssets')
@@ -525,6 +575,14 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb'
         include 'models/world/runtime/bellwether-shell-v4/asset.manifest.json'
         include 'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb'
+        include 'models/world/runtime/forest-surroundings-v1/alder-far.glb'
+        include 'models/world/runtime/forest-surroundings-v1/alder-middle.glb'
+        include 'models/world/runtime/forest-surroundings-v1/asset.manifest.json'
+        include 'models/world/runtime/forest-surroundings-v1/boundary-panel.glb'
+        include 'models/world/runtime/forest-surroundings-v1/pine-far.glb'
+        include 'models/world/runtime/forest-surroundings-v1/pine-middle.glb'
+        include 'models/world/runtime/forest-surroundings-v1/runtime-roster.json'
+        include 'models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb'
         include 'models/world/runtime/forest-understory-v1/asset.manifest.json'
         include 'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb'
         include 'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb'
@@ -603,6 +661,9 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/kit/runtime/forest.clue.wav'
         include 'audio/kit/runtime/forest.wait.wav'
         include 'audio/kit/runtime/forest.village.wav'
+        include 'audio/kit/runtime/flask.empty.wav'
+        include 'audio/kit/runtime/flask.topup.wav'
+        include 'audio/kit/runtime/flask-guidance.manifest.json'
         include 'audio/kit/runtime/asset.manifest.json'
         include 'textures/environment/runtime/night-storm.android.ktx2'
         include 'textures/environment/runtime/asset.manifest.json'
@@ -636,18 +697,21 @@ android {
         targetSdk 34
         versionCode hordeVersionCode.intValue()
         versionName hordeVersionName
+        buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
+        buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
         buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', 'false'
-        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '33'
+        buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '25'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
         externalNativeBuild {
             cmake {
                 cppFlags '-std=c++20'
                 arguments '-DANDROID_STL=c++_static'
-                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=33'
+                arguments '-DHORDE_RT_ANDROID_BENCHMARK_VALIDATION=OFF', '-DHORDE_RT_MIN_RENDER_SCALE_PERCENT=25'
             }
         }
     }
@@ -674,6 +738,8 @@ android {
 
     buildTypes {
         debug {
+            buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
             applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
@@ -685,7 +751,7 @@ android {
             minifyEnabled false
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                    arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -696,9 +762,12 @@ android {
         }
         release {
             minifyEnabled false
+            buildConfigField 'boolean', 'SHIPPING17_CONTENT', hordeShipping17AssetDirectory ? 'true' : 'false'
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
+                    arguments '-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF',
+                        "-DHORDE_RT_SHIPPING17_CONTENT=${hordeShipping17AssetDirectory ? 'ON' : 'OFF'}",
+                        '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
                         '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
                 }
@@ -744,12 +813,22 @@ android {
     sourceSets {
         main.assets.srcDirs = [runtimeAssetsDir.get().asFile]
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
+        if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
+        if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
+        if (hordeShipping17AssetDirectory) release.assets.srcDir(file(hordeShipping17AssetDirectory))
     }
 }
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.14.1'
+}
+
+gradle.taskGraph.whenReady { graph ->
+    if (hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory &&
+        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+        throw new GradleException('Ordinary 1.7 Android release requires the pinned hordeShipping17AssetDir; refusing an incomplete package.')
+    }
 }
 
 tasks.named('preBuild').configure {
@@ -772,7 +851,7 @@ tasks.register('printHordeRtPolicyForTest') {
             ? (hordeRtNativePolicyArguments('Shipping') + hordeRtBenchmarkStagedPrimaryArguments).join('|')
             : 'unavailable; set hordeBenchmarkValidation=true'))
         println("benchmarkValidation=${hordeBenchmarkValidation}")
-        println("debugMinRenderScale=33|releaseMinRenderScale=33|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
+        println("debugMinRenderScale=25|releaseMinRenderScale=25|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
         println("ordinaryPresentTiming=OFF|benchmarkPresentTiming=${hordePresentTimingValidation ? 'ON' : 'OFF'}")
         println("benchmarkMotionValidation=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")

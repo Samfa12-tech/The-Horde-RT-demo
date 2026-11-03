@@ -8,6 +8,18 @@ struct CatalogueEntry {
     std::optional<Checkpoint> checkpoint;
     storage::Result result;
 };
+// A user New Game destination must support BOTH future manual and auto writes.
+// Unknown/read-error/corrupt records remain untouched; choose another slot.
+inline bool CanStartNewGame(const std::array<CatalogueEntry,6>& entries,unsigned slot) {
+    if(slot>=3)return false;
+    for(unsigned kind=0;kind<2;++kind) {
+        const auto& entry=entries[slot*2+kind];
+        if(entry.status!=CatalogueStatus::Empty &&
+           !(entry.status==CatalogueStatus::Valid && entry.checkpoint && Validate(*entry.checkpoint)))return false;
+    }
+    return true;
+}
+
 enum class PlayOperation { None, ManualSave, Autosave, Load };
 enum class PlayOutcome { None, Pending, Succeeded, Failed, Cancelled };
 struct PlayState {
@@ -56,6 +68,10 @@ public:
     bool CommitLoad(const LoadPreparation&,simulation::WorldZoneToken ready,
         std::shared_ptr<const simulation::TriangleSupportSurface> terrain,
         simulation::InputSnapshot& ownerInput,std::uint64_t publicationSequence);
+    // End the in-memory game only after queued storage/retry work completes.
+    // Poll while false; existing save records and simulation remain untouched.
+    // Platform owners must also finish any committed-load presentation barrier.
+    bool TryEndActiveGame();
     void Cancel();
 private:
     struct PendingAuto {Checkpoint checkpoint;std::uint64_t revision;unsigned slot;};

@@ -52,6 +52,23 @@ bool FramesWater(const horde::graphics::GraphicsPreviewDescription& scene,
 }
 
 template <typename Check>
+void HitParticleAdapterContracts(const Check& check) {
+    using namespace horde::gameplay::simulation;
+    using namespace horde::vulkan::raytracing;
+    SimulationSnapshot source{};
+    source.enemyHitParticles.Add(17,EntityId::SkeletonB,{1,.3f,-3},{1,-.2f,0});
+    auto frame=BuildRtSceneFrameInputs(source,1.f);
+    check(frame.enemyHitParticles.Active() && frame.enemyHitParticles.bursts[0].eventSequence==17,
+        "immutable accepted burst crosses shared frame adapter without event-drain ownership");
+    source.enemyHitParticles.Step(.2f);
+    check(frame.enemyHitParticles.bursts[0].age==0,"later simulation changes cannot mutate a prepared frame");
+    source.paused=true;
+    check(!BuildRtSceneFrameInputs(source,1.f).enemyHitParticles.Active(),"paused frames exclude transient hit effects");
+    source.paused=false;source.playerAlive=false;
+    check(!BuildRtSceneFrameInputs(source,1.f).enemyHitParticles.Active(),"death frames exclude hit effects");
+}
+
+template <typename Check>
 void AttackWarningAdapterContracts(const Check& check)
 {
     using namespace horde::gameplay;
@@ -105,6 +122,9 @@ void AttackWarningAdapterContracts(const Check& check)
               FireEmitterQuality::High,horde::graphics::ShadowQuality::Higher).attackWarningRingVisible &&
           !build(source,{false,true}).attackWarningRingVisible,
           "every established gameplay overload and disabled reduced-motion option keeps the warning OFF");
+    check(build(source,ProductionAttackWarningOptions()).attackWarningRingVisible &&
+          ProductionAttackWarningOptions(true).reducedMotion,
+          "live shared policy enables authoritative special warnings and preserves reduced motion");
     const auto open=build(source);
     const auto tuningFirst=BuildRtSceneFrameInputs(source,1.f,RtSceneTuning{},WaterQuality::High,
         std::nullopt,std::nullopt,enabled);
@@ -263,6 +283,7 @@ int main()
     const auto check = [&passed](bool condition, const char* label) {
         if (!condition) { std::cerr << label << "\n"; passed = false; }
     };
+    HitParticleAdapterContracts(check);
     AttackWarningAdapterContracts(check);
     {
         using namespace horde::gameplay::items;

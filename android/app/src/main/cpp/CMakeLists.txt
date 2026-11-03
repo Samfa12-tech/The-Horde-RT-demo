@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.22.1)
 
 project(horde_rt_probe_android)
 
+option(HORDE_RT_FLASK_CANDIDATE "Pinned flask application candidate" OFF)
+option(HORDE_RT_PRIVATE_REVIVAL "Private pinned owner revival candidate" OFF)
+option(HORDE_RT_SHIPPING17_CONTENT "Ordinary 1.7 pinned flask and revival content" OFF)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
 option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel candidate for live Debug play" OFF)
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
@@ -10,6 +13,11 @@ endif()
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
+if(HORDE_RT_SHIPPING17_CONTENT AND
+   (NOT HORDE_RT_PACKAGE_VERSION STREQUAL "1.7.0" OR
+    HORDE_RT_DEBUG_CHECKPOINTS OR HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_FLASK_CANDIDATE))
+    message(FATAL_ERROR "Shipping 1.7 content requires ordinary 1.7.0 without private Debug gates")
+endif()
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtStagedPrimary.cmake")
@@ -46,6 +54,9 @@ horde_rt_attach_staged_primary(horde_rt_probe_android "${HORDE_RT_REPO_ROOT}")
 
 target_compile_features(horde_rt_probe_android PRIVATE cxx_std_20)
 target_compile_definitions(horde_rt_probe_android PRIVATE
+    HORDE_RT_FLASK_CANDIDATE=$<BOOL:${HORDE_RT_FLASK_CANDIDATE}>
+    HORDE_RT_PRIVATE_REVIVAL=$<BOOL:${HORDE_RT_PRIVATE_REVIVAL}>
+    HORDE_RT_SHIPPING17_CONTENT=$<BOOL:${HORDE_RT_SHIPPING17_CONTENT}>
     HORDE_RT_MIN_RENDER_SCALE_PERCENT=${HORDE_RT_MIN_RENDER_SCALE_PERCENT}
     HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=$<BOOL:${HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE}>
     HORDE_RT_DISPLAY_VERSION="${HORDE_RT_DISPLAY_VERSION}"

@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** Foreground-only, memory-only remote report submission owner. */
 final class PlaytestReportSubmission {
     static final String ENDPOINT = "https://briarhold-signal.samfa12.com/api/horde-reports";
+    static final String PUBLIC_ENDPOINT = "https://briarhold-signal.samfa12.com/api/horde-benchmark-results";
     static final int MAX_SUBMISSION_BYTES = 768 * 1024;
     static final int MAX_TOKEN_CHARS = 2048;
     static final int MAX_RESPONSE_BYTES = 8 * 1024;
@@ -574,11 +575,15 @@ final class PlaytestReportSubmission {
     /** Fixed endpoint production transport. It never follows redirects or carries app credentials. */
     static final class HttpsTransport implements Transport {
         private final ConnectionFactory connections;
+        private final boolean statisticsRoutes;
 
         HttpsTransport() { this(HttpsTransport::openHttpConnection); }
-        HttpsTransport(ConnectionFactory connections) {
+        static HttpsTransport statistics() { return new HttpsTransport(HttpsTransport::openHttpConnection, true); }
+        HttpsTransport(ConnectionFactory connections) { this(connections, false); }
+        HttpsTransport(ConnectionFactory connections, boolean statisticsRoutes) {
             if (connections == null) throw new IllegalArgumentException("transport dependencies required");
             this.connections = connections;
+            this.statisticsRoutes = statisticsRoutes;
         }
 
         private static Connection openHttpConnection(URL endpoint) throws IOException {
@@ -600,7 +605,14 @@ final class PlaytestReportSubmission {
             };
         }
 
-        @Override public Call open(byte[] body) {
+        @Override public boolean admitsPrivateDeveloperReports() { return statisticsRoutes; }
+        @Override public boolean admitsPublicBenchmarkReports() { return statisticsRoutes; }
+        @Override public Call open(byte[] body) { return openAt(body, ENDPOINT); }
+        @Override public Call openPublicBenchmark(byte[] body) {
+            if (!statisticsRoutes) throw new IllegalStateException("Public route unavailable");
+            return openAt(body, PUBLIC_ENDPOINT);
+        }
+        private Call openAt(byte[] body, String endpoint) {
             final byte[] owned = body;
             return new Call() {
                 private volatile Connection connection;
@@ -611,7 +623,7 @@ final class PlaytestReportSubmission {
                     final long deadlineNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(MAX_ATTEMPT_MILLIS);
                     Connection opened = null;
                     try {
-                        opened = connections.open(new URL(ENDPOINT));
+                        opened = connections.open(new URL(endpoint));
                         connection = opened;
                         checkDeadline(cancelledSignal, deadlineNanos);
                         opened.setInstanceFollowRedirects(false);

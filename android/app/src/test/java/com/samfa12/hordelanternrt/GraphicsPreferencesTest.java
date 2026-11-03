@@ -115,11 +115,11 @@ public final class GraphicsPreferencesTest {
         a[20]=1; a[21]=-1; assertFalse(GraphicsPreferences.presented(a,7));
     }
     @Test public void pendingScaleChoicesPreserveFresh33UntilExplicitlySaved() {
-        assertEquals(33, BuildConfig.MIN_RENDER_SCALE_PERCENT);
+        assertEquals(25, BuildConfig.MIN_RENDER_SCALE_PERCENT);
         assertTrue(GraphicsPreferences.confirmed(prefs).same(GraphicsPreferences.mobileDefaults()));
         assertEquals(33, GraphicsPreferences.mobileDefaults().scale);
         assertFalse(GraphicsPreferences.mobileDefaults().glassEnabled);
-        for (int scale : new int[]{33,40}) {
+        for (int scale : new int[]{25,26,33,40,49}) {
             prefs.edit().clear().putInt("music_volume",43).commit();
             GraphicsPreferences.Values mobile=GraphicsPreferences.mobileDefaults();
             GraphicsPreferences.Values choice=new GraphicsPreferences.Values(scale,mobile.water,mobile.fire,
@@ -131,10 +131,10 @@ public final class GraphicsPreferencesTest {
             assertTrue(GraphicsPreferences.confirmed(prefs).same(mobile));
             assertTrue(GraphicsPreferences.markPending(prefs,choice));
             assertTrue(GraphicsPreferences.confirm(prefs,choice));
-            assertTrue("a deliberately kept experiment survives reload",GraphicsPreferences.confirmed(prefs).same(choice));
+            assertTrue("a deliberately kept resolution choice survives reload",GraphicsPreferences.confirmed(prefs).same(choice));
             assertEquals(43,prefs.getInt("music_volume",0));
             java.util.Map<String,?> before=prefs.getAll();
-            for (int invalid : new int[]{32,34,39,41,49,101}) {
+            for (int invalid : new int[]{-1,0,24,101}) {
                 assertFalse(GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(invalid,1,0,30)));
                 assertEquals(before,prefs.getAll());
             }
@@ -156,7 +156,7 @@ public final class GraphicsPreferencesTest {
         for (int scale : new int[]{-1,0,32,34,39,41,49,101}) {
             assertFalse(GraphicsPreferences.validScale(scale,33));
             assertFalse(GraphicsPreferences.validScale(scale,50));
-            assertFalse(GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(scale,1,0,30)));
+            assertEquals(scale >= 25 && scale <= 100, GraphicsPreferences.markPending(prefs,new GraphicsPreferences.Values(scale,1,0,30)));
         }
         assertFalse(GraphicsPreferences.validScale(75,34));
     }

@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import java.lang.reflect.Field;
@@ -34,6 +35,11 @@ public final class BenchmarkSummaryUiTest {
         static String runId;
         static int calls, legacyCalls;
         static int publicCalls;
+        static int padding;
+        static byte[] padded(byte[] bytes) {
+            byte[] out=java.util.Arrays.copyOf(bytes,bytes.length+padding);
+            java.util.Arrays.fill(out,bytes.length,out.length,(byte)'\n');return out;
+        }
         static boolean summaryRequestReady;
         static byte[] lastPrepared;
         @Implementation protected static void __staticInitializer__() { }
@@ -42,7 +48,7 @@ public final class BenchmarkSummaryUiTest {
                 boolean consent,boolean hardware,int cooling) {
             ++calls;
             if(!run.equals(runId)) return new byte[]{2};
-            lastPrepared=BenchmarkSummaryReviewTest.prepared(run,report,hardware,cooling);
+            lastPrepared=padded(BenchmarkSummaryReviewTest.prepared(run,report,hardware,cooling));
             return lastPrepared;
         }
         @Implementation protected static boolean requestBenchmarkWithSummaryId(String run,String model) {
@@ -52,7 +58,7 @@ public final class BenchmarkSummaryUiTest {
                 boolean consent,boolean hardware,int cooling) {
             ++publicCalls;
             if(!run.equals(runId))return new byte[]{2};
-            return lastPrepared=BenchmarkSummaryReviewTest.publicPrepared(id,hardware);
+            return lastPrepared=padded(BenchmarkSummaryReviewTest.publicPrepared(id,hardware));
         }
         @Implementation protected static boolean requestBenchmark() { ++legacyCalls; return true; }
     }
@@ -67,7 +73,7 @@ public final class BenchmarkSummaryUiTest {
         set("menuScrim",scrim);
         SummaryBridgeShadow.runId=BenchmarkSummaryReviewTest.RUN;
         SummaryBridgeShadow.calls=0; SummaryBridgeShadow.legacyCalls=0;
-        SummaryBridgeShadow.publicCalls=0;
+        SummaryBridgeShadow.padding=0; SummaryBridgeShadow.publicCalls=0;
         SummaryBridgeShadow.summaryRequestReady=true; SummaryBridgeShadow.lastPrepared=null;
     }
     @After public void tearDown() throws Exception {
@@ -85,7 +91,8 @@ public final class BenchmarkSummaryUiTest {
         Method method=MainActivity.class.getDeclaredMethod(name); method.setAccessible(true); return method.invoke(activity);
     }
     private void prepare() throws Exception {
-        get("benchmarkSummaryConsent",CheckBox.class).setChecked(true);
+        if(!get("benchmarkSummaryReview",BenchmarkSummaryReview.class).isPublicPreview())
+            get("benchmarkSummaryConsent",CheckBox.class).setChecked(true);
         get("benchmarkSummaryPrepare",Button.class).performClick();
     }
 
@@ -97,10 +104,11 @@ public final class BenchmarkSummaryUiTest {
             open.invoke(activity,true);
             assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
             assertFalse(get("benchmarkSummaryHardware",CheckBox.class).isChecked());
-            assertFalse(get("benchmarkSummaryPrepare",Button.class).isEnabled());
+            assertTrue(get("benchmarkSummaryPrepare",Button.class).isEnabled());
+            assertEquals(View.GONE,get("benchmarkSummaryConsent",CheckBox.class).getVisibility());
             scrim.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),
                     View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));scrim.layout(0,0,size[0],size[1]);
-            assertTrue(get("benchmarkSummaryConsent",CheckBox.class).getMeasuredHeight()>=
+            assertTrue(get("benchmarkSummaryPrepare",Button.class).getMeasuredHeight()>=
                     Math.round(48*activity.getResources().getDisplayMetrics().density));
             prepare();
             BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
@@ -160,6 +168,111 @@ public final class BenchmarkSummaryUiTest {
             assertTrue(remote.consent.getMeasuredHeight()>=minimum);
             assertTrue(remote.review.getMeasuredHeight()>=minimum);
             assertTrue(remote.send.getMeasuredHeight()>=minimum);
+        }
+    }
+
+    @Test public void rawDetailsStayCollapsedBelowActionsAcrossSizesAndFreshForms() throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        SummaryBridgeShadow.padding=9000; // Valid trailing JSON whitespace simulates a full native report.
+        for(boolean publicPreview:new boolean[]{false,true})for(float font:new float[]{1f,2f})
+        for(int[] size:new int[][]{{1080,1800},{1800,1080}}) {
+            Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;
+            activity.getResources().updateConfiguration(config,activity.getResources().getDisplayMetrics());
+            open.invoke(activity,publicPreview);prepare();
+            BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            byte[] exact=owner.exactJsonBytes();assertTrue(exact.length>9000);
+            LinearLayout raw=get("benchmarkSummaryTechnical",LinearLayout.class);
+            Button details=get("benchmarkSummaryDetails",Button.class);
+            StatisticsReportSendControls remote=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+            assertEquals(View.GONE,raw.getVisibility());assertTrue(details.isAccessibilityHeading());
+            assertEquals(activity.getString(R.string.benchmark_technical_collapsed),details.getStateDescription());
+            LinearLayout panel=(LinearLayout)details.getParent();
+            assertTrue(panel.indexOfChild(remote.send)<panel.indexOfChild(details));
+            assertSame(raw,get("benchmarkSummarySave",Button.class).getParent());
+            assertTrue(raw.indexOfChild(get("benchmarkSummarySave",Button.class))<raw.indexOfChild(get("benchmarkSummaryJson",TextView.class)));
+            assertTrue(panel.indexOfChild(remote.send)<panel.indexOfChild(get("benchmarkSummaryDestination",Button.class)));
+            assertSame(raw,remote.preview.getParent());
+            scrim.measure(View.MeasureSpec.makeMeasureSpec(size[0],View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size[1],View.MeasureSpec.EXACTLY));
+            scrim.layout(0,0,size[0],size[1]);
+            assertEquals(0,raw.getMeasuredHeight());assertTrue(details.getMeasuredHeight()>=Math.round(48*activity.getResources().getDisplayMetrics().density));
+            assertTrue(remote.send.getMeasuredWidth()<=size[0]);assertFalse(remote.consent.isChecked());
+            details.performClick();assertEquals(View.VISIBLE,raw.getVisibility());
+            assertEquals(activity.getString(R.string.benchmark_technical_expanded),details.getStateDescription());
+            assertEquals(owner.json(),get("benchmarkSummaryJson",TextView.class).getText().toString());
+            details.performClick();assertEquals(View.GONE,raw.getVisibility());assertArrayEquals(exact,owner.exactJsonBytes());
+            get("benchmarkSummaryEdit",Button.class).performClick();details.performClick(); // Detached heading cannot expand a replacement.
+            assertEquals(View.GONE,get("benchmarkSummaryTechnical",LinearLayout.class).getVisibility());
+            assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
+        }
+    }
+
+    @Test public void publicDestinationIsDirectAndSwitchingClearsOwnersBytesAndConsent() throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        open.invoke(activity,true);
+        assertEquals("Share on the website",activity.getString(R.string.benchmark_public_preview));
+        assertEquals("Send privately to developer instead",get("benchmarkSummaryDestination",Button.class).getText().toString());
+        assertEquals(View.GONE,get("benchmarkSummaryConsent",CheckBox.class).getVisibility());
+        prepare();
+        BenchmarkSummaryReview old=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+        StatisticsReportSendControls oldRemote=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+        Button oldDestination=get("benchmarkSummaryDestination",Button.class);
+        assertTrue(old.isPrepared());assertFalse(oldRemote.consent.isChecked());assertFalse(oldRemote.send.isEnabled());
+        oldRemote.consent.setChecked(true);assertTrue(oldRemote.send.isEnabled());
+        assertEquals(PlaytestReportSubmission.State.DRAFT,oldRemote.submission.state());
+        assertNull(oldRemote.submission.statisticsJsonForReview());
+        oldDestination.performClick();
+        assertNull(old.json());assertEquals(PlaytestReportSubmission.State.CANCELLED,oldRemote.submission.state());
+        BenchmarkSummaryReview privateOwner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+        assertFalse(privateOwner.isPublicPreview());assertFalse(privateOwner.isPrepared());
+        assertEquals(View.VISIBLE,get("benchmarkSummaryConsent",CheckBox.class).getVisibility());
+        assertFalse(get("benchmarkSummaryConsent",CheckBox.class).isChecked());
+        assertFalse(get("benchmarkSummaryPrepare",Button.class).isEnabled());
+        oldRemote.send.performClick();oldDestination.performClick();assertSame(privateOwner,get("benchmarkSummaryReview",BenchmarkSummaryReview.class));
+        prepare();String privateId=privateOwner.reportId();
+        get("benchmarkSummaryDestination",Button.class).performClick();
+        assertNull(privateOwner.json());assertTrue(get("benchmarkSummaryReview",BenchmarkSummaryReview.class).isPublicPreview());
+        assertFalse(get("benchmarkSummarySendControls",StatisticsReportSendControls.class).consent.isChecked());
+        prepare();assertNotEquals(privateId,get("benchmarkSummaryReview",BenchmarkSummaryReview.class).reportId());
+        assertEquals(2,SummaryBridgeShadow.publicCalls);assertEquals(1,SummaryBridgeShadow.calls);
+    }
+
+    private void setSubmissionState(StatisticsReportSendControls controls,PlaytestReportSubmission.State state)throws Exception {
+        Field f=PlaytestReportSubmission.class.getDeclaredField("state");f.setAccessible(true);f.set(controls.submission,state);
+        controls.refresh(); // A receipt-state fixture; no token, transport or network is invoked.
+    }
+    @Test public void editCannotRemintAcceptedUncertainOrInFlightResultIdentity()throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        for(PlaytestReportSubmission.State state:new PlaytestReportSubmission.State[]{
+                PlaytestReportSubmission.State.QUEUED,PlaytestReportSubmission.State.RETRYABLE,
+                PlaytestReportSubmission.State.PUBLISHED,PlaytestReportSubmission.State.IN_FLIGHT,
+                PlaytestReportSubmission.State.SENT,PlaytestReportSubmission.State.CONFLICT}) {
+            open.invoke(activity,true);prepare();
+            BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            StatisticsReportSendControls controls=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+            controls.consent.setChecked(true);assertTrue(controls.submission.beginPublicBenchmarkSummary(owner,true));
+            setSubmissionState(controls,state);String id=owner.reportId();byte[] bytes=owner.exactJsonBytes();
+            get("benchmarkSummaryEdit",Button.class).performClick();
+            assertSame(owner,get("benchmarkSummaryReview",BenchmarkSummaryReview.class));
+            assertEquals(id,owner.reportId());assertArrayEquals(bytes,owner.exactJsonBytes());
+            assertTrue(controls.consent.isChecked());assertEquals(state,controls.submission.state());
+            assertEquals(activity.getString(R.string.statistics_edit_busy),org.robolectric.shadows.ShadowToast.getTextOfLatestToast());
+        }
+    }
+    @Test public void editBeforeSendOrAfterKnownRejectionRequiresNewIdentityAndUncheckedConsent()throws Exception {
+        Method open=MainActivity.class.getDeclaredMethod("showBenchmarkSummaryReview",boolean.class);open.setAccessible(true);
+        for(PlaytestReportSubmission.State state:new PlaytestReportSubmission.State[]{
+                PlaytestReportSubmission.State.DRAFT,PlaytestReportSubmission.State.READY,PlaytestReportSubmission.State.REJECTED}) {
+            open.invoke(activity,true);prepare();
+            BenchmarkSummaryReview owner=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            StatisticsReportSendControls controls=get("benchmarkSummarySendControls",StatisticsReportSendControls.class);
+            controls.consent.setChecked(true);
+            if(state!=PlaytestReportSubmission.State.DRAFT)assertTrue(controls.submission.beginPublicBenchmarkSummary(owner,true));
+            setSubmissionState(controls,state);String id=owner.reportId();
+            get("benchmarkSummaryEdit",Button.class).performClick();
+            BenchmarkSummaryReview next=get("benchmarkSummaryReview",BenchmarkSummaryReview.class);
+            assertNotSame(owner,next);assertNull(owner.json());assertFalse(next.isPrepared());
+            assertFalse(get("benchmarkSummarySendControls",StatisticsReportSendControls.class).consent.isChecked());
+            prepare();assertNotEquals(id,next.reportId());
         }
     }
 

@@ -45,6 +45,8 @@ inline constexpr std::array<WorldRoutePoint, 8> kWorldRoutePoints{{
     {56+kWorldPlanTranslateX, 28+kWorldPlanTranslateZ, -.55f},
     {70+kWorldPlanTranslateX, 33+kWorldPlanTranslateZ, -.25f},
     {87+kWorldPlanTranslateX, 49+kWorldPlanTranslateZ, -1.15f}}};
+// Temporary private demo closure, beyond F04 on the mapped arrival approach.
+inline constexpr WorldRoutePoint kPrivateChapterDemoEndpoint{22.3f,50.2f,-1.15f};
 inline constexpr float kWorldRouteHalfWidth = 12.0f;
 inline constexpr float kWorldRouteMaximumStep = .18f;
 inline constexpr WorldZoneId ZoneForRouteSegment(std::size_t segment)

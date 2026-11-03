@@ -22,9 +22,11 @@
 #endif
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
+#include "gameplay/effects/EnemyHitParticles.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/ForestDressing.h"
+#include "scene/ForestSurroundings.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/RescueTraversal.h"
 
@@ -106,6 +108,13 @@ enum class WaterQuality : std::uint32_t
     High = 2u,
 };
 
+// Mobile retains water surfaces and contact ripples. The optional transmissive
+// droplets belong to High: even tiny droplets can select the generic RT strategy.
+inline constexpr bool WaterContactSprayEnabled(const WaterQuality quality) noexcept
+{
+    return quality == WaterQuality::High;
+}
+
 struct PlayerWeaponRenderPose
 {
     std::array<float, 3u> rightHandLocal{};
@@ -146,6 +155,7 @@ struct RtSceneFrameInputs
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     float playerCrouchDropMetres=0;
     std::uint64_t tickIndex = 0u;
     float cameraYaw = 0.0f;
@@ -314,7 +324,7 @@ public:
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 12u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -347,7 +357,7 @@ public:
 
     void Destroy();
 #if defined(_DEBUG)
-    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76 };
+    enum class ForestRouteProofMode { Disabled, BakedResident, SharedExisting64, SharedF01Sector76, SharedRetention64, SharedF01Grouped76, BakedF01North68, BakedSurroundings480 };
     bool SetForestRouteProofMode(ForestRouteProofMode mode, std::string& diagnostic);
     [[nodiscard]] std::string ForestRouteProofJson() const;
 #endif
@@ -390,16 +400,25 @@ public:
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
+        // Destroy retains the device and immutable binding for scene/profile
+        // recreation. Reasserting that exact selection changes no resources.
+        if(path==playerUtilityCandidateAsset_)return true;
         if(ready_ || device_!=VK_NULL_HANDLE)return false;
         playerUtilityCandidateAsset_=std::move(path);return true;
     }
     // Explicit representation fallback; select before initialisation. This does
     // not change settings, geometry quality, placement, collision or save state.
     bool SetSharedForestGeometryEnabled(bool enabled) {
+        if(enabled && SelectF01NorthGrovePrototype())return false;
+#if defined(_DEBUG)
+        if(enabled && forestRouteProofMode_==ForestRouteProofMode::BakedSurroundings480)return false;
+#endif
         if((ready_ || device_!=VK_NULL_HANDLE) && enabled!=sharedForestGeometryEnabled_)return false;
         sharedForestGeometryEnabled_=enabled;return true;
     }
     [[nodiscard]] bool SharedForestGeometryActive() const noexcept { return sharedForestGeometryActive_; }
+    [[nodiscard]] bool ForestSurroundingsSelected() const noexcept { return SelectForestSurroundingsPrototype(); }
+    [[nodiscard]] bool ForestSurroundingsActive() const noexcept { return static_cast<bool>(forestSurroundingsPrototype_); }
 #ifndef NDEBUG
     // Survey A/B only; call before initialization. Does not change settings.
     bool SetRegionalWaterDiagnosticEnabled(bool enabled) {
@@ -418,6 +437,12 @@ public:
     const horde::scene::DevelopmentWorldGeometry& WorldRouteGeometry() const { return worldRouteGeometry_; }
     std::shared_ptr<const horde::gameplay::simulation::TriangleSupportSurface> ChapterTerrainSurface() const { return chapterTerrainSurface_; }
     horde::gameplay::healing::FlaskUpgradeReadiness FlaskUpgradeReadiness() const;
+    struct InitialisationBoundary {
+        void* user=nullptr;
+        bool (*visit)(void*,std::string_view)=nullptr;
+    };
+    // Synchronous owner-thread callback before each existing measured init stage.
+    void SetInitialisationBoundary(InitialisationBoundary boundary){initialisationBoundary_=boundary;}
     bool IsReady() const { return ready_; }
 #if defined(_DEBUG)
     struct ForestDetailClosureObservation {
@@ -581,6 +606,8 @@ public:
     }
     std::uint32_t TlasCount() const { return ready_ ? kTlasCount : 0u; }
     std::uint32_t TlasInstanceCount() const { return ready_ ? tlasInstanceCount_ : 0u; }
+    float SkeletonRevivalDeadDuration() const { return ready_ ? characterSlot_.SkeletonDeadClipDuration() : 0.f; }
+    float SkeletonRevivalStandDuration() const { return ready_ ? characterSlot_.SkeletonStandClipDuration() : 0.f; }
     std::size_t SkeletonPoseBucketCount() const { return characterSlot_.SkeletonPoseBucketCount(); }
     std::uint32_t PlayerSkinCadenceHz() const { return 60u; }
     std::uint64_t PlayerSkinUpdateCount() const { return playerSkinUpdateCount_; }
@@ -957,6 +984,9 @@ public:
 #endif
 
 private:
+    template<typename Action> bool MeasureInitialisationStage(InitialisationMeasurements& measurements,
+        std::string_view name,Action&& action);
+    InitialisationBoundary initialisationBoundary_{};
     friend struct PresentableTinyRtScenePreflightTestAccess;
     friend struct PresentableTinyRtSceneObservationTestAccess;
     friend struct PresentableTinyRtSceneOutputResizeTestAccess;
@@ -1405,6 +1435,8 @@ private:
     bool sharedForestGeometryEnabled_=kDefaultSharedForestGeometryEnabled;
     bool sharedForestGeometryActive_=false;
     bool SelectSharedForestGeometry() const noexcept;
+    bool SelectF01NorthGrovePrototype() const noexcept;
+    bool SelectForestSurroundingsPrototype() const noexcept;
     bool UsesSharedForestGeometry() const noexcept { return sharedForestGeometryActive_; }
     bool UsesSharedForestRetention() const noexcept;
     bool UsesSupplementalForestProof() const noexcept;
@@ -1426,6 +1458,8 @@ private:
     std::uint64_t forestRetentionFrameGeneration_=0;
     std::uint32_t forestRetentionOmittedCount_=0;
     horde::scene::ForestDressingSharedLayout forestSharedLayout_{};
+    std::shared_ptr<const horde::scene::F01NorthGrovePrototype> forestF01NorthPrototype_;
+    std::shared_ptr<const horde::scene::PreparedForestSurroundings> forestSurroundingsPrototype_;
     std::array<AccelerationStructure, 2u> forestMasterBlas_{};
     Buffer forestMasterBuildScratch_{};
     RtGpuWorkLease forestMasterBuildWork_{};

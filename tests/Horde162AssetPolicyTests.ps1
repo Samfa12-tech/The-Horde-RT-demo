@@ -27,6 +27,14 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
         'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
         'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
+        'models/world/runtime/forest-surroundings-v1/alder-far.glb',
+        'models/world/runtime/forest-surroundings-v1/alder-middle.glb',
+        'models/world/runtime/forest-surroundings-v1/asset.manifest.json',
+        'models/world/runtime/forest-surroundings-v1/boundary-panel.glb',
+        'models/world/runtime/forest-surroundings-v1/pine-far.glb',
+        'models/world/runtime/forest-surroundings-v1/pine-middle.glb',
+        'models/world/runtime/forest-surroundings-v1/runtime-roster.json',
+        'models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb',
         'models/world/runtime/forest-understory-v1/asset.manifest.json',
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
@@ -137,7 +145,18 @@ function Expect-Failure([scriptblock]$Action,[string]$Message) {
     Require ($observed -like "*$Message*") "Negative fixture failed for an unrelated reason: $observed"
     ++$script:checks
 }
+$script:previousFixtureArchive=$null
 function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [string]$Extra='', [string]$Duplicate='', [string]$Corrupt='', [string[]]$Directories=@(), [string]$EmptyFile='') {
+    # Each caller validates its archive before requesting the next fixture.
+    # Keep peak disk use bounded rather than retaining dozens of full packages.
+    if ($script:previousFixtureArchive) {
+        $prior=[IO.Path]::GetFullPath($script:previousFixtureArchive)
+        if ([IO.Path]::GetDirectoryName($prior) -ne [IO.Path]::GetFullPath($scratch)) {
+            throw 'Fixture archive cleanup target escaped its verified scratch root.'
+        }
+        if (Test-Path -LiteralPath $prior) { Remove-Item -LiteralPath $prior -Force }
+        $script:previousFixtureArchive=$null
+    }
     $path=Join-Path $scratch $Name
     # Compress the large canonical native atlases once per platform. ZIP Update
     # retains unchanged compressed entries; each negative mutates only its target.
@@ -172,6 +191,7 @@ function New-FixtureArchive([string]$Name,[string]$Platform,[string]$Omit='', [s
         $entry=$zip.CreateEntry('META-INF/debug-fixture.txt');$stream=$entry.Open()
         try{$stream.WriteByte(1)}finally{$stream.Dispose()}
     }finally{$zip.Dispose()}
+    $script:previousFixtureArchive=$path
     return $path
 }
 function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Duplicate='', [string]$Corrupt='') {
@@ -298,9 +318,16 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 50 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 51) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
-    Require ($windows.Count -eq 107 -and $android.Count -eq 108) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 58 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 59) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
+    Require ($windows.Count -eq 118 -and $android.Count -eq 119) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
+    foreach($name in $woodland) {
+        $path='models/world/runtime/forest-surroundings-v1/'+$name
+        Require (@($windows | Where-Object {$_ -ceq $path}).Count -eq 1 -and @($android | Where-Object {$_ -ceq $path}).Count -eq 1) 'Both platforms require each exact private woodland payload once.'
+    }
+    $woodlandArchive=New-FixtureArchive 'woodland-missing-fern.zip' Android -Omit 'assets/models/world/runtime/forest-surroundings-v1/woodland-low-fern.glb'
+    Expect-Failure {Assert-Horde162Package $repo $woodlandArchive Android} 'closed runtime roster'
     $deadwoodFiles=@('models/world/runtime/forest-deadwood-v1/asset.manifest.json',
         'models/world/runtime/forest-deadwood-v1/horde-fallen-log.glb',
         'models/world/runtime/forest-deadwood-v1/horde-root-tangle.glb',
@@ -349,7 +376,7 @@ try {
         Require (@($windows | Where-Object {$_ -ceq $marker}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $marker}).Count -eq 1) 'Each exact grave-marker path must be admitted once on both platforms.'
     }
-    Require (@(Get-Horde17KitAssetSpecification).Count -eq 14) 'Kit admission must retain its exact thirteen-cut/one-manifest roster.'
+    Require (@(Get-Horde17KitAssetSpecification).Count -eq 17) 'Kit admission must retain thirteen original cuts plus two flask cuts and both manifests.'
     foreach ($kit in Get-Horde17KitAssetSpecification) {
         Require ($windows -ccontains $kit.Path -and $android -ccontains $kit.Path) 'Both platforms must admit every approved Kit runtime entry.'
         Require (@($packageStrings | Where-Object { $_ -ceq ('assets/'+$kit.Path) }).Count -eq 2) 'Both package inventories must explicitly require every Kit runtime entry.'

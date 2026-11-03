@@ -12,12 +12,13 @@
 namespace horde::gameplay::dialogue {
 enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, RescueFound,
     RescueRope, ReunionQuestion, ReunionHint, ReunionProof, ReunionFirstPiece,
-    ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage };
+    ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage,
+    FlaskEmpty, FlaskTopup };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
-// Kit text/timing and PCM match the thirteen approved cuts. Public game/repository
-// distribution was explicitly confirmed by the owner on 11 October 2026.
-inline constexpr std::array<LineSpec,16> kLines{{
+// The original thirteen Kit cuts retain their 11 October distribution grant.
+// The later two flask-guidance cuts are separately pinned in their manifest.
+inline constexpr std::array<LineSpec,18> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -33,7 +34,9 @@ inline constexpr std::array<LineSpec,16> kLines{{
     {Line::ForestWaystone,"forest.waystone","Kit","Hold it there. There are marks under the moss.","assets/audio/kit/runtime/forest.waystone.wav",2.978125f,1},
     {Line::ForestClue,"forest.clue","Kit","A road to the treasury, perhaps. Someone in the village might read it.","assets/audio/kit/runtime/forest.clue.wav",4.216542f,1},
     {Line::ForestWait,"forest.wait","Kit","I'll wait here.","assets/audio/kit/runtime/forest.wait.wav",1.589208f,1},
-    {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","assets/audio/kit/runtime/forest.village.wav",2.173792f,1}
+    {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","assets/audio/kit/runtime/forest.village.wav",2.173792f,1},
+    {Line::FlaskEmpty,"flask.empty","Kit","Is your flask empty? Fill it here.","assets/audio/kit/runtime/flask.empty.wav",2.419333f,1},
+    {Line::FlaskTopup,"flask.topup","Kit","Don't forget to top your flask up here if you need it.","assets/audio/kit/runtime/flask.topup.wav",2.939333f,1}
 }};
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -56,6 +59,8 @@ struct Context {
     std::optional<Tuple> companionSource;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
     bool lanternLow=false,lanternHigh=false;
+    bool flaskGuideEnabled=false; unsigned flaskCharges=0;
+    bool companionAtBasin=false,playerNearBasin=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
 // Logical story recovery only: active speech restarts, with no audio clock,
@@ -72,6 +77,12 @@ struct Progress {
 class Director {
 public:
     const Snapshot& State() const { return state_; }
+    bool BasinGuidePending() const {
+        if(state_.line==Line::FlaskEmpty || state_.line==Line::FlaskTopup)return true;
+        for(std::size_t i=0;i<continuationCount_;++i)
+            if(continuations_[i]==Line::FlaskEmpty || continuations_[i]==Line::FlaskTopup)return true;
+        return false;
+    }
     // Continuous Kit speech follows the same actor/listener snapshot as the
     // renderer. Event-time Keeper and unseen tomb/shaft calls stay unchanged.
     // Spatial refresh never advances the line, cursor, queue or callback ID.
@@ -118,11 +129,13 @@ public:
             case Line::ForestWaystone: return p.proofAccepted && (!queued||!p.forestWaystoneConsumed);
             case Line::ForestClue: return p.proofAccepted && (!queued||!p.forestClueConsumed);
             case Line::ForestVillage: return p.proofAccepted && (!queued||!p.forestVillageConsumed);
+            case Line::FlaskEmpty: case Line::FlaskTopup: return p.proofAccepted;
             case Line::Grate: return !p.grateConsumed;
             default: return true;
             }
         };
         if(!validStory(p.activeLine,false)) return false;
+        unsigned basinCues=(p.activeLine==Line::FlaskEmpty || p.activeLine==Line::FlaskTopup)?1u:0u;
         unsigned previous=static_cast<unsigned>(p.activeLine);
         for(std::size_t i=0;i<p.continuations.size();++i) {
             const auto line=p.continuations[i];
@@ -133,6 +146,7 @@ public:
             if(!recoverable(line) || line==Line::None || line==Line::Grate ||
                line==Line::RescueFound || line==Line::ReunionHint || line==p.activeLine ||
                order<=previous || !validStory(line,true)) return false;
+            if((line==Line::FlaskEmpty || line==Line::FlaskTopup) && ++basinCues>1u) return false;
             previous=order;
         }
         // These responses are committed together at proof acceptance. An
@@ -251,6 +265,7 @@ public:
                 Request(Line::ReunionProof,{-32.0f,3.6f,-10.0f},c);
                 if(state_.line!=Line::ReunionProof) Queue(Line::ReunionProof);
                 Queue(Line::ReunionFirstPiece);Queue(Line::ReunionDepart);
+                if(c.flaskGuideEnabled) Queue(c.flaskCharges==0?Line::FlaskEmpty:Line::FlaskTopup);
             } else if(waitingSeconds_>=8 && !state_.reminderConsumed && state_.line==Line::None) {
                 state_.reminderConsumed=true;Request(Line::ReunionHint,{-32.0f,3.6f,-10.0f},c);
             }
@@ -261,14 +276,22 @@ public:
             if(state_.elapsed>=state_.duration) Finish();
         }
         if(state_.line==Line::None && continuationCount_!=0) {
-            const auto line=PopContinuation();
-            Start(line,SourceFor(line),c);
+            const auto next=continuations_[0];
+            if((next!=Line::FlaskEmpty && next!=Line::FlaskTopup) ||
+               (c.companionAtBasin && c.playerNearBasin)) {
+                auto line=PopContinuation();
+                // Charges may change while Kit walks and waits. Choose the
+                // spoken variant at delivery, before its identity is fixed.
+                if(line==Line::FlaskEmpty || line==Line::FlaskTopup)
+                    line=c.flaskCharges==0?Line::FlaskEmpty:Line::FlaskTopup;
+                Start(line,SourceFor(line),c);
+            }
         }
         RefreshCompanionSpatial(c);
     }
 private:
     void BindCompanionSpatial(const Context& c) {
-        if(state_.line<Line::ReunionQuestion || state_.line>Line::ForestVillage) return;
+        if(state_.line<Line::ReunionQuestion || state_.line>Line::FlaskTopup) return;
         const auto finite=[](Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);};
         if(!finite(c.listener) || !std::isfinite(c.yaw) ||
            (c.companionSource && !finite(*c.companionSource))) return;
@@ -302,7 +325,10 @@ private:
         return line;
     }
     void StepForestFixture(const Context& c) {
-        if(!state_.proofAccepted || !c.exterior || c.traversing) return;
+        // Keep the refill introduction ahead of forest commentary even if the
+        // player runs on before following Kit. It remains one ordered story
+        // chain and can be resumed from a campaign save.
+        if(!state_.proofAccepted || !c.exterior || c.traversing || BasinGuidePending()) return;
         if(!simulation::ResolveWorldRouteSupport(c.player.x,c.player.z).grounded) return;
         const auto& route=simulation::kWorldRoutePoints;
         const auto distance=[&](std::size_t index) {

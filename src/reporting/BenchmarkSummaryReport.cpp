@@ -80,7 +80,8 @@ void Population(std::ostream& out, const BenchmarkSummaryPopulation& p, const bo
         ",\"onePercentLowFps\":" << p.legacy.onePercentLowFps << '}';
     out << ",\"cpuStages\":{";
     const std::size_t first = allCpuStages ? 0u : RtStageIndex(RtStage::WholeFrameCycle);
-    for (std::size_t i = first; i < kRtStageCount; ++i)
+    const std::size_t end = allCpuStages ? kRtStageCount : first + 1u;
+    for (std::size_t i = first; i < end; ++i)
     {
         if (i != first) out << ',';
         Text(out, RtStageMetricName(static_cast<RtStage>(i))); out << ':';

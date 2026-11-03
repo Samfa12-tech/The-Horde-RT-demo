@@ -104,10 +104,17 @@ void TestInvalidOwnersScopeAndIdentity()
     changed.metadata.presentationWidth = 961u; changed.metadata.presentationHeight = 541u;
     changed.metadata.internalWidth = 317u; changed.metadata.internalHeight = 179u;
     Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
-        "isolated declared33 percentage accepts exact rounded odd extents independent of ordinary build admission");
+        "isolated declared 33% percentage accepts exact rounded odd extents independent of ordinary build admission");
     changed.metadata.internalHeight = 178u;
     Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
         "one-pixel incorrect scaled extent rejected");
+    changed.metadata.renderScalePercent = 25u;
+    changed.metadata.internalWidth = 240u; changed.metadata.internalHeight = 135u;
+    Check(CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+          "normal 25% percent report accepts exact rounded native-output-derived extent");
+    changed.metadata.renderScalePercent = 24u;
+    Check(!CaptureBenchmarkSummary(owners.benchmark, owners.evidence, changed, changed, kRunUuid).IsReady(),
+          "report cannot silently admit scales below the normal 25% floor");
     auto summary = CaptureBenchmarkSummary(owners.benchmark, owners.evidence, c, c, kRunUuid);
     auto a = Approval(); a.reportUuid = "22222222-2222-1222-9222-222222222222";
     Check(PrepareBenchmarkSummaryReport(summary, a).Status() == BenchmarkSummaryReportStatus::InvalidIdentity, "time UUID/nonrandom-version report identity rejected");
@@ -481,6 +488,32 @@ void TestSubmittedDimensionsSummary()
 int RunWindowsBenchmarkSummaryInteractionTests(const char* outputDirectory);
 #endif
 
+void TestNormalFullCourseFitsBoundedReports()
+{
+    CompletedOwners owners;
+    owners.Run(RtSampleStatus::Valid, false, false, false, nullptr, false, false, false, false,
+        BenchmarkWorkload::ShowcaseRoute);
+    const auto c = Configuration();
+    const auto frozen = CaptureBenchmarkSummary(owners.benchmark, owners.evidence, c, c, kRunUuid, "Unknown");
+    Check(frozen.IsReady() && frozen.Data().overall.frames == 1838u,
+        "normal two-lap multizone course freezes its full measured population");
+    const auto local = PrepareBenchmarkSummaryReport(frozen, Approval(true));
+    const auto publicReport = PreparePublicBenchmarkReport(frozen,
+        {true,true,"33333333-3333-4333-a333-333333333333","2026-11-01T00:01:02Z"});
+    Check(local.IsReady() && local.Json().size() <= kBenchmarkSummaryReportMaxBytes &&
+        publicReport.IsReady() && publicReport.Json().size() <= kPublicBenchmarkReportMaxBytes,
+        "normal full course fits unchanged local/public caps");
+    Check(local.Json().find("poseCopyCpuMs") != std::string_view::npos &&
+        publicReport.Json().find("poseCopyCpuMs") == std::string_view::npos &&
+        publicReport.Json().find("wholeFrameCycleCpuMs") != std::string_view::npos,
+        "private overall retains all stages while public aggregate exposes whole-frame only");
+    const auto zones = local.Json().find("\"zones\"");
+    Check(zones != std::string_view::npos && local.Json().substr(zones).find("poseCopyCpuMs") == std::string_view::npos,
+        "private zone aggregates do not accidentally include trailing CPU substages");
+    std::cout << "normal-course synthetic report bytes local=" << local.Json().size()
+        << " public=" << publicReport.Json().size() << '\n';
+}
+
 int main(const int argc, const char* const* const argv)
 {
 #ifdef _WIN32
@@ -511,6 +544,7 @@ int main(const int argc, const char* const* const argv)
     if (argc != 1) return 2;
     static_assert(std::is_same_v<decltype(std::declval<FrozenBenchmarkSummary>().Data()), const BenchmarkSummaryData&>);
     static_assert(std::is_same_v<decltype(std::declval<PreparedBenchmarkSummaryReport>().Json()), std::string_view>);
+    TestNormalFullCourseFitsBoundedReports();
     TestCompletedFreezePrivacyAndPopulation();
     TestInvalidOwnersScopeAndIdentity();
     TestUploadedQualitySummary();

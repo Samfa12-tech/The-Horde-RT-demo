@@ -166,7 +166,7 @@ public final class CombatTeachingUiSchedulingTest {
         NativeTeaching.overrideState=4L|(1L<<13);assertTrue((Boolean)update.invoke(activity,1));
         assertTrue(prompt.getText().toString().startsWith("Practice: no damage"));
         NativeTeaching.overrideState=4L|(1L<<13)|(1L<<33);assertTrue((Boolean)update.invoke(activity,1));
-        assertTrue(prompt.getText().toString().contains("Leaving practice safely"));
+        assertTrue(prompt.getText().toString().contains("Practice ending: enemies can hurt you next"));
         NativeTeaching.overrideState=3L|(1L<<10);assertFalse((Boolean)update.invoke(activity,1));
         assertEquals("protection must never fade into live damage",View.GONE,prompt.getVisibility());
         assertEquals("",prompt.getText().toString());assertEquals("",field("combatTeachingFadeText").get(activity));

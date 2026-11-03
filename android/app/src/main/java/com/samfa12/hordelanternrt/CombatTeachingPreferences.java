@@ -36,9 +36,10 @@ final class CombatTeachingPreferences {
     static boolean lessonSuppressed(long state) { return (state & (1L << 35)) != 0; }
     static boolean exitPending(long state) { return (state & (1L << 33)) != 0; }
     static boolean waitingForRevivalClearance(long state) { return (state & (1L << 34)) != 0; }
+    static boolean liveFightNotice(long state) { return (state & (1L << 58)) != 0; }
     static boolean blockLearned(long state) { return (state & (1L << 15)) != 0; }
     static boolean attackFromGuardLearned(long state) { return (state & (1L << 32)) != 0; }
-    static int practiceActionLabelResource(long state) { return stage(state)==6 ? R.string.combat_teaching_finish : R.string.combat_teaching_skip; }
+    static int practiceActionLabelResource(long state) { return stage(state)==6 && (state&(1L<<39))==0 ? R.string.combat_teaching_finish : R.string.combat_teaching_skip; }
 
     static String prompt(long state) { return prompt(state, false); }
 
@@ -46,11 +47,13 @@ final class CombatTeachingPreferences {
         final boolean protectedPractice=safePractice(state) && !lessonSuppressed(state);
         final boolean enabled=(state & (1L << 10)) != 0;
         final int opacity=(int)((state >>> 40) & 0xffL);
-        String text=protectedPractice ? "Practice: no damage" : "";
+        String text=protectedPractice ? "Practice: no damage — learn each step" : "";
         if(!lessonSuppressed(state) && (protectedPractice || enabled && opacity>0)) {
             String lesson=lessonText(state,controller);
             if(!lesson.isEmpty())text+=(text.isEmpty()?"":"\n")+lesson;
         }
+        if(liveFightNotice(state))
+            text+=(text.isEmpty()?"":"\n")+"LIVE FIGHT: protection ended - enemies now deal damage.";
         if(waitingForRevivalClearance(state))
             text+=(text.isEmpty()?"":"\n")+"Step back from the skeletons.";
         final int attack=attackReadability(state);
@@ -68,7 +71,7 @@ final class CombatTeachingPreferences {
         return attack == 1 ? 0xFFFFD266 : attack == 2 ? 0xFFFF6B6B : HordeUiTokens.PARCHMENT;
     }
     static int promptOpacity(long state) {
-        return safePractice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0
+        return safePractice(state) || liveFightNotice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0
                 ? 255 : (int) ((state >>> 40) & 0xffL);
     }
     static String description(long state, String visibleText) {
@@ -80,7 +83,7 @@ final class CombatTeachingPreferences {
     }
 
     static boolean needsTimelyRefresh(long state) {
-        if (safePractice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
+        if (safePractice(state) || liveFightNotice(state) || waitingForRevivalClearance(state) || attackReadability(state) != 0) return true;
         final boolean enabled = (state & (1L << 10)) != 0;
         final int opacity = (int) ((state >>> 40) & 0xffL);
         final int cue = (int) ((state >>> 3) & 0xfL);
@@ -91,23 +94,29 @@ final class CombatTeachingPreferences {
         final int stage=stage(state),cue=(int)((state >>> 3) & 0xfL),source=(int)((state >>> 7) & 0x7L);
         final String guard=controller?"[LT]":"[Parry]",swing=controller?"[RT]":"[Swing]";
         final String dodge=controller?"[B] + stick":"[Dodge] + move";
-        if(exitPending(state) || cue==13)return "Leaving practice safely...";
+        if(exitPending(state) || cue==13)return "Practice ending: enemies can hurt you next.";
         if(cue==12)return "Settings: Replay opening practice or Skip to continue";
         if(stage==2 || stage==3)return "";
+        if(stage==6 && (state&(1L<<39))!=0) {
+            int phase=(int)((state>>>36)&7);
+            return phase>=3 && phase<=5 ? "The lich calls them back. Stay clear; you are still protected." :
+                "Skills learned! Defeat both skeletons. You are still protected.";
+        }
         if(stage==6 || cue==11)return "Settings: Finish practice - enemies can hurt you";
         if(cue==7)return "Well parried - strike back";
-        if(stage==4 || cue==9)return "Hold "+guard+": block normal hits";
-        if(stage==5 || cue==10)return "Hold "+guard+" + "+swing+"; keep held";
+        final String accepted=cue==14?"Good! Next: ":cue==15?"Try again: ":"";
+        if(stage==4 || cue==9)return accepted+"1/4 Hold "+guard+": block normal hits";
+        if(stage==5 || cue==10)return accepted+"4/4 Hold "+guard+" + "+swing+"; keep held";
         if(stage==1) {
             if(cue==5)return "DODGE NOW - "+dodge;
-            return (source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge;
+            return accepted+(source==3?"Keeper lightning":source==2 || source==4?"Skeleton attack":"Attacker")+" - "+dodge+" away as it swings; clear its reach";
         }
         switch(cue) {
             case 1: return "Watch the raised arm - fresh "+guard+" press";
             case 2: return "PARRY NOW - fresh "+guard+" press";
             case 8: return "Timed parry active - face the attacker";
             case 3: return "Release, then press "+guard+" to parry";
-            default:return "Fresh "+guard+" press: timed parry";
+            default:return accepted+"Fresh "+guard+" press: timed parry";
         }
     }
 

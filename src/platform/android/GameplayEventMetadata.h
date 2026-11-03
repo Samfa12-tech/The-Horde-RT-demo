@@ -2,6 +2,7 @@
 
 #include "gameplay/EquipmentFeedback.h"
 #include "gameplay/DryFootstepFeedback.h"
+#include "gameplay/CombatFeedback.h"
 
 #include <bit>
 #include <cstdint>
@@ -12,6 +13,7 @@ static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType:
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::ParryPrepareCue) == 24u);
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::LichDischargeWarning) == 25u);
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::LichRevivalCry) == 36u);
+static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::PlayerGuardBlocked) == 37u);
 
 // Existing type/source/target/sequence fields retain their positions. The
 // previously unused byte 24 carries a selected semantic cue, not truncated
@@ -22,6 +24,9 @@ static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType:
 {
     const auto cue = event.type == gameplay::simulation::GameplayEventType::PlayerFootstep
         ? static_cast<std::uint8_t>(gameplay::DryFootstepCueForEvent(event))
+        : (event.type == gameplay::simulation::GameplayEventType::EnemyHit ||
+           event.type == gameplay::simulation::GameplayEventType::PlayerGuardBlocked)
+        ? static_cast<std::uint8_t>(gameplay::CombatCueForEvent(event))
         : static_cast<std::uint8_t>(gameplay::EquipmentCueForEvent(event));
     return static_cast<std::uint64_t>(event.type) |
         (static_cast<std::uint64_t>(event.source) << 8u) |

@@ -33,7 +33,7 @@ public:
     };
     static constexpr float kMaximumWalkableSlope=.65f;
     // Bounded intake capacity, not a renderer/quality budget or runtime growth.
-    static constexpr std::size_t kMaximumTriangles=65536;
+    static constexpr std::size_t kMaximumTriangles=147456;
     static constexpr std::size_t kMaximumSweepIntervals=512;
     static std::shared_ptr<const TriangleSupportSurface> Build(std::span<const Triangle> input,
                                                               std::string& diagnostic)

@@ -52,4 +52,18 @@ constexpr DesktopKeyAction ResolveDesktopGameplayKey(
     if (healingFlaskEnabled && key == 'J') return DesktopKeyAction::Rest;
     return DesktopKeyAction::None;
 }
+
+// A fresh gameplay key can take mouse-look ownership back after controller
+// play or a menu return. Repeats, shortcuts and unavailable actions must not
+// capture the pointer. The platform additionally requires foreground/root focus.
+constexpr bool ShouldAcquireDesktopMouseLookForKey(unsigned key,
+    bool gameplayHasFocus, bool capturedAndFocused, bool repeated,
+    bool shortcutModifierHeld, bool lanternClaimed, bool healingFlaskEnabled = false)
+{
+    if (!gameplayHasFocus || capturedAndFocused || repeated || shortcutModifierHeld)
+        return false;
+    return key == 'W' || key == 'A' || key == 'S' || key == 'D' || key == 0x14u ||
+        ResolveDesktopGameplayKey(key, true, false, lanternClaimed, healingFlaskEnabled) !=
+            DesktopKeyAction::None;
+}
 } // namespace horde::platform::windows

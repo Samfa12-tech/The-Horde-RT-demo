@@ -163,7 +163,7 @@ void GainAndTransport() {
     static_assert(static_cast<unsigned>(GameplayEventType::RopeContact)==33);
     static_assert(static_cast<unsigned>(GameplayEventType::ChapterLocalAmbienceStopped)==34);
     static_assert(static_cast<unsigned>(GameplayEventType::ForestFoliage)==35);
-    static_assert(static_cast<unsigned>(GameplayEventType::LichRevivalCry)==36 && kGameplayEventTypeCount==37);
+    static_assert(static_cast<unsigned>(GameplayEventType::LichRevivalCry)==36 && kGameplayEventTypeCount==38);
     GameplayEvent event;event.type=GameplayEventType::ForestFoliage;
     event.sequence=0x12345678u;event.tickIndex=98765;
     event.worldX=Ambience::kFoliagePosition.x;event.worldZ=Ambience::kFoliagePosition.z;

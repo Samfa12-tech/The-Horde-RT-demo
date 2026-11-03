@@ -55,6 +55,22 @@ waive correctness, save integrity, crash handling, asset readiness, existing
 unapproved capacity changes or explicit publication approval. It does not claim
 performance solved or authorise a release.
 
+### Phone-default scalability clarification - 2026-11-01
+
+The mobile investigation must work toward a genuinely playable phone default,
+including measured reductions or OFF options for costly, less essential effects.
+It is not limited to efficiency changes that preserve every current effect.
+Keep genuine hardware RT, the authored core direction and the full-quality
+Windows/user options. Never replace an existing explicit saved choice with a
+new default. Representative actual presentation/tails and controls evidence are
+required before calling a preset playable; no particular sustained FPS is
+promised. This does not reinstate a fixed-FPS release veto.
+
+Sam reports never noticing contact spray. That supports testing droplets Off
+within this scope, not removing the waterfall or claiming visual parity. The
+[first isolated splash comparison](docs/evidence/2026-10-31-mobile-efficiency/SPLASH_REFRACTION.md)
+identified a strategy-selection cost but did not pass its admission gates.
+
 ## Forest endpoint and completed return recovery - 2026-10-20
 
 The approved forest endpoint now uses stable checkpoint ID 3 (Forest lookout),
@@ -602,3 +618,36 @@ gameplay rules. Both features stay gated/OFF in normal play until asset, visual,
 lifecycle and gameplay checks pass. Resource counts are not measured GPU
 allocation or FPS evidence. No wider capacity increase, paid signing, security
 change, publication, merge or release follows from this approval.
+
+
+## Compact recovery HUD and modest dodge tolerance - 2 November 2026
+
+Owner playtest feedback rejected persistent large flask prose and asked for a
+compact graphic showing actual charge fill. Use a recognizable outlined flask,
+capacity divisions/tiny count, short input binding and accessible textual state;
+only brief relevant hints and contextual earned Rest. On the existing200ms dodge,
+keep startup2/60 and extend the half-open end10/60 to11/60 (+one16.7ms tick),
+leaving the first accepted published tick and landing exposed. No cooldown,
+distance, lesson/evasion proof, encounter health/reward or save change. See
+`docs/evidence/2026-11-01-attack-rings/COMPACT_FLASK_DODGE.md` for checks and the
+private candidate; physical acceptance and ordinary admission remain pending.
+
+
+## Android Standard benchmark evidence - 2026-11-03
+
+Keep the original Mobile provisional V1 identity-only contract unchanged. The
+new Android Standard selection uses `mobile-rt-standard-v2`: the same fixed
+1280 by 720 view / 640 by 360 RT workload and quality settings, with genuine
+Vulkan image extents and presentation rotation retained in evidence. It remains
+unranked. This is a temporary benchmark override, not new player defaults.
+
+Only a presented Showcase frame with the configured preset and matching actual
+quality can admit measurement. Returning to Entry separately proves the exact
+original configured preferences, layout and dispatch. Entry deliberately renders
+water Off, so observed Off must remain truthful instead of being relabelled as
+Mobile/High to satisfy a comparison. Full original preferences still must match;
+wrong scene, quality, settings, ownership or transform drift cannot certify the
+run. Shared preview-cap preference is retained and does not certify scanout FPS.
+Public report projection/consent and its existing unranked classification remain
+separate from the internal requested-preset receipt. Physical completion,
+cancellation and restoration must be checked on the affected device.

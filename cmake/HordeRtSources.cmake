@@ -47,6 +47,7 @@ set(HORDE_RT_CORE_RELATIVE_SOURCES
     gameplay/items/HeldItemKinematics.cpp
     gameplay/ShowcaseBenchmark.cpp
     scene/ForestDressing.cpp
+    scene/ForestSurroundings.cpp
     scene/ForestUnderstory.cpp
     scene/ForestRockDressing.cpp
     scene/ForestDeadwood.cpp

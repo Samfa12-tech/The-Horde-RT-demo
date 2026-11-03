@@ -14,7 +14,7 @@ namespace horde::gameplay
 {
 // Provisional contracts only: neither selection is admitted for ranking. The
 // platform must apply/observe real surface and dispatch extents before sampling.
-enum class BenchmarkProfileId : std::uint8_t { Custom, MobileProvisionalV1, WindowsProvisionalV1 };
+enum class BenchmarkProfileId : std::uint8_t { Custom, MobileProvisionalV1, WindowsProvisionalV1, MobileStandardV2 };
 enum class BenchmarkOutputPolicy : std::uint8_t { Native, FixedBufferPreserveAspect };
 
 inline constexpr std::string_view BenchmarkProfileName(const BenchmarkProfileId id) noexcept
@@ -22,6 +22,7 @@ inline constexpr std::string_view BenchmarkProfileName(const BenchmarkProfileId 
     switch (id) {
     case BenchmarkProfileId::Custom: return "custom";
     case BenchmarkProfileId::MobileProvisionalV1: return "mobile-rt-provisional-v1";
+    case BenchmarkProfileId::MobileStandardV2: return "mobile-rt-standard-v2";
     case BenchmarkProfileId::WindowsProvisionalV1: return "windows-rt-provisional-v1";
     default: return "invalid";
     }
@@ -30,6 +31,7 @@ inline constexpr std::string_view BenchmarkProfileClassificationName(const Bench
 {
     switch (id) {
     case BenchmarkProfileId::Custom: return "custom-unranked";
+    case BenchmarkProfileId::MobileStandardV2: return "standard-unranked";
     case BenchmarkProfileId::MobileProvisionalV1:
     case BenchmarkProfileId::WindowsProvisionalV1: return "provisional-unranked";
     default: return "invalid";
@@ -38,7 +40,7 @@ inline constexpr std::string_view BenchmarkProfileClassificationName(const Bench
 inline std::optional<BenchmarkProfileId> ParseBenchmarkProfile(const std::string_view name) noexcept
 {
     for (const auto id : {BenchmarkProfileId::Custom, BenchmarkProfileId::MobileProvisionalV1,
-                         BenchmarkProfileId::WindowsProvisionalV1})
+                         BenchmarkProfileId::WindowsProvisionalV1, BenchmarkProfileId::MobileStandardV2})
         if (BenchmarkProfileName(id) == name) return id;
     return std::nullopt;
 }
@@ -54,7 +56,9 @@ struct BenchmarkProfileSpec
 inline std::optional<BenchmarkProfileSpec> BenchmarkProfileSpecification(const BenchmarkProfileId id) noexcept
 {
     using namespace graphics;
-    if (id == BenchmarkProfileId::MobileProvisionalV1)
+    // V1 remains an immutable identity-transform contract. V2 uses these same
+    // fixed logical view dimensions, with actual image axes/transform reported.
+    if (id == BenchmarkProfileId::MobileProvisionalV1 || id == BenchmarkProfileId::MobileStandardV2)
         return BenchmarkProfileSpec{GraphicsPlatform::Android, OpticalProfile::Mobile, {640, 360}, {1280, 720},
             {50, WaterQuality::Mobile, FireDetail::Low, 30, false, ShadowQuality::Current, false, DustQuality::Off}};
     if (id == BenchmarkProfileId::WindowsProvisionalV1)
@@ -106,8 +110,18 @@ inline bool MatchesBenchmarkProfile(const BenchmarkProfileId id, const Benchmark
     if (id == BenchmarkProfileId::Custom) return true; // Explicit selection, never inferred from matching pixels.
     const auto spec = BenchmarkProfileSpecification(id);
     if (!spec || spec->platform != c.platform || spec->optical != c.optical || spec->workload != c.workload ||
-        spec->internal != c.internal || spec->output != c.output || c.dynamicResolutionEnabled || c.presentationTransform != 0 ||
-        c.outputPolicy != BenchmarkOutputPolicy::FixedBufferPreserveAspect) return false;
+        c.dynamicResolutionEnabled || c.outputPolicy != BenchmarkOutputPolicy::FixedBufferPreserveAspect) return false;
+    auto imageInternal=spec->internal, imageOutput=spec->output;
+    if (id == BenchmarkProfileId::MobileStandardV2) {
+        // Vulkan storage/swapchain images are pre-rotated; canonical profile
+        // dimensions describe the upright view. Never rewrite actual evidence.
+        if (graphics::RtPresentationTransformSwapsAxes(
+                graphics::RtPresentationTransformFromIndex(c.presentationTransform))) {
+            imageInternal={spec->internal.height,spec->internal.width};
+            imageOutput={spec->output.height,spec->output.width};
+        }
+    } else if (c.presentationTransform != 0) return false;
+    if (imageInternal != c.internal || imageOutput != c.output) return false;
     auto actual = c.graphics;
     // This setting caps the ordinary preview. It is not measured benchmark
     // pacing and must not overwrite the user's value or certify scanout FPS.
@@ -143,8 +157,18 @@ public:
             requested.graphics = spec->graphics;
             requested.graphics.previewFrameCap = previewCap;
             requested.internal = spec->internal; requested.output = spec->output;
-            requested.cameraAspect = double(spec->output.width) / spec->output.height;
-            requested.presentationTransform = 0;
+            if (id == BenchmarkProfileId::MobileStandardV2) {
+                if (graphics::RtPresentationTransformSwapsAxes(
+                        graphics::RtPresentationTransformFromIndex(requested.presentationTransform))) {
+                    requested.internal={spec->internal.height,spec->internal.width};
+                    requested.output={spec->output.height,spec->output.width};
+                }
+                requested.cameraAspect=graphics::RtPresentationCameraAspect(requested.internal.width,
+                    requested.internal.height,graphics::RtPresentationTransformFromIndex(requested.presentationTransform));
+            } else {
+                requested.cameraAspect = double(spec->output.width) / spec->output.height;
+                requested.presentationTransform = 0;
+            }
             requested.outputPolicy = BenchmarkOutputPolicy::FixedBufferPreserveAspect;
             requested.dynamicResolutionEnabled = false;
             requested.workload = spec->workload;

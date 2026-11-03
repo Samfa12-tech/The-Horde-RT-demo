@@ -7,6 +7,7 @@
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
+#include "scene/ForestSurroundings.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "vulkan/raytracing/RtStaticTextureSelection.h"
 
@@ -228,10 +229,15 @@ bool CheckBoundedWaterDropletGeometry()
                           std::isfinite(vertex.position[2]),
                       "all fixed refit vertices must remain finite, including inactive slots");
     std::array<horde::scene::assets::StaticRtVertex, kWaterDropletVertexCount> hiddenVertices{};
-    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices, false) &&
+    ok &= Require(!WaterContactSprayEnabled(WaterQuality::Off) &&
+                      !WaterContactSprayEnabled(WaterQuality::Mobile) &&
+                      WaterContactSprayEnabled(WaterQuality::High),
+                  "only High water enables optional transmissive contact spray");
+    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices,
+                          WaterContactSprayEnabled(WaterQuality::Mobile)) &&
                       hiddenVertices[0].position[0] > 9999.0f &&
                       hiddenVertices[0].position[1] > 9999.0f,
-                  "disabled water quality must refit droplet geometry outside the playable scene");
+                  "Mobile water must hide droplet geometry without changing its fixed allocation");
     for (std::size_t slot = 0u; slot < horde::gameplay::effects::kWaterDropletCapacity; ++slot)
     {
         const auto& first = hiddenVertices[slot * kWaterDropletVerticesPerSlot].position;
@@ -243,6 +249,16 @@ bool CheckBoundedWaterDropletGeometry()
                           "quality-hidden droplets must use degenerate, finite off-scene geometry");
         }
     }
+    ok &= Require(UpdateWaterDropletVertices(snapshot, hiddenVertices,
+                          WaterContactSprayEnabled(WaterQuality::High)),
+                  "returning to High restores live spray using the existing topology");
+    bool restoredSpray = true;
+    for (std::size_t index = 0; index < frameVertices.size(); ++index)
+        restoredSpray = restoredSpray &&
+            hiddenVertices[index].position == frameVertices[index].position &&
+            hiddenVertices[index].normal == frameVertices[index].normal;
+    ok &= Require(restoredSpray,
+                  "High to Mobile to High restores identical droplet geometry from the same snapshot");
     snapshot.ripples[0] = {{{-2.0f, -0.925f, -15.0f}}, 0.6f, 0.45f, true};
     snapshot.ripples[1] = {{{-3.0f, -0.925f, -15.3f}}, 0.2f, 0.75f, true};
     const auto gpuRipple = MakeWaterContactRippleGpu(snapshot);
@@ -800,7 +816,13 @@ struct PresentableTinyRtSceneObservationTestAccess
         std::sort(omitted.begin(),omitted.end());
         std::cout<<"Native sparse fixture ("<<(compiledHigh ? "High" : "Mobile")<<") IDs: "
             <<(omitted.empty() ? 0u : omitted.front())<<' '<<(omitted.size()<2u ? 0u : omitted.back())<<'\n';
-        auto plan=scene.CreateStaticGeometryTriangleOmissions(scene.StaticGeometryGeneration(),omitted,diagnostic);
+        ok &= Require(scene.ForestSurroundingsActive() &&
+            !scene.CreateStaticGeometryTriangleOmissions(scene.StaticGeometryGeneration(),omitted,diagnostic),
+            "normal resident woodland rejects legacy omissions even for structurally valid triangle IDs");
+        // This tests the bounded CPU copy algorithm only. It is not a scene
+        // visibility certificate and cannot bypass the production rejection above.
+        auto plan=RtStaticTriangleOmissions::Create(scene.fullStaticGeometrySource_,
+            PresentableTinyRtScene::kCollapseInstanceIndex,omitted,diagnostic);
         ok &= Require(!scene.CreateStaticGeometryTriangleOmissions(0u,omitted,diagnostic) &&
             !scene.CreateStaticGeometryTriangleOmissions(scene.StaticGeometryGeneration()+1u,omitted,diagnostic),
             "scene-owned sparse admission rejects absent/stale generation before touching the source");
@@ -1265,10 +1287,17 @@ struct PresentableTinyRtSceneObservationTestAccess
         // Eight original F03 kerbs and one marked waystone add 144 triangles
         // in the existing consolidated masonry owner, without a new row.
         constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u + 144u)*3u;
-        bool ok = oldIndices == 8422u * 3u &&
+        // Normal private480 adds the unchanged middle/far trees, low ferns and
+        // the admitted closed boundary, all within existing material families.
+        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1188u)*3u;
+        const auto& woodland=tomb.forestSurroundingsPrototype_;
+        bool ok = woodland && woodland->report.extraTrees==416u &&
+                  woodland->report.addedIndices==woodlandIndices &&
+                  woodland->report.boundaryContained &&
+                  oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
-                  tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices &&
+                  tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() == 33u &&
                   tomb.staticMeshSlot_.Materials().size() == 32u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 38u &&
@@ -1279,7 +1308,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                       << "; baseline top=" << baseline.collapseStaticAsset_.bounds.maximum[1]
                       << "; entry top=" << chapterEntryTop << " expected=6"
                       << "; chapter indices=" << tomb.collapseStaticAsset_.indices.size()
-                      << " expected=" << chapterEntryIndices+addedIndices << '\n';
+                      << " expected=" << chapterEntryIndices+addedIndices+woodlandIndices << '\n';
         std::cout << "Integrated native tomb static roster: "
                   << tomb.staticMeshSlot_.PrimitiveMetadata().size() << " primitives, "
                   << tomb.staticMeshSlot_.Materials().size() << " materials\n";

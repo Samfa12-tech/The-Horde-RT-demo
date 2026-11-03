@@ -88,6 +88,82 @@ int main() {
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::ReunionFirstPiece,"proof response continues to first piece");
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::ReunionDepart,"first piece continues to departure");
     d.Skip();d.Step(.016f,c);Check(d.State().line==Line::None,"departure continuation is bounded");
+    for(unsigned charges:{0u,1u,2u}) {
+        Director guided;Context gc;gc.claimed=true;
+        gc.flaskGuideEnabled=true;gc.flaskCharges=charges;
+        guided.Step(.016f,gc);guided.Skip();guided.Step(.016f,gc);guided.Skip();
+        gc.exterior=true;gc.lanternLow=true;guided.Step(.016f,gc);
+        gc.manualRaiseSequence=1;gc.visibleRaiseSequence=1;gc.lanternLow=false;gc.lanternHigh=true;
+        guided.Step(.016f,gc);
+        Check(guided.State().proofAccepted,"fresh reunion proof admits basin guidance");
+        guided.Skip();guided.Step(.016f,gc);guided.Skip();guided.Step(.016f,gc);
+        Check(guided.State().line==Line::ReunionDepart,"basin cue follows existing Kit story");
+        const auto waiting=guided.ExportProgress();
+        Check(waiting.continuationCount==1 && waiting.continuations[0]==
+            (charges==0?Line::FlaskEmpty:Line::FlaskTopup),
+            "one conditional basin cue survives a campaign save before delivery");
+        auto duplicated=waiting;
+        duplicated.continuations[1]=Line::FlaskTopup;
+        duplicated.continuationCount=2;
+        Check(!Director::ValidateProgress(duplicated),
+            "corrupt progress cannot queue both conditional basin cues");
+        Director restored;
+        Check(restored.RestoreProgress(waiting,gc,100,1),"queued basin cue restores safely");
+        restored.Skip();restored.Step(.016f,gc);
+        Check(restored.State().line==Line::None && restored.BasinGuidePending(),
+            "Kit waits for the player at the actual basin before giving the refill cue");
+        gc.companionAtBasin=true;restored.Step(.016f,gc);
+        Check(restored.State().line==Line::None,
+            "Kit cannot call here while the player is still away from the basin");
+        const auto far=simulation::kWorldRoutePoints[6];gc.player={far.x,far.y,far.z};
+        restored.Step(.016f,gc);
+        Check(restored.ExportProgress().continuationCount==1 && restored.BasinGuidePending(),
+            "running ahead cannot queue forest lines after the pending basin lesson");
+        gc.player={};
+        gc.playerNearBasin=true;restored.Step(.016f,gc);
+        Check(restored.State().line==(charges==0?Line::FlaskEmpty:Line::FlaskTopup),
+            "restored Kit delivers the charge-appropriate guidance once");
+        restored.Skip();restored.Step(.016f,gc);
+        Check(restored.State().line==Line::None && restored.ExportProgress().continuationCount==0,
+            "completed basin cue does not repeat on a nearby tick");
+    }
+    {
+        Director changed;Context gc;gc.claimed=true;gc.flaskGuideEnabled=true;gc.flaskCharges=2;
+        changed.Step(.016f,gc);changed.Skip();changed.Step(.016f,gc);changed.Skip();
+        gc.exterior=true;gc.lanternLow=true;changed.Step(.016f,gc);
+        gc.lanternLow=false;gc.lanternHigh=true;gc.manualRaiseSequence=1;gc.visibleRaiseSequence=1;
+        changed.Step(.016f,gc);
+        for(unsigned n=0;n<3;++n) {changed.Skip();changed.Step(.016f,gc);}
+        Check(changed.BasinGuidePending() && changed.State().line==Line::None,
+            "Kit keeps a pending basin lesson while walking");
+        gc.flaskCharges=0;gc.companionAtBasin=gc.playerNearBasin=true;
+        changed.Step(.016f,gc);
+        Check(changed.State().line==Line::FlaskEmpty,
+            "spoken basin line uses charges at delivery, not the old proof-time count");
+    }
+    CompanionRouteFixture basinGuide(true);
+    basinGuide.Step(1.f/60.f,basinGuide.State().x,basinGuide.State().z,
+        true,true,false,nullptr,false,true,true);
+    const auto interruptedGuide=basinGuide.State();
+    basinGuide.Step(1.f/60.f,interruptedGuide.x,interruptedGuide.z,
+        true,true,false,nullptr,false,false,true);
+    Check(basinGuide.State().basinGuide &&
+        basinGuide.State().x==interruptedGuide.x && basinGuide.State().z==interruptedGuide.z,
+        "temporary death or traversal interruption retains the unfinished basin guide");
+    bool reachedBasin=false;
+    for(unsigned tick=0;tick<1000;++tick) {
+        const auto before=basinGuide.State();
+        basinGuide.Step(1.f/60.f,before.x,before.z,true,true,false,nullptr,false,true,true);
+        if(basinGuide.State().basinArrived) {reachedBasin=true;break;}
+    }
+    Check(reachedBasin && basinGuide.State().grounded &&
+        std::hypot(basinGuide.State().x-(simulation::kWorldRoutePoints[2].x+1.45f),
+                   basinGuide.State().z-(simulation::kWorldRoutePoints[2].z+.8f))<.08f,
+        "Kit walks to the upper-rope basin without entering the reserved landing");
+    const auto guideRoot=basinGuide.State();
+    basinGuide.Step(1.f/60.f,guideRoot.x,guideRoot.z,true,true,false,nullptr,false,true,false);
+    Check(!basinGuide.State().basinGuide && basinGuide.State().waypoint==3,
+        "after the basin lesson Kit resumes the original mapped route");
     old=d.State();c.paused=true;d.Step(.05f,c);Check(d.State().elapsed==old.elapsed,"pause freezes fallback");
     d.Reset(true);Check(d.State().grateConsumed&&d.State().proofAccepted,"reconstruction preserves logical once flags");
     Check(!d.Complete(old.line,old.generation),"reset callback cannot finish a new generation");
@@ -95,7 +171,7 @@ int main() {
     c={};d.Request(Line::KeeperSense,{1,2,3},c);old=d.State();c.listener={8,9,10};d.Step(.05f,c);
     Check(d.State().listener.x==old.listener.x&&d.State().source.y==2,"source/listener tuple freezes at emission");
     // Continuous visible-companion speech is distinct from event-time calls.
-    for(unsigned n=static_cast<unsigned>(Line::ReunionQuestion);n<=static_cast<unsigned>(Line::ForestVillage);++n) {
+    for(unsigned n=static_cast<unsigned>(Line::ReunionQuestion);n<=static_cast<unsigned>(Line::FlaskTopup);++n) {
         Director live;Context lc;lc.companionSource=Tuple{4,3,2};lc.listener={1,2,3};
         live.Request(static_cast<Line>(n),{-32,3.6f,-10},lc);
         const auto started=live.State();const auto progress=live.ExportProgress();

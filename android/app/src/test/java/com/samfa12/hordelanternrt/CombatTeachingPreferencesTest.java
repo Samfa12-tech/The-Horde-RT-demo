@@ -41,6 +41,17 @@ public final class CombatTeachingPreferencesTest {
         assertFalse(warning.contains("Hold"));
     }
 
+    @Test public void liveFightNoticeUsesItsFiniteSharedPublicationNotPermanentRevivalPhase() {
+        long live=3L|(1L<<39)|(6L<<36);
+        assertFalse(CombatTeachingPreferences.prompt(live).contains("LIVE FIGHT"));
+        assertFalse(CombatTeachingPreferences.needsTimelyRefresh(live));
+        long notice=live|(1L<<58);
+        assertTrue(CombatTeachingPreferences.prompt(notice).contains("LIVE FIGHT"));
+        assertEquals(255,CombatTeachingPreferences.promptOpacity(notice));
+        assertTrue(CombatTeachingPreferences.needsTimelyRefresh(notice));
+        assertEquals("",CombatTeachingPreferences.prompt(live));
+    }
+
     @Test public void savedSettingsRoundTripAndMalformedTypesUseSafeDefaults() {
         CombatTeachingPreferences.save(preferences, new CombatTeachingPreferences.Values(false, true));
         CombatTeachingPreferences.Values values = CombatTeachingPreferences.read(preferences);
@@ -169,7 +180,7 @@ public final class CombatTeachingPreferencesTest {
         long practice=(1L<<10)|(1L<<13)|(0xffL<<40);
         for(int stage:new int[]{4,0,1,5,6}) {
             String text=CombatTeachingPreferences.prompt(practice|stage);
-            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertTrue(text.startsWith("Practice: no damage \u2014 learn each step\n"));
             assertEquals(stage==6?"Finish practice":"Skip practice",RuntimeEnvironment.getApplication().getString(CombatTeachingPreferences.practiceActionLabelResource(practice|stage)));
             assertFalse(CombatTeachingPreferences.blockLearned(practice|stage));
             assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|stage));
@@ -183,12 +194,12 @@ public final class CombatTeachingPreferencesTest {
         assertTrue(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<32)));
         assertFalse(CombatTeachingPreferences.attackFromGuardLearned(practice|(1L<<15)));
         assertTrue(CombatTeachingPreferences.exitPending(practice|(1L<<33)));
-        assertTrue(CombatTeachingPreferences.prompt(practice|(1L<<33)).contains("Leaving practice safely"));
+        assertTrue(CombatTeachingPreferences.prompt(practice|(1L<<33)).contains("Practice ending: enemies can hurt you next"));
     }
     @Test public void actualParrySuccessPrecedesCurrentSkillWithoutInventingSuccessFromAnOrdinaryHit() {
         long blockPractice=4L|(1L<<10)|(1L<<13)|(0xffL<<40);
         String parried=CombatTeachingPreferences.prompt(blockPractice|(7L<<3));
-        assertTrue(parried.startsWith("Practice: no damage\n"));
+        assertTrue(parried.startsWith("Practice: no damage \u2014 learn each step\n"));
         assertTrue(parried.contains("Well parried"));assertFalse(parried.contains("block normal hits"));
         assertFalse(CombatTeachingPreferences.prompt(blockPractice|(9L<<3)).contains("Well parried"));
     }
@@ -196,7 +207,7 @@ public final class CombatTeachingPreferencesTest {
         for(int stage:new int[]{4,0,1,5,6})for(int attack:new int[]{0,1,2}) {
             long state=(1L<<13)|stage|((long)attack<<48); // Protection publication is authoritative.
             String text=CombatTeachingPreferences.prompt(state);
-            assertTrue(text.startsWith("Practice: no damage\n"));
+            assertTrue(text.startsWith("Practice: no damage \u2014 learn each step\n"));
             assertTrue(text.split("\n").length>=2);
             if(attack==1) {
                 assertTrue(text.contains("YELLOW guard-break: parry/dodge"));
@@ -248,6 +259,37 @@ public final class CombatTeachingPreferencesTest {
         assertEquals(-1, MainActivity.combatPracticeKind(null));
     }
 
+    @Test public void acceptedAndRetryCuesKeepCurrentControllerLessonAndClearReachHint() {
+        long practice=1L|(1L<<10)|(1L<<13)|(2L<<7);
+        String accepted=CombatTeachingPreferences.prompt(practice|(14L<<3),true);
+        assertTrue(accepted.contains("Good! Next:"));
+        assertTrue(accepted.contains("[B] + stick"));
+        assertFalse(accepted.contains("[Dodge]"));
+        String retry=CombatTeachingPreferences.prompt(practice|(15L<<3),false);
+        assertTrue(retry.contains("Try again:"));
+        assertTrue(retry.contains("clear its reach"));
+        assertTrue(retry.contains("[Dodge] + move"));
+    }
+    @Test public void naturalPrivateContinuationExplainsKillsRiseAndLiveWithoutFinish() {
+        long ready=6L|(1L<<13)|(1L<<39)|(2L<<36);
+        assertTrue(CombatTeachingPreferences.prompt(ready,true).contains("Defeat both skeletons"));
+        assertFalse(CombatTeachingPreferences.prompt(ready,true).contains("Finish"));
+        assertEquals(R.string.combat_teaching_skip,CombatTeachingPreferences.practiceActionLabelResource(ready));
+        long rising=6L|(1L<<13)|(1L<<39)|(4L<<36);
+        assertTrue(CombatTeachingPreferences.prompt(rising).contains("still protected"));
+        long live=2L|(1L<<39)|(6L<<36)|(1L<<58);
+        assertTrue(CombatTeachingPreferences.prompt(live).contains("enemies now deal damage"));
+        assertFalse(CombatTeachingPreferences.safePractice(live));
+        assertEquals(255,CombatTeachingPreferences.promptOpacity(live));
+    }
+    @Test public void sheathGestureDoesNotAddPersistentTeachingOverlay() {
+        for(long state : new long[]{2L|(50L<<50),2L|(1L<<57)}) {
+            assertEquals("",CombatTeachingPreferences.prompt(state));
+            assertEquals("",CombatTeachingPreferences.prompt(state,true));
+            assertEquals(0,CombatTeachingPreferences.promptOpacity(state));
+            assertFalse(CombatTeachingPreferences.needsTimelyRefresh(state));
+        }
+    }
     @Test public void reducedMotionRemovesOpacityAnimationButKeepsVisibleState() {
         assertEquals(0.5f, CombatTeachingPreferences.alpha(128, false), 0.01f);
         assertEquals(1.0f, CombatTeachingPreferences.alpha(128, true), 0.0f);

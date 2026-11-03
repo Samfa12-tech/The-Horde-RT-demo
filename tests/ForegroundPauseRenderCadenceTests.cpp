@@ -57,7 +57,7 @@ int main()
         return 8;
 
     // Resume, Entry, Preview and surface-generation changes are immediate and
-    // leave platform background behavior to the platform loops.
+    // preserve paused background cadence and wake immediately on focus return.
     input.currentRtOutputValid = true;
     input.paused = false;
     decision = cadence.Evaluate(start + 5s + 1ms, input);
@@ -75,10 +75,19 @@ int main()
     if (!decision.renderNow || !decision.usingPausedFallback) return 12;
     input.foreground = false;
     decision = cadence.Evaluate(start + 9s, input);
-    if (!decision.renderNow || decision.usingPausedFallback) return 13;
+    if (!decision.renderNow || !decision.usingPausedFallback) return 13;
+    cadence.RecordRenderAttempt(start + 9s);
+    decision = cadence.Evaluate(start + 9s + 1ms, input);
+    if (decision.renderNow || !decision.usingPausedFallback || decision.wait <= 0ms) return 16;
+    input.foreground = true;
+    decision = cadence.Evaluate(start + 9s + 2ms, input);
+    if (!decision.renderNow || !decision.usingPausedFallback) return 17;
+    input.paused = false;
+    decision = cadence.Evaluate(start + 9s + 3ms, input);
+    if (!decision.renderNow || decision.usingPausedFallback) return 18;
     // Even if the platform has not flushed a short exit before re-entering,
     // preserve both exits and the full aggregate wall interval.
-    if (!cadence.TakeAggregate(start + 9s, aggregate) || aggregate.enteredFallback != 1u ||
-        aggregate.exitedFallback != 2u || aggregate.wallNanoseconds != 4'000'000'000ull) return 15;
+    if (!cadence.TakeAggregate(start + 9s + 3ms, aggregate) || aggregate.enteredFallback != 1u ||
+        aggregate.exitedFallback != 2u || aggregate.wallNanoseconds != 4'003'000'000ull) return 15;
     return 0;
 }

@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "baseCommit": "a81f2e481e21bcc84e51fa881185acd6e6d5f0a3",
+  "windows": {
+    "path": "reports/horde-windows-acceptance-20261101-owner-fixes/HordeLanternRT.exe",
+    "bytes": 4978176,
+    "sha256": "193292abc085764c506b1126622698c436e803b6e0a6e9847fa6d261e5910866"
+  },
+  "android": {
+    "path": "reports/ring-closeout-20261101/owner-fixes.apk",
+    "bytes": 208816912,
+    "sha256": "9474f7eb42df4c069650e67b483615681501b9ce40309fbfb3053218542ac59b"
+  },
+  "androidUiTests": [
+    {
+      "suite": "com.samfa12.hordelanternrt.CombatTeachingPreferencesTest",
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.samfa12.hordelanternrt.CombatTeachingUiSchedulingTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "hostFocusedSuites": "4/4 pass",
+  "windowsClosedAssetRoster": "PASS current policy",
+  "ownerParkedFiles": 151,
+  "ownerParkedFilesUnchanged": true,
+  "newCandidateLaunched": false,
+  "newCandidateInstalled": false,
+  "normalRevivalEnabled": false,
+  "runtimeListeningAcceptance": false,
+  "sources": [
+    {
+      "path": "android/app/src/main/cpp/android_probe_bridge.cpp",
+      "bytes": 429179,
+      "sha256": "45ac05be1b05b89ce337ab69a7cdcdcbe457bfe7ded29b5f4a944eff2240f686"
+    },
+    {
+      "path": "android/app/src/main/java/com/samfa12/hordelanternrt/CombatTeachingPreferences.java",
+      "bytes": 6758,
+      "sha256": "8aae0d89ef52a2c274f0ba14aba1cb4168ecdec52e1b71bcabcaef7a3e48e234"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingPreferencesTest.java",
+      "bytes": 16657,
+      "sha256": "522ff437d1f977869c85c41d5ea830875d28e84e0d8ed4db94979cd5ad79d01c"
+    },
+    {
+      "path": "android/app/src/test/java/com/samfa12/hordelanternrt/CombatTeachingUiSchedulingTest.java",
+      "bytes": 20007,
+      "sha256": "745c5c31db8ebef092242894adcde7a4b7d355bb8f7c490acbc183dc2135d3e7"
+    },
+    {
+      "path": "docs/evidence/2026-11-01-attack-rings/OWNER_FIXES.md",
+      "bytes": 5205,
+      "sha256": "3e0dcc0573c98de12e84e3ab69a5f46b821c2c07eac813dc32de29574dafaf96"
+    },
+    {
+      "path": "src/audio/ChapterDialogueSpatial.h",
+      "bytes": 746,
+      "sha256": "212acc8a5c98c5534fbecb41c6e3a44081562f6314ae68d456ddd9b079bfd59a"
+    },
+    {
+      "path": "src/gameplay/SwordCombat.h",
+      "bytes": 52639,
+      "sha256": "98edd545f9f6477ed9ecf3b13ad5b7b557d45224ceeda01db27a77c04f7b6866"
+    },
+    {
+      "path": "src/gameplay/simulation/CombatTeaching.h",
+      "bytes": 17245,
+      "sha256": "35619aac6767ce00dd18a73e0a62407f35f9527dedee763443fb1c8cb6938287"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.cpp",
+      "bytes": 178274,
+      "sha256": "ecc1bbeebe5d66e9f2e53d0a5e9b4ee7ed14b7bc0d6059f53bddf4a37dfd7f80"
+    },
+    {
+      "path": "src/gameplay/simulation/GameSimulation.h",
+      "bytes": 26129,
+      "sha256": "69377974e1db50b81e4577fbae567c227d1764f013ec0f6367a8fbdb1fa8e943"
+    },
+    {
+      "path": "src/gameplay/traversal/RescueTraversal.h",
+      "bytes": 7451,
+      "sha256": "aa2e90bd4733cc3eb877125ac8456b358d5eab3e52a9e27310718da446316b7e"
+    },
+    {
+      "path": "src/platform/windows/DiagnosticWindow.cpp",
+      "bytes": 707378,
+      "sha256": "5c5f0ad728e194fd087f87cdac795db9d37c9a1aa575f8fa8100e31c27f7c781"
+    },
+    {
+      "path": "src/platform/windows/WindowsCombatTeachingPrompt.h",
+      "bytes": 5405,
+      "sha256": "4b326bda1a492191243dba803273ea0ba43e2d567fb57acf49d26969e7996dd0"
+    },
+    {
+      "path": "tests/CombatFoundationTests.cpp",
+      "bytes": 175566,
+      "sha256": "98bc7cde67ea6551c5d6dc107a2d558f71687cc1ce8f1b16df3a689c3b539413"
+    },
+    {
+      "path": "tests/DialogueDuckingTests.cpp",
+      "bytes": 25402,
+      "sha256": "d2e5f1d67bbb109ccb339371d9a60957e868456f20f32a3146c8541c76e778d6"
+    },
+    {
+      "path": "tests/RescueTraversalTests.cpp",
+      "bytes": 54433,
+      "sha256": "0d01208824eba373182626cf520b7e4a125090497b9cf1d0c024a3f488ce0dd9"
+    }
+  ],
+  "logs": [
+    {
+      "path": "reports/ring-closeout-20261101/owner-fixes-final-tests.log",
+      "bytes": 919,
+      "sha256": "3b9260bee7b69e8687c21deaa4ddfb6a82f6538e8459cc7675c1fb773e915c7c"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/owner-fixes-contact-build.log",
+      "bytes": 4863,
+      "sha256": "cd912e351eaaf3341d7a79fc1e5055a36da61b019254d7da3d786932944ab6e7"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/owner-fixes-android.log",
+      "bytes": 4375,
+      "sha256": "a4ba0f005283bc08d7e56264d2a3bb19e00111c4202b100cdad5283c8867d4f6"
+    },
+    {
+      "path": "reports/ring-closeout-20261101/owner-fixes-android-final.log",
+      "bytes": 2724,
+      "sha256": "abc38dd57a334cc2e4ef6c6a0d3867d1c6bb221163778490f8fab0f0f979eecf"
+    }
+  ]
+}

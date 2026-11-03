@@ -13,7 +13,7 @@ std::array<jlong,40> gCampaignUi = [] {
     std::array<jlong,40> state{};state[0]=2;state[6]=-1;return state;
 }();
 std::uint64_t gCampaignRequestSerial=0;
-std::atomic<bool> gCampaignPauseGate{false},gCampaignShowcaseOverride{false};
+std::atomic<bool> gCampaignPauseGate{false},gCampaignShowcaseOverride{false},gCampaignEndRequested{false},gCampaignEndFailureAcknowledged{false};
 std::unique_ptr<campaign::PlaySession> gCampaignSession;
 std::string gCampaignOwnerRoot;
 std::optional<campaign::LoadPreparation> gCampaignPreparation;

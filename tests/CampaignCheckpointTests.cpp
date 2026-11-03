@@ -62,7 +62,7 @@ bool SameRecord(const cp::Checkpoint& a,const cp::Checkpoint& b) {
         a.firstAscentCompleted==b.firstAscentCompleted && a.swordStowed==b.swordStowed &&
         a.lanternHigh==b.lanternHigh && a.torchDropX==b.torchDropX &&
         a.torchDropZ==b.torchDropZ && a.torchDropYaw==b.torchDropYaw &&
-        a.torchDropPitch==b.torchDropPitch && a.guards==b.guards && SameProgress(a.dialogue,b.dialogue);
+        a.torchDropPitch==b.torchDropPitch && a.guards==b.guards && a.guardHealth==b.guardHealth && SameProgress(a.dialogue,b.dialogue);
 }
 bool SameSession(const SimulationSnapshot& a,const SimulationSnapshot& b) {
     return a.tickIndex==b.tickIndex && a.worldRoute.generation==b.worldRoute.generation &&
@@ -234,6 +234,37 @@ int main(int argc,char** argv) {
     if(!terrain) {std::cerr<<"real chapter support preparation failed: "<<error<<'\n';return 1;}
     if(argc==2 && std::string_view(argv[1])=="--revival-restore") {
         RevivalRestoreProfile(terrain);return failures?1:0;
+    }
+    // Logical restoration and subsequent ordinary ticks, not a claim of a
+    // naturally earned phone victory. A bypass never invents defeated guards.
+    for(int a:{0,1,2})for(int b:{0,1,2}) {
+        auto c=Record(true);c.schema=5;c.flaskRecorded=true;c.flask={false,1};
+        c.guardHealth={a,b};c.defeatedGuards=(a==0?1u:0u)|(b==0?2u:0u);
+        auto config=ProductionGameSimulationConfig();config.healingFlask1_7=true;
+        config.skeletonRevival1_7=true;config.sequentialPractice1_7=true;
+        GameSimulation game(config);
+        Check(game.ConfigureSkeletonRevivalPresentation(2,89.f/30.f,1.5f),"bypass restoration has real admitted clip durations");
+        if(!Restore(game,c,terrain)) {Check(false,"safe exterior survivor record restores on imported terrain");continue;}
+        const auto& loaded=game.Snapshot();
+        Check(loaded.skeletonEnemies[0].health==a && loaded.skeletonEnemies[1].health==b &&
+              loaded.skeletonEnemies[0].dead==(a==0) && loaded.skeletonEnemies[1].dead==(b==0),
+              "restoration preserves exact guard health and individual deaths");
+        Check((a==0 && b==0) ? loaded.openingEncounterComplete:!loaded.openingEncounterComplete,
+              "an exterior escape never fabricates opening-combat completion");
+        Check(loaded.combatTeaching.stage==TutorialStage::Skipped && !loaded.combatTeaching.safePractice &&
+              loaded.lich.phase==LichPhase::Dead && loaded.skeletonRevival.consumed,
+              "safe exterior restoration keeps dead Keeper and skipped protection without a new revival");
+        InputSnapshot neutral;neutral.damageEnabled=false;neutral.yawRadians=c.yaw;
+        for(int tick=0;tick<120;++tick)game.StepFixed(neutral,1.f/60.f,tick+1);
+        bool cry=false;for(const auto& event:game.Events().Events())cry|=event.type==GameplayEventType::LichRevivalCry;
+        Check(!cry && game.Snapshot().skeletonEnemies[0].health==a && game.Snapshot().skeletonEnemies[1].health==b,
+              "ordinary exterior continuation cannot revive a bypassed guard or heal existing injury");
+        const auto captured=game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::SafeExit);
+        Check(captured && captured->defeatedGuards==c.defeatedGuards &&
+              (c.defeatedGuards==3 || (captured->schema==5 && captured->guardHealth==c.guardHealth)),
+              "safe exterior checkpoint refresh retains surviving guards rather than blocking all saves");
+        Check(!game.CaptureAuthoredCampaignBoundary(cp::CheckpointId::LowerClaimed),
+              "exterior capture cannot substitute unsafe lower-room recovery");
     }
     // The initial records are ordinary validated logical values. Neither side
     // of these round trips imports a development/debug capture checkpoint.
@@ -457,7 +488,7 @@ int main(int argc,char** argv) {
         auto dated=good;dated.schema=4;dated.savedAtUnixSeconds=1767225600;
         GameSimulation datedGame(ProductionGameSimulationConfig());
         Check(cp::Validate(dated) && Restore(datedGame,dated,terrain),"ordinary dated save restores without gated flask ownership");
-        auto bad=good;bad.schema=5;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        auto bad=good;bad.schema=6;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}
@@ -657,6 +688,16 @@ int main(int argc,char** argv) {
         const auto loaded=sim.Snapshot();CheckClean(loaded);
         Check(cp::LookoutObjectiveAvailable(loaded,sim.LatestCampaignBoundary()),
             "completed grounded lookout restore permits an explicit objective request");
+        auto approach=loaded;approach.playerX=kPrivateChapterDemoEndpoint.x;approach.playerZ=kPrivateChapterDemoEndpoint.z;
+        approach.worldRoute.current=WorldZoneId::TombExterior;
+        Check(cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "completed objective remains available at temporary approach closure after restore");
+        approach.playerX=24.1964f;approach.playerZ=53.1504f;
+        Check(cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "temporary endpoint explanation remains reopenable at actual timber stopped position");
+        approach.playerX=28.f;approach.playerZ=58.f;
+        Check(!cp::LookoutObjectiveAvailable(approach,sim.LatestCampaignBoundary()),
+              "endpoint objective does not extend into the unfinished village");
         auto unavailable=loaded;unavailable.playerAlive=false;
         Check(!cp::LookoutObjectiveAvailable(unavailable,sim.LatestCampaignBoundary()) &&
             !cp::LookoutObjectiveAvailable(loaded,std::nullopt),

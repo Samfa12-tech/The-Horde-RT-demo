@@ -69,10 +69,12 @@ struct CompletedOwners
         const bool leaveLastPending = false, const bool mixedUnsupported = false,
         const BenchmarkSummaryConfiguration* uploaded = nullptr, const bool middleQualityChange = false,
         const bool middleShadowChange = false, const bool middleMistChange = false,
-        const bool middleMistUnavailable = false)
+        const bool middleMistUnavailable = false,
+        const BenchmarkWorkload workload = BenchmarkWorkload::LanternHeldHigh)
     {
-        benchmark.Start(2u, BenchmarkWorkload::LanternHeldHigh);
-        Check(evidence.Start(kLanternBenchmarkFramesPerLap), "allocate real bounded evidence owner");
+        benchmark.Start(2u, workload);
+        Check(evidence.Start(workload == BenchmarkWorkload::ShowcaseRoute ? 4000u : kLanternBenchmarkFramesPerLap),
+            "allocate real bounded evidence owner");
         bool armed = false;
         std::uint64_t serial = 0u;
         while (benchmark.IsRunning())

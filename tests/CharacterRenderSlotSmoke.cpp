@@ -115,7 +115,7 @@ bool HasCoherentAndroidTuning(const std::string& renderFrame,const std::string& 
         CountOccurrences(renderFrame,"gRtLabState.Snapshot()") == 1u &&
         renderFrame.find("simulationInput.waterfallWidthScale = rtLabTuning.waterfallWidthScale;") != std::string::npos &&
         renderFrame.find("rtLabTuning, context.graphicsSettings.shadowQuality);") != std::string::npos &&
-        renderFrame.find("                    rtLabTuning);") != std::string::npos &&
+        renderFrame.find("                    rtLabTuning, std::nullopt, std::nullopt,") != std::string::npos &&
         CountOccurrences(routeReset,"gRtLabState.Reset();") == 1u;
 }
 
@@ -126,6 +126,33 @@ int main()
     using namespace horde::gameplay;
     using namespace horde::vulkan::raytracing;
 
+    {
+        PresentableTinyRtScene normal;
+        if(!Require(!normal.ForestSurroundingsSelected(),"woodland is scoped to the authored chapter"))return 1;
+        normal.SetDevelopmentRescueJourney(true);
+        if(!Require(normal.ForestSurroundingsSelected(),"normal private chapter selects immutable woodland"))return 1;
+        if(!Require(normal.SetSharedForestGeometryEnabled(true) && !normal.ForestSurroundingsSelected(),
+            "explicit shared64 control excludes480 rather than combining rosters"))return 1;
+        if(!Require(normal.SetSharedForestGeometryEnabled(false) && normal.ForestSurroundingsSelected(),
+            "returning to normal content restores480 selection before resource creation"))return 1;
+    }
+#if defined(_DEBUG)
+    {
+        PresentableTinyRtScene scene;std::string error;
+        using Mode=PresentableTinyRtScene::ForestRouteProofMode;
+        if(!Require(scene.SetForestRouteProofMode(Mode::BakedF01North68,error) && !scene.SetSharedForestGeometryEnabled(true),
+            "prototype-first selection forbids simultaneous shared/older rosters"))return 1;
+        PresentableTinyRtScene full;
+        if(!Require(full.SetForestRouteProofMode(Mode::BakedSurroundings480,error) && !full.SetSharedForestGeometryEnabled(true),
+            "full-route480 is exclusively baked without shared master duplication"))return 1;
+        PresentableTinyRtScene shared;
+        if(!Require(shared.SetSharedForestGeometryEnabled(true) && !shared.SetForestRouteProofMode(Mode::BakedSurroundings480,error),
+            "shared-first cannot combine full-route480 and original64 instances"))return 1;
+        PresentableTinyRtScene other;
+        if(!Require(other.SetSharedForestGeometryEnabled(true) && !other.SetForestRouteProofMode(Mode::BakedF01North68,error),
+            "shared-first selection cannot silently activate overlapping68 prototype"))return 1;
+    }
+#endif
     static_assert(CharacterRenderSlot::kTlasInstanceIndex == 2u);
     static_assert(CharacterRenderSlot::kSecondSkeletonTlasInstanceIndex == 18u);
     static_assert(CharacterRenderSlot::kMaximumSkeletonPoseBuckets == 2u);
@@ -255,7 +282,7 @@ int main()
     ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
                       PresentableTinyRtScene::kBlasCount == 25u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 107u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 111u &&
                       kRtInstanceMetadataCapacity == 30u &&
                       kRtStaticAssetCapacity == 15u &&
                       kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
@@ -278,7 +305,8 @@ int main()
                       PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
                   "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
     ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
-                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u,
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u &&
+                      PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 80u == 111u,
                   "forest placement definitions follow the thirty-one-role physical prefix and fit both bounded populations");
     const DynamicBlasToTlasDependency noDynamicBlasDependency =
         BuildDynamicBlasToTlasDependency({});
@@ -2019,8 +2047,8 @@ int main()
                       androidBridgeSource.find(
                           "kProductionPlayerRenderRoute") !=
                           std::string::npos &&
-                      androidBridgeSource.find("ProductionGameSimulationConfig()") !=
-                          std::string::npos,
+                      androidBridgeSource.find("PrivateRevivalApplicationConfig()") != std::string::npos &&
+                      ReadTextFile(root / "src/gameplay/simulation/PrivateRevivalApplication.h").find("auto config=ProductionGameSimulationConfig();") != std::string::npos,
                       "Android gameplay/reward/glass must use the accepted production route and shared anatomical profile");
         const auto androidRouteReset=androidFunctionSource(
             "Java_com_samfa12_hordelanternrt_ProbeBridge_requestRouteReset(");

@@ -1,0 +1,513 @@
+{
+  "schema": 1,
+  "dateUtc": "2026-10-31",
+  "baselineSource": "a89362dcea2e394f2ce78ac1f2622ab7eb9c8d8c",
+  "baselineApkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+  "profileReference": "receipt.json",
+  "candidate": {
+    "source": "d48c5ef989bbb76b4b68943549c20f7ee1bf1860",
+    "buildId": "g:d48c5ef989bbb76b4b68943549c20f7ee1bf1860;i:13164d769b34181db6d3ef2845987dede0a7ac8100f33ae569b3f246529a2df8;c:D;s:D",
+    "apkSha256": "93ea064490da7bd47f79b851b064dbd3490fc00accf2a38e1d03efe4ab09ef9e",
+    "bytes": 184765110,
+    "nativeSha256": "e3238452a60e6a0be95ef8fc49ad1c7ce6a4c33cdbc193b33b1de8e025a31797",
+    "nativeBytes": 5465888,
+    "probe": "Mobile-only direct fire light fade6-8m; all High SPIR-V unchanged; no normal admission"
+  },
+  "decision": "Light-range probe unmeasured and unadmitted. Production source restored. Waterfall findings are observational; no optimisation claim.",
+  "preparation": "Equal 45-second prewarm followed by a new acknowledged native checkpoint; A1/A2 starting-state fingerprints match. No timing readbacks. This does not control GPU clocks/power or make the two thermal cohorts interchangeable.",
+  "controls": {
+    "reach-a1": {
+      "actualPresentedImagesPerSecond": 19.619286,
+      "matchedFrames": 847,
+      "durationSeconds": 43.120834515,
+      "intervalMedianMs": 50.0,
+      "intervalP95Ms": 70.833386,
+      "catchUpOverrunDelta": 4,
+      "thermal": {
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.3,
+            "BAT": 32.2,
+            "SKIN": 35.8
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.8,
+            "BAT": 33.7,
+            "SKIN": 36.6
+          }
+        }
+      },
+      "freshCheckpoint": {
+        "sameProcessVerified": true,
+        "priorImportCount": 1,
+        "currentImportCount": 2,
+        "worldImportedBeforeMotion": true,
+        "preparationSeconds": 45
+      }
+    },
+    "reach-a2": {
+      "actualPresentedImagesPerSecond": 17.799153,
+      "matchedFrames": 772,
+      "durationSeconds": 43.3166679,
+      "intervalMedianMs": 50.000051,
+      "intervalP95Ms": 83.333333,
+      "catchUpOverrunDelta": 8,
+      "thermal": {
+        "fresh-before-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.8,
+            "BAT": 34.4,
+            "SKIN": 37.1
+          }
+        },
+        "after-motion": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 41.6,
+            "BAT": 34.9,
+            "SKIN": 37.3
+          }
+        }
+      },
+      "freshCheckpoint": {
+        "sameProcessVerified": true,
+        "priorImportCount": 1,
+        "currentImportCount": 2,
+        "worldImportedBeforeMotion": true,
+        "preparationSeconds": 45
+      }
+    }
+  },
+  "candidateAttempts": {
+    "reach-b1": "Compatible installation/start succeeded; post-warm AP 43.0 / BAT 34.2 / SKIN 37.5 C exceeded the A1 start delta of 1.5 C. Rejected before motion timing. Any retained latest benchmark in that directory is stale, not B1 timing.",
+    "reach-b2": "After a 90-second bounded cooldown, BAT 31.1 C exceeded the preregistered 31.0 C target. No install, launch or timing. No closing C1 run."
+  },
+  "buildChecks": {
+    "pipelineVariants": 8,
+    "rayQueryComputeVariants": 8,
+    "unchangedHighSpirv": [
+      {
+        "key": "diagnostic_high_generic_dielectric",
+        "spirvSha256": "560aa773ea08869a7867dc12b1f561a8c88e2f89d8f9546151ea8c17381a5911"
+      },
+      {
+        "key": "diagnostic_high_opaque_fast",
+        "spirvSha256": "42b80e2e754fd2501c8b91d1ca41ce4f8f0de1b19e2ed05117541cf5e9d4ffff"
+      },
+      {
+        "key": "shipping_high_generic_dielectric",
+        "spirvSha256": "bf68332eed083c2edc2a18d2f2892603ea31ce13b33280cb207943e466a40153"
+      },
+      {
+        "key": "shipping_high_opaque_fast",
+        "spirvSha256": "f2c24b0ac15d915937f48ae2508723fa1791370e8385efe2626b5048c05c4738"
+      },
+      {
+        "key": "rayquery_compute_diagnostic_high_generic_dielectric",
+        "spirvSha256": "cc52b0009930221952c1536b68c800000f52c095f1a41d0649f25743588cc07e"
+      },
+      {
+        "key": "rayquery_compute_diagnostic_high_opaque_fast",
+        "spirvSha256": "16ce74d922b2ce5e24421ce5688113edcb508d8cbff1927ba2d7cfe63d5fb22e"
+      },
+      {
+        "key": "rayquery_compute_shipping_high_generic_dielectric",
+        "spirvSha256": "dcd484650399cfb8d3a0ec5648a1979611c28046fd039a48760dd51ad930f57e"
+      },
+      {
+        "key": "rayquery_compute_shipping_high_opaque_fast",
+        "spirvSha256": "b2c9f44c59196f63e0474c6310e93b79fdff5915a746f61950403b9851521278"
+      }
+    ],
+    "javaResourcesAndAssets": {
+      "entryNamesEqual": true,
+      "changed": [
+        {
+          "name": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+          "before": 5464288,
+          "after": 5465888
+        }
+      ],
+      "javaResourcesAndAssetsUnchanged": true
+    },
+    "restoredProductionFiles": 23,
+    "initialFailures": [
+      "First shader expression exceeded existing selection-merge budget; freeze rejected. Equivalent bounded expression passed unchanged limits.",
+      "First Android build detected stale generated Pipeline adapter; regenerated adapter, then offline arm64 Debug build passed."
+    ]
+  },
+  "waterfall": {
+    "scope": "Three existing baseline routes, full strict completed-frame/stage/presentation joins. Post-hoc moving-frame observations, not an A/B water intervention.",
+    "waterfallWorldCentreXZ": [
+      -2.32,
+      -15.26
+    ],
+    "runs": {
+      "opening-a2": {
+        "reportSha256": "6470490bc088925ed5949c232beff1ec744d3f5b9c695c35005796bee55fcb44",
+        "framesJoined": 777,
+        "routePeak": {
+          "serial": 286,
+          "tick": 988,
+          "phase": "approach",
+          "x": -2.16881,
+          "z": -15.1999,
+          "dispatchMs": 192.91062,
+          "asMs": 0.595208,
+          "actualInterPresentMs": 204.166615,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.565888286,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.7333333
+        },
+        "firstApproachGenericTransition": {
+          "serial": 286,
+          "tick": 988,
+          "phase": "approach",
+          "x": -2.16881,
+          "z": -15.1999,
+          "dispatchMs": 192.91062,
+          "asMs": 0.595208,
+          "actualInterPresentMs": 204.166615,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.565888286,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.7333333
+        },
+        "peakIsFirstApproachGenericFrame": true,
+        "postWaterNoFireMovingSamples": {
+          "shipping_mobile_generic_dielectric": {
+            "n": 9,
+            "dispatchMedianMs": 87.96104
+          },
+          "shipping_mobile_opaque_fast": {
+            "n": 1,
+            "dispatchMedianMs": 38.75578
+          }
+        }
+      },
+      "reach-a1": {
+        "reportSha256": "c82f49fe38bef3c6dcaf6f26198d1bb3471579a3d78c4a41754cf794983ccc61",
+        "framesJoined": 847,
+        "routePeak": {
+          "serial": 857,
+          "tick": 3837,
+          "phase": "approach",
+          "x": -2.11661,
+          "z": -15.2,
+          "dispatchMs": 138.766767,
+          "asMs": 0.400469,
+          "actualInterPresentMs": 150.000052,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.54586035,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.75
+        },
+        "firstApproachGenericTransition": {
+          "serial": 857,
+          "tick": 3837,
+          "phase": "approach",
+          "x": -2.11661,
+          "z": -15.2,
+          "dispatchMs": 138.766767,
+          "asMs": 0.400469,
+          "actualInterPresentMs": 150.000052,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.54586035,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.75
+        },
+        "peakIsFirstApproachGenericFrame": true,
+        "postWaterNoFireMovingSamples": {
+          "shipping_mobile_generic_dielectric": {
+            "n": 10,
+            "dispatchMedianMs": 68.70210750000001
+          },
+          "shipping_mobile_opaque_fast": {
+            "n": 3,
+            "dispatchMedianMs": 32.409374
+          }
+        }
+      },
+      "reach-a2": {
+        "reportSha256": "d23b1232da5fea9e345e1f61f173c46dc9ed3f84b2979eedbbf7adef63f84fd8",
+        "framesJoined": 772,
+        "routePeak": {
+          "serial": 771,
+          "tick": 3752,
+          "phase": "approach",
+          "x": -1.90957,
+          "z": -15.1997,
+          "dispatchMs": 166.067965,
+          "asMs": 0.442812,
+          "actualInterPresentMs": 183.333333,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.800355375,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.4333333
+        },
+        "firstApproachGenericTransition": {
+          "serial": 771,
+          "tick": 3752,
+          "phase": "approach",
+          "x": -1.90957,
+          "z": -15.1997,
+          "dispatchMs": 166.067965,
+          "asMs": 0.442812,
+          "actualInterPresentMs": 183.333333,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "torchPhase": 1,
+          "torchFlameStrength": 0.800355375,
+          "uploadedFireCount": 1,
+          "simulationSeconds": 15.4333333
+        },
+        "peakIsFirstApproachGenericFrame": true,
+        "postWaterNoFireMovingSamples": {
+          "shipping_mobile_generic_dielectric": {
+            "n": 9,
+            "dispatchMedianMs": 74.640779
+          },
+          "shipping_mobile_opaque_fast": {
+            "n": 2,
+            "dispatchMedianMs": 33.268384499999996
+          }
+        }
+      }
+    },
+    "limits": [
+      "No measured water pixel coverage, optical eye, active droplet count or individual generic contributor IDs.",
+      "Camera, torch wetting/light strength, water contacts and pipeline selection change together. No isolated cost or percentage saving follows.",
+      "The waterfall remains resident before and after generic selection. Source establishes an active-droplet trigger, not that mere waterfall residency makes every frame use GenericDielectric.",
+      "Retained generic and fully inlined opaque are deliberate existing driver-bounded strategies; no compiler-policy change was tested."
+    ]
+  },
+  "custody": {
+    "utc": "2026-10-31T23:11:42.311849+00:00",
+    "released": true,
+    "installedApkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+    "ownedAppStopped": true,
+    "preferencesUnchanged": true,
+    "originalCampaignFilesPreserved": 15,
+    "systemSettingsReadback": {
+      "screen_brightness": "173",
+      "screen_brightness_mode": "1",
+      "accelerometer_rotation": "1",
+      "user_rotation": "0"
+    },
+    "productionAndActorWorkerPackages": "untouched",
+    "ownedOperations": []
+  },
+  "privateArtifacts": [
+    {
+      "relativeToPrivateExperimentDirectory": "opening-a2/android-motion-perf31-opening-a2-resources.csv",
+      "bytes": 286059,
+      "sha256": "bc0db2060a63a1325a7a3549838fbfa5f93bda5e8fe92d96a15019eb2ffe017a"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "opening-a2/HordeLanternRT-benchmark-latest.json",
+      "bytes": 2091356,
+      "sha256": "6470490bc088925ed5949c232beff1ec744d3f5b9c695c35005796bee55fcb44"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/android-motion-perf31-reach-a1-resources.csv",
+      "bytes": 313740,
+      "sha256": "eea22b007fe7d9e97bd2de0cd23f3a8a774ed01f0d8bff84fe495bb33e5b13b3"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/fresh-checkpoint-ack.json",
+      "bytes": 150,
+      "sha256": "b971d0a9f5c55b4dcd1a33a52970628a8efea93baee2ac40d1beedba1280ec88"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/fresh-checkpoint-fingerprint.json",
+      "bytes": 1565,
+      "sha256": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/HordeLanternRT-benchmark-latest.json",
+      "bytes": 2280761,
+      "sha256": "c82f49fe38bef3c6dcaf6f26198d1bb3471579a3d78c4a41754cf794983ccc61"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/strict-analysis.json",
+      "bytes": 2694,
+      "sha256": "cd0d3c7cf956b6977a98b6883add368171de84edd4748a49c326d07d359fdbce"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1/thermals.json",
+      "bytes": 8815,
+      "sha256": "d1e9e6e43884ebe0e9e7bd7e8ba7cbec3ffb45c846bd168b62a5478babc08d35"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a1-wrapper.log",
+      "bytes": 2490,
+      "sha256": "8396d427c76bd032da3b3237734dbc2f8097d96c7080cc74167b81fc311d4f80"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/android-motion-perf31-reach-a2-resources.csv",
+      "bytes": 285868,
+      "sha256": "9da5982b17d130fd4dd75b49e44e214f44740ea34b0e316ec6f1c175629f672a"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/fresh-checkpoint-ack.json",
+      "bytes": 151,
+      "sha256": "cc4efceca46a075f96fae96695ab6fe9cd6c169b7cd6b5e55aca4c142a01dc5d"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/fresh-checkpoint-fingerprint.json",
+      "bytes": 1565,
+      "sha256": "fb046d71f9c1d63ce52bfbbd58c327b0f82001e8cf898dc2b3762f43dbf44598"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/HordeLanternRT-benchmark-latest.json",
+      "bytes": 2081793,
+      "sha256": "d23b1232da5fea9e345e1f61f173c46dc9ed3f84b2979eedbbf7adef63f84fd8"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/strict-analysis.json",
+      "bytes": 2696,
+      "sha256": "6245b0c78eb95d6f66fe4c14b0471a741d7f87b3315a23483c9cf78633083ce5"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2/thermals.json",
+      "bytes": 8810,
+      "sha256": "fd306eb548d6b2a79f32a20883135971a78b3694c2778af1b16e4b5333cec20f"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-a2-wrapper.log",
+      "bytes": 3028,
+      "sha256": "718e21c9c6dba6dfba4bc096d254703a161f92636e32f54ad0147ce151e630fc"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-b1/thermals.json",
+      "bytes": 7551,
+      "sha256": "3e1d7d4b2feb3deb70eaade247617d90b487e922d35ca2d3252a6600e70eb501"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-b1-restored.json",
+      "bytes": 228,
+      "sha256": "51113d1c61a9f0ab30ff935173730e79e3170bfa4d993bbb9cb71509d32a45bb"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-b1-wrapper.log",
+      "bytes": 1924,
+      "sha256": "5f338edcf35bf2ea3bc6befeb25908a93fee831fa9ca355a30f632fb7505801b"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-b2-cooldown.json",
+      "bytes": 5035,
+      "sha256": "572ab24e3cf71f3141c1496171876ca60b51656c91ee5186aa464744e47e1ea1"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-b2-wrapper.log",
+      "bytes": 917,
+      "sha256": "10fe5b6b301ea579690e03132118a5c230960783fceaa009c35f700329ebfe4b"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-build-r2.log",
+      "bytes": 2753,
+      "sha256": "1fb7c9b1267fb322611070f77e8538558992359a44607654faa1ca467bbc56a5"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-build.log",
+      "bytes": 5806,
+      "sha256": "26531616c563b04bd50d60af77d328ab8f8715b90f7ff00ce3b31c85245a1f71"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-comparison-plan.json",
+      "bytes": 1137,
+      "sha256": "0b45a6d9bd81dca9f35d8f5d5a858d4bd10d46e379f8ff5c402f69db654c62ab"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-compute-generate.log",
+      "bytes": 1875,
+      "sha256": "7373cb06c3878be3135e572766389dbd1ed4b1fbb1ba61b1e56d4fb58d2b4136"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-entry-comparison.json",
+      "bytes": 222,
+      "sha256": "f2b2953a6a344b7487a4efae767302700cd0506224863816fbbe5d4a37f98553"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-final-release.json",
+      "bytes": 659,
+      "sha256": "6f82253aa64d2b9b4e41e17df1b1a0b7226fa5e446582239fa625011c6f65ed0"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-final-source.patch",
+      "bytes": 1843,
+      "sha256": "83cff10f71511a185b09b8720287e6a456338446fddeaf0cb6a5a47907a6d4a5"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-high-identity.json",
+      "bytes": 767,
+      "sha256": "e0f3e4c4085ef65685bf4ca811e90b017fbe5a481e6713e2f681fcec1f051483"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-package.json",
+      "bytes": 94756,
+      "sha256": "ce70da64e5aec7ac2a0840c0192f560c61fd6609cf44eda5d677610a13d8319a"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-probe-source-backup/manifest.json",
+      "bytes": 3235,
+      "sha256": "997564f0b5089d00a5b9a61dfe39a6597a1b926b910db9930c27256e8fa3f482"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-raygen-freeze.log",
+      "bytes": 2648,
+      "sha256": "3fe1ba7cf342f273c80e15abf8c39301a9da6c397722c8968284fb2b92590356"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach-raygen-r2-freeze.log",
+      "bytes": 2700,
+      "sha256": "d33628858860a4bbbeb0332759a417afca53354e93eede005eb6d395cda4437e"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "reach_cohort.py",
+      "bytes": 4797,
+      "sha256": "ae8a528a83d2e2aa383dee19c71f85400d422d47647827fa33464c4caa2acd9d"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "run_route.py",
+      "bytes": 12405,
+      "sha256": "797661de9aeec77e165cbce0f185e39ffa24e072bac4164dfb0cf2fdf9edb5b3"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "seal_reach_waterfall.py",
+      "bytes": 11359,
+      "sha256": "0b6fe1d693b116548970d0a163bed71e83705ac10dc13ffcce0e0da7528c46aa"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "start-state-offline-checks.json",
+      "bytes": 144,
+      "sha256": "8f807905dd78cefd1c1ec564d933b7500a23605ecf3f909e464bff25aa227fe7"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "start_state_fingerprint.py",
+      "bytes": 774,
+      "sha256": "60dd18693b8db5c46d39c3b21a2805ff08db7366d0e96e81a2ed3c1ed2465ffa"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "waterfall-existing-route-analysis.json",
+      "bytes": 16832,
+      "sha256": "5c9cd3b05a68e1e59c33c869439fa3e7f36f0e1298c60f85c046c3fdd27cb241"
+    },
+    {
+      "relativeToPrivateExperimentDirectory": "waterfall-strategy-timeline.json",
+      "bytes": 65336,
+      "sha256": "e5d3370ad030040186a04117a5e066bb2263eeec65acce0f352bc20c70a664a6"
+    }
+  ],
+  "availability": "Raw logs/reports/APKs/source probes retained privately, not distributed by this receipt. No serials, private saves or raw device logs are included."
+}

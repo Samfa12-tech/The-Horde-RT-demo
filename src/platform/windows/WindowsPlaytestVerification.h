@@ -15,6 +15,8 @@ namespace horde::platform::windows
 {
 inline constexpr wchar_t kWindowsPlaytestVerificationPageUrl[] =
     L"https://briarhold-signal.samfa12.com/horde-report/verify";
+inline constexpr wchar_t kWindowsPublicBenchmarkVerificationPageUrl[] =
+    L"https://briarhold-signal.samfa12.com/horde-benchmark/verify";
 inline constexpr wchar_t kWindowsPlaytestVerificationPageSource[] =
     L"https://briarhold-signal.samfa12.com/horde-report/verify";
 inline constexpr wchar_t kWindowsPlaytestVerificationChallengeHost[] =
@@ -75,7 +77,7 @@ private:
     bool terminal_ = false;
 };
 
-[[nodiscard]] bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url) noexcept;
+[[nodiscard]] bool IsAllowedWindowsPlaytestVerificationPageUrl(std::wstring_view url, bool publicBoard = false) noexcept;
 [[nodiscard]] bool IsAllowedWindowsPlaytestVerificationChallengeUrl(std::wstring_view url) noexcept;
 // Child-frame-only compatibility: these two local documents are required by
 // Turnstile. They never broaden top-level navigation or outbound network hosts.
@@ -86,5 +88,5 @@ private:
 // Called on the application UI thread. Shows an owner-modal native window and
 // pumps that thread until verified, cancelled, failed, or the 20 second total
 // foreground deadline expires. It never receives report bytes or a screenshot.
-[[nodiscard]] WindowsPlaytestVerificationResult ShowWindowsPlaytestVerification(HWND owner);
+[[nodiscard]] WindowsPlaytestVerificationResult ShowWindowsPlaytestVerification(HWND owner, bool publicBoard = false);
 } // namespace horde::platform::windows

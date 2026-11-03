@@ -15,6 +15,10 @@ struct FlaskResources {
 };
 
 enum class FlaskAction : std::uint8_t { Idle, Drinking, Resting };
+// Presentation facts only; these never authorize an action or enter a save.
+enum class FlaskHint : std::uint8_t {
+    Ready, FullHealth, Empty, StandStill, Returning, Interrupted, Drinking, Resting
+};
 
 // The simulation owner supplies current, post-damage health and explicitly
 // resolved eligibility. The booleans are not requests or saved entitlement:

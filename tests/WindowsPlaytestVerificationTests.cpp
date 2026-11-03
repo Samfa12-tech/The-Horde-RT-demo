@@ -43,6 +43,10 @@ int main(int argc, char** argv)
         Check(!WindowsPlaytestVerificationStageName(stage).empty(), "stage diagnostic label is fixed and non-empty");
     Check(IsAllowedWindowsPlaytestVerificationPageUrl(
         L"https://briarhold-signal.samfa12.com/horde-report/verify"), "fixed verification page is allowed");
+    Check(IsAllowedWindowsPlaytestVerificationPageUrl(kWindowsPublicBenchmarkVerificationPageUrl,true), "exact public purpose page allowed");
+    Check(!IsAllowedWindowsPlaytestVerificationPageUrl(kWindowsPlaytestVerificationPageUrl,true) &&
+        !IsAllowedWindowsPlaytestVerificationPageUrl(kWindowsPublicBenchmarkVerificationPageUrl,false), "purpose pages cannot cross");
+    Check(!IsAllowedWindowsPlaytestVerificationPageUrl(L"https://briarhold-signal.samfa12.com/horde-benchmark/verify?token=x",true), "public page query rejected");
     for (const auto bad : {
         L"http://briarhold-signal.samfa12.com/horde-report/verify",
         L"https://briarhold-signal.samfa12.com/horde-report/verify/",

@@ -1,0 +1,715 @@
+{
+  "schema": 1,
+  "recordedAtUtc": "2026-11-01T00:52:53.833045+00:00",
+  "decision": "Keep bounded Mobile-water contact-spray omission; High unchanged. No whole-game FPS or playable-preset claim.",
+  "baseSource": "77cfc160589aa4821cc7fb464664cce0ab4e952e",
+  "sourceFiles": {
+    "android/app/src/main/java/com/samfa12/hordelanternrt/MainActivity.java": "2ff182aa867ff46b25930642893cd40e5025943b1e821beac0211c583a44b05c",
+    "android/app/src/main/res/values/strings.xml": "b4fcc7ec73c5216621752186d22cd076459a4c93e51e86d3d72e4552420e2bf6",
+    "src/graphics/GraphicsSettings.h": "8d601afd2be4d46d684f39c70634dc00fb1659d0a24eee23421918a1ea393443",
+    "src/platform/windows/DiagnosticWindow.cpp": "0facea0bde9346fd041409179e82a9b0a2fa1a472cac842d40a83d04c83a7759",
+    "src/vulkan/raytracing/PresentableTinyRtScene.cpp": "b113473bed8238b63e8b4fef8b0c593a1ddc4db745514c5d5a26d1dd4700781e",
+    "src/vulkan/raytracing/PresentableTinyRtScene.h": "351b5367391b194a29fad1a6bc96bd362d5f29056cc66c425c07232abdfbacca",
+    "tests/GraphicsSettingsTests.cpp": "5aec9a70efbab6336f3c1220adfbd80d466a30ac733f7856ebbe28b54d68bdd1",
+    "tests/RtSceneResourceInventoryTests.cpp": "e5c110c1c674b3cc750886d0d2ccd538eac327ffb396e03dbe8c233a20d2369c"
+  },
+  "finalPackage": {
+    "sourceBase": "77cfc160589aa4821cc7fb464664cce0ab4e952e",
+    "source": "Mobile water omits optional contact droplets, High unchanged; native33default aligned; private probe removed",
+    "buildId": "g:77cfc160589aa4821cc7fb464664cce0ab4e952e;i:21b018118c2aa14bc682ccf3b950dce639c0a92f13d1465982d75a7aab9c7ba4;c:D;s:D",
+    "nativeBuildLabel": "1.6.2",
+    "apkSha256": "277a41f2a30c3b69ad92f43c4530a95c294388e38c011ffd1c75054f6703ab17",
+    "bytes": 184731174,
+    "nativeSha256": "ff7674ba48a87d9a0b451bc65b43bc35be809d0c1e2140a9fcb7407c16090e92",
+    "nativeBytes": 5464720,
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "assetsIdentical": 189,
+    "raygenShaderHashes": {
+      "diagnostic_high_generic_dielectric": "560aa773ea08869a7867dc12b1f561a8c88e2f89d8f9546151ea8c17381a5911",
+      "diagnostic_high_opaque_fast": "42b80e2e754fd2501c8b91d1ca41ce4f8f0de1b19e2ed05117541cf5e9d4ffff",
+      "diagnostic_mobile_generic_dielectric": "88ac87b5079449d352c74b44d65f5fa331a58a7b3225739d26327c59732e76f7",
+      "diagnostic_mobile_opaque_fast": "ced3e0f10ccf065031ff5699d7709f599911979672dd8739a3cb20ce1ee0aeef",
+      "shipping_high_generic_dielectric": "bf68332eed083c2edc2a18d2f2892603ea31ce13b33280cb207943e466a40153",
+      "shipping_high_opaque_fast": "f2c24b0ac15d915937f48ae2508723fa1791370e8385efe2626b5048c05c4738",
+      "shipping_mobile_generic_dielectric": "8b4b2149ee60035befaacd4a7ec63def8ee79f401397fa6d74dfecc81d0004b9",
+      "shipping_mobile_opaque_fast": "9b879fe1822c768486007295d62db5013e9c9e61d35814ef96a0b0baf239f1cc"
+    },
+    "rayqueryShaderHashes": {
+      "rayquery_compute_diagnostic_high_generic_dielectric": "cc52b0009930221952c1536b68c800000f52c095f1a41d0649f25743588cc07e",
+      "rayquery_compute_diagnostic_high_opaque_fast": "16ce74d922b2ce5e24421ce5688113edcb508d8cbff1927ba2d7cfe63d5fb22e",
+      "rayquery_compute_diagnostic_mobile_generic_dielectric": "476e45e0f1a607a26cb21a8f395bf80fd1a1d500fd0fd32a2e7ddbe620d42684",
+      "rayquery_compute_diagnostic_mobile_opaque_fast": "cb15601d3ffaca049fb8e3cac6bfd22c309d2870caac81416ca739e466650c9e",
+      "rayquery_compute_shipping_high_generic_dielectric": "dcd484650399cfb8d3a0ec5648a1979611c28046fd039a48760dd51ad930f57e",
+      "rayquery_compute_shipping_high_opaque_fast": "b2c9f44c59196f63e0474c6310e93b79fdff5915a746f61950403b9851521278",
+      "rayquery_compute_shipping_mobile_generic_dielectric": "8b6b66f10152971cb5e67b720cb66a6e62c4171b1ab2889b9f9e4c3461262131",
+      "rayquery_compute_shipping_mobile_opaque_fast": "2a3432c1f46397f8c85e27c5e6732ee77eecf90fe6916bd9cdbfb43ead05ed5a"
+    },
+    "javaTests": [
+      {
+        "name": "com.samfa12.hordelanternrt.GraphicsPreferencesTest",
+        "tests": "21",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.samfa12.hordelanternrt.RenderScalePreferenceTest",
+        "tests": "3",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ],
+    "lint": {
+      "Warning": 92
+    }
+  },
+  "comparisonPackage": {
+    "sourceBase": "77cfc160589aa4821cc7fb464664cce0ab4e952e",
+    "buildId": "g:77cfc160589aa4821cc7fb464664cce0ab4e952e;i:4243d5851495c9c126450837e4d5be9da6a1ba2d47e742995ff997320d522057;c:D;s:D",
+    "nativeBuildLabel": "1.6.2",
+    "apkSha256": "2eba5e5f5ec0ee1298b0b9ec2e9cd19ef362ea4c4c977d0765c65bca213b4bf2",
+    "bytes": 184764694,
+    "nativeSha256": "d716f0c37dae41c3c9e96c923362bff30e0e7248ed7c42f211cffef04c4e2433",
+    "nativeBytes": 5465472,
+    "certificateSha256": "2bc406088b23ac80f2a00a40e2d5d8daa012844dc62f31ad6145d129f5566736",
+    "assetsIdentical": 189,
+    "raygenShaderHashes": {
+      "diagnostic_high_generic_dielectric": "560aa773ea08869a7867dc12b1f561a8c88e2f89d8f9546151ea8c17381a5911",
+      "diagnostic_high_opaque_fast": "42b80e2e754fd2501c8b91d1ca41ce4f8f0de1b19e2ed05117541cf5e9d4ffff",
+      "diagnostic_mobile_generic_dielectric": "88ac87b5079449d352c74b44d65f5fa331a58a7b3225739d26327c59732e76f7",
+      "diagnostic_mobile_opaque_fast": "ced3e0f10ccf065031ff5699d7709f599911979672dd8739a3cb20ce1ee0aeef",
+      "shipping_high_generic_dielectric": "bf68332eed083c2edc2a18d2f2892603ea31ce13b33280cb207943e466a40153",
+      "shipping_high_opaque_fast": "f2c24b0ac15d915937f48ae2508723fa1791370e8385efe2626b5048c05c4738",
+      "shipping_mobile_generic_dielectric": "8b4b2149ee60035befaacd4a7ec63def8ee79f401397fa6d74dfecc81d0004b9",
+      "shipping_mobile_opaque_fast": "9b879fe1822c768486007295d62db5013e9c9e61d35814ef96a0b0baf239f1cc"
+    },
+    "rayqueryShaderHashes": {
+      "rayquery_compute_diagnostic_high_generic_dielectric": "cc52b0009930221952c1536b68c800000f52c095f1a41d0649f25743588cc07e",
+      "rayquery_compute_diagnostic_high_opaque_fast": "16ce74d922b2ce5e24421ce5688113edcb508d8cbff1927ba2d7cfe63d5fb22e",
+      "rayquery_compute_diagnostic_mobile_generic_dielectric": "476e45e0f1a607a26cb21a8f395bf80fd1a1d500fd0fd32a2e7ddbe620d42684",
+      "rayquery_compute_diagnostic_mobile_opaque_fast": "cb15601d3ffaca049fb8e3cac6bfd22c309d2870caac81416ca739e466650c9e",
+      "rayquery_compute_shipping_high_generic_dielectric": "dcd484650399cfb8d3a0ec5648a1979611c28046fd039a48760dd51ad930f57e",
+      "rayquery_compute_shipping_high_opaque_fast": "b2c9f44c59196f63e0474c6310e93b79fdff5915a746f61950403b9851521278",
+      "rayquery_compute_shipping_mobile_generic_dielectric": "8b6b66f10152971cb5e67b720cb66a6e62c4171b1ab2889b9f9e4c3461262131",
+      "rayquery_compute_shipping_mobile_opaque_fast": "2a3432c1f46397f8c85e27c5e6732ee77eecf90fe6916bd9cdbfb43ead05ed5a"
+    },
+    "probe": "Same-APK private spray enabled/Off; separate untimed contact captures; normal spray default unchanged; native33default alignment"
+  },
+  "device": {
+    "model": "SM-S948B",
+    "android": 17,
+    "sdk": 37,
+    "osBuild": "S948BXXS4BZIG",
+    "gpu": "Adreno840",
+    "vulkan": "1.4.295",
+    "driverRaw": 2150932499
+  },
+  "comparison": {
+    "order": [
+      "contact-r2-a1",
+      "contact-r2-b1",
+      "contact-r2-b2",
+      "contact-r2-a2"
+    ],
+    "joinedFrames": 2844,
+    "conditioningRates": [
+      17.591014,
+      17.256255,
+      16.91906
+    ],
+    "gates": {
+      "closingControlRateDriftPercent": -4.682226778164944,
+      "closingWithin5Percent": true,
+      "allStartingFingerprintsEqual": true,
+      "allFrameworkStatusZero": true,
+      "allFreshStartThermalsWithin1_5C": true,
+      "waterWindowBothCandidatesAtLeast3PercentAgainstBothControls": true,
+      "wholeRouteP95Within15Percent": true,
+      "visualAcceptance": "not established by timing",
+      "wholeRouteNoMoreThan3PercentRegression": true,
+      "waterWindowP95Within15Percent": true,
+      "oneProcess": true,
+      "allStartThermalsWithinAbsoluteCeilings": true,
+      "activeContactSimulatedInEveryRun": true,
+      "offRemovesGenericDispatch": true,
+      "nativeCapturesStillRequired": true
+    },
+    "comparisons": {
+      "contact-r2-b1": {
+        "contact-r2-a1": {
+          "wholeRoute": {
+            "actualImageRateChangePercent": -0.09136298633215523,
+            "medianIntervalChangePercent": 9.599999941656279e-05,
+            "p95IntervalChangePercent": 14.999794140256073
+          },
+          "waterWindow15to18": {
+            "actualImageRateChangePercent": 9.99963625529794,
+            "medianIntervalChangePercent": -31.81813233052201,
+            "p95IntervalChangePercent": -3.4482330844235354
+          }
+        },
+        "contact-r2-a2": {
+          "wholeRoute": {
+            "actualImageRateChangePercent": 4.816377509311276,
+            "medianIntervalChangePercent": -7.1427668979586745,
+            "p95IntervalChangePercent": 9.523683374226067
+          },
+          "waterWindow15to18": {
+            "actualImageRateChangePercent": 15.04128815867334,
+            "medianIntervalChangePercent": -31.8182483635991,
+            "p95IntervalChangePercent": -9.677415433924585
+          }
+        }
+      },
+      "contact-r2-b2": {
+        "contact-r2-a1": {
+          "wholeRoute": {
+            "actualImageRateChangePercent": -2.1186434993362258,
+            "medianIntervalChangePercent": 7.692210414201783,
+            "p95IntervalChangePercent": -6.23999223736682e-05
+          },
+          "waterWindow15to18": {
+            "actualImageRateChangePercent": 29.729722841173455,
+            "medianIntervalChangePercent": -40.90902307430271,
+            "p95IntervalChangePercent": -17.24137976694411
+          }
+        },
+        "contact-r2-a2": {
+          "wholeRoute": {
+            "actualImageRateChangePercent": 2.6895123460998427,
+            "medianIntervalChangePercent": -8.914285766215002e-05,
+            "p95IntervalChangePercent": -4.761903401361356
+          },
+          "waterWindow15to18": {
+            "actualImageRateChangePercent": 35.6756707220244,
+            "medianIntervalChangePercent": -40.90912363634531,
+            "p95IntervalChangePercent": -22.580676528603316
+          }
+        }
+      }
+    },
+    "runs": {
+      "contact-r2-a1": {
+        "wholeRoute": {
+          "frames": 723,
+          "actualIntervalMs": {
+            "n": 722,
+            "median": 54.166667,
+            "p95": 83.333437,
+            "maximum": 166.666562
+          },
+          "actualImagesPerSecond": 16.70651709056771,
+          "dispatchMs": {
+            "n": 723,
+            "median": 45.775572,
+            "p95": 75.831769,
+            "maximum": 158.737027
+          },
+          "asMs": {
+            "n": 723,
+            "median": 0.504792,
+            "p95": 0.577812,
+            "maximum": 1.961198
+          },
+          "genericFrames": 18,
+          "activeDropletFrames": 18
+        },
+        "waterWindow15to18": {
+          "frames": 38,
+          "actualIntervalMs": {
+            "n": 37,
+            "median": 91.666562,
+            "p95": 120.833334,
+            "maximum": 166.666562
+          },
+          "actualImagesPerSecond": 12.333333337444444,
+          "dispatchMs": {
+            "n": 38,
+            "median": 78.5709875,
+            "p95": 109.441716,
+            "maximum": 158.737027
+          },
+          "asMs": {
+            "n": 38,
+            "median": 0.5570055,
+            "p95": 0.580521,
+            "maximum": 1.72151
+          },
+          "genericFrames": 18,
+          "activeDropletFrames": 18
+        },
+        "thermal": {
+          "fresh-before-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.6,
+              "BAT": 35.7,
+              "SKIN": 37.7
+            }
+          },
+          "after-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.7,
+              "BAT": 35.7,
+              "SKIN": 37.8
+            }
+          }
+        },
+        "catchUpOverrunDelta": 8,
+        "sampledThermalPowerLevels": [
+          0,
+          3,
+          2,
+          2
+        ]
+      },
+      "contact-r2-b1": {
+        "wholeRoute": {
+          "frames": 727,
+          "actualIntervalMs": {
+            "n": 726,
+            "median": 54.166719,
+            "p95": 95.833281,
+            "maximum": 137.500052
+          },
+          "actualImagesPerSecond": 16.691253517641677,
+          "dispatchMs": {
+            "n": 727,
+            "median": 46.327186,
+            "p95": 83.093904,
+            "maximum": 124.954164
+          },
+          "asMs": {
+            "n": 727,
+            "median": 0.505625,
+            "p95": 0.817083,
+            "maximum": 2.254115
+          },
+          "genericFrames": 0,
+          "activeDropletFrames": 24
+        },
+        "waterWindow15to18": {
+          "frames": 43,
+          "actualIntervalMs": {
+            "n": 42,
+            "median": 62.499974,
+            "p95": 116.666719,
+            "maximum": 124.999947
+          },
+          "actualImagesPerSecond": 13.566621809342285,
+          "dispatchMs": {
+            "n": 43,
+            "median": 50.341509,
+            "p95": 110.115622,
+            "maximum": 124.954164
+          },
+          "asMs": {
+            "n": 43,
+            "median": 0.793542,
+            "p95": 0.859948,
+            "maximum": 0.886146
+          },
+          "genericFrames": 0,
+          "activeDropletFrames": 24
+        },
+        "thermal": {
+          "fresh-before-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.3,
+              "BAT": 35.7,
+              "SKIN": 37.6
+            }
+          },
+          "after-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.4,
+              "BAT": 36.0,
+              "SKIN": 37.8
+            }
+          }
+        },
+        "catchUpOverrunDelta": 30,
+        "sampledThermalPowerLevels": [
+          0,
+          4,
+          3,
+          3
+        ]
+      },
+      "contact-r2-b2": {
+        "wholeRoute": {
+          "frames": 706,
+          "actualIntervalMs": {
+            "n": 705,
+            "median": 58.333281,
+            "p95": 83.333385,
+            "maximum": 116.666666
+          },
+          "actualImagesPerSecond": 16.352565552262902,
+          "dispatchMs": {
+            "n": 706,
+            "median": 46.7814835,
+            "p95": 72.235936,
+            "maximum": 103.384268
+          },
+          "asMs": {
+            "n": 706,
+            "median": 0.522865,
+            "p95": 0.684271,
+            "maximum": 1.003698
+          },
+          "genericFrames": 0,
+          "activeDropletFrames": 28
+        },
+        "waterWindow15to18": {
+          "frames": 48,
+          "actualIntervalMs": {
+            "n": 47,
+            "median": 54.166667,
+            "p95": 100.0,
+            "maximum": 104.166667
+          },
+          "actualImagesPerSecond": 15.999999155744725,
+          "dispatchMs": {
+            "n": 48,
+            "median": 42.6681235,
+            "p95": 88.872133,
+            "maximum": 94.204164
+          },
+          "asMs": {
+            "n": 48,
+            "median": 0.673307,
+            "p95": 0.699167,
+            "maximum": 0.702083
+          },
+          "genericFrames": 0,
+          "activeDropletFrames": 28
+        },
+        "thermal": {
+          "fresh-before-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.4,
+              "BAT": 36.0,
+              "SKIN": 37.8
+            }
+          },
+          "after-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.6,
+              "BAT": 36.0,
+              "SKIN": 37.9
+            }
+          }
+        },
+        "catchUpOverrunDelta": 11,
+        "sampledThermalPowerLevels": [
+          0,
+          4,
+          3,
+          3
+        ]
+      },
+      "contact-r2-a2": {
+        "wholeRoute": {
+          "frames": 688,
+          "actualIntervalMs": {
+            "n": 687,
+            "median": 58.333333,
+            "p95": 87.500053,
+            "maximum": 187.500053
+          },
+          "actualImagesPerSecond": 15.924280073654447,
+          "dispatchMs": {
+            "n": 688,
+            "median": 48.145025,
+            "p95": 81.64005,
+            "maximum": 179.363694
+          },
+          "asMs": {
+            "n": 688,
+            "median": 0.523021,
+            "p95": 0.654271,
+            "maximum": 2.414167
+          },
+          "genericFrames": 16,
+          "activeDropletFrames": 16
+        },
+        "waterWindow15to18": {
+          "frames": 38,
+          "actualIntervalMs": {
+            "n": 37,
+            "median": 91.666718,
+            "p95": 129.166719,
+            "maximum": 187.500053
+          },
+          "actualImagesPerSecond": 11.792828493566772,
+          "dispatchMs": {
+            "n": 38,
+            "median": 86.14419050000001,
+            "p95": 118.737237,
+            "maximum": 179.363694
+          },
+          "asMs": {
+            "n": 38,
+            "median": 0.5776825000000001,
+            "p95": 0.717812,
+            "maximum": 2.414167
+          },
+          "genericFrames": 16,
+          "activeDropletFrames": 16
+        },
+        "thermal": {
+          "fresh-before-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.4,
+              "BAT": 36.0,
+              "SKIN": 37.8
+            }
+          },
+          "after-motion": {
+            "frameworkStatus": 0,
+            "celsius": {
+              "AP": 41.6,
+              "BAT": 36.1,
+              "SKIN": 38.0
+            }
+          }
+        },
+        "catchUpOverrunDelta": 16,
+        "sampledThermalPowerLevels": [
+          0,
+          4,
+          4,
+          4
+        ]
+      }
+    }
+  },
+  "visuals": {
+    "scope": "Six inspected native frame-bound active-contact stills. Water retained. Different camera poses; not pixel parity, full moving-image or physical-input acceptance.",
+    "captures": {
+      "contact-r2-visual-full": [
+        {
+          "file": "android-motion-perf01-contact-r2-visual-full-12.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 15.7333333,
+          "camera": [
+            -2.17579532,
+            -15.1999598,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 8,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "rawSha256": "0b7ef3be0ece35df8415919d85745d151c92b5678107c94fabecaa6ed884b7d0"
+        },
+        {
+          "file": "android-motion-perf01-contact-r2-visual-full-13.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 16.0333333,
+          "camera": [
+            -2.74579692,
+            -15.1999598,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 13,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "rawSha256": "a514deae4be2d916e7c34ca2e72e00b4cbe93087388e804549046895ba67eb1b"
+        },
+        {
+          "file": "android-motion-perf01-contact-r2-visual-full-14.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 16.2333333,
+          "camera": [
+            -3.12579799,
+            -15.1999598,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 9,
+          "strategy": "shipping_mobile_generic_dielectric",
+          "rawSha256": "839023b18f6a8a2bc05ea0951cdbd7f900d7285590d08a6475aea8deb98b3379"
+        }
+      ],
+      "contact-r2-visual-off": [
+        {
+          "file": "android-motion-perf01-contact-r2-visual-off-11.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 15.5,
+          "camera": [
+            -1.94080317,
+            -15.1998568,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 3,
+          "strategy": "shipping_mobile_opaque_fast",
+          "rawSha256": "46c1e254008b35654737ec1a79adc5310e7f194a9d1fe8fc6d615f6ce2b83e1c"
+        },
+        {
+          "file": "android-motion-perf01-contact-r2-visual-off-12.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 16.15,
+          "camera": [
+            -2.84079504,
+            -15.1999655,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 10,
+          "strategy": "shipping_mobile_opaque_fast",
+          "rawSha256": "fd80412cba91f77dffc9db17f28e17a237b9270657dc4bccfc9523c29b00882a"
+        },
+        {
+          "file": "android-motion-perf01-contact-r2-visual-off-13.rgba",
+          "width": 475,
+          "height": 980,
+          "simulationSeconds": 16.25,
+          "camera": [
+            -3.03079557,
+            -15.1999655,
+            -1.57079637,
+            0
+          ],
+          "activeDroplets": 12,
+          "strategy": "shipping_mobile_opaque_fast",
+          "rawSha256": "4939ce3d9c79fd8e7d4d5005dece966cd9bec3d11073aa00e02b75572e1a0da5"
+        }
+      ]
+    }
+  },
+  "finalPolicySmoke": {
+    "passed": true,
+    "scope": "Final source policy, RT presentation and generated transit only; not comparative performance or natural gameplay acceptance.",
+    "completedFrames": 793,
+    "activeContactFrames": 28,
+    "activeContactOpaqueFrames": 28,
+    "settings": {
+      "scalePercent": 33,
+      "width": 1440,
+      "height": 2971,
+      "internalWidth": 475,
+      "internalHeight": 980,
+      "nativeWindowWidth": 1440,
+      "nativeWindowHeight": 2971,
+      "surfaceCurrentWidth": 1440,
+      "surfaceCurrentHeight": 2971,
+      "surfaceCurrentTransform": 1,
+      "swapchainPreTransform": 1,
+      "rtPreRotationRequired": false,
+      "rtPresentationTransform": 0,
+      "backend": "RayTracingPipeline",
+      "water": 1,
+      "fire": 0,
+      "cap": 30,
+      "glass": false,
+      "shadow": 1,
+      "mist": false,
+      "dust": 1
+    },
+    "sameShaders": true,
+    "noPrivateExperimentSwitch": true,
+    "apkSha256": "277a41f2a30c3b69ad92f43c4530a95c294388e38c011ffd1c75054f6703ab17"
+  },
+  "release": {
+    "utc": "2026-11-01T00:49:29.929215+00:00",
+    "released": true,
+    "ownedProcesses": [],
+    "installedApkSha256": "a9a2930a64c58c83de3e0399ee2dc31ee6f0e55c813746cfaaca83ce62496307",
+    "preferencesUnchanged": true,
+    "originalCampaignFilesUnchanged": 15,
+    "temporarySystemSettingsChanged": false,
+    "productionAndActorWorkerPackages": "untouched"
+  },
+  "validation": {
+    "cppTestsPassed": 4,
+    "javaTestsPassed": 24,
+    "androidArm64Build": "passed",
+    "windowsReleaseBuild": "passed, not launched",
+    "lintErrors": 0,
+    "lintExistingWarnings": 92,
+    "hostedCi": "not run; no LFS downloads authorized",
+    "ownerFilesUnchanged": 151,
+    "audioHapticRevalidation": "not required; no audio changes"
+  },
+  "artifactAvailability": "Raw inputs, APKs, scripts and images retained locally in ignored reports/mobile-efficiency-20261031; hashes are not artifact delivery.",
+  "privateInputSha256": {
+    "analyze_contact_off_r2.py": "b1a15642473775afe277d0010231bb94becc1d2007db3ca06340aa52aafe3412",
+    "contact-off-package.json": "4f04b0501a2e28b1e567e94e10852cd486d6e94760f76185e7016b39e1206aca",
+    "contact-off-plan.json": "72ab51ab91efdbb44d244d130996a0d1ce74efd0ec2635d581a548fb9d5a45ac",
+    "contact-off-probe-restoration.json": "109141eba58cf4c961c4d408550f1b2c4e0ce88b6ef9ba864a7a84e48e54c554",
+    "contact-off-r2-analysis.json": "5c7cbcbd577d9d1ce131aed9ac1b1d8c765f4bee5533d45672d4811c701ab0ee",
+    "contact-off-r2-plan.json": "0171b733637c73908e0613dd504c09dedce5d2409418fe67f8c7ff2fc952710b",
+    "contact-off-r2-release.json": "a1fe41abd16f6ec7373f72ae907b7d75f127c0469307c43b99965a81ffad7be3",
+    "contact-off-r2-result.json": "7ff57300876c51bfd66cabace41f5db5ccec232527c4bb59642fe7d4473ac3dd",
+    "contact-off-release.json": "83dc8f1169b03c7c43e4db900660b12bc35aebad31d8ff979c49c371fca9f6b9",
+    "contact-off-result.json": "9804eab65f0a11fc3dcc9db705ef2a0f08d561cb916367449d0480aa9d571ab9",
+    "contact-off-source/manifest.json": "f0808c2d0455d1228963b1a09b224912e3d039bdd35f6509146f6e4a7560c3e5",
+    "contact-r2-a1/HordeLanternRT-benchmark-latest.json": "f1eb614a30f56fd62c3fa9da487f2fa4cffa3f791b122b9eb6b1896b268c96c1",
+    "contact-r2-a1/android-motion-perf01-contact-r2-a1-manifest.json": "99540d92ab5edc9df3a728a93c9972d7cb7ae88bc3c0bd8162b7a910d4ce0f0e",
+    "contact-r2-a1/android-motion-perf01-contact-r2-a1-resources.csv": "b6783a7713622767dd3ae90e8b5a8127a23654c91a571e66f198298e50803d10",
+    "contact-r2-a1/fresh-checkpoint-ack.json": "a63ca9a7bf806350cd396e64b7ecab7beb197295d7ee1017d9bbd5782c17721e",
+    "contact-r2-a1/fresh-checkpoint-fingerprint.json": "ea2c0a14f73bfd73699ecd8aaa36be6d2caf8f17f729b5fb143afe2f37f62869",
+    "contact-r2-a1/fresh-checkpoint-state.json": "45d0edba731f6acbcb175f1e1bf9d5420829ab68e1ca7cad6fc075ddd1242ef8",
+    "contact-r2-a1/thermals.json": "1e8e1e1f7cf396e5fcf2c244456ab4c78671d23705dddbf0440ae89ecc563d23",
+    "contact-r2-a2/HordeLanternRT-benchmark-latest.json": "d339486ef38dcc15f15ca6eb9a31090fdb0779590e93599b0f31857b7b61a67a",
+    "contact-r2-a2/android-motion-perf01-contact-r2-a2-manifest.json": "af117ba1706c1c7ba983fb8153e061d9c68df4781ed457bf126750b3e4a9e98a",
+    "contact-r2-a2/android-motion-perf01-contact-r2-a2-resources.csv": "44d802f3ae15fc1400d342c1378e75ccb6e24955524968e32b218269ba05b5ee",
+    "contact-r2-a2/fresh-checkpoint-ack.json": "b2134346b45fa233836883c571b7e82056178bde7cdd86bc52cfdb50d2464e64",
+    "contact-r2-a2/fresh-checkpoint-fingerprint.json": "ea2c0a14f73bfd73699ecd8aaa36be6d2caf8f17f729b5fb143afe2f37f62869",
+    "contact-r2-a2/fresh-checkpoint-state.json": "005f744e40228757499712fd25284bbb031b501df5b2f2994238c9773f4ec688",
+    "contact-r2-a2/thermals.json": "d7015d1c32209730437414f8a735afa9e9efc908d510abfcfa685ad197676f66",
+    "contact-r2-b1/HordeLanternRT-benchmark-latest.json": "ff2252ff7ff872a650c0437331641802a230197a954bca7bc9ecb67fa13c0dbd",
+    "contact-r2-b1/android-motion-perf01-contact-r2-b1-manifest.json": "df76a595470f1145e9b792caa61c925d3f4c8ce62bc627b8523cf0f6c36ae087",
+    "contact-r2-b1/android-motion-perf01-contact-r2-b1-resources.csv": "23cc9ba97b7d8f6b81c2bac0ce934560f6c55ca4ebf042f79fee71f8933bc408",
+    "contact-r2-b1/fresh-checkpoint-ack.json": "76be44fe5ec9930afcaa51e5425d539952770101f43b3bb8b271ae7421178e32",
+    "contact-r2-b1/fresh-checkpoint-fingerprint.json": "ea2c0a14f73bfd73699ecd8aaa36be6d2caf8f17f729b5fb143afe2f37f62869",
+    "contact-r2-b1/fresh-checkpoint-state.json": "26ba49a2aec737629e4f8ccbbc523381133b9c32ac683b0932f6705f5c9567fe",
+    "contact-r2-b1/thermals.json": "a42fcc70e7cf2b91f1f5dced60ff9d3c4f89c9afff98314b8892c9066122c737",
+    "contact-r2-b2/HordeLanternRT-benchmark-latest.json": "601d645fcb794b1ec851d039fc0b4c70ab9770057043f95857e8c2febdbec905",
+    "contact-r2-b2/android-motion-perf01-contact-r2-b2-manifest.json": "a3af217d25d3c4f0dbcafbd363cacc08bba459a7db09972e661fae7e222e37a9",
+    "contact-r2-b2/android-motion-perf01-contact-r2-b2-resources.csv": "a866c16f4d84f7ca9d750c6837fc417ed554415c2b8e9b17ff98f37382a6a8bf",
+    "contact-r2-b2/fresh-checkpoint-ack.json": "c497c1b9cd16fc7a6a79f3f7e21ab2b9a988e26f59fea349b60bf89fdb7964f6",
+    "contact-r2-b2/fresh-checkpoint-fingerprint.json": "ea2c0a14f73bfd73699ecd8aaa36be6d2caf8f17f729b5fb143afe2f37f62869",
+    "contact-r2-b2/fresh-checkpoint-state.json": "857cf5c7d64879f21f946d161c72874d12356e05e86991ea4cd0de3b9d9b4f8c",
+    "contact-r2-b2/thermals.json": "d0afd1ca2f2d3ff5ccbb6d3ad2177fc3212b08300ec2a5230c749a5dd609d726",
+    "contact-r2-visual-full/android-motion-perf01-contact-r2-visual-full-12.rgba.png": "d8dd5865edd343253ced60bbd2bce37cef3d231fa40d386ee30b4782b8ff8cee",
+    "contact-r2-visual-full/android-motion-perf01-contact-r2-visual-full-13.rgba.png": "6f31483570aad44b85b20b064b9a7e8e61ad95abf4895eddd9c0922c914f93d2",
+    "contact-r2-visual-full/android-motion-perf01-contact-r2-visual-full-14.rgba.png": "1b8db956c2a27405e95f55e19db939121e8d4359fe0236d3d266628f667ae96b",
+    "contact-r2-visual-full/android-motion-perf01-contact-r2-visual-full-manifest.json": "82b8eff59b8d7b1584ea6dc04460b7b2a75f03fcd0fe11d1c518c08cfc0a0c04",
+    "contact-r2-visual-full/selected-captures.json": "9336c1982e465516540314fca80fdafb69974403e194374464d057fc92c3ead4",
+    "contact-r2-visual-off/android-motion-perf01-contact-r2-visual-off-11.rgba.png": "942ad2ac20107ca778459e2e5df3dcb14d0472651a437d7d68e2f2b80b5f6328",
+    "contact-r2-visual-off/android-motion-perf01-contact-r2-visual-off-12.rgba.png": "2f8e216af22831ed8588b402292a6a8529d349e94797e43919e9e50d58c43373",
+    "contact-r2-visual-off/android-motion-perf01-contact-r2-visual-off-13.rgba.png": "bd9f556e77a848fc56ebae1186988b5bb52183b1e0d0ac7a63c1cafcbf0d7cfa",
+    "contact-r2-visual-off/android-motion-perf01-contact-r2-visual-off-manifest.json": "c0686767fbd2b43c411fec8a49baa5f5cf97a480b5fca66fd0c16f98539e6da6",
+    "contact-r2-visual-off/selected-captures.json": "5a604002d23ce5e1d8fc3c723080cbe2d9820bcaf6d1104ee1a981edd51b0183",
+    "contact-warm2/failed-fresh-checkpoint-state.json": "80aac1f7603ec4f72cf1ea9481ca7d98a8732cc738a517c812670a02a520b028",
+    "contact-warm2/fingerprint-difference.json": "84dffacc52b448c6967c1dc98694f0d27ed401ecd1258f19c68d2644d90a5d46",
+    "contact_off_r2_cohort.py": "f6084bdf8dd667c4c4cc19501bd9cfc534ae4cbce8bd4fa1b695f5f54bbcbf60",
+    "mobile-water-android-build.log": "820b1e549579ca461d29749e325237ae144399bd09d54ab0f9da9b763066c202",
+    "mobile-water-host-build.log": "b48e74d8d466e5d372845100b6a80368b5ef17960dd9052db71e437ffdc49997",
+    "mobile-water-host-test.log": "9356e80a810e1ad4432e71b1f4d317244c0b68c297bcf3d8e56450ca9b8a2d53",
+    "mobile-water-package.json": "57c14012d41da6a7583bca1698f412a6c9a04e5ed38c9d8804b350708d52d835",
+    "mobile-water-policy/HordeLanternRT-benchmark-latest.json": "628bf08f61607758ef732bc58cde4e14e7d5230ab4d348415a2d60128612b2a2",
+    "mobile-water-policy/strict-analysis.json": "72ae2151dad11bb259cb00a1e22e127a4368dd3f6b3e6623710d8f1b62380969",
+    "mobile-water-smoke-release.json": "c92d52d4b9a4e415f2fad106801c693a3a76c9630e153b1d4c5fb67ba9a15873",
+    "mobile-water-smoke-result.json": "98b4f863ae13935c2bfa6eeb70afc1f7d6f47a3c54203beb9f495ef49394dbc1",
+    "mobile-water-source/manifest.json": "03e693f71b863da8f5f545a3402e75d1bfed0387d1e8dbb6cf54d14a18ff0c48",
+    "mobile-water-windows-build.log": "69d0f96fa2cc5115ca131a0c9d7c4fc7787cee0141530ccb2b43957ffa61aaec",
+    "mobile_water_policy_smoke.py": "613cbd18c5844ff279c1807d4d150d0d5e9c11e34a23a7f5a3a324a746aa8cb0"
+  },
+  "windowsExeSha256": "89d77f9714b863cc55948426d591247194558a0a7426946dd2a261c5608021cf"
+}

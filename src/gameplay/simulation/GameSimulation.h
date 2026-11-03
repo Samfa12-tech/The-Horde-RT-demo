@@ -21,6 +21,7 @@
 #include "gameplay/interactions/InteractionState.h"
 #include "gameplay/items/LanternPendulum.h"
 #include "gameplay/simulation/CombatPresentation.h"
+#include "gameplay/simulation/AttackHoldToSheath.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/FixedStepRunner.h"
 #include "gameplay/simulation/CharacterPosture.h"
@@ -74,10 +75,12 @@ struct GameSimulationConfig
     // Current development gameplay; legacy constructor/capture fixtures retain
     // their authored rules unless the live application profile selects this.
     bool combatFoundation1_7 = false;
-    // Isolated validation only until the enemy-anchored RT warning is admitted.
+    // Historical fixtures remain explicit; the live profile pairs specials with RT warnings.
     bool specialSkeletonAttacks1_7 = false;
+    bool sequentialPractice1_7 = false; // Explicit historical fixtures retain their lesson rules.
     // Remains explicit until the authored clip/private cue package is admitted.
     bool skeletonRevival1_7 = false;
+    bool naturalPracticeRevival1_7 = false; // Private admitted application: protected kills, automatic revival handoff.
     // Shared chapter presentation; historical constructor fixtures stay explicit.
     bool companionTurnStart = false;
     // Diagnostic owner slice only. UI/hand/save admission is still separate.
@@ -96,6 +99,8 @@ inline constexpr GameSimulationConfig ProductionGameSimulationConfig()
     config.waterfallSkeletonEncounter = true;
     config.swordStartsStowed = true;
     config.combatFoundation1_7 = true;
+    config.specialSkeletonAttacks1_7 = true;
+    config.sequentialPractice1_7 = true;
     // Authored stationary departures; routine bends retain legacy walking.
     config.companionTurnStart = true;
     return config;
@@ -118,7 +123,7 @@ public:
     // Owner-thread asset receipt; missing/recreated presentation freezes a rise.
     // It does not enable the feature or award gameplay/checkpoint progress.
     bool ConfigureSkeletonRevivalPresentation(std::uint64_t resourceGeneration,
-        float deadDurationSeconds, float standDurationSeconds, bool ready = true);
+        float deadDurationSeconds, float standDurationSeconds, bool ready = true, bool visualReady = false);
 
     std::uint32_t AdvanceFrame(const InputSnapshot& input,
                                double frameDeltaSeconds,
@@ -265,6 +270,7 @@ private:
     bool CurrentCombatRules() const;
     bool UsesSkeletonRevival() const;
     bool OpeningEncounterComplete() const;
+    bool KeeperOpeningAdmission() const;
     void UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds);
     void CancelCombatTransients();
     void BeginKeeperRepel();
@@ -280,6 +286,7 @@ private:
     void RestoreRescueEquipment();
     void PublishRescueSnapshot();
     horde::gameplay::items::HeldItemTransform RescueLanternHinge() const;
+    void RecordSuccessfulHitParticles();
     void RecordSwordContactTrace();
     bool SwordDefenseReady() const;
     bool SwordDrawBlocksDefense() const;
@@ -287,6 +294,9 @@ private:
     void ResetSwordEquipment();
     void ClearQueuedDrawAttack();
     void AdvanceSwordEquipment(float fixedDeltaSeconds);
+    void UpdateSwordSheathHold(const InputSnapshot& input,float seconds);
+    AttackHoldToSheath swordSheathHold_{};
+    bool swordIntentionallyStowed_=false;
     void EmitSwordAttachmentChange();
     void ResolvePlayerAnimation(float fixedDeltaSeconds);
     void ResolveFireEmitters(float fixedDeltaSeconds);
@@ -308,6 +318,8 @@ private:
     void DiscardUtilityCombatCommands();
     bool FlaskCompetingIntent(const InputSnapshot& input) const;
     std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
+    std::uint32_t NearbyFlaskRestAnchor() const;
+    void RefreshFlaskGuidance(const InputSnapshot& input);
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
     void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
                           bool competingIntent, int healthBeforeEncounter);
@@ -330,10 +342,11 @@ private:
     std::uint64_t skeletonRevivalResourceGeneration_ = 0;
     float skeletonRevivalDeadDurationSeconds_ = 0.0f;
     float skeletonRevivalStandDurationSeconds_ = 0.0f;
-    bool skeletonRevivalPresentationReady_ = false;
+    bool skeletonRevivalPresentationReady_ = false, skeletonRevivalVisualReady_ = false;
     bool skeletonRevivalWorkshopBypass_ = false;
     bool revivedIdlePhaseZero_ = false;
     CombatContactTraceSnapshot combatContactTrace_{};
+    horde::gameplay::effects::EnemyHitParticles enemyHitParticles_{};
     std::uint64_t currentCutCommandSequence_ = 0, currentCutConsumedTick_ = 0;
     std::uint64_t queuedUpCutCommandSequence_ = 0, queuedUpCutConsumedTick_ = 0;
     EntityId swordHitTargetThisTick_ = EntityId::Invalid;
@@ -376,6 +389,7 @@ private:
     items::UtilityEquipmentLease flaskEquipmentLease_{};
     items::UtilityHandReturn flaskHandReturn_{};
     std::uint64_t flaskCompletionTick_=0;
+    std::uint64_t flaskInterruptedUntilTick_=0;
     std::uint64_t campaignRetryRequestGeneration_=0,completedRestGeneration_=0;
     TravelFootstepCadence playerFootsteps_{};
     DryFootstepSequence dryFootstepCues_{};

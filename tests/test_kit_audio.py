@@ -36,6 +36,14 @@ class KitAudioTests(unittest.TestCase):
             (source / "manifest.json").write_text(json.dumps({"clips": [{"id": "unknown"}]}))
             with self.assertRaisesRegex(ValueError, "exactly the ordered thirteen"):
                 recipe.verify_source(source)
+        # Rerunning the original admission beside the separately approved
+        # flask cuts is idempotent; an unknown or changed extra remains closed.
+        runtime = ROOT / "assets/audio/kit/runtime"
+        original = json.loads((runtime / "asset.manifest.json").read_text())
+        outputs = {cut["runtimeFile"]: (runtime / cut["runtimeFile"]).read_bytes()
+                   for cut in original["cuts"]}
+        outputs["asset.manifest.json"] = (runtime / "asset.manifest.json").read_bytes()
+        recipe.admit(outputs, runtime)
 
     def test_closed_runtime_cuts_and_authorized_provenance(self):
         directory = ROOT / "assets/audio/kit/runtime"
@@ -47,13 +55,21 @@ class KitAudioTests(unittest.TestCase):
         cuts = manifest["cuts"]
         self.assertEqual(len(cuts), 13)
         self.assertEqual(len({cut["stableId"] for cut in cuts}), 13)
-        expected = {cut["runtimeFile"] for cut in cuts} | {"asset.manifest.json"}
+        guide = json.loads((directory / "flask-guidance.manifest.json").read_text())
+        self.assertTrue(guide["rights"]["publicGameRepositoryDistributionConfirmed"])
+        self.assertEqual(guide["rights"]["evidenceClass"], "owner-explicit-confirmation")
+        self.assertEqual([cut["stableId"] for cut in guide["cuts"]], ["flask.empty", "flask.topup"])
+        expected = {cut["runtimeFile"] for cut in cuts + guide["cuts"]} | {
+            "asset.manifest.json", "flask-guidance.manifest.json"}
         self.assertEqual({p.name for p in directory.iterdir()}, expected)
-        for cut in cuts:
+        for cut in cuts + guide["cuts"]:
             path = directory / cut["runtimeFile"]
             payload = path.read_bytes()
             self.assertEqual(hashlib.sha256(payload).hexdigest(), cut["sha256"])
-            self.assertEqual(cut["sourceCutSha256"], cut["sha256"])
+            if "sourceCutSha256" in cut:
+                self.assertEqual(cut["sourceCutSha256"], cut["sha256"])
+            else:
+                self.assertEqual(len(cut["sourceMp3Sha256"]), 64)
             self.assertEqual(len(payload), cut["bytes"])
             with wave.open(str(path), "rb") as clip:
                 self.assertEqual((clip.getnchannels(), clip.getsampwidth(), clip.getframerate()), (1, 2, 24000))
@@ -61,17 +77,19 @@ class KitAudioTests(unittest.TestCase):
                 self.assertAlmostEqual(clip.getnframes() / clip.getframerate(), cut["durationSeconds"], places=8)
             # Exactly format/data: provider/account/source metadata cannot ride along.
             self.assertEqual(len(payload), 44 + cut["frames"] * 2)
-            self.assertGreater(cut["peak"], .01)
-            self.assertGreater(cut["rms"], .001)
+            if "peak" in cut:
+                self.assertGreater(cut["peak"], .01)
+                self.assertGreater(cut["rms"], .001)
             self.assertLessEqual(cut["durationSeconds"], 6.5)
 
     def test_native_catalog_paths_exact_words_and_measured_timing(self):
         manifest = json.loads((ROOT / "assets/audio/kit/runtime/asset.manifest.json").read_text())
         catalog = (ROOT / "src/gameplay/dialogue/ChapterDialogue.h").read_text()
         rows = re.findall(r'\{Line::\w+,"([^"]+)","Kit","([^"]+)","([^"]*)",([0-9.]+)f,\d+\}', catalog)
-        self.assertEqual(len(rows), 13)
+        self.assertEqual(len(rows), 15)
         by_id = {row[0]: row for row in rows}
-        for cut in manifest["cuts"]:
+        guide = json.loads((ROOT / "assets/audio/kit/runtime/flask-guidance.manifest.json").read_text())
+        for cut in manifest["cuts"] + guide["cuts"]:
             _, text, audio, duration = by_id[cut["stableId"]]
             self.assertEqual(text, cut["text"])
             self.assertEqual(audio, "assets/audio/kit/runtime/" + cut["runtimeFile"])
@@ -79,16 +97,18 @@ class KitAudioTests(unittest.TestCase):
 
     def test_platform_packaging_is_explicit_and_source_free(self):
         manifest = json.loads((ROOT / "assets/audio/kit/runtime/asset.manifest.json").read_text())
+        guide = json.loads((ROOT / "assets/audio/kit/runtime/flask-guidance.manifest.json").read_text())
         gradle = (ROOT / "android/app/build.gradle").read_text()
         policy = (ROOT / "tools/horde-1.7-kit-asset-policy.ps1").read_text()
-        for cut in manifest["cuts"]:
+        for cut in manifest["cuts"] + guide["cuts"]:
             relative = "audio/kit/runtime/" + cut["runtimeFile"]
             self.assertIn("include '" + relative + "'", gradle)
             self.assertIn("Path='" + relative + "'", policy)
             self.assertIn("Sha256='" + cut["sha256"] + "'", policy)
         self.assertIn("include 'audio/kit/runtime/asset.manifest.json'", gradle)
+        self.assertIn("include 'audio/kit/runtime/flask-guidance.manifest.json'", gradle)
         self.assertNotIn("include 'audio/kit/**'", gradle)
-        encoded = json.dumps(manifest)
+        encoded = json.dumps(manifest) + json.dumps(guide)
         for private in ("C:\\Users", "gold_before", "voice_id", "master_mp3", "api_key"):
             self.assertNotIn(private, encoded)
 

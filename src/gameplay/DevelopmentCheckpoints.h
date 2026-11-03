@@ -67,6 +67,9 @@ struct DevelopmentCheckpoint
     // Real fixed-step traversal capture: 1 ascent, 2 folded pull-up,
     // 3 return grip/backoff, 4 second ascent. No authored root teleport.
     std::uint8_t rescueTraversalCapture = 0u;
+    bool walksBeyondExteriorStation = false;
+    // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
+    std::uint8_t combatFeedbackCapture = 0u;
 };
 
 // Canonical chapter captures require the same authored scene as the live
@@ -77,7 +80,17 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 111u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints{{
+    {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
+    {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=2u},
+    {.id=236,.name="attack-ring-red-windup",.baseShowcaseCheckpointId=9,
+     .cameraX=-31.2f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=3u},
+    {.id=237,.name="attack-ring-red-contact",.baseShowcaseCheckpointId=9,
+     .cameraX=-31.2f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=4u},
+    {.id=238,.name="enemy-hit-fragments",.baseShowcaseCheckpointId=12,
+     .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=5u},
     // Frozen retention witnesses only. Same bounded source pocket, opposite
     // corridor views; normal cameras, collision and story state are unchanged.
     {.id=230,.name="chapter-forest-retention-west",.baseShowcaseCheckpointId=11,
@@ -179,6 +192,12 @@ inline constexpr std::array<DevelopmentCheckpoint, 111u> kDevelopmentCheckpoints
     {.id = 202, .name = "chapter-forest-second-bend", .baseShowcaseCheckpointId = 11,
      .cameraX = -17.7f, .cameraZ = 15.2f, .yaw = 1.914f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 5u, .keeperDeathFixedTicks = 240u},
+    {.id=232,.name="chapter-demo-endpoint",.baseShowcaseCheckpointId=11,
+     .cameraX=22.3f,.cameraZ=50.2f,.yaw=2.57f,.pitch=-.10f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u,.walksBeyondExteriorStation=true},
+    {.id=233,.name="chapter-demo-endpoint-return",.baseShowcaseCheckpointId=11,
+     .cameraX=22.3f,.cameraZ=50.2f,.yaw=-.57f,.pitch=-.30f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u,.walksBeyondExteriorStation=true},
     {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
