@@ -2,7 +2,7 @@ package com.samfa12.hordelanternrt;
 
 /** Immutable, versioned save-menu publication. Never infers storage or renderer success. */
 final class CampaignMenuState {
-    static final int REFRESH=1, SAVE_MANUAL=2, LOAD=3, CANCEL=4, NEW_GAME=5;
+    static final int REFRESH=1, SAVE_MANUAL=2, LOAD=3, CANCEL=4, NEW_GAME=5, END_GAME=6;
     static final int MANUAL=0, AUTO=1;
     static final int UNAVAILABLE=0, READY=1, SAVING=2, READING=3, PREPARING=4,
             REBASE=5, PRESENTING=6, SUCCESS=7, FAILED=8;
@@ -29,7 +29,7 @@ final class CampaignMenuState {
         if(v==null || v.length<33 || !((v[0]==1 && (v.length==33 || v.length==34)) || (v[0]==2 && v.length==40)) || v[1]<0 || v[2]<0 || v[3]<0 ||
                 v[4]<0 || v[4]>FAILED || v[5]<0 || v[5]>Integer.MAX_VALUE ||
                 v[6]<-1 || v[6]>2 || !bit(v[7]) || v[8]<0 || !bit(v[11]) ||
-                v[30]<0 || v[30]>NEW_GAME || v[31]<0 || v[31]>2 || !bit(v[32])) return null;
+                v[30]<0 || v[30]>END_GAME || v[31]<0 || v[31]>2 || !bit(v[32])) return null;
         if(v.length>33 && !bit(v[33]))return null;
         if(v[0]==2)for(int i=34;i<40;i++)if(v[i]<0 || v[i]>253402300799L)return null;
         for(int i=0;i<6;i++) {

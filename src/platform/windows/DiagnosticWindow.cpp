@@ -3966,6 +3966,13 @@ void OpenLookoutObjective(VulkanSurfaceContext& context)
 
 void FinishLookoutObjective(VulkanSurfaceContext& context,LookoutPanel::Action action)
 {
+    if(action==LookoutPanel::Action::ReturnToMenu && context.campaign &&
+       !context.campaign->TryEndActiveGame()) {
+        GameMessageBoxA(context.windowHandle,"A save or load is still finishing. Please try again when it completes.",
+                        "Returning to main menu",MB_OK|MB_ICONINFORMATION);
+        return;
+    }
+
     if(context.lookoutObjective)context.lookoutObjective->Close();
     ClearDesktopInput(context);DiscardDesktopPendingCommands(context);
     const auto& snapshot=context.simulation.Snapshot();

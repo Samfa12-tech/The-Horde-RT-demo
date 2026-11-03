@@ -191,6 +191,19 @@ bool PlaySession::CommitLoad(const LoadPreparation& preparation,simulation::Worl
     if(captured){SetLatest(*captured);boundary_=captured->id;}
     Finish(PlayOutcome::Succeeded);return true;
 }
+bool PlaySession::TryEndActiveGame() {
+    if(Busy() || pendingAuto_ || pendingRetry_)return false;
+    SuspendCatalogue();session_.Close();
+    latest_.reset();boundary_.reset();retryRecord_.reset();
+    state_.activeSlot.reset();state_.operation=PlayOperation::None;state_.outcome=PlayOutcome::None;
+    state_.fromConfirmedRecord=false;state_.latestRevision=0;state_.checkpointRevision=0;state_.result={};
+    consumedCompletionRevision_=state_.operationRevision;
+    observedBoundaryRevision_=simulation_.CampaignBoundaryRevision();
+    observedRetryGeneration_=simulation_.Snapshot().campaignRetryRequestGeneration;
+    observedRestGeneration_=simulation_.Snapshot().completedRestGeneration;
+    return true;
+}
+
 void PlaySession::Cancel() {
     SuspendCatalogue();session_.Cancel();pendingAuto_.reset();pendingRetry_=false;
     if(state_.activeSlot)Select(*state_.activeSlot);else session_.Close();

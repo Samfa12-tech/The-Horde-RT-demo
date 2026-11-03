@@ -2426,7 +2426,7 @@ struct RevivalIntegrationFixture {
     }
     GameSimulation sim{Config()};
     InputSnapshot input{};
-    int cries=0, defeats=0;
+    int cries=0, defeats=0, keeperReveals=0;
     bool naturalPath=false;
     RevivalIntegrationFixture(bool natural=false) : sim([&]{auto cfg=Config();cfg.naturalPracticeRevival1_7=natural;
         if(natural)cfg.sequentialPractice1_7=true;return cfg;}()), naturalPath(natural) {
@@ -2440,6 +2440,7 @@ struct RevivalIntegrationFixture {
             for(const auto& event:sim.Events().Events()) {
                 cries+=event.type==GameplayEventType::LichRevivalCry ? 1 : 0;
                 defeats+=event.type==GameplayEventType::EnemyDefeated ? 1 : 0;
+                keeperReveals+=event.type==GameplayEventType::KeeperRevealStarted ? 1 : 0;
             }
             sim.ClearEvents();
         }
@@ -2675,6 +2676,32 @@ void RevivalIntegrationEarnedPath() {
             <<" lich-phase="<<int(state.lich.phase)<<" reveal-phase="<<int(state.lich.revealPhase)
             <<" reveal-started="<<state.lich.revealStarted<<" reveal-complete="<<state.lich.revealComplete<<'\n';
     };
+    // Abandoning the optional lesson is not a victory over its live guards.
+    // It only removes the separate Keeper-admission blocker after safe exit.
+    RevivalIntegrationFixture abandoned(true); abandoned.input.damageEnabled=false;
+    keeperArrival(abandoned);
+    Check(abandoned.Until([&]{return abandoned.sim.Snapshot().lich.revealStarted;},720),
+          "walking from an unfinished lesson into the real settled-torch Keeper arrival admits its reveal");
+    const auto abandonedArrival=abandoned.sim.Snapshot();
+    Check(abandonedArrival.combatTeaching.stage==TutorialStage::Skipped &&
+          !abandonedArrival.combatTeaching.safePractice && !abandonedArrival.combatTeaching.exitPending &&
+          abandonedArrival.swordCombat.aliveCount==2 && !abandonedArrival.openingEncounterComplete &&
+          abandoned.cries==0 && abandoned.defeats==0 && abandoned.keeperReveals==1,
+          "abandoned lesson ends protection without inventing guard deaths, revival or opening completion");
+    abandoned.Stage(-7.6f,-15.2f,1.57079632679f);
+    keeperArrival(abandoned); abandoned.Step(60);
+    Check(abandoned.keeperReveals==1 && abandoned.cries==0 && abandoned.defeats==0 &&
+          abandoned.sim.Snapshot().swordCombat.aliveCount==2 &&
+          !abandoned.sim.Snapshot().openingEncounterComplete,
+          "repeated Keeper entry retains live guards and does not replay reveal or revival cues");
+    abandoned.input.damageEnabled=true;
+    Check(abandoned.Until([&]{return !abandoned.sim.Snapshot().playerAlive;},1800),
+          "Keeper admitted after abandoned lessons has real lethal damage authority");
+    abandoned.sim.RetryEncounter();
+    Check(abandoned.sim.Snapshot().playerAlive && abandoned.sim.Snapshot().zone==ShowcaseZone::Opening &&
+          abandoned.sim.Snapshot().swordCombat.aliveCount==2 &&
+          !abandoned.sim.Snapshot().openingEncounterComplete && abandoned.cries==0,
+          "abandoned-lesson death Retry preserves the opening checkpoint and live-guard contract");
     auto keeperBefore=f;
     keeperArrival(keeperBefore); keeperBefore.Step(720); printKeeperGate(keeperBefore);
     Check(!keeperBefore.sim.Snapshot().lich.revealStarted && !keeperBefore.sim.Snapshot().openingEncounterComplete,

@@ -34,6 +34,25 @@ public final class CampaignMenuStateTest {
         v=ready(); v[4]=CampaignMenuState.REBASE; assertNull(CampaignMenuState.decode(v));
         v=ready(); v[12]=CampaignMenuState.VALID; assertNull(CampaignMenuState.decode(v));
     }
+    @Test public void endGamePublicationIsAcceptedButUnknownOperationIsRejected() {
+        for(int schema:new int[]{1,2}) {
+            long[] v=schema==1?ready():java.util.Arrays.copyOf(ready(),40);
+            v[0]=schema;v[3]=42;v[30]=CampaignMenuState.END_GAME;
+            CampaignMenuState ended=CampaignMenuState.decode(v);
+            assertNotNull(ended);assertEquals(CampaignMenuState.END_GAME,ended.lastOperation);
+            assertEquals(-1,ended.activeSlot);assertFalse(ended.canSaveLatest);
+            assertFalse(ended.pending());assertFalse(ended.loadBarrier());
+            assertFalse(ended.completes(42,CampaignMenuState.SAVE_MANUAL,31));
+            // Failure is a real terminal state, never a saved/presented success.
+            v[4]=CampaignMenuState.FAILED;v[5]=6;
+            CampaignMenuState failed=CampaignMenuState.decode(v);
+            assertNotNull(failed);assertEquals(6,failed.error);
+            assertFalse(failed.completes(42,CampaignMenuState.END_GAME,31));
+            v[30]=CampaignMenuState.END_GAME+1;
+            assertNull(CampaignMenuState.decode(v));
+        }
+    }
+
     @Test public void immutableCatalogueKeepsManualAndAutosaveDistinct() {
         long[] v=ready(); v[12]=3; v[13]=1; v[14]=2; v[15]=3; v[16]=2; v[17]=3;
         CampaignMenuState s=CampaignMenuState.decode(v); assertNotNull(s);

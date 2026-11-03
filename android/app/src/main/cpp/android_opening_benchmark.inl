@@ -126,8 +126,8 @@ horde::graphics::OpeningBenchmarkEligibility OpeningBenchmarkEligibilityOnOwner(
         const auto state=gCampaignSession->State();e.activeCampaign=state.activeSlot.has_value();
         e.pendingCampaign=e.pendingCampaign || state.outcome==campaign::PlayOutcome::Pending;
     }
-    e.pendingCampaign=e.pendingCampaign || gCampaignPreparation.has_value() || bool(gCampaignPreparedScene) ||
-        gCampaignBarrier.State().loaded || gCampaignPauseGate.load(std::memory_order_acquire) ||
+    e.pendingCampaign=e.pendingCampaign || gCampaignEndRequested.load(std::memory_order_acquire) || gCampaignPreparation.has_value() || bool(gCampaignPreparedScene) ||
+        gCampaignBarrier.HasPendingCommittedLoad() || gCampaignPauseGate.load(std::memory_order_acquire) ||
         gCampaignShowcaseOverride.load(std::memory_order_acquire) || gCampaignRetirementUnproved;
     e.benchmarkBusy=context.inAppBenchmark.IsRunning() || gInAppBenchmarkRequested.load(std::memory_order_acquire) ||
         gInAppBenchmarkStatus.load(std::memory_order_acquire)==1 ||

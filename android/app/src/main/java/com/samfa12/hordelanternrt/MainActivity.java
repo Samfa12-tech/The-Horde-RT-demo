@@ -505,6 +505,9 @@ public class MainActivity extends Activity {
     private long startupAssetsAttempt,entryMenuAdmittedGeneration, startupCompatibilityAttempt;
     private int startupShownRuntime=-1;
     private boolean retryPending, confirmedRetryPending;
+    private long campaignEndRequest,campaignEndRequestGeneration;
+    private boolean campaignEndPending,campaignEndFromDeath,campaignEndFromEnding;
+    private AlertDialog campaignEndFailureDialog;
     private long confirmedRetryRequestFloor, confirmedRetryStarted;
     private boolean updateCheckInFlight;
     private boolean updatePromptShown;
@@ -583,6 +586,7 @@ public class MainActivity extends Activity {
             if (!entryMenuEnabled || !resumed || surfaceRequestGeneration == 0) return;
             if (openingBenchmarkPending()) return; // The separate owner poll cannot complete campaign Play.
             if(campaignMenuVisible) { handler.postDelayed(this,200L); return; }
+            if(pollCampaignEndForEntry()) { handler.postDelayed(this,200L); return; }
             final EntryMenuState state;
             try { state = EntryMenuState.decode(ProbeBridge.getEntryMenuState()); }
             catch (RuntimeException | LinkageError unavailable) {
@@ -1528,6 +1532,8 @@ public class MainActivity extends Activity {
         // Complete storage transactions before changing scene ownership. This
         // navigation neither resets the route nor creates/overwrites a save.
         if(openingBenchmarkPending() || openingBenchmarkRecoveryRejected || campaignBusy()) return;
+        if(!requestCampaignEnd(false)) return;
+        campaignEndFromDeath=deathOverlayVisible;campaignEndFromEnding=endingOverlayVisible;
         setGameplayPaused(true);
         clearTouchState();pauseChapterVoice(true);
         ++delayedGameplayFeedbackGeneration;
@@ -1545,6 +1551,86 @@ public class MainActivity extends Activity {
         entryMenuEnabled=true;entryMenuSidePage=false;entryPlayRequested=false;entryMenuFailed=false;
         publishEntryMenuState(); // Existing native retirement and fresh-presentation gate.
         showEntryMenu(false);
+    }
+
+    private boolean requestCampaignEnd(boolean acknowledgeFailure) {
+        return requestCampaignEnd(acknowledgeFailure,false);
+    }
+
+    private boolean requestCampaignEnd(boolean acknowledgeFailure,boolean quiet) {
+        if(!resumed || surfaceRequestGeneration<=0)return false;
+        long request=0;
+        try { request=ProbeBridge.requestCampaign(CampaignMenuState.END_GAME,0,
+                acknowledgeFailure?1:0,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { request=0; }
+        if(request<=0) {
+            if(!quiet)android.widget.Toast.makeText(this,"Please wait for the current operation to finish, then try again.",android.widget.Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        campaignEndRequest=request;campaignEndRequestGeneration=surfaceRequestGeneration;
+        campaignEndPending=true;
+        return true;
+    }
+
+    private boolean pollCampaignEndForEntry() {
+        if(!campaignEndPending)return false;
+        final CampaignMenuState end;
+        try { end=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
+        catch(RuntimeException | LinkageError unavailable) { return true; }
+        if(end==null || !end.current(surfaceRequestGeneration))return true;
+        if(end.ackRequest>=campaignEndRequest && end.lastOperation==CampaignMenuState.END_GAME) {
+            if(end.phase==CampaignMenuState.FAILED) {
+                showCampaignEndFailure();return true;
+            }
+            if(end.phase==CampaignMenuState.READY && end.activeSlot<0 && end.error==0) {
+                campaignEndPending=false;campaignEndRequest=0;return false;
+            }
+        }
+        // A lifecycle replacement requires current generation admission. The
+        // native logical intent persists; do not automatically acknowledge a failure.
+        if(campaignEndRequestGeneration!=surfaceRequestGeneration && !end.loadBarrier())
+            requestCampaignEnd(false,true);
+        return true;
+    }
+
+    private void showCampaignEndFailure() {
+        if(!resumed || isFinishing() || (campaignEndFailureDialog!=null && campaignEndFailureDialog.isShowing()))return;
+        final AlertDialog dialog=new AlertDialog.Builder(this)
+                .setTitle("Latest save not confirmed")
+                .setMessage("Your existing save files have not been cleared. The latest save could not be confirmed. Stay in the paused game to review your saves, or explicitly return without relying on this new save.")
+                .setPositiveButton("Return without new save",null)
+                .setNegativeButton("Stay in paused game",null)
+                .setCancelable(false).create();
+        campaignEndFailureDialog=dialog;
+        dialog.setOnDismissListener(ignored -> {if(campaignEndFailureDialog==dialog)campaignEndFailureDialog=null;});
+        dialog.setOnShowListener(ignored -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> {
+                // This is the only path that acknowledges the native save failure.
+                if(requestCampaignEnd(true))dialog.dismiss();
+            });
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(view -> {
+                if(cancelCampaignEndToPausedGame())dialog.dismiss();
+            });
+        });
+        dialog.show();
+    }
+
+    private boolean cancelCampaignEndToPausedGame() {
+        if(!resumed || surfaceRequestGeneration<=0)return false;
+        final long cancelled;
+        try { cancelled=ProbeBridge.requestCampaign(CampaignMenuState.CANCEL,0,0,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { return false; }
+        if(cancelled<=0)return false;
+        campaignEndPending=false;campaignEndRequest=0;
+        handler.removeCallbacks(refreshEntryMenu);
+        entryMenuEnabled=false;entryMenuSidePage=false;entryPlayRequested=false;
+        try { ProbeBridge.setEntryMenu(false,false,isReducedMotionEnabled(),false,surfaceRequestGeneration); }
+        catch(RuntimeException | LinkageError unavailable) { /* Retain the paused game and its saves. */ }
+        setGameplayPaused(true);clearTouchState();firstMenu=false;
+        if(campaignEndFromDeath)renderDeathOverlay();
+        else if(campaignEndFromEnding) {menuVisible=false;showEndingOverlay();}
+        else showMainMenu(false);
+        return true;
     }
 
     private boolean isReducedMotionEnabled() {
@@ -9270,6 +9356,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if(campaignEndFailureDialog!=null)campaignEndFailureDialog.dismiss();
         if(compatibilityReportDialog!=null)compatibilityReportDialog.close();
         if (environmentSurveyMode) {
             finishEnvironmentSurvey(3);

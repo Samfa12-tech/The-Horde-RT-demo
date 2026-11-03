@@ -150,6 +150,8 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         if(!CampaignRootMatches(configured,context)){gCampaignPhase=8;gCampaignError=11;PublishCampaignOnOwner(context);return;}
         // Configuration is admitted only between Activity-owned surface sessions.
         // No owner directory is scanned, migrated, removed or created here.
+        gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
         gCampaignSession=std::make_unique<campaign::PlaySession>(gGameSimulation,configured);
         gCampaignOwnerRoot=configured;gCampaignPhase=1;gCampaignError=0;
         gCampaignRetryOperationRevision=0;gCampaignConfirmedRetry=false;
@@ -171,6 +173,8 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
         if(command->generation!=context.surfaceGeneration || !gSurfaceSessions.IsCurrent(command->generation)) {
             gCampaignError=8;
         } else if(command->action==4) {
+            gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
             if(!gCampaignBarrier.State().loaded || !gCampaignBarrier.KeepsPaused()) {
                 // Consume an already-published retry before cancelling, even if
                 // this command beat its automatic operation activation.
@@ -184,6 +188,10 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
             // camera/presentation handshake while Java keeps its menu visible.
         } else if(gCampaignBarrier.State().loaded && gCampaignBarrier.KeepsPaused()) {
             gCampaignError=2;
+        } else if(command->action==6) {
+            // The logical end intent survives surface recreation, but closure
+            // below still requires fresh Entry controls for the current owner.
+            gCampaignEndRequested.store(true,std::memory_order_release);
         } else if(command->action==1) {
             gCampaignSession->RefreshCatalogue();gCampaignError=0;
             gCampaignLastAction=1;gCampaignPhase=1;
@@ -360,6 +368,32 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
        !gCampaignPauseGate.load(std::memory_order_acquire) && !context.captureActive &&
        !context.routeReplayActive && !context.inAppBenchmark.IsRunning() && !context.benchmarkSampling)
         gCampaignSession->ObserveSafeBoundary();
+    if(gCampaignEndRequested.load(std::memory_order_acquire)) {
+        bool currentEntry=false;
+        {
+            std::lock_guard lock(gGraphicsMutex);
+            currentEntry=gEntryControls.enabled && !gEntryControls.play &&
+                horde::graphics::CurrentEntryMenuControls(gEntryControls,context.surfaceGeneration);
+        }
+        // Poll/completion handling above owns write success and failure first.
+        // Never erase a newly failed write while automatically returning.
+        const auto ending=gCampaignSession->State();
+        if(ending.outcome==campaign::PlayOutcome::Failed &&
+           !gCampaignEndFailureAcknowledged.load(std::memory_order_acquire)) {
+            gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
+            gCampaignPhase=8;gCampaignError=CampaignStorageError(ending.result);gCampaignLastAction=6;
+        } else if(currentEntry && !gCampaignPreparation && !gCampaignPreparedScene &&
+                  !gCampaignBarrier.HasPendingCommittedLoad()) {
+            if(gCampaignSession->TryEndActiveGame()) {
+                gCampaignEndRequested.store(false,std::memory_order_release);
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
+                gCampaignPhase=1;gCampaignError=0;gCampaignLastAction=6;
+                gCampaignShowcaseOverride.store(false,std::memory_order_release);
+                gCampaignPauseGate.store(false,std::memory_order_release);
+            } else {gCampaignPhase=2;gCampaignError=0;gCampaignLastAction=6;}
+        }
+    }
     PublishCampaignOnOwner(context);
 }
 

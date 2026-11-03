@@ -2343,6 +2343,16 @@ bool GameSimulation::OpeningEncounterComplete() const
         : combatSnapshot_.encounterComplete;
 }
 
+bool GameSimulation::KeeperOpeningAdmission() const
+{
+    const auto& lesson = combatTeaching_.Snapshot();
+    // Leaving the optional opening lesson admits the Keeper, not a skeleton
+    // victory. Live guards, opening Retry and earned-save requirements remain.
+    return !UsesSkeletonRevival() || OpeningEncounterComplete() ||
+        (config_.sequentialPractice1_7 && lesson.stage == TutorialStage::Skipped &&
+         !lesson.exitPending && !lesson.safePractice);
+}
+
 bool GameSimulation::ConfigureSkeletonRevivalPresentation(std::uint64_t generation,
     float deadSeconds, float standSeconds, bool ready, bool visualReady)
 {
@@ -2520,7 +2530,7 @@ void GameSimulation::UpdateEncounters(const InputSnapshot& input, float deltaSec
     }
 
     const bool finaleActive = QueryShowcaseZone(playerX_, playerZ_) == ShowcaseZone::Finale;
-    const bool openingAllowsKeeper = !UsesSkeletonRevival() || OpeningEncounterComplete();
+    const bool openingAllowsKeeper = KeeperOpeningAdmission();
     const auto& keeperBeforeActions = lichEncounter_.Snapshot();
     const bool keeperHoldsActions = IsKeeperRevealing(keeperBeforeActions.revealPhase) ||
         (!keeperBeforeActions.revealStarted && openingAllowsKeeper && activeEnemyKind_ == EnemyKind::Lich &&

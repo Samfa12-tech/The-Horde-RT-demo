@@ -270,6 +270,7 @@ private:
     bool CurrentCombatRules() const;
     bool UsesSkeletonRevival() const;
     bool OpeningEncounterComplete() const;
+    bool KeeperOpeningAdmission() const;
     void UpdateSkeletonRevival(const InputSnapshot& input, float deltaSeconds);
     void CancelCombatTransients();
     void BeginKeeperRepel();

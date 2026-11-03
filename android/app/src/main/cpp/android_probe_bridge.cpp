@@ -7363,16 +7363,23 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestCampaign(
 {
     std::lock_guard admissionLock(gDebugRequestAdmissionMutex);
     if(OpeningBenchmarkBusy())return 0;
-    if(action<1 || action>5 || slot<0 || slot>=3 || kind<0 || kind>1 || generation<=0)return 0;
+    if(action<1 || action>6 || slot<0 || slot>=3 || kind<0 || kind>1 || generation<=0)return 0;
     std::lock_guard inputLock(gInputPublisherMutex);
     std::lock_guard commandLock(gCampaignMutex);
     if(!gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
        gSurfaceSessions.IsSuspended(static_cast<std::uint64_t>(generation)) ||
        gCampaignConfiguredRoot.empty() || gCampaignRequestSerial==static_cast<std::uint64_t>(INT64_MAX) ||
-       (gCampaignCommand && action!=4))return 0;
+       (gCampaignCommand && action!=4) ||
+       (gCampaignEndRequested.load(std::memory_order_acquire) && action!=4 && action!=6))return 0;
     if((action==2 || action==3 || action==5) && gCampaignUi[4]>=2 && gCampaignUi[4]<=6)return 0;
     const auto serial=++gCampaignRequestSerial;
     gCampaignCommand=CampaignCommand{action,slot,kind,serial,static_cast<std::uint64_t>(generation)};
+    if(action==6) {
+        if(kind==1)gCampaignEndFailureAcknowledged.store(true,std::memory_order_release);
+        else if(!gCampaignEndRequested.load(std::memory_order_acquire))
+            gCampaignEndFailureAcknowledged.store(false,std::memory_order_release);
+        gCampaignEndRequested.store(true,std::memory_order_release);
+    }
     __android_log_print(ANDROID_LOG_INFO,kTag,
         "HORDE_CAMPAIGN_REQUEST request=%llu generation=%lld action=%d slot=%d kind=%d accepted=1",
         static_cast<unsigned long long>(serial),static_cast<long long>(generation),action,slot,kind);

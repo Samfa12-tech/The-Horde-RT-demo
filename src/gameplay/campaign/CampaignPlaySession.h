@@ -68,6 +68,10 @@ public:
     bool CommitLoad(const LoadPreparation&,simulation::WorldZoneToken ready,
         std::shared_ptr<const simulation::TriangleSupportSurface> terrain,
         simulation::InputSnapshot& ownerInput,std::uint64_t publicationSequence);
+    // End the in-memory game only after queued storage/retry work completes.
+    // Poll while false; existing save records and simulation remain untouched.
+    // Platform owners must also finish any committed-load presentation barrier.
+    bool TryEndActiveGame();
     void Cancel();
 private:
     struct PendingAuto {Checkpoint checkpoint;std::uint64_t revision;unsigned slot;};

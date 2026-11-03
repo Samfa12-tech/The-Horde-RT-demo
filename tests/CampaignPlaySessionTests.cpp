@@ -933,6 +933,46 @@ int main(int argc,char** argv){
         std::cout<<checks<<" opt-in earned-route diagnosis checks, "<<failures<<" failures\n";
         return failures?1:0;
     }
+    {
+        Directory ending;
+        sim::GameSimulation endingGame(sim::ProductionGameSimulationConfig());
+        cp::PlaySession endingPlay(endingGame,ending.path);
+        Check(endingPlay.BeginNewGame(0) && Seed(endingGame,Record(2),terrain) &&
+              endingPlay.ObserveSafeBoundary(),"return fixture has an earned autosave queued");
+        Check(!endingPlay.TryEndActiveGame() && endingPlay.State().activeSlot==0,
+              "return cannot discard queued autosave before owner polling");
+        Check(Until(endingPlay,[&]{return endingPlay.State().operation==cp::PlayOperation::Autosave &&
+              endingPlay.State().outcome==cp::PlayOutcome::Succeeded;}),"return drains queued autosave normally");
+        Check(endingPlay.SaveManual(0),"return fixture starts explicit manual save");
+        const auto savingRevision=endingPlay.State().operationRevision;
+        Check(!endingPlay.TryEndActiveGame() && endingPlay.State().outcome==cp::PlayOutcome::Pending,
+              "return cannot cancel an unacknowledged manual write");
+        Check(Done(endingPlay) && endingPlay.State().outcome==cp::PlayOutcome::Succeeded,
+              "pending manual write reaches its normal completion before return");
+        const auto manual=Raw(Path(ending,0,cp::SaveKind::Manual));
+        const auto automatic=Raw(Path(ending,0,cp::SaveKind::Autosave));
+        const auto before=endingGame.Snapshot();
+        Check(endingPlay.TryEndActiveGame() && !endingPlay.State().activeSlot &&
+              endingPlay.State().phase==cp::SessionPhase::Closed && !endingPlay.LatestCheckpoint(),
+              "completed return releases active game ownership and closes storage session");
+        Check(!endingPlay.TakeCompletion() && Raw(Path(ending,0,cp::SaveKind::Manual))==manual &&
+              Raw(Path(ending,0,cp::SaveKind::Autosave))==automatic && !manual.empty() && !automatic.empty(),
+              "return preserves both exact records without replaying a stale operation receipt");
+        const auto after=endingGame.Snapshot();
+        Check(before.tickIndex==after.tickIndex && before.playerX==after.playerX && before.playerZ==after.playerZ &&
+              before.playerVitals.vitality==after.playerVitals.vitality,
+              "session return does not reset or advance simulation");
+        Check(endingPlay.TryEndActiveGame() && endingPlay.BeginNewGame(2),
+              "repeated return is idempotent and a subsequent New Game can select another slot");
+        Check(Seed(endingGame,Record(1,true),terrain) && endingPlay.ObserveSafeBoundary() &&
+              Until(endingPlay,[&]{return endingPlay.State().operation==cp::PlayOperation::Autosave &&
+                  endingPlay.State().outcome==cp::PlayOutcome::Succeeded;}),
+              "second game keeps normal earned autosave behavior after menu return");
+        Check(endingPlay.State().operationRevision>savingRevision &&
+              Raw(Path(ending,0,cp::SaveKind::Manual))==manual &&
+              Raw(Path(ending,0,cp::SaveKind::Autosave))==automatic && endingPlay.TryEndActiveGame(),
+              "second game has fresh operation identity and cannot overwrite the previous slot");
+    }
     Directory directory;Faults faults;
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(0,cp::SaveKind::Manual)),Record(1)).status==io::Status::Committed,"seed first manual");
     Check(io::Write(directory.path,cp::SaveBasename(*cp::SaveTarget(2,cp::SaveKind::Manual)),Record(2,true)).status==io::Status::Committed,"seed third manual");
