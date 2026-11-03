@@ -164,9 +164,9 @@ void TestAndroidOpeningOwner()
 void TestAndroidFixedOutputTransaction()
 {
     using T=horde::platform::android::AndroidBenchmarkOutputTransaction;
-    using P=T::Phase;
+    using P=T::Phase;using Scene=T::EvidenceScene;
     using namespace horde;
-    const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileProvisionalV1);
+    const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileStandardV2);
     auto original=graphics::PlatformDefaultGraphicsSettings(graphics::GraphicsPlatform::Android);
     original.previewFrameCap=45;
     gameplay::BenchmarkProfileConfiguration actual;
@@ -174,7 +174,7 @@ void TestAndroidFixedOutputTransaction()
     actual.backend=graphics::GraphicsBackend::RayTracingPipeline;actual.graphics=spec.graphics;
     actual.graphics.previewFrameCap=45;actual.internal=spec.internal;actual.output=spec.output;
     actual.cameraAspect=16.0/9;actual.outputPolicy=gameplay::BenchmarkOutputPolicy::FixedBufferPreserveAspect;
-    T transaction;
+    T transaction;const auto requested=actual.graphics;
     Check(transaction.Begin(1,9,original) && !transaction.Ready() && transaction.Snapshot()[4]==0,
           "fixed output cannot command UI before native drain or measure from desired pixels");
     Check(transaction.Drained(true) && transaction.Snapshot()[4]==1 &&
@@ -182,43 +182,123 @@ void TestAndroidFixedOutputTransaction()
           !transaction.Acknowledge(1,9,9,2,true,1280,720,true),
           "only generation and resize-sequence matched UI acknowledgment is consumed");
     Check(transaction.Acknowledge(1,9,9,1,true,1280,720,true) && transaction.Recreating() &&
-          !transaction.Observe(actual,2,3,4,5),"holder ACK alone never certifies RT resources or completed dimensions");
-    Check(transaction.Recreated(2,3,true) && !transaction.Observe(actual,1,3,4,5) &&
-          !transaction.Observe(actual,2,2,4,5) && !transaction.Observe(actual,2,3,0,5),
+          !transaction.Observe(Scene::Showcase,actual,requested,2,3,4,5),
+          "holder ACK alone never certifies RT resources or completed dimensions");
+    Check(transaction.Recreated(2,3,true) && !transaction.Observe(Scene::Showcase,actual,requested,1,3,4,5) &&
+          !transaction.Observe(Scene::Showcase,actual,requested,2,2,4,5) &&
+          !transaction.Observe(Scene::Showcase,actual,requested,2,3,0,5),
           "applied frame requires current recreated owner and actual submission/completion identities");
     auto wrong=actual;wrong.internal.width=639;
-    Check(!transaction.Observe(wrong,2,3,4,5) && !transaction.Ready(),"requested scale does not override a mismatched recorded extent");
+    Check(!transaction.Observe(Scene::Showcase,wrong,requested,2,3,4,5) && !transaction.Ready(),
+          "requested scale does not override a mismatched recorded extent");
     wrong=actual;wrong.presentationTransform=1;wrong.cameraAspect=9.0/16;
-    Check(!transaction.Observe(wrong,2,3,4,5),"nonidentity output cannot silently become a provisional profile");
+    Check(!transaction.Observe(Scene::Showcase,wrong,requested,2,3,4,5),
+          "nonidentity metadata without transposed images cannot become a standard profile");
     wrong=actual;wrong.dynamicResolutionEnabled=true;
-    Check(!transaction.Observe(wrong,2,3,4,5) && transaction.Observe(actual,2,3,4,5) && transaction.Ready(),
-          "exact completed dimensions, fixed aspect, quality and DRS-off jointly admit measurement");
+    Check(!transaction.Observe(Scene::Showcase,wrong,requested,2,3,4,5),"DRS cannot masquerade as a fixed profile");
+    auto entry=actual;entry.graphics.waterQuality=graphics::WaterQuality::Off;
+    Check(!transaction.Observe(Scene::EntryMenu,entry,requested,2,3,4,5) &&
+          !transaction.Observe(Scene::EntryMenu,actual,requested,2,3,4,5) &&
+          !transaction.Observe(Scene::Unknown,actual,requested,2,3,4,5) && !transaction.Ready(),
+          "Entry geometry or even matching quality cannot substitute for actual Showcase measurement proof");
+    Check(!transaction.Observe(Scene::Showcase,actual,original,2,3,4,5) &&
+          transaction.Observe(Scene::Showcase,actual,requested,2,3,4,5) && transaction.Ready(),
+          "full actual Showcase and separately applied configuration jointly admit measurement");
+    auto driftCap=requested;++driftCap.previewFrameCap;
+    auto driftActual=actual;driftActual.graphics.previewFrameCap=driftCap.previewFrameCap;
+    Check(gameplay::MatchesBenchmarkProfile(gameplay::BenchmarkProfileId::MobileStandardV2,driftActual) &&
+          !transaction.Observe(Scene::Showcase,driftActual,driftCap,2,3,6,7) && transaction.Ready() &&
+          driftCap!=transaction.Requested(),
+          "fresh preview-cap drift is benchmark-profile-neutral but must trigger the owner's exact configured-tuple cancellation");
+    // A stale completion alone is not configuration drift and must not cancel.
+    Check(!transaction.Observe(Scene::Showcase,actual,requested,2,3,4,5) && transaction.Ready() &&
+          requested==transaction.Requested(),"stale evidence with unchanged settings does not manufacture a drift cancellation");
     transaction.Restore();
     Check(transaction.Draining() && transaction.Drained(true) && transaction.Snapshot()[4]==2 &&
-          !transaction.Acknowledge(1,9,9,1,true,2400,1080,true),"restoration drains independently and rejects a late apply ACK");
+          !transaction.Acknowledge(1,9,9,1,true,2400,1080,true),
+          "restoration drains independently and rejects a late apply ACK");
     Check(transaction.Acknowledge(1,9,9,2,true,2400,1080,true) && transaction.Recreated(4,5,true),
-          "restoration acknowledges actual current layout dimensions before explicit resource recreation");
-    actual.graphics=original;actual.output={2400,1080};actual.internal=graphics::ScaledGraphicsExtent(actual.output,original.renderScalePercent);
+          "restoration acknowledges actual current layout before explicit resource recreation");
+    actual.graphics=original;actual.graphics.waterQuality=graphics::WaterQuality::Off;
+    actual.output={2400,1080};actual.internal=graphics::ScaledGraphicsExtent(actual.output,original.renderScalePercent);
     actual.cameraAspect=double(actual.internal.width)/actual.internal.height;actual.outputPolicy=gameplay::BenchmarkOutputPolicy::Native;
     wrong=actual;wrong.graphics.mistEnabled=!original.mistEnabled;
-    auto staleOutput=actual;staleOutput.output={1280,720};staleOutput.internal=graphics::ScaledGraphicsExtent(staleOutput.output,original.renderScalePercent);
+    auto staleOutput=actual;staleOutput.output={1280,720};
+    staleOutput.internal=graphics::ScaledGraphicsExtent(staleOutput.output,original.renderScalePercent);
     staleOutput.cameraAspect=double(staleOutput.internal.width)/staleOutput.internal.height;
-    Check(!transaction.Observe(wrong,4,5,6,7) && !transaction.Observe(staleOutput,4,5,6,7) && !transaction.Observe(actual,4,5,6,5) &&
-          transaction.Observe(actual,4,5,6,7) && transaction.Restored(),
-          "fresh restored RT owner must preserve exact original graphics and reject stale completion");
+    Check(!transaction.Observe(Scene::EntryMenu,wrong,original,4,5,6,7) &&
+          !transaction.Observe(Scene::EntryMenu,staleOutput,original,4,5,6,7) &&
+          !transaction.Observe(Scene::EntryMenu,actual,original,4,5,6,5) &&
+          !transaction.Observe(Scene::Showcase,actual,original,4,5,6,7) &&
+          transaction.Observe(Scene::EntryMenu,actual,original,4,5,6,7) && transaction.Restored(),
+          "restored Entry keeps truthful water Off while proving original configured quality and fresh completion");
     T failedApply;failedApply.Begin(2,10,original);failedApply.Drained(true);
     Check(failedApply.Acknowledge(2,10,10,1,true,1279,720,true) && failedApply.Cancelled() && failedApply.Draining() &&
-          !failedApply.Acknowledge(2,10,10,1,true,1280,720,true),"failed fixed-size ACK is sticky and requires restoration, never late success");
+          !failedApply.Acknowledge(2,10,10,1,true,1280,720,true),
+          "failed fixed-size ACK is sticky and requires restoration, never late success");
     T lost;lost.Begin(3,11,original);lost.Drained(true);lost.SurfaceLost(11);lost.BindSurface(12);
     Check(lost.Cancelled() && lost.Draining() && lost.Drained(true) && lost.Snapshot()[2]==12 && lost.Snapshot()[4]==2 &&
-          !lost.Acknowledge(3,11,11,2,true,1280,720,true),"surface replacement only restores on the new generation and never resumes measurement");
+          !lost.Acknowledge(3,11,11,2,true,1280,720,true),
+          "surface replacement only restores on the new generation and never resumes measurement");
     actual.presentationTransform=1;actual.output={2400,1080};
     actual.internal=graphics::ScaledGraphicsExtent(actual.output,original.renderScalePercent);
     actual.cameraAspect=graphics::RtPresentationCameraAspect(actual.internal.width,actual.internal.height,
         graphics::RtPresentationTransform::Rotate90);
     Check(lost.Acknowledge(3,11,12,2,true,1080,2400,true) && lost.Recreated(8,9,true) &&
-          lost.Observe(actual,8,9,10,11) && lost.Restored(),
-          "cancelled rotation restores current layout with its actual axis mapping without forcing original orientation");
+          lost.Observe(Scene::EntryMenu,actual,original,8,9,10,11) && lost.Restored(),
+          "cancelled rotation restores current layout and actual axes without forcing original orientation");
+    // Same logical standard in every Vulkan orientation, with non-default saved
+    // settings and three independent configured water choices on restoration.
+    for(std::uint32_t transform=0;transform<8;++transform)for(bool cancel:{false,true})
+    for(auto water:{graphics::WaterQuality::Off,graphics::WaterQuality::Mobile,graphics::WaterQuality::High}) {
+        auto personal=original;personal.renderScalePercent=37;personal.glassEnabled=true;
+        personal.waterQuality=water;personal.fireDetail=graphics::FireDetail::High;
+        personal.shadowQuality=graphics::ShadowQuality::Higher;personal.mistEnabled=true;
+        personal.dustQuality=graphics::DustQuality::Standard;
+        const bool swapped=graphics::RtPresentationTransformSwapsAxes(graphics::RtPresentationTransformFromIndex(transform));
+        auto applied=actual;applied.graphics=spec.graphics;applied.graphics.previewFrameCap=personal.previewFrameCap;
+        applied.presentationTransform=transform;
+        applied.internal=swapped?graphics::GraphicsExtent{360,640}:spec.internal;
+        applied.output=swapped?graphics::GraphicsExtent{720,1280}:spec.output;
+        applied.cameraAspect=graphics::RtPresentationCameraAspect(applied.internal.width,applied.internal.height,
+            graphics::RtPresentationTransformFromIndex(transform));
+        applied.outputPolicy=gameplay::BenchmarkOutputPolicy::FixedBufferPreserveAspect;
+        T oriented;
+        Check(oriented.Begin(10+transform,30,personal) && oriented.Drained(true) &&
+            oriented.Acknowledge(10+transform,30,30,1,true,1280,720,true) && oriented.Recreated(10,11,true) &&
+            oriented.Observe(Scene::Showcase,applied,oriented.Requested(),10,11,12,13) && oriented.Ready() &&
+            oriented.MatchesAppliedTransform(transform),
+            "actual oriented image and Showcase quality proof admit standard without changing the holder contract");
+        if(cancel) {
+            auto drift=applied;drift.presentationTransform=transform^2u;
+            Check(gameplay::MatchesBenchmarkProfile(gameplay::BenchmarkProfileId::MobileStandardV2,drift) &&
+                !oriented.MatchesAppliedTransform(drift.presentationTransform) &&
+                !oriented.Observe(Scene::Showcase,drift,oriented.Requested(),10,11,14,15),
+                "otherwise-valid orientation drift cannot silently continue an active measurement");
+        }
+        oriented.Restore(cancel);
+        Check(oriented.Drained(true) && oriented.Acknowledge(10+transform,30,30,2,true,2400,1080,true) &&
+            oriented.Recreated(20,21,true),"success and cancellation require their own restored holder and resource owner");
+        auto restored=applied;restored.graphics=personal;restored.graphics.waterQuality=graphics::WaterQuality::Off;
+        restored.output=swapped?graphics::GraphicsExtent{1080,2400}:graphics::GraphicsExtent{2400,1080};
+        restored.internal=graphics::ScaledGraphicsExtent(restored.output,personal.renderScalePercent);
+        restored.cameraAspect=graphics::RtPresentationCameraAspect(restored.internal.width,restored.internal.height,
+            graphics::RtPresentationTransformFromIndex(transform));
+        restored.outputPolicy=gameplay::BenchmarkOutputPolicy::Native;
+        auto wrongPreference=personal;
+        wrongPreference.waterQuality=water==graphics::WaterQuality::Off?graphics::WaterQuality::Mobile:graphics::WaterQuality::Off;
+        auto wrongQuality=restored;wrongQuality.graphics.fireDetail=graphics::FireDetail::Mobile;
+        auto wrongDispatch=restored;++wrongDispatch.internal.width;
+        wrongDispatch.cameraAspect=graphics::RtPresentationCameraAspect(wrongDispatch.internal.width,wrongDispatch.internal.height,
+            graphics::RtPresentationTransformFromIndex(transform));
+        Check(!oriented.Observe(Scene::EntryMenu,restored,wrongPreference,20,21,22,23) &&
+            !oriented.Observe(Scene::EntryMenu,wrongQuality,personal,20,21,22,23) &&
+            !oriented.Observe(Scene::EntryMenu,wrongDispatch,personal,20,21,22,23) &&
+            !oriented.Observe(Scene::Showcase,restored,personal,20,21,22,23) &&
+            oriented.Observe(Scene::EntryMenu,restored,personal,20,21,22,23) && oriented.Restored() &&
+            oriented.Cancelled()==cancel && oriented.Original()==personal,
+            "Entry restoration keeps observed Off separate from exact saved water preference and verifies every other field");
+    }
     T unsafe;unsafe.Begin(4,13,original);
     Check(!unsafe.Drained(false) && unsafe.State()==P::Failed && unsafe.Snapshot()[4]==0,
           "unproved GPU drain cannot issue any buffer mutation command");

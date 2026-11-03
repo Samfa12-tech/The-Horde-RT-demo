@@ -62,23 +62,39 @@ void AnnotateOpeningBenchmarkReport(std::string& text,std::string& json)
 {
     std::lock_guard lock(gOpeningBenchmarkMutex);
     if(!gOpeningBenchmarkProvisional)return;
-    text+="\nRequested profile: mobile-rt-provisional-v1\nClassification: provisional-unranked (not eligible for public ranking).\n";
+    text+="\nRequested profile: mobile-rt-standard-v2\nClassification: standard-unranked (not eligible for public ranking).\n";
     if(const auto end=json.rfind('}');end!=std::string::npos)
-        json.insert(end,",\n\"androidBenchmarkProfileAttempt\":{\"requestedProfile\":\"mobile-rt-provisional-v1\","
-            "\"classification\":\"provisional-unranked\",\"ranked\":false,\"fixedOutputAcknowledged\":"+
+        json.insert(end,",\n\"androidBenchmarkProfileAttempt\":{\"requestedProfile\":\"mobile-rt-standard-v2\","
+            "\"classification\":\"standard-unranked\",\"ranked\":false,\"fixedOutputAcknowledged\":"+
             std::string(gOpeningBenchmarkOutput.Ready()?"true":"false")+",\"restorationPending\":true}\n");
+}
+
+std::string OpeningBenchmarkGraphicsJson(const horde::graphics::GraphicsSettings& settings)
+{
+    std::ostringstream out;
+    out<<"{\"renderScalePercent\":"<<settings.renderScalePercent<<",\"water\":"<<static_cast<int>(settings.waterQuality)
+        <<",\"fire\":"<<static_cast<int>(settings.fireDetail)<<",\"glass\":"<<(settings.glassEnabled?"true":"false")
+        <<",\"shadow\":"<<static_cast<int>(settings.shadowQuality)<<",\"mist\":"<<(settings.mistEnabled?"true":"false")
+        <<",\"particles\":"<<static_cast<int>(settings.dustQuality)<<",\"previewFrameCap\":"<<settings.previewFrameCap<<'}';
+    return out.str();
 }
 
 std::string OpeningBenchmarkFrameJson(const SwapchainContext& context)
 {
     const auto p=context.rtFrameEvidence.PublishedStateByValue();
     if(!p.hasCompletedEvidence || !p.completedEvidence.scene.dimensions)return "null";
+    horde::gameplay::BenchmarkProfileConfiguration actual;
+    const bool entry=context.sceneProfile==horde::vulkan::raytracing::RtSceneProfile::EntryMenu;
+    if(!ReadOpeningBenchmarkActual(context,actual,!entry))return "null";
     const auto& id=p.completedEvidence.identity;
     std::ostringstream out;out<<"{\"sceneEpoch\":"<<id.submitted.frame.sceneEpoch<<
         ",\"measurementGeneration\":"<<id.submitted.frame.measurementGeneration<<
         ",\"submissionSerial\":"<<id.submitted.submissionSerial<<",\"completionSerial\":"<<id.completionSerial<<",\"dimensions\":";
     horde::telemetry::WriteRtFrameDimensionsEvidenceJson(out,*p.completedEvidence.scene.dimensions);
-    out<<'}';return out.str();
+    out<<",\"sceneProfile\":\""<<(entry?"entry":"showcase")<<"\",\"configuredGraphics\":"
+        <<OpeningBenchmarkGraphicsJson(context.graphicsSettings)<<",\"observedGraphics\":"
+        <<OpeningBenchmarkGraphicsJson(actual.graphics)<<'}';
+    return out.str();
 }
 
 void FinishOpeningBenchmarkOutputReceipt(const SwapchainContext& context)
@@ -91,7 +107,7 @@ void FinishOpeningBenchmarkOutputReceipt(const SwapchainContext& context)
         json=gOpeningBenchmarkProfileJson;
         state=gOpeningBenchmarkOutput.Snapshot();
     }
-    const std::string receipt="{\"requestedProfile\":\"mobile-rt-provisional-v1\",\"classification\":\"provisional-unranked\","
+    const std::string receipt="{\"requestedProfile\":\"mobile-rt-standard-v2\",\"classification\":\"standard-unranked\","
         "\"ranked\":false,\"requestSerial\":"+std::to_string(state[0])+",\"originSurfaceGeneration\":"+std::to_string(state[1])+
         ",\"returnedSurfaceGeneration\":"+std::to_string(state[2])+",\"actualRestorationAcknowledged\":true,\"applied\":"+applied+",\"restored\":"+restored+"}\n";
     WriteTextFile(context.reportDirectory+"/HordeLanternRT-benchmark-profile-latest.json",receipt);
@@ -154,10 +170,7 @@ void PrepareOpeningBenchmarkOnOwner(SwapchainContext& context)
             gOpeningBenchmarkOriginalRoute=gRtLabBenchmarkRoute.load(std::memory_order_acquire);
             if(gOpeningBenchmarkProvisional) {
                 horde::gameplay::BenchmarkProfileConfiguration original;
-                const auto identity=horde::graphics::RtPresentationTransform::Identity;
-                const bool supported=context.rtPresentationTransform==identity &&
-                    context.surfaceCurrentTransform==VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR &&
-                    ReadOpeningBenchmarkActual(context,original,false) &&
+                const bool supported=ReadOpeningBenchmarkActual(context,original,false) &&
                     original.optical==horde::graphics::OpticalProfile::Mobile;
                 const auto s=gOpeningBenchmarkOwner.Snapshot();
                 if(!supported || !gOpeningBenchmarkOutput.Begin(s[0],s[5],context.graphicsSettings))
@@ -231,9 +244,6 @@ bool ProcessOpeningBenchmarkOutputOnOwner(SwapchainContext& context)
             if(!gOpeningBenchmarkOutput.Recreated(p.sceneEpoch,p.measurementGeneration,recreated)) {
                 gOpeningBenchmarkOwner.Block();return false;
             }
-            if(applying && context.rtPresentationTransform!=horde::graphics::RtPresentationTransform::Identity) {
-                gOpeningBenchmarkOwner.BeginReturn(4);gOpeningBenchmarkOutput.Restore();return false;
-            }
             gOpeningBenchmarkOutputFrameAttempts=0;
         }
         PublishGraphicsApplied(context,true,false);
@@ -296,10 +306,14 @@ void ObserveOpeningBenchmarkOnOwner(SwapchainContext& context,bool actuallyPrese
                 // never an earlier completion belonging to the retired Entry.
                 gOpeningBenchmarkOutput.ExpectCurrentOwner(p.sceneEpoch,p.measurementGeneration);
                 const auto& id=p.completedEvidence.identity;
-                gOpeningBenchmarkOutput.Observe(actual,id.submitted.frame.sceneEpoch,
+                using Output=horde::platform::android::AndroidBenchmarkOutputTransaction;
+                const auto evidenceScene=context.sceneProfile==Profile::EntryMenu?Output::EvidenceScene::EntryMenu:
+                    context.sceneProfile==Profile::Showcase?Output::EvidenceScene::Showcase:Output::EvidenceScene::Unknown;
+                gOpeningBenchmarkOutput.Observe(evidenceScene,actual,context.graphicsSettings,id.submitted.frame.sceneEpoch,
                     id.submitted.frame.measurementGeneration,id.submitted.submissionSerial,id.completionSerial);
-                if(gOpeningBenchmarkOutput.Ready() && !horde::gameplay::MatchesBenchmarkProfile(
-                    horde::gameplay::BenchmarkProfileId::MobileProvisionalV1,actual)) {
+                if(gOpeningBenchmarkOutput.Ready() && (context.graphicsSettings!=gOpeningBenchmarkOutput.Requested() ||
+                    !horde::gameplay::MatchesBenchmarkProfile(horde::gameplay::BenchmarkProfileId::MobileStandardV2,actual) ||
+                    !gOpeningBenchmarkOutput.MatchesAppliedTransform(actual.presentationTransform))) {
                     const auto s=gOpeningBenchmarkOwner.Snapshot();gOpeningBenchmarkOwner.Cancel(s[0],s[5]);
                     gInAppBenchmarkCancelRequested.store(true,std::memory_order_release);
                 }

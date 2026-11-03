@@ -631,3 +631,23 @@ leaving the first accepted published tick and landing exposed. No cooldown,
 distance, lesson/evasion proof, encounter health/reward or save change. See
 `docs/evidence/2026-11-01-attack-rings/COMPACT_FLASK_DODGE.md` for checks and the
 private candidate; physical acceptance and ordinary admission remain pending.
+
+
+## Android Standard benchmark evidence - 2026-11-03
+
+Keep the original Mobile provisional V1 identity-only contract unchanged. The
+new Android Standard selection uses `mobile-rt-standard-v2`: the same fixed
+1280 by 720 view / 640 by 360 RT workload and quality settings, with genuine
+Vulkan image extents and presentation rotation retained in evidence. It remains
+unranked. This is a temporary benchmark override, not new player defaults.
+
+Only a presented Showcase frame with the configured preset and matching actual
+quality can admit measurement. Returning to Entry separately proves the exact
+original configured preferences, layout and dispatch. Entry deliberately renders
+water Off, so observed Off must remain truthful instead of being relabelled as
+Mobile/High to satisfy a comparison. Full original preferences still must match;
+wrong scene, quality, settings, ownership or transform drift cannot certify the
+run. Shared preview-cap preference is retained and does not certify scanout FPS.
+Public report projection/consent and its existing unranked classification remain
+separate from the internal requested-preset receipt. Physical completion,
+cancellation and restoration must be checked on the affected device.

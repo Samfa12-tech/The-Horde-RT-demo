@@ -4133,3 +4133,27 @@ are retained release blockers for the follow-up correction, not erased by the
 benchmark/reporting pass. No earned phone checkpoint/save/cold-load or complete
 natural lesson/revival acceptance is claimed here. Private captures and receipts
 remain local; device serials, saved state and verification tokens are not bundled.
+
+
+### 3 November 2026: owner acceptance of exterior checkpoint and touch refill
+
+On ordinary signed SM-S948B source
+`627c6485e91a00048cb803fd5188708971da7b6a`, APK SHA-256
+`4e58ac39dd1b5074ab687ea788c3fb2353cafb35104c45306485ad6f55e113a3`,
+the owner reports all three requested regression checks worked perfectly, then
+closed the game: live-fight notice clearing after the bypass/Keeper/exterior
+route, touch refill beside the basin, and earned checkpoint save/reopen/load.
+The update used the established certificate and retained first-install identity;
+no uninstall or data clear occurred. A normal empty Slot 3 New Game was handed
+over; progression was not staged. This is owner-reported scoped acceptance,
+not a claim that every lesson/revival branch or input combination was exercised.
+
+The complete source-627 one-shot package gate passed all 265 local tests and
+Android builds/lint; all six hosted jobs passed in run 41599726330. Every
+application ZIP entry of the regenerated unsigned APK matched this exact signed
+owner-tested APK. Earlier build/reporting evidence and the fresh-install versus
+in-place-update distinction remain as recorded above.
+
+Later Standard benchmark and private-send failures are separate follow-up
+release checks. Their subsequent fixes require new exact-artifact/device
+receipts; this owner pass must not be silently attached to a later binary.

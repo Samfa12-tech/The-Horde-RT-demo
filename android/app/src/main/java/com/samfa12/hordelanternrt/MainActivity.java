@@ -175,7 +175,7 @@ public class MainActivity extends Activity {
     private Spinner benchmarkSummaryCooling;
     private TextView benchmarkSummaryStatus, benchmarkSummaryJson;
     private LinearLayout benchmarkSummaryTechnical;
-    private Button benchmarkSummaryDetails;
+    private Button benchmarkSummaryDetails, benchmarkSummaryDestination;
     private Button benchmarkSummaryPrepare, benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit;
     private final ThreadPoolExecutor reportExecutor = new ThreadPoolExecutor(1, 1, 0L,
             TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(2), runnable -> {
@@ -1934,9 +1934,10 @@ public class MainActivity extends Activity {
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
         addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
+        addBody(panel,getString(R.string.benchmark_standard_scope));
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
         openingBenchmarkButton.setEnabled(canRequestOpeningBenchmark());
-        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,"Mobile provisional benchmark (unranked)",this::requestOpeningProvisionalBenchmark,false);
+        openingBenchmarkProvisionalButton=addEntryMenuButton(panel,getString(R.string.benchmark_standard),this::requestOpeningProvisionalBenchmark,false);
         openingBenchmarkProvisionalButton.setEnabled(canRequestOpeningBenchmark());
         addEntryMenuButton(panel, "Load checkpoint", () -> showCampaignMenu(CampaignMenuState.LOAD), false);
         addEntryMenuButton(panel, getString(R.string.controls), this::showControls, false);
@@ -2576,15 +2577,15 @@ public class MainActivity extends Activity {
         if(!canRequestOpeningBenchmark()) return;
         final FrameLayout.LayoutParams original=provisional?OpeningBenchmarkOutput.snapshot(surfaceView):null;
         if(provisional && original==null) {
-            Toast.makeText(this,"Provisional unavailable; choose Custom.",Toast.LENGTH_LONG).show(); return;
+            Toast.makeText(this,R.string.benchmark_standard_unavailable,Toast.LENGTH_LONG).show(); return;
         }
         final long origin=surfaceRequestGeneration,request;
         try { request=ProbeBridge.requestOpeningBenchmarkWithSummaryId(origin,provisional,
                 UUID.randomUUID().toString(),Build.MODEL); }
         catch(RuntimeException | LinkageError unavailable) {
-            Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
+            Toast.makeText(this,provisional?getString(R.string.benchmark_standard_unavailable):getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return;
         }
-        if(request<=0) { Toast.makeText(this,provisional?"Provisional unavailable; choose Custom.":getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
+        if(request<=0) { Toast.makeText(this,provisional?getString(R.string.benchmark_standard_unavailable):getString(R.string.benchmark_unavailable),Toast.LENGTH_LONG).show(); return; }
         openingBenchmarkRequest=request; openingBenchmarkRequestGeneration=origin;
         openingBenchmarkProvisional=provisional;
         openingBenchmarkOutput=provisional?new OpeningBenchmarkOutput(request,origin,original):null;
@@ -2669,7 +2670,7 @@ public class MainActivity extends Activity {
     }
 
     private String openingBenchmarkLabel() {
-        return openingBenchmarkProvisional?"Mobile provisional benchmark (unranked)":"Custom benchmark (unranked)";
+        return openingBenchmarkProvisional?getString(R.string.benchmark_standard):"Custom benchmark (unranked)";
     }
 
     private void showOpeningBenchmarkProgress() {
@@ -2743,7 +2744,7 @@ public class MainActivity extends Activity {
             showBenchmarkReport(true);
         } else {
             showMainMenu(false);
-            Toast.makeText(this,unavailable?"Provisional unavailable; choose Custom.":
+            Toast.makeText(this,unavailable?getString(R.string.benchmark_standard_unavailable):
                 "Benchmark did not complete. Returned to opening menu.",Toast.LENGTH_LONG).show();
         }
     }
@@ -2951,8 +2952,8 @@ public class MainActivity extends Activity {
         final LinearLayout panel = createPanel(getString(R.string.benchmark_report),
                 completed ? getString(R.string.benchmark_complete) : getString(R.string.benchmark_invalid));
         if (completed && BenchmarkSummaryReview.validUuid(readyBenchmarkSummaryRunId())) {
-            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
             addMenuButton(panel, getString(R.string.benchmark_public_preview), () -> showBenchmarkSummaryReview(true));
+            addMenuButton(panel, getString(R.string.benchmark_summary_review), this::showBenchmarkSummaryReview);
         }
         final TextView report = new TextView(this);
         report.setText(latestBenchmarkReport);
@@ -2998,10 +2999,19 @@ public class MainActivity extends Activity {
                         ? R.string.benchmark_public_preview : R.string.benchmark_summary_review),
                 getString(R.string.benchmark_summary_local_only));
         addBody(panel, getString(owner.isPublicPreview() ? R.string.benchmark_public_scope : R.string.benchmark_summary_scope));
+        benchmarkSummaryDestination=createMenuButton(getString(owner.isPublicPreview()?
+                R.string.benchmark_switch_private:R.string.benchmark_switch_public),
+                benchmarkSummaryAction(owner,generation,() -> {
+                    if(benchmarkSummarySendControls!=null && !benchmarkSummarySendControls.canChangeDestination()) {
+                        Toast.makeText(this,R.string.statistics_destination_busy,Toast.LENGTH_LONG).show();return;
+                    }
+                    showBenchmarkSummaryReview(!owner.isPublicPreview());
+                }));
         benchmarkSummaryConsent = new CheckBox(this);
         benchmarkSummaryConsent.setText(owner.isPublicPreview() ? R.string.benchmark_public_consent : R.string.benchmark_summary_consent);
         stylePlaytestConsent(benchmarkSummaryConsent);
         benchmarkSummaryConsent.setMinHeight(dp(48));
+        benchmarkSummaryConsent.setVisibility(owner.isPublicPreview()?View.GONE:View.VISIBLE);
         panel.addView(benchmarkSummaryConsent, matchWrap());
         benchmarkSummaryHardware = new CheckBox(this);
         benchmarkSummaryHardware.setText(R.string.benchmark_summary_hardware);
@@ -3020,10 +3030,10 @@ public class MainActivity extends Activity {
         benchmarkSummaryPrepare = createMenuButton(getString(R.string.benchmark_summary_prepare),
                 benchmarkSummaryAction(owner, generation, this::prepareBenchmarkSummary));
         benchmarkSummaryPrepare.setMinHeight(dp(48));
-        benchmarkSummaryPrepare.setEnabled(false);
+        benchmarkSummaryPrepare.setEnabled(owner.isPublicPreview());
         panel.addView(benchmarkSummaryPrepare, menuButtonLayoutParams());
         benchmarkSummaryConsent.setOnCheckedChangeListener((button, checked) -> {
-            if (isCurrentBenchmarkSummaryForm(owner, generation))
+            if (isCurrentBenchmarkSummaryForm(owner, generation) && !owner.isPublicPreview())
                 benchmarkSummaryPrepare.setEnabled(checked && !owner.isPrepared());
         });
         benchmarkSummaryJson = new TextView(this);
@@ -3034,7 +3044,6 @@ public class MainActivity extends Activity {
         benchmarkSummaryTechnical=new LinearLayout(this);
         benchmarkSummaryTechnical.setOrientation(LinearLayout.VERTICAL);
         benchmarkSummaryTechnical.setVisibility(View.GONE);
-        benchmarkSummaryTechnical.addView(benchmarkSummaryJson, matchWrap());
         benchmarkSummaryCopy = createMenuButton(getString(R.string.benchmark_summary_copy),
                 benchmarkSummaryAction(owner, generation, this::copyBenchmarkSummary));
         benchmarkSummarySave = createMenuButton(getString(R.string.benchmark_summary_save),
@@ -3044,8 +3053,9 @@ public class MainActivity extends Activity {
         for (Button button : new Button[]{benchmarkSummaryCopy, benchmarkSummarySave, benchmarkSummaryEdit}) {
             button.setMinHeight(dp(48));
             button.setVisibility(View.GONE);
-            panel.addView(button, menuButtonLayoutParams());
+            benchmarkSummaryTechnical.addView(button, menuButtonLayoutParams());
         }
+        benchmarkSummaryTechnical.addView(benchmarkSummaryJson, matchWrap());
         benchmarkSummarySendControls = StatisticsReportSendControls.benchmark(this, panel, reportExecutor,
                 owner, StatisticsReportSendControls.Services.production(this), benchmarkSummaryTechnical);
         benchmarkSummaryDetails=createMenuButton(getString(R.string.benchmark_technical_details),
@@ -3057,6 +3067,7 @@ public class MainActivity extends Activity {
         setBenchmarkTechnicalExpanded(false);
         panel.addView(benchmarkSummaryDetails,menuButtonLayoutParams());
         panel.addView(benchmarkSummaryTechnical,matchWrap());
+        panel.addView(benchmarkSummaryDestination,menuButtonLayoutParams());
         addMenuButton(panel, getString(R.string.back),
                 benchmarkSummaryAction(owner, generation, () -> showBenchmarkReport(true)));
         attachPanel(panel);
@@ -3080,7 +3091,8 @@ public class MainActivity extends Activity {
 
     private void prepareBenchmarkSummary() {
         final BenchmarkSummaryReview owner = benchmarkSummaryReview;
-        if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() || !benchmarkSummaryConsent.isChecked()) return;
+        if (!benchmarkSummaryVisible || owner == null || owner.isPrepared() ||
+                (!owner.isPublicPreview() && !benchmarkSummaryConsent.isChecked())) return;
         final SimpleDateFormat utc = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT);
         utc.setTimeZone(TimeZone.getTimeZone("UTC"));
         final BenchmarkSummaryReview.Preparer preparer = owner.isPublicPreview()
@@ -3094,13 +3106,27 @@ public class MainActivity extends Activity {
         benchmarkSummaryHardware.setEnabled(false);
         benchmarkSummaryCooling.setEnabled(false);
         benchmarkSummaryPrepare.setEnabled(false);
-        benchmarkSummaryStatus.setText(R.string.benchmark_summary_prepared);
+        benchmarkSummaryStatus.setText(owner.isPublicPreview()?benchmarkPublicPreparedSummary(owner):getString(R.string.benchmark_summary_prepared));
         benchmarkSummaryJson.setText(owner.json()); // Literal exact native UTF-8 JSON; never reserialized.
         benchmarkSummaryDetails.setVisibility(View.VISIBLE);
         benchmarkSummaryCopy.setVisibility(View.VISIBLE);
         benchmarkSummarySave.setVisibility(View.VISIBLE);
         benchmarkSummaryEdit.setVisibility(View.VISIBLE);
         if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.refresh();
+    }
+
+    private String benchmarkPublicPreparedSummary(BenchmarkSummaryReview owner) {
+        String summary=getString(R.string.benchmark_public_prepared);
+        try {
+            // Presentation only: never replace, canonicalise or submit these parsed values.
+            final JSONObject result=new JSONObject(owner.json()).getJSONObject("result");
+            final int frames=result.getJSONObject("overall").getInt("measuredFrames");
+            final int scale=result.getJSONObject("configuration").getInt("renderScalePercent");
+            if(frames>0 && scale>=25 && scale<=100)
+                summary=getString(R.string.benchmark_public_summary,frames,scale)+"\n"+summary;
+        } catch(Exception unavailable) { /* The exact native preview remains available in Technical details. */ }
+        return summary+"\n"+getString(benchmarkSummaryHardware.isChecked()?
+                R.string.benchmark_hardware_included:R.string.benchmark_hardware_omitted);
     }
 
     private void copyBenchmarkSummary() {
@@ -3113,6 +3139,9 @@ public class MainActivity extends Activity {
 
     private void editBenchmarkSummary() {
         if (!benchmarkSummaryVisible || benchmarkSummaryReview == null) return;
+        if(benchmarkSummarySendControls!=null && !benchmarkSummarySendControls.canChangeDestination()) {
+            Toast.makeText(this,R.string.statistics_edit_busy,Toast.LENGTH_LONG).show();return;
+        }
         final PlaytestReportExport export = benchmarkSummaryReview.exportOwner();
         if (export != null && (export.state() == PlaytestReportExport.State.CHOOSING ||
                 export.state() == PlaytestReportExport.State.WRITING)) return;
@@ -3204,6 +3233,7 @@ public class MainActivity extends Activity {
         benchmarkSummaryReview = null;
         benchmarkSummaryVisible = false;
         benchmarkSummaryConsent = null;
+        benchmarkSummaryDestination = null;
         benchmarkSummaryHardware = null;
         benchmarkSummaryCooling = null;
         benchmarkSummaryStatus = null;

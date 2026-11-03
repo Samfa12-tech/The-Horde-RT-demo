@@ -9,6 +9,7 @@ namespace horde::platform::android {
 // command and explicitly recreates the same surface after its matching ACK.
 class AndroidBenchmarkOutputTransaction {
 public:
+    enum class EvidenceScene : std::uint8_t { Unknown, EntryMenu, Showcase };
     enum class Phase : std::uint8_t { Idle, DrainApply, AwaitApply, RecreateApply,
         AwaitAppliedFrame, Measuring, DrainRestore, AwaitRestore, RecreateRestore,
         AwaitRestoredFrame, Restored, Failed };
@@ -26,7 +27,7 @@ public:
                      std::uint64_t sequence,bool success,std::uint32_t width,std::uint32_t height,bool layoutProof) {
         if(request!=request_ || origin!=origin_ || generation!=generation_ || sequence!=sequence_ ||
            (phase_!=Phase::AwaitApply && phase_!=Phase::AwaitRestore))return false;
-        const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileProvisionalV1);
+        const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileStandardV2);
         if(!success || !layoutProof || !width || !height || width>16384 || height>16384 ||
            (phase_==Phase::AwaitApply && (width!=spec.output.width || height!=spec.output.height))) {
             if(phase_==Phase::AwaitApply) { cancelled_=true;command_=0;phase_=Phase::DrainRestore; }
@@ -46,20 +47,32 @@ public:
     void ExpectCurrentOwner(std::uint64_t epoch,std::uint64_t measurement) {
         if(phase_==Phase::AwaitAppliedFrame || phase_==Phase::AwaitRestoredFrame) {epoch_=epoch;measurement_=measurement;}
     }
-    bool Observe(const gameplay::BenchmarkProfileConfiguration& actual,std::uint64_t epoch,
+    bool Observe(EvidenceScene scene,const gameplay::BenchmarkProfileConfiguration& actual,
+                 const graphics::GraphicsSettings& configured,std::uint64_t epoch,
                  std::uint64_t measurement,std::uint64_t submission,std::uint64_t completion) {
         if((phase_!=Phase::AwaitAppliedFrame && phase_!=Phase::AwaitRestoredFrame && phase_!=Phase::Measuring) ||
            !epoch || epoch!=epoch_ || measurement!=measurement_ || !submission || !completion ||
            completion<=completion_ || !gameplay::ValidBenchmarkProfileConfiguration(actual))return false;
         if(phase_==Phase::AwaitRestoredFrame) {
+            if(scene!=EvidenceScene::EntryMenu || configured!=original_)return false;
+            // Entry intentionally has no water. Its observed Off is truthful;
+            // the separately checked configured tuple retains the user's choice.
+            auto entryQuality=original_;entryQuality.waterQuality=graphics::WaterQuality::Off;
             const bool swapped=graphics::RtPresentationTransformSwapsAxes(
                 graphics::RtPresentationTransformFromIndex(actual.presentationTransform));
             const graphics::GraphicsExtent acknowledgedOutput=swapped?
                 graphics::GraphicsExtent{height_,width_}:graphics::GraphicsExtent{width_,height_};
-            if(actual.graphics!=original_ || actual.output!=acknowledgedOutput)return false;
+            if(actual.graphics!=entryQuality || actual.output!=acknowledgedOutput ||
+               actual.internal!=graphics::ScaledGraphicsExtent(acknowledgedOutput,original_.renderScalePercent) ||
+               actual.outputPolicy!=gameplay::BenchmarkOutputPolicy::Native)return false;
             phase_=Phase::Restored;
         } else {
-            if(!gameplay::MatchesBenchmarkProfile(gameplay::BenchmarkProfileId::MobileProvisionalV1,actual))return false;
+            // A holder/layout ACK or an Entry frame cannot certify the full
+            // Showcase quality/workload, even when its dimensions happen to match.
+            if(scene!=EvidenceScene::Showcase || configured!=Requested() ||
+               !gameplay::MatchesBenchmarkProfile(gameplay::BenchmarkProfileId::MobileStandardV2,actual) ||
+               (phase_==Phase::Measuring && !MatchesAppliedTransform(actual.presentationTransform)))return false;
+            appliedTransform_=actual.presentationTransform;
             phase_=Phase::Measuring;
         }
         completion_=completion;return true;
@@ -81,18 +94,19 @@ public:
     bool Applying()const{return phase_==Phase::RecreateApply;}
     bool Recreating()const{return Applying() || phase_==Phase::RecreateRestore;}
     bool Ready()const{return phase_==Phase::Measuring;}
+    bool MatchesAppliedTransform(std::uint32_t transform)const{return Ready() && transform==appliedTransform_;}
     bool Restored()const{return phase_==Phase::Restored;}
     bool Cancelled()const{return cancelled_;}
     Phase State()const{return phase_;}
     const graphics::GraphicsSettings& Original()const{return original_;}
     graphics::GraphicsSettings Requested()const {
-        auto s=gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileProvisionalV1)->graphics;
+        auto s=gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileStandardV2)->graphics;
         s.previewFrameCap=original_.previewFrameCap;return s;
     }
     std::uint32_t Width()const{return width_;}
     std::uint32_t Height()const{return height_;}
     std::array<std::int64_t,8> Snapshot()const{
-        const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileProvisionalV1);
+        const auto spec=*gameplay::BenchmarkProfileSpecification(gameplay::BenchmarkProfileId::MobileStandardV2);
         return {static_cast<std::int64_t>(request_),static_cast<std::int64_t>(origin_),
             static_cast<std::int64_t>(generation_),static_cast<std::int64_t>(sequence_),command_,
             command_==1?static_cast<std::int64_t>(spec.output.width):0,
@@ -101,6 +115,7 @@ public:
 private:
     Phase phase_=Phase::Idle;graphics::GraphicsSettings original_{};
     std::uint64_t request_=0,origin_=0,generation_=0,sequence_=0,epoch_=0,measurement_=0,completion_=0;
+    std::uint32_t appliedTransform_=0;
     std::uint32_t width_=0,height_=0;std::int64_t command_=0;bool cancelled_=false;
 };
 } // namespace horde::platform::android

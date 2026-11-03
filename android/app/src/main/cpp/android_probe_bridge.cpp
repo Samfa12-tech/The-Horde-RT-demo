@@ -8027,7 +8027,7 @@ static jlong QueueOpeningBenchmark(jlong generation,bool provisional,
         gRequestedBenchmarkSummaryRunId=std::move(summaryUuid);
         gRequestedBenchmarkSummaryRawModel=std::move(summaryModel);
         gRequestedBenchmarkRunId.clear();gRequestedBenchmarkWorkload=horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
-        gLatestBenchmarkReport.clear();gLatestBenchmarkProgress=provisional?"PROVISIONAL BENCHMARK QUEUED":"CUSTOM BENCHMARK QUEUED";
+        gLatestBenchmarkReport.clear();gLatestBenchmarkProgress=provisional?"STANDARD BENCHMARK QUEUED":"CUSTOM BENCHMARK QUEUED";
     }
     return static_cast<jlong>(serial);
 }

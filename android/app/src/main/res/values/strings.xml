@@ -226,9 +226,14 @@
     <string name="benchmark_progress_details_only">Tap for details.</string>
     <string name="benchmark_progress_hide_only">Tap to hide details.</string>
     <string name="benchmark_progress_hide">Tap to hide details. Back cancels.</string>
-    <string name="benchmark_summary_review">Review benchmark statistics</string>
-    <string name="benchmark_public_preview">Preview public statistics</string>
-    <string name="benchmark_public_scope">See the aggregate statistics that could be shared publicly. This local preview omits private report and run IDs, full timestamps and raw frame rows. Phone model, GPU and Vulkan version are optional. Results remain unverified and unranked; temperature and display scanout FPS were not measured. Preparing this preview uploads nothing. Sharing uses separate consent and verification.</string>
+    <string name="benchmark_summary_review">Send privately to developer</string>
+    <string name="benchmark_public_preview">Share on the website</string>
+    <string name="benchmark_switch_private">Send privately to developer instead</string>
+    <string name="benchmark_switch_public">Share on the website instead</string>
+    <string name="benchmark_standard">Standard benchmark (fixed settings)</string>
+    <string name="benchmark_standard_scope">Standard temporarily uses 1280 × 720 output and 640 × 360 RT, Mobile water, Low fire, Current shadows, and glass, mist, particles and dynamic resolution off. Your previous settings and layout return afterward. Custom uses your current settings. Community results are unverified.</string>
+    <string name="benchmark_standard_unavailable">Standard benchmark unavailable. You can still choose Custom.</string>
+    <string name="benchmark_public_scope">Publish this run on the Horde results website. First prepare a local preview, then choose publication consent and Publish. Only aggregate timings and graphics settings are shared; no private report IDs or raw frame rows. Hardware labels are optional. Results are unverified and unranked. Nothing uploads before Publish and anti-spam verification succeed.</string>
     <string name="benchmark_public_consent">Prepare a local public preview (does not publish)</string>
     <string name="benchmark_summary_local_only">Local preview; sharing is a separate choice</string>
     <string name="benchmark_summary_scope">Review a completed run before sharing. This report contains settings and owning frame, CPU and GPU timings. GPU duration is not FPS, and display scanout FPS was not measured. Temperature was not collected and thermal status is unknown. Nothing is sent automatically. Sharing uses separate consent and verification.</string>
@@ -240,8 +245,12 @@
         <item>No external cooling declared</item>
         <item>External cooling declared</item>
     </string-array>
-    <string name="benchmark_summary_prepare">Prepare preview</string>
+    <string name="benchmark_summary_prepare">Preview report</string>
     <string name="benchmark_summary_prepared">Prepared locally. Copy or Save exports these exact bytes; Technical details shows the JSON. Sharing has separate controls. Edits require a new report ID and fresh consent.</string>
+    <string name="benchmark_public_prepared">Preview ready: aggregate timings and graphics settings. Choose publication consent below, then Publish on website. Technical details contains the exact local JSON and export options.</string>
+    <string name="benchmark_public_summary">Ready to share: %1$d measured frames at %2$d%% render scale.</string>
+    <string name="benchmark_hardware_included">Optional hardware labels included.</string>
+    <string name="benchmark_hardware_omitted">Optional hardware labels omitted.</string>
     <string name="benchmark_summary_copy">Copy reviewed JSON</string>
     <string name="benchmark_summary_save">Save reviewed JSON</string>
     <string name="benchmark_summary_edit">Edit choices (requires new consent)</string>
@@ -260,12 +269,12 @@
     <string name="crouching_blocked">Crouching (ceiling)</string>
     <string name="compatibility_report">Report compatibility to developer</string>
     <string name="statistics_private_send_consent">I agree to send this report privately to the developer.</string>
-    <string name="statistics_publish_consent">I agree to publish these reviewed statistics on the public board.</string>
+    <string name="statistics_publish_consent">I agree to publish these reviewed benchmark statistics on the Horde results website.</string>
     <string name="statistics_review_private_submission">Review private submission</string>
     <string name="statistics_review_public_submission">Review public submission</string>
     <string name="statistics_submission_preview">Separate submission preview (verification token excluded)</string>
     <string name="statistics_private_send">Send to developer</string>
-    <string name="statistics_publish_send">Submit to public board</string>
+    <string name="statistics_publish_send">Publish on website</string>
     <string name="statistics_retry_send">Verify and retry</string>
     <string name="statistics_check_publication">Check publication status</string>
     <string name="statistics_send_unavailable">Sending is unavailable. You can still copy or save the local report.</string>
@@ -282,7 +291,7 @@
     <string name="statistics_live_ready">Review this separate submission. Send starts a fresh anti-spam check.</string>
     <string name="statistics_live_verifying">Complete the anti-spam check. Your reviewed report stays in the game until it succeeds.</string>
     <string name="statistics_live_verification_cancelled">Verification cancelled or unavailable. Choose Send to try again.</string>
-    <string name="statistics_live_pending">Accepted for review; not published. Check publication explicitly later.</string>
+    <string name="statistics_live_pending">Received, but publication is not confirmed. Check publication status to retry this same result safely.</string>
     <string name="statistics_live_private_queued">Private report accepted; developer delivery is not confirmed. Do not send a new copy.</string>
     <string name="statistics_live_sent">Email provider accepted the private report. Inbox delivery is not confirmed.</string>
     <string name="statistics_live_published">Matching published receipt received.</string>
@@ -290,6 +299,9 @@
     <string name="statistics_live_uncertain">Outcome unknown. Retry explicitly with the same reviewed payload and fresh verification.</string>
     <string name="statistics_live_interrupted">Submission interrupted. Earlier acceptance may be unknown; no automatic retry.</string>
     <string name="statistics_live_available">Choose separate submission consent, then review the exact payload before Send.</string>
+    <string name="statistics_public_available">Preview the report above, then choose publication consent and Publish on website. A brief anti-spam check opens before sending.</string>
+    <string name="statistics_destination_busy">Finish or cancel verification first. For a sent or uncertain result, keep this receipt; changing destination cannot withdraw it.</string>
+    <string name="statistics_edit_busy">This send attempt cannot be revised. Finish or cancel verification, or keep the sent or uncertain result and its receipt. Editing cannot withdraw it.</string>
     <string name="statistics_live_sending">Sending the reviewed payload. Cancellation cannot prove it was not accepted.</string>
     <string name="flask_drink">Drink</string>
     <string name="flask_rest">Refill flask</string>

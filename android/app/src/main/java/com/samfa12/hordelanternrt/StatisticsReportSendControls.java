@@ -90,14 +90,17 @@ final class StatisticsReportSendControls {
         consent = new CheckBox(activity); consent.setText(publicResult ? R.string.statistics_publish_consent : R.string.statistics_private_send_consent);
         consent.setTextColor(HordeUiTokens.PARCHMENT); consent.setMinHeight(dp(48)); panel.addView(consent);
         review = button(panel, publicResult ? R.string.statistics_review_public_submission : R.string.statistics_review_private_submission);
+        if(publicResult)review.setVisibility(View.GONE); // The explicit Publish action admits the immutable envelope.
         final LinearLayout raw=technicalDetails==null?panel:technicalDetails;
         text(raw, R.string.statistics_submission_preview);
         preview = text(raw, 0); preview.setTypeface(Typeface.MONOSPACE); preview.setTextIsSelectable(true);
         send = button(panel, publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
-        status = text(panel, this.services.verification == null ? R.string.statistics_send_unavailable : R.string.statistics_live_available);
+        status = text(panel, this.services.verification == null ? R.string.statistics_send_unavailable :
+                publicResult ? R.string.statistics_public_available : R.string.statistics_live_available);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         consent.setOnCheckedChangeListener((view, checked) -> refresh());
-        review.setOnClickListener(view -> prepareSubmission()); send.setOnClickListener(view -> verifyAndSend());
+        if(!publicResult)review.setOnClickListener(view -> prepareSubmission());
+        send.setOnClickListener(view -> verifyAndSend());
         refresh();
     }
     private int dp(int value) { return Math.round(activity.getResources().getDisplayMetrics().density * value); }
@@ -112,13 +115,16 @@ final class StatisticsReportSendControls {
         if (closed) return;
         final PlaytestReportSubmission.State state = submission.state();
         consent.setEnabled(foreground && prepared.getAsBoolean() && state == PlaytestReportSubmission.State.DRAFT);
-        review.setEnabled(consent.isEnabled() && consent.isChecked());
+        review.setEnabled(!publicResult && consent.isEnabled() && consent.isChecked());
         final boolean retry = state == PlaytestReportSubmission.State.RETRYABLE;
         final boolean pendingPublic = publicResult && state == PlaytestReportSubmission.State.QUEUED;
         send.setText(pendingPublic ? R.string.statistics_check_publication : retry ? R.string.statistics_retry_send :
                 publicResult ? R.string.statistics_publish_send : R.string.statistics_private_send);
-        send.setEnabled(foreground && !verifying && services.verification != null && submission.statisticsSendAvailable() &&
-                (state == PlaytestReportSubmission.State.READY || retry || pendingPublic));
+        final boolean directPublic=publicResult && state==PlaytestReportSubmission.State.DRAFT &&
+                prepared.getAsBoolean() && consent.isChecked() && services.transport.admitsPublicBenchmarkReports();
+        send.setEnabled(foreground && !verifying && services.verification != null &&
+                (directPublic || (submission.statisticsSendAvailable() &&
+                (state == PlaytestReportSubmission.State.READY || retry || pendingPublic))));
         if (!verifying) renderReceiptState(state);
     }
     private void renderReceiptState(PlaytestReportSubmission.State state) {
@@ -144,6 +150,13 @@ final class StatisticsReportSendControls {
     }
     private void verifyAndSend() {
         if (closed || !foreground || verifying || !send.isEnabled() || services.verification == null) return;
+        // Public consent alone never constructs or sends anything. Only this
+        // explicit final action freezes the already reviewed local preview.
+        if(publicResult && submission.state()==PlaytestReportSubmission.State.DRAFT) {
+            if(!consent.isChecked() || !prepared.getAsBoolean() || !services.transport.admitsPublicBenchmarkReports())return;
+            prepareSubmission();
+            if(submission.state()!=PlaytestReportSubmission.State.READY)return;
+        }
         final PlaytestReportSubmission.State state = submission.state();
         if ((state == PlaytestReportSubmission.State.RETRYABLE ||
                 (publicResult && state == PlaytestReportSubmission.State.QUEUED)) && submission.retry() < 0) return;
@@ -173,6 +186,13 @@ final class StatisticsReportSendControls {
         refresh();
     }
     void resume() { if (!closed) { foreground = true; refresh(); } }
+    boolean canChangeDestination() {
+        final PlaytestReportSubmission.State state=submission.state();
+        // Changing audience cannot withdraw an accepted/uncertain request or
+        // silently mint a replacement identity after a network attempt.
+        return !closed && foreground && !verifying && (state==PlaytestReportSubmission.State.DRAFT ||
+                state==PlaytestReportSubmission.State.READY || state==PlaytestReportSubmission.State.REJECTED);
+    }
     void close() {
         if (closed) return;
         closed = true; foreground = false; ++generation; verifying = false; submission.cancel();
