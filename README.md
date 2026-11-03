@@ -4,12 +4,12 @@ A native Vulkan hardware-ray-tracing game/tech demo for **Android and Windows**,
 
 ## Play and current development
 
-- **Unreleased candidate source: 1.7.0 / proposed Android code 11.** These identities are staged for ordinary-package validation; external Play-code availability, owner-only signing safeguards, final packages and publication are still pending. The public download remains 1.6.2.
-
-- **Public release: 1.6.2.** Download from [itch.io](https://samfa12.itch.io/the-horde) or [GitHub v1.6.2](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2). Android versionCode 10; frozen release source `db62032d`. [Package hashes, verified downloads and release limits](docs/evidence/2026-10-09-release-publication/README.md).
-- **Main contains unfinished 1.7 development.** [PR27](https://github.com/Samfa12-tech/The-Horde-RT-demo/pull/27) merged on 30 October 2026 at `f0cea47b`; it is no longer a draft. This is source integration, **not a 1.7 release**. World/assets, reporting and full-platform acceptance remain unfinished; experimental feature gates remain OFF. See the [current design and acceptance index](docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md).
-- **Defaults depend on the version.** Published 1.6.2 starts/reset at 50% mobile scale with Mist On; 1.7 development starts/reset at 33% with Mist Off. Explicit saved choices are preserved. Older 75% recommendations are historical, not current defaults.
-- **Performance is not solved.** No sustained mobile 30 FPS claim is made. For 1.7, measured optimisation continues without a fixed-FPS release veto or reducing approved scope; correctness and release approval still matter. See the [owner decision](PROJECT_DECISIONS.md#phone-performance-and-17-scope---2026-10-26) and [experiment ledger](docs/PERFORMANCE_EXPERIMENT_LEDGER.md).
+- **Public release: 1.7.0 / Android code 11.** Download from [itch.io](https://samfa12.itch.io/the-horde) or [GitHub v1.7.0](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.7.0). The Windows ZIP and signed Android APK were published on 3 November 2026 from runtime source `d1c6d152`. [Package hashes, validation scope and publication receipt](docs/SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md). Published versions and codes are frozen; later documentation changes do not rebuild these downloads.
+- **What is in 1.7.** Forest surroundings and bounded routes toward Bellwether, combat lessons and skeleton revival, attack warnings and hit feedback, a healing flask and earned refill basins, Kit's basin guidance, three save slots, encounter Retry, return to the main menu, and hold Attack to sheathe. The demo ends before the unfinished village. [Release notes](docs/SHOWCASE_ALPHA_1_7_0_RELEASE_NOTES_DRAFT.md) describe the shipped scope; older design and acceptance documents retain their historical checkpoints.
+- **Benchmarks and sharing.** Standard temporarily applies fixed settings and a fixed viewport, then restores your saved choices. Custom uses your selected settings in the scripted course. Results can be sent privately or published with separate explicit consent on the [community results website](https://samfa12.com/games/the-horde/benchmark-stats/). Community submissions are unverified and unranked; benchmark frame-duration figures are not a gameplay FPS guarantee.
+- **Defaults preserve personal choices.** Fresh/reset 1.7 Android uses 33% render scale, Mobile water/fire, Mist Off and particles Low; Windows particles default to Standard. The resolution slider spans 25–100%. Explicit saved choices are retained. Published 1.6.2's 50%/Mist On defaults and older 75% recommendations are historical.
+- **Performance limits remain.** No sustained mobile 30 FPS claim is made. The broader mobile optimisation investigation remains paused; the measured [experiment ledger](docs/PERFORMANCE_EXPERIMENT_LEDGER.md) records retained, rejected and unresolved work. Hardware RT remains required at every setting.
+- **Previous release: 1.6.2 / Android code 10.** [Frozen GitHub downloads](https://github.com/Samfa12-tech/The-Horde-RT-demo/releases/tag/v1.6.2), source `db62032d`, and [historical publication evidence](docs/evidence/2026-10-09-release-publication/README.md) remain available.
 
 ## Hardware and controls
 
@@ -49,6 +49,7 @@ See the [validation guide](docs/AGENT_VALIDATION.md) for host-only CI commands, 
 | [Roadmap](docs/ROADMAP.md) / [source inventory](docs/ROADMAP_SOURCES.md) | Approved scope, later chapters, plans and historical records |
 | [Current 1.7 index](docs/design/HORDE_1_7_CURRENT_DESIGN_INDEX.md) | Implemented, gated and unfinished work; scoped acceptance |
 | [Project decisions](PROJECT_DECISIONS.md) / [agent instructions](AGENTS.md) | Product and engineering contracts |
+| [1.7.0 validation](docs/SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md) | Published artifacts, exact validation scope and remaining limitations |
 | [1.6.2 validation](docs/SHOWCASE_ALPHA_1_6_2_RELEASE_VALIDATION_2026-10-09.md) | Frozen public package evidence and limitations |
 | [Historical README archive](README_HISTORY_2026-10-30.md) | Complete pre-cleanup README: older controls, architecture, commands and release history, not current guidance; [historical 1.6.0 release evidence](docs/SHOWCASE_ALPHA_1_6_0_RELEASE_VALIDATION_2026-08-30.md) |
 
