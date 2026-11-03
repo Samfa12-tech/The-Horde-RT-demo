@@ -1573,11 +1573,18 @@ public class MainActivity extends Activity {
     }
 
     private boolean pollCampaignEndForEntry() {
-        if(!campaignEndPending)return false;
         final CampaignMenuState end;
         try { end=CampaignMenuState.decode(ProbeBridge.getCampaignState()); }
-        catch(RuntimeException | LinkageError unavailable) { return true; }
-        if(end==null || !end.current(surfaceRequestGeneration))return true;
+        catch(RuntimeException | LinkageError unavailable) { return campaignEndPending; }
+        if(end==null || !end.current(surfaceRequestGeneration))return campaignEndPending;
+        if(!campaignEndPending) {
+            // Activity recreation can discard Java fields while the native
+            // owner is still finishing the user's explicit return request.
+            if(end.lastOperation!=CampaignMenuState.END_GAME || end.activeSlot<0 ||
+               (end.phase!=CampaignMenuState.SAVING && end.phase!=CampaignMenuState.FAILED))return false;
+            campaignEndPending=true;campaignEndRequest=end.ackRequest;
+            campaignEndRequestGeneration=surfaceRequestGeneration;
+        }
         if(end.ackRequest>=campaignEndRequest && end.lastOperation==CampaignMenuState.END_GAME) {
             if(end.phase==CampaignMenuState.FAILED) {
                 showCampaignEndFailure();return true;
