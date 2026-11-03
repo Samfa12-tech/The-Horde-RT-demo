@@ -1,5 +1,28 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-03 - Ordinary signed 1.7 update and retained title-return failure
+
+Physical SM-S948B / Android 17. Ordinary Release source `53d0000d`, version
+`1.7.0` / code `11`, signed APK SHA256
+`b8eda239ee913da5920f16410f3e232c60888a0546abf9f10a35073887519283`.
+The established release certificate matched the installed published 1.6.2 APK;
+its APK backup matched the published hash. An in-place update succeeded without
+uninstall/data clearing and retained the original installation date. Observed
+saved 50% scale, Mobile water/fire, glass On, Current shadows, mist On, particles
+Off, 30 Hz preview cap and 70% audio values were retained. The production sandbox
+is non-debuggable with backup disabled: direct file-level save/pref hash backup
+was unavailable, and no alternative privilege access was attempted. This is
+observed settings continuity, not a byte-for-byte data-restore claim.
+
+ADB-scripted normal Play -> empty Slot 3 -> New Game reached the rendered
+Showcase with compact flask icon/charges and accessible controls. Pre-checkpoint
+Save was correctly disabled with guidance; no earned save/load or natural
+lesson/revival pass is inferred. Quit to Main Menu returned to Entry, but both
+Benchmark actions remained disabled. Investigation identified stale Java
+campaign-state cache after successful native END; the corrective Activity test
+must be followed by an actual ordinary-device repeat. No report was sent in
+this check. Debug and actor-worker packages were untouched. This is bounded
+physical UI/update evidence, not owner touch/controller feel or performance.
 ## 2026-11-02 - Compact benchmark UI, bounded physical acceptance
 
 SM-S948B, arm64 Debug APK

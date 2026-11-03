@@ -1590,6 +1590,11 @@ public class MainActivity extends Activity {
                 showCampaignEndFailure();return true;
             }
             if(end.phase==CampaignMenuState.READY && end.activeSlot<0 && end.error==0) {
+                if(campaignState!=null && campaignState.surfaceGeneration==end.surfaceGeneration &&
+                        end.revision<campaignState.revision)return true;
+                // Benchmark admission reads this cache after the normal save-menu
+                // poll has stopped. Publish the acknowledged closed state first.
+                campaignState=end;campaignPublicationValid=true;
                 campaignEndPending=false;campaignEndRequest=0;return false;
             }
         }
