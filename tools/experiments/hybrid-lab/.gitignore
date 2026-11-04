@@ -1,0 +1,10 @@
+/build/
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/app/.cxx/
+/android/local.properties
+/generated/*.spv
+/evidence/
+/deliverables/
+__pycache__/

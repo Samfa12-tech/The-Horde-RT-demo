@@ -1,0 +1,14 @@
+#version 460
+#extension GL_GOOGLE_include_directive : require
+#include "common.glsl"
+layout(local_size_x=8,local_size_y=8) in;
+void main() {
+    ivec2 pixel=ivec2(gl_GlobalInvocationID.xy);
+    if(any(greaterThanEqual(pixel,ivec2(pc.config.xy))))return;
+    vec3 d=rayDirection(vec2(pixel)+0.5),p,n;
+    vec4 m;uint tri;vec2 b;float t;
+    vec3 c=sky;
+    float projection=dot(d,pc.forward.xyz);
+    if(hit(pc.camera.xyz,d,50.0/projection,tri,b,t,0.025/projection)){surface(tri,b,p,n,m);c=shade(p,n,m,d);}
+    imageStore(target,pixel,display(c));
+}

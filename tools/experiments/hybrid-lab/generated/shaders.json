@@ -1,0 +1,32 @@
+[
+  {
+    "name": "forward.vert",
+    "bytes": 3728,
+    "sha256": "ce0564356ccc51f23a9125c80986562c6f3aecbe2de5471dc59e3933c1913034"
+  },
+  {
+    "name": "forward.frag",
+    "bytes": 16028,
+    "sha256": "8ff95cf895f4f3a084d91ecec6e107699056e5c382b7fbe106843c032303d169"
+  },
+  {
+    "name": "full.comp",
+    "bytes": 17640,
+    "sha256": "fc5cb85c47d17d85b06b4e2abcfe3cac5a465581b15096875663508b0fc78e79"
+  },
+  {
+    "name": "full.rgen",
+    "bytes": 17180,
+    "sha256": "e1af6fdf7f3b07a23ec9e2a4378c4a83a83b44a3570ca95f1f1bf98d38bb8c24"
+  },
+  {
+    "name": "full.rchit",
+    "bytes": 676,
+    "sha256": "4f2b16eb78f9f55d2291d2b0fd25d177983b6acb8e32c40e81310a2fa8014458"
+  },
+  {
+    "name": "full.rmiss",
+    "bytes": 368,
+    "sha256": "15041a7a1d22f09f5523c3749eb7ab1c6ce925cfb251360d121ad72077588190"
+  }
+]
