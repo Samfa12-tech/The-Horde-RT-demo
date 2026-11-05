@@ -39,6 +39,15 @@
 
 #include "ui/DiagnosticOverlay.h"
 #include "graphics/GraphicsSettings.h"
+// Never enter production benchmark/report flows from this isolated renderer experiment.
+#if defined(HORDE_RT_HYBRID_STATIC_PRIMARY) && HORDE_RT_HYBRID_STATIC_PRIMARY
+static constexpr bool kHybridStaticPrimaryExperimentBuild = true;
+#else
+static constexpr bool kHybridStaticPrimaryExperimentBuild = false;
+#endif
+#if defined(HORDE_RT_HYBRID_STATIC_PRIMARY) && HORDE_RT_HYBRID_STATIC_PRIMARY
+#include "vulkan/raytracing/experimental/HybridStaticPrimaryControl.h"
+#endif
 #include "graphics/RtPresentationTransform.h"
 #include "graphics/EntryMenuHandoff.h"
 #include "graphics/ForegroundPauseRenderCadence.h"
@@ -123,6 +132,10 @@ namespace
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
 // One coherent mode+revision word; bit0 is worker, higher bits are request epoch.
 std::atomic<std::uint64_t> gActorWorkerExperimentRequested{0};
+#endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+// UI publishes mode+revision only; the render owner publishes the shared renderer control.
+std::atomic<std::uint64_t> gHybridStaticPrimaryRequest{0};
 #endif
 
 
@@ -333,6 +346,10 @@ std::atomic<bool> gMotionValidationRequested{false};
 struct SwapchainContext
 {
     std::uint64_t surfaceGeneration = 0u;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    std::uint64_t hybridStaticPrimaryRequest = 0u;
+    bool hybridStaticPrimarySubmitLogPending = true;
+#endif
     ANativeWindow* window = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -4203,6 +4220,37 @@ bool DestroySwapchainContext(SwapchainContext& context)
     return true;
 }
 
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+bool ApplyHybridStaticPrimaryRequestOnOwner(SwapchainContext& context, bool& changed)
+{
+    const auto request = gHybridStaticPrimaryRequest.load(std::memory_order_acquire);
+    if (request == context.hybridStaticPrimaryRequest) return true;
+    // Finish every sample owned by the old mode before invalidating its measurement
+    // generation. No old query can later enter the new mode's rolling averages.
+    if (!ConsumePendingImageAcquire(context) ||
+        !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device))) return false;
+    if (context.rtFrameEvidenceInitialised && !context.rtFrameEvidence.ApplyEvent(
+            horde::telemetry::RtLifecycleEvent::CheckpointChange)) return false;
+    context.gpuFrameTimer.ResetAfterDeviceIdle();
+#if HORDE_RT_FRAME_STAGE_PROBE
+    for (auto& timer : context.frameStageTimers) timer.ResetAfterDeviceIdle();
+#endif
+    ResetBenchmarkTiming(context);
+    context.gpuFrameTimingTotalMs = 0.0;
+    context.gpuFrameTimingSampleCount = 0u;
+    context.previewGpuSamples = 0u;
+    context.previewPerformance.BeginScope(++context.previewEpoch);
+    context.previewWarmFrames = kMaxFramesInFlight;
+    RefreshGpuTimingTelemetry(context);
+    context.hybridStaticPrimaryRequest = request;
+    context.hybridStaticPrimarySubmitLogPending = true;
+    horde::vulkan::raytracing::experimental::SetHybridStaticPrimaryRequested((request & 1u) != 0u);
+    changed = true; // Wake a paused scene so the newly requested mode can submit.
+    PublishRuntimeReports(context);
+    return true;
+}
+#endif
+
 bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resourceRecreated,
     horde::reporting::CompatibilityStage* failureStage=nullptr)
 {
@@ -5143,6 +5191,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
     }
     context.imageAcquirePending = false;
     if (useRtFrame) context.rtScene.NotifyFrameSubmitted();
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if (useRtFrame && context.hybridStaticPrimarySubmitLogPending)
+    {
+        context.hybridStaticPrimarySubmitLogPending = false;
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "HORDE_HYBRID_STATIC_PRIMARY_SUBMITTED surface=%llu request_epoch=%llu requested=%s submitted=%s measurement_generation=%llu gpu_completion_certified=0 presentation_certified=0",
+            static_cast<unsigned long long>(context.surfaceGeneration),
+            static_cast<unsigned long long>(context.hybridStaticPrimaryRequest >> 1),
+            (context.hybridStaticPrimaryRequest & 1u) != 0u ? "hybrid-static-assets" : "full-rt",
+            horde::vulkan::raytracing::experimental::HybridStaticPrimaryApplied() ? "hybrid-static-assets" : "full-rt",
+            static_cast<unsigned long long>(context.rtFrameEvidence.SeedsByValue().measurementGeneration));
+    }
+#endif
     if (evidenceFrame)
     {
         context.rtFrameEvidence.CommitGraphicsSubmit(
@@ -5910,6 +5971,16 @@ void SwapchainRenderLoop()
                 "Diagnostic surface stopped after vertical support fixture checkpoint failure.");
             break;
         }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (!ApplyHybridStaticPrimaryRequestOnOwner(gSwapchainContext, sceneTransition))
+        {
+            PublishCompatibilityFailure(gSwapchainContext.surfaceGeneration,horde::reporting::CompatibilityStage::RenderLoop);
+            gSurfaceSessions.Publish(gSwapchainContext.surfaceGeneration, 3);
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Hybrid static-assets mode change could not isolate owned timing evidence.");
+            break;
+        }
+#endif
         horde::graphics::ForegroundPauseRenderInput pauseCadenceInput{};
         pauseCadenceInput.foreground = true; // A live swapchain owner exists only for the foreground surface.
         pauseCadenceInput.paused = measurementPaused;
@@ -8032,6 +8103,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestDebugRouteReplay(JNIEnv*, jcl
 static jlong QueueOpeningBenchmark(jlong generation,bool provisional,
     std::string summaryUuid = {},std::string summaryModel = {})
 {
+    if (kHybridStaticPrimaryExperimentBuild) return 0;
     if(generation<=0 || !gSurfaceSessions.IsCurrent(static_cast<std::uint64_t>(generation)) ||
        gSurfaceSessions.State()!=1)return 0;
     std::lock_guard admission(gDebugRequestAdmissionMutex);
@@ -8119,6 +8191,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getOpeningBenchmarkState(JNIEnv* env
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmark(JNIEnv*, jclass)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return JNI_FALSE;
     std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
     if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
     std::lock_guard<std::mutex> lock(gReportMutex);
@@ -8141,6 +8214,7 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithId(
     JNIEnv* env, jclass, jstring runId)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return JNI_FALSE;
     if (runId == nullptr || env->GetStringUTFLength(runId) < 1 ||
         env->GetStringUTFLength(runId) > 64) return JNI_FALSE;
     const char* text = env->GetStringUTFChars(runId, nullptr);
@@ -8170,6 +8244,7 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithIdAndWorkload(
     JNIEnv* env, jclass, jstring runId, jstring workloadName)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return JNI_FALSE;
     if (runId == nullptr || workloadName == nullptr ||
         env->GetStringUTFLength(runId) < 1 || env->GetStringUTFLength(runId) > 64 ||
         env->GetStringUTFLength(workloadName) < 1 || env->GetStringUTFLength(workloadName) > 64) {
@@ -8213,6 +8288,7 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkMotionValidation(
     JNIEnv* env, jclass, jstring runId, jstring scenarioName)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return JNI_FALSE;
 #if HORDE_RT_ANDROID_MOTION_VALIDATION
     if (runId == nullptr || scenarioName == nullptr || env->GetStringLength(runId) < 1 ||
         env->GetStringLength(runId) > 64 || env->GetStringLength(scenarioName) > 64 ||
@@ -8405,6 +8481,7 @@ extern "C" JNIEXPORT jboolean JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithSummaryId(
     JNIEnv* env, jclass, jstring summaryRunUuid, jstring rawModel)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return JNI_FALSE;
     try
     {
         std::string uuid, model;
@@ -8433,6 +8510,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_requestBenchmarkWithSummaryId(
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getReadyBenchmarkSummaryRunId(JNIEnv* env, jclass)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return nullptr;
     try
     {
         std::lock_guard<std::mutex> lock(gReportMutex);
@@ -8501,6 +8579,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_prepareBenchmarkSummaryReport(
     JNIEnv* env, jclass, jstring expectedRunUuid, jstring reportUuid, jstring capturedAtUtc,
     jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return nullptr;
     return PrepareLocalBenchmarkReview(env, expectedRunUuid, reportUuid, capturedAtUtc,
         consentToPrepare, includeBasicHardware, declaredCooling, false);
 }
@@ -8510,6 +8589,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_preparePublicBenchmarkPreview(
     JNIEnv* env, jclass, jstring expectedRunUuid, jstring resultUuid, jstring capturedAtUtc,
     jboolean consentToPrepare, jboolean includeBasicHardware, jint declaredCooling)
 {
+    if (kHybridStaticPrimaryExperimentBuild) return nullptr;
     return PrepareLocalBenchmarkReview(env, expectedRunUuid, resultUuid, capturedAtUtc,
         consentToPrepare, includeBasicHardware, declaredCooling, true);
 }
@@ -8586,3 +8666,47 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_drainPlatformEvents(JNIEnv* env, jcl
     return result;
 }
 #include "android_environment_survey_jni.inl"
+
+// The isolated Debug experiment exposes requested state only; the renderer owns application.
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_MainActivity_nativeHybridStaticPrimaryAvailable(JNIEnv*, jclass)
+{
+#if defined(HORDE_RT_HYBRID_STATIC_PRIMARY) && HORDE_RT_HYBRID_STATIC_PRIMARY && !defined(NDEBUG)
+    return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_MainActivity_nativeHybridStaticPrimaryRequested(JNIEnv*, jclass)
+{
+#if defined(HORDE_RT_HYBRID_STATIC_PRIMARY) && HORDE_RT_HYBRID_STATIC_PRIMARY && !defined(NDEBUG)
+    return (gHybridStaticPrimaryRequest.load(std::memory_order_acquire) & 1u) != 0u ? JNI_TRUE : JNI_FALSE;
+#else
+    return JNI_FALSE;
+#endif
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_MainActivity_nativeSetHybridStaticPrimaryRequested(JNIEnv*, jclass, jboolean enabled)
+{
+#if defined(HORDE_RT_HYBRID_STATIC_PRIMARY) && HORDE_RT_HYBRID_STATIC_PRIMARY && !defined(NDEBUG)
+    std::lock_guard<std::mutex> admissionLock(gDebugRequestAdmissionMutex);
+    if (!CanQueueCompetingDebugRequestLocked()) return JNI_FALSE;
+    const auto state = ReadDebugRequestAdmissionStateLocked();
+    if (!state.surfaceReady || state.checkpointPending || state.fixtureCheckpointActive ||
+        state.capturePending || state.replayPending || state.benchmarkPendingOrActive ||
+        state.motionPendingOrActive) return JNI_FALSE;
+    auto old = gHybridStaticPrimaryRequest.load(std::memory_order_acquire);
+    std::uint64_t next = 0u;
+    do {
+        if (old > std::numeric_limits<std::uint64_t>::max() - 3u) return JNI_FALSE;
+        next = ((old & ~std::uint64_t{1}) + 2u) | (enabled == JNI_TRUE ? 1u : 0u);
+    } while (!gHybridStaticPrimaryRequest.compare_exchange_weak(old, next, std::memory_order_acq_rel));
+    return JNI_TRUE;
+#else
+    (void)enabled;
+    return JNI_FALSE;
+#endif
+}

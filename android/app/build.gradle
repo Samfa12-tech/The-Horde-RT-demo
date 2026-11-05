@@ -136,6 +136,12 @@ def hordeBenchmarkMinRenderScale = hordeBenchmarkMinRenderScaleProperty == '33' 
 if (hordeBenchmarkMotionValidation && hordeBenchmarkMinRenderScale != 33) {
     throw new GradleException('hordeBenchmarkMotionValidation requires hordeBenchmarkMinRenderScale=33 for matched 50/40/33 captures.')
 }
+// Opt-in real-engine experiment; default renderer remains full hardware RT.
+def hordeHybridStaticPrimaryProperty = providers.gradleProperty('hordeHybridStaticPrimary').orNull
+if (hordeHybridStaticPrimaryProperty != null && !(hordeHybridStaticPrimaryProperty in ['true', 'false'])) {
+    throw new GradleException('hordeHybridStaticPrimary must be true or false.')
+}
+def hordeHybridStaticPrimary = hordeHybridStaticPrimaryProperty == 'true'
 def hordeStagedPrimaryDebugValidationProperty = providers.gradleProperty('hordeStagedPrimaryDebugValidation').orNull
 if (hordeStagedPrimaryDebugValidationProperty != null && !(hordeStagedPrimaryDebugValidationProperty in ['true', 'false'])) {
     throw new GradleException('hordeStagedPrimaryDebugValidation must be true or false.')
@@ -147,7 +153,7 @@ if (hordeStagedPrimaryDebugValidation && hordeBenchmarkValidation) {
 // Benchmark validation is an isolated, development-signed app. Do not even
 // read production signing environment variables for either investigation opt-in.
 def hordeRegionPagePrototypeRootProperty = providers.gradleProperty('hordeRegionPagePrototypeRoot').orNull
-def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment
+def hordeValidationUnsigned = validationUnsigned || hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation || hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment || hordeHybridStaticPrimary
 def releaseStoreFile = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_FILE')
 def releaseStorePassword = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_STORE_PASSWORD')
 def releaseKeyAlias = hordeValidationUnsigned ? null : System.getenv('HORDE_RELEASE_KEY_ALIAS')
@@ -337,6 +343,13 @@ if (hordeBenchmarkMinRenderScale == 33 &&
 if (hordeStagedPrimaryDebugValidation && viewmodelCandidate) {
     throw new GradleException('Staged execution investigation must preserve the accepted player assets, not a viewmodel asset overlay.')
 }
+if (hordeHybridStaticPrimary && (hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation ||
+        hordeStagedPrimaryShaderDirProperty != null || hordeStagedPrimaryTiming || viewmodelCandidate ||
+        hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment || outdoorScaleProbe ||
+        dispatchClockProbe || privateRevivalDirectory || flaskCandidateDirectory || hordeShipping17AssetDirectory)) {
+    throw new GradleException('Hybrid static-assets requires its separate Debug app with accepted assets and production shaders; other renderer, benchmark and asset experiments must be separate.')
+}
+
 def viewmodelOverlayDir = layout.buildDirectory.dir('generated/viewmodelCandidateAssets')
 def viewmodelReceipt = viewmodelCandidate ? new JsonSlurper().parse(
     new File(viewmodelCandidate, 'viewmodel-processing.json'), 'UTF-8') : null
@@ -704,6 +717,7 @@ android {
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
         buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', 'false'
         buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', 'false'
+        buildConfigField 'boolean', 'HYBRID_STATIC_PRIMARY', 'false'
         buildConfigField 'int', 'MIN_RENDER_SCALE_PERCENT', '25'
         resValue 'string', 'alpha_version', "SHOWCASE · ALPHA ${hordeVersionName}"
 
@@ -740,19 +754,24 @@ android {
         debug {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
-            applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
+            applicationIdSuffix hordeHybridStaticPrimary ? '.debug.hybridstatic' : (actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug')))
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
             buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', actorWorkerExperiment ? 'true' : 'false'
+            buildConfigField 'boolean', 'HYBRID_STATIC_PRIMARY', hordeHybridStaticPrimary ? 'true' : 'false'
+            if (hordeHybridStaticPrimary) resValue 'string', 'app_name', 'Horde Hybrid Static Assets Experiment'
             if (actorWorkerExperiment) resValue 'string', 'app_name', 'Horde RT Actor Worker Experiment'
             if (viewmodelCandidate) resValue 'string', 'app_name', 'Horde RT Viewmodel Candidate'
             if (hordeStagedPrimaryDebugValidation) resValue 'string', 'app_name', 'Horde RT Staged Investigation'
+            if (hordeHybridStaticPrimary) ndk { abiFilters 'arm64-v8a' }
             versionNameSuffix '-debug'
             minifyEnabled false
             externalNativeBuild {
                 cmake {
                     arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         *hordeRtDebugObservationArguments,
+                        "-DHORDE_RT_HYBRID_STATIC_PRIMARY=${hordeHybridStaticPrimary ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_HYBRID_STATIC_SHADER_DIR=${hordeHybridStaticPrimary ? providers.gradleProperty('hordeHybridStaticShaderDir').get() : ''}",
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
                         *hordeRtDebugStagedPrimaryArguments,
@@ -768,7 +787,7 @@ android {
                     arguments '-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF',
                         "-DHORDE_RT_SHIPPING17_CONTENT=${hordeShipping17AssetDirectory ? 'ON' : 'OFF'}",
                         '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
-                        '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
+                        '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF', '-DHORDE_RT_HYBRID_STATIC_PRIMARY=OFF',
                         *hordeRtNativePolicyArguments('Shipping')
                 }
             }
@@ -854,6 +873,8 @@ tasks.register('printHordeRtPolicyForTest') {
         println("debugMinRenderScale=25|releaseMinRenderScale=25|benchmarkMinRenderScale=${hordeBenchmarkMinRenderScale}")
         println("ordinaryPresentTiming=OFF|benchmarkPresentTiming=${hordePresentTimingValidation ? 'ON' : 'OFF'}")
         println("benchmarkMotionValidation=${hordeBenchmarkMotionValidation ? 'ON' : 'OFF'}")
+        println("hybridStaticPrimaryDebug=${hordeHybridStaticPrimary ? 'ON' : 'OFF'}|release=OFF|defaultMode=Full RT")
+        println("hybridStaticPrimaryApplicationId=${hordeHybridStaticPrimary ? 'com.samfa12.hordelanternrt.debug.hybridstatic' : 'disabled'}")
         println("stagedPrimaryDebugValidation=${hordeStagedPrimaryDebugValidation}")
         println("stagedPrimaryShaderDir=${hordeStagedPrimaryShaderDir ?: ''}")
     }

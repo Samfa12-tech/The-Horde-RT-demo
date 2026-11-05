@@ -590,6 +590,11 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     uploadedFireEmittersValid_ = std::exchange(other.uploadedFireEmittersValid_, false);
     uploadedQualityControlsValid_ = std::exchange(other.uploadedQualityControlsValid_, false);
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    hybridStaticPrimary_ = std::move(other.hybridStaticPrimary_);
+    hybridStaticFrameSelected_ = other.hybridStaticFrameSelected_;
+    other.hybridStaticFrameSelected_ = false;
+#endif
     staticVertexBuffer_ = std::exchange(other.staticVertexBuffer_, Buffer{});
     worldPlayerVertexBuffer_ = std::exchange(other.worldPlayerVertexBuffer_, Buffer{});
     viewmodelVertexBuffer_ = std::exchange(other.viewmodelVertexBuffer_, Buffer{});
@@ -1624,6 +1629,33 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
         vkCmdTraceRaysKHR_, stagedApi, diagnostic);
     if (!stagedPrimary_) { Destroy(); return false; }
 #endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    RtPipelineBundleBuildApi hybridApi{};
+    hybridApi.user = this;
+    hybridApi.createSharedShaderModules = [](void* user, VkShaderModule& miss, VkShaderModule& hit, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleSharedShaderModules(miss, hit, error);
+    };
+    hybridApi.createEntryShaderModule = [](void* user, const RtPipelineVariantArtifact& artifact, VkShaderModule& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleEntryShaderModule(artifact, out, error);
+    };
+    hybridApi.createStrategyPipeline = [](void* user, RtMaterialStrategy strategy, VkShaderModule entry, VkShaderModule miss,
+                                         VkShaderModule hit, VkPipelineLayout layout, VkPipeline& out, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategyPipeline(strategy, entry, miss, hit, layout, out, error);
+    };
+    hybridApi.createStrategySbt = [](void* user, RtMaterialStrategy strategy, VkPipeline pipeline, Buffer& out,
+                                   std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions, std::string& error) {
+        return static_cast<PresentableTinyRtScene*>(user)->CreateBundleStrategySbt(strategy, pipeline, out, regions, error);
+    };
+    hybridApi.destroyShaderModule = [](void* user, VkShaderModule& module) noexcept {
+        auto& scene = *static_cast<PresentableTinyRtScene*>(user);
+        if (module != VK_NULL_HANDLE) vkDestroyShaderModule(scene.device_, module, nullptr);
+        module = VK_NULL_HANDLE;
+    };
+    hybridStaticPrimary_ = experimental::HybridStaticPrimaryPass::Create(instance_,physicalDevice_,device_,gpuResources_,
+        pipelineBundle_.descriptorSetLayout,pipelineBundle_.descriptorSet,dispatchExtent_,executionPolicy_,hybridApi,
+        staticMeshSlot_,staticVertexBuffer_,staticIndexBuffer_,diagnostic);
+    if(!hybridStaticPrimary_){Destroy();return false;}
+#endif
     pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
     ready_ = true;
     diagnostic.clear();
@@ -1809,6 +1841,11 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(instanceMetadataBuffer_);
     DestroyBuffer(staticIndexBuffer_);
     DestroyBuffer(staticGeometryTransformBuffer_);
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    hybridStaticPrimary_.reset();
+    hybridStaticFrameSelected_ = false;
+    experimental::SetHybridStaticPrimaryApplied(false);
+#endif
     DestroyBuffer(staticVertexBuffer_);
     DestroyBuffer(worldPlayerVertexBuffer_);
     DestroyBuffer(viewmodelVertexBuffer_);
@@ -2010,6 +2047,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
 horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory() const noexcept
 {
     horde::telemetry::RtResourceInventory inventory{};
+
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     regionPageOwner_.AccumulateResourceInventory(inventory);
     if(regionPagePreparation_)regionPagePreparation_->AccumulateResourceInventory(inventory);
@@ -2083,6 +2121,9 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
             inventory, texture->memory, texture->allocationSize,
             texture->memoryPropertyFlags);
     }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if(hybridStaticPrimary_)hybridStaticPrimary_->AccumulateResourceInventory(inventory);
+#endif
     return inventory;
 }
 
@@ -2500,7 +2541,13 @@ bool PresentableTinyRtScene::ResizeOutputAfterDeviceIdle(VkExtent2D extent, std:
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
     if (stagedPrimary_ && !stagedPrimary_->PrepareResizeAfterDeviceIdle(extent, diagnostic)) return false;
 #endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if(hybridStaticPrimary_ && !hybridStaticPrimary_->PrepareResizeAfterDeviceIdle(extent,diagnostic)) return false;
+#endif
     const bool resized = ResizeOutputWithApi(extent, groups, api, diagnostic);
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if(hybridStaticPrimary_){if(resized)hybridStaticPrimary_->CommitResizeAfterDeviceIdle();else hybridStaticPrimary_->CancelResizeAfterDeviceIdle();}
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
     if (stagedPrimary_) {
         if (resized) stagedPrimary_->CommitResizeAfterDeviceIdle();
@@ -6484,6 +6531,16 @@ bool PresentableTinyRtScene::CapturePipelineEvidenceIdentity() noexcept
         candidate.active = candidate.opaqueFast;
     }
 #endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if(hybridStaticPrimary_ && hybridStaticFrameSelected_){
+        if(!horde::telemetry::AssignRtFixedText(candidate.bundleKey,"hybrid_static21_experiment") ||
+           !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.key,SelectedOpaqueFastKey()) ||
+           !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.sha256,SelectedOpaqueFastSha256()) ||
+           !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.key,SelectedGenericDielectricKey()) ||
+           !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.sha256,SelectedGenericDielectricSha256()))return false;
+        candidate.active=candidate.opaqueFast;
+    }
+#endif
     pipelineEvidenceIdentity_ = candidate;
     return true;
 }
@@ -9291,6 +9348,9 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
 
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    experimental::SetHybridStaticPrimaryApplied(hybridStaticPrimary_ && hybridStaticFrameSelected_);
+#endif
     characterSlot_.NotifyFrameSubmitted();
     thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     if (!tlasPendingDefinitionsValid_) return;
@@ -9359,6 +9419,22 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
     {
         return false;
     }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    hybridStaticFrameSelected_ = experimental::HybridStaticPrimaryRequested();
+    if(hybridStaticFrameSelected_ && (!hybridStaticPrimary_ || !tlasPendingDefinitionsValid_ ||
+       !hybridStaticPrimary_->PrepareFrame(std::span(tlasPendingInstances_).first(tlasInstanceCount_),staticVertexBuffer_,staticIndexBuffer_,diagnostic,observation)))return false;
+    pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
+    if(!pipelineEvidenceIdentityValid_){diagnostic="Hybrid/full-RT frame identity assignment failed.";return false;}
+    // UpdateDynamicInstances captured the frame snapshot before this frame's
+    // renderer selection. Refresh pipeline ownership without losing its actual
+    // water quality/strategy facts, including the very first candidate frame.
+    framePipelineEvidenceValid_ = pipelineEvidenceIdentityValid_;
+    framePipelineEvidence_.bundleKey = pipelineEvidenceIdentity_.bundleKey;
+    framePipelineEvidence_.opaqueFast = pipelineEvidenceIdentity_.opaqueFast;
+    framePipelineEvidence_.genericDielectric = pipelineEvidenceIdentity_.genericDielectric;
+    framePipelineEvidence_.active = genericTransmissionActive_
+        ? framePipelineEvidence_.genericDielectric : framePipelineEvidence_.opaqueFast;
+#endif
 
 #if HORDE_RT_FRAME_STAGE_PROBE
     if(asTiming)gpuProbe->End(commandBuffer,0,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
@@ -9475,6 +9551,14 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                     , stagedTiming, timingFrameSlot
 #endif
                     );
+                return;
+            }
+#endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+            if(hybridStaticFrameSelected_){
+                const float eyeOffset=horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y-frame.playerCrouchDropMetres-.70f;
+                hybridStaticPrimary_->Record(commandBuffer,genericTransmissionActive_?RtMaterialStrategy::GenericDielectric:RtMaterialStrategy::OpaqueFast,
+                    std::as_bytes(std::span{&pushConstants,1u}),eyeOffset);
                 return;
             }
 #endif

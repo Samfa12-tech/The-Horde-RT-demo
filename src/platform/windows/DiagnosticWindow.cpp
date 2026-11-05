@@ -163,6 +163,9 @@
 #include "vulkan/RetirementOwner.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 #include "vulkan/raytracing/DevelopmentStaticAssetPolicy.h"
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#include "vulkan/raytracing/experimental/HybridStaticPrimaryControl.h"
+#endif
 #include "vulkan/raytracing/RtFrameEvidenceCoordinator.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
@@ -228,7 +231,26 @@ constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_UI
 #endif
     ;
 constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
-constexpr char kHudActiveText[] = "RT ACTIVE | DIAGNOSTICS";
+const char* ActiveRendererHudText()
+{
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    return horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+        ? "EXPERIMENT: STATIC HYBRID REQUESTED | DIAGNOSTICS"
+        : "FULL RT REFERENCE | DIAGNOSTICS";
+#else
+    return "RT ACTIVE | DIAGNOSTICS";
+#endif
+}
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+std::uint64_t gHybridControlGeneration = 0u;
+std::string RendererComparisonTitle()
+{
+    return std::string(kWindowTitle) +
+        (horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+            ? " [requested: experimental static-assets hybrid (partial)]"
+            : " [Full RT reference]");
+}
+#endif
 constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  APPLYING RT RENDER SCALE...";
 constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_UI_VERSION "\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.";
 constexpr char kReportDirectory[] = "reports";
@@ -236,7 +258,11 @@ constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
 constexpr std::uint32_t kCaptureWidth = 960u;
 constexpr std::uint32_t kCaptureHeight = 540u;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+constexpr int kCaptureSettlingFrames = 180; // 60 warm-up + 120 recorded evidence frames for the local comparison.
+#else
 constexpr int kCaptureSettlingFrames = 12;
+#endif
 constexpr int kEditControlId = 101;
 constexpr int kHudControlId = 102;
 constexpr int kPauseTitleId = 103;
@@ -350,6 +376,10 @@ constexpr int kMenuDeveloperOverlayId = 2024;
 constexpr int kMenuCheckUpdatesId = 2025;
 constexpr int kMenuReportProblemId = 2026;
 constexpr int kMenuCompatibilityReportId = 2027;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+constexpr int kMenuFullRtReferenceId = 2040;
+constexpr int kMenuHybridStaticPrimaryId = 2041;
+#endif
 constexpr wchar_t kCompatibilityProperty[]=L"HordeCompatibilityOwnerV1";
 struct CompatibilityWindowOwner
 {
@@ -466,6 +496,7 @@ struct CaptureLaunchOptions
     horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset =
         horde::vulkan::raytracing::RtWorkloadPreset::Authored;
     bool requireRayQueryCompute = false;
+    bool hybridStaticPrimary = false;
     bool portrait = false;
     bool anatomicalPlayerMount = false;
     bool validateStaticZoneCutover = false;
@@ -1026,7 +1057,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         options.requested=true;options.graphicsPreview=true;options.outputDirectory=previewPair.outputDirectory;
     }
     const auto hiddenCapture=horde::platform::windows::ParseWindowsHiddenCaptureLaunch(argumentViews,
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_HYBRID_STATIC_PRIMARY
         true
 #else
         false
@@ -1130,6 +1161,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
+        if (argument == L"--hybrid-static-primary")
+        {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+            if (options.hybridStaticPrimary) {
+                options.error = "--hybrid-static-primary may only be specified once.";
+                break;
+            }
+            options.hybridStaticPrimary = true;
+#else
+            options.error = "--hybrid-static-primary requires the explicit experimental build.";
+            break;
+#endif
+            continue;
+        }
         if (argument == L"--validate-native-motion" || argument == L"--motion-scenario" ||
             argument == L"--motion-rt-workload") { ++index; continue; }
         if (argument == L"--validate-output-resize") { ++index; continue; }
@@ -1563,7 +1608,11 @@ std::filesystem::path ResolveAssetRoot()
 #else
         false,
 #endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        true); // Explicit local experiment reuses the canonical assets without another copy.
+#else
         HORDE_RT_CHAPTER_MEASUREMENT && ParseCaptureLaunchOptions().measureChapterShippingRoute);
+#endif
 }
 
 std::filesystem::path SettingsPath()
@@ -4224,6 +4273,10 @@ void StartBenchmark(VulkanSurfaceContext& context,
                     const horde::vulkan::raytracing::RtWorkloadPreset rtWorkloadPreset =
                         horde::vulkan::raytracing::RtWorkloadPreset::Authored)
 {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    (void)context; (void)workload; (void)showLiveFps; (void)rtWorkloadPreset;
+    return; // This comparison build never produces community/shipping benchmark scores.
+#endif
     context.benchmarkSummaryArm.reset();
     context.benchmarkSummary.reset();
     ResetRoute(context);
@@ -4292,7 +4345,7 @@ void CancelBenchmark(VulkanSurfaceContext& context, const bool showMenu, const c
     ResetRoute(context);
     if (HWND hud = GetDlgItem(context.windowHandle, kHudControlId))
     {
-        SetWindowTextA(hud, kHudActiveText);
+        SetWindowTextA(hud, ActiveRendererHudText());
     }
     if (showMenu)
     {
@@ -8012,6 +8065,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+             << "  \"renderingExperiment\": {\"scope\": \"partial-static-assets-primary\", \"requested\": "
+             << (horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested() ? "true" : "false")
+             << ", \"submitted\": "
+             << (horde::vulkan::raytracing::experimental::HybridStaticPrimaryApplied() ? "true" : "false")
+            << ", \"rasterDrawsRecorded\": " << context.rtScene.HybridStaticPrimaryRecordedDrawCount()
+            << ", \"rasterTrianglesRecorded\": " << context.rtScene.HybridStaticPrimaryRecordedTriangleCount() << "},\n"
+#endif
              << "  \"playerMountProfile\": \""
              << (context.simulation.Snapshot().playerMountProfile ==
                      horde::gameplay::items::PlayerMountProfile::AnatomicalBody
@@ -8719,6 +8780,21 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 #include "platform/windows/WindowsKeeperCastCapture.inl"
         }
 #endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        std::ofstream hybridEvidenceRows(outputDirectory/(std::to_string(checkpoint.id)+"-hybrid-frames.jsonl"),std::ios::binary);
+        std::uint64_t lastHybridEvidenceSerial=0;
+        const auto appendHybridEvidence=[&](int captureFrameIndex){
+            const auto publication=context.rtFrameEvidence.PublishedStateByValue();
+            if(!publication.hasCompletedEvidence)return;
+            const auto serial=publication.completedEvidence.identity.submitted.submissionSerial;
+            if(serial<=lastHybridEvidenceSerial)return;
+            std::string canonical;horde::telemetry::RtEvidenceValidationError validationError{};
+            if(!horde::telemetry::SerializeRtPerformanceEvidenceJson(publication.completedEvidence,canonical,validationError))return;
+            while(!canonical.empty() && (canonical.back()=='\n' || canonical.back()=='\r'))canonical.pop_back();
+            hybridEvidenceRows<<"{\"captureFrameIndex\":"<<captureFrameIndex<<",\"completedFrame\":"<<canonical<<"}\n";
+            lastHybridEvidenceSerial=serial;
+        };
+#endif
         std::vector<double> frameTimesMs;
         frameTimesMs.reserve(kCaptureSettlingFrames);
         unsigned recreateAttempts = 0u;
@@ -8751,6 +8827,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             if(frame==0 && ParseCaptureLaunchOptions().measureChapterShippingRoute)
                 std::cerr<<"HORDE_TIMING_BOOTSTRAP first-render-complete"<<std::endl;
             frameTimesMs.push_back(std::chrono::duration<double, std::milli>(frameEnd - frameStart).count());
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+            appendHybridEvidence(frame);
+#endif
             capabilities.performance.gpuRt = context.gpuRtTiming;
             capabilities.rtScene.presented = true;
             capabilities.rtScene.executionBackend = context.rtScene.ExecutionBackend();
@@ -8778,6 +8857,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         if (!CompleteRtEvidenceAfterDeviceIdle(context, captureIdle))
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' could not complete its owning submitted frames.");
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        appendHybridEvidence(kCaptureSettlingFrames);
+#endif
         const auto capturePublication = context.rtFrameEvidence.PublishedStateByValue();
         const auto& completedFrame = capturePublication.completedEvidence;
         const auto& completedIdentity = completedFrame.identity.submitted;
@@ -10093,12 +10175,24 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     horde::graphics::ForegroundPauseRenderCadence foregroundPauseCadence;
     std::vector<double> timingSamples;
     timingSamples.reserve(120u);
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    auto observedHybridControlGeneration = gHybridControlGeneration;
+#endif
     std::uint64_t timingWindowIndex = 0u;
-    const std::filesystem::path timingEvidencePath = textReportPath.parent_path() / "windows_showcase_timing.csv";
+    const std::filesystem::path timingEvidencePath = textReportPath.parent_path() /
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        "windows_hybrid_static_primary_timing.csv";
+#else
+        "windows_showcase_timing.csv";
+#endif
     if (!std::filesystem::exists(timingEvidencePath))
     {
         std::ofstream header(timingEvidencePath, std::ios::binary);
-        header << "window,render_scale_percent,zone,median_ms,p95_ms,average_ms,fps_from_median,cap_bound_165\n";
+        header << "window,render_scale_percent,zone,median_ms,p95_ms,average_ms,fps_from_median,cap_bound_165"
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+               << ",hybrid_static_primary_requested,hybrid_static_primary_submitted"
+#endif
+               << '\n';
     }
     while (running)
     {
@@ -10117,6 +10211,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         {
             break;
         }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (observedHybridControlGeneration != gHybridControlGeneration) {
+            timingSamples.clear();
+            observedHybridControlGeneration = gHybridControlGeneration;
+        }
+#endif
         if (context.benchmarkProfileActive && context.benchmarkProfileCancelRequested)
         {
             CancelBenchmark(context, false, "profile-lifecycle-interrupted");
@@ -10419,7 +10519,12 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                          << static_cast<int>(std::lround(context.renderScale * 100.0f)) << ','
                          << horde::gameplay::ShowcaseZoneName(zone) << ','
                          << medianFrameMs << ',' << p95FrameMs << ',' << averageFrameMs << ',' << fps << ','
-                         << (fps >= 160.0 ? "yes" : "no") << '\n';
+                         << (fps >= 160.0 ? "yes" : "no")
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+                         << ',' << horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+                         << ',' << horde::vulkan::raytracing::experimental::HybridStaticPrimaryApplied()
+#endif
+                         << '\n';
             }
             auto& timingDiagnostics = capabilities.diagnostics;
             timingDiagnostics.erase(std::remove(timingDiagnostics.begin(), timingDiagnostics.end(),
@@ -10459,7 +10564,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             WriteReportFile(jsonReportPath, horde::vulkan::BuildCapabilityJsonReport(capabilities, evidencePublication));
             if (HWND hud = GetDlgItem(hWnd, kHudControlId))
             {
-                SetWindowTextA(hud, kHudActiveText);
+                SetWindowTextA(hud, ActiveRendererHudText());
                 RECT hudClient{};
                 GetClientRect(hWnd, &hudClient);
                 LayoutOverlayControls(hWnd, hudClient.right, hudClient.bottom);
@@ -10918,7 +11023,11 @@ void LayoutOverlayControls(HWND window, const int width, const int height)
         const bool expanded = sceneContext != nullptr && sceneContext->benchmark.ShowsLiveFps();
         char hudText[96]{};
         GetWindowTextA(hud, hudText, static_cast<int>(sizeof(hudText)));
-        const bool compact = !expanded && std::string_view(hudText) == kHudActiveText;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        const bool compact = false; // Mode labels need the existing wide HUD layout.
+#else
+        const bool compact = !expanded && std::string_view(hudText) == ActiveRendererHudText();
+#endif
         const LONG_PTR style = GetWindowLongPtrA(hud, GWL_STYLE);
         SetWindowLongPtrA(hud, GWL_STYLE, expanded ? style & ~SS_CENTERIMAGE : style | SS_CENTERIMAGE);
         const int hudWidth = compact ? ScaleForDpi(window, 240) :
@@ -11277,6 +11386,12 @@ void ShowControlsHelp(HWND window)
                  "F2  RT diagnostics\n"
 #if defined(_DEBUG)
                  "F3  Live developer overlay\n"
+#endif
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+                 "Rendering comparison menu  Full RT / partial static-assets hybrid\n"
+                 "Hybrid rasterizes selected immutable static assets only.\n"
+                 "Procedural world, actors and water remain primary RT; lighting stays production RT.\n"
+                 "This experiment disables the community benchmark.\n"
 #endif
                  "Alt+Enter  Fullscreen",
                 "Horde Lantern RT - controls",
@@ -11701,6 +11816,36 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 return 0;
             }
             const int commandId = LOWORD(wParam);
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+            if (commandId == kMenuFullRtReferenceId || commandId == kMenuHybridStaticPrimaryId)
+            {
+                // Initial CLI selection is allowed for deterministic captures;
+                // live menu input must never alter a frozen capture cohort.
+                if (GetPropA(hWnd, kCaptureModeProperty) || gShowcaseCaptureHidden ||
+                    gCampaignHiddenValidation || sceneContext->benchmarkProfileActive ||
+                    sceneContext->unattendedBenchmark) return 0;
+                const bool requested = commandId == kMenuHybridStaticPrimaryId;
+                using namespace horde::vulkan::raytracing::experimental;
+                if (HybridStaticPrimaryRequested() != requested)
+                {
+                    SetHybridStaticPrimaryRequested(requested);
+                    ++gHybridControlGeneration;
+                    sceneContext->rtLabRouteTainted = true;
+                    if (sceneContext->rtFrameEvidenceInitialised)
+                        (void)sceneContext->rtFrameEvidence.ApplyEvent(
+                            horde::telemetry::RtLifecycleEvent::CheckpointChange);
+                    sceneContext->gpuFrameTimingTotalMs = 0.0;
+                    sceneContext->gpuFrameTimingSampleCount = 0u;
+                    sceneContext->gpuRtTiming = {};
+                }
+                CheckMenuRadioItem(GetMenu(hWnd), kMenuFullRtReferenceId, kMenuHybridStaticPrimaryId,
+                    requested ? kMenuHybridStaticPrimaryId : kMenuFullRtReferenceId, MF_BYCOMMAND);
+                SetWindowTextA(hWnd, RendererComparisonTitle().c_str());
+                if (HWND hud = GetDlgItem(hWnd, kHudControlId))
+                    SetWindowTextA(hud, ActiveRendererHudText());
+                return 0;
+            }
+#endif
             if(LookoutPanel::Handles(commandId)) {
                 if(sceneContext->lookoutObjective) {
                     const bool visible=sceneContext->lookoutObjective->Visible();
@@ -12971,6 +13116,16 @@ HMENU CreateApplicationMenu()
     AppendMenuA(settings, MF_STRING, kMenuFullscreenId, "&Fullscreen\tAlt+Enter");
     AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(settings), "&Settings");
 
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    HMENU comparison = CreatePopupMenu();
+    AppendMenuA(comparison, MF_STRING, kMenuFullRtReferenceId, "Full RT (reference)");
+    AppendMenuA(comparison, MF_STRING, kMenuHybridStaticPrimaryId,
+        "Experimental static-assets hybrid (partial)");
+    CheckMenuRadioItem(comparison, kMenuFullRtReferenceId, kMenuHybridStaticPrimaryId,
+        horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+            ? kMenuHybridStaticPrimaryId : kMenuFullRtReferenceId, MF_BYCOMMAND);
+    AppendMenuA(bar, MF_POPUP, reinterpret_cast<UINT_PTR>(comparison), "&Rendering comparison");
+#endif
     HMENU help = CreatePopupMenu();
     AppendMenuA(help, MF_STRING, kMenuControlsId, "&Controls\tF1");
     AppendMenuA(help, MF_STRING, kMenuDiagnosticsId, "RT &diagnostics\tF2");
@@ -13397,7 +13552,11 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const bool sceneMode = horde::vulkan::raytracing::SelectRtExecutionBackend(capabilities, true) !=
         horde::vulkan::RtExecutionBackend::Unsupported;
     const std::string windowTitle = sceneMode
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        ? RendererComparisonTitle()
+#else
         ? kWindowTitle
+#endif
         : MakeWindowTitle(diagnosticText);
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
@@ -13533,8 +13692,15 @@ int RunDiagnosticWindow(const int showCommand)
         std::cerr << launchOptions.error << '\n';
         return 2;
     }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    if (launchOptions.benchmark.requested || gOpeningBenchmarkMenuValidation) {
+        std::cerr << "Community/shipping benchmarks are disabled in this rendering experiment build.\n";
+        return 2;
+    }
+    horde::vulkan::raytracing::experimental::SetHybridStaticPrimaryRequested(launchOptions.hybridStaticPrimary);
+#endif
     gShowcaseCaptureHidden=launchOptions.captureHidden;
-#if !defined(_DEBUG)
+#if !defined(_DEBUG) && !HORDE_RT_HYBRID_STATIC_PRIMARY
     if (launchOptions.requested && !(HORDE_RT_CHAPTER_MEASUREMENT && launchOptions.measureChapterShippingRoute))
     {
         std::cerr << "Scene capture modes are Debug-only automation; Release builds reject them.\n";

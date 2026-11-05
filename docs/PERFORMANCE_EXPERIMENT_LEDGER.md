@@ -13,6 +13,25 @@
 
 ## Closed or retained rendering experiments
 
+
+**5 November real-assets partial hybrid — experimental only, no mobile gain established:**
+[Attribution and bounded follow-up](HYBRID_REGRESSION_ANALYSIS_2026-11-05.md).
+RTX 5050 Laptop GPU, Pipeline Shipping/Mobile, 960×540, fixed portal/niche/forest,
+RT/Hybrid/Hybrid/RT: candidate whole-GPU mean-of-run medians +11.34–14.50%
+(+0.1854–0.2103 ms), CPU trace/copy recording +0.0327–0.0338 ms. Only opaque
+static owner21 primary visibility is rasterised; remaining primary and all
+secondary RT remain. No GPU pass/counter decomposition or phone measurements.
+One camera-uniform-hoist follow-up used 18 balanced Full RT/original/camera/
+camera/original/Full RT captures plus two validation captures. Smaller raster
+SPIR-V did not demonstrate repeatable GPU improvement (-0.19%, +10.00%, +2.32%
+versus original hybrid in the three new views, with run variation); **NOT ADOPTED,
+trial source restored and archived**, no unchanged retry. Original opt-in hybrid
+and full RT reference remain, normal default OFF. Exact source/shader/EXE hashes,
+per-run measurements, pixel differences, local raw-artifact locations and the
+next fence-owned phone GPU profiler protocol are in the report and linked JSON.
+This does not reopen the closed opacity, lookup or inverse-transform trials.
+
+
 **1 November Mobile-water quality reduction — KEEP, scoped to the waterfall hitch:** [Controlled comparison and pause handoff](evidence/2026-10-31-mobile-efficiency/MOBILE_WATER.md). One APK/process, three conditioning routes then A/B/B/A, 2,844 actual-presentation joins. Spray Off improves the predefined water window by 10.0–35.7% against both controls; median intervals 91.667 ms become 62.500/54.167 ms. Whole-route rates 16.707/16.691/16.353/15.924 images/s show no broad FPS gain; closing drift −4.682% and one whole-route p95 almost +15% are borderline. Six active-contact stills inspected, not pixel parity. Mobile now omits optional droplets while water/ripples remain; High and saved tier values are preserved. Private probe removed. Final normal-policy APK completed 793 RT frames, including 28 active-contact frames on OpaqueFast. Native Android fresh/reset default aligned to the approved 33%. Four CTests, 24 Java tests, both platform builds and Android lint pass locally; no new hosted CI/LFS downloads. Phone restored/released; owner-requested pause. Future direct-light scaling is a recommendation only, not another started experiment.
 
 **31 October splash-refraction comparison (cleanup1 November00:00UTC):** [Exact cohort and decision](evidence/2026-10-31-mobile-efficiency/SPLASH_REFRACTION.md). Same APK A/B/B/A,3,140 joined frames; authored droplets versus opaque spray. Whole-route actual rates19.100/18.295/17.958/17.527 images/s; predefined waterfall window14.195/18.409/17.341/13.061. B avoids the generic-transmission switch, but closing control drifts8.234% and the3% route-wide keep gate fails. **NOT ADMITTED:** runtime probe removed, only immutable water-contact telemetry retained. Separate visual route had zero active droplets, so appearance remains unvalidated. Owner reports spray is not noticeable; approved phone-default investigation may test contact droplets Off with full water/high-quality retained, but no playable preset or saved-choice change is established. Clock/power traces and appropriate active-contact capture remain necessary; no unchanged immediate cohort rerun.

@@ -1,0 +1,112 @@
+--- a/tools/compile-hybrid-static-primary.py
++++ b/tools/compile-hybrid-static-primary.py
+@@ -1,6 +1,6 @@
+ """Generate opt-in production-shader adapters; original shader files stay unchanged."""
+ import argparse,pathlib,re,hashlib,json,subprocess,os
+-p=argparse.ArgumentParser();p.add_argument('repo',type=pathlib.Path);p.add_argument('out',type=pathlib.Path);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('repo',type=pathlib.Path);p.add_argument('out',type=pathlib.Path);p.add_argument('--precompute-camera',action='store_true');a=p.parse_args()
+ a.out.mkdir(parents=True,exist_ok=True);deps={}
+ def expand(path,active=()):
+     path=path.resolve();assert path not in active
+@@ -60,6 +60,47 @@
+  .70+controls.hybridEyeOffset+abs(sin(step))*.035*controls.walkAmount,controls.cameraZ);
+  visibility=uvec4(floatBitsToUint(length(worldPosition-eye)),drawIndex,triangleIndex,packUnorm2x16(clamp(bary,0,1)));}
+ '''
++
++# Optional trial: camera-uniform work runs once per frame on the host. The
++# original adapter remains the generator's default. No shading/query changes.
++if a.precompute_camera:
++    camera='''layout(push_constant) uniform RasterCamera {
++ vec4 eyeAspect; vec4 forwardTransform; vec4 right; vec4 up;
++} controls;
++'''
++    vertex='''#version 460
++'''+camera+common+'''
++layout(std430,set=1,binding=3) readonly buffer Vertices {StaticRtVertex values[];} vertices;
++layout(std430,set=1,binding=4) readonly buffer Indices {uint values[];} indices;
++layout(location=0) out vec3 worldPosition;
++layout(location=1) out vec2 bary;
++layout(location=2) flat out uint drawIndex;
++layout(location=3) flat out uint triangleIndex;
++void main(){
++ triangleIndex=uint(gl_VertexIndex)/3u;drawIndex=gl_InstanceIndex;HybridDraw draw=hybridDraws.values[drawIndex];
++ uint vertex=draw.ids.w+indices.values[draw.ids.z+uint(gl_VertexIndex)];
++ worldPosition=(draw.objectToWorld*vertices.values[vertex].position).xyz;
++ uint corner=uint(gl_VertexIndex)%3u;bary=corner==0u?vec2(0):corner==1u?vec2(1,0):vec2(0,1);
++ vec3 d=worldPosition-controls.eyeAspect.xyz;float z=dot(d,controls.forwardTransform.xyz);
++ vec2 xy=vec2(dot(d,controls.right.xyz)*1.22/controls.eyeAspect.w,-dot(d,controls.up.xyz)*1.22/.74);
++ uint transform=uint(controls.forwardTransform.w+.5),rotation=transform&3u;
++ if(transform>=4u)xy.x=-xy.x;
++ if(rotation==1u)xy=vec2(-xy.y,xy.x);else if(rotation==2u)xy=-xy;else if(rotation==3u)xy=vec2(xy.y,-xy.x);
++ gl_Position=vec4(xy,z*10000.0/9999.999-.0010000001,z);
++}
++'''
++    fragment='''#version 460
++layout(location=0) in vec3 worldPosition;
++layout(location=1) in vec2 bary;
++layout(location=2) flat in uint drawIndex;
++layout(location=3) flat in uint triangleIndex;
++layout(location=0) out uvec4 visibility;
++'''+camera+'''
++void main(){
++ visibility=uvec4(floatBitsToUint(length(worldPosition-controls.eyeAspect.xyz)),drawIndex,triangleIndex,packUnorm2x16(clamp(bary,0,1)));
++}
++'''
++
+ hit_path=a.repo/'shaders/raytracing/include/rt_hit_decode.glsl';hit_source=hit_path.read_text()
+ trace=block(hit_source,hit_source.index('HitInfo traceScene('))
+ remaining=trace.replace('HitInfo traceScene(', 'HitInfo hybridTraceRemaining(').replace('query, topLevelAS,','query, hybridRemainingAS,')
+@@ -93,6 +134,7 @@
+ catalog=json.loads((a.repo/'tools/raygen-variant-catalog.json').read_text())
+ generic_cleanup=next(v['compiler']['spirvOptArguments'] for v in catalog['variants'] if v['key']=='shipping_mobile_generic_dielectric')
+ header=['#pragma once','#include <cstdint>','#include <span>','namespace horde::vulkan::raytracing::experimental {','inline constexpr int kHybridInstrumentation=0,kHybridQuality=0;']
++if a.precompute_camera:header.append('#define HORDE_HYBRID_PRECOMPUTED_CAMERA 1')
+ records=[]
+ def compile(name,text):
+     path=a.out/name;path.write_text(text,encoding='utf-8');spv=path.with_suffix(path.suffix+'.spv')
+@@ -134,5 +176,5 @@
+         compile(f'hybrid{material}.{ext}',candidate)
+ header.append('}')
+ (a.out/'HybridStaticPrimaryShaders.h').write_text('\n'.join(header)+'\n')
+-(a.out/'manifest.json').write_text(json.dumps({'scope':'production shader adapter; immutable instance21 primary only','instrumentation':'Shipping','quality':'Mobile','dependencies':deps,'modules':records,'optimizationPolicy':{'opaqueFast':'production LegacyInlined: glslang -Os + spirv-opt -O','genericDielectric':'production GenericRetained cleanup list from frozen raygen catalog','raster':'glslang -Os + spirv-opt -O','geometryShaderRequired':False}},indent=2)+'\n')
++(a.out/'manifest.json').write_text(json.dumps({'scope':'production shader adapter; immutable instance21 primary only','precomputedCamera':a.precompute_camera,'instrumentation':'Shipping','quality':'Mobile','dependencies':deps,'modules':records,'optimizationPolicy':{'opaqueFast':'production LegacyInlined: glslang -Os + spirv-opt -O','genericDielectric':'production GenericRetained cleanup list from frozen raygen catalog','raster':'glslang -Os + spirv-opt -O','geometryShaderRequired':False}},indent=2)+'\n')
+ print(json.dumps(records,indent=2))
+--- a/src/vulkan/raytracing/experimental/HybridStaticPrimaryPass.cpp
++++ b/src/vulkan/raytracing/experimental/HybridStaticPrimaryPass.cpp
+@@ -2,6 +2,7 @@
+ #include "HybridStaticPrimaryShaders.h"
+ #include <algorithm>
+ #include <cstring>
++#include <cmath>
+ #include <limits>
+ namespace horde::vulkan::raytracing::experimental {
+ static_assert(kHybridInstrumentation==HORDE_RT_SELECTED_INSTRUMENTATION);
+@@ -166,7 +167,27 @@
+  VkAccelerationStructureBuildRangeInfoKHR range{};range.primitiveCount=instanceCount_;const auto* p=&range;build_(cmd,1,&b,&p);
+  VkMemoryBarrier before{VK_STRUCTURE_TYPE_MEMORY_BARRIER};before.srcAccessMask=VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR;before.dstAccessMask=VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR;
+  vkCmdPipelineBarrier(cmd,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR,policy_.shaderPipelineStage,0,1,&before,0,nullptr,0,nullptr);
+- std::array<float,32> rasterControls{};std::memcpy(rasterControls.data(),controls.data(),128);rasterControls[29]=float(targets_.extent.width);rasterControls[30]=float(targets_.extent.height);rasterControls[31]=eyeOffset;
++ std::array<float,32> rasterControls{};
++#if HORDE_HYBRID_PRECOMPUTED_CAMERA
++ // Explicit shader-generator trial. Default adapters retain their original ABI.
++ std::array<float,32> sourceControls{};std::memcpy(sourceControls.data(),controls.data(),128);
++ const float step=sourceControls[3]*6.2f,walk=sourceControls[6],wave=std::sin(step);
++ const float pitch=std::clamp(sourceControls[1]+wave*.012f*walk,-.32f,.28f);
++ const auto normalise=[](std::array<float,3> v){const float n=std::sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);for(auto& c:v)c/=n;return v;};
++ const auto forward=normalise({std::sin(sourceControls[0]),-.05f+pitch,-std::cos(sourceControls[0])});
++ const auto right=normalise({-forward[2],0.f,forward[0]});
++ const auto up=normalise({right[1]*forward[2]-right[2]*forward[1],right[2]*forward[0]-right[0]*forward[2],right[0]*forward[1]-right[1]*forward[0]});
++ const uint32_t transform=(uint32_t(sourceControls[7]+.5f)>>1u)&7u,rotation=transform&3u;
++ float aspect=float(targets_.extent.width)/float(targets_.extent.height);
++ if(rotation==1u||rotation==3u)aspect=1.f/aspect;
++ rasterControls[0]=sourceControls[4]+std::sin(step*.5f)*.035f*walk;
++ rasterControls[1]=.70f+eyeOffset+std::abs(wave)*.035f*walk;
++ rasterControls[2]=sourceControls[5];rasterControls[3]=aspect;
++ for(unsigned i=0;i<3;++i){rasterControls[4+i]=forward[i];rasterControls[8+i]=right[i];rasterControls[12+i]=up[i];}
++ rasterControls[7]=float(transform);
++#else
++ std::memcpy(rasterControls.data(),controls.data(),128);rasterControls[29]=float(targets_.extent.width);rasterControls[30]=float(targets_.extent.height);rasterControls[31]=eyeOffset;
++#endif
+  const auto pushStages=policy_.pushConstantStages|VK_SHADER_STAGE_VERTEX_BIT|VK_SHADER_STAGE_FRAGMENT_BIT;
+  vkCmdPushConstants(cmd,layout_,pushStages,0,128,rasterControls.data());
+  VkClearValue clears[2]{};for(auto& u:clears[0].color.uint32)u=0xffffffffu;clears[1].depthStencil={1,0};

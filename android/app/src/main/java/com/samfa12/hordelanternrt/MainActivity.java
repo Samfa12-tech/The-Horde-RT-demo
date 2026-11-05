@@ -98,6 +98,10 @@ import java.util.UUID;
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
+    // Experiment-only JNI control. It changes only the renderer request, never saved graphics settings.
+    private static native boolean nativeHybridStaticPrimaryAvailable();
+    private static native boolean nativeHybridStaticPrimaryRequested();
+    private static native boolean nativeSetHybridStaticPrimaryRequested(boolean enabled);
     private boolean environmentSurveyMode;
     private boolean environmentSurveyFinishing;
     private EnvironmentSurveyRequest environmentSurveyRequest;
@@ -1933,6 +1937,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) addBody(panel, "Partial hybrid experiment: benchmarks and benchmark sharing are disabled. Compare locally using capture and timing diagnostics.");
         addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
         addBody(panel,getString(R.string.benchmark_standard_scope));
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
@@ -2455,6 +2460,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean requestInteractiveBenchmark() {
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) return false;
         try {
             if (ProbeBridge.requestBenchmarkWithSummaryId(UUID.randomUUID().toString(), Build.MODEL)) return true;
         } catch (RuntimeException | LinkageError unavailable) { /* Optional statistics cannot block the run. */ }
@@ -2555,6 +2561,7 @@ public class MainActivity extends Activity {
     private boolean openingBenchmarkPending() { return openingBenchmarkRequest>0; }
 
     private boolean canRequestOpeningBenchmark() {
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) return false;
         if(openingBenchmarkRecoveryRejected || !entryMenuEnabled || entryPlayRequested || openingBenchmarkPending() || benchmarkRunning || !resumed ||
                 surfaceRequestGeneration<=0 || benchmarkAutomationId!=null || campaignMenuVisible || campaignRequest!=0 ||
                 (campaignState!=null && (campaignState.activeSlot>=0 || campaignState.pending())) ||
@@ -2759,6 +2766,10 @@ public class MainActivity extends Activity {
     }
 
     private void startBenchmark() {
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) {
+            Toast.makeText(this, "Benchmarks are disabled in the partial hybrid experiment. Compare locally using capture and timing diagnostics.", Toast.LENGTH_LONG).show();
+            return;
+        }
         playSound("ui_select", 0.18f);
         if (benchmarkAutomationMotionScenario != null) {
             clearTouchState();
@@ -2866,6 +2877,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean consumeBenchmarkAutomationIntent(final Intent intent, final boolean freshLaunch) {
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) return false;
         if (intent == null || !ACTION_BENCHMARK.equals(intent.getAction())) return false;
         try {
             final String id = benchmarkAutomationRequestId(intent);
@@ -2980,6 +2992,7 @@ public class MainActivity extends Activity {
     }
 
     private void showBenchmarkSummaryReview(boolean publicPreview) {
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) return;
         final String runId = readyBenchmarkSummaryRunId();
         if (!BenchmarkSummaryReview.validUuid(runId)) {
             Toast.makeText(this, R.string.benchmark_summary_unavailable, Toast.LENGTH_LONG).show();
@@ -4803,6 +4816,7 @@ public class MainActivity extends Activity {
         background.setColor(0xF2151719); background.setCornerRadius(dp(4));
         background.setStroke(dp(1), 0xFFCFA96A); panel.setBackground(background);
         addGraphicsSelectionSummary(panel);
+        addHybridStaticPrimaryControls(panel);
         if (graphicsRecoveryNotice != null) addBody(panel, graphicsRecoveryNotice);
         addGraphicsButton(panel, "Details", this::showGraphicsSettingsDetails);
         graphicsTelemetry = new TextView(this);
@@ -4902,6 +4916,23 @@ public class MainActivity extends Activity {
         setGraphicsEditorsEnabled(page, !graphicsBusy);
         graphicsPageViewport.restoreAfterLayout(menuScrim);
         logGraphicsUiBuild("graphics", uiBuildStartedNs);
+    }
+
+    private void addHybridStaticPrimaryControls(LinearLayout panel) {
+        if (!BuildConfig.DEBUG || !BuildConfig.HYBRID_STATIC_PRIMARY || !nativeHybridStaticPrimaryAvailable()) return;
+        addGraphicsSectionLabel(panel, "Partial hybrid experiment");
+        addBody(panel, "Raster primary visibility for static asset instances only. World, actors, water and secondary rays stay RT. " +
+                "This session-only request leaves resolution and quality unchanged; performance benefit is unmeasured. Benchmarks are disabled; use local capture and timing diagnostics.");
+        final boolean hybridRequested = nativeHybridStaticPrimaryRequested();
+        addBody(panel, "Renderer request: " + (hybridRequested ? "Hybrid static-assets" : "Full RT"));
+        addGraphicsButton(panel, hybridRequested ? "Request Full RT" : "Request Hybrid static-assets", () -> {
+            if (graphicsBusy || openingBenchmarkPending()) return;
+            if (!nativeSetHybridStaticPrimaryRequested(!nativeHybridStaticPrimaryRequested())) {
+                Toast.makeText(this, "Renderer request unavailable while a benchmark or capture is active.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            showGraphicsPage();
+        });
     }
 
     private void addGraphicsSectionLabel(LinearLayout panel, String label) {

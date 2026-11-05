@@ -67,6 +67,10 @@
 #include "vulkan/raytracing/RtSceneTuning.h"
 #include "vulkan/raytracing/RtSceneProfile.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
+#include "vulkan/raytracing/experimental/HybridStaticPrimaryControl.h"
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#include "vulkan/raytracing/experimental/HybridStaticPrimaryPass.h"
+#endif
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
 #include "vulkan/raytracing/experimental/StagedPrimaryPass.h"
@@ -782,8 +786,15 @@ public:
         default: return {};
         }
     }
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    uint32_t HybridStaticPrimaryRecordedDrawCount() const noexcept {return hybridStaticPrimary_ && hybridStaticFrameSelected_?hybridStaticPrimary_->RecordedDrawCount():0;}
+    uint64_t HybridStaticPrimaryRecordedTriangleCount() const noexcept {return hybridStaticPrimary_ && hybridStaticFrameSelected_?hybridStaticPrimary_->RecordedTriangleCount():0;}
+#endif
     std::string_view SelectedOpaqueFastKey() const
     {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (hybridStaticPrimary_ && hybridStaticFrameSelected_) return hybridStaticPrimary_->Key(RtMaterialStrategy::OpaqueFast);
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
         if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::OpaqueFast);
 #endif
@@ -792,6 +803,9 @@ public:
     [[nodiscard]] std::optional<RtSelectedPipelineArtifactMetadata>
     SelectedPipelineArtifactMetadata(RtMaterialStrategy strategy) const noexcept
     {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (hybridStaticPrimary_ && hybridStaticFrameSelected_) return std::nullopt;
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
         if (stagedPrimary_) return std::nullopt;
 #endif
@@ -804,6 +818,9 @@ public:
     }
     std::string_view SelectedGenericDielectricKey() const
     {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (hybridStaticPrimary_ && hybridStaticFrameSelected_) return hybridStaticPrimary_->Key(RtMaterialStrategy::GenericDielectric);
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
         if (stagedPrimary_) return experimental::StagedPrimaryPass::PairKey(RtMaterialStrategy::GenericDielectric);
 #endif
@@ -811,6 +828,9 @@ public:
     }
     std::string_view SelectedOpaqueFastSha256() const
     {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (hybridStaticPrimary_ && hybridStaticFrameSelected_) return hybridStaticPrimary_->Sha(RtMaterialStrategy::OpaqueFast);
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
         if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::OpaqueFast);
 #endif
@@ -818,6 +838,9 @@ public:
     }
     std::string_view SelectedGenericDielectricSha256() const
     {
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+        if (hybridStaticPrimary_ && hybridStaticFrameSelected_) return hybridStaticPrimary_->Sha(RtMaterialStrategy::GenericDielectric);
+#endif
 #ifdef HORDE_RT_STAGED_PRIMARY_EXPERIMENT
         if (stagedPrimary_) return experimental::StagedPrimaryPass::PairSha256(RtMaterialStrategy::GenericDielectric);
 #endif
@@ -1363,6 +1386,10 @@ private:
     bool uploadedFireEmittersValid_ = false;
     bool uploadedQualityControlsValid_ = false;
     Buffer worldSurfaceBuffer_;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    std::unique_ptr<experimental::HybridStaticPrimaryPass> hybridStaticPrimary_;
+    bool hybridStaticFrameSelected_ = false;
+#endif
     Buffer staticVertexBuffer_;
     Buffer worldPlayerVertexBuffer_;
     Buffer viewmodelVertexBuffer_;

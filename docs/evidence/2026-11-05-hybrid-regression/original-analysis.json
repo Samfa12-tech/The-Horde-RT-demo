@@ -1,0 +1,521 @@
+{
+  "priorArtifactHashesVerified": 28,
+  "originalExecutableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+  "scope": "Existing sealed laptop captures only; CPU medians are not GPU-stage attribution",
+  "scenes": [
+    {
+      "checkpoint": "chapter-forest-lookout",
+      "modes": {
+        "rt": {
+          "gpuRunMedianMeanMs": 1.298424,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.01245,
+            "blasRefitRecordCpuMs": 0.028624999999999998,
+            "tlasUpdateRecordCpuMs": 0.0063999999999999994,
+            "traceCopyRecordCpuMs": 0.027125000000000003,
+            "frameFenceWaitCpuMs": 0.004675,
+            "imageAcquireCpuMs": 0.00545,
+            "queueSubmitCpuMs": 0.040999999999999995,
+            "presentCallCpuMs": 5.556375,
+            "wholeFrameCycleCpuMs": 5.9468
+          },
+          "dynamicUploadBytes": [
+            87200
+          ],
+          "dynamicUploadInvocationCounts": [
+            9
+          ],
+          "simulationTicks": [
+            2757
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            31
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.299168,
+            1.29768
+          ],
+          "gpuRunP95Ms": [
+            2.9147728,
+            1.3293088
+          ]
+        },
+        "hybrid": {
+          "gpuRunMedianMeanMs": 1.4866640000000002,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.01295,
+            "blasRefitRecordCpuMs": 0.027225,
+            "tlasUpdateRecordCpuMs": 0.006625,
+            "traceCopyRecordCpuMs": 0.05985,
+            "frameFenceWaitCpuMs": 0.004824999999999999,
+            "imageAcquireCpuMs": 0.0050750000000000005,
+            "queueSubmitCpuMs": 0.042374999999999996,
+            "presentCallCpuMs": 5.546775,
+            "wholeFrameCycleCpuMs": 5.945025
+          },
+          "dynamicUploadBytes": [
+            90064
+          ],
+          "dynamicUploadInvocationCounts": [
+            11
+          ],
+          "simulationTicks": [
+            2757
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            62
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.4864000000000002,
+            1.486928
+          ],
+          "gpuRunP95Ms": [
+            1.4938608,
+            1.4970528
+          ]
+        }
+      },
+      "gpuMedianMeanDeltaMs": 0.18824000000000018,
+      "gpuMedianMeanChangePercent": 14.497575522325533,
+      "cpuStageRunMedianMeanDeltaMs": {
+        "dynamicUploadCpuMs": 0.0005000000000000004,
+        "blasRefitRecordCpuMs": -0.0013999999999999985,
+        "tlasUpdateRecordCpuMs": 0.00022500000000000037,
+        "traceCopyRecordCpuMs": 0.032725,
+        "frameFenceWaitCpuMs": 0.0001499999999999991,
+        "imageAcquireCpuMs": -0.00037499999999999947,
+        "queueSubmitCpuMs": 0.0013750000000000012,
+        "presentCallCpuMs": -0.009599999999999831,
+        "wholeFrameCycleCpuMs": -0.001774999999999416
+      }
+    },
+    {
+      "checkpoint": "chapter-niche-arch",
+      "modes": {
+        "rt": {
+          "gpuRunMedianMeanMs": 1.7496800000000001,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.024725,
+            "blasRefitRecordCpuMs": 0.0295,
+            "tlasUpdateRecordCpuMs": 0.0068000000000000005,
+            "traceCopyRecordCpuMs": 0.02855,
+            "frameFenceWaitCpuMs": 0.005125,
+            "imageAcquireCpuMs": 0.6288,
+            "queueSubmitCpuMs": 0.040175,
+            "presentCallCpuMs": 4.9367,
+            "wholeFrameCycleCpuMs": 5.9449749999999995
+          },
+          "dynamicUploadBytes": [
+            87200
+          ],
+          "dynamicUploadInvocationCounts": [
+            9
+          ],
+          "simulationTicks": [
+            1
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            31
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.712912,
+            1.786448
+          ],
+          "gpuRunP95Ms": [
+            1.7172592000000002,
+            1.8276159999999997
+          ]
+        },
+        "hybrid": {
+          "gpuRunMedianMeanMs": 1.960008,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.0127,
+            "blasRefitRecordCpuMs": 0.027975,
+            "tlasUpdateRecordCpuMs": 0.0067,
+            "traceCopyRecordCpuMs": 0.061700000000000005,
+            "frameFenceWaitCpuMs": 0.004125,
+            "imageAcquireCpuMs": 0.49855000000000005,
+            "queueSubmitCpuMs": 0.0385,
+            "presentCallCpuMs": 5.021125,
+            "wholeFrameCycleCpuMs": 5.9449000000000005
+          },
+          "dynamicUploadBytes": [
+            90064
+          ],
+          "dynamicUploadInvocationCounts": [
+            11
+          ],
+          "simulationTicks": [
+            1
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            62
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.971936,
+            1.94808
+          ],
+          "gpuRunP95Ms": [
+            1.977168,
+            1.9754192
+          ]
+        }
+      },
+      "gpuMedianMeanDeltaMs": 0.21032799999999985,
+      "gpuMedianMeanChangePercent": 12.020940972063453,
+      "cpuStageRunMedianMeanDeltaMs": {
+        "dynamicUploadCpuMs": -0.012025000000000001,
+        "blasRefitRecordCpuMs": -0.0015249999999999986,
+        "tlasUpdateRecordCpuMs": -0.00010000000000000026,
+        "traceCopyRecordCpuMs": 0.033150000000000006,
+        "frameFenceWaitCpuMs": -0.001,
+        "imageAcquireCpuMs": -0.13024999999999998,
+        "queueSubmitCpuMs": -0.0016750000000000029,
+        "presentCallCpuMs": 0.08442499999999953,
+        "wholeFrameCycleCpuMs": -7.499999999893703e-05
+      }
+    },
+    {
+      "checkpoint": "chapter-stone-portal-front",
+      "modes": {
+        "rt": {
+          "gpuRunMedianMeanMs": 1.635264,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.0126,
+            "blasRefitRecordCpuMs": 0.029675,
+            "tlasUpdateRecordCpuMs": 0.0066,
+            "traceCopyRecordCpuMs": 0.028675,
+            "frameFenceWaitCpuMs": 0.004574999999999999,
+            "imageAcquireCpuMs": 1.427125,
+            "queueSubmitCpuMs": 0.041325,
+            "presentCallCpuMs": 4.13725,
+            "wholeFrameCycleCpuMs": 5.954549999999999
+          },
+          "dynamicUploadBytes": [
+            87200
+          ],
+          "dynamicUploadInvocationCounts": [
+            9
+          ],
+          "simulationTicks": [
+            1
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            31
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.636768,
+            1.63376
+          ],
+          "gpuRunP95Ms": [
+            1.8439424,
+            1.8288736
+          ]
+        },
+        "hybrid": {
+          "gpuRunMedianMeanMs": 1.820656,
+          "cpuRunMedianMeanMs": {
+            "dynamicUploadCpuMs": 0.0128,
+            "blasRefitRecordCpuMs": 0.02835,
+            "tlasUpdateRecordCpuMs": 0.0067,
+            "traceCopyRecordCpuMs": 0.06245,
+            "frameFenceWaitCpuMs": 0.003475,
+            "imageAcquireCpuMs": 2.3543000000000003,
+            "queueSubmitCpuMs": 0.039075,
+            "presentCallCpuMs": 3.2216250000000004,
+            "wholeFrameCycleCpuMs": 5.950925
+          },
+          "dynamicUploadBytes": [
+            90064
+          ],
+          "dynamicUploadInvocationCounts": [
+            11
+          ],
+          "simulationTicks": [
+            1
+          ],
+          "skinUpdates": [
+            1
+          ],
+          "liveAllocatedTlases": [
+            2
+          ],
+          "inventoryTlasInstances": [
+            62
+          ],
+          "dimensions": {
+            "internalExtent": [
+              960,
+              540
+            ],
+            "outputExtent": [
+              960,
+              540
+            ],
+            "cameraAspect": 1.77777779,
+            "presentationTransform": 0,
+            "dynamicResolutionEnabled": false,
+            "linearBlit": false,
+            "aspectPreserved": true
+          },
+          "gpuRunMedianMs": [
+            1.833952,
+            1.80736
+          ],
+          "gpuRunP95Ms": [
+            1.8406752,
+            1.8344976000000002
+          ]
+        }
+      },
+      "gpuMedianMeanDeltaMs": 0.185392,
+      "gpuMedianMeanChangePercent": 11.337129662244138,
+      "cpuStageRunMedianMeanDeltaMs": {
+        "dynamicUploadCpuMs": 0.00020000000000000052,
+        "blasRefitRecordCpuMs": -0.0013249999999999998,
+        "tlasUpdateRecordCpuMs": 0.00010000000000000026,
+        "traceCopyRecordCpuMs": 0.033775,
+        "frameFenceWaitCpuMs": -0.0010999999999999994,
+        "imageAcquireCpuMs": 0.9271750000000003,
+        "queueSubmitCpuMs": -0.002250000000000002,
+        "presentCallCpuMs": -0.9156249999999995,
+        "wholeFrameCycleCpuMs": -0.0036249999999995453
+      }
+    }
+  ],
+  "shaderStaticMetrics": [
+    {
+      "material": "opaque_fast",
+      "mode": "fullRt",
+      "bytes": 557556,
+      "sha256": "276767ebb2920bec4262a291d6bfc0a24f6012acfa3ff62a7f58c75923e11c9a",
+      "spirvInstructions": 30940,
+      "selectedStaticOperationCounts": {
+        "OpFunction": 1,
+        "OpFunctionCall": 0,
+        "OpLoopMerge": 80,
+        "OpSelectionMerge": 1700,
+        "OpBranch": 2490,
+        "OpBranchConditional": 1598,
+        "OpSwitch": 182,
+        "OpRayQueryInitializeKHR": 27,
+        "OpRayQueryProceedKHR": 27,
+        "OpImageRead": 0
+      }
+    },
+    {
+      "material": "opaque_fast",
+      "mode": "hybrid",
+      "bytes": 573728,
+      "sha256": "9746bf9e2644437f3e7c8e21c26d4bc93520000de61276b9970b56b5820752ec",
+      "spirvInstructions": 31733,
+      "selectedStaticOperationCounts": {
+        "OpFunction": 1,
+        "OpFunctionCall": 0,
+        "OpLoopMerge": 81,
+        "OpSelectionMerge": 1727,
+        "OpBranch": 2531,
+        "OpBranchConditional": 1624,
+        "OpSwitch": 184,
+        "OpRayQueryInitializeKHR": 27,
+        "OpRayQueryProceedKHR": 27,
+        "OpImageRead": 1
+      }
+    },
+    {
+      "material": "generic_dielectric",
+      "mode": "fullRt",
+      "bytes": 241268,
+      "sha256": "c9c842a86f245f1443a6ffc1186acf76f58c555dbc0927d6332a683f05d96e32",
+      "spirvInstructions": 13888,
+      "selectedStaticOperationCounts": {
+        "OpFunction": 83,
+        "OpFunctionCall": 260,
+        "OpLoopMerge": 20,
+        "OpSelectionMerge": 384,
+        "OpBranch": 483,
+        "OpBranchConditional": 404,
+        "OpSwitch": 0,
+        "OpRayQueryInitializeKHR": 2,
+        "OpRayQueryProceedKHR": 2,
+        "OpImageRead": 0
+      }
+    },
+    {
+      "material": "generic_dielectric",
+      "mode": "hybrid",
+      "bytes": 282284,
+      "sha256": "f5cf7dc6dd6e0e5e4aebf1cd3dff9c88bf5a041dbe0599c216d400c9a9f60fbd",
+      "spirvInstructions": 16212,
+      "selectedStaticOperationCounts": {
+        "OpFunction": 85,
+        "OpFunctionCall": 273,
+        "OpLoopMerge": 21,
+        "OpSelectionMerge": 446,
+        "OpBranch": 574,
+        "OpBranchConditional": 467,
+        "OpSwitch": 0,
+        "OpRayQueryInitializeKHR": 3,
+        "OpRayQueryProceedKHR": 3,
+        "OpImageRead": 1
+      }
+    }
+  ],
+  "rasterStaticMetrics": [
+    {
+      "mode": "original",
+      "stage": "vert",
+      "bytes": 7308,
+      "instructions": 388,
+      "sinSites": 3,
+      "cosSites": 1,
+      "normaliseSites": 3
+    },
+    {
+      "mode": "original",
+      "stage": "frag",
+      "bytes": 3296,
+      "instructions": 158,
+      "sinSites": 2,
+      "cosSites": 0,
+      "normaliseSites": 0
+    },
+    {
+      "mode": "precomputedCamera",
+      "stage": "vert",
+      "bytes": 4800,
+      "instructions": 274,
+      "sinSites": 0,
+      "cosSites": 0,
+      "normaliseSites": 0
+    },
+    {
+      "mode": "precomputedCamera",
+      "stage": "frag",
+      "bytes": 1340,
+      "instructions": 75,
+      "sinSites": 0,
+      "cosSites": 0,
+      "normaliseSites": 0
+    }
+  ],
+  "sourceFacts": {
+    "rasterDrawsPerCandidateFrame": 11,
+    "rasterTrianglesPerCandidateFrame": 751868,
+    "submittedNonindexedVerticesPerCandidateFrame": 2255604,
+    "depthBytesPerPixel": 4,
+    "visibilityBytesPerPixel": 16,
+    "attachmentPayloadBytesAt960x540": 10368000,
+    "fullVisibilityReadBytesAt960x540": 8294400,
+    "visibilityLogicalReadPlusWriteBytesAt960x540": 16588800,
+    "perFragmentCameraWorkInOriginalShader": true,
+    "extraTlasBuildEachCandidateRecord": true,
+    "remainingPrimaryQueryStillIssuedForEachPrimaryPixel": true,
+    "gpuStageOrMemoryBandwidthCountersAvailable": false
+  }
+}

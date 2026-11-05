@@ -1,0 +1,12 @@
+[
+  {
+    "file": "tools/compile-hybrid-static-primary.py",
+    "originalSha256": "28cd7a8d96aa2b2ac964456b5f6e19c3ef1b593cf3a3ae274710523e1e00b57e",
+    "trialSha256": "f3e5c4ec886be270d35682fee57540e1800c794d1a1eae851ba06055cdc40175"
+  },
+  {
+    "file": "src/vulkan/raytracing/experimental/HybridStaticPrimaryPass.cpp",
+    "originalSha256": "eb7e5e6ff185a3d04ddaa5182327109e387af8ff079edd7b90d16b137b482db7",
+    "trialSha256": "8926f9dfb72dba50c3454f543f1ec8d0451db58cd6ba90f5ab4fd458cd54d257"
+  }
+]

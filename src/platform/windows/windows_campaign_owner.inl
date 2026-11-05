@@ -5,6 +5,9 @@ namespace campaign=horde::gameplay::campaign;
 std::filesystem::path WindowsCampaignDirectory()
 {
     if(gAcceptanceProfile.Active())return gAcceptanceProfile.CampaignDirectory();
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    return ExecutableDirectory()/"hybrid-static-primary-state"/"campaign-v1";
+#endif
 #if defined(_DEBUG)
     if(gOpeningBenchmarkMenuValidation)return gCampaignValidationDirectory;
 #endif

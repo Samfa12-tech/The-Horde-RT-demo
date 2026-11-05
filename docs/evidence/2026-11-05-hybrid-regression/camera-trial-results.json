@@ -1,0 +1,2710 @@
+{
+  "method": "One cohort, Full RT / original hybrid / camera hybrid / camera hybrid / original hybrid / Full RT per scene; 180 owning frames/run, first 60 excluded",
+  "priorArtifactsPreservedAndHashVerified": 28,
+  "newDefaultShadersByteIdenticalToOriginal": true,
+  "productionShadingModulesByteIdentical": true,
+  "originalExecutableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+  "trialExecutableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+  "scenes": [
+    {
+      "checkpoint": "chapter-stone-portal-front",
+      "modeMeanOfRunMedianGpuMs": {
+        "full-rt": 1.801408,
+        "original": 1.8266399999999998,
+        "camera": 1.823096
+      },
+      "cameraVsOriginalChangePercent": -0.19401743091138623,
+      "cameraVsFullRtChangePercent": 1.2039471346857678,
+      "imageDifferences": {
+        "cameraVersusOriginalHybrid": {
+          "meanAbsoluteRgbError255": 0.00020318930041152264,
+          "maxChannelError255": 61,
+          "pixelsAnyChannelOver8Percent": 0.000771604938271605,
+          "identical": false
+        },
+        "originalHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.015464891975308643,
+          "maxChannelError255": 158,
+          "pixelsAnyChannelOver8Percent": 0.012924382716049383,
+          "identical": false
+        },
+        "cameraHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.015302854938271606,
+          "maxChannelError255": 158,
+          "pixelsAnyChannelOver8Percent": 0.012152777777777778,
+          "identical": false
+        }
+      }
+    },
+    {
+      "checkpoint": "chapter-niche-arch",
+      "modeMeanOfRunMedianGpuMs": {
+        "full-rt": 1.72656,
+        "original": 2.0440560000000003,
+        "camera": 2.2484960000000003
+      },
+      "cameraVsOriginalChangePercent": 10.001682928452048,
+      "cameraVsFullRtChangePercent": 30.229821147252345,
+      "imageDifferences": {
+        "cameraVersusOriginalHybrid": {
+          "meanAbsoluteRgbError255": 0.0011921296296296296,
+          "maxChannelError255": 49,
+          "pixelsAnyChannelOver8Percent": 0.007523148148148149,
+          "identical": false
+        },
+        "originalHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.0036091820987654323,
+          "maxChannelError255": 49,
+          "pixelsAnyChannelOver8Percent": 0.013117283950617283,
+          "identical": false
+        },
+        "cameraHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.0031050668724279837,
+          "maxChannelError255": 45,
+          "pixelsAnyChannelOver8Percent": 0.010223765432098766,
+          "identical": false
+        }
+      }
+    },
+    {
+      "checkpoint": "chapter-forest-lookout",
+      "modeMeanOfRunMedianGpuMs": {
+        "full-rt": 1.317936,
+        "original": 1.413624,
+        "camera": 1.44636
+      },
+      "cameraVsOriginalChangePercent": 2.3157501570431727,
+      "cameraVsFullRtChangePercent": 9.74432749389955,
+      "imageDifferences": {
+        "cameraVersusOriginalHybrid": {
+          "meanAbsoluteRgbError255": 0.004441872427983539,
+          "maxChannelError255": 73,
+          "pixelsAnyChannelOver8Percent": 0.017746913580246913,
+          "identical": false
+        },
+        "originalHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.06987268518518518,
+          "maxChannelError255": 75,
+          "pixelsAnyChannelOver8Percent": 0.13599537037037038,
+          "identical": false
+        },
+        "cameraHybridVersusFullRt": {
+          "meanAbsoluteRgbError255": 0.06925411522633745,
+          "maxChannelError255": 75,
+          "pixelsAnyChannelOver8Percent": 0.13368055555555555,
+          "identical": false
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "run": "chapter-forest-lookout-0-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.307312,
+        "p95": 2.0167248
+      },
+      "cpuCycleMs": {
+        "median": 5.9434000000000005,
+        "p95": 5.984515
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0315,
+        "p95": 0.05008
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-forest-lookout-1-original",
+      "mode": "original",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.4021119999999998,
+        "p95": 2.1641343999999996
+      },
+      "cpuCycleMs": {
+        "median": 5.94025,
+        "p95": 5.99069
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06715,
+        "p95": 0.09820999999999999
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-forest-lookout-2-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.401952,
+        "p95": 2.1523904
+      },
+      "cpuCycleMs": {
+        "median": 5.9402,
+        "p95": 5.972565
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0703,
+        "p95": 0.10206499999999999
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-forest-lookout-3-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.490768,
+        "p95": 2.317088
+      },
+      "cpuCycleMs": {
+        "median": 5.93965,
+        "p95": 5.984005
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06545000000000001,
+        "p95": 0.090405
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-forest-lookout-4-original",
+      "mode": "original",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.4251360000000002,
+        "p95": 1.4364944
+      },
+      "cpuCycleMs": {
+        "median": 5.9412,
+        "p95": 5.97248
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06105,
+        "p95": 0.08932
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-forest-lookout-5-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-forest-lookout",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.32856,
+        "p95": 1.3354336
+      },
+      "cpuCycleMs": {
+        "median": 5.944649999999999,
+        "p95": 5.991079999999999
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.028749999999999998,
+        "p95": 0.04514
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                13.7770128,
+                -0.0170526803,
+                36.5440369,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 13.304916,
+          "z": 36.204624,
+          "yaw": 2.51,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "lich",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-0-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.711072,
+        "p95": 1.7171552
+      },
+      "cpuCycleMs": {
+        "median": 5.941599999999999,
+        "p95": 5.98023
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.034699999999999995,
+        "p95": 0.06715
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-1-original",
+      "mode": "original",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 2.1272,
+        "p95": 3.1104320000000003
+      },
+      "cpuCycleMs": {
+        "median": 5.93785,
+        "p95": 5.978095
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0668,
+        "p95": 0.13776
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-2-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 2.068144,
+        "p95": 3.0034832
+      },
+      "cpuCycleMs": {
+        "median": 5.9365000000000006,
+        "p95": 5.98227
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06895000000000001,
+        "p95": 0.1232
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-3-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 2.4288480000000003,
+        "p95": 3.4742368000000003
+      },
+      "cpuCycleMs": {
+        "median": 5.938000000000001,
+        "p95": 5.9750049999999995
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06545000000000001,
+        "p95": 0.09712
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-4-original",
+      "mode": "original",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.960912,
+        "p95": 2.9509888
+      },
+      "cpuCycleMs": {
+        "median": 5.9387,
+        "p95": 5.98156
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.06765,
+        "p95": 0.09502499999999998
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-niche-arch-5-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-niche-arch",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.742048,
+        "p95": 2.452368
+      },
+      "cpuCycleMs": {
+        "median": 5.93045,
+        "p95": 5.98609
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.03095,
+        "p95": 0.047904999999999996
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1279348308,
+              "positionStrength": [
+                -0.501213849,
+                0.362413019,
+                -1.97987604,
+                0.686399996
+              ],
+              "colourIntensity": [
+                1,
+                0.426759988,
+                0.0815246254,
+                0.686399996
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": -0.4,
+          "z": -2.6,
+          "yaw": -1.570796,
+          "pitch": -0.32
+        },
+        "state": {
+          "torchFailurePhase": "settled",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dead",
+          "finaleSkylightOpenProgress": 1.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-0-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.788976,
+        "p95": 1.8316496
+      },
+      "cpuCycleMs": {
+        "median": 5.94245,
+        "p95": 5.995185
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.028749999999999998,
+        "p95": 0.041575
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-1-original",
+      "mode": "original",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.8422399999999999,
+        "p95": 1.8496063999999999
+      },
+      "cpuCycleMs": {
+        "median": 5.9402,
+        "p95": 5.9732650000000005
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0717,
+        "p95": 0.131185
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-2-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.810384,
+        "p95": 1.83836
+      },
+      "cpuCycleMs": {
+        "median": 5.947100000000001,
+        "p95": 6.14574
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0629,
+        "p95": 0.07944999999999998
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-3-camera",
+      "mode": "camera",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.835808,
+        "p95": 1.9169696
+      },
+      "cpuCycleMs": {
+        "median": 5.94745,
+        "p95": 5.98714
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.05975,
+        "p95": 0.085225
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-4-original",
+      "mode": "original",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.81104,
+        "p95": 1.8386464
+      },
+      "cpuCycleMs": {
+        "median": 5.947900000000001,
+        "p95": 5.97999
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.059,
+        "p95": 0.08554500000000001
+      },
+      "executableSha256": "73318ed0b98a19fea8cbd34760e92a4e9b5179f62ff62fd5cfa0315a6509c4b1",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    },
+    {
+      "run": "chapter-stone-portal-front-5-full-rt",
+      "mode": "full-rt",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.81384,
+        "p95": 1.8570527999999997
+      },
+      "cpuCycleMs": {
+        "median": 5.9532,
+        "p95": 5.99961
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.0266,
+        "p95": 0.043225
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      }
+    }
+  ],
+  "validationRuns": [
+    {
+      "run": "validation-camera-portrait",
+      "mode": "camera",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.90528,
+        "p95": 2.0945152
+      },
+      "cpuCycleMs": {
+        "median": 5.949450000000001,
+        "p95": 5.995965
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.20185,
+        "p95": 0.27950499999999995
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            540,
+            960
+          ],
+          "outputExtent": [
+            540,
+            960
+          ],
+          "cameraAspect": 0.5625,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.150803879,
+                0.745665729,
+                -5.54176998,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      },
+      "validationDeviceLayerLoaded": true,
+      "noVuidOrValidationErrors": true,
+      "backend": "RayTracingPipeline"
+    },
+    {
+      "run": "validation-camera-query",
+      "mode": "camera",
+      "checkpoint": "chapter-stone-portal-front",
+      "samples": 120,
+      "gpuMs": {
+        "median": 1.929312,
+        "p95": 2.6598336000000002
+      },
+      "cpuCycleMs": {
+        "median": 5.94325,
+        "p95": 6.006945
+      },
+      "cpuTraceRecordMs": {
+        "median": 0.2062,
+        "p95": 0.28477
+      },
+      "executableSha256": "58b446b977df79a6523d46c47770017b222fe4e09327bb901239917ff3e10ef9",
+      "settings": {
+        "submittedDimensions": {
+          "internalExtent": [
+            960,
+            540
+          ],
+          "outputExtent": [
+            960,
+            540
+          ],
+          "cameraAspect": 1.77777779,
+          "presentationTransform": 0,
+          "dynamicResolutionEnabled": false,
+          "linearBlit": false,
+          "aspectPreserved": true
+        },
+        "shadowQuality": {
+          "mode": "current",
+          "localPrimarySamples": 1,
+          "skyPrimarySamples": 1,
+          "reserved": 0
+        },
+        "fireQuality": {
+          "quality": "High",
+          "volumeSteps": 10,
+          "reflectionSamples": 2,
+          "reflectedVolumeSteps": 8
+        },
+        "actualUploadedDustQuality": 2,
+        "actualUploadedMistEnabled": true,
+        "fireLighting": {
+          "count": 1,
+          "emitters": [
+            {
+              "stableId": 1,
+              "positionStrength": [
+                -0.200803831,
+                0.77097553,
+                -5.5091033,
+                1.58399999
+              ],
+              "colourIntensity": [
+                1,
+                0.454960018,
+                0.0977689177,
+                1.58399999
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "stableId": 0,
+              "positionStrength": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "colourIntensity": [
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "camera": {
+          "x": 0.0,
+          "z": -4.9,
+          "yaw": 0.0,
+          "pitch": -0.15
+        },
+        "state": {
+          "torchFailurePhase": "held",
+          "selectedEnemy": "skeleton",
+          "lichPhase": "dormant",
+          "finaleSkylightOpenProgress": 0.0
+        },
+        "strategy": "opaque-fast",
+        "waterQuality": "high",
+        "fixedAnimationTimeSeconds": 0.0
+      },
+      "validationDeviceLayerLoaded": true,
+      "noVuidOrValidationErrors": true,
+      "backend": "RayQueryCompute"
+    }
+  ]
+}

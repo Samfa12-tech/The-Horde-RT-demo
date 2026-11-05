@@ -5,6 +5,9 @@ horde::platform::windows::OpeningBenchmarkEligibility OpeningBenchmarkEligibilit
 {
     using namespace horde::platform::windows;
     OpeningBenchmarkEligibility e;
+#if HORDE_RT_HYBRID_STATIC_PRIMARY
+    return e; // Experiment mode never enters community/shipping benchmark ownership.
+#endif
     e.entryVisible=c.openingBenchmark && c.controlsEnabled && c.entryMenuVisible &&
         !c.settingsVisible && !c.graphicsVisible && !c.diagnosticsVisible && !c.benchmarkReportVisible &&
         !c.rtLabVisible && !c.openingBenchmarkReturnPending;
