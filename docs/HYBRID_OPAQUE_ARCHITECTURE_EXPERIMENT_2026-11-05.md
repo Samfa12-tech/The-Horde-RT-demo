@@ -82,3 +82,8 @@ Set-Location "$repo\android"
 ```
 
 No device installation command is included as an action taken. Future phone acceptance needs equal initial state/settings, interleaved controls, completed present ownership and heat context; do not compare the reduced-effects candidate against full shipping shading as a primary-visibility speedup.
+
+
+## Subsequent physical-phone follow-up
+
+Later on5 November Sam connected the phone and authorised testing. The same APK was installed and both modes physically validated on SM-S948B. The earlier no-device statements above describe the host-delivery checkpoint. [Subsequent phone evidence](HYBRID_OPAQUE_PHONE_EXPERIMENT_2026-11-05.md) records four short matched-scene windows and screenshots: no reliable mobile benefit, because thermal/power state drift prevents causal attribution. The original sealed artifacts remain unchanged.

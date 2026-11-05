@@ -4203,3 +4203,12 @@ latest signed package retained. This complements the earlier scoped owner route
 acceptance at `627c6485`; it does not silently transfer every earlier gameplay
 observation to the final binary. See the [published artifact and validation
 receipt](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md).
+
+
+### 5 November 2026: isolated raster-primary / RT-shadow architectural lab
+
+**Evidence class: actual-device bounded native-rendering and timing evidence on SM-S948B**, Android17/API37, Adreno840, Vulkan1.4.295, Qualcomm driver raw2150932499 / build089d643e2a, compilerE031.50.19.27. Existing debug APK SHA256 `271c789fb5bd74f19eee38a6de9969674d70c10b449883a64ca31f4468dcf747`, source `a1f51f9ef42f2733f3f329cc7febec8a599f5b2d`, separate package `com.samfa12.hordelanternrt.debug.hybridroom`. Installed on explicitly authorised connected user0 and on-device hash matched; no rebuild, released-package replacement or data clear.
+
+Actual Horde opaque niche renders with conventional raster primary visibility and genuine hardware ray-query direct-light shadows; matched RT-primary reference uses the same selected effects. 50% portrait720x1486→1440x2971, Shipping/Mobile; same camera, time0, lights, settings and process. Four20-second raster/reference/reference/raster windows produce1,752 native SurfaceView actual presentations,1,560 GPU timestamp interval samples and17 sparse owning completed-frame reports. Raster43.17/44.79ms GPU and22.31/20.85 displayed images/s; RT-primary35.48/49.19ms and26.02/20.06 images/s. **No repeatable mobile gain established**: reference GPU mean drifts38.7%, thermal status1–2 and GPU thermal power levels0–5 vary. No sustained campaign/thermal acceptance or full shipping-effects comparison follows.
+
+Mode-control UI, native output and still capture physically exercised; zero steady AS updates/skin/uploads in the static fixture. Actors/held props, water/glass, volumetrics, indirect light/reflections omitted equally. No per-frame GPU percentile or per-frame GPU→display join, phone Khronos-validation, rotation/fault lifecycle, combat/touch or broad model-family certification. Lab stopped/Home requested and separate app retained for owner; published Full RT package/saves/settings untouched. Exact method, thermal endpoints, limitations and private evidence locations: [phone report](HYBRID_OPAQUE_PHONE_EXPERIMENT_2026-11-05.md).
