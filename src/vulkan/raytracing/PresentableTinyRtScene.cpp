@@ -592,6 +592,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     worldSurfaceBuffer_ = std::exchange(other.worldSurfaceBuffer_, Buffer{});
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
     hybridStaticPrimary_ = std::move(other.hybridStaticPrimary_);
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    opaqueRoomWorldIndices_=std::move(other.opaqueRoomWorldIndices_);
+    opaqueRoomWorldCodes_=std::move(other.opaqueRoomWorldCodes_);
+#endif
     hybridStaticFrameSelected_ = other.hybridStaticFrameSelected_;
     other.hybridStaticFrameSelected_ = false;
 #endif
@@ -1653,7 +1657,11 @@ bool PresentableTinyRtScene::ContinueInitialiseAfterPreflight(
     };
     hybridStaticPrimary_ = experimental::HybridStaticPrimaryPass::Create(instance_,physicalDevice_,device_,gpuResources_,
         pipelineBundle_.descriptorSetLayout,pipelineBundle_.descriptorSet,dispatchExtent_,executionPolicy_,hybridApi,
-        staticMeshSlot_,staticVertexBuffer_,staticIndexBuffer_,diagnostic);
+        staticMeshSlot_,staticVertexBuffer_,staticIndexBuffer_,
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        vertexBuffer_,opaqueRoomWorldIndices_,opaqueRoomWorldCodes_,
+#endif
+        diagnostic);
     if(!hybridStaticPrimary_){Destroy();return false;}
 #endif
     pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
@@ -1843,6 +1851,9 @@ void PresentableTinyRtScene::Destroy()
     DestroyBuffer(staticGeometryTransformBuffer_);
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
     hybridStaticPrimary_.reset();
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    opaqueRoomWorldIndices_.clear();opaqueRoomWorldCodes_.clear();
+#endif
     hybridStaticFrameSelected_ = false;
     experimental::SetHybridStaticPrimaryApplied(false);
 #endif
@@ -2607,7 +2618,11 @@ bool PresentableTinyRtScene::CreateOutputImage(VkExtent2D extent, OutputImageRes
         1u,
         VK_SAMPLE_COUNT_1_BIT,
         VK_IMAGE_TILING_OPTIMAL,
-        VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
+        VK_IMAGE_USAGE_STORAGE_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+            |VK_IMAGE_USAGE_TRANSFER_DST_BIT
+#endif
+            ,
         VK_SHARING_MODE_EXCLUSIVE,
         0u,
         nullptr,
@@ -4056,6 +4071,9 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
     for (const auto& plane : content.worldQuads) worldQuad(plane);
     for (const auto& plane : content.waterQuads) worldQuad(plane);
     const auto worldIndexCount = static_cast<std::uint32_t>(indices.size());
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    opaqueRoomWorldIndices_=indices;opaqueRoomWorldCodes_=surfaceCodes;
+#endif
     // Reuse the production analytic water profile exactly, including taper and
     // world anchor. Each stream has physical depth and open air between streams.
     constexpr std::array<float, 8u> ringCos{{1.0f, .70710678f, 0.0f, -.70710678f, -1.0f, -.70710678f, 0.0f, .70710678f}};
@@ -4097,7 +4115,11 @@ bool PresentableTinyRtScene::BuildPreviewAccelerationStructures(std::string& dia
         pipelineBundle_.Request().quality == DielectricQuality::High);
     const QualityDustUpload initialDustQuality{initialQuality,{}};
     const auto initialWaterContactRipple = MakeRegionalWaterRenderData(false);
-    if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage, true, "preview world vertices", vertexBuffer_) ||
+    if (!upload(vertices.data(), vertices.size() * sizeof(Vertex), geometryUsage
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        |VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
+#endif
+        , true, "preview world vertices", vertexBuffer_) ||
         !upload(indices.data(), indices.size() * sizeof(std::uint32_t), geometryUsage, true, "preview world indices", indexBuffer_) ||
         !upload(surfaceCodes.data(), surfaceCodes.size() * sizeof(std::uint32_t), VK_BUFFER_USAGE_STORAGE_BUFFER_BIT, false,
                 "preview world surfaces", worldSurfaceBuffer_) ||
@@ -4996,6 +5018,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         for(const auto& vertex:vertices) rescueWorldVertices_.push_back({vertex.position[0],vertex.position[1],vertex.position[2]});
     }
     const std::uint32_t sceneIndexCount = static_cast<std::uint32_t>(indices.size());
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    opaqueRoomWorldIndices_=indices;opaqueRoomWorldCodes_=worldSurfaceCodes;
+#endif
     rescueWorldPrimitiveCount_=sceneIndexCount/3u;
     if (worldSurfaceCodes.size() != sceneIndexCount / 3u)
     {
@@ -5177,7 +5202,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     const VkDeviceSize vertexBufferSize = sizeof(Vertex) * vertices.size();
     const VkDeviceSize indexBufferSize = sizeof(std::uint32_t) * indices.size();
     const VkDeviceSize worldSurfaceBufferSize = sizeof(std::uint32_t) * worldSurfaceCodes.size();
-    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
+    if (!CreateBuffer(vertexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                      |VK_BUFFER_USAGE_STORAGE_BUFFER_BIT
+#endif
+                      ,
                       uploadMemory, true, vertexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
         !CreateBuffer(indexBufferSize, VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR,
                       uploadMemory, true, indexBuffer_, diagnostic, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT) ||
@@ -6532,8 +6561,22 @@ bool PresentableTinyRtScene::CapturePipelineEvidenceIdentity() noexcept
     }
 #endif
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
-    if(hybridStaticPrimary_ && hybridStaticFrameSelected_){
-        if(!horde::telemetry::AssignRtFixedText(candidate.bundleKey,"hybrid_static21_experiment") ||
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    if(hybridStaticPrimary_){
+#else
+    if(hybridStaticPrimary_ && (hybridStaticFrameSelected_
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        || true
+#endif
+        )){
+#endif
+        if(!horde::telemetry::AssignRtFixedText(candidate.bundleKey,
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+            "complete_opaque_architecture_experiment"
+#else
+            "hybrid_static21_experiment"
+#endif
+            ) ||
            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.key,SelectedOpaqueFastKey()) ||
            !horde::telemetry::AssignRtFixedText(candidate.opaqueFast.sha256,SelectedOpaqueFastSha256()) ||
            !horde::telemetry::AssignRtFixedText(candidate.genericDielectric.key,SelectedGenericDielectricKey()) ||
@@ -6565,13 +6608,19 @@ bool PresentableTinyRtScene::CreateBundleDescriptorSetLayout(
         diagnostic = "Device sampled-image/sampler limits cannot accommodate the shared RT environment.";
         return false;
     }
-    const auto bindings = TryMakeRtDescriptorSetLayoutBindings(contract,
+    auto bindings = TryMakeRtDescriptorSetLayoutBindings(contract,
         executionPolicy_.pushConstantStages, executionPolicy_.shaderStage);
     if (!bindings)
     {
         diagnostic = "Selected RT descriptor roster exceeds its capacity or contains an invalid resource kind.";
         return false;
     }
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    for(std::uint32_t i=0;i<bindings->count;++i){
+        auto& b=bindings->values[i];if(b.binding!=0u)b.stageFlags|=VK_SHADER_STAGE_FRAGMENT_BIT;
+        if(b.binding==1u)b.stageFlags|=VK_SHADER_STAGE_VERTEX_BIT;
+    }
+#endif
     const VkDescriptorSetLayoutCreateInfo layoutInfo{
         VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO, nullptr, 0u,
         bindings->count, bindings->values.data()};
@@ -9350,6 +9399,9 @@ void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
     experimental::SetHybridStaticPrimaryApplied(hybridStaticPrimary_ && hybridStaticFrameSelected_);
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    if(hybridStaticPrimary_)hybridStaticPrimary_->NotifyFrameSubmitted();
+#endif
 #endif
     characterSlot_.NotifyFrameSubmitted();
     thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
@@ -9380,6 +9432,9 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
         (frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible || frame.playerUtilityHand.has_value());
     // A prior unsubmitted recording must not advance the GPU definition cache.
     tlasPendingDefinitionsValid_ = false;
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    if(!hybridStaticPrimary_ || !hybridStaticPrimary_->ScenePrimed())
+#endif
     uploadedFireEmittersValid_ = false;
 #if !defined(NDEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
     // A rejected presentation attempt invalidates geometry evidence from the
@@ -9415,14 +9470,30 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
 #if HORDE_RT_FRAME_STAGE_PROBE
     const bool asTiming=gpuProbe && gpuProbe->Begin(commandBuffer,0,VK_PIPELINE_STAGE_ACCELERATION_STRUCTURE_BUILD_BIT_KHR);
 #endif
-    if (!UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
+    if (
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        (!hybridStaticPrimary_ || !hybridStaticPrimary_->ScenePrimed()) &&
+#endif
+        !UpdateDynamicInstances(commandBuffer, frame, diagnostic, observation))
     {
         return false;
     }
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    if(hybridStaticPrimary_ && hybridStaticPrimary_->ScenePrimed())
+        ObserveRtSceneCommand(observation,RtSceneCommandEvent::RetainedStaticScene);
+#endif
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
     hybridStaticFrameSelected_ = experimental::HybridStaticPrimaryRequested();
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    genericTransmissionActive_=false;
+    framePipelineEvidence_.activeStrategy=horde::telemetry::RtMaterialStrategy::OpaqueFast;
+    const auto& opaqueDefinitions=tlasPendingDefinitionsValid_?tlasPendingInstances_:tlasBuiltInstances_;
+    if(!hybridStaticPrimary_ || !hybridStaticPrimary_->PrepareFrame(std::span(opaqueDefinitions).first(tlasInstanceCount_),
+        staticVertexBuffer_,staticIndexBuffer_,diagnostic,observation))return false;
+#else
     if(hybridStaticFrameSelected_ && (!hybridStaticPrimary_ || !tlasPendingDefinitionsValid_ ||
        !hybridStaticPrimary_->PrepareFrame(std::span(tlasPendingInstances_).first(tlasInstanceCount_),staticVertexBuffer_,staticIndexBuffer_,diagnostic,observation)))return false;
+#endif
     pipelineEvidenceIdentityValid_ = CapturePipelineEvidenceIdentity();
     if(!pipelineEvidenceIdentityValid_){diagnostic="Hybrid/full-RT frame identity assignment failed.";return false;}
     // UpdateDynamicInstances captured the frame snapshot before this frame's
@@ -9555,10 +9626,20 @@ bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
             }
 #endif
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
-            if(hybridStaticFrameSelected_){
+            if(
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                true
+#else
+                hybridStaticFrameSelected_
+#endif
+            ){
                 const float eyeOffset=horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY)+offset.y-frame.playerCrouchDropMetres-.70f;
                 hybridStaticPrimary_->Record(commandBuffer,genericTransmissionActive_?RtMaterialStrategy::GenericDielectric:RtMaterialStrategy::OpaqueFast,
-                    std::as_bytes(std::span{&pushConstants,1u}),eyeOffset);
+                    std::as_bytes(std::span{&pushConstants,1u}),eyeOffset
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                    ,storageImage_
+#endif
+                    );
                 return;
             }
 #endif

@@ -1937,7 +1937,9 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel = createPanel("HORDE LANTERN", getString(R.string.entry_more_eyebrow));
         addBody(panel, getString(R.string.entry_more_description));
-        if (BuildConfig.HYBRID_STATIC_PRIMARY) addBody(panel, "Partial hybrid experiment: benchmarks and benchmark sharing are disabled. Compare locally using capture and timing diagnostics.");
+        if (BuildConfig.HYBRID_STATIC_PRIMARY) addBody(panel, BuildConfig.HYBRID_OPAQUE_ROOM
+                ? "Opaque room comparison: benchmarks and benchmark sharing are disabled. Compare locally using capture and timing diagnostics."
+                : "Partial hybrid experiment: benchmarks and benchmark sharing are disabled. Compare locally using capture and timing diagnostics.");
         addBody(panel,"The benchmark course speeds up or slows down with rendering speed. Normal gameplay does not.");
         addBody(panel,getString(R.string.benchmark_standard_scope));
         openingBenchmarkButton=addEntryMenuButton(panel,"Custom benchmark (unranked)",this::requestOpeningCustomBenchmark,false);
@@ -2767,7 +2769,7 @@ public class MainActivity extends Activity {
 
     private void startBenchmark() {
         if (BuildConfig.HYBRID_STATIC_PRIMARY) {
-            Toast.makeText(this, "Benchmarks are disabled in the partial hybrid experiment. Compare locally using capture and timing diagnostics.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Benchmarks are disabled in this renderer experiment. Compare locally using capture and timing diagnostics.", Toast.LENGTH_LONG).show();
             return;
         }
         playSound("ui_select", 0.18f);
@@ -4920,12 +4922,22 @@ public class MainActivity extends Activity {
 
     private void addHybridStaticPrimaryControls(LinearLayout panel) {
         if (!BuildConfig.DEBUG || !BuildConfig.HYBRID_STATIC_PRIMARY || !nativeHybridStaticPrimaryAvailable()) return;
-        addGraphicsSectionLabel(panel, "Partial hybrid experiment");
-        addBody(panel, "Raster primary visibility for static asset instances only. World, actors, water and secondary rays stay RT. " +
-                "This session-only request leaves resolution and quality unchanged; performance benefit is unmeasured. Benchmarks are disabled; use local capture and timing diagnostics.");
+        addGraphicsSectionLabel(panel, BuildConfig.HYBRID_OPAQUE_ROOM ? "Opaque room comparison" : "Partial hybrid experiment");
+        if (BuildConfig.HYBRID_OPAQUE_ROOM) {
+            addBody(panel, "Complete opaque architectural fixture only: Horde world geometry and actual static assets. " +
+                    "Both modes use the same selected RT direct lights and shadows. Water, glass, actors and gameplay are absent; " +
+                    "fuller indirect lighting, fire and mist are absent or simplified equally in both modes. " +
+                    "This compares a bounded room profile, not full-game visual parity. Mobile performance is unmeasured. " +
+                    "The session-only request leaves resolution and quality unchanged. Benchmarks are disabled; use local capture and timing diagnostics.");
+        } else {
+            addBody(panel, "Raster primary visibility for static asset instances only. World, actors, water and secondary rays stay RT. " +
+                    "This session-only request leaves resolution and quality unchanged; performance benefit is unmeasured. Benchmarks are disabled; use local capture and timing diagnostics.");
+        }
+        final String referenceMode = BuildConfig.HYBRID_OPAQUE_ROOM ? "RT primary + RT shadows" : "Full RT";
+        final String candidateMode = BuildConfig.HYBRID_OPAQUE_ROOM ? "Raster scene + RT shadows" : "Hybrid static-assets";
         final boolean hybridRequested = nativeHybridStaticPrimaryRequested();
-        addBody(panel, "Renderer request: " + (hybridRequested ? "Hybrid static-assets" : "Full RT"));
-        addGraphicsButton(panel, hybridRequested ? "Request Full RT" : "Request Hybrid static-assets", () -> {
+        addBody(panel, "Renderer request: " + (hybridRequested ? candidateMode : referenceMode));
+        addGraphicsButton(panel, "Request " + (hybridRequested ? referenceMode : candidateMode), () -> {
             if (graphicsBusy || openingBenchmarkPending()) return;
             if (!nativeSetHybridStaticPrimaryRequested(!nativeHybridStaticPrimaryRequested())) {
                 Toast.makeText(this, "Renderer request unavailable while a benchmark or capture is active.", Toast.LENGTH_SHORT).show();

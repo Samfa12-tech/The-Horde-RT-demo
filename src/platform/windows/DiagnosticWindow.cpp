@@ -233,7 +233,11 @@ constexpr char kWindowTitle[] = "Horde Lantern RT - Showcase Alpha " HORDE_RT_UI
 constexpr char kHudStartingText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  VULKAN RT STARTING...  |  F1 CONTROLS  |  ESC MENU";
 const char* ActiveRendererHudText()
 {
-#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    return horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+        ? "OPAQUE SCENE: RASTER + RT SHADOWS REQUESTED | DIAGNOSTICS"
+        : "OPAQUE SCENE: RT PRIMARY + RT SHADOWS | DIAGNOSTICS";
+#elif HORDE_RT_HYBRID_STATIC_PRIMARY
     return horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
         ? "EXPERIMENT: STATIC HYBRID REQUESTED | DIAGNOSTICS"
         : "FULL RT REFERENCE | DIAGNOSTICS";
@@ -247,12 +251,33 @@ std::string RendererComparisonTitle()
 {
     return std::string(kWindowTitle) +
         (horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+            ? " [opaque architecture: Raster scene + RT shadows (requested)]"
+            : " [opaque architecture: RT primary + RT shadows]");
+#else
             ? " [requested: experimental static-assets hybrid (partial)]"
             : " [Full RT reference]");
+#endif
+}
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+const char* OpaqueRoomCommandPath()
+{
+    return horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
+        ? "forward-raster-fragment-ray-query-shadows"
+        : "rt-primary-selected-ray-query-shadows";
 }
 #endif
+#endif
 constexpr char kHudApplyingScaleText[] = "ALPHA " HORDE_RT_UI_VERSION "  |  APPLYING RT RENDER SCALE...";
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+constexpr char kAboutText[] = "Horde Lantern RT\nOpaque architecture rendering experiment\n\n"
+    "RT primary + RT shadows versus Raster scene + RT shadows.\n"
+    "A bounded architectural scene using genuine hardware ray-query shadows.\n"
+    "Both modes omit or simplify actors, held props, water, glass, mist, volumetrics, indirect lighting and reflections equally.\n"
+    "This profile is not the full shipping renderer.\nA Samfa12 technology demo.";
+#else
 constexpr char kAboutText[] = "Horde Lantern RT\nShowcase Alpha " HORDE_RT_UI_VERSION "\n\nNative Vulkan hardware ray tracing. RT or nothing.\nA Samfa12 technology demo.";
+#endif
 constexpr char kReportDirectory[] = "reports";
 constexpr char kTextReportFilename[] = "vulkan_capability_report.txt";
 constexpr char kJsonReportFilename[] = "vulkan_capability_report.json";
@@ -8059,14 +8084,29 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "{\n"
              << "  \"schemaVersion\": 1,\n"
              << "  \"complete\": " << (complete ? "true" : "false") << ",\n"
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+             << "  \"source\": \"renderer-output-image\",\n"
+#else
              << "  \"source\": \"rt-storage-image\",\n"
+#endif
              << "  \"sceneOnly\": true,\n"
              << "  \"overlaysIncluded\": false,\n"
              << "  \"settlingFrames\": " << kCaptureSettlingFrames << ",\n"
              << "  \"fixedAnimationTimeSeconds\": 0.000000,\n"
              << "  \"buildId\": \"" << JsonEscape(HORDE_RT_BUILD_ID) << "\",\n"
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+             << "  \"renderingExperiment\": {\"scope\": \"complete-opaque-architecture\", "
+             << "\"actualCommandPath\": \"" << OpaqueRoomCommandPath() << "\", "
+             << "\"referenceBackend\": \""
+             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\", "
+             << "\"executionBackendMeaning\": \"available RT-primary reference backend; actualCommandPath identifies the selected command path\", "
+             << "\"geometry\": \"architectural world0 plus actual StaticPbr owner21\", "
+             << "\"equalProfileLimitations\": \"Both modes omit or simplify actors, held props, water, glass, mist, volumetrics, indirect lighting and reflections equally.\", "
+             << "\"fullShippingReference\": false, \"requested\": "
+#else
              << "  \"renderingExperiment\": {\"scope\": \"partial-static-assets-primary\", \"requested\": "
+#endif
              << (horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested() ? "true" : "false")
              << ", \"submitted\": "
              << (horde::vulkan::raytracing::experimental::HybridStaticPrimaryApplied() ? "true" : "false")
@@ -8108,7 +8148,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
              << "    \"sampleCount\": " << allFrameTimes.size() << ",\n"
              << "    \"overallMedianMs\": " << CaptureMedianMs(allFrameTimes) << ",\n"
              << "    \"overallMeanMs\": " << CaptureMeanMs(allFrameTimes) << ",\n"
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+             << "    \"gpuFrameCommandBuffer\": {\"valid\": "
+#else
              << "    \"gpuRtCommandBuffer\": {\"valid\": "
+#endif
              << (context.gpuRtTiming.valid ? "true" : "false")
              << ", \"latestMs\": " << context.gpuRtTiming.latestMs
              << ", \"averageMs\": " << context.gpuRtTiming.averageMs
@@ -8302,7 +8346,12 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                   << ", \"projectedMotes\": " << capture.dustWork.projectedMotes
                   << ", \"tileReferences\": " << capture.dustWork.tileReferences
                   << ", \"overflowReferences\": " << capture.dustWork.overflowReferences << "}},\n"
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                  << "      \"visibility\": {\"actorValidationRequested\": false, \"actorOwnershipCertified\": false, "
+                  << "\"actorEvidenceMeaning\": \"raw simulation/renderer metadata only; actors and held props omitted by profile\", \"playerPrimaryVisible\": "
+#else
                   << "      \"visibility\": {\"playerPrimaryVisible\": "
+#endif
                  << (capture.playerPrimaryVisible ? "true" : "false")
                  << ", \"primaryArmsMayBeOutsideFrame\": "
                  << (capture.primaryArmsMayBeOutsideFrame ? "true" : "false")
@@ -8368,6 +8417,10 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << (capture.redBlueSwapNormalised ? "true" : "false") << ",\n"
                  << "      \"pixelFormat\": \"RGBA8\",\n"
                  << "      \"file\": \"" << JsonEscape(capture.filename) << "\",\n"
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                 << "      \"viewmodelGeometry\": {\"requested\": false, \"available\": false, \"exported\": false, \"certified\": false, \"status\": \"omitted-by-opaque-architecture-profile\"},\n"
+                 << "      \"playerWorldBodyGeometry\": {\"requested\": false, \"available\": false, \"exported\": false, \"certified\": false, \"status\": \"omitted-by-opaque-architecture-profile\"},\n"
+#else
                  << "      \"viewmodelGeometry\": {\"available\": "
                  << (capture.viewmodelGeometryFile.empty() ? "false" : "true")
                  << ", \"space\": \"model\", \"source\": \"cpu-upload\", \"file\": \""
@@ -8386,6 +8439,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"finiteVertexCount\": "
                  << capture.worldBodyGeometryEvidence.vertexCount << ", \"faceCount\": "
                  << capture.worldBodyGeometryEvidence.faceCount << "},\n"
+#endif
                  << "      \"pngSha256\": \"" << capture.pngSha256 << "\"\n"
                  << "    }" << (index + 1u == captures.size() ? "\n" : ",\n");
     }
@@ -8884,6 +8938,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                 completedFrame, completedFrameJson, captureEvidenceError))
             return fail(std::string("Checkpoint '") + checkpoint.name +
                         "' completed-frame evidence failed canonical validation.");
+#if !HORDE_RT_HYBRID_OPAQUE_ROOM
         const bool completedRtDispatch = context.useRtPath &&
             completedFrame.scene.dispatch.sceneReady &&
             completedFrame.scene.dispatch.rtDispatchRecorded &&
@@ -8893,6 +8948,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             completedIdentity.submissionSerial != 0u &&
             completedIdentity.submissionSerial ==
                 completedFrame.presentation.lastSuccessfulPresentSubmissionSerial;
+#endif
 
         horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
         std::string diagnostic;
@@ -8904,6 +8960,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             static_cast<std::uint64_t>(image.width) * image.height * 4u;
         const bool rtStorageImageCopied = image.width != 0u && image.height != 0u &&
             expectedStorageImageBytes == image.rgba.size();
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        if (!rtStorageImageCopied)
+            return fail(std::string("Checkpoint '") + checkpoint.name +
+                        "' has no complete opaque architectural output image.");
+#endif
 
         std::ostringstream filename;
         filename << std::setw(2) << std::setfill('0') << checkpoint.id << '-' << checkpoint.name;
@@ -8976,6 +9037,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             context.developmentCheckpoint);
         record.primaryArmsMayBeOutsideFrame = development != nullptr &&
             development->primaryArmsMayBeOutsideFrame;
+#if !HORDE_RT_HYBRID_OPAQUE_ROOM
+        // Production actor/held-prop ownership and geometry evidence is outside
+        // the opaque architectural profile, which omits those contributors.
         const bool simulationRewardClaimed =
             simulation.interaction.heldLightKind ==
                 horde::gameplay::interactions::HeldLightKind::RewardLantern;
@@ -9165,12 +9229,15 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                    << record.rewardBodyPosition[2] << ".";
             return fail(reason.str());
         }
+#endif
         if (!Sha256File(pngPath, record.pngSha256, diagnostic))
         {
             return fail(std::string("Checkpoint '") + checkpoint.name + "' hash failed: " + diagnostic);
         }
+#if !HORDE_RT_HYBRID_OPAQUE_ROOM
         if (viewmodelCapture && record.viewmodelGeometryFile.empty() && !capturePlayerGeometry())
             return 1;
+#endif
 #if defined(_DEBUG)
         if(forestProof && !context.rtScene.ValidateForestRouteProof(diagnostic))return fail(diagnostic);
 #endif
@@ -10180,7 +10247,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #endif
     std::uint64_t timingWindowIndex = 0u;
     const std::filesystem::path timingEvidencePath = textReportPath.parent_path() /
-#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        "windows_hybrid_opaque_room_timing.csv";
+#elif HORDE_RT_HYBRID_STATIC_PRIMARY
         "windows_hybrid_static_primary_timing.csv";
 #else
         "windows_showcase_timing.csv";
@@ -10189,7 +10258,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     {
         std::ofstream header(timingEvidencePath, std::ios::binary);
         header << "window,render_scale_percent,zone,median_ms,p95_ms,average_ms,fps_from_median,cap_bound_165"
-#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+               << ",raster_scene_requested,raster_scene_submitted,actual_command_path"
+#elif HORDE_RT_HYBRID_STATIC_PRIMARY
                << ",hybrid_static_primary_requested,hybrid_static_primary_submitted"
 #endif
                << '\n';
@@ -10523,6 +10594,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
                          << ',' << horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
                          << ',' << horde::vulkan::raytracing::experimental::HybridStaticPrimaryApplied()
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                         << ',' << OpaqueRoomCommandPath()
+#endif
 #endif
                          << '\n';
             }
@@ -11387,7 +11461,14 @@ void ShowControlsHelp(HWND window)
 #if defined(_DEBUG)
                  "F3  Live developer overlay\n"
 #endif
-#if HORDE_RT_HYBRID_STATIC_PRIMARY
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+                 "Rendering comparison: RT primary + RT shadows / Raster scene + RT shadows\n"
+                 "Both modes use the same bounded opaque Horde architectural scene:\n"
+                 "procedural world plus real static assets, with selected hardware ray-query shadows.\n"
+                 "Actors, held props, water, glass, mist, volumetrics, indirect lighting and reflections\n"
+                 "are omitted or simplified equally in both modes; this is not a full shipping reference.\n"
+                 "This experiment disables the community benchmark.\n"
+#elif HORDE_RT_HYBRID_STATIC_PRIMARY
                  "Rendering comparison menu  Full RT / partial static-assets hybrid\n"
                  "Hybrid rasterizes selected immutable static assets only.\n"
                  "Procedural world, actors and water remain primary RT; lighting stays production RT.\n"
@@ -13118,9 +13199,14 @@ HMENU CreateApplicationMenu()
 
 #if HORDE_RT_HYBRID_STATIC_PRIMARY
     HMENU comparison = CreatePopupMenu();
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    AppendMenuA(comparison, MF_STRING, kMenuFullRtReferenceId, "RT primary + RT shadows");
+    AppendMenuA(comparison, MF_STRING, kMenuHybridStaticPrimaryId, "Raster scene + RT shadows");
+#else
     AppendMenuA(comparison, MF_STRING, kMenuFullRtReferenceId, "Full RT (reference)");
     AppendMenuA(comparison, MF_STRING, kMenuHybridStaticPrimaryId,
         "Experimental static-assets hybrid (partial)");
+#endif
     CheckMenuRadioItem(comparison, kMenuFullRtReferenceId, kMenuHybridStaticPrimaryId,
         horde::vulkan::raytracing::experimental::HybridStaticPrimaryRequested()
             ? kMenuHybridStaticPrimaryId : kMenuFullRtReferenceId, MF_BYCOMMAND);

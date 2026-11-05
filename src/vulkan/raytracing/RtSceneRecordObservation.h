@@ -22,6 +22,9 @@ enum class RtSceneCommandEvent : std::uint8_t
     TlasToTraceBarrier,
     Trace,
     CopyOrBlit,
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+    RetainedStaticScene,
+#endif
     Count,
 };
 
@@ -43,6 +46,12 @@ public:
 
     [[nodiscard]] bool ValidCompleted() const noexcept
     {
+#if HORDE_RT_HYBRID_OPAQUE_ROOM
+        // Explicit static-fixture path. No pretend HostWrite/TLAS commands:
+        // its immutable AS were submitted once and retained by the owner.
+        if(!overflowed_ && size_==3u && events_[0]==RtSceneCommandEvent::RetainedStaticScene &&
+           events_[1]==RtSceneCommandEvent::Trace && events_[2]==RtSceneCommandEvent::CopyOrBlit)return true;
+#endif
         if (overflowed_ || size_ < 5u ||
             events_[0] != RtSceneCommandEvent::HostWriteBarrier)
         {
