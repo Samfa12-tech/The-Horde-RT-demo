@@ -1,0 +1,111 @@
+# Bellwether arrival: locked directing direction
+
+**Owner approval: 7 November 2026. Planning and voice production, not implementation or animation acceptance.** The [shared roadmap](../../ROADMAP.md#18---bellwether-npcs-and-light-rpg-systems) remains the scope authority. Sam approved the 7 November lookout-to-town screenplay with: “ok YES lock this in. we likely need some more lines produces via Mureak - can you organise that now?”
+
+The approved direction is a continuous, largely player-controlled sequence: existing lookout, loose-ground ankle injury, short independent protective walk, square, south tavern door, chair by the hearth, then a player-initiated conversation. This record supersedes the older undecided injury-cause and offered-arm draft, without treating a plan or recording as a finished scene.
+
+## Locked direction and boundaries
+
+- Keep the same night, road, skyline and unwalled Bellwether visible from 1.7. Arrive southeast from the lookout without crossing the river. The silent player retains the camera; no forced cinematic shots.
+- Kit turns his ankle on a small loose patch of road, catches his balance and tests the foot. No attack, full-body tumble, ragdoll, loud bone crack, quick-time event or punishment for not catching him.
+- Kit walks independently over a short route, protecting the ankle. Do not promise player-arm support or paired locomotion. Looking away must not cause the stumble to replay; overtaking, stopping and backtracking must not become an escort-failure system.
+- Reach the well/square and approach the tavern through its mapped south-facing doorway. Do not invent a north door to shorten the sequence.
+- First arrival features Kit and the capable, practical tavern keeper. Other villagers stay at their own service areas rather than crowding the doorway. The approved keeper voice is the capable young-adult woman, **Ironclad Strategist**, from audition02. Do not silently recast her to match an inconsistent model.
+- Kit settles at a sturdy chair/table in a quiet alcove near the hearth, clear of the door swing and player route. His emotional progression is care, frustration, then competence. He remains the player's useful partner, not an abandoned quest marker.
+- The longer conversation starts through player interaction after Kit sits. Kit indicates the lantern without taking it. The first lantern speech remains the later shrine scene, with Kit absent. No new lantern voice on arrival, automatic dawn or unexplained recovery.
+
+## Screenplay and exact dialogue
+
+### 1. Lookout, night
+
+Kit and the player see the same town they will reach. Let cold moonlight, warm windows and the existing line breathe. Preserve the view and player control.
+
+**KIT:** “There. Chimney smoke.” (`forest.village`, existing runtime take)
+
+Kit takes the road when the player advances. Completed 1.7 saves do not replay the reveal or demand another lantern presentation. Replace the old demo turnaround/end presentation deliberately when extending the route.
+
+### 2. Lower road
+
+A stone shifts under Kit's foot. His ankle rolls slightly, knee yields and arm/torso counterbalance catches him. He stops with weight on the other leg. A boot scrape, small gravel movement and controlled breath support the action.
+
+**KIT:** “Ah. Wait a moment.” (`kit.approach_injury.stop`)
+
+He tests the foot and removes the weight.
+
+**KIT:** “Loose ground. Turned my ankle. I can stand, but give me a moment.” (`kit.approach_injury.ankle`)
+
+**KIT:** “Stay close a moment. I can manage if we go slowly.” (`kit.approach_injury.slow`, new ID)
+
+The new `slow` line replaces the old unrecorded `kit.approach_injury.arm` (“Lend me your arm for this bit. We'll take it slowly.”). Preserve the old historical bank but do not schedule its arm line or imply that physical support exists.
+
+### 3. Down to the square
+
+Kit uses a restrained protective walk. Injury persists across starts, stops and turns. The player can look around or move ahead. Keep the journey short and readable without constant pain barks, route exposition or an escort timer. The church path remains an actual branch, not blocked scenery.
+
+### 4. Tavern doorway
+
+Warm light comes through the real south doorway. The keeper notices Kit and stays clear of his route and the door swing.
+
+**TAVERN KEEPER:** “Easy. There's a chair just inside.” (`hub.arrival_chair`, new ID)
+
+The existing **“Shut the door behind you. Both of you look frozen.”** (`hub.arrival`) is **conditional**, not compulsory: reuse only if it fits the final door interaction and performance. Closing the door must not gate progression.
+
+### 5. By the fire
+
+**KIT:** “Right. I'm sitting down before I make this worse.” (`kit.accept_base.sit`)
+
+Kit turns, finds the seat and lowers himself with the injured leg protected. Feet, pelvis, chair, clothing and hands must make convincing contact.
+
+**KIT:** “I won't get far along those roads like this. You'll have to go without me.” (`kit.accept_base.limit`)
+
+A pause. His attention moves to the table and what he can still do.
+
+**KIT:** “Bring what you find back here. I can still make myself useful.” (`kit.accept_base.work`)
+
+### 6. First conversation
+
+After settling, the player chooses to talk rather than triggering a lecture on entering.
+
+**KIT:** “The tomb was there. So was something worth the climb.” (`hub.kit_introduce`)
+
+**TAVERN KEEPER:** “My grandfather called the Horde an army. You treasure hunters always hear the other word.” (`hub.horde_army`)
+
+**KIT:** “Armies need paying. I'm hoping we're both right.” (`hub.hoard_answer`)
+
+A useful lead points toward the record keeper and wayside shrine. The record keeper stays by the northern church rather than appearing in the tavern. The player can leave through the same door; Kit remains settled and subsequent visits recognise the completed arrival.
+
+## Geography and staging authority
+
+Use the [town service drawing](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02b-bellwether-use-1-8.webp), [terrain drawing](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/02a-bellwether-terrain-1-8.webp), [shared coordinate layout](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/design/world/connected/shared-coordinate-layout.json) and [world atlas](../../design/world/atlas/README.md). Their metric coordinates are proposed blockout, not certified engine transforms.
+
+The keeper belongs at the tavern; record keeper north by the church; artificer at the southeast smith; salvager east toward river/mill; relic dealer west of the square. These service anchors do not finalize actor heights, facing, pathing or activity. The old square-side Kit marker predates his recovery arc and is not a final seat.
+
+Protect the northwest return to the lookout, northern church/shrine routes and southeast regional road. Future branches remain downstream Abbey, eastern gorge/Foundry and northeast ridge/Glass Court. Exact junctions, entries and terrain remain proposals. Their mouths should be legible without falsely advertising unfinished areas as playable. The regional Foundry is distinct from the village smith; the mill bridge is not the Foundry crossing.
+
+## Open decisions deliberately preserved
+
+1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
+2. **Final blockout:** injury mark, tavern chair/table/hearth/keeper marks, door clearance, actor facing and exact routes still need joint spatial validation. The mapped south door is the continuity constraint, not proof that its model works.
+3. **Performance acceptance:** approved dialogue text is not approval of new takes, injury/walk/sit clips or target-device results. Existing Nov 4 Kit-reel listening approval remains valid and should not be reopened unnecessarily.
+4. **Optional door line:** decide against the actual door behaviour and avoid redundant greetings.
+
+## Voice audit and production handoff
+
+Four missing takes were identified for this exact arrival, using established voices and plain spoken text without direction tags:
+
+| ID | Voice | Delivery intent |
+|---|---|---|
+| `kit.approach_injury.stop` | Saved Kit | Brief involuntary catch, then controlled pause. |
+| `kit.approach_injury.ankle` | Saved Kit | Calm self-assessment, discomfort without melodrama. |
+| `kit.approach_injury.slow` | Saved Kit | Reassuring and practical; independent walk. |
+| `hub.arrival_chair` | Ironclad Strategist | Capable keeper notices the difficulty and directs him inside. |
+
+The five existing Kit tavern/conversation WAVs were verified present and hash-matched against the 4 November private intake receipt, with owner listening approval. `forest.village.wav` is present in the runtime folder. Tavern `hub.horde_army.wav` and optional `hub.arrival.wav` are present in the October production archive; casting is approved, but do not treat the older archive's technical checks as blanket approval of every production take.
+
+Keep original MP3s, per-line review WAVs, exact text/voice/cost manifests and a short pickup listening reel in the existing private Horde audio archive. Do not overwrite accepted runtime audio or insert new clips into the game as part of this planning task. Use the pickup receipt for exact production/QC status; this plan does not claim runtime admission, licence clearance for wider distribution, or performance approval.
+
+## Animation and gameplay acceptance gate
+
+First author a short test on the real Kit rig: loose-ground step/catch, protective standing assessment, several injured steps, turn and sit. Keep editable sources. Review normal first-person, front and side views for weight, planted feet, contact and coherent transitions before expanding into the complete scene. A flattering render is insufficient.
+
+Then validate the whole slice in-engine with representative fire/lantern/glass/actors and exterior overlap on Android and Windows. Check looking away, overtaking, stopping/backtracking, repeated visits, subtitle-only/missing audio, skip/pause/quit/reload and door/collision recovery. Persist injury/arrival/settled state without duplicating the incident or trapping the player. Preserve real RT, shared simulation and existing scene/streaming contracts. No build, animation implementation, merge or release is authorized by this document's completion.
