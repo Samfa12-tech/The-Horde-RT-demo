@@ -4,6 +4,10 @@
 
 **For Sam, Eric and Codex. Reconciled 12 October 2026.** This is the shared source of truth for each update's purpose, approved scope, boundaries, status, acceptance gates and detailed plans. A planned version is not a release promise or permission to begin every work package.
 
+## 15 November 2026 - utilisation profiling follow-up
+
+Version unassigned: retain Sam's laptop benchmark observation (approximately 70% GPU and 15% total CPU) as an unverified profiling lead. See [capture checklist and mobile threading inspection](CPU_GPU_UTILISATION_FOLLOWUP_2026-11-15.md). No runtime change or performance conclusion is implied.
+
 ## Authority and maintenance
 
 Record each new owner scope decision here, under its update or **version unassigned**, with its date, status and a link to the detailed plan. Update the relevant plan and source index in the same documentation change; do not create a competing master scope list. Record implementation and acceptance separately. When an update closes, link its exact release receipt and move unfinished work to an explicit deferred entry. Sam resolves product scope; Eric and Codex keep the plans and evidence linked. Merge approved documentation through the normal review process so main remains the shared reference.
@@ -231,3 +235,4 @@ This update preserves the owner's 11 September campaign direction and records th
 Keep WP0 → WP1 → WP2 → WP2a → WP3–WP10. Reuse implemented simulation/timestamp/input/combat/parry/equipment/two guards/theme/hearts/native touch/menu/graphics/adaptive music; residual contact is owner-accepted release debt, not permission for a WP0 patch. Genuine future scope includes real height, baseline short dodge protection, accessible teaching, unseen wall-grate Kit, same-night bidirectional screen-free rope rescue, measured forest/lookout and distant-only town. Gate6 is the later 1.8 arrival-to-tavern stress slice, after accepted 1.7. Source archive assets, dialogue banks, art references and later enemies are not automatically admitted.
 
 [One early-WP2 vertical-transform proposal](superpowers/plans/2026-10-09-horde-1.7-vertical-transform-proposal.md) is ready for owner scope review. This job stops at the WP0 documentation checkpoint. No campaign runtime slice, release, production or PR merge is authorized here.
+
