@@ -19,7 +19,8 @@ public final class ChapterVoiceAssetsTest {
     };
 
     @Test public void everyAdmittedSpeechLineHasOneUniqueKeyAndExpectedRuntimePath() {
-        assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0),
+        assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0)
+                        + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0),
                 ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
@@ -29,8 +30,6 @@ public final class ChapterVoiceAssetsTest {
             assertNotNull("line " + line, asset);
             assertEquals(line, asset.line);
             assertEquals(STABLE_IDS[i], asset.stableId);
-            assertTrue("duplicate key " + asset.soundKey, keys.add(asset.soundKey));
-            assertTrue("duplicate path " + asset.assetPath, paths.add(asset.assetPath));
             if (line <= 2) {
                 assertTrue(asset.assetPath.startsWith("audio/pixabay/"));
             } else {
@@ -38,12 +37,16 @@ public final class ChapterVoiceAssetsTest {
                 assertEquals("audio/kit/runtime/" + asset.stableId + ".wav", asset.assetPath);
             }
         }
+        for (ChapterVoiceAssets.Asset asset : ChapterVoiceAssets.all()) {
+            assertTrue("duplicate key " + asset.soundKey, keys.add(asset.soundKey));
+            assertTrue("duplicate path " + asset.assetPath, paths.add(asset.assetPath));
+        }
     }
 
     @Test public void unknownAndBoundaryLinesHaveNoAssetAndMissingSoundDoesNotInventOne() {
         assertNull(ChapterVoiceAssets.forLine(Integer.MIN_VALUE));
         assertNull(ChapterVoiceAssets.forLine(0));
-        assertNull(ChapterVoiceAssets.forLine(21));
+        assertNull(ChapterVoiceAssets.forLine(34));
         assertNull(ChapterVoiceAssets.forLine(Integer.MAX_VALUE));
         assertNull(ChapterVoiceAssets.soundIdForLine(3, new java.util.HashMap<String, Integer>()));
         final java.util.Map<String, Integer> sounds = new java.util.HashMap<>();
@@ -64,6 +67,20 @@ public final class ChapterVoiceAssetsTest {
                 assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
             } else assertNull(asset);
         }
-        for (int line : new int[]{21, 22, 23, 25, 27, 34}) assertNull(ChapterVoiceAssets.forLine(line));
+    }
+
+    @Test public void privateArrivalAuditionAdmitsOnlyTheFiveReviewTakes() {
+        final int[] lines = {21, 22, 23, 25, 27};
+        final String[] ids = {"kit.approach_injury.stop", "kit.approach_injury.ankle",
+                "kit.approach_injury.slow", "hub.horde_army", "hub.arrival_chair"};
+        for (int i = 0; i < lines.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
+            if (BuildConfig.BELLWETHER_ARRIVAL_AUDITION) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+                assertTrue(asset.soundKey.startsWith(i < 3 ? "kit_" : "keeper_"));
+            } else assertNull(asset);
+        }
     }
 }

@@ -78,9 +78,13 @@ int main() {
             std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
             "the shared clock covers the exact five approved Kit waveforms");
     }
-    Check(!horde::audio::HasBellwetherVoiceCut(Line::TavernHordeArmy) &&
-        !horde::audio::HasBellwetherVoiceCut(Line::RoadAnkle),
-        "nearby unapproved performances are excluded from the local voice fixture");
+    for (const auto& cut : horde::audio::kBellwetherArrivalAuditionCuts) {
+        const auto& spec = Spec(cut.line);
+        Check(!horde::audio::HasBellwetherVoiceCut(cut.line) &&
+            horde::audio::HasBellwetherVoiceCut(cut.line, true) && RequiresChapterCaption(cut.line) &&
+            std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
+            "arrival audition uses the measured WAV and keeps the required timed caption");
+    }
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
           "invalid catalogue paths cannot escape the supplied asset root");

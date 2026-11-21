@@ -991,3 +991,12 @@ source models, editable Blender assembly, and byte inventories.
 The paid Meshy account charged 20 credits. Exact distribution rights are still
 pending. Keep the source models, derived textures, and APK outside public
 source and published packages until the asset's rights are recorded.
+
+## Bellwether arrival voice audition - 22 November 2026
+
+The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply
+reuse the exact Mureka takes from the private Horde audio archive. The
+five 24 kHz mono PCM16 WAVs are byte-pinned for local Debug audition.
+The private archive retains the original files, scripts, voices, receipts,
+and review copies. Owner listening approval and wider distribution rights
+for these five takes remain open.

@@ -108,10 +108,12 @@ For the hinged-door build, the analysis must report `openDoorWitness: true`.
 
 The five privately approved Kit takes can be enabled by adding
 `-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
-That root contains only the five pinned WAVs under `private_bellwether_voice/`.
-The voice overlay is optional. The shared dialogue clock uses the measured takes
-and an unavailable cue retains its caption. The release guard also covers this
-overlay.
+Use the same property with the ten-file overlay to audition the three
+roadside pickups, the doorway welcome and the keeper's hearth reply. All
+files go under `private_bellwether_voice/`. Gradle checks the exact five- or
+ten-file roster. The shared dialogue clock uses the measured durations, and
+an unavailable or muted cue retains its caption. The audition awaits owner
+listening approval. Both overlays are restricted to the resident Debug app.
 
 The post-benchmark Back fix from `3caefd67` is in this build. On the host,
 the opening benchmark, Android controller and campaign menu suites passed all
