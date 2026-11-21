@@ -1680,6 +1680,7 @@ public class MainActivity extends Activity {
         startupUiVisible=false;
         invalidateLookoutObjective();
         closeBenchmarkSummaryReview();
+        benchmarkReportVisible = false;
         interfaceVisible = false;
         menuVisible = true;
         entryMenuSidePage = sidePage;
@@ -9016,7 +9017,7 @@ public class MainActivity extends Activity {
         if(openingBenchmarkPending()) {
             cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
         }
-        if(benchmarkReportVisible && entryMenuEnabled) {
+        if(benchmarkReportVisible && entryMenuEnabled && !benchmarkSummaryVisible) {
             playSound("ui_back",.18f); showMainMenu(false); return;
         }
         if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {

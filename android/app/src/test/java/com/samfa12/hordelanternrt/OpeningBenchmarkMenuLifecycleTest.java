@@ -1,8 +1,10 @@
 package com.samfa12.hordelanternrt;
 
 import static org.junit.Assert.*;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
@@ -229,6 +232,43 @@ public final class OpeningBenchmarkMenuLifecycleTest {
         assertFalse(field("benchmarkRunning").getBoolean(activity));assertEquals(0L,field("openingBenchmarkRequest").getLong(activity));
         assertTrue(field("benchmarkReportVisible").getBoolean(activity));assertTrue(field("entryMenuEnabled").getBoolean(activity));
         assertEquals(0,Bridge.plays);
+    }
+    @Test public void completedReportBackReleasesEntryAndAllowsExitConfirmation()throws Exception {
+        start();
+        Bridge.opening=new long[]{7,31,5,2,1,31};
+        call("pollOpeningBenchmark");
+        assertTrue(field("benchmarkReportVisible").getBoolean(activity));
+
+        activity.onBackPressed();
+        assertFalse(field("benchmarkReportVisible").getBoolean(activity));
+        assertFalse(field("entryMenuSidePage").getBoolean(activity));
+        assertNull(field("backExitDialog").get(activity));
+
+        activity.onBackPressed();
+        AlertDialog exit=(AlertDialog)field("backExitDialog").get(activity);
+        assertNotNull(exit);
+        assertTrue(exit.isShowing());
+        exit.getButton(AlertDialog.BUTTON_NEGATIVE).performClick();
+        Shadows.shadowOf(Looper.getMainLooper()).idle();
+        assertFalse(activity.isFinishing());
+        assertFalse(exit.isShowing());
+        assertTrue(field("menuVisible").getBoolean(activity));
+        assertTrue(Bridge.paused);
+    }
+    @Test public void sharingReviewBackReturnsToReportBeforeEntry()throws Exception {
+        start();
+        Bridge.readySummary="12345678-1234-4234-8234-123456789abc";
+        Bridge.opening=new long[]{7,31,5,2,1,31};
+        call("pollOpeningBenchmark");
+        call("showBenchmarkSummaryReview",true);
+        assertTrue(field("benchmarkSummaryVisible").getBoolean(activity));
+
+        activity.onBackPressed();
+        assertFalse(field("benchmarkSummaryVisible").getBoolean(activity));
+        assertTrue(field("benchmarkReportVisible").getBoolean(activity));
+        activity.onBackPressed();
+        assertFalse(field("benchmarkReportVisible").getBoolean(activity));
+        assertTrue(field("menuVisible").getBoolean(activity));
     }
     @Test public void surfaceLossKeepsOriginCancellationAndCannotBorrowOldEntry()throws Exception {
         start();call("stopSurface");
