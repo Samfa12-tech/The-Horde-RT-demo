@@ -1,4 +1,5 @@
 import argparse, csv, itertools, json, math, pathlib, statistics
+import re
 
 HOST_SPANS=('host_previous_tail_ns','host_system_load_ns','host_messages_ns',
             'host_visibility_ns','host_clock_simulation_ns','host_render_to_present_ns')
@@ -249,11 +250,96 @@ def analyze_bellwether(name, analysis_name):
     print(json.dumps(summary['phases']))
 
 
+def analyze_android_bellwether(name, analysis_name):
+    directory = pathlib.Path(name)
+    with (directory / 'bellwether-doorway.csv').open(newline='') as source:
+        rows = list(csv.DictReader(source))
+
+    def require(condition, detail):
+        if not condition:
+            raise ValueError(detail)
+
+    require(bool(rows), 'Bellwether route report is empty')
+    groups = [pair for pair, _ in itertools.groupby(
+        (row['phase'], int(row['returns'])) for row in rows)]
+    expected = [(phase, lap) for lap in range(2)
+                for phase in ('room', 'doorway-outbound', 'square', 'doorway-inbound')]
+    require(groups == expected + [('room', 2), ('complete', 2)],
+            'Expected two complete room-doorway-square returns')
+    backend = rows[0]['backend']
+    identity = rows[0]['scene_epoch'], rows[0]['generation']
+    setting_fields = ('internal_width', 'internal_height', 'output_width', 'output_height', 'glass_enabled')
+    width, height, surface_width, surface_height, glass = tuple(int(rows[0][key]) for key in setting_fields)
+    require(backend in ('RayTracingPipeline', 'RayQueryCompute') and all(int(key) > 0 for key in identity),
+            'Missing admitted RT backend or scene identity')
+    require(0 < width <= surface_width and 0 < height <= surface_height and glass in (0, 1),
+            'Missing render extent or glass setting')
+    serials = [int(row['submission_serial']) for row in rows]
+    ticks = [int(row['tick']) for row in rows]
+    elapsed = [int(row['elapsed_ns']) for row in rows]
+    returned = [int(row['present_return_ns']) for row in rows]
+    require(serials[0] > 0 and serials == list(range(serials[0], serials[0] + len(rows))),
+            'Submissions must be continuous')
+    require(elapsed[0] > 0 and 60e9 <= elapsed[-1] <= 151e9 and ticks[-1] - ticks[0] >= 3600,
+            'Missing a full simulated or wall-clock route')
+    clock_base = returned[0] - elapsed[0]
+    intervals = []
+    for index, row in enumerate(rows):
+        serial = serials[index]
+        require((row['scene_epoch'], row['generation']) == identity and row['backend'] == backend,
+                f'Frame {serial} changed scene, measurement generation or backend')
+        require(tuple(int(row[key]) for key in setting_fields) == (width, height, surface_width, surface_height, glass),
+                f'Frame {serial} changed render extents or glass')
+        require(all(int(row[key]) == serial for key in ('completion_serial', 'present_serial', 'gpu_serial')),
+                f'Frame {serial} lost the GPU-to-present join')
+        require(int(row['record_serial']) > 0 and int(row['gpu_ns']) > 0 and int(row['cpu_cycle_ns']) > 0 and
+                re.fullmatch(r'[0-9a-f]{64}', row['shader_sha256']), f'Frame {serial} lacks timing or shader evidence')
+        require(row['record_keeper_mask'] == '1', f'Frame {serial} lost the record keeper instance')
+        if row['phase'] == 'room':
+            require([row[key] for key in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', str(glass), '1'],
+                    f'Frame {serial} changed the staffed tavern workload')
+        require(returned[index] - elapsed[index] == clock_base and
+                (index == 0 or (returned[index] > returned[index - 1] and 0 <= ticks[index] - ticks[index - 1] <= 4)),
+                f'Frame {serial} broke the clock or 60 Hz catch-up bound')
+        intervals.append(None if index == 0 else (returned[index] - returned[index - 1]) / 1e6)
+
+    summary = dict(backend=backend, scope='Android Debug RT submissions and present-call returns',
+                   totalFrames=len(rows), durationSeconds=elapsed[-1] / 1e9,
+                   simulationTicks=ticks[-1] - ticks[0], shaderHashes=sorted({row['shader_sha256'] for row in rows}),
+                   internalExtent=[width, height], outputExtent=[surface_width, surface_height], glassEnabled=bool(glass),
+                   phases={})
+    for phase in dict.fromkeys(phase for phase, _ in expected):
+        indices = [i for i, row in enumerate(rows) if row['phase'] == phase and elapsed[i] >= 5e9]
+        require(bool(indices), f'No post-warmup frames for {phase}')
+        resources = {}
+        for key in ('device_local_bytes', 'host_visible_bytes', 'tlas_instances', 'blas_owners'):
+            values = [int(rows[i][key]) for i in indices]
+            resources[key] = [min(values), max(values)]
+        summary['phases'][phase] = dict(
+            gpuMilliseconds=stats([int(rows[i]['gpu_ns']) / 1e6 for i in indices]),
+            nativeCycleMilliseconds=stats([int(rows[i]['cpu_cycle_ns']) / 1e6 for i in indices]),
+            presentReturnIntervalMilliseconds=stats([
+                intervals[i] for i in indices if i and rows[i - 1]['phase'] == phase and elapsed[i - 1] >= 5e9]),
+            resourceMinMax=resources)
+    require(pathlib.Path(analysis_name).name == analysis_name and analysis_name.endswith('.json'),
+            'Expected a plain JSON analysis filename')
+    target = directory / analysis_name
+    if target.exists():
+        require(json.loads(target.read_text()) == summary, 'Stored analysis differs from verified arithmetic')
+    else:
+        target.write_text(json.dumps(summary, indent=2) + '\n')
+    print(json.dumps(summary))
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description='Verify completed exact-identity chapter route evidence.')
     parser.add_argument('directories',nargs='+')
     parser.add_argument('--analysis-name',default='analysis-v3.json')
-    parser.add_argument('--bellwether-doorway', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--bellwether-doorway', action='store_true')
+    mode.add_argument('--android-bellwether-doorway', action='store_true')
     args=parser.parse_args()
+    analyzer = (analyze_android_bellwether if args.android_bellwether_doorway else
+                analyze_bellwether if args.bellwether_doorway else analyze)
     for name in args.directories:
-        (analyze_bellwether if args.bellwether_doorway else analyze)(name,args.analysis_name)
+        analyzer(name,args.analysis_name)

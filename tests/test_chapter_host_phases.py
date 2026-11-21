@@ -1,6 +1,9 @@
 import importlib.util
 import pathlib
 import csv
+from contextlib import redirect_stdout
+from io import StringIO
+from tempfile import TemporaryDirectory
 
 repo=pathlib.Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('measurement',repo/'tools/analyze-chapter-route-measurement.py')
@@ -36,3 +39,60 @@ try:m.verify_host_phases(first)
 except AssertionError:pass
 else:raise AssertionError('first present borrowed bootstrap work')
 print('Exact host interval partition, stale/subset/negative/unknown and first-present negatives passed.')
+
+
+def verify_android_route():
+    phases = [(phase, lap) for lap in range(2)
+              for phase in ('room', 'doorway-outbound', 'square', 'doorway-inbound')]
+    rows = []
+    for phase, lap in phases + [('room', 2), ('complete', 2)]:
+        for _ in range(1 if phase == 'complete' else 125):
+            serial = 100 + len(rows)
+            elapsed = (len(rows) + 1) * 67_000_000
+            rows.append(dict(phase=phase, station=1, returns=lap, elapsed_ns=elapsed,
+                present_return_ns=200_000_000_000 + elapsed, scene_epoch=4, generation=3,
+                record_serial=serial, submission_serial=serial, tick=4 * len(rows),
+                completion_serial=serial, present_serial=serial, gpu_serial=serial,
+                gpu_ns=40_000_000, cpu_cycle_ns=66_000_000, backend='RayTracingPipeline',
+                shader_sha256='a' * 64, internal_width=475, internal_height=980,
+                output_width=1440, output_height=2971, glass_enabled=0,
+                fire_count=3, tlas_instances=37, blas_owners=28,
+                device_local_bytes=231_192_576, host_visible_bytes=78_070_656,
+                kit_mask=1, window_mask=0, resident_mask=1, record_keeper_mask=1))
+
+    with TemporaryDirectory() as root:
+        report = pathlib.Path(root) / 'bellwether-doorway.csv'
+
+        def analyze(rows):
+            with report.open('w', newline='') as output:
+                writer = csv.DictWriter(output, fieldnames=rows[0])
+                writer.writeheader()
+                writer.writerows(rows)
+            with redirect_stdout(StringIO()):
+                m.analyze_android_bellwether(root, 'analysis.json')
+
+        analyze(rows)
+        analyze(rows)
+        for column, bad, message in (
+                ('gpu_serial', 0, 'GPU-to-present join'),
+                ('record_keeper_mask', 0, 'lost the record keeper'),
+                ('window_mask', 1, 'changed the staffed tavern workload'),
+                ('generation', 2, 'changed scene'),
+                ('present_return_ns', 0, 'broke the clock')):
+            invalid = [dict(rows[0], **{column: bad}), *rows[1:]]
+            try:
+                analyze(invalid)
+            except ValueError as error:
+                assert message in str(error), error
+            else:
+                raise AssertionError(f'Bad Android frame passed: {column}')
+        try:
+            analyze(rows[:-1])
+        except ValueError as error:
+            assert 'two complete' in str(error), error
+        else:
+            raise AssertionError('A truncated Android route passed')
+
+
+verify_android_route()
+print('Android doorway verification rejected stale GPU, missing residents, mixed generations and truncated runs.')

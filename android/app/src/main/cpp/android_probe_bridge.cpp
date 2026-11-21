@@ -48,6 +48,9 @@
 #include "gameplay/validation/KeeperMistFixture.h"
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "graphics/GraphicsPreviewPerformance.h"
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+#include "BellwetherDoorwayMeasurement.h"
+#endif
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
 #include "platform/android/AndroidMotionEvidencePolicy.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
@@ -135,6 +138,9 @@ constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
 constexpr float kDefaultAndroidRtRenderScale = 0.50f;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+constexpr std::int32_t kBellwetherDoorwayMeasurementCheckpoint = 337;
+#endif
 
 std::string JsonUtf8String(const std::string_view value)
 {
@@ -425,6 +431,10 @@ struct SwapchainContext
     double gpuFrameTimingTotalMs = 0.0;
     std::uint64_t gpuFrameTimingSampleCount = 0u;
     bool rtFrameEvidenceInitialised = false;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    bool bellwetherDoorwayRequested = false;
+    std::optional<horde::platform::android::BellwetherDoorwayMeasurement> bellwetherDoorway;
+#endif
     float outputExposure = 0.92f;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::string activeBenchmarkName;
@@ -2047,6 +2057,14 @@ struct DebugCheckpointSelection
 
 bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& selection)
 {
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    if (id == kBellwetherDoorwayMeasurementCheckpoint) {
+        if (!ResolveDebugCheckpoint(329, selection)) return false;
+        selection.checkpoint.id = id;
+        selection.checkpoint.name = "bellwether-doorway-measurement";
+        return true;
+    }
+#endif
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
         selection = {horde::gameplay::ShowcaseCheckpointForEncounter(*showcase,
@@ -2440,15 +2458,32 @@ void WriteChapterStartAcknowledgement(
 }
 #endif
 
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+void CancelBellwetherDoorwayMeasurement(SwapchainContext& context, const char* reason)
+{
+    if (!context.bellwetherDoorway && !context.bellwetherDoorwayRequested) return;
+    context.bellwetherDoorwayRequested = false;
+    context.bellwetherDoorway.reset();
+    context.lastInputOwnerSteadyNs = 0u;
+    gGameSimulation.ResetTiming();
+    __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_BELLWETHER_DOORWAY failed reason=%s", reason);
+}
+#endif
+
 bool ApplyBenchmarkCheckpoint(
     SwapchainContext& context,
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    CancelBellwetherDoorwayMeasurement(context, "checkpoint changed");
+    const bool measureDoorway = checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint;
+    if (measureDoorway && (!context.gpuFrameTimingEnabled || kMaxFramesInFlight != 1u)) return false;
+#endif
     const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-        || checkpoint.id == 329 || checkpoint.id == 335
+        || checkpoint.id == 329 || checkpoint.id == 335 || measureDoorway
 #endif
         );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
@@ -2500,6 +2535,9 @@ bool ApplyBenchmarkCheckpoint(
     context.benchmarkSampling = !liveJourney;
     if (liveJourney)
     {
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        context.bellwetherDoorwayRequested = measureDoorway;
+#endif
         // This owner playtest route is not a benchmark: retain ordinary damage,
         // teaching and dialogue timing from its first live fixed step.
         __android_log_print(ANDROID_LOG_INFO, kTag,
@@ -2530,6 +2568,10 @@ bool ApplyCaptureCheckpoint(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    CancelBellwetherDoorwayMeasurement(context, "capture requested");
+    if (checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint) return false;
+#endif
     context.combatFeedbackCaptureSnapshot.reset();
     if (!ApplyDebugCheckpointSimulation(context, selection, observation))
     {
@@ -4321,6 +4363,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context,
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        if (context.bellwetherDoorway && context.bellwetherDoorway->AwaitingFrame()) {
+            if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot)) {
+                CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
+            } else if (context.bellwetherDoorway->probe.Complete()) {
+                context.bellwetherDoorway.reset();
+                context.lastInputOwnerSteadyNs = 0u;
+                gGameSimulation.ResetTiming();
+                __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_BELLWETHER_DOORWAY complete returns=2");
+            }
+        }
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         ObserveAndroidMotionCompletion(context, completion.completedEvidence);
 #endif
@@ -4573,6 +4627,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationInput.commands.routeReset > beforeCommands.lastConsumedRouteResetSequence;
             const bool retryPending =
                 simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            if (simulationInput.paused || routeResetPending || retryPending)
+                CancelBellwetherDoorwayMeasurement(context, "gameplay paused or reset");
+#endif
             if (routeResetPending)
             {
                 if(gCampaignSession) {
@@ -4750,6 +4808,27 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     PublishBenchmarkProgress(context);
                 }
             }
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            else if (!worldCommandsDeferred && context.bellwetherDoorway)
+            {
+                auto& run = *context.bellwetherDoorway;
+                const auto steps = run.StepsDue(std::chrono::steady_clock::now());
+                horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                    evidenceFrame ? &observation : nullptr, horde::telemetry::RtStage::SimulationStep);
+                unsigned simulated = 0;
+                for (; steps && simulated < *steps && !run.probe.Complete(); ++simulated) {
+                    const auto& state = gGameSimulation.Snapshot();
+                    simulationInput = run.probe.Next(state);
+                    if (run.probe.Failed()) break;
+                    gGameSimulation.StepFixed(simulationInput,
+                        static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                        publishedInput.publicationSequence);
+                }
+                simulationScope.Complete(simulated);
+                if (!steps || run.probe.Failed())
+                    CancelBellwetherDoorwayMeasurement(context, "route readiness, walk or deadline failed");
+            }
+#endif
             else if (!worldCommandsDeferred && context.routeReplayActive)
             {
                 // Debug route replay owns an authoritative pose and fixed step. It
@@ -5363,6 +5442,26 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         (void)context.rtFrameEvidence.AttachPresentation(outcome);
         context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    if (context.bellwetherDoorway || context.bellwetherDoorwayRequested) {
+        horde::telemetry::RtSubmittedFrameIdentity owner{};
+        const auto& state = gGameSimulation.Snapshot();
+        if (!evidenceFrame || acquireResult != VK_SUCCESS || presentResult != VK_SUCCESS ||
+            !context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
+            owner.frame.simulationTick != state.tickIndex) {
+            CancelBellwetherDoorwayMeasurement(context, "no stable RT submission for the staged pose");
+        } else if (context.bellwetherDoorwayRequested) {
+            context.bellwetherDoorwayRequested = false;
+            auto& run = context.bellwetherDoorway.emplace();
+            if (!run.Start(state, std::filesystem::path(context.reportDirectory) / "bellwether-doorway.csv", presentDone))
+                CancelBellwetherDoorwayMeasurement(context, "staffed repeat visit or report unavailable");
+            else
+                __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_BELLWETHER_DOORWAY started");
+        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene)) {
+            CancelBellwetherDoorwayMeasurement(context, "submission sequence or resource generation changed");
+        }
+    }
+#endif
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR ||
         (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR))
     {
@@ -5759,6 +5858,9 @@ void SwapchainRenderLoop()
             }
             SuspendCampaignOnOwner(gSwapchainContext);
             CancelActiveInAppBenchmark(gSwapchainContext);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            CancelBellwetherDoorwayMeasurement(gSwapchainContext, "surface suspended");
+#endif
             ClearPlatformGameplayEvents();
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
             FailAndroidMotion(gSwapchainContext, "Motion interrupted by lifecycle suspension.");
@@ -5790,6 +5892,10 @@ void SwapchainRenderLoop()
         }
         bool sceneTransition = DesiredProfile(gSwapchainContext, previewControls) != gSwapchainContext.sceneProfile ||
             previewControls.resetSerial != gSwapchainContext.previewResetSerial;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        if (sceneTransition || measurementPaused)
+            CancelBellwetherDoorwayMeasurement(gSwapchainContext, "foreground pause or scene transition");
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         if (sceneTransition || measurementPaused)
             FailAndroidMotion(gSwapchainContext, "Motion interrupted by foreground pause or scene transition.");
@@ -5823,6 +5929,9 @@ void SwapchainRenderLoop()
              graphicsCommand.lifecycleGeneration == gSwapchainContext.surfaceGeneration))
         {
             auto& context = gSwapchainContext;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            CancelBellwetherDoorwayMeasurement(context, "graphics settings changed");
+#endif
             sceneTransition = true;
             if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
             {

@@ -7327,6 +7327,7 @@ public class MainActivity extends Activity {
             case "world-route-staged": return 191;
             case "rescue-journey-start": return 192;
             case "bellwether-repeat-visit": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 329 : -1;
+            case "bellwether-doorway-measurement": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 337 : -1;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
@@ -7676,7 +7677,8 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
-            case 329: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{-0.14f, -0.11f} : null;
+            case 329:
+            case 337: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{-0.14f, -0.11f} : null;
             case 331:
             case 332:
             case 333: return new float[]{0.0f, -0.12f};

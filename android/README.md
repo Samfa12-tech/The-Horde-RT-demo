@@ -57,6 +57,24 @@ From a fresh launch of the Bellwether package, the live church start uses:
 adb shell am start -n com.samfa12.hordelanternrt.debug.bellwether/com.samfa12.hordelanternrt.MainActivity --ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-record-keeper-handoff
 ```
 
+For a repeatable moving baseline, launch the same activity with
+`--ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-doorway-measurement`.
+This runs the Windows proof's two room-to-square returns using the shared player
+motor at 60 Hz. It begins after the staffed pose has reached hardware RT
+presentation. Use a fresh launch with GPU timing enabled and keep it in the
+foreground until the `HORDE_BELLWETHER_DOORWAY complete returns=2` log marker.
+The CSV joins the route phase, instance masks, GPU timing and accepted present
+for each submitted frame. `present_return_ns` records the native present call,
+while actual display timing requires a display capture.
+
+```powershell
+adb exec-out run-as com.samfa12.hordelanternrt.debug.bellwether cat files/reports/bellwether-doorway.csv
+```
+
+Save that output as `bellwether-doorway.csv` in the local run directory. From
+the repository root, verify and summarize it with
+`python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
+
 ### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
