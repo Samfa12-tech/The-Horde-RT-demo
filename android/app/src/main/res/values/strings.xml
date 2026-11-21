@@ -56,6 +56,7 @@
     <string name="open_chest">OPEN CHEST</string>
     <string name="take_flask_upgrade">Upgrade flask</string>
     <string name="talk_to_kit">Talk to Kit</string>
+    <string name="directions">Directions</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>
     <string name="chest_unlocking">SEAL BREAKING…</string>

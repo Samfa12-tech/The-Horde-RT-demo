@@ -71,6 +71,7 @@ struct SimulationSnapshot
 {
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
+    bool tavernDirectionsAvailable=false;
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;

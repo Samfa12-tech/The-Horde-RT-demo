@@ -36,6 +36,9 @@ public final class ContextualControlsLayoutTest {
     public void flaskPickupReusesContextActionAndRopeKeepsPriority() {
         assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 12) | 1));
         assertEquals(R.string.talk_to_kit, MainActivity.contextualInteractLabel((1 << 14) | 1));
+        assertEquals(R.string.directions, MainActivity.contextualInteractLabel((1 << 15) | 1));
+        assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 15) | (1 << 12) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((1 << 15) | (1 << 9) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 14) | (1 << 9) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 12) | (1 << 9) | 1));
         assertEquals(R.string.open_chest, MainActivity.contextualInteractLabel((2 << 3) | 1));

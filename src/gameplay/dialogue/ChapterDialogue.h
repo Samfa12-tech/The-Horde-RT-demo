@@ -14,12 +14,12 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     RescueRope, ReunionQuestion, ReunionHint, ReunionProof, ReunionFirstPiece,
     ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage,
     FlaskEmpty, FlaskTopup, TavernSit, TavernLimit, TavernWork, RoadStop, RoadAnkle, RoadSlow,
-    TavernIntroduce, TavernHordeArmy, TavernHoardAnswer, TavernWelcome };
+    TavernIntroduce, TavernHordeArmy, TavernHoardAnswer, TavernWelcome, TavernDirections };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,28> kLines{{
+inline constexpr std::array<LineSpec,29> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -47,7 +47,8 @@ inline constexpr std::array<LineSpec,28> kLines{{
     {Line::TavernIntroduce,"hub.kit_introduce","Kit","The tomb was there. So was something worth the climb.","",3.6f,1},
     {Line::TavernHordeArmy,"hub.horde_army","Tavern keeper","My grandfather called the Horde an army. You treasure hunters always hear the other word.","",6.2f,1},
     {Line::TavernHoardAnswer,"hub.hoard_answer","Kit","Armies need paying. I'm hoping we're both right.","",3.4f,1},
-    {Line::TavernWelcome,"hub.arrival_chair","Tavern keeper","Easy. There's a chair just inside.","",2.6f,1}
+    {Line::TavernWelcome,"hub.arrival_chair","Tavern keeper","Easy. There's a chair just inside.","",2.6f,1},
+    {Line::TavernDirections,"hub.record_keeper_lead","","Ask the record keeper by the northern church about the wayside shrine.","",7.0f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -58,8 +59,10 @@ inline constexpr std::array kTavernConversation{Line::TavernIntroduce,Line::Tave
 inline constexpr bool IsTavernConversationLine(Line line) {
     return line>=kTavernConversation.front() && line<=kTavernConversation.back();
 }
+inline constexpr bool IsGuidanceLine(Line line) { return line==Line::TavernDirections; }
 inline constexpr bool IsBellwetherLine(Line line) {
-    return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) || line==Line::TavernWelcome;
+    return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
+        line==Line::TavernWelcome || IsGuidanceLine(line);
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -116,6 +119,13 @@ public:
         tavernConversationActive_=true;
         StartNextTavernLine(c);
         return true;
+    }
+    bool CanShowTavernDirections(const Context& c) const {
+        return state_.line==Line::None && continuationCount_==0 &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() && AtTavernHearth(c);
+    }
+    void ShowTavernDirections(const Context& c) {
+        if(CanShowTavernDirections(c))Start(Line::TavernDirections,*c.companionSource,c);
     }
     bool HoldingAnkleAssessment() const {
         return state_.line==Line::RoadStop || state_.line==Line::RoadAnkle ||
@@ -298,6 +308,7 @@ public:
         const bool hearsWelcome=c.tavernDoorInReach && c.exterior && !c.traversing && !c.combat &&
             c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
         if(state_.line==Line::TavernWelcome && !hearsWelcome)Cancel(false);
+        if(state_.line==Line::TavernDirections && !AtTavernHearth(c))Cancel(false);
         if(tavernConversationActive_ && !CanHearTavernConversation(c)) {
             if(IsTavernConversationLine(state_.line))Cancel(false);
             tavernConversationActive_=false;
@@ -374,10 +385,12 @@ public:
     }
 private:
     static bool Finite(Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);}
+    static bool AtTavernHearth(const Context& c) {
+        return c.alive && c.exterior && !c.paused && !c.combat && !c.traversing && c.tavernInReach &&
+            c.kitSeated && c.companionSource && Finite(*c.companionSource) && Finite(c.listener) && std::isfinite(c.yaw);
+    }
     static bool CanHearTavernConversation(const Context& c) {
-        return c.alive && c.exterior && !c.paused && !c.combat && !c.traversing && c.tavernInReach && c.kitSeated && c.keeperAtHearth &&
-            c.companionSource && Finite(*c.companionSource) && c.tavernKeeperSource && Finite(*c.tavernKeeperSource) &&
-            Finite(c.listener) && std::isfinite(c.yaw);
+        return AtTavernHearth(c) && c.keeperAtHearth && c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
     }
     void StartNextTavernLine(const Context& c) {
         const auto line=kTavernConversation[state_.tavernConversationLinesResolved];

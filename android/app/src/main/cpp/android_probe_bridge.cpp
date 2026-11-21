@@ -1191,7 +1191,7 @@ void PublishSimulationUiState()
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
             ? std::string{}
-            : std::string(line.speaker) + "\n" + line.text;
+            : (*line.speaker ? std::string(line.speaker) + "\n" + line.text : std::string(line.text));
     }
     if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
          teaching.stage == horde::gameplay::simulation::TutorialStage::Skipped) &&
@@ -1254,6 +1254,8 @@ void PublishSimulationUiState()
         contextualControls |= (1 << 12) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
         contextualControls |= (1 << 14) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
+        contextualControls |= (1 << 15) | 1;
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
     if (simulation.crouchActive) contextualControls |= 1 << 10;
@@ -7167,7 +7169,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingState(JNIEnv*, jcla
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env, jclass)
 {
-    jlong state[5]{};
+    jlong state[6]{};
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         const auto& snapshot = gChapterDialogueUiSnapshot;
@@ -7176,9 +7178,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env,
         state[2] = static_cast<jlong>(std::max(0.0f, snapshot.elapsed) * 1000.0f + 0.5f);
         state[3] = static_cast<jlong>(std::max(0.0f, snapshot.duration) * 1000.0f + 0.5f);
         state[4] = snapshot.paused ? 1 : 0;
+        state[5] = horde::gameplay::dialogue::IsGuidanceLine(snapshot.line) ? 1 : 0;
     }
-    jlongArray result = env->NewLongArray(5);
-    if (result != nullptr) env->SetLongArrayRegion(result, 0, 5, state);
+    jlongArray result = env->NewLongArray(6);
+    if (result != nullptr) env->SetLongArrayRegion(result, 0, 6, state);
     return result;
 }
 

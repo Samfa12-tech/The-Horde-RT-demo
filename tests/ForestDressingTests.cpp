@@ -1469,12 +1469,18 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             if(!walkTo(route[index])) {Check(false,"the player can re-enter the tavern on foot");return;}
         if(!walkTo({kConversation[0],kConversation[2]})) {Check(false,"the return clears the furniture");return;}
         input.moveForward=0;input.runHeld=false;
-        ++input.commands.interact;
         step();
         Check(game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
               game.Snapshot().tavernKeeper && game.Snapshot().tavernKeeper->stage==TavernKeeperStage::AtHearth &&
-              !game.Snapshot().tavernConversationAvailable && game.Snapshot().chapterDialogue.line==Line::None,
-              "the first physical return leaves both actors settled and the finished Talk quiet");
+              !game.Snapshot().tavernConversationAvailable && game.Snapshot().tavernDirectionsAvailable &&
+              game.Snapshot().chapterDialogue.line==Line::None,
+              "the first physical return leaves both actors settled and offers directions quietly");
+        ++input.commands.interact;
+        step();
+        Check(game.Snapshot().chapterDialogue.line==Line::TavernDirections,
+              "the normal hearth interaction opens the directions before walking north");
+        ++input.commands.dialogueSkip;
+        step();
     }
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}

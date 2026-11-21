@@ -246,8 +246,14 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
             const bool restored=Seed(staffed,savedDone,terrain);
             if(restored)staffed.StepFixed(idle);
             Check(restored && staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3 &&
-                  staffed.Snapshot().chapterDialogue.line==Line::None && !staffed.Snapshot().tavernConversationAvailable,
-                  "reopening the completed autosave keeps the exchange quiet");
+                  staffed.Snapshot().chapterDialogue.line==Line::None && !staffed.Snapshot().tavernConversationAvailable &&
+                  staffed.Snapshot().tavernDirectionsAvailable,
+                  "reopening the completed autosave keeps Talk quiet and restores the Directions action");
+            idle.commands.interact=staffed.Snapshot().lastConsumedInteractSequence+1;
+            staffed.StepFixed(idle);
+            Check(staffed.Snapshot().chapterDialogue.line==Line::TavernDirections &&
+                  staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3,
+                  "the restored Directions action opens the lead without changing the saved exchange");
         }
     } else Check(false,"the partial exchange is restorable");
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);

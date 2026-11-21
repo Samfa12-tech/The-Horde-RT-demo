@@ -261,6 +261,7 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
+    private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -4277,7 +4278,7 @@ public class MainActivity extends Activity {
         final String text;
         try {
             state = ProbeBridge.getChapterDialogueState();
-            if (state == null || state.length != 5) {
+            if (state == null || state.length != 6) {
                 chapterSubtitlePanel.setVisibility(View.GONE);
                 pauseChapterVoice(true);
                 return;
@@ -4291,7 +4292,7 @@ public class MainActivity extends Activity {
         final long[] confirm;
         try { confirm = ProbeBridge.getChapterDialogueState(); }
         catch (RuntimeException | LinkageError unavailable) { pauseChapterVoice(true); return; }
-        if (confirm == null || confirm.length != 5 || state[1] != confirm[1] ||
+        if (confirm == null || confirm.length != 6 || state[1] != confirm[1] ||
                 (state[0] > 0 && (text == null || text.isEmpty()))) {
             // The render owner published between JNI reads. Wait one poll for a coherent pair.
             pauseChapterVoice(true);
@@ -4312,7 +4313,9 @@ public class MainActivity extends Activity {
             return;
         }
         final long generation = state[1];
-        stopChapterAmbience(); // Kit has priority even when captions or Voice gain are muted.
+        final boolean guidance = state[5] != 0;
+        chapterAmbienceDialogueActive = !guidance;
+        if (!guidance) stopChapterAmbience(); // Speech keeps priority when Voice or subtitles are muted.
         if (chapterDialogueSkipPendingGeneration != generation)
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
         final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
@@ -4323,7 +4326,7 @@ public class MainActivity extends Activity {
             stopChapterVoice();
             chapterVoiceGeneration = generation;
         } else updateChapterVoice(line, generation, paused);
-        final boolean subtitles = preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
+        final boolean subtitles = guidance || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
         if (chapterSubtitleGeneration != generation) {
             chapterSubtitleGeneration = generation;
@@ -8858,6 +8861,7 @@ public class MainActivity extends Activity {
         if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
         if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
+        if ((state & CONTEXTUAL_TAVERN_DIRECTIONS) != 0) return R.string.directions;
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
             case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
             case CHEST_PROMPT_OPEN: return R.string.open_chest;

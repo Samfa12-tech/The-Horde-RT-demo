@@ -2404,7 +2404,8 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
     if (subtitle == nullptr) return;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
-    if (!context.subtitlesEnabled || dialogue.line == horde::gameplay::dialogue::Line::None ||
+    if ((!context.subtitlesEnabled && !horde::gameplay::dialogue::IsGuidanceLine(dialogue.line)) ||
+        dialogue.line == horde::gameplay::dialogue::Line::None ||
         dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
     {
         SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
@@ -3323,7 +3324,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const bool rescueJourney = snapshot.developmentRescueJourney &&
         snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
-    const bool tavern = !rescueJourney && !flaskUpgrade && snapshot.tavernConversationAvailable;
+    const bool tavern = !rescueJourney && !flaskUpgrade &&
+        (snapshot.tavernConversationAvailable || snapshot.tavernDirectionsAvailable);
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
     const bool visible = (rescueJourney || flaskUpgrade || tavern || raiseLantern)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
@@ -3351,7 +3353,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         context.flaskUpgradeInteractionPromptPresented=visible;
     }
     else if(tavern) {
-        text = "LEFT-CLICK / A TO TALK TO KIT";
+        text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT";
         context.tavernInteractionPromptPresented=visible;
     }
     else
@@ -12628,7 +12630,7 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 (snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None ||
                  sceneContext->rescueInteractionPromptPresented || snapshot.flaskUpgrade.interactEligible ||
                  sceneContext->flaskUpgradeInteractionPromptPresented || snapshot.tavernConversationAvailable ||
-                 sceneContext->tavernInteractionPromptPresented))
+                 snapshot.tavernDirectionsAvailable || sceneContext->tavernInteractionPromptPresented))
             {
                 // A contextual prompt owns the click. A stale/disabled prompt
                 // is consumed without falling through to the attack action.
@@ -12638,7 +12640,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                       (snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Climb ||
                        snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Descend)) ||
                      (sceneContext->flaskUpgradeInteractionPromptPresented && snapshot.flaskUpgrade.interactEligible) ||
-                     (sceneContext->tavernInteractionPromptPresented && snapshot.tavernConversationAvailable))
+                     (sceneContext->tavernInteractionPromptPresented &&
+                      (snapshot.tavernConversationAvailable || snapshot.tavernDirectionsAvailable)))
                         ? DesktopClickAction::Interact : DesktopClickAction::Ignore;
             }
             else

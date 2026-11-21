@@ -3431,8 +3431,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.chapterDialogue=chapterDialogue_.State();
     snapshot_.tavernKeeper=config_.bellwetherTavernKeeperAdmitted && chapterTerrain_ &&
         chapterTerrainGeneration_==worldRoute_.generation ? tavernKeeper_.Pose() : std::nullopt;
+    const auto tavernContext=TavernConversationContext(input.paused);
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
-        chapterDialogue_.CanStartTavernConversation(TavernConversationContext(input.paused));
+        chapterDialogue_.CanStartTavernConversation(tavernContext);
+    snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(tavernContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
         playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();

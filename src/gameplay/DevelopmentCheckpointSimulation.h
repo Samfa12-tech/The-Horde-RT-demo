@@ -337,7 +337,7 @@ inline bool StageDevelopmentCheckpointSimulation(
                 return finalize(false);
 
             // Retrace the mapped portal from the hearth to the square and back.
-            // Use one campaign session throughout, including both Interact retries.
+            // Use one campaign session throughout and check that Directions is offered on both returns.
             constexpr auto square=traversal::kBellwetherSouthApproachStation-1;
             returningQuietly=true;
             for(unsigned trip=0;trip<2;++trip) {
@@ -349,9 +349,9 @@ inline bool StageDevelopmentCheckpointSimulation(
                     if(!walkStation(index))return finalize(false);
                 if(!walkToHearth())return finalize(false);
                 input.moveForward=0;input.runHeld=false;
-                ++input.commands.interact;
                 advance();
-                if(!conversationSaved() || replayedCaption || state.tavernConversationAvailable || state.chapterDialogue.line!=Line::None ||
+                if(!conversationSaved() || replayedCaption || state.tavernConversationAvailable ||
+                   !state.tavernDirectionsAvailable || state.chapterDialogue.line!=Line::None ||
                    state.chapterCompanion.bellwetherArrival!=BellwetherArrivalStage::Seated ||
                    !state.tavernKeeper || state.tavernKeeper->stage!=TavernKeeperStage::AtHearth)
                     return finalize(false);

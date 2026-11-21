@@ -3,8 +3,10 @@
 #include <cmath>
 namespace horde::gameplay::simulation {
 void GameSimulation::InteractWithClaimedChapter() {
-    if(!TryRescueInteraction() && !TryFlaskUpgradeInteraction() && config_.bellwetherTavernKeeperAdmitted)
-        chapterDialogue_.TryStartTavernConversation(TavernConversationContext(false));
+    if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
+    const auto context=TavernConversationContext(false);
+    if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
+    chapterDialogue_.ShowTavernDirections(context);
 }
 
 horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(bool paused) const {

@@ -338,6 +338,8 @@ int main() {
     using namespace horde::platform::windows;
     Check(WindowsSfxSourceGain(.5f,0)==0&&WindowsDialogueSourceGain(70)>.69f,"SFX mute leaves voice independent");
     Check(WindowsDialogueSourceGain(0)==0&&WindowsSfxSourceGain(.5f,70)>0,"voice mute leaves effects independent");
+    Check(WindowsSubtitleCaption("",Spec(Line::TavernDirections).text)==Spec(Line::TavernDirections).text,
+          "a directions note has no speaker label");
     Check(WindowsSubtitleCaption("Keeper","Come closer")=="Keeper: Come closer",
         "normal subtitle contains only speaker and spoken words, no modal/footer paragraphs");
     request={};request.lines=1;request.bottomReserved=WindowsSubtitleBottomReserved(false,100);request.margin=12;
@@ -587,6 +589,7 @@ int main() {
         hearth.Step(.05f,room);
         Check(hearth.State().line==Line::None,"the resolved hearth sequence remains quiet");
         Check(!hearth.TryStartTavernConversation(room),"a missing tavern keeper cannot offer the exchange");
+        Check(!hearth.CanShowTavernDirections(room),"directions require the completed exchange");
         room.tavernKeeperSource=Tuple{85.5f,-7.31f,109.0f};
         room.keeperAtHearth=true;
         hearth.Step(.05f,room);
@@ -610,6 +613,21 @@ int main() {
         hearth.Skip();hearth.Step(.05f,room);
         Check(!hearth.CanStartTavernConversation(room) && hearth.ExportProgress().tavernConversationLinesResolved==3,
               "the completed exchange cannot replay");
+        Check(hearth.State().line==Line::None && hearth.CanShowTavernDirections(room),
+              "directions are offered after the exchange without starting another line");
+        hearth.ShowTavernDirections(room);
+        const auto directions=hearth.State();
+        const auto directionsProgress=hearth.ExportProgress();
+        Check(IsGuidanceLine(directions.line) && directionsProgress.activeLine==Line::None &&
+              directionsProgress.tavernConversationLinesResolved==kTavernConversation.size(),
+              "directions are a temporary note rather than a fourth conversation line");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.CanShowTavernDirections(room) &&
+              !hearth.Complete(directions.line,directions.generation),
+              "moving away dismisses the note and invalidates its generation");
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.CanShowTavernDirections(room),
+              "returning allows rereading without automatically replaying anything");
     }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }
