@@ -4,6 +4,8 @@
 
 The approved direction is a continuous, largely player-controlled sequence: existing lookout, loose-ground ankle injury, short independent protective walk, square, south tavern door, chair by the hearth, then a player-initiated conversation. This record supersedes the older undecided injury-cause and offered-arm draft, without treating a plan or recording as a finished scene.
 
+**1.8 kickoff, 21 November 2026:** all four pickups below are now present in the private production archive. The receipt, originals, review WAVs, script and listening reels match the archived SHA-256 inventory. The new takes still need listening approval and runtime admission. The five previously approved Kit lines remain the reuse source for the hearth and first conversation.
+
 ## Locked direction and boundaries
 
 - Keep the same night, road, skyline and unwalled Bellwether visible from 1.7. Arrive southeast from the lookout without crossing the river. The silent player retains the camera; no forced cinematic shots.
