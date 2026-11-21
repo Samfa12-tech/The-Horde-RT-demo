@@ -216,6 +216,58 @@ void Transport() {
           "shared incidental family includes cleanup but cannot absorb combat feedback");
 }
 
+void HearthCadenceAndScope() {
+    auto s=DripState();
+    s.rescue.exteriorSide=true;
+    s.chapterDialogue.proofAccepted=true;
+    s.worldRoute.current=WorldZoneId::Lookout;
+    s.worldRoute.readiness[3]=ZoneReadiness::Ready;
+    s.playerX=bellwether::kConversation[0];
+    s.playerSupportWorldY=bellwether::kConversation[1];
+    s.playerZ=bellwether::kConversation[2];
+    s.fireEmitters[1].stableId=effects::kBellwetherHearthEmitterId;
+    s.fireEmitters[1].strength=1.f;
+    Check(Local::HearthEligible(s) && !ForestBirdAmbience::ExteriorEligible(s),
+          "the mapped room is a hearth habitat even when the route label is exterior");
+    auto extinguished=s;
+    extinguished.fireEmitters[1].strength=0.f;
+    Check(!Local::HearthEligible(extinguished),"an unlit hearth emits no crackle");
+    auto sill=s;
+    sill.playerZ=bellwether::kRoomMax[2]+.01f;
+    Check(!Local::HearthEligible(sill) && ForestBirdAmbience::ExteriorEligible(sill),
+          "the south sill keeps exterior audio and excludes the hearth");
+    auto upstairs=s;
+    upstairs.playerSupportWorldY+=2.f;
+    Check(!Local::HearthEligible(upstairs),"matching XZ on another storey cannot borrow the hearth");
+
+    Local local;
+    const auto advance=[&](unsigned count) {
+        Local::Result result;
+        for(unsigned i=0;i<count;++i) {
+            ++s.tickIndex;
+            result=local.Step(s);
+            if(result.cue!=Cue::None)break;
+        }
+        return result;
+    };
+    Check(advance(Local::kHearthInitialTicks-1).cue==Cue::None,
+          "a fresh room entry has a quiet interval");
+    const auto first=advance(1);
+    Check(first.cue==Cue::Hearth && Same(first.position, Local::kHearthPosition) && Near(first.gain,.42f),
+          "the finite cue uses the actual fire's position and restrained gain");
+    Check(advance(Local::kHearthIntervalTicks-1).cue==Cue::None && advance(1).cue==Cue::Hearth,
+          "the cadence leaves a gap beyond the six-second clip");
+    s.chapterDialogue.line=dialogue::Line::TavernIntroduce;
+    Check(advance(1).cue==Cue::Stop && advance(600).cue==Cue::None,
+          "active dialogue cancels the cue and prevents a backlog");
+    s.chapterDialogue.line=dialogue::Line::None;
+    Check(advance(Local::kHearthInitialTicks-1).cue==Cue::None && advance(1).cue==Cue::Hearth,
+          "after speech ends the hearth earns a fresh quiet interval");
+    s.playerZ=bellwether::kRoomMax[2]+.01f;
+    Check(advance(1).cue==Cue::Stop && advance(600).cue==Cue::None,
+          "walking out of the room stops the outstanding hearth voice once");
+}
+
 cp::Checkpoint Record(bool upper) {
     cp::Checkpoint c;
     c.guards = {cp::GuardPose{-4.f, -15.2f, .3f}, cp::GuardPose{-6.f, -16.f, -.7f}};
@@ -364,7 +416,9 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           audible.find("!campaignMenuVisible") != std::string::npos &&
           audible.find("!menuVisible") != std::string::npos &&
           audible.find("sfx_enabled") != std::string::npos && audible.find("sfx_volume") != std::string::npos &&
-          play.find("stopChapterAmbience();") < play.find("soundPool.play(") &&
+          play.find("chapterAmbienceStream = replaceChapterOneShot(chapterAmbienceStream, packedStereoGains, soundKey)") != std::string::npos &&
+          play.find("soundPool.play(") != std::string::npos &&
+          play.find("soundPool.stop(stream)") < play.find("soundPool.play(") &&
           play.find("packedStereoGains>>>32") != std::string::npos &&
           play.find("0,0,1.f)") != std::string::npos,
           "Android finite single-voice routing retains event gains, focus/dialogue/UI/mute gates and stop-before-play");
@@ -405,6 +459,11 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           nativeDrain.find("stopped.type=GameplayEventType::ForestBirdStopped") != std::string::npos &&
           nativeDrain.find("EnqueuePlatformGameplayEvent(stopped)") != std::string::npos,
           "Android render owner drops stale foliage starts through an ordered stop without a UI-thread simulation read");
+    Check(nativeDrain.find("!ChapterLocalAmbience::HearthEligible(current)") != std::string::npos &&
+          nativeDrain.find("stopped.type=GameplayEventType::ChapterLocalAmbienceStopped") != std::string::npos &&
+          drain.find("audio/bellwether-hearth/runtime/hearth_crackle.wav") != std::string::npos &&
+          java.find("loadSound(\"bellwether_hearth\", \"audio/bellwether-hearth/runtime/hearth_crackle.wav\")") != std::string::npos,
+          "both platform owners bind the hearth asset and Android converts an out-of-room start to a stop");
     const auto campaign = Read(root/"src/platform/windows/windows_campaign_owner.inl");
     const auto commit = Section(campaign, "void FinishCampaignCommit(", "\n}");
     Check(commit.find("StopLoop(\"chapter_ambience\")") != std::string::npos,
@@ -414,7 +473,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
 
 int main(int argc, char** argv) {
     if (argc != 2) { std::cerr << "usage: ChapterLocalAmbienceTests <source-root>\n"; return 2; }
-    Eligibility(); DripCadenceAndIdentity(); RopeTravelAndSource(); Transport();
+    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); RopeTravelAndSource(); Transport();
     const auto directory = std::filesystem::path(argv[1]) / "assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json", manifest, diagnostic) ||

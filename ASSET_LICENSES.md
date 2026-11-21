@@ -27,6 +27,15 @@ made from locally synthesized filtered noise. The
 sources, crop frames and exact WAVs. Packages carry the bounded derivatives
 and manifest. The archive originals stay private.
 
+## Bellwether tavern hearth (1.8 development)
+
+The quiet hearth cue uses [Fireplace burning by giddster](https://freesound.org/people/giddster/sounds/414482/)
+under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The six-second in-game WAV is trimmed, downmixed, filtered and faded from the
+author's public high-quality playback copy. The [asset manifest](assets/audio/bellwether-hearth/asset.manifest.json)
+pins the source, exact processing recipe and output. The game packages the
+finite WAV and manifest. The source copy remains in the local archive.
+
 ## Bellwether loose road stone (1.8 development)
 
 `assets/models/world/source/bellwether-loose-road-stone-v1/` contains original

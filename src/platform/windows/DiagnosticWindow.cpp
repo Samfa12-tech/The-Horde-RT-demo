@@ -2810,6 +2810,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::TombDrip:
         case GameplayEventType::RopeContact:
         case GameplayEventType::ForestFoliage:
+        case GameplayEventType::BellwetherHearth:
             if(event.sequence!=latestAmbienceSignal)break;
             if(event.type==GameplayEventType::ForestFoliage &&
                !horde::gameplay::simulation::ForestBirdAmbience::FoliageEligible(context.simulation.Snapshot())) {
@@ -2823,6 +2824,8 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                    horde::gameplay::simulation::ChapterLocalAmbience::DripEligible(context.simulation.Snapshot()):
                 event.type==GameplayEventType::RopeContact?
                    horde::gameplay::simulation::ChapterLocalAmbience::RopeEligible(context.simulation.Snapshot()):
+                event.type==GameplayEventType::BellwetherHearth?
+                   horde::gameplay::simulation::ChapterLocalAmbience::HearthEligible(context.simulation.Snapshot()):
                 event.type==GameplayEventType::PondFrogs?
                    horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()):
                    horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()))) {
@@ -2833,7 +2836,8 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                 const auto clip=event.type==GameplayEventType::ForestFoliage?
                     "audio/forest-foliage/runtime/leaf_rustle.wav":event.type==GameplayEventType::TombDrip?
                     "audio/chapter-local-ambience/runtime/tomb_drip.wav":event.type==GameplayEventType::RopeContact?
-                    "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::PondFrogs?
+                    "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::BellwetherHearth?
+                    "audio/bellwether-hearth/runtime/hearth_crackle.wav":event.type==GameplayEventType::PondFrogs?
                     "audio/night-ambience/runtime/pond_frogs_crickets.wav":event.type==GameplayEventType::ForestCrickets?
                     "audio/night-ambience/runtime/evening_cricket.wav":"audio/night-ambience/runtime/tawny_owl.wav";
                 (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,

@@ -1,6 +1,7 @@
 #pragma once
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/ForestBirdAmbience.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/SpatialAudio.h"
 #include "audio/LichRevivalAudio.h"
 #include <algorithm>
@@ -11,9 +12,13 @@ namespace horde::gameplay::simulation {
 // platform. Only the fixed-step simulation schedules these local contacts.
 class ChapterLocalAmbience {
 public:
-    enum class Cue { None, Stop, Drip, Rope };
+    enum class Cue { None, Stop, Drip, Rope, Hearth };
     struct Result { Cue cue=Cue::None; traversal::Vec3 position{}; float gain=0; };
     static constexpr unsigned kDripInitialTicks=360, kRopeMinimumTicks=72;
+    static constexpr unsigned kHearthInitialTicks=105, kHearthIntervalTicks=540;
+    static constexpr float kHearthRange=9.f;
+    static constexpr traversal::Vec3 kHearthPosition{
+        effects::kBellwetherHearthFlame[0], effects::kBellwetherHearthFlame[1], effects::kBellwetherHearthFlame[2]};
     static constexpr float kRopeTravelMetres=.35f;
     // Within the existing waterfall wet footprint, at the west-side wet floor.
     static constexpr traversal::Vec3 kDripPosition{-3.4f,-.928f,-15.25f};
@@ -40,7 +45,15 @@ public:
             std::all_of(s.rescue.grippingHandTargets.begin(),s.rescue.grippingHandTargets.end(),
                 [](const auto& v){return std::isfinite(v.x)&&std::isfinite(v.y)&&std::isfinite(v.z);});
     }
-    static bool Eligible(const SimulationSnapshot& s) { return DripEligible(s)||RopeEligible(s); }
+    static bool HearthEligible(const SimulationSnapshot& s) {
+        return CommonEligible(s) && s.rescue.exteriorSide && !s.rescue.equipmentStowed && s.playerGrounded &&
+            traversal::IsOnBellwetherTavernRoomFloor(s.playerX, s.playerSupportWorldY, s.playerZ) &&
+            std::hypot(s.playerX - kHearthPosition.x, s.playerZ - kHearthPosition.z) < kHearthRange &&
+            std::any_of(s.fireEmitters.begin(), s.fireEmitters.end(), [](const auto& emitter) {
+                return emitter.stableId == effects::kBellwetherHearthEmitterId && emitter.strength > 0.f;
+            });
+    }
+    static bool Eligible(const SimulationSnapshot& s) { return DripEligible(s)||RopeEligible(s)||HearthEligible(s); }
     Result Step(const SimulationSnapshot& s) {
         const bool identityChanged=seen_ && (retry_!=s.retryGeneration ||
             routeReset_!=s.lastConsumedRouteResetSequence || generation_!=s.rescue.generation || s.tickIndex<tick_);
@@ -49,7 +62,7 @@ public:
         if(seen_ && s.tickIndex==tick_) return {};
         seen_=true;tick_=s.tickIndex;retry_=s.retryGeneration;
         routeReset_=s.lastConsumedRouteResetSequence;generation_=s.rescue.generation;
-        const auto wanted=RopeEligible(s)?Cue::Rope:DripEligible(s)?Cue::Drip:Cue::None;
+        const auto wanted=RopeEligible(s)?Cue::Rope:DripEligible(s)?Cue::Drip:HearthEligible(s)?Cue::Hearth:Cue::None;
         if(stop) { ClearCadence(); return {Cue::Stop}; }
         if(wanted!=mode_) {
             const bool leaving=mode_!=Cue::None;
@@ -64,6 +77,12 @@ public:
             constexpr unsigned intervals[]{1080,1440,1260};
             nextDrip_=intervals[dripVariant_++%3];
             return {Cue::Drip,kDripPosition,.25f};
+        }
+        if(mode_==Cue::Hearth) {
+            if(++ticks_<nextHearth_) return {};
+            ticks_=0;
+            nextHearth_=kHearthIntervalTicks;
+            return {Cue::Hearth,kHearthPosition,.42f};
         }
         const auto& indices=s.rescue.grippingRopeNodeIndices;
         if(!gripsSeen_) { previousGrips_=indices;gripsSeen_=true;return {}; }
@@ -81,10 +100,10 @@ public:
     }
     void Reset() { seen_=false;ClearCadence(); }
 private:
-    void ClearCadence() { mode_=Cue::None;ticks_=0;nextDrip_=kDripInitialTicks;
+    void ClearCadence() { mode_=Cue::None;ticks_=0;nextDrip_=kDripInitialTicks;nextHearth_=kHearthInitialTicks;
         dripVariant_=0;gripsSeen_=false;travel_=0; }
     Cue mode_=Cue::None;
-    unsigned ticks_=0,nextDrip_=kDripInitialTicks,dripVariant_=0;
+    unsigned ticks_=0,nextDrip_=kDripInitialTicks,dripVariant_=0,nextHearth_=kHearthInitialTicks;
     bool seen_=false,gripsSeen_=false;
     std::uint64_t tick_=0,routeReset_=0,generation_=0;
     std::uint32_t retry_=0;
@@ -95,12 +114,15 @@ inline bool IsChapterAmbienceEvent(GameplayEventType type) {
     return type==GameplayEventType::ForestBird || type==GameplayEventType::ForestCrickets ||
         type==GameplayEventType::PondFrogs || type==GameplayEventType::ForestBirdStopped ||
         type==GameplayEventType::TombDrip || type==GameplayEventType::RopeContact ||
-        type==GameplayEventType::ChapterLocalAmbienceStopped || type==GameplayEventType::ForestFoliage;
+        type==GameplayEventType::ChapterLocalAmbienceStopped || type==GameplayEventType::ForestFoliage ||
+        type==GameplayEventType::BellwetherHearth;
 }
 // Both platform transports use one event-time source/gain calculation. Other
 // semantic events retain their existing 1/14 metre emitter contract.
 inline SpatialAudioEmitter ChapterAmbienceEmitter(const GameplayEvent& event) {
     if(event.type==GameplayEventType::LichRevivalCry)return audio::LichRevivalEmitter(event);
+    if(event.type==GameplayEventType::BellwetherHearth)
+        return {event.worldX,event.worldZ,std::max(0.f,event.intensity),2.f,ChapterLocalAmbience::kHearthRange,event.worldY};
     const bool foliage=event.type==GameplayEventType::ForestFoliage;
     return {event.worldX,event.worldZ,std::max(0.f,event.intensity),
         foliage?ForestBirdAmbience::kFoliageReferenceDistance:1.f,

@@ -681,6 +681,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/chapter-local-ambience/asset.manifest.json'
         include 'audio/chapter-local-ambience/runtime/tomb_drip.wav'
         include 'audio/chapter-local-ambience/runtime/rope_contact.wav'
+        include 'audio/bellwether-hearth/asset.manifest.json'
+        include 'audio/bellwether-hearth/runtime/hearth_crackle.wav'
         include 'audio/kit-ankle/asset.manifest.json'
         include 'audio/kit-ankle/runtime/boot_and_gravel.wav'
         include 'audio/kit-ankle/runtime/steady_breath.wav'

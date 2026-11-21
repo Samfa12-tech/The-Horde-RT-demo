@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cmath>
+#include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
 namespace horde::gameplay::traversal
 {
@@ -25,4 +27,12 @@ inline constexpr std::size_t kBellwetherChurchJunction=3;
 inline constexpr std::size_t kBellwetherSouthApproachStation=9;
 inline constexpr std::size_t kBellwetherSouthDoorStation=10;
 inline constexpr std::size_t kBellwetherAnkleStation=5;
+
+// The authored room starts at the inner face of the south wall. The ramp
+// and sill remain exterior even where they share the physical floor height.
+inline bool IsOnBellwetherTavernRoomFloor(float x, float y, float z) {
+    const auto& low = bellwether::kRoomMin;
+    const auto& high = bellwether::kRoomMax;
+    return x >= low[0] && x <= high[0] && z >= low[2] && z <= high[2] && std::abs(y - low[1]) <= .02f;
+}
 }

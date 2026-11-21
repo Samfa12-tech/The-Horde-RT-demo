@@ -1221,6 +1221,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     bool welcomeAtDoor=true,kitWalkedDuringWelcome=false;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
+    unsigned hearthCues=0;
+    bool hearthSourceCorrect=true, hearthStoppedForTalk=false;
     bool stoneMovesOnlyAfterContact=true;
     unsigned stoneMotionTicks=0;
     std::vector<Line> hearthSpoken;
@@ -1289,6 +1291,15 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         }
         using namespace horde::audio;
         for(const auto& event:game.Events().Events()) {
+            if(event.type==sim::GameplayEventType::BellwetherHearth) {
+                ++hearthCues;
+                const auto source=sim::ChapterLocalAmbience::kHearthPosition;
+                hearthSourceCorrect &= event.worldX==source.x && event.worldY==source.y &&
+                    event.worldZ==source.z && after.chapterDialogue.line==Line::None &&
+                    sim::ChapterLocalAmbience::HearthEligible(after);
+            }
+            if(event.type==sim::GameplayEventType::ChapterLocalAmbienceStopped &&
+                after.chapterDialogue.line==Line::TavernIntroduce) hearthStoppedForTalk=true;
             if(event.type!=sim::GameplayEventType::KitAnkleFoley)continue;
             const auto cue=KitAnkleCueForEvent(event);
             const auto metadata=horde::platform::android::PackGameplayEventMetadata(event);
@@ -1452,8 +1463,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(stayAtIncident ? (welcomes==1 && welcomeAtDoor && kitWalkedDuringWelcome) : welcomes==0,
           "the welcome plays once at the mapped door while Kit keeps walking, and requires the keeper");
     if(stayAtIncident) {
+        const auto previousHearthCues=hearthCues;
+        for(unsigned tick=0;tick<sim::ChapterLocalAmbience::kHearthIntervalTicks &&
+            hearthCues==previousHearthCues;++tick)step();
+        Check(hearthCues==previousHearthCues+1 && hearthSourceCorrect,
+              "the real tavern route hears the lit hearth on the authored floor during a quiet interval");
         input.commands.interact=game.Snapshot().lastConsumedInteractSequence+1;
         step();
+        Check(hearthStoppedForTalk,"choosing Talk stops the active hearth cue before the exchange");
         for(const auto line:kTavernConversation) {
             const auto& speech=game.Snapshot().chapterDialogue;
             const float speakerX=line==Line::TavernHordeArmy ? kKeeperHearth[0] : kChairSitRoot[0];

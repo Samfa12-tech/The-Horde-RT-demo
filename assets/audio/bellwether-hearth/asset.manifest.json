@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "target": "Bellwether tavern finite positional hearth crackle",
+  "source": {
+    "title": "Fireplace burning",
+    "author": "giddster",
+    "page": "https://freesound.org/people/giddster/sounds/414482/",
+    "file": "https://cdn.freesound.org/previews/414/414482_1738686-hq.mp3",
+    "format": "Public high-quality stereo MP3 playback copy",
+    "sha256": "dc187159238d196ed9c7071c932d5fec2d148d8b810ebe2b83838a4aee589d43",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+  },
+  "runtime": {
+    "file": "runtime/hearth_crackle.wav",
+    "sha256": "673a5d2110af94cf8b4280b03004af05edc82086fc468cb4db957b4d53d29d4f",
+    "bytes": 576044,
+    "sampleRate": 48000,
+    "bitsPerSample": 16,
+    "channels": 1,
+    "frames": 288000,
+    "cropSeconds": [6, 12],
+    "peakSample": 5248,
+    "loop": false
+  },
+  "processing": "ffmpeg -ss 6 -i <source> -t 6 -af 'pan=mono|c0=0.5*c0+0.5*c1,highpass=f=75,volume=8dB,afade=t=in:d=0.08,afade=t=out:st=5.64:d=0.36' -ar 48000 -c:a pcm_s16le -map_metadata -1 -fflags +bitexact -flags:a +bitexact <runtime>",
+  "listeningAcceptance": false
+}

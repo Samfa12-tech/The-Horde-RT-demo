@@ -450,6 +450,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         if(local.cue!=ChapterLocalAmbience::Cue::None)
             Emit(local.cue==ChapterLocalAmbience::Cue::Drip?GameplayEventType::TombDrip:
                  local.cue==ChapterLocalAmbience::Cue::Rope?GameplayEventType::RopeContact:
+                 local.cue==ChapterLocalAmbience::Cue::Hearth?GameplayEventType::BellwetherHearth:
                  GameplayEventType::ChapterLocalAmbienceStopped,
                 EntityId::Invalid,EntityId::Invalid,local.position.x,local.position.z,local.gain,0,local.position.y);
     }

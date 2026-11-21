@@ -1,6 +1,7 @@
 #pragma once
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
 #include "scene/ChapterRegionalWater.h"
 #include <algorithm>
 #include <cmath>
@@ -28,6 +29,7 @@ public:
         return s.developmentRescueJourney && s.rescue.exteriorSide && !s.rescue.equipmentStowed &&
             !s.paused && s.playerAlive && s.playerGrounded && s.chapterDialogue.proofAccepted &&
             s.chapterDialogue.line==dialogue::Line::None &&
+            !traversal::IsOnBellwetherTavernRoomFloor(s.playerX, s.playerSupportWorldY, s.playerZ) &&
             (zone==WorldZoneId::TombExterior || zone==WorldZoneId::ForestApproach || zone==WorldZoneId::Lookout) &&
             s.worldRoute.readiness[static_cast<unsigned>(zone)]==ZoneReadiness::Ready;
         // This authored campaign exterior is always the same night; legacy

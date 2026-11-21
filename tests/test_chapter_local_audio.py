@@ -79,6 +79,31 @@ class ChapterLocalAudioTests(unittest.TestCase):
         self.assertNotIn('leaves rustle 1.wav',gradle);self.assertNotIn('leaves rustle 1.wav',windows)
         self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text(encoding='utf-8'))
 
+    def test_bellwether_hearth_finite_pcm_and_package_roster(self):
+        relative = 'audio/bellwether-hearth/'
+        directory = ROOT/'assets'/relative
+        manifest = json.loads((directory/'asset.manifest.json').read_text(encoding='utf-8'))
+        asset = manifest['runtime']
+        self.assertEqual(manifest['source']['license'], 'CC0-1.0')
+        self.assertFalse(manifest['listeningAcceptance'])
+        self.assertFalse(asset['loop'])
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()},
+                         {'asset.manifest.json', 'runtime/hearth_crackle.wav'})
+        path = directory/asset['file']
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), asset['sha256'])
+        self.assertEqual(path.stat().st_size, asset['bytes'])
+        with wave.open(str(path), 'rb') as wav:
+            self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+            self.assertEqual(wav.getnframes(), 6 * 48000)
+            pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+        self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+        self.assertEqual(max(map(abs, pcm)), asset['peakSample'])
+        for roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            contents = (ROOT/roster).read_text(encoding='utf-8')
+            self.assertIn(relative + 'asset.manifest.json', contents)
+            self.assertIn(relative + asset['file'], contents)
+            self.assertNotIn('414482_1738686-hq.mp3', contents)
+
     def test_kit_ankle_packages_two_finite_cues_and_their_provenance(self):
         directory = ROOT / 'assets/audio/kit-ankle'
         manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))

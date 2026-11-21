@@ -16,6 +16,7 @@ static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType:
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::LichRevivalCry) == 36u);
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::PlayerGuardBlocked) == 37u);
 static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::KitAnkleFoley) == 38u);
+static_assert(static_cast<std::uint8_t>(gameplay::simulation::GameplayEventType::BellwetherHearth) == 39u);
 
 // Existing type/source/target/sequence fields retain their positions. The
 // previously unused byte 24 carries a selected semantic cue, not truncated

@@ -65,10 +65,11 @@ enum class GameplayEventType : std::uint8_t
     LichRevivalCry,
     PlayerGuardBlocked,
     KitAnkleFoley,
+    BellwetherHearth,
 };
 
 inline constexpr std::size_t kGameplayEventTypeCount =
-    static_cast<std::size_t>(GameplayEventType::KitAnkleFoley) + 1u;
+    static_cast<std::size_t>(GameplayEventType::BellwetherHearth) + 1u;
 
 struct GameplayEvent
 {

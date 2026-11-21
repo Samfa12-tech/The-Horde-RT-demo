@@ -1157,6 +1157,13 @@ void DrainSimulationEventsToPlatform()
             EnqueuePlatformGameplayEvent(stopped);
             continue;
         }
+        if(event.type==GameplayEventType::BellwetherHearth && !ChapterLocalAmbience::HearthEligible(current)) {
+            auto stopped=event;
+            stopped.type=GameplayEventType::ChapterLocalAmbienceStopped;
+            stopped.intensity=0.f;
+            EnqueuePlatformGameplayEvent(stopped);
+            continue;
+        }
         EnqueuePlatformGameplayEvent(event);
     }
     gGameSimulation.ClearEvents();

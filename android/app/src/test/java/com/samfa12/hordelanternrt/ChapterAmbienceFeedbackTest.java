@@ -11,6 +11,8 @@ public class ChapterAmbienceFeedbackTest {
         assertEquals("pond_frogs_crickets", ChapterAmbienceFeedback.soundKey(31));
         assertEquals(35, ChapterAmbienceFeedback.FOREST_FOLIAGE);
         assertEquals("forest_leaf_rustle", ChapterAmbienceFeedback.soundKey(35));
+        assertEquals(39, ChapterAmbienceFeedback.BELLWETHER_HEARTH);
+        assertEquals("bellwether_hearth", ChapterAmbienceFeedback.soundKey(39));
     }
     @Test public void stopAndUnknownEventsCannotSelectAudio() {
         for(int type: new int[]{-1,0,27,29,34,36,255})
@@ -37,6 +39,7 @@ public class ChapterAmbienceFeedbackTest {
         assertNull(ChapterAmbienceFeedback.soundKey((int)(forestStop[6]&255)));
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(35,32,34)));
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(33,35,34)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(39,38,34)));
     }
     @Test public void laterEligibleStartsReplaceOldStopsAndOtherFamilyStarts() {
         long[] foliage=batch(29,0,35);
