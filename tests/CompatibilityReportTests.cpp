@@ -1,4 +1,5 @@
 #include "reporting/CompatibilityReport.h"
+#include "vulkan/DeviceCapabilities.h"
 #include "reporting/DeveloperReportSubmission.h"
 
 #include <array>
@@ -39,11 +40,11 @@ CompatibilityReportSnapshot Presented(bool pipeline=true)
     auto s=Device(); s.extensions.accelerationStructure=CompatibilityCheck::Present;
     s.extensions.bufferDeviceAddress=s.extensions.deferredHostOperations=CompatibilityCheck::Present;
     s.features.accelerationStructure=s.features.bufferDeviceAddress=CompatibilityCheck::Present;
+    s.extensions.rayQuery=s.features.rayQuery=CompatibilityCheck::Present;
     if (pipeline) {
         s.extensions.rayTracingPipeline=s.features.rayTracingPipeline=CompatibilityCheck::Present;
         s.backend=CompatibilityBackend::RayTracingPipeline;
     } else {
-        s.extensions.rayQuery=s.features.rayQuery=CompatibilityCheck::Present;
         s.backend=CompatibilityBackend::RayQueryCompute;
     }
     s.rtPresented=true; s.lastStage=CompatibilityStage::Presentation; s.outcome=CompatibilityOutcome::Presented;
@@ -127,7 +128,7 @@ void PresentationAndStartupEvidence()
         if (fault==3)s.backend=CompatibilityBackend::NotSelected;
         if (fault==4)s.extensions.accelerationStructure=CompatibilityCheck::Unknown;
         if (fault==5)s.extensions.rayTracingPipeline=CompatibilityCheck::Absent;
-        if (fault==6)s.extensions.bufferDeviceAddress=CompatibilityCheck::Unknown;
+        if (fault==6)s.extensions.rayQuery=CompatibilityCheck::Unknown;
         if (fault==7)s.extensions.deferredHostOperations=CompatibilityCheck::Unknown;
         if (fault==8)s.features.accelerationStructure=CompatibilityCheck::Unknown;
         if (fault==9)s.features.rayTracingPipeline=CompatibilityCheck::Absent;
@@ -152,6 +153,62 @@ void PresentationAndStartupEvidence()
     CheckRejected(startup,"failed probe cannot retain a previous attempt's GPU checks or backend");
     startup=Device(); startup.vulkanApiVersion=0u;
     CheckRejected(startup,"zero API is unavailable data rather than a valid observed API version");
+}
+
+void SelectedDeviceEvidence()
+{
+    using CheckValue = CompatibilityCheck;
+    auto s = Device();
+    horde::vulkan::DeviceCapabilities device;
+    device.identity.gpuName = "Example adapter";
+    device.identity.driverVersion = 8388887u;
+    device.identity.vulkanApiVersion = (1u<<22u)|(3u<<12u);
+    device.extensionsEnumerated = true;
+    device.extensions.bufferDeviceAddress = true;
+    device.features = {true, true, true, true};
+    device.featuresQueried = {true, true, true, true};
+    CaptureCompatibilityDeviceEvidence(s, device);
+    const auto unsupported = PrepareCompatibilityReport(s, Approval());
+    Check(unsupported.IsReady() && s.outcome == CompatibilityOutcome::Unsupported &&
+        Has(unsupported,"\"VK_KHR_ray_tracing_pipeline\":\"absent\"") &&
+        Has(unsupported,"\"rayTracingPipeline\":\"unknown\"") &&
+        Has(unsupported,"\"accelerationStructure\":\"unknown\"") &&
+        Has(unsupported,"\"rayQuery\":\"unknown\"") && Has(unsupported,"\"bufferDeviceAddress\":\"present\""),
+        "unsupported report separates missing RT extensions from unqueried features");
+    s.features.rayQuery = CheckValue::Present;
+    CheckRejected(s,"serializer rejects an extension-only feature value without observed support for its extension");
+
+    device.extensions = {true,true,true,false,true};
+    device.featuresQueried = {};
+    CaptureCompatibilityDeviceEvidence(s, device);
+    Check(PrepareCompatibilityReport(s, Approval()).IsReady() && s.outcome == CompatibilityOutcome::CapabilityOnly &&
+        s.features.accelerationStructure == CheckValue::Unknown && s.features.bufferDeviceAddress == CheckValue::Unknown,
+        "an unavailable features query reports unknown and cannot certify support or rejection");
+
+    device.featuresQueried = {true,true,true,true};
+    device.features.rayQuery = false;
+    CaptureCompatibilityDeviceEvidence(s, device);
+    Check(PrepareCompatibilityReport(s, Approval()).IsReady() && s.outcome == CompatibilityOutcome::Unsupported &&
+        s.extensions.rayQuery == CheckValue::Present && s.features.rayQuery == CheckValue::Absent,
+        "observed false ray query blocks both current backends even with the extension and pipeline present");
+
+    device.features.rayQuery = true;
+    CaptureCompatibilityDeviceEvidence(s, device);
+    s.backend = CompatibilityBackend::RayTracingPipeline;
+    s.outcome = CompatibilityOutcome::Presented;
+    s.lastStage = CompatibilityStage::Presentation;
+    s.rtPresented = true;
+    Check(PrepareCompatibilityReport(s, Approval()).IsReady() &&
+        s.extensions.bufferDeviceAddress == CheckValue::Absent && s.features.bufferDeviceAddress == CheckValue::Present,
+        "a presented pipeline can use promoted Vulkan 1.2 BDA without inventing extension support");
+
+    s = Device();
+    device.extensionsEnumerated = false;
+    CaptureCompatibilityDeviceEvidence(s, device);
+    Check(PrepareCompatibilityReport(s, Approval()).IsReady() &&
+        s.extensions.accelerationStructure == CheckValue::Unknown && s.features.accelerationStructure == CheckValue::Unknown &&
+        s.features.bufferDeviceAddress == CheckValue::Present && s.outcome == CompatibilityOutcome::CapabilityOnly,
+        "failed extension enumeration leaves RT extension evidence unknown while retaining a core BDA check");
 }
 
 void ConsentPrivacyBoundsAndOwnership()
@@ -212,7 +269,8 @@ int main()
 {
     static_assert(std::is_same_v<decltype(std::declval<PreparedCompatibilityReport>().Json()),std::string_view>);
     static_assert(!std::is_constructible_v<PreparedCompatibilityReport,std::string>);
-    MissingProbeAndUnsupported(); PresentationAndStartupEvidence(); ConsentPrivacyBoundsAndOwnership();
+    MissingProbeAndUnsupported(); PresentationAndStartupEvidence(); SelectedDeviceEvidence();
+    ConsentPrivacyBoundsAndOwnership();
     auto laterFailure=Presented();laterFailure.outcome=CompatibilityOutcome::RuntimeFailure;
     laterFailure.lastStage=CompatibilityStage::Presentation;
     const auto observedFailure=PrepareCompatibilityReport(laterFailure,Approval());

@@ -2758,54 +2758,8 @@ horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
     const bool confirmedNoDevice=initialised && context.HasConfirmedNoPhysicalDevices();
     snapshot.probe=confirmedNoDevice?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
     snapshot.outcome=confirmedNoDevice?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
-    const auto physicalDevice=context.GetSelectedPhysicalDevice();
-    if (initialised && physicalDevice!=VK_NULL_HANDLE) {
-        snapshot.probe=CompatibilityProbe::DeviceChecked;
-        snapshot.outcome=CompatibilityOutcome::CapabilityOnly;
-        snapshot.gpu=capabilities.identity.gpuName;
-        snapshot.rawDriverVersion=capabilities.identity.driverVersion;
-        snapshot.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
-        // Existing capability booleans have no "query completed" marker.
-        // Confirm extension enumeration before treating a false value as Absent.
-        std::uint32_t count=0u;
-        bool extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,nullptr)==VK_SUCCESS;
-        std::vector<VkExtensionProperties> extensions;
-        if (extensionsChecked && count<=4096u) {
-            extensions.resize(count);
-            if (count!=0u) {
-                const auto capacity=count;
-                extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,extensions.data())==VK_SUCCESS &&
-                    count<=capacity;
-                if (extensionsChecked) extensions.resize(count);
-            }
-        } else extensionsChecked=false;
-        const auto extension=[&](bool observed,const char* name) {
-            if (!extensionsChecked) return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
-            return std::any_of(extensions.begin(),extensions.end(),[name](const auto& item) {
-                return std::strncmp(item.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;
-            })?CompatibilityCheck::Present:CompatibilityCheck::Absent;
-        };
-        const auto& e=capabilities.extensions;
-        snapshot.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),
-            extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
-            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),
-            extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),
-            extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
-        const auto feature=[](bool observed) { return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown; };
-        const auto& f=capabilities.features;
-        // Do not guess Absent when the original core/KHR Features2 entrypoint
-        // may have been unavailable. Positive queried values remain evidence.
-        snapshot.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),
-            feature(f.rayQuery),feature(f.bufferDeviceAddress)};
-        const auto& x=snapshot.extensions;
-        const bool commonBlocked=x.accelerationStructure==CompatibilityCheck::Absent ||
-            x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent;
-        const auto api=capabilities.identity.vulkanApiVersion;
-        const bool apiBlocked=api!=0u && api<VK_API_VERSION_1_2;
-        if (commonBlocked || apiBlocked ||
-            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))
-            snapshot.outcome=CompatibilityOutcome::Unsupported;
-    }
+    if (initialised && context.GetSelectedPhysicalDevice()!=VK_NULL_HANDLE)
+        CaptureCompatibilityDeviceEvidence(snapshot, capabilities);
     PublishCompatibilityProbe(std::move(snapshot),generation,startupAttempt);
     return capabilities;
 }

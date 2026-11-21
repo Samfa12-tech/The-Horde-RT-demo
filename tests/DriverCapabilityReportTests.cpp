@@ -1,5 +1,6 @@
 #include "vulkan/DeviceCapabilities.h"
 #include "vulkan/RtCapabilityReport.h"
+#include "vulkan/VulkanContext.h"
 #include "vulkan/raytracing/RtDeviceEnablePlan.h"
 
 #include <cstdint>
@@ -37,6 +38,86 @@ horde::vulkan::DeviceCapabilities MakeCapabilities()
     return capabilities;
 }
 
+struct FeatureQuery
+{
+    std::vector<VkStructureType> chain;
+    bool pipeline = true;
+};
+
+VKAPI_ATTR void VKAPI_CALL ObserveFeatures(VkPhysicalDevice device, VkPhysicalDeviceFeatures2* features)
+{
+    auto& observed = *reinterpret_cast<FeatureQuery*>(device);
+    for (auto* node = static_cast<VkBaseOutStructure*>(features->pNext); node; node = node->pNext)
+    {
+        observed.chain.push_back(node->sType);
+        switch (node->sType)
+        {
+        case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR:
+            reinterpret_cast<VkPhysicalDeviceAccelerationStructureFeaturesKHR*>(node)->accelerationStructure = VK_TRUE;
+            break;
+        case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR:
+            reinterpret_cast<VkPhysicalDeviceRayTracingPipelineFeaturesKHR*>(node)->rayTracingPipeline =
+                observed.pipeline ? VK_TRUE : VK_FALSE;
+            break;
+        case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR:
+            reinterpret_cast<VkPhysicalDeviceRayQueryFeaturesKHR*>(node)->rayQuery = VK_TRUE;
+            break;
+        case VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES:
+            reinterpret_cast<VkPhysicalDeviceBufferDeviceAddressFeatures*>(node)->bufferDeviceAddress = VK_TRUE;
+            break;
+        default:
+            Check(false, "unexpected feature in physical-device query chain");
+        }
+    }
+}
+
+void CheckFeatureQueryAdmission()
+{
+    using namespace horde::vulkan;
+    constexpr auto address = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+    auto capabilities = MakeCapabilities();
+    capabilities.extensionsEnumerated = true;
+    capabilities.extensions.bufferDeviceAddress = true;
+    FeatureQuery observed;
+    const auto device = reinterpret_cast<VkPhysicalDevice>(&observed);
+    QueryRtDeviceFeatures(device, ObserveFeatures, capabilities);
+    Check(observed.chain == std::vector{address} && capabilities.features.bufferDeviceAddress &&
+        !capabilities.featuresQueried.accelerationStructure && !capabilities.featuresQueried.rayTracingPipeline &&
+        !capabilities.featuresQueried.rayQuery &&
+        raytracing::SelectRtExecutionBackend(capabilities, true) == RtExecutionBackend::Unsupported,
+        "AMD-shaped extension inventory queries only BDA and remains unsupported");
+    const auto report = BuildCapabilityJsonReport(capabilities);
+    Check(Contains(report, "\"extensionsEnumerated\": true") && Contains(report, "\"featuresQueried\": {") &&
+        Contains(report, "\"accelerationStructure\": false"),
+        "raw capability JSON records checked enumeration and the query coverage");
+
+    observed.chain.clear();
+    observed.pipeline = false;
+    capabilities.extensions = {true, true, true, false, true};
+    QueryRtDeviceFeatures(device, ObserveFeatures, capabilities);
+    Check(observed.chain.size() == 4u && observed.chain.back() == address &&
+        capabilities.featuresQueried.rayTracingPipeline && !capabilities.features.rayTracingPipeline &&
+        raytracing::SelectRtExecutionBackend(capabilities, true) == RtExecutionBackend::RayQueryCompute,
+        "observed false pipeline feature preserves real ray query and promoted BDA");
+
+    observed.chain.clear();
+    capabilities.extensionsEnumerated = false;
+    QueryRtDeviceFeatures(device, ObserveFeatures, capabilities);
+    Check(observed.chain == std::vector{address} && !capabilities.features.rayQuery,
+        "unconfirmed extension enumeration cannot admit extension feature structures");
+    QueryRtDeviceFeatures(device, nullptr, capabilities);
+    Check(!capabilities.featuresQueried.bufferDeviceAddress && !capabilities.features.bufferDeviceAddress,
+        "unavailable query clears prior coverage and results");
+
+    observed.chain.clear();
+    capabilities.extensions = {};
+    capabilities.extensionsEnumerated = true;
+    capabilities.identity.vulkanApiVersion = VK_API_VERSION_1_1;
+    QueryRtDeviceFeatures(device, ObserveFeatures, capabilities);
+    Check(observed.chain.empty() && !capabilities.featuresQueried.bufferDeviceAddress,
+        "Vulkan 1.1 without the BDA extension cannot query its feature");
+}
+
 } // namespace
 
 int main()
@@ -44,6 +125,7 @@ int main()
     using horde::vulkan::BuildCapabilityJsonReport;
     using horde::vulkan::BuildCapabilityTextReport;
     using horde::vulkan::FormatDriverVersionText;
+    CheckFeatureQueryAdmission();
 
     constexpr std::uint32_t rawDriverVersion = std::numeric_limits<std::uint32_t>::max();
     const std::string rawDescription = "raw 4294967295 (vendor-specific)";

@@ -9,6 +9,10 @@
 namespace horde::vulkan
 {
 
+// Query the extension/core structures supported by this physical device.
+void QueryRtDeviceFeatures(VkPhysicalDevice physicalDevice,
+    PFN_vkGetPhysicalDeviceFeatures2 query, DeviceCapabilities& capabilities);
+
 class VulkanContext
 {
 public:

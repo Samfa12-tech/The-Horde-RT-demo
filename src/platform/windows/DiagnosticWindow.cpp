@@ -416,30 +416,8 @@ CompatibilityWindowOwner CaptureWindowsCompatibilityProbe(const horde::vulkan::V
     if(GetVersionExW(&os))s.os="Windows API major "+std::to_string(os.dwMajorVersion)+" minor "+
         std::to_string(os.dwMinorVersion)+" build "+std::to_string(os.dwBuildNumber)+" (manifest/compatibility dependent)";
 #pragma warning(pop)
-    const auto physical=probe.GetSelectedPhysicalDevice();
-    if(initialised && physical!=VK_NULL_HANDLE) {
-        s.probe=CompatibilityProbe::DeviceChecked;s.outcome=CompatibilityOutcome::CapabilityOnly;
-        s.gpu=capabilities.identity.gpuName;s.rawDriverVersion=capabilities.identity.driverVersion;s.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
-        std::uint32_t count=0;bool checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,nullptr)==VK_SUCCESS;
-        std::vector<VkExtensionProperties> extensions;
-        if(checked && count<=4096u) {extensions.resize(count);const auto capacity=count;
-            if(count)checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,extensions.data())==VK_SUCCESS && count<=capacity;
-            if(checked)extensions.resize(count);
-        } else checked=false;
-        const auto extension=[&](bool observed,const char* name){
-            if(!checked)return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
-            return std::any_of(extensions.begin(),extensions.end(),[&](const auto& e){return std::strncmp(e.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;})?
-                CompatibilityCheck::Present:CompatibilityCheck::Absent;};
-        const auto& e=capabilities.extensions;
-        s.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
-            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
-        const auto feature=[](bool b){return b?CompatibilityCheck::Present:CompatibilityCheck::Unknown;};const auto& f=capabilities.features;
-        s.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),feature(f.rayQuery),feature(f.bufferDeviceAddress)};
-        const auto& x=s.extensions;
-        if((capabilities.identity.vulkanApiVersion!=0 && capabilities.identity.vulkanApiVersion<VK_API_VERSION_1_2) ||
-            x.accelerationStructure==CompatibilityCheck::Absent || x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent ||
-            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))s.outcome=CompatibilityOutcome::Unsupported;
-    }
+    if (initialised && probe.GetSelectedPhysicalDevice()!=VK_NULL_HANDLE)
+        CaptureCompatibilityDeviceEvidence(s, capabilities);
     owner.probeSnapshot=s;return owner;
 }
 constexpr int kMenuTeachingEnabledId = 2030;
