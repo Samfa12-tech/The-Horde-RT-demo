@@ -303,6 +303,7 @@ public:
     static constexpr std::uint32_t kHealingFlaskInstanceIndex = 29u;
     // Separate physical pickup, shared immutable metadata/mesh/material/BLAS.
     static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
+    static constexpr std::uint32_t kRoadStoneMetadataIndex = 30u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -318,13 +319,14 @@ public:
     static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 1u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -1248,6 +1250,8 @@ private:
         const RtSceneFrameInputs& frame,
         const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,
         std::string& diagnostic) const;
+    void ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
+        const horde::gameplay::dialogue::CompanionSnapshot& companion) const;
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
@@ -1387,6 +1391,7 @@ private:
     AccelerationStructure waterDropletBlas_;
     AccelerationStructure attackWarningRingBlas_;
     AccelerationStructure healingFlaskBlas_;
+    AccelerationStructure roadStoneBlas_;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
@@ -1529,6 +1534,7 @@ private:
     horde::scene::assets::StaticMeshAsset waterDropletAsset_;
     horde::scene::assets::StaticMeshAsset attackWarningRingAsset_;
     horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
+    horde::scene::assets::StaticMeshAsset roadStoneAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

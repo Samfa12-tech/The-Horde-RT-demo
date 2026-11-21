@@ -321,7 +321,7 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
     constexpr std::size_t forestBegin=kOrdinaryTlasInstanceCount;
     constexpr std::size_t forestEnd=forestBegin+64u;
     for(std::size_t i=forestBegin;i<forestEnd && i<instances.size();++i)instances[i].mask=1u;
-    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd || !ready_ ||
+    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd+(roadStoneBlas_.address?1u:0u) || !ready_ ||
        !ForestRetentionIdentityMatches() || !ordinaryStaticFacesVerified_ ||
        !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticOmissions_ || preparedStaticGeometry_ ||
        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
@@ -568,6 +568,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &attackWarningRingAsset_});
     registrations.push_back({kHealingFlaskMetadataIndex, 0x464c4153u,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &healingFlaskAsset_});
+    if (!roadStoneAsset_.primitives.empty())
+        registrations.push_back({kRoadStoneMetadataIndex, 0x53544f4eu,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &roadStoneAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)

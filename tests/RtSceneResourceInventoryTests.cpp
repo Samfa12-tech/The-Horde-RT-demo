@@ -708,18 +708,22 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==32u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?34u:33u);
+        ok &= materials.size()==33u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?35u:34u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==37846u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
         const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
+        const auto& stone=instances[PresentableTinyRtScene::kRoadStoneMetadataIndex];
         ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
               ring.primitiveBase!=flask.primitiveBase &&
               scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&
               scene.healingFlaskAsset_.vertices.size()==242u && scene.healingFlaskAsset_.indices.size()==1152u;
+        ok &= stone.primitiveCount==1u && stone.assetIndex!=ring.assetIndex && stone.assetIndex!=flask.assetIndex &&
+              stone.flags==static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) &&
+              scene.roadStoneAsset_.vertices.size()==113u && scene.roadStoneAsset_.indices.size()==126u;
         if(ring.primitiveBase<primitives.size() && flask.primitiveBase<primitives.size()) {
             const auto ringMaterial=primitives[ring.primitiveBase].materialIndex;
             const auto flaskMaterial=primitives[flask.primitiveBase].materialIndex;
@@ -1302,10 +1306,10 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 33u &&
-                  tomb.staticMeshSlot_.Materials().size() == 32u &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 38u &&
-                  tomb.staticMeshSlot_.Materials().size() <= 34u;
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 34u &&
+                  tomb.staticMeshSlot_.Materials().size() == 33u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
+                  tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)
             std::cerr << "Integrated intake invariants: baseline indices=" << oldIndices
                       << " expected=" << 8422u*3u

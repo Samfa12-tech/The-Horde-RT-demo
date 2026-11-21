@@ -1,5 +1,6 @@
 #include "gameplay/campaign/CampaignSession.h"
 #include "gameplay/campaign/CampaignPlaySession.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/BellwetherShell.h"
@@ -113,8 +114,9 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
             kit.motion.mode==CompanionMotionMode::Seated && kit.motion.sitPlaybackSeconds==kTavernSitDurationSeconds;
     };
     Check(seated() && fresh.Snapshot().playerX==record.position.x && fresh.Snapshot().playerZ==record.position.z &&
+          BellwetherRoadStoneWorldFromModel(fresh.Snapshot().chapterCompanion)==kBellwetherRoadStoneTrack.back() &&
           fresh.Snapshot().chapterDialogue.forestVillageConsumed,
-          "fresh game restores the tavern position, settled Kit and completed lookout");
+          "fresh game restores the tavern position, settled Kit and road stone, and completed lookout");
     for(unsigned tick=0;tick<120;++tick)fresh.StepFixed(input,1.f/60.f,tick+1);
     Check(seated() && fresh.Snapshot().worldRoute.current==record.zone &&
           fresh.CaptureAuthoredCampaignBoundary(record.id).has_value() &&

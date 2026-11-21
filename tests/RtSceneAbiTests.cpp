@@ -211,17 +211,17 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 30u,
-          "joint ring28/flask29 append after unchanged metadata0..27");
-    Check(kRtTlasInstanceCapacity == 111u,
-          "storage fits the31-role prefix,64 original trees,4 prototype reserve and12 older-trial reserve; active rosters remain exclusive");
+    Check(kRtInstanceMetadataCapacity == 31u,
+          "Bellwether road stone appends one metadata record after the ring and flask");
+    Check(kRtTlasInstanceCapacity == 112u,
+          "storage fits the legacy 31-slot prefix, forest reserves and the Bellwether road stone");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 15u, "static asset capacity admits both independent ring/flask assets while preserving all thirteen previous owners");
-    Check(kRtPrimitiveMetadataCapacity == 38u, "primitive storage fits the High route bank and both independent joint props");
-    Check(kRtMaterialCapacity == 34u, "material capacity is 34 for simultaneous joint props and the shared world palette");
+    Check(kRtStaticAssetCapacity == 16u, "static asset capacity admits the stone while retaining existing owners");
+    Check(kRtPrimitiveMetadataCapacity == 39u, "primitive storage admits a single primitive for the road stone");
+    Check(kRtMaterialCapacity == 35u, "material storage admits the road stone and retains the shared world palette");
     Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
@@ -313,7 +313,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 30u * 32u &&
+              slot.Measurements().instanceMetadataBytes == 31u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");

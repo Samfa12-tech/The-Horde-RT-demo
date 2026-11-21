@@ -6,12 +6,13 @@ The 42-triangle stone starts moving at frame 9, matching the existing scrape at 
 
 At frame 9 the flat take's lowest left boot sample was 28.7 mm below the road and the right was 49.9 mm above it. The fitted action places those lowest samples 2.9 mm and 1.5 mm above their respective support surfaces. The largest fitted-versus-intended clearance error across all frames was 0.52 mm. The contact measurements cover the lowest weighted boot vertices and the stone's rotated footprint.
 
-The game still plays the earlier ankle clip. Runtime integration needs the matching road-fit take and moving stone on the same simulation clock. The mesh has passed native source import and glTF validation. Scene lighting, hardware RT presentation, and phone performance remain open for this pair.
+The native route plays the road-fitted take and advances the stone on Kit’s 60 Hz assessment clock. After the injury, the route and the earned tavern checkpoint both hold the stone at its settled pose. Rendering uses the shared static PBR material path with one immutable BLAS and one moving TLAS instance.
 
 Rebuild from the repository root into a new folder:
 
 ```powershell
 blender --background --disable-autoexec --python-exit-code 1 --python tools/author-bellwether-loose-stone.py -- build/loose-stone-rebuild
+python tools/generate-bellwether-road-stone.py --check
 ```
 
 The recipe pins the [Kit source](../../../characters/source/kit-ankle-approach-v1/README.md) and chapter terrain by hash. Stone geometry, material and road fit are original Samfa12/Codex work. [Asset provenance](../../../../../ASSET_LICENSES.md)

@@ -27,13 +27,15 @@ made from locally synthesized filtered noise. The
 sources, crop frames and exact WAVs. Packages carry the bounded derivatives
 and manifest. The archive originals stay private.
 
-## Bellwether loose road stone (1.8 source)
+## Bellwether loose road stone (1.8 development)
 
 `assets/models/world/source/bellwether-loose-road-stone-v1/` contains original
 Samfa12/Codex stone geometry, a single opaque material, and an editable fit to
 the existing Kit rig and chapter terrain. The source Blend includes the
 previously documented Kit rig and a cut of the admitted terrain for review.
-The standalone stone GLB contains only the authored stone.
+The packaged asset in `assets/models/world/runtime/bellwether-loose-road-stone-v1/`
+contains only the original 42-triangle stone and its untextured material. The GLB
+matches the source export at SHA-256 `9b127782e788cef0b8c5a911ba74939250b9df37b298e30a567c1452f3a194d3`.
 
 ## Original tomb-floor masonry chips (1.7 development)
 
@@ -525,9 +527,10 @@ SHA-256 is `799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d`.
 
 The editable `assets/models/characters/source/kit-ankle-approach-v1/` takes use
 the same owner-approved Kit rig. Samfa12/Codex authored the joint motion in
-Blender. The 1.8 runtime appends the ankle assessment and protective walk to
-the intermediate hearth export. The new runtime is 2,545,820 bytes with SHA-256
-`d80194bb696fb021c3361ec59225e87f3e46c0f494fe71837ace9d776aad021a`.
+Blender. The 1.8 runtime appends the road-fitted ankle assessment from the stone
+study and the original protective walk to the intermediate hearth export.
+The runtime is 2,545,820 bytes with SHA-256
+`f91851d7dba80d66294551f997c5b2b8a0d48de2632ba692f7dcab484b23eca4`.
 Editable source, measurements and reference samples remain outside packages.
 
 ### Kit same-rig turn runtime promotion (24 October 2026)

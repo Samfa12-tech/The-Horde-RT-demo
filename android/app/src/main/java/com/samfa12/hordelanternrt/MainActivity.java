@@ -1071,6 +1071,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/asset.manifest.json", "models/world/runtime/bellwether-tavern-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-middle.glb", "models/world/runtime/forest-surroundings-v1/alder-middle.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/asset.manifest.json", "models/world/runtime/forest-surroundings-v1/asset.manifest.json") &&

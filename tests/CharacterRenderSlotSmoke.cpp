@@ -282,10 +282,10 @@ int main()
     ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
                       PresentableTinyRtScene::kBlasCount == 25u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 111u &&
-                      kRtInstanceMetadataCapacity == 30u &&
-                      kRtStaticAssetCapacity == 15u &&
-                      kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 112u &&
+                      kRtInstanceMetadataCapacity == 31u &&
+                      kRtStaticAssetCapacity == 16u &&
+                      kRtPrimitiveMetadataCapacity == 39u && kRtMaterialCapacity == 35u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
@@ -302,8 +302,9 @@ int main()
                       PresentableTinyRtScene::kAttackWarningInstanceIndex == 28u &&
                       PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
                       PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u &&
-                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
-                  "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
+                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u &&
+                      PresentableTinyRtScene::kRoadStoneMetadataIndex == 30u,
+                  "the road stone appends metadata after the ring and flask and preserves their physical slots");
     ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 80u == 111u,

@@ -1,6 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameSimulation.h"
@@ -1196,15 +1197,24 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     unsigned assessmentTicks=0,protectiveTicks=0;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
+    bool stoneMovesOnlyAfterContact=true;
+    unsigned stoneMotionTicks=0;
     std::vector<Line> hearthSpoken;
     std::uint64_t hearthVoiceGeneration=0;
     bool firstCaptionAtChair=false;
     float maximumKitStep=0;
     Stage previousStage=Stage::AtLookout;
     const auto step=[&] {
+        using horde::gameplay::dialogue::BellwetherRoadStoneWorldFromModel;
         const auto before=game.Snapshot().chapterCompanion;
         game.StepFixed(input);
         const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
+        if(BellwetherRoadStoneWorldFromModel(before)!=BellwetherRoadStoneWorldFromModel(kit)) {
+            ++stoneMotionTicks;
+            stoneMovesOnlyAfterContact &= kit.bellwetherArrival==Stage::AnkleAssessment &&
+                kit.motion.anklePlaybackSeconds>=horde::audio::kKitAnkleBeats.front().seconds &&
+                kit.motion.anklePlaybackSeconds<=horde::audio::kKitAnkleBeats.back().seconds+.00001f;
+        }
         const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
         replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
         if(IsHearthLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=hearthVoiceGeneration) {
@@ -1247,11 +1257,13 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         previousStage=kit.bellwetherArrival;
         if(!anklePausedBeforeCue && kit.bellwetherArrival==Stage::AnkleAssessment) {
             const auto time=kit.motion.anklePlaybackSeconds;
+            const auto stoneBeforePause=BellwetherRoadStoneWorldFromModel(kit);
             auto pausedInput=input;
             pausedInput.paused=true;
             pausedInput.yawRadians+=3.14f;
             for(unsigned tick=0;tick<20;++tick)game.StepFixed(pausedInput);
             anklePausedBeforeCue=game.Snapshot().chapterCompanion.motion.anklePlaybackSeconds==time &&
+                BellwetherRoadStoneWorldFromModel(game.Snapshot().chapterCompanion)==stoneBeforePause &&
                 std::none_of(game.Events().Events().begin(),game.Events().Events().end(),
                     [](const auto& event){return event.type==sim::GameplayEventType::KitAnkleFoley;});
             game.ClearEvents();
@@ -1326,6 +1338,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(ankleCuesMatchContact && anklePausedBeforeCue && ankleCues==std::vector{
         horde::audio::KitAnkleCue::BootAndGravel,horde::audio::KitAnkleCue::SteadyBreath},
         "the real ankle take emits the two local audio beats in order and waits through pause");
+    const auto stoneTravel = [&] {
+        using namespace horde::gameplay::dialogue;
+        const auto& initial = BellwetherRoadStoneWorldFromModel({});
+        const auto& current = BellwetherRoadStoneWorldFromModel(game.Snapshot().chapterCompanion);
+        return std::hypot(current[3] - initial[3], current[11] - initial[11]);
+    };
+    Check(stoneMovesOnlyAfterContact && stoneMotionTicks==23 && std::abs(stoneTravel()-.284f)<.001f,
+          "the real road route moves the stone only between the scrape and breath, then holds the authored settled pose");
     Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.LatestCampaignBoundary()->contentRevision==cp::kBellwetherContentRevision,
           "standing near the hearth after Kit sits earns the canonical tavern boundary");
@@ -1341,7 +1361,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2 &&
-          hearthSpoken.size()==3,
+          hearthSpoken.size()==3 && std::abs(stoneTravel()-.284f)<.001f,
           "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
 }
 

@@ -7,7 +7,11 @@ mode=parser.add_mutually_exclusive_group()
 mode.add_argument('--hearth-sit',action='store_true',help='Append the chair-fitted take to the preserved turn payload')
 mode.add_argument('--ankle-approach',type=pathlib.Path,metavar='HEARTH_GLB',
  help='Append the two road takes to a rebuilt, pinned hearth-sit GLB')
+parser.add_argument('--road-fit',type=pathlib.Path,metavar='ROAD_BLEND',
+ help='Use the placed road-contact take for ankle assessment while preserving the original gait')
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+if args.road_fit and not args.ankle_approach:
+ parser.error('--road-fit requires --ankle-approach')
 OUT=args.output.resolve();OUT.mkdir(parents=True,exist_ok=False)
 runtime=ROOT/'assets/models/characters/runtime/kit-warden-v1'
 base=args.ankle_approach or (pathlib.Path(__file__).parent/'native/kit-turn-proof.glb' if args.hearth_sit else runtime/'kit-warden-lod0.runtime.glb')
@@ -148,29 +152,44 @@ def export_hearth_sit():
  print('HEARTH_SIT_EXPORT',json.dumps(receipt),flush=True)
 
 def export_ankle_approach():
- scene=bpy.data.scenes['Bellwether road - Kit ankle and protective gait']
- bpy.context.window.scene=scene
- arm=next(obj for obj in scene.objects if obj.type=='ARMATURE')
- mesh=scene.objects['briarhold-warden']
- fps=scene.render.fps
- assert fps==60 and len(joints)==24
- identity=Matrix.Identity(4)
- initial,initial_error,calibration_error,at_frame=calibrate(scene,arm,mesh,identity)
+ original_source=pathlib.Path(bpy.data.filepath)
  clips=[]
+ initial_errors=[]
+ calibration_errors=[]
  for name,last,samples in (('ankle_assess',97,(1,9,15,21,33,61,73,97)),
                            ('protective_walk',53,(1,8,15,21,27,34,42,53))):
-  take=bpy.data.actions[f'Kit|{name}']
+  fitted=args.road_fit is not None and name=='ankle_assess'
+  source=args.road_fit.resolve() if fitted else original_source
+  if pathlib.Path(bpy.data.filepath)!=source:
+   bpy.ops.wm.open_mainfile(filepath=str(source))
+  scene=bpy.data.scenes['Bellwether lower road - loose stone contact' if fitted else
+                        'Bellwether road - Kit ankle and protective gait']
+  bpy.context.window.scene=scene
+  arm=next(obj for obj in scene.objects if obj.type=='ARMATURE')
+  mesh=scene.objects['briarhold-warden']
+  fps=scene.render.fps
+  assert fps==60 and len(joints)==24
+  inverse_root=(scene.objects['Kit - witnessed native road placement'].matrix_world.inverted()
+                if fitted else Matrix.Identity(4))
+  initial,initial_error,calibration_error,at_frame=calibrate(scene,arm,mesh,inverse_root)
+  initial_errors.append(initial_error)
+  calibration_errors.append(calibration_error)
+  clip_name=f'Kit|{name}'
+  take=bpy.data.actions[f'{clip_name}_road_fit' if fitted else clip_name]
   assert tuple(take.frame_range)==(1,last)
   arm.animation_data.action=take;arm.animation_data.action_slot=take.slots[0]
-  append_joint_clip(take.name,range(1,last+1),fps,at_frame)
-  reference_samples(f'{name}-reference.bin',samples,fps,scene,mesh,initial,identity)
-  clips.append({'name':take.name,'frames':last})
+  append_joint_clip(clip_name,range(1,last+1),fps,at_frame)
+  reference_samples(f'{name}-reference.bin',samples,fps,scene,mesh,initial,inverse_root)
+  clips.append({'name':clip_name,'frames':last})
  result=finish_payload()
  (OUT/'kit-warden-turn.runtime.glb').write_bytes(result)
- receipt={'schema':1,'sourceBlendSha256':hashlib.sha256(pathlib.Path(bpy.data.filepath).read_bytes()).hexdigest(),
+ receipt={'schema':1,'sourceBlendSha256':hashlib.sha256(original_source.read_bytes()).hexdigest(),
   'baseGlbSha256':base_hash,'outputGlbSha256':hashlib.sha256(result).hexdigest(),
   'outputBytes':len(result),'originalBinaryPrefixBytes':len(old_binary),'clips':clips,
-  'fps':fps,'jointCount':len(joints),'calibrationJointOriginMaxErrorM':calibration_error,'idleGeometryMaxErrorM':initial_error}
+  'fps':fps,'jointCount':len(joints),'calibrationJointOriginMaxErrorM':max(calibration_errors),
+  'idleGeometryMaxErrorM':max(initial_errors)}
+ if args.road_fit:
+  receipt['roadFitBlendSha256']=hashlib.sha256(args.road_fit.read_bytes()).hexdigest()
  (OUT/'export-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8',newline='\n')
  print('ANKLE_APPROACH_EXPORT',json.dumps(receipt),flush=True)
 

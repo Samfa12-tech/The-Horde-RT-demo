@@ -1,4 +1,5 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
@@ -627,6 +628,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterDropletBlas_ = std::exchange(other.waterDropletBlas_, AccelerationStructure{});
     attackWarningRingBlas_ = std::exchange(other.attackWarningRingBlas_, AccelerationStructure{});
     healingFlaskBlas_ = std::exchange(other.healingFlaskBlas_, AccelerationStructure{});
+    roadStoneBlas_ = std::exchange(other.roadStoneBlas_, AccelerationStructure{});
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
@@ -671,6 +673,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterDropletGeometryVisible_ = std::exchange(other.waterDropletGeometryVisible_, false);
     attackWarningRingAsset_ = std::move(other.attackWarningRingAsset_);
     healingFlaskAsset_ = std::move(other.healingFlaskAsset_);
+    roadStoneAsset_ = std::move(other.roadStoneAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -1167,7 +1170,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
             return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
     }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
-       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u) ||
+       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+(roadStoneBlas_.address?1u:0u) ||
        staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
@@ -1175,7 +1178,8 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=15)return fail("Forest proof did not preserve exactly fifteen unique static assets.");
+    if(std::count(assets.begin(),assets.end(),true)!=15+(roadStoneBlas_.address?1:0))
+        return fail("Forest proof did not preserve every unique static asset.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
         if(omitted!=forestRetentionOmittedCount_ || (!forestRetentionFrameEligible_ && omitted))
@@ -1743,8 +1747,10 @@ void PresentableTinyRtScene::Destroy()
         waterDropletGeometryVisible_ = false;
         attackWarningRingBlas_ = {};
         healingFlaskBlas_ = {};
+        roadStoneBlas_ = {};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
+        roadStoneAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1789,6 +1795,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waterDropletBlas_);
     DestroyAccelerationStructure(attackWarningRingBlas_);
     DestroyAccelerationStructure(healingFlaskBlas_);
+    DestroyAccelerationStructure(roadStoneBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -1859,6 +1866,7 @@ void PresentableTinyRtScene::Destroy()
     waterDropletGeometryVisible_ = false;
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    roadStoneAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -1975,7 +1983,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
@@ -2040,7 +2048,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -3177,6 +3185,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     productionDielectricFixtureAsset_ = {};
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    roadStoneAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -3321,6 +3330,16 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     healingFlaskAsset_ = std::move(healingFlaskCandidate);
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_)
     {
+        const auto roadStoneDirectory = root / "models/world/runtime/bellwether-loose-road-stone-v1";
+        horde::scene::assets::AssetManifest roadStoneManifest;
+        if (!horde::scene::assets::AssetManifest::Load(roadStoneDirectory / "asset.manifest.json",
+                roadStoneManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(roadStoneDirectory / "loose-road-stone.glb",
+                roadStoneManifest, roadStoneAsset_, diagnostic)) return false;
+        if (!jointPropAssetAdmitted(roadStoneAsset_)) {
+            diagnostic = "The Bellwether road stone requires one opaque untextured primitive and material.";
+            return false;
+        }
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
                 rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
@@ -5706,7 +5725,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !buildRegisteredStaticBlas(kAttackWarningMetadataIndex,
             "attack warning ring", attackWarningRingBlas_, true) ||
         !buildRegisteredStaticBlas(kHealingFlaskMetadataIndex,
-            "healing flask", healingFlaskBlas_, true))
+            "healing flask", healingFlaskBlas_, true) ||
+        (!roadStoneAsset_.primitives.empty() && !buildRegisteredStaticBlas(kRoadStoneMetadataIndex,
+            "Bellwether road stone", roadStoneBlas_, true)))
         return false;
     if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
         healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
@@ -6209,6 +6230,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             static_cast<std::uint32_t>(forestSharedLayout_.supplementalPlacements.size());
     }else
         tlasInstanceCount_=kOrdinaryTlasInstanceCount;
+    if (roadStoneBlas_.address)
+        ApplyRoadStoneInstance(instances[tlasInstanceCount_++], {});
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -7348,6 +7371,19 @@ bool PresentableTinyRtScene::ApplyHealingFlaskInstances(
     const auto pickup=make(frame.healingFlaskUpgradeWorldFromItem,frame.healingFlaskUpgradeVisible);
     instances[kHealingFlaskInstanceIndex]=carried;instances[kHealingFlaskUpgradeInstanceIndex]=pickup;
     diagnostic.clear();return true;
+}
+
+void PresentableTinyRtScene::ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
+    const horde::gameplay::dialogue::CompanionSnapshot& companion) const
+{
+    const auto& transform = horde::gameplay::dialogue::BellwetherRoadStoneWorldFromModel(companion);
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t column = 0; column < 4; ++column)
+            instance.transform.matrix[row][column] = transform[row * 4 + column];
+    instance.instanceCustomIndex = kRoadStoneMetadataIndex;
+    instance.mask = 0x01u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = roadStoneBlas_.address;
 }
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
@@ -8542,6 +8578,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
     if(UsesSharedForestRetention())
         ApplySharedForestRetentionProof(instances,frame);
+    if (roadStoneBlas_.address)
+        ApplyRoadStoneInstance(instances[tlasInstanceCount_ - 1u], frame.chapterCompanion);
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||

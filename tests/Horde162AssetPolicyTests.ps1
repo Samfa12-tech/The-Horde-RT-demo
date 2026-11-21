@@ -27,6 +27,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
         'models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
+        'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
         'models/world/runtime/forest-surroundings-v1/alder-far.glb',
         'models/world/runtime/forest-surroundings-v1/alder-middle.glb',
         'models/world/runtime/forest-surroundings-v1/asset.manifest.json',
@@ -39,7 +41,7 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
         'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb','models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest and tomb runtime rosters.'
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest, tomb and Bellwether runtime rosters.'
 }
 function Assert-PropsGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'textures/props/*' })
@@ -81,10 +83,11 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/world/runtime/chapter-entry-return-v1/*' -or
                        $_ -like 'models/world/runtime/chapter-terrain-v1/*' -or
                        $_ -like 'models/world/runtime/bellwether-tavern-v1/*' -or
+                       $_ -like 'models/world/runtime/bellwether-loose-road-stone-v1/*' -or
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 20) 'Android equipment and chapter staging require the closed twenty-file package roster.'
+    Require ($required.Count -eq 22) 'Android equipment and chapter staging require the closed 22-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -217,9 +220,9 @@ function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Dupl
 try {
     $gradle=Get-Content (Join-Path $repo 'android/app/build.gradle') -Raw
     Assert-CollapseGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact collapse, forest and tomb runtime rosters'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'exact collapse, forest and tomb runtime rosters'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'Gradle world assets must match'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'Gradle world assets must match'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'Gradle world assets must match'
     Assert-PropsGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact eight-file Android runtime roster'
     Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact eight-file Android runtime roster'
@@ -246,6 +249,7 @@ try {
                        'models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb',
                        'models/world/runtime/chapter-terrain-v1/asset.manifest.json',
                        'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb',
+                       'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
                        'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
                        'textures/props/runtime/chapter-terrain/orm.android.ktx2',
@@ -267,7 +271,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed twenty-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 22-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -351,9 +355,11 @@ try {
                  @($android | Where-Object {$_ -ceq $rock}).Count -eq 1) 'Each exact rock payload is admitted once.'
     }
     $townFiles=@('models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
-        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb')
-    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq 2 -and
-             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq 2) 'Both platforms admit only the two shared tavern payloads.'
+        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
+        'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count) 'Both platforms admit the exact shared tavern and roadside stone payloads.'
     foreach($town in $townFiles) {
         Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'
