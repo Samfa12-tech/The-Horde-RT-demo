@@ -148,6 +148,7 @@
 #include "platform/windows/WindowsBenchmarkMenuOwner.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
+#include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
@@ -482,6 +483,7 @@ struct CaptureLaunchOptions
     bool captureGpuStages = false;
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
+    bool measureBellwetherDoorway = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -1136,6 +1138,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     options.measureChapterShippingRoute=chapterShipping.requested;
     options.measureChapterForeground=chapterShipping.foregroundRequested;
+    options.measureBellwetherDoorway=chapterShipping.bellwetherDoorway;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);

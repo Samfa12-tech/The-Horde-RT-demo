@@ -76,6 +76,21 @@ int main()
     check(!ParseWindowsChapterShippingLaunch(ordinary,true).requested &&
         ParseWindowsChapterShippingLaunch(ordinary,true).error.empty(),
         "ordinary launches must not gain a measurement owner");
+    const std::array<std::wstring_view,8> doorwayArgs{L"--measure-bellwether-doorway",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\reports\\bellwether",L"--development-checkpoint",L"bellwether-repeat-visit",
+        L"--chapter-resident-fixture",L"C:\\fixtures\\resident"};
+    const auto doorway=ParseWindowsChapterShippingLaunch(doorwayArgs,true);
+    check(doorway.requested && doorway.bellwetherDoorway && doorway.error.empty() &&
+        !ParseWindowsChapterShippingLaunch(doorwayArgs,false,true).error.empty(),
+        "Bellwether measurement requires the hidden Debug repeat-visit fixture");
+    auto visibleDoorway=doorwayArgs;
+    visibleDoorway[1]=L"--measure-chapter-foreground";
+    check(!ParseWindowsChapterShippingLaunch(visibleDoorway,true).error.empty(),
+        "hidden fixture timing cannot claim a visible or foreground route");
+    auto wrongDoorway=doorwayArgs;
+    wrongDoorway[5]=L"bellwether-staffed-room";
+    check(!ParseWindowsChapterShippingLaunch(wrongDoorway,true).error.empty(),
+        "doorway measurement must start from a completed visit");
     for(const auto conflict:{L"--validate-chapter-roundtrip",L"--validate-static-zone-cutover",
         L"--validate-static-triangle-cutover",L"--capture-graphics-preview",L"--benchmark-showcase",
         L"--validate-output-resize",L"--validate-native-motion",L"--capture-sky-attribution",L"--mist-off",

@@ -1,4 +1,4 @@
-import argparse, csv, json, math, pathlib, statistics
+import argparse, csv, itertools, json, math, pathlib, statistics
 
 HOST_SPANS=('host_previous_tail_ns','host_system_load_ns','host_messages_ns',
             'host_visibility_ns','host_clock_simulation_ns','host_render_to_present_ns')
@@ -167,9 +167,81 @@ def analyze(name, analysis_name='analysis-v3.json'):
     print('phase GPU (median/p95 ms):',json.dumps({k:(v['gpuMilliseconds'].get('median'),v['gpuMilliseconds'].get('p95')) for k,v in summary['phases'].items()}))
     print(interval_key,':',json.dumps(summary[interval_key]), 'throughput Hz:',summary[throughput_key])
 
+def analyze_bellwether(name, analysis_name):
+    root = pathlib.Path(name)
+    directory = root / 'bellwether-doorway'
+    run = json.loads((directory / 'run.json').read_text())
+    receipt = json.loads(pathlib.Path(name + '.candidate.json').read_text(encoding='utf-8-sig'))
+    manifest = json.loads((root / 'capture-manifest.json').read_text())
+    with (directory / 'completed-frames.csv').open(newline='') as source:
+        rows = list(csv.DictReader(source))
+    journal = [json.loads(line) for line in (directory / 'identities.jsonl').read_text().splitlines()]
+    assert run['schema'] == 4 and run['complete'] and run['quietReturns'] == 2
+    assert 60 <= run['durationSeconds'] <= 150 and run['simulationHz'] == 60
+    assert not run['unoccludedClientChecks'] and not run['foregroundRequested']
+    assert run['scope'].startswith('Debug CPU') and receipt['residentFixtureHashes']
+    assert manifest['complete'] and receipt['backend'] == manifest['executionBackend']
+    assert manifest['captures'][0]['bellwetherVisit']['quietReturns'] == 2
+    assert len(rows) == run['completedSamples'] == run['renderedFrames']
+    by_serial = {int(row['submission_serial']): row for row in rows}
+    serials = list(by_serial)
+    assert len(serials) == len(rows) and serials == list(range(serials[0], serials[-1] + 1))
+    assert len({(row['scene_epoch'], row['generation']) for row in rows}) == 1
+    ticks = [int(row['tick']) for row in rows]
+    assert ticks == sorted(ticks) and ticks[-1] - ticks[0] >= 3600
+    assert all(row['present_interval_available'] == row['present_return_interval_ns'] ==
+               row['unoccluded_client'] == '0' for row in rows)
+    phases = [phase for phase, _ in itertools.groupby(row['phase'] for row in rows)]
+    assert phases == ['room', 'doorway-outbound', 'square', 'doorway-inbound'] * 2 + ['room', 'complete']
+    for row in rows:
+        verify_host_phases(row)
+        assert all(int(row[column]) == 0 for column in row if column.endswith('_overflow'))
+        if row['phase'] == 'room':
+            assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', '1', '1']
+    keys = set()
+    for item in journal:
+        frame = item['evidence']
+        identity = frame['identity']
+        serial = identity['submissionSerial']
+        row = by_serial[serial]
+        assert serial not in keys
+        keys.add(serial)
+        assert identity['simulationTick'] == int(row['tick']) and item['phase'] == row['phase']
+        assert item['station'] == int(row['station'])
+        assert frame['presentation']['outcome'] == 'presented'
+        assert frame['presentation']['lastSuccessfulPresentSubmissionSerial'] == serial
+        assert frame['pipeline']['executionBackend'] == receipt['backend']
+        assert frame['pipeline']['activeSha256'] == row['shader_sha256']
+        assert frame['gpu']['status'] == row['gpu_status']
+        assert frame['resources']['deviceLocalBytes'] == int(row['device_local_bytes'])
+        assert frame['fireLighting']['count'] == int(row['fire_count'])
+    assert serials[0] in keys and serials[-1] in keys
+    assert {item['phase'] for item in journal} == set(phases)
+    summary = dict(scope=run['scope'], backend=receipt['backend'], executableSha256=receipt['executableSha256'],
+                   residentFixtureHashes=receipt['residentFixtureHashes'], hardware=manifest['device'],
+                   presentation=manifest['presentation'], run=run, phases={})
+    for phase in dict.fromkeys(phases[:-1]):
+        samples = [row for row in rows if row['phase'] == phase and float(row['elapsed_s']) >= run['warmupSeconds']]
+        valid = [int(row['gpu_ns']) / 1e6 for row in samples if row['gpu_status'] == 'valid' and int(row['gpu_ns']) > 0]
+        assert valid
+        summary['phases'][phase] = dict(samples=len(samples), gpuMilliseconds=stats(valid),
+            resourcePeaks={column: max(int(row[column]) for row in samples)
+                           for column in ('device_local_bytes', 'host_visible_bytes', 'tlas_instances', 'blas_owners')},
+            fireCounts=sorted({int(row['fire_count']) for row in samples}))
+    assert pathlib.Path(analysis_name).name == analysis_name and analysis_name.endswith('.json')
+    target = directory / analysis_name
+    if target.exists():
+        assert json.loads(target.read_text()) == summary, 'stored doorway analysis differs from verified arithmetic'
+    else:
+        target.write_text(json.dumps(summary, indent=2) + '\n')
+    print(json.dumps(summary['phases']))
+
+
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description='Verify completed exact-identity Release route evidence; preserve legacy raw measurements.')
+    parser=argparse.ArgumentParser(description='Verify completed exact-identity chapter route evidence.')
     parser.add_argument('directories',nargs='+')
     parser.add_argument('--analysis-name',default='analysis-v3.json')
+    parser.add_argument('--bellwether-doorway', action='store_true')
     args=parser.parse_args()
-    for name in args.directories: analyze(name,args.analysis_name)
+    for name in args.directories:
+        (analyze_bellwether if args.bellwether_doorway else analyze)(name,args.analysis_name)

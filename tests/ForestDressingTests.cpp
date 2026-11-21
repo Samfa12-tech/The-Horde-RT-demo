@@ -25,6 +25,7 @@
 #include "scene/assets/StaticTriangleSelection.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "scene/assets/AssetManifest.h"
 
 #include <algorithm>
@@ -1560,6 +1561,20 @@ void TestBellwetherRepeatVisitCheckpoint(
           evidence.bellwetherVisit->welcomeCaption && evidence.bellwetherVisit->exchangeCaptions==3 &&
           evidence.bellwetherVisit->quietReturns==2 && std::hypot(state.playerX-view->cameraX,state.playerZ-view->cameraZ)<.01f,
           "the exact render replay starts at the old lookout and reaches the authored room again after two quiet returns");
+    if(!staged)return;
+    gameplay::validation::BellwetherDoorwayProbe probe;
+    if(!probe.Start(state)) {Check(false,"the measured route admits the completed tavern visit");return;}
+    unsigned steps=0;
+    bool squareReached=false;
+    while(steps++<9000 && !probe.Complete() && !probe.Failed()) {
+        const auto input=probe.Next(state);
+        squareReached|=probe.PhaseName()=="square" &&
+            state.playerZ>gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation].z;
+        if(!input.paused)capture.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        capture.ClearEvents();
+    }
+    Check(probe.Complete() && !probe.Failed() && squareReached && probe.Returns()==2 && steps>3600,
+          "the wall-clock runner's exact input schedule walks through the authored portal both ways for two visits");
 }
 
 void TestFullSurroundings()
