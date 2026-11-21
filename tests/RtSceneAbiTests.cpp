@@ -222,7 +222,7 @@ void TestGeneratedConstants()
     Check(kRtStaticAssetCapacity == 21u, "static asset capacity includes the archive cover, register and two resident actors");
     Check(kRtPrimitiveMetadataCapacity == 45u, "primitive storage includes two register primitives");
     Check(kRtMaterialCapacity == 41u, "material storage includes the register finishes and shared world palette");
-    Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
+    Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
@@ -343,21 +343,21 @@ void TestExplicitTextureGroups()
               diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
           "grouped materials cannot silently disagree on texture presence");
     asset.materials[2].normalTexture = 6;
-    auto preceding = MakeAsset(1u, 17u);
+    auto preceding = MakeAsset(1u, kRtTextureLayerCapacity - 1u);
     for (std::size_t i = 0; i < preceding.materials.size(); ++i)
         preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
     const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
     Check(!slot.Initialize(registrations, diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 20.",
           "canonical groups still enforce bounded texture capacity");
 }
 
 void TestDeferredTextureGroups()
 {
     using namespace horde::vulkan::raytracing;
-    auto combined=MakeAsset(6u,6u);
+    auto combined=MakeAsset(6u,8u);
     for(std::size_t i=0;i<2;++i) combined.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
-    for(std::size_t i=2;i<6;++i) {
+    for(std::size_t i=2;i<8;++i) {
         auto& material=combined.materials[i];
         material.baseColorTexture=static_cast<std::int32_t>(i);
         material.textureGroup=static_cast<std::int32_t>(i-2);
@@ -368,16 +368,16 @@ void TestDeferredTextureGroups()
     const std::array<StaticRtAssetRegistration,2> registrations{{
         {1u,1u,1u,0u,&combined},{3u,2u,1u,0u,&later}}};
     RtStaticMeshSlot slot;std::string diagnostic;
-    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the18-layer boundary");
+    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the 20-layer boundary");
     bool legacy=true,newGroups=true;
-    if(slot.Materials().size()==18) {
+    if(slot.Materials().size()==20) {
         for(std::size_t i=0;i<2;++i) legacy&=slot.Materials()[i].textureLayers[0]==i;
-        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[6+i].textureLayers[0]==i+2;
-        for(std::size_t i=0;i<4;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
+        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[8+i].textureLayers[0]==i+2;
+        for(std::size_t i=0;i<6;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
     } else legacy=newGroups=false;
-    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==18,
-          "sharing geometry owner preserves all14 legacy layers and routes tail families14..17");
-    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==6,
+    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==20,
+          "sharing geometry owner preserves all 14 legacy layers and routes tail families 14 through 19");
+    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==8,
           "deferred textures do not reorder primitive/material geometry");
     later.materials.push_back(later.materials.back());
     later.materials.back().baseColorTexture=12;
@@ -435,12 +435,12 @@ void TestNamedCapacityFailures()
                   std::to_string(kRtMaterialCapacity) + ".",
           "material overflow fails initialization by name");
 
-    auto textureOverflow = MakeAsset(1u, 19u);
+    auto textureOverflow = MakeAsset(1u, kRtTextureLayerCapacity + 1u);
     for (std::size_t materialIndex = 0u; materialIndex < textureOverflow.materials.size(); ++materialIndex)
         textureOverflow.materials[materialIndex].baseColorTexture = static_cast<std::int32_t>(materialIndex);
     StaticRtAssetRegistration textureRequest{3u, 1u, 1u, 0u, &textureOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&textureRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 20.",
           "metadata cannot assign a texture layer outside the fixed Vulkan array");
 }
 
@@ -551,19 +551,19 @@ void TestTextureArrayCapacities()
 {
     using namespace horde::vulkan::raytracing;
     std::string diagnostic;
-    Check(RtTextureArrays::Validate({18u, 18u, 18u, 18u}, diagnostic),
-          "all four arrays accept the exact 18-layer boundary");
-    Check(!RtTextureArrays::Validate({19u, 1u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 18.",
+    Check(RtTextureArrays::Validate({20u, 20u, 20u, 20u}, diagnostic),
+          "all four arrays accept the exact 20-layer boundary");
+    Check(!RtTextureArrays::Validate({21u, 1u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 20.",
           "base colour overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 19u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 21u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 20.",
           "normal overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 19u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 21u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 20.",
           "ORM overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 19u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 21u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 20.",
           "emissive overflow is named");
 }
 

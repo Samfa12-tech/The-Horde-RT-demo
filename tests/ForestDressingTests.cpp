@@ -1512,6 +1512,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&
                   game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRoadMark,
                   "at the church the player can show the forest road mark before finding the register");
+            const float idleBeforePause=recordKeeper ? recordKeeper->idleSeconds : 0.f;
+            input.paused=true;step();
+            Check(idleBeforePause>0 && game.Snapshot().recordKeeper &&
+                  game.Snapshot().recordKeeper->idleSeconds==idleBeforePause,
+                  "the admitted record keeper animates in earshot and holds pose while paused");
+            input.paused=false;step();
+            Check(game.Snapshot().recordKeeper && game.Snapshot().recordKeeper->idleSeconds>idleBeforePause,
+                  "the record keeper resumes from the held idle pose");
             ++input.commands.interact;step();
             for(const auto line:kRecordKeeperLead) {
                 Check(game.Snapshot().chapterDialogue.line==line &&

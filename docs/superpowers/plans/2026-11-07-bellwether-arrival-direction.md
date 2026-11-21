@@ -150,7 +150,7 @@ The **road register** rests on the sill behind the stone as a separate opaque le
 
 Matched 960 × 540 Windows captures on the RTX 5050 Laptop GPU show the register on the sill and the empty niche after interaction on both RayTracingPipeline and RayQueryCompute. The second capture requires the simulation to record recovery in the earned tavern checkpoint. The four captures use the same camera and exercise the staged walk from that checkpoint. Android device performance still needs validation.
 
-The local record keeper review package includes a rigged Meshy model, PBR maps, an editable Blender assembly and voice takes. The supplied pose track needs a usable idle and the walk/run clips have unresolved ground contact. The additional chapter resident lanes currently admit untextured finishes, and the base-color atlas uses all 18 layers. The church-side encounter needs a measured textured resident path and exact asset distribution rights before runtime packaging. Kit's later evidence-based reaction remains open.
+The local record keeper review package includes a rigged Meshy model, PBR maps, an editable Blender assembly and voice takes. Its original zero-duration pose and stock walk/run are source material. Kit's later evidence-based reaction remains open.
 
 ### Church register handoff
 
@@ -158,7 +158,11 @@ The record keeper's shared simulation pose uses the existing church service mark
 
 The collected register offers **Show the road register**. That deliberate handoff records the interpretation at the earned tavern save and starts the bank's three reading lines. The Abbey downstream and the Foundry across the eastern gorge can be pursued in either order. The Court's route remains sealed. **Recall the expedition routes** repeats the reading, and the tavern Directions note also reflects the player's progress. These captions use the written English bank. Kit's knowledge still requires a separate encounter.
 
-The `bellwether-record-keeper-handoff` debug view requires a local resident stand-in. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. Both Windows hardware RT backends presented the approach-side view of the stand-in at 960 × 540. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup. Normal packaging still needs the prepared record keeper model admitted to the textured resident path and the recorded takes cleared for distribution.
+The `bellwether-record-keeper-handoff` debug view loads a local resident fixture. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup.
+
+The local fixture now uses the prepared 15,322-triangle record keeper. Its four-second idle preserves the standing stance, settles the arms using the supplied rig, and adds a small breathing motion and head glance. The shared simulation advances the idle in earshot and holds it while paused or outside earshot. [The source recipe](../../../tools/author-record-keeper-idle.py) preserves the rigged and walking GLBs and writes an editable Blend and a separate local export.
+
+Both Windows hardware RT backends presented the textured actor at 960 × 540 and recorded the same idle time and completed interpretation. The exact-byte texture check verified all 11 mips and the unchanged preceding layers in both Windows RGBA8 and Android ASTC. One resident adds 16,777,212 bytes of Windows texture payload and 2,650,704 bytes of Android texture payload. The Android ARM64 debug package built without the local fixture. Phone performance, model and voice distribution clearance, and normal package integration remain open.
 
 ## Open decisions deliberately preserved
 

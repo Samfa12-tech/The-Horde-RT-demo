@@ -2701,7 +2701,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            const std::span<const std::uint32_t> sourceLayers,
                                            const VkImageViewType viewType,
                                            const std::span<const RtTextureLayerAlias> sourceAliases,
-                                           std::span<const std::string> appendedArrayPaths,
+                                           std::span<const TextureArrayAddition> additions,
                                            TextureUploadRecovery* recovery,
                                            RtSceneRecordObservation* observation)
 {
@@ -2744,18 +2744,18 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
     }
-    if (appendedArrayPaths.size() > kRtTextureLayerCapacity) {
+    if (additions.size() > kRtTextureLayerCapacity) {
         diagnostic = "Too many appended PBR arrays."; return false;
     }
-    std::vector<std::vector<std::uint8_t>> appendedBytes(appendedArrayPaths.size());
-    std::vector<RtKtxArrayAppendView> appended(appendedArrayPaths.size());
+    std::vector<std::vector<std::uint8_t>> appendedBytes(additions.size());
+    std::vector<RtKtxArrayAppendView> appended(additions.size());
     std::uint32_t appendedLayerCount = 0;
-    for (std::size_t i = 0; i < appendedArrayPaths.size(); ++i)
+    for (std::size_t i = 0; i < additions.size(); ++i)
     {
         if (!ktx2 || sourceLayers.empty()) {
             diagnostic = "Appended PBR arrays require an explicit KTX layer selection."; return false;
         }
-        const auto& appendedArrayPath = appendedArrayPaths[i];
+        const auto& appendedArrayPath = additions[i].path;
         std::ifstream extra(appendedArrayPath, std::ios::binary | std::ios::ate);
         if (!extra || extra.tellg() < 80) {
             diagnostic = "Appended PBR texture array is missing or truncated: " + appendedArrayPath; return false;
@@ -2766,9 +2766,11 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
             diagnostic = "Failed to read appended PBR texture array: " + appendedArrayPath; return false;
         }
         std::uint32_t count = 0; std::memcpy(&count, bytes.data() + 32, sizeof(count));
-        if (!count || count > kRtTextureLayerCapacity ||
-            sourceLayers.size() + appendedLayerCount + count > layers ||
-            !PrepareRtKtxArrayAppend(fileBytes, bytes, static_cast<std::uint32_t>(format),
+        if (count != additions[i].layers || sourceLayers.size() + appendedLayerCount + count > layers) {
+            diagnostic = "Appended PBR texture array has an unexpected layer count: " + appendedArrayPath;
+            return false;
+        }
+        if (!PrepareRtKtxArrayAppend(fileBytes, bytes, static_cast<std::uint32_t>(format),
                 width, height, static_cast<std::uint32_t>(sourceLayers.size()),
                 static_cast<std::uint32_t>(sourceLayers.size()) + count, appended[i], diagnostic)) return false;
         appendedLayerCount += count;
@@ -3044,17 +3046,29 @@ bool PresentableTinyRtScene::LoadChapterResidents(std::string& diagnostic)
 {
     for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
         const auto& source = chapterResidentSources_[lane];
-        auto& actor = chapterResidents_[lane].actor;
+        auto& resident = chapterResidents_[lane];
+        auto& actor = resident.actor;
         if (!actor.Load(source.directory, source.fileName.c_str(), source.clips, diagnostic))
             return false;
-        for (const auto& material : actor.Asset().materials) {
-            if (material.baseColorTexture >= 0 || material.normalTexture >= 0 ||
-                material.ormTexture >= 0 || material.emissiveTexture >= 0 ||
-                material.transmissionFactor > 0) {
-                diagnostic = "Chapter resident material needs an admitted texture or transmission route.";
+        resident.hasPbrMaps = false;
+        std::optional<std::array<std::int32_t, 3>> sharedMaps;
+        for (auto& material : actor.Asset().materials) {
+            const std::array maps{material.baseColorTexture, material.normalTexture, material.ormTexture};
+            const bool textured = std::any_of(maps.begin(), maps.end(), [](auto index) { return index >= 0; });
+            if (material.emissiveTexture >= 0 || material.transmissionFactor > 0 ||
+                (textured && (std::any_of(maps.begin(), maps.end(), [](auto index) { return index < 0; }) ||
+                              (sharedMaps && *sharedMaps != maps)))) {
+                diagnostic = "Chapter residents support one shared base-color, normal and ORM map set per actor, without emissive maps or transmission.";
                 return false;
             }
+            if (textured) {
+                sharedMaps = maps;
+                // Append after terrain and Kit without moving their material layers.
+                material.textureGroup = 0;
+                material.deferTextureAllocation = true;
+            }
         }
+        resident.hasPbrMaps = sharedMaps.has_value();
     }
     return true;
 }
@@ -3981,7 +3995,11 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto baseLayers = selection.baseColor;
     const auto normalOrmLayers = selection.normalOrm;
     const auto aliases = selection.aliases;
-    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) : 0u;
+    static_assert(kChapterBaseColorSourceLayers.size() + 3u + kAdditionalChapterActorCapacity <=
+        kRtTextureLayerCapacity);
+    const auto residentLayers = std::count_if(chapterResidents_.begin(), chapterResidents_.end(),
+        [](const auto& resident) { return resident.hasPbrMaps; });
+    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) + residentLayers : 0u;
     if (!baseLayers.empty() &&
         (textureCounts.baseColor != baseLayers.size() + extraLayers ||
          textureCounts.normal != normalOrmLayers.size() + extraLayers ||
@@ -4007,10 +4025,13 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto kitTextureDirectory = assetDirectory.parent_path().parent_path() /
         "characters/runtime/kit-warden-v1";
     const auto addition = [&assetDirectory,&kitTextureDirectory,chapterLayout,this](const char* name) {
-        std::vector<std::string> paths;
-        if (chapterLayout) paths.push_back((assetDirectory / "chapter-terrain" / name).string());
-        if (chapterActorReady_) paths.push_back((kitTextureDirectory / name).string());
-        return paths;
+        std::vector<TextureArrayAddition> additions;
+        if (chapterLayout) additions.push_back({(assetDirectory / "chapter-terrain" / name).string(), 2u});
+        if (chapterActorReady_) additions.push_back({(kitTextureDirectory / name).string(), 1u});
+        for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+            if (chapterResidents_[lane].hasPbrMaps)
+                additions.push_back({(chapterResidentSources_[lane].directory / name).string(), 1u});
+        return additions;
     };
     const auto emissionPath = [&](const char* name) {
         return chapterActorReady_ ? (kitTextureDirectory / name).string() : path(name);

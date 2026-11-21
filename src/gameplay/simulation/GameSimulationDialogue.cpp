@@ -188,6 +188,8 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
             recordKeeper_=RecordKeeperPose{{mark.x,support.worldY,mark.z},-1.57079632679f};
     }
     auto c=ChapterInteractionContext(input.paused);
+    if(recordKeeper_ && c.recordKeeperSource && !c.paused && c.alive && !c.traversing)
+        recordKeeper_->idleSeconds+=seconds;
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {
         const auto door=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation];

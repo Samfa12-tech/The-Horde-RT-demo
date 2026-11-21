@@ -1237,6 +1237,10 @@ private:
                     std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
+    struct TextureArrayAddition {
+        std::string path;
+        std::uint32_t layers;
+    };
     bool CreateTexture(const std::string& path,
                        VkFormat format,
                        std::uint32_t width,
@@ -1247,7 +1251,7 @@ private:
                        std::span<const std::uint32_t> sourceLayers = {},
                        VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                        std::span<const RtTextureLayerAlias> sourceAliases = {},
-                       std::span<const std::string> appendedArrayPaths = {},
+                       std::span<const TextureArrayAddition> additions = {},
                        TextureUploadRecovery* recovery = nullptr,
                        RtSceneRecordObservation* observation = nullptr);
     bool SupportsTextureArrayFormat(VkFormat format) const;
@@ -1535,6 +1539,7 @@ private:
         Buffer scratch;
         horde::scene::SkinnedClip uploadedClip = horde::scene::SkinnedClip::Idle;
         float uploadedTime = -1;
+        bool hasPbrMaps = false;
         bool needsRefit = false;
         bool refitRecorded = false;
     };

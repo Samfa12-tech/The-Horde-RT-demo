@@ -309,7 +309,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     if (simulation.recordKeeper) {
         const auto& keeper = *simulation.recordKeeper;
         frame.chapterResidents[1] = {horde::gameplay::dialogue::kRecordKeeperActorId, keeper.foot,
-            horde::scene::CompanionModelYaw(keeper.yaw), horde::scene::SkinnedClip::Idle, 0.f};
+            horde::scene::CompanionModelYaw(keeper.yaw), horde::scene::SkinnedClip::Idle, keeper.idleSeconds};
     }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;

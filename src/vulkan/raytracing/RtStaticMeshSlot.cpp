@@ -731,7 +731,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                     if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
                     {
                         diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
-                            categoryNames[category] + " texture layers exceed 18.";
+                            categoryNames[category] + " texture layers exceed " + std::to_string(kRtTextureLayerCapacity) + ".";
                         return false;
                     }
                     layers[category] = nextTextureLayers[category]++;
@@ -755,7 +755,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 if (nextTextureLayers[category] >= kRtTextureLayerCapacity)
                 {
                     diagnostic = std::string("RtStaticMeshSlot capacity overflow: ") +
-                                 categoryName + " texture layers exceed 18.";
+                                 categoryName + " texture layers exceed " + std::to_string(kRtTextureLayerCapacity) + ".";
                     return false;
                 }
                 ++nextTextureLayers[category];

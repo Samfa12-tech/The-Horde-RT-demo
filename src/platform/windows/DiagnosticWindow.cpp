@@ -6643,7 +6643,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                 ctx.chapterResidentFixture, "resident.glb", clips});
         } else if (ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
             fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
-                ctx.chapterResidentFixture, "resident.glb", clips});
+                ctx.chapterResidentFixture, "resident.glb", {clips.front()}});
         } else {
             fixtures.push_back({0x52544431, ctx.chapterResidentFixture, "resident.glb", clips});
             fixtures.push_back({0x52544432, ctx.chapterResidentFixture, "resident.glb", clips});
@@ -8405,7 +8405,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
         if (capture.recordKeeper) {
             const auto& keeper = *capture.recordKeeper;
             manifest << ", \"recordKeeper\": {\"foot\": [" << keeper.foot[0] << ", " << keeper.foot[1] << ", " << keeper.foot[2]
-                     << "], \"yaw\": " << keeper.yaw << ", \"chapterLine\": \""
+                     << "], \"yaw\": " << keeper.yaw << ", \"idleSeconds\": " << keeper.idleSeconds
+                     << ", \"chapterLine\": \""
                      << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
                      << "\", \"registerInterpreted\": " << (capture.registerInterpreted ? "true" : "false") << "}";
         }
