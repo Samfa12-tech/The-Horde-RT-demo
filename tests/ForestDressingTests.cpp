@@ -1745,7 +1745,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   read->dialogue.activeLine==Line::None && boundary && read->position.x==boundary->position.x &&
                   read->position.z==boundary->position.z && read->flask==boundary->flask,
                   "showing the register updates the earned tavern save without changing its anchor or saving active speech");
-            for(const auto line:kRecordKeeperReading) {
+            for(const auto line:kRecordKeeperFirstReading) {
                 Check(game.Snapshot().chapterDialogue.line==line &&
                       game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
                       "the church reading identifies both independent routes in order");
@@ -1754,11 +1754,51 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::CollectReward &&
                   game.Snapshot().treasurePurse.coins==0 && read && read->treasurePurse==cp::TreasurePurse{},
                   "interpretation offers a reward without crediting it before the player collects it");
+            input.moveForward=1;input.runHeld=true;
+            if(!(walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherNorthApproach.back()) &&
+                 walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end()))) {
+                Check(false,"the keeper's binding instruction leads back to the same shrine");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=0.f;step();
+            Check(state.waysideArchiveAction==ArchiveAction::RestoreBinding && !state.waysideArchive.airWardLearned,
+                  "the interpreted register offers physical restoration from the shrine front");
+            ++input.commands.interact;step();
+            const float closing=state.waysideArchive.opening;
+            const auto duringClosing=game.LatestCampaignBoundary();
+            auto pausedClosing=input;pausedClosing.paused=true;game.StepFixed(pausedClosing);
+            Check(state.waysideArchive.stage==ArchiveStage::Closing && state.waysideArchive.opening==closing &&
+                  duringClosing && duringClosing->waysideArchive==cp::WaysideArchiveProgress::Open,
+                  "pausing stops the hinge and an interrupted save still represents the open stone");
+            for(unsigned tick=0;tick<72;++tick)step();
+            const auto restored=game.LatestCampaignBoundary();
+            Check(state.waysideArchive.stage==ArchiveStage::Restored && state.waysideArchive.opening==0.f &&
+                  state.waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(0.f).worldFromModel &&
+                  state.waysideArchiveAction==ArchiveAction::Recap && restored &&
+                  restored->waysideArchive==cp::WaysideArchiveProgress::Restored && !restored->airWardLearned &&
+                  restored->schema==cp::kAirWardSchema && restored->waysideRegisterRecovered,
+                  "the real stone closes while preserving the collected register and the lantern recap");
+            input.moveForward=1;input.runHeld=true;
+            if(!(walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+                 walkTo(kBellwetherNorthApproach.back()) && walkTo(kBellwetherChurchApproach.front()) &&
+                 walkTo(kBellwetherRecordKeeperApproach))) {
+                Check(false,"the restored shrine has a walkable return to the ward teacher");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57079632679f;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::LearnAirWard && state.treasurePurse==cp::TreasurePurse{},
+                  "the keeper teaches the ward before any reward is collected or spent");
+            ++input.commands.interact;step();
+            const auto taught=game.LatestCampaignBoundary();
+            Check(state.chapterDialogue.line==Line::RecordKeeperWardLesson && state.waysideArchive.airWardLearned &&
+                  taught && taught->airWardLearned && taught->treasurePurse==cp::TreasurePurse{} && read &&
+                  taught->position.x==read->position.x && taught->position.z==read->position.z && taught->flask==read->flask,
+                  "the lesson records preparation at the existing checkpoint without charging the player");
+            ++input.commands.dialogueSkip;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::CollectReward,"the original coin reward remains available after the lesson");
             ++input.commands.interact;step();
             const auto rewarded=game.LatestCampaignBoundary();
             const cp::TreasurePurse earned{cp::TreasurePurse::kRegisterRewardCoins,true};
             Check(state.chapterDialogue.line==Line::RecordKeeperReward && state.treasurePurse==earned &&
-                  rewarded && read && rewarded->schema==cp::kTreasurePurseSchema && rewarded->treasurePurse==earned &&
+                  rewarded && read && rewarded->schema==cp::kAirWardSchema && rewarded->treasurePurse==earned &&
                   rewarded->position.x==read->position.x && rewarded->position.z==read->position.z &&
                   rewarded->dialogue.activeLine==Line::None && rewarded->flask==read->flask,
                   "the player collects the coins once and updates the existing return point and resources atomically");
@@ -1794,7 +1834,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const cp::TreasurePurse fitted{earned.coins-cp::TreasurePurse::kLanternFittingPrice,true,true};
             const auto bought=game.LatestCampaignBoundary();
             Check(state.chapterDialogue.line==Line::TavernLanternFitting && state.treasurePurse==fitted &&
-                  bought && rewarded && bought->schema==cp::kLanternFittingSchema && bought->treasurePurse==fitted &&
+                  bought && rewarded && bought->schema==cp::kAirWardSchema && bought->treasurePurse==fitted &&
                   bought->position.x==rewarded->position.x && bought->position.z==rewarded->position.z &&
                   bought->vitality==rewarded->vitality && bought->flask==rewarded->flask,
                   "one fitting purchase saves its debit and ownership at the earned return point");
@@ -1858,7 +1898,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 ++input.commands.dialogueSkip;step();
             }
             const auto introduced=game.LatestCampaignBoundary();
-            Check(introduced && introduced->schema==cp::kLanternFittingSchema && introduced->treasurePurse==fitted &&
+            Check(introduced && introduced->schema==cp::kAirWardSchema && introduced->treasurePurse==fitted && introduced->airWardLearned &&
                   introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
                   introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
                   "the direct exchange updates the earned save and retains the independently interpreted register");

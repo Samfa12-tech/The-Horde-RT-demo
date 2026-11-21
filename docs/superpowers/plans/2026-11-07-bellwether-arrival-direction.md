@@ -206,6 +206,12 @@ A private 23.025-second review reel collects the four available cuts in church s
 
 The `bellwether-record-keeper-handoff` debug view loads a local resident fixture. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup.
 
+#### Wayside air ward preparation
+
+The first register reading offers a Magic preparation for the Abbey. Return to the same point in front of the wayside shrine and choose **Restore shrine binding**. The player re-seats the existing lower stone. The reverse sweep uses the original hinge and collision. Closing stops if the player blocks it, and a save during the swing retains the last completed open pose.
+
+When the stone finishes closing, **Bellwether directions** sends the player back to the record keeper. **Learn the air ward** records the lesson for the future Abbey crossing. Both steps save at the existing checkpoint. The player can finish them with an empty purse and still collect the register reward later. The collected register and the two expedition leads remain available, and the shrine still offers the lantern recap.
+
 #### Register reward and coin purse
 
 After the record keeper reads the recovered register, **Collect register reward** offers a one-time payment. The three-coin amount is provisional for the private playtest. The player collects it through the same interaction and sees the balance in **Bellwether directions**. After payment the keeper offers **Recall the expedition routes** again.

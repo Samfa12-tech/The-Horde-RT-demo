@@ -21,7 +21,8 @@ inline constexpr std::uint32_t kRegisterInterpretationSchema=11;
 inline constexpr std::uint32_t kTavernLanternExchangeSchema=12;
 inline constexpr std::uint32_t kTreasurePurseSchema=13;
 inline constexpr std::uint32_t kLanternFittingSchema=14;
-enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open };
+inline constexpr std::uint32_t kAirWardSchema=15;
+enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open, Restored };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
 inline constexpr traversal::Vec3 kBellwetherCheckpointPosition{84.52f,-8.709551f,107.68f};
@@ -62,6 +63,7 @@ struct Checkpoint {
     bool waysideRegisterRecovered=false;
     bool waysideRegisterInterpreted=false;
     TreasurePurse treasurePurse{};
+    bool airWardLearned=false;
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
     return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
@@ -84,7 +86,10 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kLanternFittingSchema ||
+    if (c.schema < 1 || c.schema > kAirWardSchema ||
+        (c.airWardLearned && c.waysideArchive!=WaysideArchiveProgress::Restored) ||
+        (c.waysideArchive==WaysideArchiveProgress::Restored &&
+            (c.schema<kAirWardSchema || !c.waysideRegisterInterpreted)) ||
         (c.schema<kTreasurePurseSchema && c.treasurePurse!=TreasurePurse{}) ||
         (c.treasurePurse.lanternFittingPurchased &&
             (c.schema<kLanternFittingSchema || !c.treasurePurse.registerRewardClaimed)) ||
@@ -95,8 +100,8 @@ inline bool Validate(const Checkpoint& c) {
             (c.schema<kTavernLanternExchangeSchema || !c.waysideLanternRevealStarted)) ||
         (c.waysideRegisterInterpreted && (c.schema<kRegisterInterpretationSchema || !c.waysideRegisterRecovered)) ||
         (c.waysideRegisterRecovered && (c.schema<kWaysideRegisterSchema || !c.waysideLanternRevealStarted)) ||
-        (c.waysideLanternRevealStarted && (c.schema<kShrineLanternSchema || c.waysideArchive!=WaysideArchiveProgress::Open)) ||
-        c.waysideArchive>WaysideArchiveProgress::Open ||
+        (c.waysideLanternRevealStarted && (c.schema<kShrineLanternSchema || c.waysideArchive<WaysideArchiveProgress::Open)) ||
+        c.waysideArchive>WaysideArchiveProgress::Restored ||
         (c.waysideArchive!=WaysideArchiveProgress::Closed &&
             (c.schema<kWaysideArchiveSchema || c.contentRevision<kBellwetherContentRevision ||
              c.dialogue.hearthLinesResolved!=dialogue::kHearthLines.size())) ||

@@ -24,6 +24,8 @@ void GameSimulation::InteractWithClaimedChapter() {
     if(chapterDialogue_.TryStartRecordKeeper(records,context)) {
         if(records==dialogue::RecordKeeperAction::ShowRegister)
             waysideArchive_.registerInterpreted=true;
+        if(records==dialogue::RecordKeeperAction::LearnAirWard)
+            waysideArchive_.airWardLearned=true;
         return;
     }
     switch(WaysideArchiveAction(context)) {
@@ -44,6 +46,9 @@ void GameSimulation::InteractWithClaimedChapter() {
     case bellwether::ArchiveAction::Recap:
         chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Recap,context);
         return;
+    case bellwether::ArchiveAction::RestoreBinding:
+        waysideArchive_.stage=bellwether::ArchiveStage::Closing;
+        return;
     default:
         using dialogue::TavernGuidance;
         const auto guidance=waysideArchive_.registerInterpreted?TavernGuidance::Expeditions:
@@ -56,6 +61,9 @@ dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::
     using Action=dialogue::RecordKeeperAction;
     if(!chapterDialogue_.CanStartRecordKeeper(c))return Action::None;
     if(waysideArchive_.registerInterpreted) {
+        if(campaignBoundary_ && campaignBoundary_->waysideArchive==campaign::WaysideArchiveProgress::Restored &&
+           !waysideArchive_.airWardLearned && campaignBoundaryRevision_!=UINT64_MAX)
+            return Action::LearnAirWard;
         if(campaignBoundary_ && campaignBoundary_->waysideRegisterInterpreted &&
            campaignBoundaryRevision_!=UINT64_MAX && treasurePurse_.CanClaimRegisterReward())
             return Action::CollectReward;
@@ -68,7 +76,7 @@ bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::C
     using namespace bellwether;
     const auto stage=waysideArchive_.stage;
     if(!c.shrineLanternSource || c.paused || chapterDialogue_.State().line!=dialogue::Line::None ||
-       stage==ArchiveStage::Opening)
+       stage==ArchiveStage::Opening || stage==ArchiveStage::Closing)
         return ArchiveAction::None;
     const float dx=kWaysideMechanism[0]-c.player.x,dz=kWaysideMechanism[2]-c.player.z;
     const float distance=std::hypot(dx,dz);
@@ -81,7 +89,10 @@ bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::C
             kWaysideMechanism[2]+.08f,y-.06f,y+.06f,.025f))return ArchiveAction::None;
     if(stage==ArchiveStage::Closed)return ArchiveAction::Inspect;
     if(stage==ArchiveStage::Inspected)return ArchiveAction::Open;
+    if(stage==ArchiveStage::Restored)return ArchiveAction::Recap;
     if(!waysideArchive_.lanternRevealStarted)return ArchiveAction::Listen;
+    if(campaignBoundary_ && campaignBoundary_->waysideRegisterInterpreted &&
+       campaignBoundaryRevision_!=UINT64_MAX)return ArchiveAction::RestoreBinding;
     if(waysideArchive_.registerRecovered)return ArchiveAction::Recap;
     const auto& mark=kWaysideRoadRegister;
     if(!chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
@@ -93,18 +104,20 @@ bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::C
 
 void GameSimulation::AdvanceWaysideArchive(float seconds) {
     using namespace bellwether;
-    if(waysideArchive_.stage!=ArchiveStage::Opening || seconds<=0 || !chapterTerrain_ ||
+    const bool closing=waysideArchive_.stage==ArchiveStage::Closing;
+    if((!closing && waysideArchive_.stage!=ArchiveStage::Opening) || seconds<=0 || !chapterTerrain_ ||
        chapterTerrainGeneration_!=worldRoute_.generation || !chapterTerrain_->HingedContact())return;
-    const float progress=std::min(1.f,waysideArchive_.opening+seconds);
+    const float progress=std::clamp(waysideArchive_.opening+(closing?-seconds:seconds),0.f,1.f);
     const auto candidate=ArchivePose::AtOpening(progress);
     // Expand the body query by the greatest point travel between poses.
-    const float swingMargin=(progress-waysideArchive_.opening)*1.57079632679f*1.30f;
+    const float swingMargin=std::abs(progress-waysideArchive_.opening)*1.57079632679f*1.30f;
     if(UsesRescueExterior() && !candidate.VolumeClear(*chapterTerrain_->HingedContact(),
             playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY+.001f,
             playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+swingMargin))return;
     waysideArchive_.opening=progress;
     waysideArchive_.pose=candidate;
-    if(progress>=1.f) {
+    if(closing && progress<=0.f)waysideArchive_.stage=ArchiveStage::Restored;
+    else if(!closing && progress>=1.f) {
         waysideArchive_.stage=ArchiveStage::Open;
         TryStartShrineReveal(ChapterInteractionContext(false));
     }

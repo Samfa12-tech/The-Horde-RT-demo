@@ -298,6 +298,18 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
               restoredArchive.Snapshot().chapterDialogue.tavernLanternLinesStarted==1 &&
               restoredArchive.Snapshot().chapterDialogue.line==Line::None,
               "Kit keeps the first witnessed line on load without replaying speech");
+        archive.schema=cp::kAirWardSchema;
+        archive.waysideArchive=cp::WaysideArchiveProgress::Restored;
+        Check(Seed(restoredArchive,archive,terrain) &&
+              restoredArchive.Snapshot().waysideArchive.stage==ArchiveStage::Restored &&
+              restoredArchive.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(0.f).worldFromModel &&
+              !restoredArchive.Snapshot().waysideArchive.airWardLearned,
+              "restored binding loads closed and still requires the keeper's lesson");
+        archive.airWardLearned=true;
+        Check(Seed(restoredArchive,archive,terrain) && restoredArchive.Snapshot().waysideArchive.airWardLearned &&
+              restoredArchive.Snapshot().waysideArchive.registerRecovered &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "the ward lesson survives reload without replaying speech or putting the register back");
         archive.schema=cp::kTavernConversationSchema;
         Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
     }

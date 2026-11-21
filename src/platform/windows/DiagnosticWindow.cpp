@@ -3539,6 +3539,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case ArchiveAction::Listen: text = "LEFT-CLICK / A TO LISTEN TO THE LANTERN"; break;
         case ArchiveAction::TakeRegister: text = "LEFT-CLICK / A TO TAKE THE ROAD REGISTER"; break;
         case ArchiveAction::Recap: text = "LEFT-CLICK / A TO RECALL THE LANTERN'S WORDS"; break;
+        case ArchiveAction::RestoreBinding: text = "LEFT-CLICK / A TO RESTORE SHRINE BINDING"; break;
         default:
             using horde::gameplay::dialogue::RecordKeeperAction;
             switch (snapshot.recordKeeperAction) {
@@ -3546,6 +3547,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             case RecordKeeperAction::ShowRegister: text = "LEFT-CLICK / A TO SHOW THE ROAD REGISTER"; break;
             case RecordKeeperAction::RecallRoutes: text = "LEFT-CLICK / A TO RECALL THE EXPEDITION ROUTES"; break;
             case RecordKeeperAction::CollectReward: text = "LEFT-CLICK / A TO COLLECT REGISTER REWARD"; break;
+            case RecordKeeperAction::LearnAirWard: text = "LEFT-CLICK / A TO LEARN THE AIR WARD"; break;
             default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
             }
             break;
@@ -3731,7 +3733,8 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
         LookoutPanel::Objective::None;
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
-        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse};
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse,
+        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive)};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)

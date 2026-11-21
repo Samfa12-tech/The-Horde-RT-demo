@@ -960,6 +960,7 @@ horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
 std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
 horde::gameplay::campaign::TreasurePurse gLookoutObjectivePurse{}; // guarded by gChapterDialogueUiMutex
+horde::gameplay::campaign::AirWardDirections gLookoutObjectiveWard{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -1219,6 +1220,7 @@ void PublishSimulationUiState()
             static_cast<jlong>(horde::gameplay::campaign::CurrentPauseObjective(simulation,
                 gGameSimulation.LatestCampaignBoundary()))};
         gLookoutObjectivePurse=simulation.treasurePurse;
+        gLookoutObjectiveWard=horde::gameplay::campaign::CurrentAirWardDirections(simulation.waysideArchive);
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -1301,10 +1303,9 @@ void PublishSimulationUiState()
         contextualControls |= (static_cast<int>(simulation.waysideArchiveAction) << 16) | 1;
     else if ((contextualControls & (1 << 9)) == 0 &&
              simulation.recordKeeperAction != horde::gameplay::dialogue::RecordKeeperAction::None) {
-        using horde::gameplay::dialogue::RecordKeeperAction;
-        const int action = simulation.recordKeeperAction == RecordKeeperAction::CollectReward
-            ? 1 << 24 : static_cast<int>(simulation.recordKeeperAction) << 19;
-        contextualControls |= action | 1;
+        const int action=static_cast<int>(simulation.recordKeeperAction);
+        // The third action bit lives above the tavern door fields.
+        contextualControls |= ((action & 3) << 19) | ((action & 4) << 22) | 1;
     }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
@@ -7353,7 +7354,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
         gLookoutObjectiveUiState[3]!=objective)
         return env->NewStringUTF("");
     using namespace horde::gameplay::campaign;
-    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse);
+    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse,gLookoutObjectiveWard);
     return env->NewStringUTF(text.c_str());
 }
 

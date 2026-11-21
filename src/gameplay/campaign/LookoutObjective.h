@@ -33,6 +33,14 @@ enum class PauseObjective {
     None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone
 };
 
+enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
+
+inline AirWardDirections CurrentAirWardDirections(const bellwether::WaysideArchive& archive) {
+    if(archive.airWardLearned)return AirWardDirections::Learned;
+    return archive.stage==bellwether::ArchiveStage::Restored ?
+        AirWardDirections::LearnWard:AirWardDirections::RestoreBinding;
+}
+
 inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
     const std::optional<Checkpoint>& boundary)
 {
@@ -76,13 +84,18 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     return "";
 }
 
-inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse)
+inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse, AirWardDirections ward)
 {
     std::string text=PauseObjectiveText(objective);
     if (objective==PauseObjective::BellwetherExpeditions) {
         text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");
         if (purse.lanternFittingPurchased) text+="\r\nLantern hinge fitted.";
         else text+="\r\nLantern fitting at the tavern: "+std::to_string(TreasurePurse::kLanternFittingPrice)+" coins.";
+        switch(ward) {
+        case AirWardDirections::RestoreBinding:text+="\r\n\r\nFor an air ward, return to the wayside shrine and restore its binding.";break;
+        case AirWardDirections::LearnWard:text+="\r\n\r\nBinding restored. Ask the record keeper to teach you the air ward.";break;
+        case AirWardDirections::Learned:text+="\r\n\r\nAir ward learned for the Abbey crossing.";break;
+        }
     }
     return text;
 }

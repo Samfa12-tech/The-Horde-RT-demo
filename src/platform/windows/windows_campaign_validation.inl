@@ -987,7 +987,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
 int FinishHiddenLookoutValidation(HWND owner,int result)
 {
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
-    const int timeLimit = gBellwetherExpeditionValidation ? 190 : gBellwetherHearthRestValidation ? 110 : 90;
+    const int timeLimit = gBellwetherExpeditionValidation ? 230 : gBellwetherHearthRestValidation ? 110 : 90;
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1197,7 +1197,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
     };
     const auto deadline = std::chrono::steady_clock::now() +
-        std::chrono::seconds(gBellwetherExpeditionValidation ? 165 : gBellwetherHearthRestValidation ? 85 : 65);
+        std::chrono::seconds(gBellwetherExpeditionValidation ? 205 : gBellwetherHearthRestValidation ? 85 : 65);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1432,7 +1432,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     }
                     std::array<char,512> text{};
                     GetWindowTextA(GetDlgItem(ctx.windowHandle,LookoutPanel::BodyId),text.data(),static_cast<int>(text.size()));
-                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective,state.treasurePurse);
+                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(
+                        objective,state.treasurePurse,campaign::CurrentAirWardDirections(state.waysideArchive));
                     const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
                         ctx.pauseMenuVisible && ctx.simulationPaused;
                     const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
@@ -1515,7 +1516,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     progressed = check(walk(std::next(kBellwetherWaysideApproach.rbegin()), kBellwetherWaysideApproach.rend()) &&
                         walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
                         state.recordKeeperAction == RecordKeeperAction::ShowRegister && interact() &&
-                        state.waysideArchive.registerInterpreted && frame() && dialogue(kRecordKeeperReading) &&
+                        state.waysideArchive.registerInterpreted && frame() && dialogue(kRecordKeeperFirstReading) &&
                         state.recordKeeperAction == RecordKeeperAction::CollectReward && state.treasurePurse.coins == 0 &&
                         state.chapterDialogue.tavernLanternLinesStarted == 0,
                         "the real register handoff teaches both routes independently of Kit's firsthand knowledge");
@@ -1523,6 +1524,36 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 if (progressed)
                     progressed = check(readDirections(PauseObjective::BellwetherExpeditions),
                         "the church pause directions show both interpreted routes as future expeditions");
+                if (progressed) {
+                    campaign::storage::StoredCheckpoint restored;
+                    progressed = check(walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherNorthApproach.back()) &&
+                        walk(kBellwetherWaysideApproach.begin(), kBellwetherWaysideApproach.end()) && face(0.f,-.12f) &&
+                        state.waysideArchiveAction == ArchiveAction::RestoreBinding && interact() &&
+                        state.waysideArchive.stage == ArchiveStage::Closing && waitFor([&] {
+                            return state.waysideArchive.stage == ArchiveStage::Restored;
+                        }, 90) && state.waysideArchive.opening == 0.f && !state.waysideArchive.airWardLearned && frame() &&
+                        until([&] {
+                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",restored).status ==
+                                campaign::storage::Status::Read &&
+                                restored.checkpoint.waysideArchive == campaign::WaysideArchiveProgress::Restored &&
+                                !restored.checkpoint.airWardLearned && restored.checkpoint.waysideRegisterRecovered;
+                        },false) && readDirections(PauseObjective::BellwetherExpeditions),
+                        "the rendered lower stone closes and saves the restored binding while the ward remains unlearned");
+                }
+                if (progressed) {
+                    campaign::storage::StoredCheckpoint taught;
+                    progressed = check(walk(std::next(kBellwetherWaysideApproach.rbegin()), kBellwetherWaysideApproach.rend()) &&
+                        walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
+                        state.recordKeeperAction == RecordKeeperAction::LearnAirWard && interact() &&
+                        state.waysideArchive.airWardLearned && state.treasurePurse == campaign::TreasurePurse{} && frame() &&
+                        dialogue(kRecordKeeperWard) && state.recordKeeperAction == RecordKeeperAction::CollectReward &&
+                        until([&] {
+                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",taught).status ==
+                                campaign::storage::Status::Read && taught.checkpoint.airWardLearned &&
+                                taught.checkpoint.treasurePurse == campaign::TreasurePurse{};
+                        },false) && readDirections(PauseObjective::BellwetherExpeditions),
+                        "the return lesson saves the air ward before the player earns or spends any coins");
+                }
                 const campaign::TreasurePurse earned{campaign::TreasurePurse::kRegisterRewardCoins,true};
                 if (progressed) {
                     campaign::storage::StoredCheckpoint rewarded;
@@ -1600,13 +1631,15 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         expedition.checkpoint.position.z == original.position.z &&
                         expedition.checkpoint.vitality == original.vitality &&
                         expedition.checkpoint.flask == original.flask && expedition.checkpoint.treasurePurse == fitted &&
+                        expedition.checkpoint.airWardLearned &&
                         expedition.checkpoint.dialogue.activeLine == Line::None,
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
                     if (progressed) {
                         campaign::storage::StoredCheckpoint resumed;
                         progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
-                            state.treasurePurse == fitted &&
+                            state.treasurePurse == fitted && state.waysideArchive.airWardLearned &&
+                            state.waysideArchive.stage == ArchiveStage::Restored &&
                             (!state.healingFlaskEnabled || state.healingFlask.resources == expedition.checkpoint.flask) &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==

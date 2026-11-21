@@ -33,7 +33,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
-        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse);};
+        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,c.airWardLearned);};
     return facts(a)==facts(b);
 }
 }
@@ -42,7 +42,9 @@ static campaign::WaysideArchiveProgress WaysideArchiveProgressForSave(const bell
     using bellwether::ArchiveStage;
     using campaign::WaysideArchiveProgress;
     if(archive.stage==ArchiveStage::Closed)return WaysideArchiveProgress::Closed;
-    return archive.stage==ArchiveStage::Open?WaysideArchiveProgress::Open:WaysideArchiveProgress::Inspected;
+    if(archive.stage==ArchiveStage::Restored)return WaysideArchiveProgress::Restored;
+    return archive.stage==ArchiveStage::Open || archive.stage==ArchiveStage::Closing ?
+        WaysideArchiveProgress::Open:WaysideArchiveProgress::Inspected;
 }
 
 static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellwether::WaysideArchive& archive) {
@@ -50,6 +52,7 @@ static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellweth
     checkpoint.waysideLanternRevealStarted=archive.lanternRevealStarted;
     checkpoint.waysideRegisterRecovered=archive.registerRecovered;
     checkpoint.waysideRegisterInterpreted=archive.registerInterpreted;
+    checkpoint.airWardLearned=archive.airWardLearned;
     if(checkpoint.waysideArchive!=campaign::WaysideArchiveProgress::Closed)
         checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideArchiveSchema);
     if(checkpoint.waysideLanternRevealStarted)
@@ -58,6 +61,8 @@ static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellweth
         checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideRegisterSchema);
     if(checkpoint.waysideRegisterInterpreted)
         checkpoint.schema=std::max(checkpoint.schema,campaign::kRegisterInterpretationSchema);
+    if(checkpoint.waysideArchive==campaign::WaysideArchiveProgress::Restored)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kAirWardSchema);
 }
 
 static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::TreasurePurse purse) {
@@ -199,7 +204,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     }
     if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
         RecordWaysideArchive(c,waysideArchive_);
-    if(c.dialogue.tavernLanternLinesStarted)c.schema=campaign::kTavernLanternExchangeSchema;
+    if(c.dialogue.tavernLanternLinesStarted)c.schema=std::max(c.schema,campaign::kTavernLanternExchangeSchema);
     RecordTreasurePurse(c,treasurePurse_);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
@@ -247,11 +252,13 @@ void GameSimulation::LatchCampaignBoundary() {
         const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
         if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
             const auto& speech=chapterDialogue_.State();
-            const bool waysideProgressAdvanced=atTavernBoundary &&
+            const bool hasRegisterBoundary=campaignBoundary_ && campaignBoundary_->waysideRegisterInterpreted;
+            const bool waysideProgressAdvanced=(atTavernBoundary || hasRegisterBoundary) &&
                 (WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
                  (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted) ||
                  (waysideArchive_.registerRecovered && !campaignBoundary_->waysideRegisterRecovered) ||
-                 (waysideArchive_.registerInterpreted && !campaignBoundary_->waysideRegisterInterpreted));
+                 (waysideArchive_.registerInterpreted && !campaignBoundary_->waysideRegisterInterpreted) ||
+                 (waysideArchive_.airWardLearned && !campaignBoundary_->airWardLearned));
             const bool lanternExchangeAdvanced=atTavernBoundary &&
                 speech.tavernLanternLinesStarted>campaignBoundary_->dialogue.tavernLanternLinesStarted;
             if((waysideProgressAdvanced || lanternExchangeAdvanced) && chapterTerrain_ &&
@@ -352,6 +359,9 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     else if(c.waysideArchive==campaign::WaysideArchiveProgress::Open)
         next.waysideArchive_={bellwether::ArchiveStage::Open,1.f,bellwether::ArchivePose::AtOpening(1.f),
             c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted};
+    else if(c.waysideArchive==campaign::WaysideArchiveProgress::Restored)
+        next.waysideArchive_={bellwether::ArchiveStage::Restored,0.f,bellwether::ArchivePose::AtOpening(0.f),
+            c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.airWardLearned};
     if(!next.worldRoute_.Publish(readyDestination,ZoneReadiness::Ready)) return false;
     next.playerX_=c.position.x;next.playerZ_=c.position.z;
     next.playerYawRadians_=c.yaw;next.playerPitchRadians_=c.pitch;

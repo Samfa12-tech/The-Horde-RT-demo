@@ -42,10 +42,12 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.listen_to_lantern, MainActivity.contextualInteractLabel((3 << 16) | 1));
         assertEquals(R.string.recall_lantern_words, MainActivity.contextualInteractLabel((4 << 16) | 1));
         assertEquals(R.string.take_road_register, MainActivity.contextualInteractLabel((5 << 16) | 1));
+        assertEquals(R.string.restore_shrine_binding, MainActivity.contextualInteractLabel((6 << 16) | 1));
         assertEquals(R.string.show_road_mark, MainActivity.contextualInteractLabel((1 << 19) | 1));
         assertEquals(R.string.show_road_register, MainActivity.contextualInteractLabel((2 << 19) | 1));
         assertEquals(R.string.recall_expedition_routes, MainActivity.contextualInteractLabel((3 << 19) | 1));
         assertEquals(R.string.collect_register_reward, MainActivity.contextualInteractLabel((1 << 24) | 1));
+        assertEquals(R.string.learn_air_ward, MainActivity.contextualInteractLabel((1 << 24) | (1 << 19) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 24) | (1 << 9) | 1));
         assertEquals(R.string.fit_lantern_hinge, MainActivity.contextualInteractLabel((2 << 25) | 1));
         assertEquals(2, MainActivity.lanternFittingPrice((2 << 25) | 1));

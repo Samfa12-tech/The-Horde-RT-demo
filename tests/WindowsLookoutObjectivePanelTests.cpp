@@ -136,8 +136,13 @@ int main() {
         h.view.purse={3,true,false};
         Check(open(h.view) && Text(parent,Panel::BodyId).find("future expeditions")!=std::string::npos &&
             Text(parent,Panel::BodyId).find("Purse: 3 coins.")!=std::string::npos &&
-            Text(parent,Panel::BodyId).find("Lantern fitting at the tavern: 2 coins.")!=std::string::npos,
-            "expedition directions identify both leads, the purse and the fitting price");
+            Text(parent,Panel::BodyId).find("Lantern fitting at the tavern: 2 coins.")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("restore its binding")!=std::string::npos,
+            "expedition directions show the purse, fitting price and first ward step");
+        h.view.ward=horde::gameplay::campaign::AirWardDirections::Learned;
+        Check(!h.panel.Refresh(h.view) && open(h.view) &&
+              Text(parent,Panel::BodyId).find("Air ward learned")!=std::string::npos,
+            "the reopened directions reflect the earned ward lesson");
         Click(parent,Panel::ContinueId);
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }

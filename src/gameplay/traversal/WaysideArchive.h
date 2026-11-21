@@ -5,8 +5,8 @@
 
 namespace horde::gameplay::bellwether {
 
-enum class ArchiveStage : std::uint8_t { Closed, Inspected, Opening, Open };
-enum class ArchiveAction : std::uint8_t { None, Inspect, Open, Listen, Recap, TakeRegister };
+enum class ArchiveStage : std::uint8_t { Closed, Inspected, Opening, Open, Closing, Restored };
+enum class ArchiveAction : std::uint8_t { None, Inspect, Open, Listen, Recap, TakeRegister, RestoreBinding };
 
 struct ArchivePose : traversal::HingedYawPose {
     ArchivePose():HingedYawPose{{
@@ -27,6 +27,7 @@ struct WaysideArchive {
     bool lanternRevealStarted=false;
     bool registerRecovered=false;
     bool registerInterpreted=false;
+    bool airWardLearned=false;
 };
 
 } // namespace horde::gameplay::bellwether

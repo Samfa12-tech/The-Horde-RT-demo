@@ -22,6 +22,7 @@ public:
         std::uint64_t worldGeneration=0,surfaceGeneration=0;
         Objective objective=Objective::Lookout;
         gameplay::campaign::TreasurePurse purse{};
+        gameplay::campaign::AirWardDirections ward=gameplay::campaign::AirWardDirections::RestoreBinding;
     };
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
@@ -35,8 +36,9 @@ public:
         if(visible_ || !IsWindow(parent) || !Admitted(view))return false;
         parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
         purse_=view.purse;
+        ward_=view.ward;
         const bool lookout = objective_ == Objective::Lookout;
-        const auto body=gameplay::campaign::PauseObjectiveText(objective_,purse_);
+        const auto body=gameplay::campaign::PauseObjectiveText(objective_,purse_,ward_);
         const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
             body.c_str(),"CONTINUE EXPLORING",
             lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
@@ -66,7 +68,7 @@ public:
     bool Refresh(const View& view) {
         if(!visible_)return false;
         if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_ ||
-            view.objective!=objective_ || view.purse!=purse_) {
+            view.objective!=objective_ || view.purse!=purse_ || view.ward!=ward_) {
             Close();return false;
         }
         return true;
@@ -87,7 +89,7 @@ public:
         const int availableWidth=std::max(1L,bounds.right-bounds.left);
         const int availableHeight=std::max(1L,bounds.bottom-bounds.top);
         const int width=std::min(px(540),availableWidth);
-        const int titleHeight=px(42),bodyHeight=px(140),gap=px(10);
+        const int titleHeight=px(42),bodyHeight=px(objective_==Objective::BellwetherExpeditions?185:140),gap=px(10);
         const int buttons = objective_==Objective::Lookout ? 3 : 2;
         const int gaps = buttons + 2;
         const int buttonHeight=std::min(px(44),std::max(px(24),(availableHeight-titleHeight-bodyHeight-gaps*gap)/buttons));
@@ -108,6 +110,7 @@ private:
     bool visible_=false;
     std::uint64_t world_=0,surface_=0;
     gameplay::campaign::TreasurePurse purse_{};
+    gameplay::campaign::AirWardDirections ward_=gameplay::campaign::AirWardDirections::RestoreBinding;
     Objective objective_=Objective::None;
 };
 } // namespace horde::platform::windows
