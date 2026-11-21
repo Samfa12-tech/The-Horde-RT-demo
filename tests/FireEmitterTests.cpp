@@ -1,4 +1,5 @@
 #include "gameplay/effects/FireEmitterState.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 
@@ -212,6 +213,33 @@ bool TestAllFourEligibleEmittersRemainActive()
            Require(upload.activeCount == 4u &&
                        upload.selectedStableIds == std::array<std::uint32_t, 4u>{{1u, 3u, 4u, 0x4c414e54u}},
                    "four-source budget must never silently discard an otherwise eligible light");
+}
+
+bool TestBellwetherHearthUsesTheOrdinaryFireBudget()
+{
+    using namespace horde::gameplay::effects;
+    auto hearth=MakeBellwetherHearthFireEmitter();
+    StepFireEmitterFixed(hearth,BellwetherHearthFireInput(),kFixedDelta);
+    FireEmitterUpload upload;
+    std::string diagnostic;
+    const std::array<float,3> camera{{84.3f,-7.f,111.7f}};
+    bool ok=Require(BuildFireEmitterUpload(std::span(&hearth,1),
+        {camera,ShowcaseZone::Outside,24.f},{},FireEmitterQuality::Mobile,upload,diagnostic) &&
+        upload.activeCount==1 && upload.selectedStableIds[0]==kBellwetherHearthEmitterId &&
+        Approx(upload.emitters[0].shape[1],hearth.height) &&
+        upload.emitters[0].lightPositionStrength[3]>0 &&
+        upload.emitters[0].identity[2]==ResolveFireEmitterQualityBudget(FireEmitterQuality::Mobile).volumeSteps,
+        "Bellwether hearth publishes both its flame volume and shadowed direct light at Mobile quality");
+    auto lantern=Emitter(0x4c414e54u,84.1f,ShowcaseZone::Outside);
+    lantern.parentObject=FireEmitterParentObject::RewardLantern;
+    ok &= Require(horde::vulkan::raytracing::AppendFireEmitterUpload(
+        lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2 &&
+        upload.selectedStableIds[0]==kBellwetherHearthEmitterId && upload.selectedStableIds[1]==lantern.stableId,
+        "the hearth and held lantern fit together without dropping either source");
+    ok &= Require(BuildFireEmitterUpload(std::span(&hearth,1),{{13.3f,0.f,36.2f},ShowcaseZone::Outside,24.f},
+        {},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==0,
+        "the hearth is outside the lookout's fire workload");
+    return ok;
 }
 
 bool TestTorchExtinguishZerosStrengthWithoutChangingTransforms()
@@ -459,6 +487,7 @@ int main()
     ok &= TestDistanceTieBreaksByStableEmitterId();
     ok &= TestDistanceBoundaryIsExactBeforeStablePublication();
     ok &= TestAllFourEligibleEmittersRemainActive();
+    ok &= TestBellwetherHearthUsesTheOrdinaryFireBudget();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
     ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();

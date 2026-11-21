@@ -195,6 +195,26 @@ public:
         if(!ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
         return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius);
     }
+    // Carry lookahead extends beyond the held geometry. The upward continuation
+    // of the player's current floor is not an obstacle in that lookahead.
+    // Only walkable faces can use the rising floor band; other faces keep the
+    // fixed limits. Raised ground above the local slope still obstructs carry.
+    bool HorizontalCarryVolumeClear(float fromX,float fromZ,float toX,float toZ,
+                                    float minimumY,float maximumY,float radius) const
+    {
+        if(!ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
+        if(HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return true;
+        const float dx=toX-fromX,dz=toZ-fromZ;
+        const float length=std::hypot(dx,dz);
+        if(length<=1e-6f)return false;
+        const auto floor=Query(fromX,fromZ);
+        if(!floor.found||!floor.walkable)return false;
+        const float unitX=dx/length,unitZ=dz/length;
+        const float rise=-(floor.normal[0]*unitX+floor.normal[2]*unitZ)/floor.normal[1];
+        if(rise<=0.f)return false;
+        return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius,
+            minimumY,{rise*unitX,rise*unitZ});
+    }
     // Terrain-only body sweep with a conservative floor-band exemption.
     // Upward walkable faces are clipped to the part above the footprint's
     // permitted slope band. Remote high vertices cannot block local ground
@@ -360,25 +380,35 @@ private:
     }
     bool HorizontalVolumeNodeClear(std::uint32_t index,float x,float z,float toX,float toZ,
                                   float minY,float maxY,float radius,
-                                  float ignoredWalkableBelow=-std::numeric_limits<float>::infinity()) const
+                                  float ignoredWalkableBelow=-std::numeric_limits<float>::infinity(),
+                                  std::array<float,2> floorRise={}) const
     {
         const auto& node=nodes_[index];
         if(std::max(x,toX)+radius<node.minimum[0]||std::min(x,toX)-radius>node.maximum[0]||
            std::max(z,toZ)+radius<node.minimum[2]||std::min(z,toZ)-radius>node.maximum[2]||
            maxY<node.minimum[1]||minY>node.maximum[1])return true;
-        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow)&&
-                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow);
+        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow,floorRise)&&
+                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow,floorRise);
         const Point from{x,0,z},to{toX,0,toZ};
         const double radiusSquared=double(radius)*radius;
         for(auto i=node.begin;i<node.begin+node.count;++i) {
             Polygon a{},b{};
             const auto id=order_[i];const auto& triangle=triangles_[id];const auto n=normals_[id];
-              const bool walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
+            const bool walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
             std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
-              const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
+            const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
             const auto count=ClipHeight(b,first,maxY,false,a);
             if(!count)continue;
-            if(SweptFootprintTouches(a,count,from,to,radiusSquared))return false;
+            if(walkable&&(floorRise[0]!=0.f||floorRise[1]!=0.f)) {
+                // After clipping the fixed height band, flatten only Y against
+                // the sloped lower plane. The footprint test uses X and Z.
+                for(std::size_t vertex=0;vertex<count;++vertex) {
+                    auto& p=a[vertex];
+                    p[1]-=floorRise[0]*(p[0]-x)+floorRise[1]*(p[2]-z);
+                }
+                const auto aboveSlope=ClipHeight(a,count,minY,true,b);
+                if(aboveSlope&&SweptFootprintTouches(b,aboveSlope,from,to,radiusSquared))return false;
+            } else if(SweptFootprintTouches(a,count,from,to,radiusSquared))return false;
         }
         return true;
     }

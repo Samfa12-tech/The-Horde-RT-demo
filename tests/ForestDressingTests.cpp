@@ -1,5 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/effects/BellwetherHearth.h"
+#include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
@@ -1171,6 +1173,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     game.StepFixed(neutral);
 
     const auto& route=gameplay::traversal::kBellwetherTavernRoute;
+    const auto approach=route[gameplay::traversal::kBellwetherSouthApproachStation];
+    const auto ramp=terrain->Query(approach.x,approach.z);
+    const auto clearance=gameplay::items::ComputeRewardLanternForwardClearance(
+        approach.x,approach.z,0,-1,false,true,ramp.worldY,terrain.get());
+    Check(ramp.found && clearance>2.69f,
+          "the uphill tavern approach keeps the normal carried-item reach");
     sim::InputSnapshot input;
     input.moveForward=1.f;
     input.runHeld=true;
@@ -1201,6 +1209,19 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(game.Snapshot().playerZ<118.4f &&
           std::abs(game.Snapshot().playerSupportWorldY-(-8.70955f))<.001f,
           "the shared motor stands on the actual imported tavern floor behind the portal");
+    const auto& room=game.Snapshot();
+    using gameplay::effects::kBellwetherHearthFlame;
+    using gameplay::effects::kBellwetherHearthLight;
+    const auto floor=terrain->Query(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2]);
+    const auto& hearth=room.fireEmitters.back();
+    Check(room.fireEmitterCount==room.fireEmitters.size() &&
+          hearth.stableId==gameplay::effects::kBellwetherHearthEmitterId &&
+          hearth.strength>0 && hearth.zone==gameplay::ShowcaseZone::Outside &&
+          floor.found && std::abs(kBellwetherHearthFlame[1]-floor.worldY-.12f)<.002f &&
+          terrain->NonWalkableVolumeClear(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2],
+              kBellwetherHearthLight[0],kBellwetherHearthLight[2],kBellwetherHearthFlame[1],
+              kBellwetherHearthFlame[1]+hearth.height,hearth.radius),
+          "the stationary fire fits inside the rendered hearth, over its imported floor");
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
         if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
     }

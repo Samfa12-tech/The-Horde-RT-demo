@@ -20,6 +20,20 @@ int main()
     check(sample.found&&sample.walkable&&std::abs(sample.worldY-1)<1e-6&&sample.surface==SupportSurface::Earth,
           "support must interpolate the rendered plane on its shared diagonal");
     check(terrain->GroundSweep(-1,0,1,0,.5f,.24f),"ordinary ramp movement was rejected");
+    check(!terrain->HorizontalVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f) &&
+          terrain->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "the continuing uphill floor must clear the carry lookahead");
+    const auto raisedDeck=Surface::WithAdditionalGroundGeometry(*terrain,
+        quad(.6f,1.5f,-.5f,.5f,1.85f,1.85f),error);
+    check(raisedDeck&&!raisedDeck->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "an upward face above the continuing slope must still block carry");
+    auto slopeRoof=quad(.6f,1.5f,-.5f,.5f,1.35f,1.35f);
+    for(auto& triangle:slopeRoof)std::swap(triangle.points[1],triangle.points[2]);
+    std::vector<Surface::Triangle> covered(ramp.begin(),ramp.end());
+    covered.insert(covered.end(),slopeRoof.begin(),slopeRoof.end());
+    const auto coveredSlope=Surface::Build(covered,error);
+    check(coveredSlope&&!coveredSlope->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "the uphill floor exemption must not hide a downward face inside the carry band");
     check(!terrain->GroundSweep(1.7f,0,2,0,1.85f,.24f),"capsule crossed an unsupported outer edge");
     check(!terrain->Query(3,0).found,"query invented a floor beyond the mesh");
     check(!terrain->Query(0,0,1.1f,2).found,"vertical range accepted a different surface");

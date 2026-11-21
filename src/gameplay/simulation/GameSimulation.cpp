@@ -11,6 +11,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 
 namespace horde::gameplay::simulation
@@ -25,6 +26,8 @@ constexpr float kDodgeDistanceMetres = 0.90f;
 constexpr float kDodgeCooldownSeconds = 0.55f;
 constexpr float kRunSpeedMetresPerSecond = 3.2f;
 constexpr float kMovementAccelerationMetresPerSecondSquared = 8.0f;
+constexpr std::size_t kBellwetherHearthSlot=1+effects::kKeeperTorchAnchors.size();
+static_assert(kBellwetherHearthSlot<effects::kFireEmitterCapacity);
 
 float FiniteOr(float value, float fallback)
 {
@@ -86,6 +89,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
+    fireEmitters_[kBellwetherHearthSlot]=effects::MakeBellwetherHearthFireEmitter();
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2038,6 +2042,17 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
              items::MultiplyHeldItemTransforms(worldFromItem, items::OriginalTorchLightSocketTransform()),
              strength, 1.0f, ShowcaseZone::Finale},
             fixedDeltaSeconds);
+    }
+    // The exterior terrain and tavern publish together. The existing renderer
+    // selects nearby outside emitters and traces their visibility through stone
+    // and the doorway. Nothing new is submitted for the underground chapter.
+    const bool hearthReady=UsesRescueExterior() && config_.authoredChapterTerrain &&
+        chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation;
+    fireEmitterCount_=kBellwetherHearthSlot;
+    if(hearthReady) {
+        effects::StepFireEmitterFixed(fireEmitters_[kBellwetherHearthSlot],
+            effects::BellwetherHearthFireInput(),fixedDeltaSeconds);
+        ++fireEmitterCount_;
     }
 }
 

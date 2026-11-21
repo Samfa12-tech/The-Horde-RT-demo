@@ -101,12 +101,12 @@ inline bool ChapterExteriorMovementClear(const simulation::TriangleSupportSurfac
 inline bool ChapterExteriorCarryClear(const simulation::TriangleSupportSurface& terrain,
     float fromX,float fromZ,float toX,float toZ,float supportY,float radius)
 {
-    // Bounded conservative upright carry band. It clears the 18cm coping and
-    // the ground beneath the cage, while retaining raised banks and real
-    // trunks/shaft fittings. Body movement still requires continuous support.
+    // The carry band clears the 18cm coping and the standing slope beneath
+    // the held item. Imported solids, trunks and shaft fittings retain the
+    // fixed band. Body movement still requires continuous support.
     constexpr float bottom=.25f,top=2.30f;
     return ChapterExteriorObstacleClear(terrain,fromX,fromZ,toX,toZ,supportY+bottom,
-        supportY+top,radius)&&terrain.HorizontalVolumeClear(fromX,fromZ,toX,toZ,
+        supportY+top,radius)&&terrain.HorizontalCarryVolumeClear(fromX,fromZ,toX,toZ,
         supportY+bottom,supportY+top,radius);
 }
 }
