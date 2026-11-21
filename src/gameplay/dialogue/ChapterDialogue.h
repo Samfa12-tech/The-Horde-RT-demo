@@ -13,12 +13,12 @@ namespace horde::gameplay::dialogue {
 enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, RescueFound,
     RescueRope, ReunionQuestion, ReunionHint, ReunionProof, ReunionFirstPiece,
     ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage,
-    FlaskEmpty, FlaskTopup };
+    FlaskEmpty, FlaskTopup, TavernSit, TavernLimit, TavernWork };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,18> kLines{{
+inline constexpr std::array<LineSpec,21> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -36,8 +36,14 @@ inline constexpr std::array<LineSpec,18> kLines{{
     {Line::ForestWait,"forest.wait","Kit","I'll wait here.","assets/audio/kit/runtime/forest.wait.wav",1.589208f,1},
     {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","assets/audio/kit/runtime/forest.village.wav",2.173792f,1},
     {Line::FlaskEmpty,"flask.empty","Kit","Is your flask empty? Fill it here.","assets/audio/kit/runtime/flask.empty.wav",2.419333f,1},
-    {Line::FlaskTopup,"flask.topup","Kit","Don't forget to top your flask up here if you need it.","assets/audio/kit/runtime/flask.topup.wav",2.939333f,1}
+    {Line::FlaskTopup,"flask.topup","Kit","Don't forget to top your flask up here if you need it.","assets/audio/kit/runtime/flask.topup.wav",2.939333f,1},
+    {Line::TavernSit,"kit.accept_base.sit","Kit","Right. I'm sitting down before I make this worse.","",3.379333f,1},
+    {Line::TavernLimit,"kit.accept_base.limit","Kit","I won't get far along those roads like this. You'll have to go without me.","",4.739333f,1},
+    {Line::TavernWork,"kit.accept_base.work","Kit","Bring what you find back here. I can still make myself useful.","",4.259333f,1}
 }};
+inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
+inline constexpr float kHearthWorkPauseSeconds=.55f;
+inline constexpr bool IsHearthLine(Line line) {return line>=Line::TavernSit && line<=Line::TavernWork;}
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
 struct Tuple { float x=0,y=0,z=0; };
@@ -49,6 +55,7 @@ struct Snapshot {
     bool waitingForRaise=false,proofAccepted=false,reminderConsumed=false;
     bool forestNightConsumed=false,forestWaystoneConsumed=false;
     bool forestClueConsumed=false,forestVillageConsumed=false;
+    unsigned hearthLinesResolved=0;
     // A labelled companion fixture contract, not a rendered/admitted Kit actor.
     bool companionVisualAdmitted=false;
 };
@@ -61,6 +68,7 @@ struct Context {
     bool lanternLow=false,lanternHigh=false;
     bool flaskGuideEnabled=false; unsigned flaskCharges=0;
     bool companionAtBasin=false,playerNearBasin=false;
+    bool tavernInReach=false, kitAtChair=false, kitSeated=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
 // Logical story recovery only: active speech restarts, with no audio clock,
@@ -73,6 +81,7 @@ struct Progress {
     bool waitingForRaise=false,proofAccepted=false,reminderConsumed=false;
     bool forestNightConsumed=false,forestWaystoneConsumed=false;
     bool forestClueConsumed=false,forestVillageConsumed=false;
+    unsigned hearthLinesResolved=0;
 };
 class Director {
 public:
@@ -91,13 +100,15 @@ public:
     }
     Progress ExportProgress() const {
         Progress p;
-        p.activeLine=state_.line;p.continuations=continuations_;p.continuationCount=continuationCount_;
+        p.activeLine=IsHearthLine(state_.line) ? Line::None : state_.line;
+        p.continuations=continuations_;p.continuationCount=continuationCount_;
         p.grateConsumed=state_.grateConsumed;p.rescueConsumed=state_.rescueConsumed;
         p.reunionStarted=state_.reunionStarted;p.waitingForRaise=state_.waitingForRaise;
         p.proofAccepted=state_.proofAccepted;p.reminderConsumed=state_.reminderConsumed;
         p.forestNightConsumed=state_.forestNightConsumed;
         p.forestWaystoneConsumed=state_.forestWaystoneConsumed;
         p.forestClueConsumed=state_.forestClueConsumed;p.forestVillageConsumed=state_.forestVillageConsumed;
+        p.hearthLinesResolved=state_.hearthLinesResolved;
         return p;
     }
     static bool ValidateProgress(const Progress& p) {
@@ -105,9 +116,10 @@ public:
             // Keeper speech belongs to a live combat emitter, not either safe
             // campaign boundary. ForestWait currently has no logical trigger.
             return static_cast<std::uint32_t>(line)<kLines.size() &&
-                line!=Line::KeeperSense && line!=Line::KeeperCloser && line!=Line::ForestWait;
+                line!=Line::KeeperSense && line!=Line::KeeperCloser && line!=Line::ForestWait && !IsHearthLine(line);
         };
         if(!recoverable(p.activeLine) || p.continuationCount>p.continuations.size() ||
+           p.hearthLinesResolved>kHearthLines.size() || (p.hearthLinesResolved && !p.forestVillageConsumed) ||
            (p.waitingForRaise && (!p.reunionStarted || p.proofAccepted)) ||
            (p.reunionStarted && !p.waitingForRaise && !p.proofAccepted) ||
            (p.proofAccepted && !p.reunionStarted) ||
@@ -182,6 +194,7 @@ public:
         state_.forestNightConsumed=p.forestNightConsumed;
         state_.forestWaystoneConsumed=p.forestWaystoneConsumed;
         state_.forestClueConsumed=p.forestClueConsumed;state_.forestVillageConsumed=p.forestVillageConsumed;
+        state_.hearthLinesResolved=p.hearthLinesResolved;hearthPauseSeconds_=0;
         pending_=Line::None;continuations_=p.continuations;continuationCount_=p.continuationCount;
         raiseFloor_=std::max(raiseFloor,c.manualRaiseSequence);waitingSeconds_=0;
         if(p.activeLine!=Line::None) {
@@ -205,10 +218,11 @@ public:
             state_.forestNightConsumed=old.forestNightConsumed;
             state_.forestWaystoneConsumed=old.forestWaystoneConsumed;
             state_.forestClueConsumed=old.forestClueConsumed;
-            state_.forestVillageConsumed=old.forestVillageConsumed; }
+            state_.forestVillageConsumed=old.forestVillageConsumed;
+            state_.hearthLinesResolved=old.hearthLinesResolved; }
         pending_=Line::None; continuations_={}; continuationCount_=0;
         if(preserveOnce) { continuations_=oldContinuations;continuationCount_=oldContinuationCount; }
-        raiseFloor_=preserveOnce?oldRaiseFloor:0; waitingSeconds_=0;
+        raiseFloor_=preserveOnce?oldRaiseFloor:0; waitingSeconds_=hearthPauseSeconds_=0;
     }
     // Lifecycle cancellation invalidates callbacks but retains logical once state.
     void Suspend() { if(state_.line==Line::Grate) state_.grateConsumed=true;
@@ -219,7 +233,7 @@ public:
     }
     void Skip() { if(state_.line!=Line::None) Finish(); }
     void Request(Line line,Tuple source,const Context& c) {
-        if(line==Line::None || static_cast<std::uint32_t>(line)>=kLines.size()) return;
+        if(line==Line::None || static_cast<std::uint32_t>(line)>=kLines.size() || IsHearthLine(line)) return;
         if(state_.line!=Line::None && Spec(line).priority<=Spec(state_.line).priority &&
             !(line==Line::ReunionProof && (state_.line==Line::ReunionQuestion||state_.line==Line::ReunionHint))) {
             if(line==Line::RescueRope) Queue(line);
@@ -232,6 +246,8 @@ public:
         state_.paused=c.paused; if(c.paused) return;
         const float dt=std::isfinite(seconds)?std::clamp(seconds,0.0f,0.05f):0;
         if(!c.alive) { Suspend(); return; }
+        const bool hearsHearth=c.tavernInReach && c.exterior && !c.traversing && !c.combat && c.companionSource.has_value();
+        if(IsHearthLine(state_.line) && !hearsHearth) Cancel(false);
         const float dx=c.player.x-2.6f,dz=c.player.z+8.6f;
         const bool audible=dx*dx+dz*dz<=16.0f && !c.exterior;
         if((c.combat || !audible) && state_.line==Line::Grate) {
@@ -287,11 +303,12 @@ public:
                 Start(line,SourceFor(line),c);
             }
         }
+        StepHearth(c,hearsHearth,dt);
         RefreshCompanionSpatial(c);
     }
 private:
     void BindCompanionSpatial(const Context& c) {
-        if(state_.line<Line::ReunionQuestion || state_.line>Line::FlaskTopup) return;
+        if(state_.line<Line::ReunionQuestion || (state_.line>Line::FlaskTopup && !IsHearthLine(state_.line))) return;
         const auto finite=[](Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);};
         if(!finite(c.listener) || !std::isfinite(c.yaw) ||
            (c.companionSource && !finite(*c.companionSource))) return;
@@ -347,6 +364,17 @@ private:
         if(clueReached && !state_.forestVillageConsumed && fromF04<=3.0f)
             Queue(Line::ForestVillage);
     }
+    void StepHearth(const Context& c,bool hearsHearth,float dt) {
+        if(!state_.forestVillageConsumed) return;
+        auto& resolved=state_.hearthLinesResolved;
+        // Arriving after the chair is occupied still permits the two seated
+        // lines. The earlier sit remark expires with the act of sitting.
+        if(c.kitSeated && resolved==0 && state_.line!=Line::TavernSit)resolved=1;
+        if(!hearsHearth || state_.line!=Line::None || continuationCount_ || resolved>=kHearthLines.size())return;
+        if(resolved==0 ? !c.kitAtChair : !c.kitSeated)return;
+        hearthPauseSeconds_=std::max(0.f,hearthPauseSeconds_-dt);
+        if(hearthPauseSeconds_==0)Start(kHearthLines[resolved],*c.companionSource,c);
+    }
     void MarkOnce(Line line) {
         switch(line) {
         case Line::ForestNight: state_.forestNightConsumed=true;break;
@@ -363,6 +391,10 @@ private:
         // still discards its queue explicitly.
         if(clearContinuations) { continuations_={};continuationCount_=0; } }
     void Finish() { if(state_.line==Line::Grate) state_.grateConsumed=true;
+        if(IsHearthLine(state_.line)) {
+            ++state_.hearthLinesResolved;
+            if(state_.line==Line::TavernLimit)hearthPauseSeconds_=kHearthWorkPauseSeconds;
+        }
         state_.line=Line::None;state_.generation=Next(state_.generation);state_.elapsed=0; }
     void Start(Line line,Tuple source,const Context& c) {
         state_.generation=Next(state_.generation);state_.line=line;state_.duration=Spec(line).duration;
@@ -373,6 +405,6 @@ private:
     }
     Snapshot state_{};Line pending_=Line::None;
     std::array<Line,8> continuations_{};std::size_t continuationCount_=0;
-    std::uint64_t raiseFloor_=0;float waitingSeconds_=0;
+    std::uint64_t raiseFloor_=0;float waitingSeconds_=0,hearthPauseSeconds_=0;
 };
 } // namespace horde::gameplay::dialogue

@@ -59,7 +59,9 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==5?185u:(c.schema==4?177u:(c.schema==3?168u:(c.schema==2?163u:162u)))) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    constexpr std::array<std::size_t,7> lengths{0,162,163,168,177,185,186};
+    const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
+        "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -72,6 +74,15 @@ int main() {
     tavern.zone=cp::Destination(tavern.id);
     tavern.position=cp::kBellwetherCheckpointPosition;tavern.yaw=-1.40f;tavern.pitch=-.22f;
     RoundTrip(tavern);
+    for(unsigned line=1;line<=3;++line) {
+        auto spoken=tavern;spoken.dialogue.hearthLinesResolved=line;
+        Check(!cp::Validate(spoken),"old schema cannot silently drop hearth progress");
+        spoken.schema=cp::kHearthSpeechSchema;RoundTrip(spoken);
+        auto bad=Encode(spoken);bad.back()=std::byte{4};Rechecksum(bad);
+        Reject(bad,codec::Error::InvalidCheckpoint);
+        spoken.dialogue.activeLine=dlg::Line::TavernWork;
+        Check(!cp::Validate(spoken),"an active local caption cannot become saved playback");
+    }
     auto wrongChair=tavern;wrongChair.position.y+=.05f;
     Check(!cp::Validate(wrongChair),"the tavern record pins the real safe floor height");
     auto earlyTavern=tavern;earlyTavern.dialogue.forestVillageConsumed=false;
@@ -171,7 +182,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,6);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,7);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -292,7 +303,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,6u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,7u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -337,7 +348,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=6;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=7;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

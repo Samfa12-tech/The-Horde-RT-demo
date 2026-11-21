@@ -60,8 +60,12 @@ int main() {
     for (const auto& spec : kLines) {
         if (spec.id == Line::None) continue;
         const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
+        if(IsHearthLine(spec.id)) {
+            Check(path.empty() && spec.text[0]!='\0',"a private tavern take is timed by its caption alone");
+            continue;
+        }
         Check(!path.empty() && std::filesystem::is_regular_file(path),
-            "every Kit and Keeper voice resolves to actual bytes from the Windows assets root");
+            "every admitted Kit and Keeper voice resolves to actual bytes from the Windows assets root");
         Check(path.lexically_relative(assetRoot).generic_string().starts_with("audio/"),
             "dialogue root is joined once rather than duplicating assets/assets");
     }
@@ -455,5 +459,49 @@ int main() {
     forest.Reset();Check(!forest.State().forestNightConsumed&&!forest.State().forestWaystoneConsumed&&
         !forest.State().forestClueConsumed&&!forest.State().forestVillageConsumed,
         "new route clears outdoor once flags");
+    {
+        Director hearth;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context room;
+        room.exterior=room.claimed=room.kitAtChair=true;
+        room.companionSource=Tuple{82.46f,-7.31f,107.3f};
+        Check(hearth.RestoreProgress(progress,room,1,0),"completed lookout prepares the hearth story");
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None,"room dialogue cannot reach a player outside the hearth area");
+        room.tavernInReach=true;
+        hearth.Step(.05f,room);const auto sit=hearth.State();
+        Check(sit.line==Line::TavernSit && sit.source.x==82.46f && Spec(sit.line).audio[0]=='\0' &&
+              hearth.ExportProgress().activeLine==Line::None,
+              "the chair starts the named caption from Kit without serializing its playback state");
+        room.kitSeated=room.paused=true;
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernSit && hearth.State().elapsed==sit.elapsed,"pause freezes the hearth line");
+        room.paused=false;
+        room.companionSource->y-=.27f;
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernSit && hearth.State().source.y==room.companionSource->y &&
+              hearth.Complete(sit.line,sit.generation),"the settling caption follows Kit down into the chair");
+        hearth.Step(.05f,room);const auto limit=hearth.State();
+        Check(limit.line==Line::TavernLimit && hearth.ExportProgress().hearthLinesResolved==1,
+              "the seated line follows the sit without repeating it");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.Complete(limit.line,limit.generation),
+              "leaving cancels the incomplete caption and rejects its stale completion");
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernLimit,"return begins at the unresolved line");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.ExportProgress().hearthLinesResolved==2,
+              "the last line leaves a short pause after Kit explains his limits");
+        for(int i=0;i<12;++i)hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernWork,"Kit offers practical help after the pause");
+        for(int i=0;i<110;++i)hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.ExportProgress().hearthLinesResolved==3,
+              "natural subtitle completion resolves the last beat without a voice callback");
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None,"the resolved hearth sequence remains quiet");
+    }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

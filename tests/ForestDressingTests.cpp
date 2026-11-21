@@ -1196,6 +1196,9 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     unsigned assessmentTicks=0,protectiveTicks=0;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
+    std::vector<Line> hearthSpoken;
+    std::uint64_t hearthVoiceGeneration=0;
+    bool firstCaptionAtChair=false;
     float maximumKitStep=0;
     Stage previousStage=Stage::AtLookout;
     const auto step=[&] {
@@ -1204,6 +1207,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
         const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
         replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
+        if(IsHearthLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=hearthVoiceGeneration) {
+            if(hearthSpoken.empty())firstCaptionAtChair=kit.bellwetherArrival==Stage::ChairTurn ||
+                kit.bellwetherArrival==Stage::Lowering;
+            hearthSpoken.push_back(after.chapterDialogue.line);
+            hearthVoiceGeneration=after.chapterDialogue.generation;
+        }
         maximumKitStep=std::max(maximumKitStep,travelled);
         if(kit.bellwetherArrival==Stage::AnkleAssessment && previousStage!=Stage::AnkleAssessment) {
             ++injuryEntries;
@@ -1320,6 +1329,10 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.LatestCampaignBoundary()->contentRevision==cp::kBellwetherContentRevision,
           "standing near the hearth after Kit sits earns the canonical tavern boundary");
+    for(unsigned tick=0;tick<900 && game.Snapshot().chapterDialogue.hearthLinesResolved<kHearthLines.size();++tick)step();
+    Check(firstCaptionAtChair && hearthSpoken==std::vector{Line::TavernSit,Line::TavernLimit,Line::TavernWork} &&
+          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->dialogue.hearthLinesResolved==3,
+          "the real route delivers all three hearth captions in order and records the completed sequence");
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
@@ -1327,7 +1340,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     }
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
-          game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2,
+          game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2 &&
+          hearthSpoken.size()==3,
           "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
 }
 

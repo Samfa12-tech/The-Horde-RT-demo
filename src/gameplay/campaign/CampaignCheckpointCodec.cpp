@@ -10,10 +10,11 @@ static_assert(sizeof(float)==4 && std::numeric_limits<float>::is_iec559);
 constexpr std::array<std::byte,8> kMagic{std::byte{'H'},std::byte{'R'},std::byte{'D'},
     std::byte{'C'},std::byte{'P'},std::byte{'K'},std::byte{'T'},std::byte{0}};
 constexpr std::uint32_t kFormat=1,kLegacyPayloadBytes=142,kHalfHeartPayloadBytes=143,
-    kFlaskPayloadBytes=148,kDatedPayloadBytes=157,kGuardHealthPayloadBytes=165;
+    kFlaskPayloadBytes=148,kDatedPayloadBytes=157,kGuardHealthPayloadBytes=165,kHearthSpeechPayloadBytes=166;
 constexpr std::size_t kHeaderBytes=20;
-static_assert(kHeaderBytes+kGuardHealthPayloadBytes<=kMaxFileBytes);
+static_assert(kHeaderBytes+kHearthSpeechPayloadBytes<=kMaxFileBytes);
 constexpr std::uint32_t PayloadBytes(std::uint32_t schema) {
+    if(schema==kHearthSpeechSchema)return kHearthSpeechPayloadBytes;
     return schema==5?kGuardHealthPayloadBytes:(schema==4?kDatedPayloadBytes:(schema==3?kFlaskPayloadBytes:(schema==2?kHalfHeartPayloadBytes:kLegacyPayloadBytes)));
 }
 std::uint32_t Crc32(std::span<const std::byte> bytes) {
@@ -38,8 +39,9 @@ public:
         return value;
     }
     float Float() {return std::bit_cast<float>(U32());}
+    unsigned Byte() {return std::to_integer<unsigned>(bytes_[offset_++]);}
     bool Bool() {
-        const auto value=std::to_integer<unsigned>(bytes_[offset_++]);
+        const auto value=Byte();
         if(value>1) valid_=false;
         return value==1;
     }
@@ -48,7 +50,7 @@ private:
     std::span<const std::byte> bytes_;std::size_t offset_=0;bool valid_=true;
 };
 Error VersionError(const Checkpoint& c) {
-    if(c.schema!=1 && c.schema!=2 && c.schema!=3 && c.schema!=4 && c.schema!=5) return Error::UnsupportedSchema;
+    if(c.schema<1 || c.schema>kHearthSpeechSchema) return Error::UnsupportedSchema;
     if(c.contentRevision<1 || c.contentRevision>kBellwetherContentRevision) return Error::UnsupportedContent;
     return Error::None;
 }
@@ -81,6 +83,7 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     if(c.schema>=3) {Bool(payload,c.flask.upgraded);U32(payload,c.flask.charges);}
     if(c.schema>=4) {U32(payload,static_cast<std::uint32_t>(c.savedAtUnixSeconds));U32(payload,static_cast<std::uint32_t>(c.savedAtUnixSeconds>>32));Bool(payload,c.flaskRecorded);}
     if(c.schema>=5)for(auto health:c.guardHealth)U32(payload,static_cast<std::uint32_t>(health));
+    if(c.schema>=kHearthSpeechSchema)payload.push_back(static_cast<std::byte>(p.hearthLinesResolved));
     std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+payloadBytes);
     encoded.insert(encoded.end(),kMagic.begin(),kMagic.end());
     U32(encoded,kFormat);U32(encoded,payloadBytes);U32(encoded,Crc32(payload));
@@ -97,7 +100,8 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     const auto length=header.U32(),crc=header.U32();
     if(length>kMaxFileBytes-kHeaderBytes) {error=Error::TooLarge;return false;}
     if((length!=kLegacyPayloadBytes && length!=kHalfHeartPayloadBytes &&
-        length!=kFlaskPayloadBytes && length!=kDatedPayloadBytes && length!=kGuardHealthPayloadBytes) ||
+        length!=kFlaskPayloadBytes && length!=kDatedPayloadBytes && length!=kGuardHealthPayloadBytes &&
+        length!=kHearthSpeechPayloadBytes) ||
        bytes.size()!=kHeaderBytes+length) {error=Error::Malformed;return false;}
     const auto payload=bytes.subspan(kHeaderBytes);
     if(Crc32(payload)!=crc) {error=Error::Corrupt;return false;}
@@ -123,6 +127,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(c.schema>=3) {c.flask.upgraded=r.Bool();c.flask.charges=r.U32();}
     if(c.schema>=4) {const auto low=r.U32();c.savedAtUnixSeconds=low|(static_cast<std::uint64_t>(r.U32())<<32);c.flaskRecorded=r.Bool();}
     if(c.schema>=5)for(auto& health:c.guardHealth)health=std::bit_cast<std::int32_t>(r.U32());
+    if(c.schema>=kHearthSpeechSchema)p.hearthLinesResolved=r.Byte();
     if(!r.Valid()) {error=Error::Malformed;return false;}
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
     out=std::move(c);error=Error::None;return true;

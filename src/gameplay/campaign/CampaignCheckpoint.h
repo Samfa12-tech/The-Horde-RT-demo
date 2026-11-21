@@ -11,6 +11,7 @@
 namespace horde::gameplay::campaign {
 enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2, ForestEndpoint = 3, BellwetherTavern = 4 };
 inline constexpr std::uint32_t kForestContentRevision=2, kBellwetherContentRevision=3;
+inline constexpr std::uint32_t kHearthSpeechSchema=6;
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
 inline constexpr traversal::Vec3 kBellwetherCheckpointPosition{84.52f,-8.709551f,107.68f};
@@ -68,7 +69,8 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if ((c.schema != 1 && c.schema != 2 && c.schema != 3 && c.schema != 4 && c.schema != 5) ||
+    if (c.schema < 1 || c.schema > kHearthSpeechSchema ||
+        (c.dialogue.hearthLinesResolved && (c.schema<kHearthSpeechSchema || c.contentRevision<kBellwetherContentRevision)) ||
         c.savedAtUnixSeconds > 253402300799ULL || (c.schema < 4 && c.savedAtUnixSeconds != 0) ||
         (c.schema < 4 && c.flaskRecorded) ||
         (c.schema >= 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||
@@ -84,7 +86,7 @@ inline bool Validate(const Checkpoint& c) {
     const bool upper = c.id != CheckpointId::LowerClaimed;
     // Live guards remain confined to the tomb. Never create a lower-room
     // recovery point among them, or allow legacy records to gain new semantics.
-    if(c.schema==5 && !upper && c.defeatedGuards!=3)return false;
+    if(c.schema>=5 && !upper && c.defeatedGuards!=3)return false;
     for(std::size_t i=0;i<c.guardHealth.size();++i) {
         const auto health=c.guardHealth[i];
         if(c.schema<5 ? health!=0 :

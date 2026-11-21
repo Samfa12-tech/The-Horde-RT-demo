@@ -425,7 +425,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
         dialogueDucking_.Reset();
     else if(!input.paused)
-        dialogueDucking_.Step(chapterDialogue_.State().line!=dialogue::Line::None,dialogueDeltaSeconds);
+        dialogueDucking_.Step(dialogue::Spec(chapterDialogue_.State().line).audio[0]!='\0',dialogueDeltaSeconds);
     RefreshSnapshot(input);
     // Revalidate after damage, death and newly-started dialogue. No further
     // health/action mutation can intervene before this owner snapshot is used.

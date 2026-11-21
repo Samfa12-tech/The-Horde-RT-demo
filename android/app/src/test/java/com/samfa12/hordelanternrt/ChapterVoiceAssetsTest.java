@@ -42,12 +42,16 @@ public final class ChapterVoiceAssetsTest {
     @Test public void unknownAndBoundaryLinesHaveNoAssetAndMissingSoundDoesNotInventOne() {
         assertNull(ChapterVoiceAssets.forLine(Integer.MIN_VALUE));
         assertNull(ChapterVoiceAssets.forLine(0));
-        assertNull(ChapterVoiceAssets.forLine(18));
+        assertNull(ChapterVoiceAssets.forLine(21));
         assertNull(ChapterVoiceAssets.forLine(Integer.MAX_VALUE));
         assertNull(ChapterVoiceAssets.soundIdForLine(3, new java.util.HashMap<String, Integer>()));
         final java.util.Map<String, Integer> sounds = new java.util.HashMap<>();
         sounds.put(ChapterVoiceAssets.forLine(3).soundKey, 27);
         assertEquals(Integer.valueOf(27), ChapterVoiceAssets.soundIdForLine(3, sounds));
-        assertNull(ChapterVoiceAssets.soundIdForLine(18, sounds));
+        assertNull(ChapterVoiceAssets.soundIdForLine(21, sounds));
+    }
+
+    @Test public void privateTavernTakesRemainCaptionOnly() {
+        for (int line : new int[]{18, 19, 20}) assertNull(ChapterVoiceAssets.forLine(line));
     }
 }

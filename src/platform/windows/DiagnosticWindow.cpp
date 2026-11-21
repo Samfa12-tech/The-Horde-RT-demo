@@ -2311,7 +2311,8 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     const auto& dialogue = simulation.chapterDialogue;
     const auto line = dialogue.line;
     const auto lineId = static_cast<std::uint32_t>(line);
-    if (line == Line::None)
+    const auto& spec = horde::gameplay::dialogue::Spec(line);
+    if (line == Line::None || spec.audio == nullptr || spec.audio[0] == '\0')
     {
         if (context.playingDialogueLine != 0u)
             SpatialAudioEngine().StopLoop("chapter_dialogue");
@@ -2334,8 +2335,6 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     SpatialAudioEngine().StopLoop("chapter_dialogue");
     context.playingDialogueLine = 0u;
     context.playingDialogueGeneration = 0u;
-    const auto& spec = horde::gameplay::dialogue::Spec(line);
-    if (spec.audio == nullptr || spec.audio[0] == '\0') return;
     const auto path = horde::platform::windows::WindowsDialogueAudioPath(
         ResolveAssetRoot(), spec.audio);
     if (!std::filesystem::exists(path))

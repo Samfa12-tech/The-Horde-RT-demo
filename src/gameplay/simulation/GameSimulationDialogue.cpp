@@ -39,9 +39,17 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     const bool proofWasAccepted=chapterDialogue_.State().proofAccepted;
     const auto bindCompanion=[&] {
         const auto& kit=chapterCompanion_.State();
+        c.kitAtChair=kit.grounded && kit.bellwetherArrival>=BellwetherArrivalStage::ChairTurn;
+        c.kitSeated=c.kitAtChair && kit.bellwetherArrival==BellwetherArrivalStage::Seated;
+        const auto hearthMark=campaign::kBellwetherCheckpointPosition;
+        c.tavernInReach=c.kitAtChair && playerSupport_.grounded &&
+            std::abs(playerSupport_.worldY-hearthMark.y)<.001f &&
+            std::hypot(playerX_-hearthMark.x,playerZ_-hearthMark.z)<=1.75f;
         c.companionSource.reset();
-        if(c.exterior && kit.grounded)
-            c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight,kit.z};
+        if(c.exterior && kit.grounded) {
+            const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
+            c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
+        }
         const auto basin=kWorldRoutePoints[2];
         c.companionAtBasin=kit.basinGuide && kit.basinArrived && kit.grounded;
         c.playerNearBasin=c.exterior &&

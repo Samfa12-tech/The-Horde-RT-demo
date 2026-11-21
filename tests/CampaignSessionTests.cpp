@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignSession.h"
+#include "gameplay/campaign/CampaignPlaySession.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/BellwetherShell.h"
@@ -117,12 +118,50 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     for(unsigned tick=0;tick<120;++tick)fresh.StepFixed(input,1.f/60.f,tick+1);
     Check(seated() && fresh.Snapshot().worldRoute.current==record.zone &&
           fresh.CaptureAuthoredCampaignBoundary(record.id).has_value() &&
-          fresh.Snapshot().chapterDialogue.line==Line::None && stored.encoded==
+          fresh.Snapshot().chapterDialogue.line==Line::TavernLimit &&
+          fresh.Snapshot().dialogueBedGain==1.f &&
+          fresh.Snapshot().chapterDialogue.hearthLinesResolved==1 && stored.encoded==
           Read(directory.path,0,cp::SaveKind::Autosave).encoded,
-          "load and subsequent fixed steps neither replay nor rewrite the saved milestone");
-    auto returned=record;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
+          "legacy tavern load keeps Kit seated and starts with his first seated line without rewriting the source save");
+
+    cp::PlaySession play(fresh,directory.path);
+    Check(play.BeginNewGame(1),"test owner activates a separate autosave slot");
+    std::uint64_t publication=120;
+    const auto awaitSave=[&](std::uint64_t operation) {
+        const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+        do {
+            play.Poll();
+            const auto state=play.State();
+            if(state.operationRevision>operation && state.outcome==cp::PlayOutcome::Succeeded)return true;
+            std::this_thread::yield();
+        } while(std::chrono::steady_clock::now()<deadline);
+        return false;
+    };
+    ++input.commands.dialogueSkip;
+    fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(play.ObserveSafeBoundary() && awaitSave(0),"advancing at the hearth writes the same tavern boundary");
+    const auto partial=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
+    Check(partial.schema==cp::kHearthSpeechSchema && partial.dialogue.hearthLinesResolved==2 &&
+          partial.dialogue.activeLine==Line::None,"dated autosave retains only the resolved hearth beats");
+    for(unsigned tick=0;tick<50;++tick)fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(fresh.Snapshot().chapterDialogue.line==Line::TavernWork,"Kit's offer follows the seated pause");
+    const auto previousSave=play.State().operationRevision;
+    ++input.commands.dialogueSkip;
+    fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(play.ObserveSafeBoundary() && awaitSave(previousSave),"another resolved line refreshes the existing autosave");
+    const auto complete=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
+    sim::GameSimulation resumed(sim::ProductionGameSimulationConfig());
+    Check(Seed(resumed,partial,terrain),"partial dialogue can restore from the saved hearth boundary");
+    sim::InputSnapshot resumedInput;resumedInput.yawRadians=record.yaw;resumedInput.pitchRadians=record.pitch;
+    resumed.StepFixed(resumedInput,1.f/60.f,1);
+    Check(resumed.Snapshot().chapterDialogue.line==Line::TavernWork,"partial restore resumes the first unresolved caption");
+    Check(complete.dialogue.hearthLinesResolved==3 && Seed(resumed,complete,terrain),"completed dialogue restores from disk");
+    resumed.StepFixed(resumedInput,1.f/60.f,2);
+    Check(resumed.Snapshot().chapterDialogue.line==Line::None,"completed hearth captions remain quiet on reload");
+    auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
-    Check(Seed(fresh,returned,terrain) && seated(),"a later safe-side save keeps Kit settled back at the tavern");
+    Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,
+          "a later safe-side save keeps completed hearth progress and Kit settled back at the tavern");
     auto lookout=ForestRecord(*terrain);lookout.contentRevision=cp::kBellwetherContentRevision;
     Check(Seed(fresh,lookout,terrain) && seated(),"returning to the old lookout anchor keeps the earned tavern state");
     const auto atLookout=fresh.CaptureCampaignCheckpoint(cp::CheckpointId::ForestEndpoint);

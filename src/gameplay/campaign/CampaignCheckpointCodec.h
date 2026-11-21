@@ -20,6 +20,8 @@ enum class Error {
 // Schema4 appends LE64 UTC save-request seconds and a canonical resource-presence
 // bool (157 bytes); zero time is unavailable. Dates cannot enable flask ownership.
 // PlaySession dates a write once at request admission; reads never invent dates.
+// Schema5 appends two LE32 guard health values. Schema6 adds one byte for the
+// number of resolved hearth lines. Older saves restore that count as zero.
 // Schema and payload length must agree. The payload encodes logical values;
 // integers are LE32, floats IEEE754 binary32, bools a single 0/1 byte.
 // No padding, runtime identities, filesystem access or migration-on-read.
