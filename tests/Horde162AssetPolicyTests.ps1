@@ -323,9 +323,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 58 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 59) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
-    Require ($windows.Count -eq 118 -and $android.Count -eq 119) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 60 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 61) 'The base runtime roster includes the two roadside stone files on both platforms.'
+    Require ($windows.Count -eq 120 -and $android.Count -eq 121) 'Both platforms have the expected full runtime asset roster.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name
