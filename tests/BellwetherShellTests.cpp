@@ -117,6 +117,52 @@ int main(int argc,char** argv) {
         std::cerr<<error<<'\n';return 1;
     }
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
+    if(!originalTerrain) {
+        std::cerr<<error<<'\n';
+        return 1;
+    }
+    // Use the actual RT vertices and the same native support query as walking.
+    // The end segments taper beneath the main river. Interior samples cover
+    // the bed, the retaining banks and the short drop through the wheel bay.
+    // Physical wheel envelope from the linked Blender source layout.
+    constexpr std::array<float,3> axle{137.2f,-21.10f,109.35f};
+    constexpr float radius=1.50f,halfWidth=.88f;
+    const auto& waterFaces=ChapterRegionalWaterTriangles();
+    for(std::size_t section=1;section+2<kBellwetherMillraceStations.size();++section) {
+        const auto face=kChapterOriginalRegionalWaterTriangleCount+section*2;
+        const auto& first=waterFaces[face];
+        const auto& second=waterFaces[face+1];
+        bool bed=true,banks=true;
+        for(int step=0;step<=12;++step) {
+            const float t=float(step)/12;
+            const float surface=std::lerp(first[0][1],second[1][1],t);
+            for(float across:{0.f,.15f,.5f,.85f,1.f}) {
+                const auto coordinate=[&](std::size_t axis) {
+                    const float left=std::lerp(first[0][axis],second[1][axis],t);
+                    const float right=std::lerp(first[2][axis],first[1][axis],t);
+                    return std::lerp(left,right,across);
+                };
+                const float z=coordinate(2);
+                const auto ground=originalTerrain->Query(coordinate(0),z);
+                const bool wheelBay=z>axle[2]-radius-1.f && z<axle[2]+radius+.18f;
+                const float cover=ground.worldY-surface;
+                if(across==0.f || across==1.f) banks=banks && ground.found && cover>.025f;
+                else bed=bed && ground.found && (wheelBay || cover>-.43f) && cover<-.34f;
+            }
+        }
+        check(bed,"millrace has continuous native bed support under each graded RT segment");
+        check(banks,"millrace water ends inside raised terrain along both bed edges");
+    }
+    bool wheelClearsTerrain=true;
+    for(int step=-32;step<=32;++step) {
+        const float dz=radius*static_cast<float>(step)/32.f;
+        const float rimBottom=axle[1]-std::sqrt(std::max(0.f,radius*radius-dz*dz));
+        for(float dx:{-halfWidth,-halfWidth*.5f,0.f,halfWidth*.5f,halfWidth}) {
+            const auto bed=originalTerrain->Query(axle[0]+dx,axle[2]+dz);
+            wheelClearsTerrain=wheelClearsTerrain && bed.found && bed.worldY<rimBottom-.15f;
+        }
+    }
+    check(wheelClearsTerrain,"the complete wheel rotation envelope clears the actual native terrain by at least 15 cm");
     auto support=originalTerrain;
     assets::StaticMeshAsset glazing,cover,ledger,door;
     const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger,&door);

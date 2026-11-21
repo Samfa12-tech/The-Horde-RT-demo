@@ -498,6 +498,11 @@ int main()
     check(!ParseWindowsEnvironmentSurveyLaunch(duplicateSurveyProfile,true).error.empty(),"duplicate environment profiles reject");
     auto unknown=survey;unknown.back()=L"arbitrary-camera";
     check(!ParseWindowsEnvironmentSurveyLaunch(unknown,true).error.empty(),"unknown survey profile rejects");
+    auto millraceSurvey=survey;millraceSurvey.back()=L"millrace";
+    const auto millraceLaunch=ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,true);
+    check(millraceLaunch.requested && millraceLaunch.profile=="millrace" && millraceLaunch.error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,false).error.empty(),
+          "millrace survey uses the bounded hidden Debug camera path");
     auto tombSurvey=survey;tombSurvey.back()=L"tomb-debris";
     const auto tombLaunch=ParseWindowsEnvironmentSurveyLaunch(tombSurvey,true);
     check(tombLaunch.requested && tombLaunch.profile=="tomb-debris" && !tombLaunch.debrisDisabled &&

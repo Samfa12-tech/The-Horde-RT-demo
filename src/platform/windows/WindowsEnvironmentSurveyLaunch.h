@@ -24,9 +24,11 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         const auto a=arguments[i];
         if(a==L"--capture-environment-survey")
         {
-            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
-            {result.error="Environment survey requires exactly one river-bend, tomb-debris or player-dodge profile.";return result;}
-            result.requested=true;result.profile=arguments[i+1]==L"player-dodge"?"player-dodge":arguments[i+1]==L"tomb-debris"?"tomb-debris":"river-bend";++i;
+            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"millrace" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
+            {result.error="Environment survey requires exactly one river-bend, millrace, tomb-debris or player-dodge profile.";return result;}
+            result.requested=true;
+            // Only the fixed ASCII profile names above reach this conversion.
+            for(const wchar_t letter:arguments[++i])result.profile.push_back(static_cast<char>(letter));
         }
         else if(a==L"--survey-water-disabled")
         {
@@ -72,6 +74,11 @@ inline EnvironmentSurveyCamera RiverBendSurveyCamera()
     const auto shore=horde::scene::ChapterWaterFromAtlas(56,-5,0);
     const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
     return {shore[0],shore[2],0,std::atan2(target[0]-shore[0],shore[2]-target[2]),-.18f};
+}
+inline EnvironmentSurveyCamera MillraceSurveyCamera()
+{
+    // West side of the grading envelope, looking along the up-river cut.
+    return {135.8f,99.f,0,.23f,-.26f};
 }
 inline EnvironmentSurveyCamera TombDebrisSurveyCamera(unsigned frame)
 {

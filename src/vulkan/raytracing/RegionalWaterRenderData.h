@@ -10,9 +10,10 @@ inline constexpr float kRegionalWaterFlowMetresPerSecond=.45f; // authored phase
 struct alignas(16) RegionalWaterRenderData {
     std::array<float,4> ripple{};
     std::array<std::uint32_t,4> metadata{}; // x: admitted surface count; yzw reserved zero
-    std::array<RtWaterSurfaceGpu,scene::kChapterRegionalWaterTriangleCount> surfaces{};
+    std::array<RtWaterSurfaceGpu,kRtRegionalWaterSurfaceCapacity> surfaces{};
 };
-static_assert(sizeof(RegionalWaterRenderData)==4736);
+static_assert(sizeof(RegionalWaterRenderData)==6752);
+static_assert(scene::kChapterRegionalWaterTriangleCount==kRtRegionalWaterSurfaceCapacity);
 static_assert(offsetof(RegionalWaterRenderData,metadata)==16);
 static_assert(offsetof(RegionalWaterRenderData,surfaces)==32);
 static_assert(std::is_trivially_copyable_v<RegionalWaterRenderData>);
@@ -31,18 +32,18 @@ inline void Normal(RtWaterSurfaceGpu& record,const scene::ChapterWaterTriangle& 
     const double length=std::sqrt(n[0]*n[0]+n[1]*n[1]+n[2]*n[2]);
     record.normalKind={float(n[0]/length),float(n[1]/length),float(n[2]/length),kind};
 }
-template<std::size_t N>
-inline void Ribbon(RegionalWaterRenderData& data,const std::array<scene::ChapterWaterPoint,N>& atlas,
-    std::size_t first,float downstreamSign) {
+template<std::size_t N,class DirectionAt>
+inline void Ribbon(RegionalWaterRenderData& data,const std::array<scene::ChapterWaterPoint,N>& stations,
+    std::size_t first,float downstreamSign,float halfWidth,DirectionAt directionAt) {
     std::array<float,N> cumulative{};
     std::array<std::array<float,2>,N> flows{};
     for(std::size_t i=1;i<N;++i) {
-        const auto delta=scene::chapter_water_detail::Sub(atlas[i],atlas[i-1]);
+        const auto delta=scene::chapter_water_detail::Sub(stations[i],stations[i-1]);
         cumulative[i]=cumulative[i-1]+float(std::sqrt(scene::chapter_water_detail::Dot(delta,delta)));
     }
     for(std::size_t i=0;i<N;++i) {
         const auto direction=[&](std::size_t a,std::size_t b){
-            const float dx=atlas[b][0]-atlas[a][0],dz=atlas[a][1]-atlas[b][1];
+            const auto [dx,dz]=directionAt(a,b);
             const float length=std::hypot(dx,dz);
             return std::array<float,2>{dx/length,dz/length};
         };
@@ -64,7 +65,7 @@ inline void Ribbon(RegionalWaterRenderData& data,const std::array<scene::Chapter
             const auto station=stations[v];
             const float along=downstreamSign<0?cumulative.back()-cumulative[station]:cumulative[station];
             Vertex(record,v,triangle[v],along,flows[station],
-                sides[v]*downstreamSign*scene::kChapterRiverHalfWidth,kRegionalWaterFlowMetresPerSecond);
+                sides[v]*downstreamSign*halfWidth,kRegionalWaterFlowMetresPerSecond);
         }
         Normal(record,triangle,1);
     }
@@ -83,8 +84,16 @@ inline RegionalWaterRenderData MakeRegionalWaterRenderData(bool enabled) {
             regional_water_render_detail::Vertex(record,v,triangles[i][v],0,{0,0},0,0);
         regional_water_render_detail::Normal(record,triangles[i],0);
     }
-    regional_water_render_detail::Ribbon(result,scene::kChapterRiverAtlas,14,-1);
-    regional_water_render_detail::Ribbon(result,scene::kChapterOutflowAtlas,38,1);
+    regional_water_render_detail::Ribbon(result,scene::kChapterRiverAtlas,14,-1,scene::kChapterRiverHalfWidth,
+        [&](std::size_t a,std::size_t b){return std::array<float,2>{scene::kChapterRiverAtlas[b][0]-scene::kChapterRiverAtlas[a][0],
+            scene::kChapterRiverAtlas[a][1]-scene::kChapterRiverAtlas[b][1]};});
+    regional_water_render_detail::Ribbon(result,scene::kChapterOutflowAtlas,38,1,scene::kChapterRiverHalfWidth,
+        [&](std::size_t a,std::size_t b){return std::array<float,2>{scene::kChapterOutflowAtlas[b][0]-scene::kChapterOutflowAtlas[a][0],
+            scene::kChapterOutflowAtlas[a][1]-scene::kChapterOutflowAtlas[b][1]};});
+    regional_water_render_detail::Ribbon(result,scene::kBellwetherMillraceStations,
+        scene::kChapterOriginalRegionalWaterTriangleCount,1,scene::kBellwetherMillraceChannelWidth*.5f,
+        [&](std::size_t a,std::size_t b){return std::array<float,2>{scene::kBellwetherMillraceStations[b][0]-scene::kBellwetherMillraceStations[a][0],
+            scene::kBellwetherMillraceStations[b][2]-scene::kBellwetherMillraceStations[a][2]};});
     return result;
 }
 } // namespace horde::vulkan::raytracing

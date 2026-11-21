@@ -10,6 +10,7 @@
     "textureLayers": 20,
     "fireEmitters": 4,
     "activeFireEmitters": 4,
+    "regionalWaterSurfaces": 60,
     "dustMotes": 64,
     "dustTiles": 576,
     "dustTileCandidates": 4

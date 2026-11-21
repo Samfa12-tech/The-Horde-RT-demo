@@ -801,10 +801,10 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==39u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?41u:40u);
+        ok &= materials.size()==40u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?42u:41u);
         ok &= scene.chapterTerrainSurface_ &&
-            scene.chapterTerrainSurface_->TriangleCount()==37846u+horde::scene::kBellwetherGroundTriangles;
+            scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         const auto& window=instances[PresentableTinyRtScene::kChapterWindowMetadataIndex];
         ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u &&
@@ -813,6 +813,9 @@ struct PresentableTinyRtSceneObservationTestAccess
             primitives[window.primitiveBase].materialIndex<materials.size() &&
             (materials[primitives[window.primitiveBase].materialIndex].materialFlags[0] &
                 static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume));
+        const auto& drive=instances[PresentableTinyRtScene::kMillDriveMetadataIndex];
+        ok &= drive.primitiveCount==1u && drive.assetIndex!=window.assetIndex &&
+              scene.millDriveAsset_.indices.size()==384u*3u;
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
         const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
         const auto& stone=instances[PresentableTinyRtScene::kRoadStoneMetadataIndex];
@@ -1403,7 +1406,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // Eight original F03 kerbs and one marked waystone add 144 triangles
         // in the existing consolidated masonry owner, without a new row.
         constexpr auto townTriangles=horde::scene::kBellwetherSolidTriangles+horde::scene::kBellwetherGroundTriangles;
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + townTriangles + 6168u + 11904u + 72u + 144u)*3u;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 39266u + 656u + 6184u + 17712u + townTriangles + 6168u + 11904u + 72u + 144u)*3u;
         // The full woodland retains the same trees/ferns/rocks and opens two
         // rail spans, keeping the end post of the adjoining retained span.
         constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
@@ -1416,8 +1419,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 40u &&
-                  tomb.staticMeshSlot_.Materials().size() == 39u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 41u &&
+                  tomb.staticMeshSlot_.Materials().size() == 40u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)

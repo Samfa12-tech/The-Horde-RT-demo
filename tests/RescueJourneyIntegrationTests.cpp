@@ -101,18 +101,12 @@ int main(int argc,char** argv) {
   unsigned chapterSelections=0;
   for(const auto& checkpoint:kDevelopmentCheckpoints) {
    const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-") ||
-       checkpoint.name=="bellwether-south-approach" || checkpoint.name=="bellwether-tavern-hearth" ||
-       checkpoint.name=="bellwether-kit-lowering" || checkpoint.name=="bellwether-kit-seated" ||
-       checkpoint.name=="bellwether-kit-ankle-catch" || checkpoint.name=="bellwether-tavern-window" ||
-       checkpoint.name=="bellwether-staffed-room" || checkpoint.name=="bellwether-keeper-reply" ||
-       checkpoint.name=="bellwether-kit-lantern-glance" || checkpoint.name=="bellwether-repeat-visit" ||
-       checkpoint.name=="bellwether-church-waymarker" || checkpoint.name=="bellwether-wayside-archive" ||
-       checkpoint.name=="bellwether-wayside-archive-open";
+       checkpoint.name.starts_with("bellwether-");
    check(DevelopmentCheckpointRequiresAuthoredChapter(checkpoint)==expected,
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==54,"the live journey, 40 chapter views and thirteen Bellwether views require authored-scene admission");
+  check(chapterSelections==66,"the live journey, 40 chapter views and 25 Bellwether views require authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right",
                        "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {

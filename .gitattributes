@@ -528,3 +528,6 @@ assets/models/world/runtime/forest-surroundings-v1/*.json text eol=lf
 # Bellwether waterwheel authoring receipt pins exact recipe and layout bytes.
 tools/author-bellwether-waterwheel.py text eol=lf
 assets/models/world/source/bellwether-waterwheel-v1/*.json text eol=lf
+tools/author-bellwether-millrace.py text eol=lf
+src/scene/BellwetherMillrace.generated.h text eol=lf
+assets/models/world/source/bellwether-millrace-v1/*.json text eol=lf

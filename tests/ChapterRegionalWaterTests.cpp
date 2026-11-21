@@ -68,7 +68,9 @@ int main(int argc,char** argv){
     Check(Close(s::chapter_water_detail::TriangleDistanceSquared({.5f,1,0},graded),.5),
           "graded river proximity projects onto actual tilted face");
     const auto& triangles=s::ChapterRegionalWaterTriangles();
-    Check(triangles.size()==42 && sizeof(triangles)==1512 && s::kChapterRiverHalfWidth==5.f,"regional water retains 42 triangles/1512 vertex bytes and authored 5m coverage half-width");
+    Check(triangles.size()==60 && sizeof(triangles)==2160 && s::kChapterRiverHalfWidth==5.f &&
+          s::kChapterOriginalRegionalWaterTriangleCount==42 && s::kChapterBellwetherMillraceTriangleCount==18,
+          "regional water preserves the original 42 triangles and appends an 18-triangle millrace");
     double lakeArea=0;
     for(std::size_t i=0;i<triangles.size();++i){
         const auto& t=triangles[i];bool finite=true;
@@ -81,7 +83,12 @@ int main(int argc,char** argv){
             (t[0][1]+t[1][1]+t[2][1])/3,(t[0][2]+t[1][2]+t[2][2])/3};
         Check(Distance(centre)<1e-7f,"actual surface triangle interior has zero proximity distance");
         const auto waterY=s::ChapterRegionalWaterSurfaceAt(centre[0],centre[2]);
-        Check(waterY && Close(*waterY,centre[1]),"vertical contact uses the actual height of each finite face");
+        std::optional<float> highestAtCentre;
+        for(const auto& candidate:triangles)
+            if(const auto height=s::chapter_water_detail::TriangleHeightAt(candidate,centre[0],centre[2]);
+                height && (!highestAtCentre || *height>*highestAtCentre))highestAtCentre=*height;
+        Check(waterY && highestAtCentre && Close(*waterY,*highestAtCentre),
+              "vertical contact chooses the highest finite water face where authored bodies overlap");
         if(i<14){
             lakeArea+=normalY*.5;
             Check(t[0][1]==s::kChapterLakeWorldY && t[1][1]==s::kChapterLakeWorldY && t[2][1]==s::kChapterLakeWorldY,
@@ -127,6 +134,32 @@ int main(int argc,char** argv){
           Close(bounds[0].minimum[2],366.2) && Close(bounds[0].maximum[2],585.2),"lake bounds match exact atlas coordinates");
     Check(Close(bounds[1].minimum[1],-31.55) && Close(bounds[1].maximum[1],47.45) &&
           Close(bounds[2].minimum[1],-32.75),"river and outflow bounds preserve atlas height envelope");
+    const auto& millraceBounds=s::ChapterBellwetherMillraceBounds();
+    bool containedByRiverBox=true;
+    for(std::size_t i=s::kChapterOriginalRegionalWaterTriangleCount;i<triangles.size();++i)
+        for(const auto& p:triangles[i])for(std::size_t axis=0;axis<3;++axis)
+            containedByRiverBox=containedByRiverBox && p[axis]>=bounds[1].minimum[axis] && p[axis]<=bounds[1].maximum[axis];
+    Check(containedByRiverBox && millraceBounds.minimum[0]>=bounds[1].minimum[0] &&
+          millraceBounds.maximum[0]<=bounds[1].maximum[0] && millraceBounds.minimum[1]>=bounds[1].minimum[1] &&
+          millraceBounds.maximum[1]<=bounds[1].maximum[1] && millraceBounds.minimum[2]>=bounds[1].minimum[2] &&
+          millraceBounds.maximum[2]<=bounds[1].maximum[2],
+          "all millrace faces fit the unchanged main-river shader broadphase box");
+    bool channelStationContact=true;
+    for(const auto& p:s::kBellwetherMillraceStations)
+        channelStationContact=channelStationContact && Distance(p)<1e-7f;
+    Check(channelStationContact,"headrace, steep wheel drop and tailrace stations lie on the shared ribbon");
+    bool steepDropSafe=true;
+    for(std::size_t i=52;i<54;++i) {
+        const auto& t=triangles[i];
+        const double ax=double(t[1][0])-t[0][0],az=double(t[1][2])-t[0][2];
+        const double bx=double(t[2][0])-t[0][0],bz=double(t[2][2])-t[0][2];
+        const auto e1=s::chapter_water_detail::Sub(t[1],t[0]),e2=s::chapter_water_detail::Sub(t[2],t[0]);
+        const s::chapter_water_detail::DPoint n{e1[1]*e2[2]-e1[2]*e2[1],
+            e1[2]*e2[0]-e1[0]*e2[2],e1[0]*e2[1]-e1[1]*e2[0]};
+        const double length=std::sqrt(s::chapter_water_detail::Dot(n,n));
+        steepDropSafe=steepDropSafe && std::abs(ax*bz-az*bx)>2.3 && n[1]/length>.40;
+    }
+    Check(steepDropSafe,"wheel-drop projected faces retain a nondegenerate XZ determinant and upward normal margin");
     // The first main segment's two triangles share the exact next-segment edge.
     for(std::size_t i=14;i<36;i+=2)
         Check(triangles[i][1]==triangles[i+2][2] && triangles[i+1][1]==triangles[i+2][0],"river bends share exact vertices without strip gaps");
@@ -150,8 +183,8 @@ int main(int argc,char** argv){
     Check(!s::DetailRegionalWaterQueriesSeparated(omitted,mutated),"changed immutable water record order invalidates admission");
     namespace rt=horde::vulkan::raytracing;
     const auto render=rt::MakeRegionalWaterRenderData(true),disabled=rt::MakeRegionalWaterRenderData(false);
-    Check(sizeof(render)==4736 && offsetof(rt::RegionalWaterRenderData,surfaces)==32 && render.metadata[0]==42,
-          "one fixed binding27 payload preserves ripple prefix, metadata and bounded 42-record ABI");
+    Check(sizeof(render)==6752 && offsetof(rt::RegionalWaterRenderData,surfaces)==32 && render.metadata[0]==60,
+          "one fixed binding27 payload preserves ripple prefix and exposes all 60 bounded surface records");
     Check(disabled.metadata==std::array<std::uint32_t,4>{} && disabled.ripple==std::array<float,4>{},
           "disabled scene exposes no regional profile or ripple debt");
     bool disabledZero=true,finite=true,positions=true,normals=true,standing=true,flowUnit=true,speeds=true;
@@ -166,7 +199,9 @@ int main(int argc,char** argv){
         for(std::size_t v=0;v<3;++v){
             for(std::size_t axis=0;axis<3;++axis)positions=positions&&(*along[v])[axis]==t[v][axis];
             if(i<14)standing=standing&&(*along[v])[3]==0 && *flow[v]==std::array<float,4>{} && r.normalKind[3]==0;
-            else {flowUnit=flowUnit&&Close(std::hypot((*flow[v])[0],(*flow[v])[1]),1) && std::abs((*flow[v])[2])==s::kChapterRiverHalfWidth;
+            else {const float halfWidth=i<s::kChapterOriginalRegionalWaterTriangleCount?s::kChapterRiverHalfWidth:
+                    s::kBellwetherMillraceChannelWidth*.5f;
+                flowUnit=flowUnit&&Close(std::hypot((*flow[v])[0],(*flow[v])[1]),1) && std::abs((*flow[v])[2])==halfWidth;
                 speeds=speeds&&(*flow[v])[3]==.45f && r.normalKind[3]==1;}
         }
         const auto ab=s::chapter_water_detail::Sub(t[1],t[0]),ac=s::chapter_water_detail::Sub(t[2],t[0]);
@@ -197,8 +232,14 @@ int main(int argc,char** argv){
     }
     for(std::size_t i=38;i<42;i+=2){const auto& r=render.surfaces[i];
         downstream=downstream&&r.aAlong[3]<r.bAlong[3]&&r.aAlong[1]>=r.bAlong[1];}
+    for(std::size_t i=42;i<60;i+=2){const auto& r=render.surfaces[i];
+        downstream=downstream&&r.aAlong[3]<r.bAlong[3]&&r.aAlong[3]==r.cAlong[3] &&
+            r.aAlong[1]>=r.bAlong[1];}
     Check(downstream && render.surfaces[36].bAlong[3]==0 && render.surfaces[38].aAlong[3]==0,
           "main phases progress from headwaters toward lake and outflow progresses away from lake without upstream motion");
     std::cout<<checks<<" regional water geometry/proximity checks, "<<failures<<" failures; terrain visibility and RT presentation not claimed\n";
+    std::cout<<std::setprecision(9)<<"millrace triangle XYZ bounds min("<<millraceBounds.minimum[0]<<", "
+        <<millraceBounds.minimum[1]<<", "<<millraceBounds.minimum[2]<<") max("
+        <<millraceBounds.maximum[0]<<", "<<millraceBounds.maximum[1]<<", "<<millraceBounds.maximum[2]<<")\n";
     return failures?1:0;
 }

@@ -5,7 +5,7 @@ int waterProfileIndex(uint code)
 {
     uint index = code >> 16u;
     return all(bvec3((code & 0xffffu) == (10u | (7u << 8u)), index > 0u,
-        index <= min(rtWaterContactRipple.surfaceMetadata.x, 42u)))
+        index <= min(rtWaterContactRipple.surfaceMetadata.x, kRtRegionalWaterSurfaceCapacity)))
         ? int(index - 1u) : -1;
 }
 
@@ -16,7 +16,7 @@ void waterProfileCoordinates(int index, vec3 p, out vec4 coordinates,
     vec2 e1 = profile.bAlong.xz - profile.aAlong.xz;
     vec2 e2 = profile.cAlong.xz - profile.aAlong.xz;
     vec3 n = profile.normalKind.xyz;
-    // All admitted surfaces are height-field triangles (normal.y > .65).
+    // All admitted faces project to nondegenerate XZ triangles, including the millrace drop.
     // XZ barycentrics are exact on that plane and avoid a second 3D solve.
     float determinant = e1.x * e2.y - e1.y * e2.x;
     vec2 reciprocalB = vec2(e2.y, -e2.x) / determinant;

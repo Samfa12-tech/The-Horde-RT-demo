@@ -22,7 +22,9 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
     std::memcpy(initialSnapshotBytes.data(),&context.simulation.Snapshot(),initialSnapshotBytes.size());
     bool snapshotBytesUnchanged=true;
     const bool tomb=context.environmentSurveyProfile=="tomb-debris";
-    auto camera=tomb?TombDebrisSurveyCamera(0):RiverBendSurveyCamera();
+    const bool millrace=context.environmentSurveyProfile=="millrace";
+    auto camera=tomb?TombDebrisSurveyCamera(0):
+        millrace?MillraceSurveyCamera():RiverBendSurveyCamera();
     horde::gameplay::simulation::TriangleSupportSurface::Sample shore{};
     const auto terrain=context.rtScene.ChapterTerrainSurface();
     const auto width=context.rtScene.DispatchExtent().width,height=context.rtScene.DispatchExtent().height;
@@ -49,7 +51,7 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             <<"\",\"renderScale\":"<<context.renderScale<<",\"dispatchWidth\":"<<width<<",\"dispatchHeight\":"<<height
             <<",\"surfaceWidth\":"<<context.swapchainExtent.width<<",\"surfaceHeight\":"<<context.swapchainExtent.height
             <<",\"outputExposure\":"<<context.outputExposure<<",\"waterQuality\":"<<unsigned(context.waterQuality)
-            <<",\"surveyFogDensityScale\":"<<(tomb?"null":"0.004")
+            <<",\"surveyFogDensityScale\":"<<(tomb || millrace?"null":"0.004")
             <<",\"shaderPair\":{\"opaque\":{\"key\":\""<<opaqueKey<<"\",\"sha256\":\""<<opaqueSha
             <<"\"},\"generic\":{\"key\":\""<<genericKey<<"\",\"sha256\":\""<<genericSha<<"\"}}"
             ;
@@ -62,12 +64,13 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             }
             json<<']';
         } else {
-            json
-            <<",\"camera\":{\"atlasEast\":56,\"atlasNorth\":-5,\"x\":"<<camera.x<<",\"z\":"<<camera.z
+            json<<",\"camera\":{";
+            if(!millrace)json<<"\"atlasEast\":56,\"atlasNorth\":-5,";
+            json<<"\"x\":"<<camera.x<<",\"z\":"<<camera.z
             <<",\"supportY\":"<<camera.supportY<<",\"yaw\":"<<camera.yaw<<",\"pitch\":"<<camera.pitch
-            <<",\"eyeY\":"<<horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres
-            <<",\"targetAtlasEast\":58,\"targetAtlasNorth\":-25,\"targetAtlasUp\":6"
-            <<",\"terrainFound\":"<<(shore.found?"true":"false")<<",\"terrainWalkable\":"<<(shore.walkable?"true":"false")
+            <<",\"eyeY\":"<<horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres;
+            if(!millrace)json<<",\"targetAtlasEast\":58,\"targetAtlasNorth\":-25,\"targetAtlasUp\":6";
+            json<<",\"terrainFound\":"<<(shore.found?"true":"false")<<",\"terrainWalkable\":"<<(shore.walkable?"true":"false")
             <<",\"terrainTriangle\":"<<shore.triangle<<",\"testedTriangles\":"<<shore.testedTriangles
             <<",\"terrainNormal\":["<<shore.normal[0]<<','<<shore.normal[1]<<','<<shore.normal[2]
             <<"]}";
@@ -103,11 +106,14 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             return fail("Tomb survey cameras require legal shared-floor opening positions.");
     } else {
         shore=terrain->Query(camera.x,camera.z);
-        if(!shore.found || !std::isfinite(shore.worldY))return fail("Actual imported terrain does not support the planned shore camera.");
+        if(!shore.found || !std::isfinite(shore.worldY) || (millrace && !shore.walkable))
+            return fail("Actual imported terrain does not support the planned shore camera.");
         camera.supportY=shore.worldY;
-        const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
-        camera.pitch=.05f+(target[1]-(horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres))/
-            std::hypot(target[0]-camera.x,target[2]-camera.z);
+        if(!millrace) {
+            const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
+            camera.pitch=.05f+(target[1]-(horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres))/
+                std::hypot(target[0]-camera.x,target[2]-camera.z);
+        }
         if(!std::isfinite(camera.pitch) || camera.pitch<-.32f || camera.pitch>.28f)
             return fail("Native queried survey aim exceeds existing production pitch limits.");
     }
@@ -177,7 +183,7 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             const auto readbackStart=std::chrono::steady_clock::now();
             horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
             if(!context.rtScene.CaptureStorageImage(image,diagnostic))return fail("Actual survey readback failed: "+diagnostic);
-            std::ostringstream name;name<<(tomb?"tomb-debris-":"river-bend-")<<std::setw(3)<<std::setfill('0')<<frame<<".png";row.file=name.str();
+            std::ostringstream name;name<<context.environmentSurveyProfile<<'-'<<std::setw(3)<<std::setfill('0')<<frame<<".png";row.file=name.str();
             if(!WriteRgbaPng(directory/row.file,image,diagnostic) || !Sha256File(directory/row.file,row.sha256,diagnostic))
                 return fail("Survey PNG/identity failed: "+diagnostic);
             row.readbackMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-readbackStart).count();

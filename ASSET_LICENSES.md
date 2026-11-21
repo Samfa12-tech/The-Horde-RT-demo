@@ -1029,6 +1029,8 @@ or provider assets were used. The source and receipt are stored under
 assets/models/world/source/bellwether-waterwheel-v1/. The GLB candidate is
 reproducible from the recipe and remains outside game packages.
 
+The millrace terrain and water are also original Horde authoring. The terrain cut derives from the pinned r23 chapter mesh and retains the original embedded material images and texture mapping policy. Its source receipt is in assets/models/world/source/bellwether-millrace-v1/.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply
