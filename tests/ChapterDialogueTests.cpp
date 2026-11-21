@@ -656,5 +656,34 @@ int main() {
               shrine.State().line==Line::LanternFirstRequest,
               "a return stays quiet until a deliberate practical recap");
     }
+    {
+        Director records;
+        Context church;
+        church.claimed=church.exterior=church.kitSeated=true;
+        church.recordKeeperInReach=true;
+        Progress arrival;
+        arrival.grateConsumed=arrival.rescueConsumed=arrival.reunionStarted=arrival.proofAccepted=true;
+        arrival.forestNightConsumed=arrival.forestWaystoneConsumed=arrival.forestClueConsumed=arrival.forestVillageConsumed=true;
+        arrival.hearthLinesResolved=kHearthLines.size();
+        Check(records.RestoreProgress(arrival,church,1,0),"record keeper fixture restores completed hearth progress");
+        Check(!records.TryStartRecordKeeper(RecordKeeperAction::ShowRegister,church),"an absent keeper cannot read the register");
+        church.recordKeeperSource=Tuple{71.3f,-1.3f,75.2f};
+        Check(records.TryStartRecordKeeper(RecordKeeperAction::ShowRegister,church) &&
+              records.State().line==Line::RecordKeeperRegister &&
+              records.State().source.x==church.recordKeeperSource->x &&
+              RequiresChapterCaption(records.State().line),
+              "the reading starts at the physical keeper and displays an essential caption");
+        const auto before=records.State();
+        church.recordKeeperInReach=false;
+        records.Skip();records.Step(.05f,church);
+        Check(records.State().line==Line::RecordKeeperTwoRoads,
+              "turning away ends interaction reach while the audible reading continues");
+        church.paused=true;records.Step(.05f,church);
+        Check(records.State().elapsed==0.f,"pausing holds the next record keeper caption");
+        church.paused=false;church.recordKeeperSource.reset();records.Step(.05f,church);
+        Check(records.State().line==Line::None && records.ExportProgress().activeLine==Line::None &&
+              !records.Complete(before.line,before.generation),
+              "leaving earshot cancels the remaining reading and its stale callbacks");
+    }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

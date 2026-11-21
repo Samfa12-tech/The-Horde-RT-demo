@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/dialogue/TavernKeeperPlacement.h"
+#include "gameplay/dialogue/RecordKeeperPlacement.h"
 #include "gameplay/effects/WaterContact.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/CompanionRouteFixture.h"
@@ -73,12 +74,15 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
     bool tavernDirectionsAvailable=false;
+    dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
     bellwether::WaysideArchive waysideArchive;
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
-        return tavernConversationAvailable || tavernDirectionsAvailable || waysideArchiveAction!=bellwether::ArchiveAction::None;
+        return tavernConversationAvailable || tavernDirectionsAvailable ||
+            recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
+    std::optional<dialogue::RecordKeeperPose> recordKeeper;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

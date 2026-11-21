@@ -264,6 +264,8 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
     private static final int CONTEXTUAL_ARCHIVE_SHIFT = 16;
     private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
+    private static final int CONTEXTUAL_RECORD_KEEPER_SHIFT = 19;
+    private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -8882,6 +8884,12 @@ public class MainActivity extends Activity {
             case 3: return R.string.listen_to_lantern;
             case 4: return R.string.recall_lantern_words;
             case 5: return R.string.take_road_register;
+            default: break;
+        }
+        switch ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) {
+            case 1: return R.string.show_road_mark;
+            case 2: return R.string.show_road_register;
+            case 3: return R.string.recall_expedition_routes;
             default: break;
         }
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {

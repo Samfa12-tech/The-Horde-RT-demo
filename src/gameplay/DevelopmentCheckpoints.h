@@ -30,7 +30,7 @@ enum class DevelopmentRewardPose : std::uint8_t
     MotionExtreme,
 };
 
-enum class BellwetherNorthView : std::uint8_t { None, Church, Archive, ArchiveOpen, RegisterRecovered };
+enum class BellwetherNorthView : std::uint8_t { None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff };
 
 struct DevelopmentCheckpoint
 {
@@ -92,7 +92,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 133u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 134u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -280,6 +280,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 133u> kDevelopmentCheckpoints
      .yaw=-1.57f,.pitch=-.24f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
      .bellwetherNorthView=BellwetherNorthView::Church},
+    {.id=335,.name="bellwether-record-keeper-handoff",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z,
+     .yaw=1.57079632679f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherNorthView=BellwetherNorthView::RegisterHandoff},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

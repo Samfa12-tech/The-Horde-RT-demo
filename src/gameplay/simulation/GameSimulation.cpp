@@ -816,7 +816,7 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};waysideArchive_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();waysideArchive_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -3442,6 +3442,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tavernKeeper=config_.bellwetherTavernKeeperAdmitted && chapterTerrain_ &&
         chapterTerrainGeneration_==worldRoute_.generation ? tavernKeeper_.Pose() : std::nullopt;
     const auto chapterContext=ChapterInteractionContext(input.paused);
+    snapshot_.recordKeeper=chapterContext.exterior && chapterTerrainGeneration_==worldRoute_.generation ? recordKeeper_ : std::nullopt;
+    snapshot_.recordKeeperAction=RecordKeeperAction(chapterContext);
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
         chapterDialogue_.CanStartTavernConversation(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);

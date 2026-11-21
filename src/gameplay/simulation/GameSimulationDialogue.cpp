@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "audio/KitAnkleAudio.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
@@ -6,6 +7,12 @@ void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=ChapterInteractionContext(false);
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
+    const auto records=RecordKeeperAction(context);
+    if(chapterDialogue_.TryStartRecordKeeper(records,context)) {
+        if(records==dialogue::RecordKeeperAction::ShowRegister)
+            waysideArchive_.registerInterpreted=true;
+        return;
+    }
     switch(WaysideArchiveAction(context)) {
     case bellwether::ArchiveAction::Inspect:
         if(chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Help,context))
@@ -25,8 +32,18 @@ void GameSimulation::InteractWithClaimedChapter() {
         chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Recap,context);
         return;
     default:
-        chapterDialogue_.ShowTavernDirections(context);
+        using dialogue::TavernGuidance;
+        const auto guidance=waysideArchive_.registerInterpreted?TavernGuidance::Expeditions:
+            waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
+        chapterDialogue_.ShowTavernDirections(context,guidance);
     }
+}
+
+dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::Context& c) const {
+    using Action=dialogue::RecordKeeperAction;
+    if(!chapterDialogue_.CanStartRecordKeeper(c))return Action::None;
+    if(waysideArchive_.registerInterpreted)return Action::RecallRoutes;
+    return waysideArchive_.registerRecovered?Action::ShowRegister:Action::ShowRoadMark;
 }
 
 bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::Context& c) const {
@@ -127,6 +144,20 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
         c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
         c.keeperAtHearth=keeper->stage==TavernKeeperStage::AtHearth;
     }
+    if(recordKeeper_ && c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation) {
+        const auto& foot=recordKeeper_->foot;
+        const Tuple source{foot[0],foot[1]+kCompanionSpeechHeight,foot[2]};
+        const float dx=source.x-c.player.x,dz=source.z-c.player.z;
+        const float distance=std::hypot(dx,dz),height=std::min(source.y,c.listener.y);
+        if(distance<=4.f && std::abs(source.y-c.listener.y)<=1.2f &&
+           chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,source.x,source.z,
+               height-.025f,height+.025f,.025f)) {
+            c.recordKeeperSource=source;
+            c.recordKeeperInReach=distance<=2.5f &&
+                (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance;
+        }
+    }
     const auto& mark=bellwether::kWaysideMechanism;
     if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && c.alive && c.claimed && c.exterior &&
        !c.combat && !c.traversing && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
@@ -147,6 +178,15 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        rescueTraversal_.Snapshot().exteriorSide && !rescueTraversal_.IsActive() &&
        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
+    if(!recordKeeper_ && config_.bellwetherRecordKeeperAdmitted && terrain &&
+       arrival==BellwetherArrivalStage::Seated) {
+        constexpr auto mark=traversal::kBellwetherRecordKeeperMark;
+        constexpr float radius=.28f,height=1.78f;
+        const auto support=traversal::ChapterExteriorStepSupport(*terrain,mark.x,mark.z,radius,height);
+        if(support.grounded && traversal::ResolveChapterStepMovement(*terrain,mark.x,mark.z,mark.x,mark.z,
+                support.worldY,radius,height).accepted)
+            recordKeeper_=RecordKeeperPose{{mark.x,support.worldY,mark.z},-1.57079632679f};
+    }
     auto c=ChapterInteractionContext(input.paused);
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {

@@ -283,6 +283,12 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
               Seed(restoredArchive,decoded,terrain) && restoredArchive.Snapshot().waysideArchive.registerRecovered &&
               restoredArchive.Snapshot().chapterDialogue.line==Line::None,
               "the recovered register stays collected on reload without replaying its pickup caption");
+        archive.schema=cp::kRegisterInterpretationSchema;
+        archive.waysideRegisterInterpreted=true;
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              Seed(restoredArchive,decoded,terrain) && restoredArchive.Snapshot().waysideArchive.registerInterpreted &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "the expedition directions survive reload without replaying the church reading");
         archive.schema=cp::kTavernConversationSchema;
         Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
     }

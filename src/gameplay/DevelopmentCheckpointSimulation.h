@@ -192,6 +192,8 @@ inline bool StageDevelopmentCheckpointSimulation(
     if(checkpoint.bellwetherNorthView!=BellwetherNorthView::None) {
         using namespace simulation;
         using namespace bellwether;
+        const bool handoff=checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterHandoff;
+        if(handoff && !gameSimulation.config_.bellwetherRecordKeeperAdmitted)return finalize(false);
         if(!chapterTerrain || checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)
             return finalize(false);
         campaign::Checkpoint record;
@@ -237,7 +239,8 @@ inline bool StageDevelopmentCheckpointSimulation(
                 if(!walkStation(station))return finalize(false);
         }
         input.moveForward=0;input.runHeld=false;
-        input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+        input.yawRadians=handoff?0.f:checkpoint.yaw;
+        input.pitchRadians=handoff?-.12f:checkpoint.pitch;
         for(unsigned tick=0;tick<120;++tick)advance();
         if(checkpoint.bellwetherNorthView==BellwetherNorthView::Church)
             return finalize(state.playerGrounded &&
@@ -254,7 +257,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(unsigned tick=0;tick<70 && state.waysideArchive.stage!=ArchiveStage::Open;++tick)advance();
         if(state.waysideArchive.stage!=ArchiveStage::Open ||
            state.chapterDialogue.line!=dialogue::Line::LanternFirstIdentity)return finalize(false);
-        if(checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterRecovered) {
+        if(handoff || checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterRecovered) {
             for(const auto line:{dialogue::Line::LanternKingName,dialogue::Line::LanternFirstRequest,dialogue::Line::None}) {
                 gameSimulation.chapterDialogue_.Skip();advance();
                 if(state.chapterDialogue.line!=line)return finalize(false);
@@ -264,6 +267,24 @@ inline bool StageDevelopmentCheckpointSimulation(
             const auto saved=gameSimulation.LatestCampaignBoundary();
             if(!state.waysideArchive.registerRecovered || !saved || !saved->waysideRegisterRecovered ||
                state.chapterDialogue.line!=dialogue::Line::LanternRegisterReturn)return finalize(false);
+        }
+        if(handoff) {
+            gameSimulation.chapterDialogue_.Skip();advance();
+            const auto& wayside=traversal::kBellwetherWaysideApproach;
+            for(std::size_t i=wayside.size()-1;i>0;--i)
+                if(!walkStation(wayside[i-1]))return finalize(false);
+            if(!walkStation(traversal::kBellwetherNorthApproach.back()) ||
+               !walkStation(traversal::kBellwetherChurchApproach.front()) ||
+               !walkStation(traversal::kBellwetherRecordKeeperApproach))return finalize(false);
+            input.moveForward=0;input.runHeld=false;
+            input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+            advance();
+            if(state.recordKeeperAction!=dialogue::RecordKeeperAction::ShowRegister || !state.recordKeeper)
+                return finalize(false);
+            gameSimulation.InteractWithClaimedChapter();advance();
+            const auto saved=gameSimulation.LatestCampaignBoundary();
+            if(!saved || !saved->waysideRegisterInterpreted || state.chapterDialogue.line!=dialogue::Line::RecordKeeperRegister)
+                return finalize(false);
         }
         return finalize(state.lastConsumedInteractSequence==input.commands.interact &&
             gameSimulation.chapterSkipFloor_==input.commands.dialogueSkip &&

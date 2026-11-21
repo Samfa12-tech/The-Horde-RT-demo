@@ -89,6 +89,7 @@ struct GameSimulationConfig
     bool flaskUtilityCandidate = false;
     // Set by the scene profile when the placed tavern keeper is admitted.
     bool bellwetherTavernKeeperAdmitted = false;
+    bool bellwetherRecordKeeperAdmitted = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -334,6 +335,7 @@ private:
     std::optional<dialogue::Tuple> HeldRewardLanternSource() const;
     void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
+    dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void AdvanceWaysideArchive(float seconds);
     bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
 
@@ -378,6 +380,7 @@ private:
     SimulationSnapshot snapshot_{};
     horde::gameplay::dialogue::Director chapterDialogue_{};
     horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
+    std::optional<dialogue::RecordKeeperPose> recordKeeper_;
     bellwether::WaysideArchive waysideArchive_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};

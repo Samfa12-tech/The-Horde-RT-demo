@@ -1165,6 +1165,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     using Stage=BellwetherArrivalStage;
     auto config=sim::ProductionGameSimulationConfig();
     config.bellwetherTavernKeeperAdmitted=stayAtIncident;
+    config.bellwetherRecordKeeperAdmitted=stayAtIncident;
     sim::GameSimulation game(config);
     const auto record=LookoutCheckpoint(*terrain);
     const auto token=game.BeginCampaignRestore(record);
@@ -1499,10 +1500,28 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 return true;
             };
             const bool visited=walkStations(std::next(kBellwetherNorthApproach.begin()),kBellwetherNorthApproach.end()) &&
-                walkStations(kBellwetherChurchApproach.begin(),kBellwetherChurchApproach.end());
+                walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherRecordKeeperApproach);
             Check(visited && game.Snapshot().playerGrounded,
                   "the completed tavern visit can reach the mapped exterior record keeper mark on foot");
             if(!visited)return;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=-1.57079632679f;step();
+            Check(game.Snapshot().recordKeeper && game.Snapshot().recordKeeperAction==RecordKeeperAction::None,
+                  "the grounded record keeper waits until the player faces the service mark");
+            input.yawRadians=1.57079632679f;step();
+            const auto recordKeeper=game.Snapshot().recordKeeper;
+            Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&
+                  game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRoadMark,
+                  "at the church the player can show the forest road mark before finding the register");
+            ++input.commands.interact;step();
+            for(const auto line:kRecordKeeperLead) {
+                Check(game.Snapshot().chapterDialogue.line==line &&
+                      game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
+                      "the record keeper gives the ordered shrine lead from the church");
+                ++input.commands.dialogueSkip;step();
+            }
+            Check(!game.Snapshot().waysideArchive.registerInterpreted,
+                  "showing the waystone mark earns no expedition routes");
+            input.moveForward=1;input.runHeld=true;
             const bool shrineReached=walkTo(kBellwetherChurchApproach.front()) &&
                 walkTo(kBellwetherNorthApproach.back()) &&
                 walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end());
@@ -1570,7 +1589,31 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             ++input.commands.interact;step();
             Check(game.Snapshot().chapterDialogue.line==Line::LanternFirstRequest,"recap repeats the practical request");
             input.moveForward=1;input.runHeld=true;
-            const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+            const bool returnedToChurch=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+                walkTo(kBellwetherNorthApproach.back()) && walkTo(kBellwetherChurchApproach.front()) &&
+                walkTo(kBellwetherRecordKeeperApproach);
+            Check(returnedToChurch,"the player returns from the shrine to the record keeper by the same path");
+            if(!returnedToChurch)return;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57079632679f;step();
+            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRegister &&
+                  !game.Snapshot().waysideArchive.registerInterpreted,
+                  "collecting the register offers a physical handoff without earning its routes");
+            ++input.commands.interact;step();
+            const auto read=game.LatestCampaignBoundary();
+            Check(read && read->schema==cp::kRegisterInterpretationSchema && read->waysideRegisterInterpreted &&
+                  read->dialogue.activeLine==Line::None && boundary && read->position.x==boundary->position.x &&
+                  read->position.z==boundary->position.z && read->flask==boundary->flask,
+                  "showing the register updates the earned tavern save without changing its anchor or saving active speech");
+            for(const auto line:kRecordKeeperReading) {
+                Check(game.Snapshot().chapterDialogue.line==line &&
+                      game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
+                      "the church reading identifies both independent routes in order");
+                ++input.commands.dialogueSkip;step();
+            }
+            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::RecallRoutes,
+                  "after the interpretation the player can recall both directions");
+            input.moveForward=1;input.runHeld=true;
+            const bool returned=walkTo(kBellwetherChurchApproach.front()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
             Check(returned && game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
                   game.Snapshot().chapterDialogue.tavernConversationLinesResolved==kTavernConversation.size(),

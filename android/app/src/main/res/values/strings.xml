@@ -61,6 +61,9 @@
     <string name="open_lower_stone">Open lower stone</string>
     <string name="listen_to_lantern">Listen to the lantern</string>
     <string name="take_road_register">Take the road register</string>
+    <string name="show_road_mark">Show the road mark</string>
+    <string name="show_road_register">Show the road register</string>
+    <string name="recall_expedition_routes">Recall the expedition routes</string>
     <string name="recall_lantern_words">Recall the lantern\'s words</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>

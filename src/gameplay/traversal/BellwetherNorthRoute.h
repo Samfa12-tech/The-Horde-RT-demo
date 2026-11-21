@@ -14,6 +14,7 @@ inline constexpr std::array kBellwetherNorthApproach{
     BellwetherMapStation(-16.f,61.f),
 };
 inline constexpr auto kBellwetherRecordKeeperMark=BellwetherMapStation(-7.f,51.f);
+inline constexpr auto kBellwetherRecordKeeperApproach=BellwetherMapStation(-8.7f,51.f);
 inline constexpr std::array kBellwetherChurchApproach{
     BellwetherMapStation(-14.f,51.f),
     kBellwetherRecordKeeperMark,

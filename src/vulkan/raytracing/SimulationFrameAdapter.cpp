@@ -306,6 +306,11 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
             moving ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle,
             moving ? keeper.walkSeconds : 0.f};
     }
+    if (simulation.recordKeeper) {
+        const auto& keeper = *simulation.recordKeeper;
+        frame.chapterResidents[1] = {horde::gameplay::dialogue::kRecordKeeperActorId, keeper.foot,
+            horde::scene::CompanionModelYaw(keeper.yaw), horde::scene::SkinnedClip::Idle, 0.f};
+    }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;

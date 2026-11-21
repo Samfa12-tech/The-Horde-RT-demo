@@ -34,6 +34,7 @@ struct WaysideArchive {
     ArchivePose pose{};
     bool lanternRevealStarted=false;
     bool registerRecovered=false;
+    bool registerInterpreted=false;
 };
 
 } // namespace horde::gameplay::bellwether

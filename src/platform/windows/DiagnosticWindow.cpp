@@ -536,6 +536,8 @@ struct ShowcaseCaptureRecord
     horde::gameplay::items::HeldItemTransform publishedLanternBody{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
+    std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
+    bool registerInterpreted = false;
     horde::gameplay::dialogue::Line chapterLine = horde::gameplay::dialogue::Line::None;
     std::optional<horde::gameplay::DevelopmentCheckpointStageEvidence::BellwetherVisit> bellwetherVisit;
     float keeperDissolve = 0.0f;
@@ -1325,11 +1327,13 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     const auto* residentCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
     options.staffedTavernCapture = residentCheckpoint &&
         residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None;
-    if (options.error.empty() && (options.staffedTavernCapture || !options.chapterResidentFixture.empty()) &&
+    const bool recordKeeperCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::RegisterHandoff;
+    if (options.error.empty() && (options.staffedTavernCapture || recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
         (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
-         (!options.staffedTavernCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
+         (!options.staffedTavernCapture && !recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
-        options.error = "Chapter resident fixtures require a hidden reunion or staffed tavern capture.";
+        options.error = "Chapter resident fixtures require a hidden reunion, staffed tavern or record keeper capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -3359,7 +3363,15 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case ArchiveAction::Listen: text = "LEFT-CLICK / A TO LISTEN TO THE LANTERN"; break;
         case ArchiveAction::TakeRegister: text = "LEFT-CLICK / A TO TAKE THE ROAD REGISTER"; break;
         case ArchiveAction::Recap: text = "LEFT-CLICK / A TO RECALL THE LANTERN'S WORDS"; break;
-        default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
+        default:
+            using horde::gameplay::dialogue::RecordKeeperAction;
+            switch (snapshot.recordKeeperAction) {
+            case RecordKeeperAction::ShowRoadMark: text = "LEFT-CLICK / A TO SHOW THE ROAD MARK"; break;
+            case RecordKeeperAction::ShowRegister: text = "LEFT-CLICK / A TO SHOW THE ROAD REGISTER"; break;
+            case RecordKeeperAction::RecallRoutes: text = "LEFT-CLICK / A TO RECALL THE EXPEDITION ROUTES"; break;
+            default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
+            }
+            break;
         }
         context.tavernInteractionPromptPresented=visible;
     }
@@ -6629,6 +6641,9 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         if (ctx.staffedTavernCapture) {
             fixtures.push_back({horde::gameplay::dialogue::kTavernKeeperActorId,
                 ctx.chapterResidentFixture, "resident.glb", clips});
+        } else if (ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
+            fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
+                ctx.chapterResidentFixture, "resident.glb", clips});
         } else {
             fixtures.push_back({0x52544431, ctx.chapterResidentFixture, "resident.glb", clips});
             fixtures.push_back({0x52544432, ctx.chapterResidentFixture, "resident.glb", clips});
@@ -7523,7 +7538,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             return false;
         }
 #if defined(_DEBUG)
-        if (!ctx.chapterResidentFixture.empty() && !ctx.staffedTavernCapture) {
+        if (!ctx.chapterResidentFixture.empty() && ctx.developmentCheckpoint == "chapter-kit-reunion") {
             const auto terrain = ctx.rtScene.ChapterTerrainSurface();
             const auto request = [&](std::size_t lane, std::uint32_t id, float x, float z, float yaw,
                                      horde::scene::SkinnedClip clip, float time) {
@@ -8387,6 +8402,13 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      << "], \"yaw\": " << keeper.yaw << ", \"chapterLine\": \""
                      << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId << "\"}";
         }
+        if (capture.recordKeeper) {
+            const auto& keeper = *capture.recordKeeper;
+            manifest << ", \"recordKeeper\": {\"foot\": [" << keeper.foot[0] << ", " << keeper.foot[1] << ", " << keeper.foot[2]
+                     << "], \"yaw\": " << keeper.yaw << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
+                     << "\", \"registerInterpreted\": " << (capture.registerInterpreted ? "true" : "false") << "}";
+        }
         manifest << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
@@ -8990,6 +9012,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.publishedLanternBody = simulation.lanternPendulum.worldFromBody;
         record.chapterCompanion = simulation.chapterCompanion;
         record.tavernKeeper = simulation.tavernKeeper;
+        record.recordKeeper = simulation.recordKeeper;
+        record.registerInterpreted = simulation.waysideArchive.registerInterpreted;
         record.chapterLine = simulation.chapterDialogue.line;
         record.bellwetherVisit = stageEvidence.bellwetherVisit;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
@@ -9731,6 +9755,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         // Normal application configuration, settings and save schema stay OFF.
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
         simulationConfig.bellwetherTavernKeeperAdmitted=context.staffedTavernCapture;
+        simulationConfig.bellwetherRecordKeeperAdmitted=developmentCheckpoint &&
+            *developmentCheckpoint=="bellwether-record-keeper-handoff" && !context.chapterResidentFixture.empty();
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }
