@@ -1,0 +1,3705 @@
+{
+  "schema": 1,
+  "rigSha256": "9e19eb14e08c3d1527e0eba15d88971513b56b6b7706749dacb89bce74f27330",
+  "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "meshSha256": "9b127782e788cef0b8c5a911ba74939250b9df37b298e30a567c1452f3a194d3",
+  "kitEnginePosition": [
+    59.300003,
+    -9.848501,
+    108.199997
+  ],
+  "kitYawRadians": -3.74468,
+  "fps": 60,
+  "contactFrame": 9,
+  "settledFrame": 32,
+  "triangles": 42,
+  "editableRoadTake": "Kit|ankle_assess_road_fit",
+  "poses": [
+    {
+      "frame": 1,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.065399,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.02867,
+        "Right": 0.022903
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.003098
+      },
+      "bootFitMaxErrorMetres": 0.000125,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 2,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.059376,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.02867,
+        "Right": 0.027507
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.00681
+      },
+      "bootFitMaxErrorMetres": 0.000117,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 3,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.045967,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.02867,
+        "Right": 0.038167
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.015148
+      },
+      "bootFitMaxErrorMetres": 0.000102,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 4,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.03686,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.02867,
+        "Right": 0.05013
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.023931
+      },
+      "bootFitMaxErrorMetres": 0.000109,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 5,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.024396,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.02867,
+        "Right": 0.058655
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.025964
+      },
+      "bootFitMaxErrorMetres": 9.3e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 6,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.022213,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028674,
+        "Right": 0.060658
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.018311
+      },
+      "bootFitMaxErrorMetres": 9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 7,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.016423,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028672,
+        "Right": 0.058757
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.008821
+      },
+      "bootFitMaxErrorMetres": 9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 8,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.014161,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028667,
+        "Right": 0.054554
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.002948
+      },
+      "bootFitMaxErrorMetres": 9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 9,
+      "worldPosition": [
+        59.2522964,
+        -9.9129324,
+        108.5359955
+      ],
+      "engineBasisColumns": [
+        [
+          0.9090743,
+          0.1144992,
+          -0.4005919
+        ],
+        [
+          -0.0476728,
+          0.9837674,
+          0.1730001
+        ],
+        [
+          0.4138976,
+          -0.1381726,
+          0.8997761
+        ]
+      ],
+      "supportWorldY": -9.9099007,
+      "closestBootSampleMetres": 0.01654,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028664,
+        "Right": 0.049915
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.001507
+      },
+      "bootFitMaxErrorMetres": 8.9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 10,
+      "worldPosition": [
+        59.2515106,
+        -9.9121428,
+        108.5373535
+      ],
+      "engineBasisColumns": [
+        [
+          0.9081592,
+          0.1026385,
+          -0.4058479
+        ],
+        [
+          -0.036293,
+          0.9851313,
+          0.1679264
+        ],
+        [
+          0.4170491,
+          -0.1377745,
+          0.8983811
+        ]
+      ],
+      "supportWorldY": -9.9101753,
+      "closestBootSampleMetres": 0.014986,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028666,
+        "Right": 0.046776
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.001498
+      },
+      "bootFitMaxErrorMetres": 8.7e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.000706
+    },
+    {
+      "frame": 11,
+      "worldPosition": [
+        59.2492523,
+        -9.9098568,
+        108.5412598
+      ],
+      "engineBasisColumns": [
+        [
+          0.9046691,
+          0.0684111,
+          -0.4205875
+        ],
+        [
+          -0.0037201,
+          0.9882588,
+          0.1527445
+        ],
+        [
+          0.4260986,
+          -0.1366185,
+          0.8943016
+        ]
+      ],
+      "supportWorldY": -9.9109726,
+      "closestBootSampleMetres": 0.009137,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.028282,
+        "Right": 0.046071
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.003314,
+        "Right": 0.001493
+      },
+      "bootFitMaxErrorMetres": 7.2e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.00014
+    },
+    {
+      "frame": 12,
+      "worldPosition": [
+        59.2456589,
+        -9.906251,
+        108.5474701
+      ],
+      "engineBasisColumns": [
+        [
+          0.8965578,
+          0.0140311,
+          -0.4427047
+        ],
+        [
+          0.0472009,
+          0.9907801,
+          0.1269922
+        ],
+        [
+          0.4404048,
+          -0.1347519,
+          0.8876293
+        ]
+      ],
+      "supportWorldY": -9.9122391,
+      "closestBootSampleMetres": 0.010845,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.024259,
+        "Right": 0.046225
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.007635,
+        "Right": 0.001576
+      },
+      "bootFitMaxErrorMetres": 5.5e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.00148
+    },
+    {
+      "frame": 13,
+      "worldPosition": [
+        59.2408676,
+        -9.9015627,
+        108.555748
+      ],
+      "engineBasisColumns": [
+        [
+          0.881121,
+          -0.0575312,
+          -0.4693783
+        ],
+        [
+          0.1125924,
+          0.9895504,
+          0.0900713
+        ],
+        [
+          0.4592915,
+          -0.1322121,
+          0.8783912
+        ]
+      ],
+      "supportWorldY": -9.913929,
+      "closestBootSampleMetres": 0.017825,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.017096,
+        "Right": 0.046438
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.015356,
+        "Right": 0.001785
+      },
+      "bootFitMaxErrorMetres": 3.5e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.003239
+    },
+    {
+      "frame": 14,
+      "worldPosition": [
+        59.2350273,
+        -9.8961306,
+        108.5658493
+      ],
+      "engineBasisColumns": [
+        [
+          0.8559138,
+          -0.1419538,
+          -0.4972531
+        ],
+        [
+          0.1871777,
+          0.9814273,
+          0.042012
+        ],
+        [
+          0.482054,
+          -0.1290334,
+          0.8665877
+        ]
+      ],
+      "supportWorldY": -9.9159889,
+      "closestBootSampleMetres": 0.014181,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.00828,
+        "Right": 0.04658
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.024923,
+        "Right": 0.002086
+      },
+      "bootFitMaxErrorMetres": 2.3e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.005319
+    },
+    {
+      "frame": 15,
+      "worldPosition": [
+        59.2282677,
+        -9.8904476,
+        108.5775223
+      ],
+      "engineBasisColumns": [
+        [
+          0.8198125,
+          -0.2333125,
+          -0.5229465
+        ],
+        [
+          0.2643325,
+          0.9643017,
+          -0.0158344
+        ],
+        [
+          0.5079725,
+          -0.1252505,
+          0.8522185
+        ]
+      ],
+      "supportWorldY": -9.9183693,
+      "closestBootSampleMetres": 0.01535,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.000677,
+        "Right": 0.046602
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.034812,
+        "Right": 0.002524
+      },
+      "bootFitMaxErrorMetres": 0.000115,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.007592
+    },
+    {
+      "frame": 16,
+      "worldPosition": [
+        59.2207413,
+        -9.8850727,
+        108.590538
+      ],
+      "engineBasisColumns": [
+        [
+          0.7739252,
+          -0.3244241,
+          -0.5438646
+        ],
+        [
+          0.3367498,
+          0.9381532,
+          -0.080425
+        ],
+        [
+          0.5363201,
+          -0.1209034,
+          0.8353102
+        ]
+      ],
+      "supportWorldY": -9.9210205,
+      "closestBootSampleMetres": 0.026673,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.008273,
+        "Right": 0.046562
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.043467,
+        "Right": 0.002789
+      },
+      "bootFitMaxErrorMetres": 8.7e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.009898
+    },
+    {
+      "frame": 17,
+      "worldPosition": [
+        59.2125778,
+        -9.8806086,
+        108.6046448
+      ],
+      "engineBasisColumns": [
+        [
+          0.721891,
+          -0.4077893,
+          -0.5590895
+        ],
+        [
+          0.3976071,
+          0.9056724,
+          -0.1471939
+        ],
+        [
+          0.566376,
+          -0.11604,
+          0.8159367
+        ]
+      ],
+      "supportWorldY": -9.9238968,
+      "closestBootSampleMetres": 0.040189,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.013013,
+        "Right": 0.046478
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.049324,
+        "Right": 0.00299
+      },
+      "bootFitMaxErrorMetres": 7.3e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.012057
+    },
+    {
+      "frame": 18,
+      "worldPosition": [
+        59.2039261,
+        -9.8775768,
+        108.6195984
+      ],
+      "engineBasisColumns": [
+        [
+          0.6692531,
+          -0.4767886,
+          -0.5698887
+        ],
+        [
+          0.4417797,
+          0.8720174,
+          -0.2107524
+        ],
+        [
+          0.5974371,
+          -0.1107185,
+          0.7942358
+        ]
+      ],
+      "supportWorldY": -9.9269409,
+      "closestBootSampleMetres": 0.054943,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.013409,
+        "Right": 0.046366
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.050901,
+        "Right": 0.003049
+      },
+      "bootFitMaxErrorMetres": 4.9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.013885
+    },
+    {
+      "frame": 19,
+      "worldPosition": [
+        59.1949234,
+        -9.8763514,
+        108.6351624
+      ],
+      "engineBasisColumns": [
+        [
+          0.622022,
+          -0.5265853,
+          -0.5794796
+        ],
+        [
+          0.4665422,
+          0.8436119,
+          -0.2658147
+        ],
+        [
+          0.62883,
+          -0.1050091,
+          0.7704194
+        ]
+      ],
+      "supportWorldY": -9.9301224,
+      "closestBootSampleMetres": 0.069817,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.009639,
+        "Right": 0.046219
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.048336,
+        "Right": 0.00304
+      },
+      "bootFitMaxErrorMetres": 4e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.015212
+    },
+    {
+      "frame": 20,
+      "worldPosition": [
+        59.1857071,
+        -9.8771305,
+        108.6510925
+      ],
+      "engineBasisColumns": [
+        [
+          0.584978,
+          -0.5543659,
+          -0.5920128
+        ],
+        [
+          0.471487,
+          0.8263648,
+          -0.3079307
+        ],
+        [
+          0.6599248,
+          -0.0989937,
+          0.7447817
+        ]
+      ],
+      "supportWorldY": -9.9333687,
+      "closestBootSampleMetres": 0.084646,
+      "originalBootToRoadClearanceMetres": {
+        "Left": 0.002981,
+        "Right": 0.046129
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.042843,
+        "Right": 0.003016
+      },
+      "bootFitMaxErrorMetres": 4e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.015911
+    },
+    {
+      "frame": 21,
+      "worldPosition": [
+        59.1764221,
+        -9.8799734,
+        108.6671448
+      ],
+      "engineBasisColumns": [
+        [
+          0.5603871,
+          -0.5590048,
+          -0.6111299
+        ],
+        [
+          0.4578889,
+          0.8239587,
+          -0.3338108
+        ],
+        [
+          0.6901477,
+          -0.0927664,
+          0.717698
+        ]
+      ],
+      "supportWorldY": -9.9366417,
+      "closestBootSampleMetres": 0.099333,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.005567,
+        "Right": 0.046022
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.035403,
+        "Right": 0.003027
+      },
+      "bootFitMaxErrorMetres": 3.9e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.015911
+    },
+    {
+      "frame": 22,
+      "worldPosition": [
+        59.1672058,
+        -9.8848104,
+        108.6830673
+      ],
+      "engineBasisColumns": [
+        [
+          0.5475776,
+          -0.5406273,
+          -0.6386554
+        ],
+        [
+          0.4280287,
+          0.8368104,
+          -0.341379
+        ],
+        [
+          0.7189924,
+          -0.0864313,
+          0.6896227
+        ]
+      ],
+      "supportWorldY": -9.939888,
+      "closestBootSampleMetres": 0.113522,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.014977,
+        "Right": 0.045918
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.026983,
+        "Right": 0.003021
+      },
+      "bootFitMaxErrorMetres": 3.4e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.015212
+    },
+    {
+      "frame": 23,
+      "worldPosition": [
+        59.1582031,
+        -9.8914404,
+        108.6986313
+      ],
+      "engineBasisColumns": [
+        [
+          0.5434373,
+          -0.5005205,
+          -0.6739104
+        ],
+        [
+          0.3848674,
+          0.862011,
+          -0.32987
+        ],
+        [
+          0.7460249,
+          -0.0801025,
+          0.6610829
+        ]
+      ],
+      "supportWorldY": -9.943058,
+      "closestBootSampleMetres": 0.127119,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.024258,
+        "Right": 0.045805
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.018574,
+        "Right": 0.003029
+      },
+      "bootFitMaxErrorMetres": 4.3e-05,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.013885
+    },
+    {
+      "frame": 24,
+      "worldPosition": [
+        59.1495476,
+        -9.8995762,
+        108.7135925
+      ],
+      "engineBasisColumns": [
+        [
+          0.5435811,
+          -0.4414344,
+          -0.7139012
+        ],
+        [
+          0.3320396,
+          0.894245,
+          -0.3001257
+        ],
+        [
+          0.7708885,
+          -0.0739008,
+          0.6326684
+        ]
+      ],
+      "supportWorldY": -9.9461136,
+      "closestBootSampleMetres": 0.140457,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.032384,
+        "Right": 0.044831
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.01113,
+        "Right": 0.003235
+      },
+      "bootFitMaxErrorMetres": 0.000117,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.012058
+    },
+    {
+      "frame": 25,
+      "worldPosition": [
+        59.1413879,
+        -9.908741,
+        108.7276993
+      ],
+      "engineBasisColumns": [
+        [
+          0.5437642,
+          -0.3678899,
+          -0.7543061
+        ],
+        [
+          0.2738376,
+          0.9273833,
+          -0.254899
+        ],
+        [
+          0.7933055,
+          -0.0679524,
+          0.6050199
+        ]
+      ],
+      "supportWorldY": -9.9489861,
+      "closestBootSampleMetres": 0.153572,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.038342,
+        "Right": 0.043483
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.005627,
+        "Right": 0.003291
+      },
+      "bootFitMaxErrorMetres": 0.000119,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.009898
+    },
+    {
+      "frame": 26,
+      "worldPosition": [
+        59.1338577,
+        -9.9183836,
+        108.7407074
+      ],
+      "engineBasisColumns": [
+        [
+          0.5410517,
+          -0.2860306,
+          -0.7908537
+        ],
+        [
+          0.2148968,
+          0.9561874,
+          -0.1988087
+        ],
+        [
+          0.8130698,
+          -0.0623862,
+          0.5788139
+        ]
+      ],
+      "supportWorldY": -9.9516411,
+      "closestBootSampleMetres": 0.166297,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041127,
+        "Right": 0.042286
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.003038,
+        "Right": 0.003284
+      },
+      "bootFitMaxErrorMetres": 0.000122,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.007592
+    },
+    {
+      "frame": 27,
+      "worldPosition": [
+        59.1271019,
+        -9.9278765,
+        108.752388
+      ],
+      "engineBasisColumns": [
+        [
+          0.5343843,
+          -0.2028756,
+          -0.8205333
+        ],
+        [
+          0.1595883,
+          0.9775247,
+          -0.1377573
+        ],
+        [
+          0.8300391,
+          -0.0573322,
+          0.5547504
+        ]
+      ],
+      "supportWorldY": -9.9540215,
+      "closestBootSampleMetres": 0.178504,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04122,
+        "Right": 0.041284
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002958,
+        "Right": 0.003289
+      },
+      "bootFitMaxErrorMetres": 0.000135,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.005319
+    },
+    {
+      "frame": 28,
+      "worldPosition": [
+        59.1212578,
+        -9.9365902,
+        108.7624893
+      ],
+      "engineBasisColumns": [
+        [
+          0.5244578,
+          -0.1252571,
+          -0.8421727
+        ],
+        [
+          0.1113974,
+          0.990712,
+          -0.0779774
+        ],
+        [
+          0.8441178,
+          -0.05292,
+          0.5335399
+        ]
+      ],
+      "supportWorldY": -9.9560814,
+      "closestBootSampleMetres": 0.189821,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041223,
+        "Right": 0.040525
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00295,
+        "Right": 0.003304
+      },
+      "bootFitMaxErrorMetres": 0.000152,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.003239
+    },
+    {
+      "frame": 29,
+      "worldPosition": [
+        59.1164703,
+        -9.9439926,
+        108.7707672
+      ],
+      "engineBasisColumns": [
+        [
+          0.5131259,
+          -0.0589374,
+          -0.8562876
+        ],
+        [
+          0.0726004,
+          0.9970448,
+          -0.0251202
+        ],
+        [
+          0.8552375,
+          -0.049277,
+          0.5158883
+        ]
+      ],
+      "supportWorldY": -9.9577713,
+      "closestBootSampleMetres": 0.199799,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041224,
+        "Right": 0.040083
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002941,
+        "Right": 0.003327
+      },
+      "bootFitMaxErrorMetres": 0.000171,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.00148
+    },
+    {
+      "frame": 30,
+      "worldPosition": [
+        59.1128769,
+        -9.9496508,
+        108.7769775
+      ],
+      "engineBasisColumns": [
+        [
+          0.5026832,
+          -0.008234,
+          -0.8644316
+        ],
+        [
+          0.0443578,
+          0.998883,
+          0.0162802
+        ],
+        [
+          0.863332,
+          -0.046528,
+          0.5024869
+        ]
+      ],
+      "supportWorldY": -9.9590378,
+      "closestBootSampleMetres": 0.208015,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04123,
+        "Right": 0.040437
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002947,
+        "Right": 0.003815
+      },
+      "bootFitMaxErrorMetres": 0.00019,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": 0.00014
+    },
+    {
+      "frame": 31,
+      "worldPosition": [
+        59.1106148,
+        -9.9532356,
+        108.7808838
+      ],
+      "engineBasisColumns": [
+        [
+          0.4952804,
+          0.0238131,
+          -0.8684068
+        ],
+        [
+          0.0271356,
+          0.9987124,
+          0.0428626
+        ],
+        [
+          0.8683093,
+          -0.0447938,
+          0.4939964
+        ]
+      ],
+      "supportWorldY": -9.9598274,
+      "closestBootSampleMetres": 0.21378,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041223,
+        "Right": 0.042141
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002934,
+        "Right": 0.005537
+      },
+      "bootFitMaxErrorMetres": 0.000211,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.000706
+    },
+    {
+      "frame": 32,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.216368,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041217,
+        "Right": 0.044817
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002923,
+        "Right": 0.008216
+      },
+      "bootFitMaxErrorMetres": 0.000221,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 33,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.217311,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041207,
+        "Right": 0.04816
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002916,
+        "Right": 0.011575
+      },
+      "bootFitMaxErrorMetres": 0.000239,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 34,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.218415,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041201,
+        "Right": 0.05189
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002913,
+        "Right": 0.015292
+      },
+      "bootFitMaxErrorMetres": 0.000236,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 35,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.219608,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041189,
+        "Right": 0.055696
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002899,
+        "Right": 0.019115
+      },
+      "bootFitMaxErrorMetres": 0.000251,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 36,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.220789,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041181,
+        "Right": 0.059304
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002896,
+        "Right": 0.022717
+      },
+      "bootFitMaxErrorMetres": 0.00025,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 37,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.221847,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041168,
+        "Right": 0.062411
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002884,
+        "Right": 0.02582
+      },
+      "bootFitMaxErrorMetres": 0.000251,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 38,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.222662,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04116,
+        "Right": 0.064717
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002882,
+        "Right": 0.028146
+      },
+      "bootFitMaxErrorMetres": 0.000268,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 39,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.223096,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041151,
+        "Right": 0.065949
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.029372
+      },
+      "bootFitMaxErrorMetres": 0.000273,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 40,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.222938,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041148,
+        "Right": 0.065976
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002871,
+        "Right": 0.029338
+      },
+      "bootFitMaxErrorMetres": 0.00029,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 41,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.222261,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041148,
+        "Right": 0.06517
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00287,
+        "Right": 0.028374
+      },
+      "bootFitMaxErrorMetres": 0.000303,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 42,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.221161,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041149,
+        "Right": 0.063718
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002872,
+        "Right": 0.026694
+      },
+      "bootFitMaxErrorMetres": 0.000336,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 43,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.219731,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041151,
+        "Right": 0.06177
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.024439
+      },
+      "bootFitMaxErrorMetres": 0.000368,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 44,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.218075,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041154,
+        "Right": 0.059469
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002876,
+        "Right": 0.021818
+      },
+      "bootFitMaxErrorMetres": 0.000457,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 45,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.216262,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04116,
+        "Right": 0.056961
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002882,
+        "Right": 0.018875
+      },
+      "bootFitMaxErrorMetres": 0.000486,
+      "hipDropMetres": 0.002282,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 46,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.214369,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041162,
+        "Right": 0.054396
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002878,
+        "Right": 0.01578
+      },
+      "bootFitMaxErrorMetres": 0.000474,
+      "hipDropMetres": 0.005067,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 47,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.212485,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041168,
+        "Right": 0.051908
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002887,
+        "Right": 0.012729
+      },
+      "bootFitMaxErrorMetres": 0.000458,
+      "hipDropMetres": 0.007794,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 48,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.210678,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041174,
+        "Right": 0.049653
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002886,
+        "Right": 0.009892
+      },
+      "bootFitMaxErrorMetres": 0.000453,
+      "hipDropMetres": 0.010311,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 49,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.209005,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041176,
+        "Right": 0.047776
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002892,
+        "Right": 0.007398
+      },
+      "bootFitMaxErrorMetres": 0.000435,
+      "hipDropMetres": 0.012476,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 50,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.207533,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041179,
+        "Right": 0.04641
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002888,
+        "Right": 0.005434
+      },
+      "bootFitMaxErrorMetres": 0.000434,
+      "hipDropMetres": 0.014128,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 51,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.206046,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041183,
+        "Right": 0.045714
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002898,
+        "Right": 0.004141
+      },
+      "bootFitMaxErrorMetres": 0.000437,
+      "hipDropMetres": 0.01513,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 52,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.204763,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041185,
+        "Right": 0.045825
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002897,
+        "Right": 0.003673
+      },
+      "bootFitMaxErrorMetres": 0.000441,
+      "hipDropMetres": 0.015318,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 53,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.203694,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041191,
+        "Right": 0.046379
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.0029,
+        "Right": 0.003666
+      },
+      "bootFitMaxErrorMetres": 0.000443,
+      "hipDropMetres": 0.015065,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 54,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.202713,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041192,
+        "Right": 0.046901
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002902,
+        "Right": 0.00367
+      },
+      "bootFitMaxErrorMetres": 0.000457,
+      "hipDropMetres": 0.014838,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 55,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.21024,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041193,
+        "Right": 0.04739
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002904,
+        "Right": 0.003663
+      },
+      "bootFitMaxErrorMetres": 0.000459,
+      "hipDropMetres": 0.014645,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 56,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.209085,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041202,
+        "Right": 0.047821
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002913,
+        "Right": 0.003659
+      },
+      "bootFitMaxErrorMetres": 0.000463,
+      "hipDropMetres": 0.01447,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 57,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.208102,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.048201
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002913,
+        "Right": 0.003661
+      },
+      "bootFitMaxErrorMetres": 0.000471,
+      "hipDropMetres": 0.01433,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 58,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.207303,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.048512
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002913,
+        "Right": 0.00366
+      },
+      "bootFitMaxErrorMetres": 0.000475,
+      "hipDropMetres": 0.014221,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 59,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.206725,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.04874
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002913,
+        "Right": 0.003654
+      },
+      "bootFitMaxErrorMetres": 0.000473,
+      "hipDropMetres": 0.014136,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 60,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.206355,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.048889
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002914,
+        "Right": 0.003655
+      },
+      "bootFitMaxErrorMetres": 0.000478,
+      "hipDropMetres": 0.014089,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 61,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.206267,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.049067
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002914,
+        "Right": 0.003791
+      },
+      "bootFitMaxErrorMetres": 0.000484,
+      "hipDropMetres": 0.013937,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 62,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.206718,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041207,
+        "Right": 0.049707
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002916,
+        "Right": 0.004529
+      },
+      "bootFitMaxErrorMetres": 0.000479,
+      "hipDropMetres": 0.01323,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 63,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.207764,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041203,
+        "Right": 0.050711
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002914,
+        "Right": 0.005822
+      },
+      "bootFitMaxErrorMetres": 0.000479,
+      "hipDropMetres": 0.012034,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 64,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.209363,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041202,
+        "Right": 0.051971
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002907,
+        "Right": 0.007554
+      },
+      "bootFitMaxErrorMetres": 0.00049,
+      "hipDropMetres": 0.01047,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 65,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.211428,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041201,
+        "Right": 0.053398
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002911,
+        "Right": 0.009583
+      },
+      "bootFitMaxErrorMetres": 0.000498,
+      "hipDropMetres": 0.008666,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 66,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.205275,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041192,
+        "Right": 0.054891
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.0029,
+        "Right": 0.011792
+      },
+      "bootFitMaxErrorMetres": 0.000509,
+      "hipDropMetres": 0.006742,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 67,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.207388,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04119,
+        "Right": 0.056365
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002903,
+        "Right": 0.01404
+      },
+      "bootFitMaxErrorMetres": 0.000508,
+      "hipDropMetres": 0.004829,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 68,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.209659,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041184,
+        "Right": 0.057706
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002898,
+        "Right": 0.016219
+      },
+      "bootFitMaxErrorMetres": 0.000512,
+      "hipDropMetres": 0.003035,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 69,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.211943,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041182,
+        "Right": 0.058827
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002897,
+        "Right": 0.018191
+      },
+      "bootFitMaxErrorMetres": 0.000509,
+      "hipDropMetres": 0.001484,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 70,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.21375,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041175,
+        "Right": 0.059635
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002893,
+        "Right": 0.019845
+      },
+      "bootFitMaxErrorMetres": 0.000512,
+      "hipDropMetres": 0.00029,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 71,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215435,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041163,
+        "Right": 0.06002
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002886,
+        "Right": 0.021
+      },
+      "bootFitMaxErrorMetres": 0.000465,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 72,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.216905,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041161,
+        "Right": 0.059893
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002883,
+        "Right": 0.021613
+      },
+      "bootFitMaxErrorMetres": 0.000451,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 73,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.21805,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041153,
+        "Right": 0.059183
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002875,
+        "Right": 0.021589
+      },
+      "bootFitMaxErrorMetres": 0.00048,
+      "hipDropMetres": 0.0,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 74,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.218826,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.04115,
+        "Right": 0.057974
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002873,
+        "Right": 0.020921
+      },
+      "bootFitMaxErrorMetres": 0.000481,
+      "hipDropMetres": 0.0009,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 75,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.219197,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041148,
+        "Right": 0.056404
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002871,
+        "Right": 0.019733
+      },
+      "bootFitMaxErrorMetres": 0.000471,
+      "hipDropMetres": 0.002358,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 76,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.219126,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041143,
+        "Right": 0.054605
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002867,
+        "Right": 0.018147
+      },
+      "bootFitMaxErrorMetres": 0.000463,
+      "hipDropMetres": 0.004098,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 77,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.218613,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.052706
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002867,
+        "Right": 0.016256
+      },
+      "bootFitMaxErrorMetres": 0.000442,
+      "hipDropMetres": 0.006011,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 78,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.217985,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.050656
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00286,
+        "Right": 0.014193
+      },
+      "bootFitMaxErrorMetres": 0.00043,
+      "hipDropMetres": 0.008075,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 79,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.217354,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.048532
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002869,
+        "Right": 0.012054
+      },
+      "bootFitMaxErrorMetres": 0.000419,
+      "hipDropMetres": 0.010213,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 80,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.21675,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.046445
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002862,
+        "Right": 0.009952
+      },
+      "bootFitMaxErrorMetres": 0.00041,
+      "hipDropMetres": 0.012325,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 81,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.216202,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.044501
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002859,
+        "Right": 0.007977
+      },
+      "bootFitMaxErrorMetres": 0.00039,
+      "hipDropMetres": 0.014299,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 82,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.21574,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.042798
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.00286,
+        "Right": 0.006257
+      },
+      "bootFitMaxErrorMetres": 0.000375,
+      "hipDropMetres": 0.016017,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 83,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215382,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.041449
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002857,
+        "Right": 0.004898
+      },
+      "bootFitMaxErrorMetres": 0.000366,
+      "hipDropMetres": 0.017374,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 84,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215149,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040568
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002857,
+        "Right": 0.003995
+      },
+      "bootFitMaxErrorMetres": 0.000352,
+      "hipDropMetres": 0.018279,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 85,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 86,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 87,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 88,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 89,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 90,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 91,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 92,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 93,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 94,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 95,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 96,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    },
+    {
+      "frame": 97,
+      "worldPosition": [
+        59.1098328,
+        -9.9544783,
+        108.7822418
+      ],
+      "engineBasisColumns": [
+        [
+          0.4925626,
+          0.0349424,
+          -0.8695753
+        ],
+        [
+          0.021269,
+          0.9984119,
+          0.0521671
+        ],
+        [
+          0.8700171,
+          -0.0441906,
+          0.4910372
+        ]
+      ],
+      "supportWorldY": -9.9601097,
+      "closestBootSampleMetres": 0.215067,
+      "originalBootToRoadClearanceMetres": {
+        "Left": -0.041142,
+        "Right": 0.040245
+      },
+      "fittedBootToSupportClearanceMetres": {
+        "Left": 0.002861,
+        "Right": 0.003676
+      },
+      "bootFitMaxErrorMetres": 0.000354,
+      "hipDropMetres": 0.018596,
+      "minimumTerrainClearanceMetres": -0.001
+    }
+  ]
+}

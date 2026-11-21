@@ -27,6 +27,14 @@ made from locally synthesized filtered noise. The
 sources, crop frames and exact WAVs. Packages carry the bounded derivatives
 and manifest. The archive originals stay private.
 
+## Bellwether loose road stone (1.8 source)
+
+`assets/models/world/source/bellwether-loose-road-stone-v1/` contains original
+Samfa12/Codex stone geometry, a single opaque material, and an editable fit to
+the existing Kit rig and chapter terrain. The source Blend includes the
+previously documented Kit rig and a cut of the admitted terrain for review.
+The standalone stone GLB contains only the authored stone.
+
 ## Original tomb-floor masonry chips (1.7 development)
 
 `src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in
