@@ -1428,6 +1428,10 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if(options.error.empty() && options.bellwetherFurnitureRoute &&
        (!options.bellwetherFurnitureTransitions || options.developmentCheckpoint!="bellwether-repeat-visit"))
         options.error="Bellwether furniture route requires automatic selection and the repeat-visit checkpoint.";
+#if defined(HORDE_RT_BELLWETHER_RAY_WITNESS)
+    if(options.error.empty() && (!options.bellwetherFurnitureTransitions || options.bellwetherFurnitureRoute))
+        options.error="The private Bellwether ray witness requires one hidden automatic-detail checkpoint.";
+#endif
     const bool returnToKit = residentCheckpoint &&
         residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
@@ -8337,6 +8341,9 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
         manifest<<"  \"bellwetherFurnitureLod\": "<<level<<",\n"
                 <<"  \"bellwetherFurnitureTriangles\": "<<horde::scene::kBellwetherFurnitureTriangles[level]<<",\n";
     }
+#endif
+#if defined(HORDE_RT_BELLWETHER_RAY_WITNESS)
+    manifest << "  \"furnitureRayWitnessEncoding\": \"furniture-ray-red-low-nibble-v1\",\n";
 #endif
     manifest << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))

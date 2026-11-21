@@ -37,6 +37,32 @@ For a moving check, add `--bellwether-furniture-route` and use `bellwether-repea
 
 Both Windows RT backends presented 1,033 sampled frames across three entries and two quiet returns. The sampled route logs matched byte for byte, with one TLAS per run and 13 completed image readbacks per backend. The tier sequence was far, mid, near, mid, near, mid, near. The authored door and pane stayed active throughout. The route used the local tavern keeper fixture and hidden 960 x 540 presentation.
 
-Per-ray relevance, safe resource retirement and phone budgets remain acceptance gates.
+## Ray contribution diagnostic
+
+The private Windows Debug witness counts pixels whose existing hardware RT queries hit the split furniture instance. It records the committed primary hit, shadow blockers, reflected hits and transmitted hits in the low four red bits of the presented image. The bits are 1, 2, 4 and 8 respectively. A pixel can carry more than one bit. The shaders keep the normal color in the upper red nibble and the green and blue channels to support a matched ordinary capture.
+
+From the repository root, prepare a fresh private shader tree, then generate its catalogs with the normal shader tools.
+
+```powershell
+python tools/prototype-bellwether-ray-witness.py build/bellwether-ray-witness
+$witnessRoot = (Resolve-Path build/bellwether-ray-witness).Path
+& "$witnessRoot/tools/compile-raygen.ps1" -Freeze -ArtifactDirectory "$witnessRoot/src/vulkan/raytracing/variants" -CatalogPath "$witnessRoot/tools/raygen-variant-catalog.json" -BudgetPath "$witnessRoot/tools/raygen-variant-budgets.json"
+& "$witnessRoot/tools/GenerateRtPipelineVariantCatalog.ps1" -Write
+& "$witnessRoot/tools/GenerateRayQueryComputeVariants.ps1" -Write
+```
+
+Use a separate Windows build directory with `HORDE_RT_BELLWETHER_RAY_WITNESS_ROOT` set to the absolute private directory, and build Debug. Launch the same hidden automatic-detail checkpoint as above. The capture manifest records the private encoding and the exact selected shader hashes. Decode each RGB PNG with `red & 15`.
+
+Both backends reported the same counts in all five matched 960 x 540 views.
+
+| View | Primary | Shadow | Reflection | Transmission |
+| --- | ---: | ---: | ---: | ---: |
+| Church waymarker | 0 | 0 | 0 | 0 |
+| South approach | 216 | 910 | 38 | 0 |
+| Staffed room | 1,786 | 8,006 | 700 | 0 |
+| Window with Glass On | 0 | 1 | 0 | 0 |
+| Hearth | 5,408 | 27,719 | 2,483 | 0 |
+
+In the staffed room, 6,524 shadow pixels and 423 reflection pixels had no primary furniture hit. The window gave a shadow hit even though the furniture lay entirely outside direct visibility in that frame. The matched ordinary captures retained identical green and blue channels. These sampled views establish why a furniture tier must remain available for secondary and shadow rays when its primary hits disappear. Safe resource retirement and phone budgets remain acceptance gates.
 
 The [Blender recipe](../../../../../tools/author-bellwether-tavern-lods.py) takes the repository root and a new output directory. The existing `horde_rt_bellwether_shell_tests` executable accepts that output directory as an optional argument to run the candidate checks alongside its ordinary town tests.
