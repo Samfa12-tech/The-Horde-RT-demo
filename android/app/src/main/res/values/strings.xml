@@ -68,6 +68,10 @@
     <string name="inspect_mill_gearing">Inspect mill gearing</string>
     <string name="take_spare_bearing">Take a spare bearing</string>
     <string name="check_mill_bearing_fit">Check bearing fit</string>
+    <string name="start_rig_leak_test">Start leak test</string>
+    <string name="confirm_rig_seal">Confirm seal</string>
+    <string name="rig_leak_test_in_progress">Stay in the shallows</string>
+    <string name="rig_leak_test_return_to_dry">Return to dry stone</string>
     <string name="open_tavern_door">Open tavern door</string>
     <string name="close_tavern_door">Close tavern door</string>
     <string name="show_road_mark">Show the road mark</string>

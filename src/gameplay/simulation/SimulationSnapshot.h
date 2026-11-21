@@ -86,6 +86,7 @@ struct SimulationSnapshot
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
     bellwether::MillPreparation millPreparation{};
     bellwether::MillAction millAction{};
+    bellwether::MillLeakTestPhase millLeakTestPhase{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {

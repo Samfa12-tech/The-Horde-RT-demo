@@ -3528,8 +3528,11 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
     const bool chapterInteract = !rescueJourney && !flaskUpgrade && snapshot.HasChapterInteractPrompt();
+    using horde::gameplay::bellwether::MillLeakTestPhase;
+    const auto leakTest=snapshot.millLeakTestPhase;
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
-    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern || snapshot.tavernLanternAvailable)
+    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern ||
+                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
@@ -3568,6 +3571,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case MillAction::InspectGearing: text = "LEFT-CLICK / A TO INSPECT MILL GEARING"; break;
         case MillAction::RecoverBearing: text = "LEFT-CLICK / A TO TAKE A SPARE BEARING"; break;
         case MillAction::CheckFit: text = "LEFT-CLICK / A TO CHECK BEARING FIT"; break;
+        case MillAction::StartLeakTest: text = "LEFT-CLICK / A TO START LEAK TEST"; break;
+        case MillAction::ConfirmSeal: text = "LEFT-CLICK / A TO CONFIRM SEAL"; break;
         default: break;
         }
         context.tavernInteractionPromptPresented=visible;
@@ -3594,6 +3599,9 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             break;
         }
         context.tavernInteractionPromptPresented=visible;
+    }
+    else if(leakTest!=MillLeakTestPhase::Idle) {
+        text = leakTest==MillLeakTestPhase::Testing ? "LEAK TEST | STAY IN THE SHALLOWS" : "RETURN TO DRY STONE";
     }
     else
     {

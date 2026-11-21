@@ -1,8 +1,16 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "audio/KitAnkleAudio.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
+namespace {
+bool AtRiverLeakTest(const dialogue::Context& c) {
+    constexpr auto station=traversal::kBellwetherRiverLanding.back();
+    return std::hypot(c.player.x-station.x,c.player.z-station.z)<=.5f;
+}
+} // namespace
+
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=ChapterInteractionContext(false);
@@ -63,13 +71,24 @@ void GameSimulation::InteractWithClaimedChapter() {
 
 bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context& c) const {
     using namespace bellwether;
-    if(millPreparation_==MillPreparation::FitChecked || !c.claimed || !c.exterior ||
+    if(millPreparation_==MillPreparation::FitChecked || millPreparation_==MillPreparation::RigTested ||
+       !c.claimed || !c.exterior ||
        !c.alive || c.paused || c.traversing || c.combat || !c.kitSeated || !playerSupport_.grounded ||
        !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
        !campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
        campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size() ||
        chapterDialogue_.State().line!=dialogue::Line::None)
         return MillAction::None;
+    if(millPreparation_==MillPreparation::RigTrialReady) {
+        const bool wet=waterContact_.Snapshot().wetGround;
+        constexpr auto dry=traversal::kBellwetherRiverDryMark;
+        if(millLeakTestPhase_==MillLeakTestPhase::Idle && wet && AtRiverLeakTest(c))
+            return MillAction::StartLeakTest;
+        if(millLeakTestPhase_==MillLeakTestPhase::ReturnToDry && !wet &&
+           std::hypot(c.player.x-dry.x,c.player.z-dry.z)<=.55f)
+            return MillAction::ConfirmSeal;
+        return MillAction::None;
+    }
     const bool atBin=millPreparation_==MillPreparation::BearingNeeded;
     const auto& mark=atBin?kMillBearingBin:kMillComparison;
     const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
@@ -80,6 +99,28 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
            mark[1]-.02f,mark[1]+.02f,.025f))return MillAction::None;
     if(atBin)return MillAction::RecoverBearing;
     return millPreparation_==MillPreparation::Unexamined?MillAction::InspectGearing:MillAction::CheckFit;
+}
+
+void GameSimulation::AdvanceMillLeakTest(float seconds) {
+    using bellwether::MillLeakTestPhase;
+    if(millLeakTestPhase_==MillLeakTestPhase::Idle)return;
+    const auto c=ChapterInteractionContext(false);
+    constexpr auto wet=traversal::kBellwetherRiverLanding.back();
+    constexpr auto dry=traversal::kBellwetherRiverDryMark;
+    const bool onLanding=c.player.x>=dry.x-.75f && c.player.x<=wet.x+.5f &&
+        std::abs(c.player.z-dry.z)<=.6f;
+    const bool testing=millLeakTestPhase_==MillLeakTestPhase::Testing;
+    if(!c.alive || !c.exterior || c.traversing || c.combat || !playerSupport_.grounded || !onLanding ||
+       (testing && (!waterContact_.Snapshot().wetGround || !AtRiverLeakTest(c)))) {
+        millLeakTestPhase_=MillLeakTestPhase::Idle;
+        millLeakTestSeconds_=0.f;
+        return;
+    }
+    if(testing) {
+        millLeakTestSeconds_+=seconds;
+        if(millLeakTestSeconds_+1.e-5f>=bellwether::kMillLeakTestSeconds)
+            millLeakTestPhase_=MillLeakTestPhase::ReturnToDry;
+    }
 }
 
 dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::Context& c) const {

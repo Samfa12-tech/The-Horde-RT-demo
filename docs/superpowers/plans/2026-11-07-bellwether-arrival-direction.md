@@ -331,9 +331,17 @@ The two fixtures add 180 triangles to the shared town mesh and reuse its existin
 
 A 1.9 m stone causeway starts just south of the salvager's existing mark, follows the mill's south edge and reaches the west bank of the main river. A timber rail marks the end of the terrace. The river covers the lower stone platform by about 20 cm. The shared collision and render mesh gives the player a continuous walk to and from dry ground.
 
-Shallow contact queries the existing, finite Vulkan water faces and compares their height with the grounded player's feet. Wet steps use the surface height for the sound source and splash droplets. The landing gives the future breathing rig trial and salvager lesson a common place to practise and retreat. The millrace, rig trial and training encounter remain open.
+Shallow contact queries the existing, finite Vulkan water faces and compares their height with the grounded player's feet. Wet steps use the surface height for the sound source and splash droplets. The landing gives the breathing rig trial and the planned salvager lesson a common place to practise and retreat. The millrace and salvager encounter remain open.
 
 The native walkthrough enters and leaves the shallows, verifies wet-footstep positions against the river height, and continues through the existing mill and shrine interactions. The `bellwether-river-landing` Debug checkpoint walks through the same geometry and then returns to its dry camera position. Both Windows hardware RT backends presented the view at 960 × 540. The Android ARM64 Debug package contains the same town export, with phone performance and listening checks pending.
+
+#### Breathing rig seal trial
+
+The private Debug checkpoint bellwether-rig-leak-trial starts on the dry causeway with the rig ready to test. Enter the shallows at the rail and choose **Start leak test**. Stay on the wet platform for two active seconds. Leaving early resets the test and the player can try again. On a successful hold, the prompt directs the player back to dry stone. **Confirm seal** updates the existing tavern return record. Pausing freezes the test and reloading an unconfirmed result requires a fresh attempt.
+
+The checkpoint supplies the rig for testing. Normal campaign play ends this branch at the bearing fit check until the artificer's repair and hand-off are ready. The seal trial uses the existing shallow contact at the river rail. The salvager lesson, underwater traversal and Abbey crossing remain separate milestones.
+
+The native walkthrough checks early retreat, pause, retry, the full wet hold and the dry confirmation. It checks that an unfinished trial restarts after loading and the confirmed seal survives loading. Both Windows hardware RT backends presented the Debug starting position at 960 x 540. The ARM64 Debug package passed the Android checkpoint and prompt tests. Phone performance remains open.
 
 ## Open decisions deliberately preserved
 

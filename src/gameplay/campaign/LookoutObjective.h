@@ -114,6 +114,13 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
         case MillPreparation::FitChecked:
             text+="\r\n\r\nMill bearing matched and ready for repair.";
             break;
+        case MillPreparation::RigTrialReady:
+            text+="\r\n\r\nFollow the stone causeway south of the mill to the river rail. Start the leak test "
+                  "in the shallows and stay there for two seconds. Return to dry stone to confirm the seal.";
+            break;
+        case MillPreparation::RigTested:
+            text+="\r\n\r\nBreathing rig passed its shallow-water seal test.";
+            break;
         }
     }
     return text;

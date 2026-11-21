@@ -325,7 +325,8 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
               millPlay.ObserveSafeBoundary() && awaitSave(millPlay,0),
               "the mill autosave check starts with an ordinary completed tavern record");
         mill.schema=cp::kMillPreparationSchema;
-        for(auto stage:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked}) {
+        for(auto stage:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked,
+                        MillPreparation::RigTrialReady,MillPreparation::RigTested}) {
             const auto previous=millPlay.State().operationRevision;
             mill.millPreparation=stage;
             Check(Seed(millGame,mill,terrain) && millPlay.ObserveSafeBoundary() && awaitSave(millPlay,previous),

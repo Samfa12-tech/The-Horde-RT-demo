@@ -70,6 +70,16 @@ public final class ContextualControlsLayoutTest {
         assertEquals(0, MainActivity.contextualInteractLabel(workbench | (3 << 25) | (1 << 9)));
         assertEquals(0, MainActivity.lanternFittingPrice(workbench | (2 << 25)));
     }
+    @Test
+    public void rigTrialShowsActionsAndReadOnlyCuesInTheMillLane() {
+        final int mill = 7 << 16;
+        assertEquals(R.string.start_rig_leak_test, MainActivity.contextualInteractLabel(mill | (4 << 25) | 1));
+        assertEquals(R.string.confirm_rig_seal, MainActivity.contextualInteractLabel(mill | (5 << 25) | 1));
+        assertEquals(R.string.rig_leak_test_in_progress, MainActivity.contextualInteractLabel(mill | (6 << 25)));
+        assertEquals(R.string.rig_leak_test_return_to_dry, MainActivity.contextualInteractLabel(mill | (7 << 25)));
+        assertEquals(0, MainActivity.lanternFittingPrice(mill | (7 << 25)));
+    }
+
     private static Rect bounds(final View view) {
         return new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }

@@ -2084,6 +2084,108 @@ void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSu
     }
 }
 
+void TestBellwetherRigLeakTrial(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::traversal;
+    using gameplay::bellwether::MillAction;
+    using gameplay::bellwether::MillLeakTestPhase;
+    using gameplay::bellwether::MillPreparation;
+    const auto config=sim::ProductionGameSimulationConfig();
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-rig-leak-trial");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=view && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*view);
+    const auto& state=game.Snapshot();
+    Check(ready && !state.waterContact.wetGround && state.millAction==MillAction::None &&
+          state.millPreparation==MillPreparation::RigTrialReady,
+          "the private rig checkpoint stages on dry stone before the test");
+    if(!ready)return;
+
+    sim::InputSnapshot input;
+    input.damageEnabled=false;input.tutorialEnabled=false;
+    input.commands.interact=state.lastConsumedInteractSequence;
+    const auto step=[&] {
+        game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        game.ClearEvents();
+    };
+    const auto walkTo=[&](BellwetherStation point) {
+        for(unsigned tick=0;tick<180;++tick) {
+            const float dx=point.x-state.playerX,dz=point.z-state.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.008f) {
+                input.moveForward=0;
+                step();
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            step();
+        }
+        return false;
+    };
+    const auto interact=[&] {++input.commands.interact;step();};
+    constexpr auto shallows=kBellwetherRiverLanding.back();
+    const auto trialBoundaryRevision=game.CampaignBoundaryRevision();
+    interact();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Idle &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "a dry start cannot begin or save the leak test");
+    if(!walkTo(shallows)) {Check(false,"can walk to the wet trial mark");return;}
+    Check(state.millAction==MillAction::StartLeakTest && state.waterContact.wetGround,
+          "the test appears only in grounded, shallow river contact");
+    interact();
+    input.paused=true;
+    for(unsigned tick=0;tick<125;++tick)step();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Testing && state.millAction==MillAction::None,
+          "pause cannot count toward the wet hold");
+    input.paused=false;
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"can step back to dry stone early");return;}
+    interact();
+    Check(!state.waterContact.wetGround && state.millLeakTestPhase==MillLeakTestPhase::Idle &&
+          state.millPreparation==MillPreparation::RigTrialReady &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "leaving the water early aborts the test without earning the seal");
+    if(!walkTo(shallows)) {Check(false,"can re-enter the shallows for a retry");return;}
+    interact();
+    for(unsigned tick=0;tick<115;++tick)step();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Testing,
+          "an uninterrupted hold still requires the last part of the two seconds");
+    for(unsigned tick=0;tick<9;++tick)step();
+    interact();
+    const auto unconfirmed=game.LatestCampaignBoundary();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::ReturnToDry && state.millAction==MillAction::None &&
+          unconfirmed && unconfirmed->millPreparation==MillPreparation::RigTrialReady &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "a complete wet hold cannot be confirmed or saved while still in the shallows");
+    if(!unconfirmed)return;
+    sim::GameSimulation reloaded(config);
+    const auto reload=[&](const cp::Checkpoint& record) {
+        const auto token=reloaded.BeginCampaignRestore(record);
+        return token && reloaded.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,{});
+    };
+    Check(reload(*unconfirmed) && reloaded.Snapshot().millLeakTestPhase==MillLeakTestPhase::Idle &&
+          reloaded.Snapshot().millPreparation==MillPreparation::RigTrialReady,
+          "reloading discards an unconfirmed wet trial");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"can return dry after a full hold");return;}
+    Check(state.millAction==MillAction::ConfirmSeal && !state.waterContact.wetGround,
+          "dry stone offers confirmation after a successful wet hold");
+    interact();
+    const auto tested=game.LatestCampaignBoundary();
+    const auto confirmationRevision=game.CampaignBoundaryRevision();
+    interact();
+    Check(tested && tested->millPreparation==MillPreparation::RigTested && cp::Validate(*tested) &&
+          tested->position.x==unconfirmed->position.x && tested->position.z==unconfirmed->position.z &&
+          confirmationRevision==trialBoundaryRevision+1 && game.CampaignBoundaryRevision()==confirmationRevision &&
+          state.millAction==MillAction::None && state.millLeakTestPhase==MillLeakTestPhase::Idle,
+          "dry confirmation earns one durable seal at the existing tavern boundary");
+    Check(tested && reload(*tested) && reloaded.Snapshot().millPreparation==MillPreparation::RigTested,
+          "a confirmed seal survives reloading");
+}
+
 void TestBellwetherRepeatVisitCheckpoint(
     const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
     namespace sim=gameplay::simulation;
@@ -2331,6 +2433,7 @@ void TestFullSurroundings()
             TestBellwetherTavernRoute(recreatedTerrain,true);
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
+            TestBellwetherRigLeakTrial(recreatedTerrain);
         }
     }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns

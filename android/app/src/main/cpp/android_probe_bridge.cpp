@@ -1259,6 +1259,8 @@ void PublishSimulationUiState()
         static_cast<int>(simulation.EndingPhaseForUi()),
         std::memory_order_release);
     int contextualControls = 0;
+    using horde::gameplay::bellwether::MillAction;
+    using horde::gameplay::bellwether::MillLeakTestPhase;
     using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
@@ -1301,11 +1303,15 @@ void PublishSimulationUiState()
         contextualControls |= static_cast<int>(price << 25) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
-             simulation.millAction != horde::gameplay::bellwether::MillAction::None) {
-        // Tag 7 extends the mutually exclusive archive/fitting prompt lanes.
+             (simulation.millAction != MillAction::None || simulation.millLeakTestPhase != MillLeakTestPhase::Idle)) {
+        // Tag 7 shares the archive/fitting lanes. Details 6 and 7 are read-only leak test cues.
         constexpr int millTag=7, detailShift=25;
         static_assert(static_cast<int>(horde::gameplay::bellwether::ArchiveAction::RestoreBinding)<millTag);
-        contextualControls |= (millTag << 16) | (static_cast<int>(simulation.millAction) << detailShift) | 1;
+        static_assert(static_cast<int>(MillAction::ConfirmSeal)==5);
+        const bool actionable=simulation.millAction!=MillAction::None;
+        const int detail=actionable ? static_cast<int>(simulation.millAction) :
+            simulation.millLeakTestPhase==MillLeakTestPhase::Testing ? 6 : 7;
+        contextualControls |= (millTag << 16) | (detail << detailShift) | (actionable ? 1 : 0);
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
              simulation.waysideArchiveAction != horde::gameplay::bellwether::ArchiveAction::None)

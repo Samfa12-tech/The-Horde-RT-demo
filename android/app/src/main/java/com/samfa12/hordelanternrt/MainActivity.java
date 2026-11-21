@@ -7405,6 +7405,7 @@ public class MainActivity extends Activity {
             case "bellwether-church-approach": return 334;
             case "bellwether-mill-yard": return 341;
             case "bellwether-river-landing": return 342;
+            case "bellwether-rig-leak-trial": return 343;
             case "bellwether-record-keeper-handoff": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
@@ -7757,7 +7758,8 @@ public class MainActivity extends Activity {
             case 333: return new float[]{0.0f, -0.12f};
             case 334: return new float[]{-1.57f, -0.24f};
             case 341: return new float[]{1.76f, -0.21f};
-            case 342: return new float[]{1.68f, -0.28f};
+            case 342:
+            case 343: return new float[]{1.68f, -0.28f};
             case 335: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{1.57079632679f, -0.07f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
@@ -8995,6 +8997,10 @@ public class MainActivity extends Activity {
                     case 1: return R.string.inspect_mill_gearing;
                     case 2: return R.string.take_spare_bearing;
                     case 3: return R.string.check_mill_bearing_fit;
+                    case 4: return R.string.start_rig_leak_test;
+                    case 5: return R.string.confirm_rig_seal;
+                    case 6: return R.string.rig_leak_test_in_progress;
+                    case 7: return R.string.rig_leak_test_return_to_dry;
                     default: return 0;
                 }
             default: break;

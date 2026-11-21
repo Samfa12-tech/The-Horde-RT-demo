@@ -198,7 +198,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         using namespace simulation;
         using namespace bellwether;
         const bool millYard=checkpoint.bellwetherBranchView==BellwetherBranchView::MillYard;
-        const bool riverLanding=checkpoint.bellwetherBranchView==BellwetherBranchView::RiverLanding;
+        const bool rigTrial=checkpoint.bellwetherBranchView==BellwetherBranchView::RigLeakTrial;
+        const bool riverLanding=rigTrial || checkpoint.bellwetherBranchView==BellwetherBranchView::RiverLanding;
         const bool east=millYard || riverLanding;
         const auto junction=east?traversal::kBellwetherMillJunction:traversal::kBellwetherChurchJunction;
         const bool returnsToKit=checkpoint.bellwetherBranchView==BellwetherBranchView::KitIntroduction;
@@ -212,6 +213,11 @@ inline bool StageDevelopmentCheckpointSimulation(
         record.zone=campaign::Destination(record.id);
         record.contentRevision=campaign::kBellwetherContentRevision;
         record.schema=campaign::kTavernConversationSchema;
+        if(rigTrial) {
+            // Stand in for the artificer's future hand-off in this Debug entry point.
+            record.schema=campaign::kMillPreparationSchema;
+            record.millPreparation=MillPreparation::RigTrialReady;
+        }
         record.position=campaign::kBellwetherCheckpointPosition;
         record.firstAscentCompleted=true;
         record.swordStowed=true;

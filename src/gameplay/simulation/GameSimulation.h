@@ -337,6 +337,7 @@ private:
     void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
     bellwether::MillAction CurrentMillAction(const dialogue::Context&) const;
+    void AdvanceMillLeakTest(float seconds);
     void InteractWithMill(bellwether::MillAction);
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
@@ -395,6 +396,8 @@ private:
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
     bellwether::MillPreparation millPreparation_{};
+    bellwether::MillLeakTestPhase millLeakTestPhase_{};
+    float millLeakTestSeconds_{};
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};

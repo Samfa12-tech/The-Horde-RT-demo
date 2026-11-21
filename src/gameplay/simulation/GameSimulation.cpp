@@ -428,6 +428,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // Speech duration follows the unscaled active fixed-step clock. Combat,
     // movement and poses still share the teaching time scale; pause freezes both.
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
+    if(!input.paused)AdvanceMillLeakTest(fixedDeltaSeconds);
     if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
         dialogueDucking_.Reset();
     else if(!input.paused)
@@ -825,6 +826,8 @@ void GameSimulation::ResetRoute()
     chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
     treasurePurse_={};
     millPreparation_={};
+    millLeakTestPhase_={};
+    millLeakTestSeconds_=0.f;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -3485,6 +3488,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);
     snapshot_.millPreparation=millPreparation_;
     snapshot_.millAction=CurrentMillAction(chapterContext);
+    snapshot_.millLeakTestPhase=millLeakTestPhase_;
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&

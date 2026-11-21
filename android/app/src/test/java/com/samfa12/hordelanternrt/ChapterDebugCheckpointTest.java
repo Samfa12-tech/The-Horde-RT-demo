@@ -39,11 +39,12 @@ public final class ChapterDebugCheckpointTest {
         Path root = Paths.get("../../src/gameplay/DevelopmentCheckpoints.h");
         if (!Files.exists(root)) root = Paths.get("src/gameplay/DevelopmentCheckpoints.h");
         final String registry = new String(Files.readAllBytes(root), StandardCharsets.UTF_8);
-        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"((?:chapter-|attack-ring-|enemy-hit-)[^\"]+|bellwether-(?:mill-yard|river-landing))\"([^}]+)\\}")
+        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"((?:chapter-|attack-ring-|enemy-hit-)[^\"]+|bellwether-(?:mill-yard|river-landing|rig-leak-trial))\"([^}]+)\\}")
                 .matcher(registry);
         int count = 0;
         boolean millYard = false;
         boolean riverLanding = false;
+        boolean rigLeakTrial = false;
         while (rows.find()) {
             final int id = Integer.parseInt(rows.group(1));
             final String name = rows.group(2);
@@ -58,11 +59,13 @@ public final class ChapterDebugCheckpointTest {
                     MainActivity.developmentCheckpointViewPose(id), 0.000001f);
             millYard |= name.equals("bellwether-mill-yard");
             riverLanding |= name.equals("bellwether-river-landing");
+            rigLeakTrial |= name.equals("bellwether-rig-leak-trial");
             ++count;
         }
         assertTrue("The chapter roster must include landing, town, Kit and traversal views", count >= 22);
         assertTrue("The mill yard must have a native checkpoint and matching camera", millYard);
         assertTrue("The river landing must have a native checkpoint and matching camera", riverLanding);
+        assertTrue("The rig leak trial must have a native checkpoint and matching camera", rigLeakTrial);
         assertEquals(-1, MainActivity.checkpointId("chapter-unknown"));
         assertNull(MainActivity.developmentCheckpointViewPose(999));
     }

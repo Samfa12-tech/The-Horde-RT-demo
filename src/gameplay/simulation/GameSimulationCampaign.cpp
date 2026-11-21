@@ -329,12 +329,19 @@ void GameSimulation::InteractWithMill(bellwether::MillAction action) {
     case MillAction::InspectGearing: preparation=MillPreparation::BearingNeeded;break;
     case MillAction::RecoverBearing: preparation=MillPreparation::BearingRecovered;break;
     case MillAction::CheckFit: preparation=MillPreparation::FitChecked;break;
+    case MillAction::StartLeakTest:
+        millLeakTestPhase_=MillLeakTestPhase::Testing;
+        millLeakTestSeconds_=0.f;
+        return;
+    case MillAction::ConfirmSeal: preparation=MillPreparation::RigTested;break;
     default: return;
     }
     auto updated=*campaignBoundary_;
     RecordMillPreparation(updated,preparation);
     if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return;
     millPreparation_=preparation;
+    millLeakTestPhase_=MillLeakTestPhase::Idle;
+    millLeakTestSeconds_=0.f;
     campaignBoundary_=updated;
     ++campaignBoundaryRevision_;
 }
