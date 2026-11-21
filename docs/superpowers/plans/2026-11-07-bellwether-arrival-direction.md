@@ -118,6 +118,12 @@ The keeper's resident render pose now comes from the shared simulation. Each adm
 
 At 960 × 540 on the RTX 5050 Laptop GPU, both hardware RT backends presented the room view with seated Kit, the stand-in, active glazing, and the hearth and reward lantern in the uploaded light roster. The scene used 34 TLAS definitions and 25 BLAS owners. The RayTracingPipeline reply view also preserved the `hub.horde_army` state in its capture manifest. Kit reads mostly as a silhouette from the doorway. The original keeper asset, voiced playback, final scene lighting and phone performance need their own checks. The live approach, welcome and movement remain covered by the separate authored route test.
 
+The table now has an authored candle, holder and wick in the editable tavern source. The recipe exports the wick and light anchors with the furniture, and the shared simulation uses the existing fire path to light the room. The two town fires share the fixed upload budget with the player's light. The lookout is outside their activation distance, and the tomb torches keep their existing triggers. The town export gained 100 solid triangles within the existing four material rows. The window export is byte-identical.
+
+In a matched doorway view, doubling the hearth output mainly brightened its masonry and Kit's cast shadow. The retained candle improved the seat and table outline with the original hearth output. Both Windows RT backends presented the candle, hearth and player lantern at the same camera and 960 × 540 settings. The room still used 34 TLAS definitions and 25 BLAS owners. The native fire, town geometry, authored route and package-policy checks passed. The Android debug APK contains the exact tavern export. Phone rendering and sustained performance remain open.
+
+The closer Windows RayTracingPipeline view replayed the 1.7 lookout continuation and restored the earned tavern seat. At the conversation mark, the candle brings out Kit's hood and armour while keeping the room dim. The earlier view is within 6 mm of the new camera position and has the same angles and seated pose. The staffed reply view also presented with all three lights and retained the `hub.horde_army` caption.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

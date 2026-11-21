@@ -218,27 +218,31 @@ bool TestAllFourEligibleEmittersRemainActive()
 bool TestBellwetherHearthUsesTheOrdinaryFireBudget()
 {
     using namespace horde::gameplay::effects;
-    auto hearth=MakeBellwetherHearthFireEmitter();
+    std::array worldFires{MakeBellwetherHearthFireEmitter(),MakeBellwetherTableCandleFireEmitter()};
+    auto& [hearth,candle]=worldFires;
     StepFireEmitterFixed(hearth,BellwetherHearthFireInput(),kFixedDelta);
+    StepFireEmitterFixed(candle,BellwetherTableCandleFireInput(),kFixedDelta);
     FireEmitterUpload upload;
     std::string diagnostic;
     const std::array<float,3> camera{{84.3f,-7.f,111.7f}};
-    bool ok=Require(BuildFireEmitterUpload(std::span(&hearth,1),
+    bool ok=Require(BuildFireEmitterUpload(worldFires,
         {camera,ShowcaseZone::Outside,24.f},{},FireEmitterQuality::Mobile,upload,diagnostic) &&
-        upload.activeCount==1 && upload.selectedStableIds[0]==kBellwetherHearthEmitterId &&
-        Approx(upload.emitters[0].shape[1],hearth.height) &&
-        upload.emitters[0].lightPositionStrength[3]>0 &&
-        upload.emitters[0].identity[2]==ResolveFireEmitterQualityBudget(FireEmitterQuality::Mobile).volumeSteps,
-        "Bellwether hearth publishes both its flame volume and shadowed direct light at Mobile quality");
+        upload.activeCount==2 && upload.selectedStableIds[0]==kBellwetherTableCandleEmitterId &&
+        upload.selectedStableIds[1]==kBellwetherHearthEmitterId &&
+        Approx(upload.emitters[0].shape[1],candle.height) && Approx(upload.emitters[1].shape[1],hearth.height) &&
+        upload.emitters[0].lightPositionStrength[3]>0 && upload.emitters[1].lightPositionStrength[3]>0 &&
+        upload.emitters[0].identity[2]==ResolveFireEmitterQualityBudget(FireEmitterQuality::Mobile).volumeSteps &&
+        upload.emitters[1].identity[2]==ResolveFireEmitterQualityBudget(FireEmitterQuality::Mobile).volumeSteps,
+        "Bellwether candle and hearth publish flame volumes and shadowed direct light at Mobile quality");
     auto lantern=Emitter(0x4c414e54u,84.1f,ShowcaseZone::Outside);
     lantern.parentObject=FireEmitterParentObject::RewardLantern;
     ok &= Require(horde::vulkan::raytracing::AppendFireEmitterUpload(
-        lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2 &&
-        upload.selectedStableIds[0]==kBellwetherHearthEmitterId && upload.selectedStableIds[1]==lantern.stableId,
-        "the hearth and held lantern fit together without dropping either source");
-    ok &= Require(BuildFireEmitterUpload(std::span(&hearth,1),{{13.3f,0.f,36.2f},ShowcaseZone::Outside,24.f},
+        lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==3 &&
+        upload.selectedStableIds[2]==lantern.stableId,
+        "the Bellwether room fires and held lantern fit together without dropping a source");
+    ok &= Require(BuildFireEmitterUpload(worldFires,{{13.3f,0.f,36.2f},ShowcaseZone::Outside,24.f},
         {},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==0,
-        "the hearth is outside the lookout's fire workload");
+        "the room fires are outside the lookout's fire workload");
     return ok;
 }
 

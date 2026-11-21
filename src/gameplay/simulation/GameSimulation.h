@@ -412,7 +412,8 @@ private:
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
         horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};
-    std::size_t fireEmitterCount_ = 3u;
+    std::array<horde::gameplay::effects::FireEmitterState, 2> bellwetherFireEmitters_{};
+    bool bellwetherFireReady_ = false;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     PlayerSupportResolution playerSupport_{};

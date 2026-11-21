@@ -26,8 +26,8 @@ constexpr float kDodgeDistanceMetres = 0.90f;
 constexpr float kDodgeCooldownSeconds = 0.55f;
 constexpr float kRunSpeedMetresPerSecond = 3.2f;
 constexpr float kMovementAccelerationMetresPerSecondSquared = 8.0f;
-constexpr std::size_t kBellwetherHearthSlot=1+effects::kKeeperTorchAnchors.size();
-static_assert(kBellwetherHearthSlot<effects::kFireEmitterCapacity);
+constexpr std::size_t kUndergroundFireEmitterCount=1+effects::kKeeperTorchAnchors.size();
+static_assert(kUndergroundFireEmitterCount<=effects::kFireEmitterCapacity);
 
 float FiniteOr(float value, float fallback)
 {
@@ -89,7 +89,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
-    fireEmitters_[kBellwetherHearthSlot]=effects::MakeBellwetherHearthFireEmitter();
+    bellwetherFireEmitters_={effects::MakeBellwetherHearthFireEmitter(),
+                           effects::MakeBellwetherTableCandleFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -858,8 +859,10 @@ void GameSimulation::ResetRoute()
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
-        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
+    for (std::size_t index = 0u; index < kUndergroundFireEmitterCount; ++index)
+        effects::ResetFireEmitter(fireEmitters_[index]);
+    for (auto& emitter : bellwetherFireEmitters_)
+        effects::ResetFireEmitter(emitter);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
@@ -1695,8 +1698,10 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
-        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
+    for (std::size_t index = 0u; index < kUndergroundFireEmitterCount; ++index)
+        effects::ResetFireEmitter(fireEmitters_[index]);
+    for (auto& emitter : bellwetherFireEmitters_)
+        effects::ResetFireEmitter(emitter);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
@@ -2047,13 +2052,13 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
     // The exterior terrain and tavern publish together. The existing renderer
     // selects nearby outside emitters and traces their visibility through stone
     // and the doorway. Nothing new is submitted for the underground chapter.
-    const bool hearthReady=UsesRescueExterior() && config_.authoredChapterTerrain &&
+    bellwetherFireReady_=UsesRescueExterior() && config_.authoredChapterTerrain &&
         chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation;
-    fireEmitterCount_=kBellwetherHearthSlot;
-    if(hearthReady) {
-        effects::StepFireEmitterFixed(fireEmitters_[kBellwetherHearthSlot],
+    if(bellwetherFireReady_) {
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[0],
             effects::BellwetherHearthFireInput(),fixedDeltaSeconds);
-        ++fireEmitterCount_;
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[1],
+            effects::BellwetherTableCandleFireInput(),fixedDeltaSeconds);
     }
 }
 
@@ -3609,6 +3614,13 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
     snapshot_.completedRestGeneration=completedRestGeneration_;
     snapshot_.fireEmitters = fireEmitters_;
+    snapshot_.fireEmitterCount = kUndergroundFireEmitterCount;
+    // Bellwether and the tomb torches occupy different zones. Keep the shared
+    // renderer's fixed upload capacity and publish only the current roster.
+    if (bellwetherFireReady_) {
+        snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1]};
+        snapshot_.fireEmitterCount = 1 + bellwetherFireEmitters_.size();
+    }
     snapshot_.flaskUpgrade={};
     if(UsesFlaskUtility() && flaskUpgradeReady_ && flaskUpgradeSite_ && flaskUpgradeWorldGeneration_==worldRoute_.generation &&
        flaskUpgradeResourceGeneration_ && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
@@ -3616,7 +3628,6 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         snapshot_.flaskUpgrade={flaskUpgradeSite_,flaskUpgradeWorldGeneration_,flaskUpgradeResourceGeneration_,
             FlaskUpgradeEligible(input)};
     }
-    snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.playerMountProfile = config_.playerMountProfile;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();

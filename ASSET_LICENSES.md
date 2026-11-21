@@ -116,6 +116,8 @@ MedievalWall02 and TombEarthenware still supply the architecture. The editable
 master, recipe and hashes are retained with the tavern authoring records.
 The south-window frame and closed glass volume are original Horde geometry
 from the same Blender source. The untextured window has no third-party inputs.
+The table candle, holder and wick are original Horde geometry in that source.
+They reuse the existing TombEarthenware and TombCharredWick material rows.
 
 ## Generic closed dielectric fixture
 

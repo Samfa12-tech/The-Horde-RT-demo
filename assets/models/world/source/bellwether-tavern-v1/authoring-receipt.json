@@ -2,8 +2,8 @@
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
-  "runtimeSha256": "7fe6269e2a63ea8b6f831dbb0a886555c669a59aa96dbb859d13a967bfa16567",
-  "solidTriangles": 2204,
+  "runtimeSha256": "27c4b15a755ed67fd0edfaf515c7c2f541ba6381aa57b4b1f9d202bfa729160c",
+  "solidTriangles": 2304,
   "walkableTriangles": 4,
   "windowSha256": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
   "windowTriangles": 12,
@@ -73,6 +73,16 @@
     84.52,
     -8.70955078125,
     107.68
+  ],
+  "tableCandleFlame": [
+    82.93,
+    -7.69055078125,
+    106.39
+  ],
+  "tableCandleLight": [
+    82.93,
+    -7.63355078125,
+    106.39
   ],
   "keeperRoute": [
     [

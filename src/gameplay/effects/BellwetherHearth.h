@@ -1,10 +1,12 @@
 #pragma once
 
 #include "gameplay/effects/FireEmitterState.h"
+#include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
 namespace horde::gameplay::effects
 {
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
+inline constexpr std::uint32_t kBellwetherTableCandleEmitterId=0x42303143u;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -24,14 +26,39 @@ inline FireEmitterState MakeBellwetherHearthFireEmitter()
     return emitter;
 }
 
-inline FireEmitterFixedStepInput BellwetherHearthFireInput()
+inline FireEmitterState MakeBellwetherTableCandleFireEmitter()
+{
+    auto emitter=MakeWorldTorchFireEmitter(kBellwetherTableCandleEmitterId,0x5749434bu);
+    emitter.colourTemperatureKelvin=1950.f;
+    emitter.radius=.044f;
+    emitter.height=.158f;
+    emitter.coreRadius=.022f;
+    emitter.smokeDensity=.018f;
+    emitter.emberRate=0.f;
+    emitter.turbulence=.21f;
+    return emitter;
+}
+
+inline FireEmitterFixedStepInput BellwetherFireInput(
+    const std::array<float,3>& flame, const std::array<float,3>& light, float strength)
 {
     FireEmitterFixedStepInput input;
     for(std::size_t axis=0;axis<3;++axis) {
-        input.worldFromFlame[12+axis]=kBellwetherHearthFlame[axis];
-        input.worldFromLight[12+axis]=kBellwetherHearthLight[axis];
+        input.worldFromFlame[12+axis]=flame[axis];
+        input.worldFromLight[12+axis]=light[axis];
     }
+    input.strength=strength;
     input.zone=ShowcaseZone::Outside;
     return input;
+}
+
+inline FireEmitterFixedStepInput BellwetherHearthFireInput()
+{
+    return BellwetherFireInput(kBellwetherHearthFlame,kBellwetherHearthLight,1.f);
+}
+
+inline FireEmitterFixedStepInput BellwetherTableCandleFireInput()
+{
+    return BellwetherFireInput(bellwether::kTableCandleFlame,bellwether::kTableCandleLight,.58f);
 }
 }
