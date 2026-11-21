@@ -1379,10 +1379,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "native autosave persists the refilled flask at the same earned tavern boundary");
                     if (progressed) {
                         const auto restGeneration = state.completedRestGeneration;
-                        check(reloadTavern() && step() && atHearth() && frame() &&
+                        progressed = check(reloadTavern() && step() && atHearth() && frame() &&
                             state.healingFlask.resources == rested.checkpoint.flask &&
                             state.healingFlask.action == FlaskAction::Idle && state.completedRestGeneration == restGeneration,
                             "native Load presents the rested save without replaying Rest");
+                        if (progressed) stored = std::move(rested);
                     }
                 }
             }
@@ -1454,7 +1455,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 if (!progressed)
                     std::cerr << "Bellwether church lead reached=" << reachedKeeper
                               << " offered=" << static_cast<int>(offered) << " presented=" << presentedLead
-                              << " currentLine=" << static_cast<int>(state.chapterDialogue.line) << '\n';
+                              << " currentLine=" << static_cast<int>(state.chapterDialogue.line)
+                              << " hearthLines=" << state.chapterDialogue.hearthLinesResolved
+                              << " keeperAdmitted=" << state.recordKeeper.has_value()
+                              << " player=" << state.playerX << ',' << state.playerSupportWorldY << ',' << state.playerZ
+                              << " grounded=" << state.playerGrounded << " yaw=" << state.playerYawRadians
+                              << " paused=" << state.paused << '\n';
                 if (progressed) {
                     constexpr std::array help{Line::LanternFirstHelp};
                     constexpr std::array reveal{Line::LanternFirstIdentity, Line::LanternKingName, Line::LanternFirstRequest};
@@ -1533,6 +1539,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         campaign::storage::StoredCheckpoint resumed;
                         progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
+                            (!state.healingFlaskEnabled || state.healingFlask.resources == expedition.checkpoint.flask) &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                                 campaign::storage::Status::Read && resumed.encoded == expedition.encoded,
@@ -1603,8 +1610,8 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
-    if (hearthRestRequested && (expeditionRequested || !HORDE_RT_FLASK_ADMITTED)) {
-        std::cerr << "Hidden hearth Rest requires its own flask-enabled campaign validation run.\n";
+    if (hearthRestRequested && !HORDE_RT_FLASK_ADMITTED) {
+        std::cerr << "Hidden hearth Rest requires the flask-enabled campaign validation build.\n";
         return false;
     }
     if (earnTavernRequested && (!lookoutRequested || inspectKit)) {

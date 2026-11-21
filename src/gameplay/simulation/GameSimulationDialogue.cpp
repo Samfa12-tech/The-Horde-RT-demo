@@ -264,11 +264,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
             kit.bellwetherStation<=traversal::kBellwetherSouthDoorStation+1 &&
             std::hypot(kit.x-door.x,kit.z-door.z)<=2.5f && c.companionSource;
         const auto audibleFromDoor=[&](Tuple other) {
-            const auto& source=*c.tavernKeeperSource;
-            const float height=std::min(source.y,other.y);
-            return std::abs(source.y-other.y)<=1.4f && std::hypot(other.x-source.x,other.z-source.z)<=4.5f &&
-                terrain->NonWalkableVolumeClear(source.x,source.z,other.x,other.z,
-                    height-.025f,height+.025f,.025f);
+            return TavernWelcomeAudible(*terrain,*c.tavernKeeperSource,other);
         };
         if(approaching || chapterDialogue_.State().line==Line::TavernWelcome)
             c.tavernDoorInReach=playerSupport_.grounded && audibleFromDoor(c.listener);

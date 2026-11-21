@@ -44,6 +44,13 @@ build. Both residents are prepared with the authored chapter scene before a
 save is resumed. The same campaign can continue on foot from the lookout to
 the tavern, where the game can earn and restore the tavern checkpoint.
 
+For the hearth Rest playtest, also pass `-PhordeFlaskCandidateDir=<local-root>`
+with the exact pinned `private_flask/player.glb`. This builds
+`com.samfa12.hordelanternrt.debug.bellwether.flask` with its own saves and
+settings. Complete the first tavern Talk, stand close to the hearth and use
+**Rest**. Verify the flask and health before and after the action, then reload
+the same checkpoint from the campaign menu.
+
 In **Settings → Chapter subtitles**, **Yellow subtitles** switches the
 existing white text to yellow. Both colours use the same black outline on the
 speaker and line. Enable the optional dark backing and set its opacity from

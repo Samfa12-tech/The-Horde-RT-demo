@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
@@ -12,6 +13,12 @@ namespace horde::gameplay::dialogue {
 
 enum class TavernKeeperStage { AtDoor, Walking, AtHearth };
 inline constexpr std::uint32_t kTavernKeeperActorId = 0x4230314bu;
+
+inline bool TavernWelcomeAudible(const simulation::TriangleSupportSurface& terrain, Tuple source, Tuple listener) {
+    const float height=std::min(source.y,listener.y);
+    return std::abs(source.y-listener.y)<=1.4f && std::hypot(listener.x-source.x,listener.z-source.z)<=4.5f &&
+        terrain.NonWalkableVolumeClear(source.x,source.z,listener.x,listener.z,height-.025f,height+.025f,.025f);
+}
 
 struct TavernKeeperPose {
     TavernKeeperStage stage;

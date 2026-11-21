@@ -1157,6 +1157,27 @@ gameplay::campaign::Checkpoint LookoutCheckpoint(
     return record;
 }
 
+void TestBellwetherWelcomeClearance(const gameplay::simulation::TriangleSupportSurface& terrain) {
+    using namespace gameplay::dialogue;
+    using namespace gameplay::traversal;
+    const auto door=kBellwetherTavernRoute[kBellwetherSouthDoorStation];
+    const auto& keeper=gameplay::bellwether::kKeeperDoor;
+    const Tuple source{keeper[0],keeper[1]+kCompanionSpeechHeight,keeper[2]};
+    const auto listenerAt=[&](float x,float z) {
+        const auto ground=terrain.Query(x,z);
+        Check(ground.found && ground.walkable,"welcome clearance probe has grounded listener support");
+        return Tuple{x,gameplay::simulation::PlayerEyeWorldY(ground.worldY),z};
+    };
+    // The oblique line from the keeper crosses the east jamb from farther down
+    // the ramp. The grounded sill and upper ramp give a clear path to the room.
+    Check(TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z)) &&
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)),
+          "the welcome carries through the real south aperture as the player approaches the sill");
+    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)) &&
+          !TavernWelcomeAudible(terrain,source,listenerAt(keeper[0],door.z+.5f)),
+          "the south jamb and adjacent wall occlude the welcome away from the open path");
+}
+
 void TestBellwetherHearthRest() {
     namespace sim=gameplay::simulation;
     namespace cp=gameplay::campaign;
@@ -1174,6 +1195,8 @@ void TestBellwetherHearthRest() {
         AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic);
     Check(admitted,diagnostic);
     if(!admitted)return;
+
+    TestBellwetherWelcomeClearance(*terrain);
 
     auto config=sim::ProductionGameSimulationConfig();
     config.bellwetherTavernKeeperAdmitted=true;
@@ -1277,13 +1300,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(ramp.found && clearance>2.69f,
           "the uphill tavern approach keeps the normal carried-item reach");
     const auto& door=route[gameplay::traversal::kBellwetherSouthDoorStation];
-    const auto& greetingMark=gameplay::bellwether::kKeeperDoor;
-    const float greetingHeight=greetingMark[1]+1.2f;
-    Check(terrain->NonWalkableVolumeClear(greetingMark[0],greetingMark[2],door.x,door.z+1.f,
-              greetingHeight-.025f,greetingHeight+.025f,.025f) &&
-          !terrain->NonWalkableVolumeClear(greetingMark[0],greetingMark[2],greetingMark[0],door.z+1.f,
-              greetingHeight-.025f,greetingHeight+.025f,.025f),
-          "the south portal carries the doorway cue while the adjacent stone wall blocks it");
+    TestBellwetherWelcomeClearance(*terrain);
     sim::InputSnapshot input;
     input.moveForward=1.f;
     input.runHeld=true;
@@ -1934,15 +1951,25 @@ void TestBellwetherRepeatVisitCheckpoint(
     input.commands.interact=state.lastConsumedInteractSequence+1;
     step(100);
     const float stopped=state.tavernDoor.opening;
+    const float stoppedX=state.playerX,stoppedZ=state.playerZ;
     step(30);
-    Check(stopped>0.f && stopped<1.f && state.tavernDoor.opening==stopped,
+    Check(stopped>0.f && stopped<1.f && state.tavernDoor.opening==stopped &&
+          state.playerX==stoppedX && state.playerZ==stoppedZ,
           "the inward swing stops at the player and never pushes them");
-    input.yawRadians=0.f;input.moveForward=1.f;
-    for(unsigned tick=0;tick<140 && state.playerZ>116.24f;++tick)step(1);
-    input.moveForward=0.f;
+    // Exit around the tip of the halted leaf. Walking north along the door's
+    // centreline would require passing through the solid door.
+    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::kSouthDoorSwingRadius+
+        gameplay::kPlayerCollisionRadius+.10f;
+    input.yawRadians=0.f;input.moveStrafe=1.f;
+    for(unsigned tick=0;tick<140 && state.playerX<clearX;++tick)step(1);
+    input.moveStrafe=0.f;
     step(100);
-    Check(state.tavernDoor.opening==0.f,"the door finishes closing when the player steps clear");
-    input.yawRadians=2.81f;
+    if(state.tavernDoor.opening!=0.f)
+        std::cerr<<"Tavern closing stopped at opening "<<state.tavernDoor.opening
+                 <<" with player at "<<state.playerX<<','<<state.playerSupportWorldY<<','<<state.playerZ<<'\n';
+    Check(state.playerX>=clearX && state.tavernDoor.opening==0.f,
+          "the player can sidestep the stalled leaf and let it finish closing");
+    input.yawRadians=3.14159265f;
     step(1);
     Check(state.tavernDoorAction==DoorAction::Open,"the player can reach the closed latch from the hearth side");
     input.commands.interact=state.lastConsumedInteractSequence+1;
