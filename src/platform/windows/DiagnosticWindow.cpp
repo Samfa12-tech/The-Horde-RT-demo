@@ -1634,9 +1634,18 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
 bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
 {
     if (directory.empty()) return true;
-    constexpr std::pair<std::string_view, std::string_view> pinned[]{
+    constexpr std::pair<std::string_view, std::string_view> standIn[]{
         {"tavern-keeper/asset.manifest.json", "a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7"},
         {"tavern-keeper/resident.glb", "67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696"},
+    };
+    constexpr std::pair<std::string_view, std::string_view> texturedKeeper[]{
+        {"tavern-keeper/asset.manifest.json", "e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341"},
+        {"tavern-keeper/resident.glb", "61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827"},
+        {"tavern-keeper/base-color.windows.ktx2", "a6b150a54e3b5ae66513b104078960a96d4d7d6a45e0c95201407174bb574feb"},
+        {"tavern-keeper/normal.windows.ktx2", "d00d3af09449b6edf2331d7fcf49b96fe1eca16607bd4a7264787946ff3d4050"},
+        {"tavern-keeper/orm.windows.ktx2", "e66ba00bbb9669ec62d322549972b700bf9e8fe427dc48ec56348215052cbafd"},
+    };
+    constexpr std::pair<std::string_view, std::string_view> recordKeeper[]{
         {"record-keeper/asset.manifest.json", "5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864"},
         {"record-keeper/resident.glb", "10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884"},
         {"record-keeper/base-color.windows.ktx2", "38b1c2ece28db386be8c2633311c487c3a8b4d70a0cd1852ae16c362d718e6dc"},
@@ -1646,12 +1655,16 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
     std::error_code error;
     const auto root = std::filesystem::canonical(directory, error);
     if (error) return false;
-    for (const auto& [relative, expected] : pinned) {
-        const auto path = root / relative;
-        std::string digest, diagnostic;
-        if (!std::filesystem::is_regular_file(path, error) || error ||
-            !Sha256File(path, digest, diagnostic) || digest != expected) return false;
-    }
+    const auto matches = [&](const auto& files) {
+        for (const auto& [relative, expected] : files) {
+            const auto path = root / relative;
+            std::string digest, diagnostic;
+            if (!std::filesystem::is_regular_file(path, error) || error ||
+                !Sha256File(path, digest, diagnostic) || digest != expected) return false;
+        }
+        return true;
+    };
+    if (!matches(recordKeeper) || (!matches(standIn) && !matches(texturedKeeper))) return false;
     gBellwetherCampaignActors = root;
     return true;
 }

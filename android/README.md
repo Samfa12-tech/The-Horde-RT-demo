@@ -35,9 +35,11 @@ The ordinary debug build uses `com.samfa12.hordelanternrt.debug`, so it can be i
 Build the separate phone playtest with `-PhordeBellwetherResidentDir=<local-root>`.
 The directory contains `private_bellwether/tavern-keeper` with the stand-in
 GLB and manifest, and `private_bellwether/record-keeper` with the prepared GLB,
-manifest, and three Android ASTC KTX2 files. The build verifies the seven file
-identities. Its application ID is `com.samfa12.hordelanternrt.debug.bellwether`,
-which gives it separate saves and settings.
+manifest, and three Android ASTC KTX2 files. The textured tavern keeper
+candidate supplies its own GLB, manifest and three ASTC KTX2 files in the
+`tavern-keeper` directory. Gradle verifies the exact seven- or ten-file
+overlay. Both variants use `com.samfa12.hordelanternrt.debug.bellwether` and
+share that app's saves and settings, separate from the release app.
 
 Play, New Game, Continue and Load use the ordinary campaign menus in this
 build. Both residents are prepared with the authored chapter scene before a

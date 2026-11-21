@@ -62,16 +62,30 @@ def verifyBellwetherOverlay = { File root, Map pinned, String label ->
             throw new GradleException("Bellwether ${label} asset differs: ${relative}")
     }
 }
+def texturedTavernKeeper = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/tavern-keeper/base-color.android.ktx2').isFile()
 if (bellwetherResidentDirectory) {
     def pinned = [
-        'private_bellwether/tavern-keeper/asset.manifest.json': 'a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7',
-        'private_bellwether/tavern-keeper/resident.glb': '67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696',
         'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
         'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
         'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
         'private_bellwether/record-keeper/normal.android.ktx2': '04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0',
         'private_bellwether/record-keeper/orm.android.ktx2': 'f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb'
     ]
+    if (texturedTavernKeeper) {
+        pinned.putAll([
+            'private_bellwether/tavern-keeper/asset.manifest.json': 'e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341',
+            'private_bellwether/tavern-keeper/resident.glb': '61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827',
+            'private_bellwether/tavern-keeper/base-color.android.ktx2': '57eed409fa5b6bbdbac2da57490eb3ed102a1fdc9b3423118d8ca39bcc37888e',
+            'private_bellwether/tavern-keeper/normal.android.ktx2': '7d6debe36b993c982758a2ec2768d76b724adee57389e844746b178c06af9f8a',
+            'private_bellwether/tavern-keeper/orm.android.ktx2': '03da79e706d71840c5f3f1de1cbf76a8f8c19f5ae8250d3c0fc0b227eaf9c43e'
+        ])
+    } else {
+        pinned.putAll([
+            'private_bellwether/tavern-keeper/asset.manifest.json': 'a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7',
+            'private_bellwether/tavern-keeper/resident.glb': '67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696'
+        ])
+    }
     verifyBellwetherOverlay(bellwetherResidentDirectory, pinned, 'Debug resident overlay')
 }
 if (bellwetherVoiceDirectory) {
@@ -769,6 +783,7 @@ android {
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
         buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
@@ -812,6 +827,7 @@ android {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
                 applicationIdSuffix flaskCandidateDirectory ? '.debug.bellwether.flask' : '.debug.bellwether'

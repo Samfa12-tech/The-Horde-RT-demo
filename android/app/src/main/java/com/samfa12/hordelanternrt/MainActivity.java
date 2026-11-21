@@ -983,6 +983,13 @@ public class MainActivity extends Activity {
                     if (!stageAsset(path, path))
                         throw new IllegalStateException("Bellwether Debug could not stage " + asset);
                 }
+                if (BuildConfig.BELLWETHER_TEXTURED_TAVERN_KEEPER) {
+                    for (String map : new String[] {"base-color", "normal", "orm"}) {
+                        final String path = "private_bellwether/tavern-keeper/" + map + ".android.ktx2";
+                        if (!stageAsset(path, path))
+                            throw new IllegalStateException("Bellwether Debug could not stage " + path);
+                    }
+                }
             }
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")

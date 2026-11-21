@@ -976,3 +976,18 @@ The compact dynamic gauge follow-up uses original code-authored bottle paths in
 actual owned charge fraction and persistent outline/divisions. The static icon
 above remains source artwork, not the current charge indicator. No imported
 asset, new rights claim or rendering-material ownership is introduced.
+
+## Bellwether tavern keeper candidate - 22 November 2026
+
+The keeper uses an original project concept (OpenAI image generation) and
+Meshy T2.5 geometry, Meshy 7 PBR textures, and Meshy auto-rig and stock walk.
+Blender authoring by Samfa12/Codex adapts the standing pose and walk to the
+authored tavern blocking. The 15,421-triangle runtime GLB
+(`61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827`)
+and its platform texture arrays are pinned for local Debug only. The private
+keeper source archive retains the concept, prompt, project provider receipts,
+source models, editable Blender assembly, and byte inventories.
+
+The paid Meshy account charged 20 credits. Exact distribution rights are still
+pending. Keep the source models, derived textures, and APK outside public
+source and published packages until the asset's rights are recorded.
