@@ -192,8 +192,10 @@ inline bool StageDevelopmentCheckpointSimulation(
     if(checkpoint.bellwetherNorthView!=BellwetherNorthView::None) {
         using namespace simulation;
         using namespace bellwether;
-        const bool handoff=checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterHandoff;
+        const bool returnsToKit=checkpoint.bellwetherNorthView==BellwetherNorthView::KitIntroduction;
+        const bool handoff=checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterHandoff || returnsToKit;
         if(handoff && !gameSimulation.config_.bellwetherRecordKeeperAdmitted)return finalize(false);
+        if(returnsToKit && !gameSimulation.config_.bellwetherTavernKeeperAdmitted)return finalize(false);
         if(!chapterTerrain || checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)
             return finalize(false);
         campaign::Checkpoint record;
@@ -277,13 +279,37 @@ inline bool StageDevelopmentCheckpointSimulation(
                !walkStation(traversal::kBellwetherChurchApproach.front()) ||
                !walkStation(traversal::kBellwetherRecordKeeperApproach))return finalize(false);
             input.moveForward=0;input.runHeld=false;
-            input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+            input.yawRadians=1.57079632679f;input.pitchRadians=-.07f;
             advance();
             if(state.recordKeeperAction!=dialogue::RecordKeeperAction::ShowRegister || !state.recordKeeper)
                 return finalize(false);
             gameSimulation.InteractWithClaimedChapter();advance();
             const auto saved=gameSimulation.LatestCampaignBoundary();
             if(!saved || !saved->waysideRegisterInterpreted || state.chapterDialogue.line!=dialogue::Line::RecordKeeperRegister)
+                return finalize(false);
+        }
+        if(returnsToKit) {
+            for(const auto line:{dialogue::Line::RecordKeeperTwoRoads,dialogue::Line::RecordKeeperRoadOrder,dialogue::Line::None}) {
+                gameSimulation.chapterDialogue_.Skip();advance();
+                if(state.chapterDialogue.line!=line)return finalize(false);
+            }
+            if(!walkStation(traversal::kBellwetherChurchApproach.front()))return finalize(false);
+            const auto& north=traversal::kBellwetherNorthApproach;
+            for(auto station=north.rbegin();station!=north.rend();++station)
+                if(!walkStation(*station))return finalize(false);
+            for(std::size_t i=traversal::kBellwetherChurchJunction+1;i<route.size();++i)
+                if(!walkStation(route[i]))return finalize(false);
+            if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+            input.moveForward=0;input.runHeld=false;
+            input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+            advance();
+            if(!state.NeedsRaiseLanternPrompt() || !state.tavernKeeper || !state.recordKeeper)return finalize(false);
+            input.commands.toggleHeldLightPose=state.lastConsumedToggleHeldLightPoseSequence+1;
+            for(unsigned tick=0;tick<90 && state.interaction.heldLightPose!=horde::gameplay::interactions::HeldLightPose::High;++tick)
+                advance();
+            // The Windows capture must present this pose before the exchange starts.
+            if(state.interaction.heldLightPose!=horde::gameplay::interactions::HeldLightPose::High ||
+               state.chapterDialogue.line!=dialogue::Line::None || state.chapterDialogue.tavernLanternLinesStarted)
                 return finalize(false);
         }
         return finalize(state.lastConsumedInteractSequence==input.commands.interact &&

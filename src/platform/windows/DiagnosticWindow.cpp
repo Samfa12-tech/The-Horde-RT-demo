@@ -538,6 +538,8 @@ struct ShowcaseCaptureRecord
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
     bool registerInterpreted = false;
+    std::uint64_t tavernLanternPresentedRaiseTick = 0;
+    unsigned tavernLanternLinesStarted = 0;
     horde::gameplay::dialogue::Line chapterLine = horde::gameplay::dialogue::Line::None;
     std::optional<horde::gameplay::DevelopmentCheckpointStageEvidence::BellwetherVisit> bellwetherVisit;
     float keeperDissolve = 0.0f;
@@ -1325,10 +1327,12 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
     }
     const auto* residentCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+    const bool returnToKit = residentCheckpoint &&
+        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
-        residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None;
-    const bool recordKeeperCapture = residentCheckpoint &&
-        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::RegisterHandoff;
+        (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None || returnToKit);
+    const bool recordKeeperCapture = returnToKit || (residentCheckpoint &&
+        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::RegisterHandoff);
     if (options.error.empty() && (options.staffedTavernCapture || recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
         (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
          (!options.staffedTavernCapture && !recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
@@ -6643,13 +6647,18 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         const std::vector<horde::scene::SkinnedClipBinding> clips{
             {"Warden|idle", true, true}, {"Warden|walk", true, true}};
         std::vector<ChapterResidentActorSource> fixtures;
+        const bool returnToKit = ctx.developmentCheckpoint == "bellwether-return-to-kit";
         if (ctx.staffedTavernCapture) {
             fixtures.push_back({horde::gameplay::dialogue::kTavernKeeperActorId,
-                ctx.chapterResidentFixture, "resident.glb", clips});
-        } else if (ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
+                returnToKit ? ctx.chapterResidentFixture / "tavern-keeper" : ctx.chapterResidentFixture,
+                "resident.glb", clips});
+        }
+        if (returnToKit || ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
             fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
-                ctx.chapterResidentFixture, "resident.glb", {clips.front()}});
-        } else {
+                returnToKit ? ctx.chapterResidentFixture / "record-keeper" : ctx.chapterResidentFixture,
+                "resident.glb", {clips.front()}});
+        }
+        if (fixtures.empty()) {
             fixtures.push_back({0x52544431, ctx.chapterResidentFixture, "resident.glb", clips});
             fixtures.push_back({0x52544432, ctx.chapterResidentFixture, "resident.glb", clips});
         }
@@ -8415,6 +8424,12 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
                      << "\", \"registerInterpreted\": " << (capture.registerInterpreted ? "true" : "false") << "}";
         }
+        if (capture.tavernLanternPresentedRaiseTick) {
+            manifest << ", \"tavernLanternIntroduction\": {\"presentedRaiseTick\": "
+                     << capture.tavernLanternPresentedRaiseTick << ", \"linesStarted\": "
+                     << capture.tavernLanternLinesStarted << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId << "\"}";
+        }
         manifest << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
@@ -8785,6 +8800,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 #endif
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
         horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
+        std::uint64_t tavernLanternPresentedRaiseTick = 0;
 #if defined(_DEBUG)
         if(forestProof && forestRecreated)
         {
@@ -8848,6 +8864,44 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             ApplyCaptureCheckpoint(context, checkpoint);
         }
 #if defined(_DEBUG)
+        if (context.developmentCheckpoint == "bellwether-return-to-kit") {
+            using horde::gameplay::dialogue::Line;
+            const auto& state = context.simulation.Snapshot();
+            const auto raiseTick = state.tickIndex;
+            const auto generation = state.chapterDialogue.generation;
+            bool presented = false;
+            if (!RenderFrame(context, clearColor, presented) || !presented ||
+                context.lastChapterPresentationAckTick != raiseTick ||
+                context.lastChapterPresentationAckGeneration != generation)
+                return fail("The raised lantern did not reach an acknowledged RT presentation at Kit's chair.");
+            tavernLanternPresentedRaiseTick = raiseTick;
+
+            // These are ordinary authored input edges after the real presentation
+            // acknowledgement. The save and speech director still own the scene.
+            auto input = context.simulationInput;
+            input.paused = false;
+            input.tutorialEnabled = false;
+            input.yawRadians = state.playerYawRadians;
+            input.pitchRadians = state.playerPitchRadians;
+            input.commands.interact = state.lastConsumedInteractSequence;
+            input.commands.toggleHeldLightPose = state.lastConsumedToggleHeldLightPoseSequence;
+            const auto advance = [&] {
+                context.simulation.StepFixed(input, 1.f/60.f, state.inputPublicationSequence+1);
+                context.simulation.ClearEvents();
+            };
+            for (const auto line : {Line::TavernLanternIdentity, Line::TavernLanternSeals, Line::KitVoiceReaction}) {
+                advance();
+                if (state.chapterDialogue.line != line)
+                    return fail("The acknowledged raise did not advance the authored tavern exchange.");
+                if (line != Line::KitVoiceReaction) ++input.commands.dialogueSkip;
+            }
+            for (unsigned tick = 0; tick < 160; ++tick) advance();
+            const auto saved = context.simulation.LatestCampaignBoundary();
+            if (state.chapterDialogue.line != Line::KitVoiceReaction || !saved || !saved->waysideRegisterInterpreted ||
+                saved->dialogue.tavernLanternLinesStarted != 3)
+                return fail("The tavern capture did not retain both the register reading and Kit's firsthand evidence.");
+            MirrorSimulationSnapshot(context);
+        }
         if(forestProof && !forestRecreated)
         {
             // Match the existing lifecycle pause policy before the first view,
@@ -9020,6 +9074,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.tavernKeeper = simulation.tavernKeeper;
         record.recordKeeper = simulation.recordKeeper;
         record.registerInterpreted = simulation.waysideArchive.registerInterpreted;
+        record.tavernLanternPresentedRaiseTick = tavernLanternPresentedRaiseTick;
+        record.tavernLanternLinesStarted = simulation.chapterDialogue.tavernLanternLinesStarted;
         record.chapterLine = simulation.chapterDialogue.line;
         record.bellwetherVisit = stageEvidence.bellwetherVisit;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
@@ -9762,7 +9818,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
         simulationConfig.bellwetherTavernKeeperAdmitted=context.staffedTavernCapture;
         simulationConfig.bellwetherRecordKeeperAdmitted=developmentCheckpoint &&
-            *developmentCheckpoint=="bellwether-record-keeper-handoff" && !context.chapterResidentFixture.empty();
+            (*developmentCheckpoint=="bellwether-record-keeper-handoff" ||
+             *developmentCheckpoint=="bellwether-return-to-kit") && !context.chapterResidentFixture.empty();
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }

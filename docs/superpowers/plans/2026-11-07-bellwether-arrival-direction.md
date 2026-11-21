@@ -170,6 +170,12 @@ After hearing the shrine claim, return to Kit's table and raise the lantern on t
 
 The register reading and Kit's firsthand conversation open independently. Each line that starts in earshot updates the existing tavern save, with the saved pose and resources preserved. Leaving or lowering the lantern cancels pending lines, and a fresh raise lets the player continue from the next line. Loading an older save leaves Kit awaiting the introduction. A partial or complete exchange loads quietly. The local audio inventory has a provisional `lantern.town_seals` clip and three Kit review lines. The exact `lantern.town_identity` and `kit.royal_claim.king` takes were absent from the reviewed intake. Voiced playback and phone playtesting remain open.
 
+The hidden Windows `bellwether-return-to-kit` checkpoint starts from the earned tavern save, walks to the shrine for the register, visits the record keeper and walks back to Kit's chair. Pass `--chapter-resident-fixture` a local directory with `tavern-keeper` and `record-keeper` subdirectories. Each holds a `resident.glb` and its manifest. The prepared record keeper also uses his Windows texture arrays. The fixture currently reuses the older tavern keeper stand-in.
+
+The replay raises the lantern through the normal input command. The exchange waits for an acknowledged hardware RT presentation of that pose. The capture then advances to Kit's first reply and verifies that the save retains both the register interpretation and the start of Kit's response. The manifest records the raised-lantern presentation tick and the later reply frame.
+
+At 960 × 540 on the RTX 5050 Laptop GPU, both RayTracingPipeline and RayQueryCompute acknowledged the raise at simulation tick 8,822 and presented the reply at tick 8,985. All three actor instances were active, with 37 TLAS definitions, 28 BLAS owners, three uploaded lights and 441,697,264 bytes in device-local RT allocations on each backend. The fixed-step route stages the reply view before capture. Continuous route performance, streaming retirement, the final tavern keeper and phone validation remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
