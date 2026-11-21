@@ -120,6 +120,9 @@ The table candle, holder and wick are original Horde geometry in that source.
 They reuse the existing TombEarthenware and TombCharredWick material rows.
 The church arrow, post and chisel-stroke lettering are original Horde meshes.
 They reuse the existing timber and char material rows from the same export.
+The wayside archive, lower stone, hinge and stylised roots are original Horde
+meshes in the same Blender source. They reuse MedievalWall02, TombEarthenware
+and TombCharredWick.
 
 ## Generic closed dielectric fixture
 

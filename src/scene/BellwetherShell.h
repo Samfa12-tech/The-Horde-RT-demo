@@ -4,7 +4,7 @@
 #include <filesystem>
 
 namespace horde::scene {
-inline constexpr std::size_t kBellwetherSolidTriangles=2668;
+inline constexpr std::size_t kBellwetherSolidTriangles=2860;
 inline constexpr std::size_t kBellwetherGroundTriangles=4;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 // The town and B01 interior use one render and physical geometry source.

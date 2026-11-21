@@ -12,6 +12,9 @@ inline constexpr std::array<float, 3> kConversation{{84.520000f, -8.709551f, 107
 inline constexpr std::array<float, 3> kTableCandleFlame{{82.930000f, -7.690551f, 106.390000f}};
 inline constexpr std::array<float, 3> kTableCandleLight{{82.930000f, -7.633551f, 106.390000f}};
 inline constexpr std::array<float, 3> kChurchWaymarker{{34.650000f, -5.981606f, 82.100000f}};
+inline constexpr std::array<float, 3> kWaysideMechanism{{103.300000f, -2.706654f, 31.400000f}};
+inline constexpr std::array<float, 3> kWaysideHinge{{102.690000f, -2.946654f, 31.410000f}};
+inline constexpr std::array<float, 3> kWaysideInspection{{103.300000f, -4.133766f, 33.600000f}};
 inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.200000f}};
 inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
 inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};

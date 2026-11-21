@@ -142,6 +142,8 @@ The native route test walks from the completed tavern visit to the mapped church
 
 After the three-line exchange, **Directions** at Kit’s chair points to the record keeper by the northern church and names the wayside shrine. The player can read the note again on a quiet return or after reopening a completed tavern autosave. The note is text-only and stays readable with speech subtitles off. It introduces no new spoken line or lantern reveal.
 
+The **wayside archive prototype** sits outside B09 on its south-facing spur. The editable town master retains the mapped shrine shell and adds a low, hollow masonry compartment, a separate lower stone and a left hinge partly covered by roots. The authoring receipt records the face, hinge and inspection marks. The player can reach the inspection mark from the completed tavern visit by normal movement. The closed stone has contact in the same mesh used by hardware RT. Both Windows RT backends presented the view at 960 × 540 from a fixed-step walk to the mark. Inspection, hinge movement and the first lantern speech are the next gameplay pieces for this site. The [English bank](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/dialogue/en/Horde-Dialogue-Bank-English-en.json) provides the draft scene order and the later register handoff.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

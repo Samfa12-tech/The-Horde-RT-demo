@@ -1502,7 +1502,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 walkTo(kBellwetherNorthApproach.back()) &&
                 walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end());
             Check(shrineReached && game.Snapshot().playerGrounded,
-                  "the church junction gives continuous surface support to the wayside forecourt");
+                  "the church junction leads on continuous support to the archive inspection mark");
             if(!shrineReached)return;
             const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());

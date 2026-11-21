@@ -2,8 +2,8 @@
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
-  "runtimeSha256": "878b4afc92903457df8be6992c55022fdd9e7af3d9d16a2775a821ce827ddfc4",
-  "solidTriangles": 2668,
+  "runtimeSha256": "4df059bb21c83d65c92a56316f2b0bc4c23a696fadb13f20bc58c0abae48314a",
+  "solidTriangles": 2860,
   "walkableTriangles": 4,
   "windowSha256": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
   "windowTriangles": 12,
@@ -88,6 +88,23 @@
     34.65,
     -5.981605529785156,
     82.1
+  ],
+  "waysideArchive": [
+    [
+      103.3,
+      -2.7066543579101565,
+      31.400000000000002
+    ],
+    [
+      102.69,
+      -2.9466543579101563,
+      31.410000000000004
+    ],
+    [
+      103.3,
+      -4.133766174316406,
+      33.6
+    ]
   ],
   "keeperRoute": [
     [

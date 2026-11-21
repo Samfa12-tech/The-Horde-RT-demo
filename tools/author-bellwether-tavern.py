@@ -1,4 +1,4 @@
-"""Author the first playable B01 interior from the preserved Bellwether master.
+"""Author the B01 interior and B09 wayside mechanism from the preserved Bellwether master.
 
 blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT [OUTPUT_WORLD]
 The editable and runtime output directories must both be new.
@@ -356,6 +356,61 @@ for index, letter in enumerate("CHURCH"):
 mesh("B02_church_arrow_letters", letter_vertices, letter_faces, solids, oak)
 
 
+# B09 keeps its mapped footprint and distant silhouette. The old archive
+# compartment sits outside on the reachable south slope below the shell.
+shrine = next(building for building in parent["buildings"] if building["id"] == "B09")
+shrine_x = shrine["engineX"]
+archive_back = shrine["engineZ"] + shrine["depth"] / 2 + .80
+archive_front = archive_back + 1.40
+archive_half_width = 1.05
+archive_edges = (-archive_half_width, 0, archive_half_width)
+archive_base = min(ground(shrine_x + dx, z) for dx in archive_edges
+                   for z in (archive_back, archive_front)) - .18
+archive_lintel = max(ground(shrine_x + dx, archive_back) for dx in archive_edges) + .54
+
+
+def shrine_box(name, lo, hi, back, front, bottom, top, material=stone):
+    box("B09_" + name, shrine_x + lo, shrine_x + hi,
+        archive_front + back, archive_front + front, bottom, top, material)
+
+
+# A hollow compartment with separate solid sides and sill. The lower slab is
+# a separate editable mesh so a later interaction can turn it about the pin.
+opening_bottom = archive_lintel - .66
+shrine_box("archive_sill", -archive_half_width, archive_half_width, -1.40, 0, archive_base, opening_bottom)
+shrine_box("archive_back", -.66, .66, -1.40, -1.05, opening_bottom, archive_lintel)
+for name, lo, hi in (("west", -archive_half_width, -.66), ("east", .66, archive_half_width)):
+    shrine_box("archive_" + name, lo, hi, -1.40, 0, opening_bottom, archive_lintel)
+shrine_box("archive_lintel", -archive_half_width, archive_half_width, -1.40, .06, archive_lintel, archive_lintel + .31)
+
+
+def shrine_face(name, outline, back, front, material=stone):
+    size = len(outline)
+    mesh("B09_" + name,
+         [(shrine_x + x, opening_bottom + y, archive_front + z)
+          for z in (back, front) for x, y in outline],
+         [tuple(reversed(range(size))), tuple(range(size, size * 2))] +
+         [(i, (i + 1) % size, (i + 1) % size + size, i + size) for i in range(size)], solids, material)
+
+
+shrine_face("lower_stone", [(-.61, .03), (.50, .03), (.62, .14), (.60, .49), (.47, .60),
+                           (-.50, .60), (-.61, .48)], -.19, -.045)
+# Two readable knuckles straddle the cover seam. The roots partly conceal the
+# bottom knuckle, leaving the upper pin and the edge of the stone discoverable.
+hinge_x = -.61
+for name, low, high in (("hinge_lower", .13, .23), ("hinge_upper", .43, .53)):
+    shrine_box(name, -.74, -.54, -.13, .028, opening_bottom + low, opening_bottom + high, ember)
+shrine_box("hinge_pin", hinge_x - .028, hinge_x + .028, -.042, .031,
+           opening_bottom + .08, opening_bottom + .57, ember)
+shrine_face("root_at_hinge", [(-.96, -.58), (-.84, -.55), (-.80, -.29), (-.74, -.20), (-.69, .04),
+                             (-.58, .25), (-.61, .28), (-.77, .17), (-.81, .02), (-.95, -.10)], -.02, .065, oak)
+shrine_face("root_at_sill", [(-1.11, -.63), (-.98, -.61), (-.89, -.38), (-.69, -.30), (-.54, -.13),
+                            (-.36, -.08), (-.39, -.035), (-.61, -.066), (-.77, -.22), (-1.02, -.27)], .01, .10, oak)
+shrine_mechanism = [shrine_x, opening_bottom + .32, archive_front]
+shrine_hinge = [shrine_x + hinge_x, opening_bottom + .08, archive_front + .01]
+shrine_view = [shrine_x, ground(shrine_x, archive_front + 2.2), archive_front + 2.2]
+
+
 def joined_copy(group, name):
     bpy.ops.object.select_all(action="DESELECT")
     copies = []
@@ -392,6 +447,14 @@ for name, mark, yaw in (("Door greeting", keeper_door, keeper_door_yaw),
     marker.location = (mark[0], -mark[2], mark[1])
     marker.rotation_euler.z = -yaw
     blocking.objects.link(marker)
+archive_blocking = bpy.data.collections.new("B09 - Wayside archive blocking")
+bpy.context.scene.collection.children.link(archive_blocking)
+for name, mark in (("Hinge rotation origin", shrine_hinge), ("Player inspection mark", shrine_view)):
+    marker = bpy.data.objects.new(name, None)
+    marker.empty_display_type = "PLAIN_AXES"
+    marker.empty_display_size = .25
+    marker.location = (mark[0], -mark[2], mark[1])
+    archive_blocking.objects.link(marker)
 bpy.data.orphans_purge(do_recursive=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(OUTPUT / "bellwether-tavern-v1.blend"), compress=True)
 shell_mesh = joined_copy(solids, "BellwetherSolid")
@@ -416,7 +479,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=6250, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=6500, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -446,6 +509,7 @@ receipt = dict(sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
                tableCandleFlame=candle_flame, tableCandleLight=candle_light,
                churchWaymarker=[sign_x,sign_y,sign_z],
+               waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
                keeperRoute=[keeper_door, keeper_aisle, keeper_hearth],
                keeperDoorYaw=keeper_door_yaw, keeperHearthYaw=keeper_hearth_yaw)
 (OUTPUT / "authoring-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -457,6 +521,8 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("TableTop", receipt["tableTop"]), ("Conversation", talk_mark),
                    ("TableCandleFlame", candle_flame), ("TableCandleLight", candle_light),
                    ("ChurchWaymarker", receipt["churchWaymarker"]),
+                   ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
+                   ("WaysideInspection", shrine_view),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")

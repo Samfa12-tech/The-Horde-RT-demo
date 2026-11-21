@@ -75,6 +75,7 @@ struct DevelopmentCheckpoint
     std::size_t bellwetherStations = 0;
     std::uint32_t bellwetherSitTicks = 0;
     std::uint32_t bellwetherAnkleTicks = 0;
+    bool bellwetherWaysideApproach = false;
     BellwetherStaffedView bellwetherStaffedView = BellwetherStaffedView::None;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
@@ -89,7 +90,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 129u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 130u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -257,6 +258,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 129u> kDevelopmentCheckpoints
      .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherChurchJunction].z,
      .yaw=1.54f,.pitch=-.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1},
+    {.id=331,.name="bellwether-wayside-archive",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
+     .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherWaysideApproach=true},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

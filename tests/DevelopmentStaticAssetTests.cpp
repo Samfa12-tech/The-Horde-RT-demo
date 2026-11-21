@@ -69,7 +69,7 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 129u &&
+    Check(kDevelopmentCheckpoints.size() == 130u &&
           FindShowcaseCheckpoint("bellwether-keeper-reply") == nullptr &&
           FindShowcaseCheckpoint("bellwether-staffed-room") == nullptr &&
           FindShowcaseCheckpoint("bellwether-kit-lantern-glance") == nullptr &&

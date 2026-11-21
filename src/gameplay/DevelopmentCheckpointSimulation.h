@@ -2,6 +2,7 @@
 
 #include "gameplay/DevelopmentCheckpoints.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
 
 namespace horde::gameplay
 {
@@ -519,6 +520,13 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(std::size_t station=0;station<checkpoint.bellwetherStations;++station) {
             const auto destination=traversal::kBellwetherTavernRoute[station];
             if(!walkTo(routeInput,advance,destination.x,destination.z))return finalize(false);
+        }
+        if(checkpoint.bellwetherWaysideApproach) {
+            if(checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)return finalize(false);
+            for(const auto& station:traversal::kBellwetherNorthApproach)
+                if(!walkTo(routeInput,advance,station.x,station.z))return finalize(false);
+            for(const auto& station:traversal::kBellwetherWaysideApproach)
+                if(!walkTo(routeInput,advance,station.x,station.z))return finalize(false);
         }
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a

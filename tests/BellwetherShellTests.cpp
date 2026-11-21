@@ -1,4 +1,5 @@
 #include "scene/BellwetherShell.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
@@ -41,6 +42,18 @@ int main() {
         check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles+kBellwetherGlazingTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "rendered masonry stays solid while only the ramp and floor extend ground support");
+        using namespace horde::gameplay::bellwether;
+        constexpr auto wayside=horde::gameplay::traversal::kBellwetherWaysideApproach.back();
+        auto waysideGround=support->Query(wayside.x,wayside.z);
+        check(std::abs(wayside.x-kWaysideInspection[0])<.001f && std::abs(wayside.z-kWaysideInspection[2])<.001f &&
+              waysideGround.found && waysideGround.walkable && std::abs(waysideGround.worldY-kWaysideInspection[1])<.001f,
+            "the mapped wayside route ends on the authored archive inspection mark");
+        check(support->NonWalkableVolumeClear(wayside.x,wayside.z,wayside.x,wayside.z-.55f,
+                  waysideGround.worldY+.20f,waysideGround.worldY+1.7f,.32f) &&
+              !support->NonWalkableVolumeClear(kWaysideMechanism[0],kWaysideMechanism[2]+.2f,
+                  kWaysideMechanism[0],kWaysideMechanism[2]-.25f,
+                  kWaysideMechanism[1]-.05f,kWaysideMechanism[1]+.05f,.01f),
+            "the inspection approach is clear and the closed lower stone has native contact");
         constexpr float southDoorX=82.3f,southWallZ=119.2f;
         const auto bare=originalTerrain->Query(southDoorX,southWallZ);
         const auto after=support->Query(southDoorX,southWallZ);
