@@ -1220,7 +1220,6 @@ private:
                        std::span<const std::string> appendedArrayPaths = {},
                        TextureUploadRecovery* recovery = nullptr,
                        RtSceneRecordObservation* observation = nullptr);
-    VkAccelerationStructureGeometryKHR ChapterActorGeometry() const;
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);

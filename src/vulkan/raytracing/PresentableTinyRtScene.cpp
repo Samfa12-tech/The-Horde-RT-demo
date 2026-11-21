@@ -33,6 +33,7 @@
 #include <locale>
 #include "vulkan/raytracing/ChestGuidanceLight.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
+#include "vulkan/raytracing/RtIndexedActorGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
@@ -2963,25 +2964,6 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
     return true;
 }
 
-VkAccelerationStructureGeometryKHR PresentableTinyRtScene::ChapterActorGeometry() const
-{
-    const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
-    const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
-    VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-    geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-    geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-    auto& triangle = geometry.geometry.triangles;
-    triangle.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-    triangle.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    triangle.vertexData.deviceAddress = staticVertexBuffer_.address +
-        VkDeviceSize(primitive.vertexOffset) * sizeof(horde::scene::assets::StaticRtVertex);
-    triangle.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
-    triangle.maxVertex = staticMeshSlot_.PrimitiveVertexCounts()[metadata.primitiveBase] - 1u;
-    triangle.indexType = VK_INDEX_TYPE_UINT32;
-    triangle.indexData.deviceAddress = staticIndexBuffer_.address + VkDeviceSize(primitive.indexOffset) * sizeof(std::uint32_t);
-    return geometry;
-}
-
 bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
 {
     VkFormatProperties formatProperties{};
@@ -3461,9 +3443,6 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         const auto clips=horde::scene::CompanionChapterClipBindings();
         if (!chapterActor_.Load(root / "models/characters/runtime/kit-warden-v1",
                 horde::scene::kCompanionTurnRuntimeFile, clips, diagnostic)) return false;
-        if (chapterActor_.Asset().primitives.size() != 1) {
-            diagnostic = "The bounded chapter actor requires one indexed primitive."; return false;
-        }
         for (auto& material : chapterActor_.Asset().materials) {
             material.textureGroup = 0; material.deferTextureAllocation = true;
         }
@@ -6064,11 +6043,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // One third-lane AS allocation can be rebuilt for either compatible owner.
     // Size for both layouts up front; UPDATE is only used within an owner.
     if (chapterActorReady_) {
-        auto geometry = ChapterActorGeometry();
-        auto build = lichBuildInfo; build.pGeometries = &geometry;
-        const std::uint32_t count = static_cast<std::uint32_t>(chapterActor_.Asset().indices.size() / 3u);
+        RtIndexedActorGeometry actorGeometry;
+        if (!actorGeometry.Resolve(staticMeshSlot_, CharacterRenderSlot::kKeeperMetadataIndex,
+                chapterActor_.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+            return false;
+        auto build = lichBuildInfo;
+        build.geometryCount = static_cast<std::uint32_t>(actorGeometry.Geometries().size());
+        build.pGeometries = actorGeometry.Geometries().data();
         VkAccelerationStructureBuildSizesInfoKHR sizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-        vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &build, &count, &sizes);
+        vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+            &build, actorGeometry.TriangleCounts().data(), &sizes);
         lichSizes.accelerationStructureSize = std::max(lichSizes.accelerationStructureSize, sizes.accelerationStructureSize);
         lichSizes.buildScratchSize = std::max(lichSizes.buildScratchSize, sizes.buildScratchSize);
         lichSizes.updateScratchSize = std::max(lichSizes.updateScratchSize, sizes.updateScratchSize);
@@ -7949,6 +7933,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
 
     const bool wantCompanion = WantsChapterCompanion(frame);
+    RtIndexedActorGeometry actorGeometry;
+    if (wantCompanion &&
+        !actorGeometry.Resolve(staticMeshSlot_, CharacterRenderSlot::kKeeperMetadataIndex,
+            companionActor->Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+        return false;
     if (!wantCompanion && lichGpu.vertices.Empty()) {
         diagnostic = "Keeper vertex storage must be restored before recording its character owner.";
         return false;
@@ -8003,12 +7992,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lastActorPreparationPerformed_=true;
 #endif
         ObserveSkinWork(observation,companionWork);
-        const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
-        const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
         const auto& vertices = companionActor->Asset().vertices;
         if (!gpuResources_.WriteBufferRange(staticVertexBuffer_,
-                VkDeviceSize(primitive.vertexOffset) * sizeof(vertices.front()), vertices.data(),
-                vertices.size() * sizeof(vertices.front()), "chapter actor pose", diagnostic, observation)) return false;
+                actorGeometry.VertexOffset(), vertices.data(), actorGeometry.VertexBytes(),
+                "chapter actor pose", diagnostic, observation)) return false;
         chapterActorPoseGeneration_ = frame.chapterCompanion.generation;
         chapterActorPoseSeconds_ = frame.chapterCompanion.animationSeconds;
         chapterActorWalking_ = frame.chapterCompanion.walking;
@@ -8841,7 +8828,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::TexturedSkinnedRtVertex);
         lichGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(lichSkinnedVertices_.size() - 1u);
         lichGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
-        if (thirdActorIsCompanion_) lichGeometry = ChapterActorGeometry();
         VkAccelerationStructureBuildGeometryInfoKHR lichUpdateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
         lichUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         lichUpdateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
@@ -8851,8 +8837,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichUpdateInfo.geometryCount = 1u;
         lichUpdateInfo.pGeometries = &lichGeometry;
         lichUpdateInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.AlignedAddress();
+        if (thirdActorIsCompanion_) {
+            actorGeometry.Record(commandBuffer, vkCmdBuildAccelerationStructuresKHR_, lichUpdateInfo);
+            return;
+        }
         VkAccelerationStructureBuildRangeInfoKHR lichRange{};
-        lichRange.primitiveCount = static_cast<std::uint32_t>(thirdActorIsCompanion_ ? chapterActor_.Asset().indices.size() / 3u : lichSkinnedVertices_.size() / 3u);
+        lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
     };

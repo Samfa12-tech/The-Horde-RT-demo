@@ -11,6 +11,7 @@
 #include "scene/ForestSurroundings.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "vulkan/raytracing/RtStaticTextureSelection.h"
+#include "vulkan/raytracing/RtIndexedActorGeometry.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -70,6 +71,63 @@ bool Require(const bool condition, const std::string_view message)
         std::cerr << "FAIL: " << message << '\n';
     }
     return condition;
+}
+
+bool CheckIndexedActorGeometry()
+{
+    using namespace horde::vulkan::raytracing;
+    using namespace horde::scene::assets;
+    constexpr auto opaque = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    constexpr auto stride = sizeof(StaticRtVertex);
+    StaticMeshAsset actor;
+    actor.vertices.resize(7);
+    actor.indices = {0, 1, 2, 0, 1, 2, 0, 2, 3};
+    actor.primitives = {{0, 0, 3, 0, 0}, {3, 3, 6, 1, 0}};
+    actor.materials.resize(2);
+    actor.nodeTransforms.resize(1);
+    auto precedingAsset = actor;
+    constexpr std::uint32_t actorSlot = 4;
+    std::array registrations{
+        StaticRtAssetRegistration{3, 1001, opaque, 0, &precedingAsset},
+        StaticRtAssetRegistration{actorSlot, 1002, opaque, 0, &actor},
+    };
+    RtStaticMeshSlot full;
+    std::string diagnostic;
+    if (!Require(full.InitializeSelectedGeometry(registrations, diagnostic), diagnostic)) return false;
+    RtGpuBuffer vertices, indices;
+    vertices.address = 0x10000;
+    vertices.size = full.Measurements().vertexBytes;
+    indices.address = 0x20000;
+    indices.size = full.Measurements().indexBytes;
+    RtIndexedActorGeometry binding;
+    if (!Require(binding.Resolve(full, actorSlot, actor, vertices, indices, diagnostic), diagnostic)) return false;
+    const auto ranges = binding.Geometries();
+    const auto counts = binding.TriangleCounts();
+    bool ok = Require(ranges.size() == 2 && counts[0] == 1 && counts[1] == 2 &&
+        ranges[0].geometry.triangles.vertexData.deviceAddress == vertices.address + 7 * stride &&
+        ranges[1].geometry.triangles.vertexData.deviceAddress == vertices.address + 10 * stride &&
+        ranges[0].geometry.triangles.indexData.deviceAddress == indices.address + 9 * sizeof(std::uint32_t) &&
+        ranges[1].geometry.triangles.indexData.deviceAddress == indices.address + 12 * sizeof(std::uint32_t) &&
+        ranges[0].geometry.triangles.maxVertex == 2 && ranges[1].geometry.triangles.maxVertex == 3 &&
+        binding.VertexOffset() == 7 * stride && binding.VertexBytes() == 7 * stride,
+        "each actor primitive keeps its own index, vertex and triangle range even with an earlier GPU asset");
+    registrations.front().primitiveCount = 1;
+    RtStaticMeshSlot compact;
+    if (!Require(compact.InitializeSelectedGeometry(registrations, diagnostic), diagnostic)) return false;
+    vertices.address += 0x10000;
+    vertices.size = compact.Measurements().vertexBytes;
+    indices.address += 0x10000;
+    indices.size = compact.Measurements().indexBytes;
+    ok &= Require(binding.Resolve(compact, actorSlot, actor, vertices, indices, diagnostic) &&
+        binding.VertexOffset() == 3 * stride &&
+        binding.Geometries().back().geometry.triangles.indexData.deviceAddress ==
+            indices.address + 6 * sizeof(std::uint32_t),
+        "actor binding follows the newly packed owner after a static world cutover");
+    --vertices.size;
+    ok &= Require(!binding.Resolve(compact, actorSlot, actor, vertices, indices, diagnostic) &&
+        binding.Geometries().empty() && binding.VertexBytes() == 0,
+        "an incomplete owner cannot leave a previous actor binding usable");
+    return ok;
 }
 
 bool CheckTlasInstanceRefresh()
@@ -1922,6 +1980,7 @@ int main(int argc, char** argv)
         "player upload must preserve exact pose bytes and asset lifetime across reload/move/failure");
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = playerUploadOk;
+    ok &= CheckIndexedActorGeometry();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
