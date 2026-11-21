@@ -299,6 +299,7 @@ public class MainActivity extends Activity {
     private int privateRevivalSoundId;
     private long privateRevivalAudioGeneration;
     private int chapterAmbienceStream;
+    private int kitAnkleStream;
     private boolean chapterAmbienceDialogueActive;
     private boolean chapterVoicePaused;
     private boolean chapterSubtitleOverflowReported;
@@ -750,6 +751,7 @@ public class MainActivity extends Activity {
             if (!isMusicAudioFocusGranted()) {
                 if (menuAmbience != null) menuAmbience.stop();
                 stopChapterAmbience();
+                stopKitAnkleFoley();
                 stopPrivateLichRevivalAudio();
             }
             });
@@ -1301,6 +1303,7 @@ public class MainActivity extends Activity {
         stopPrivateLichRevivalAudio();
         cancelOpeningBenchmarkRequest();
         stopChapterAmbience();
+        stopKitAnkleFoley();
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
         stopMenuAmbience();
@@ -6087,7 +6090,11 @@ public class MainActivity extends Activity {
         if(openingBenchmarkRecoveryRejected)return;
         if (paused) {stopChapterAmbience();stopPrivateLichRevivalAudio();}
         if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
-        if (paused) { clearRunIntent(); clearCrouchIntent(); }
+        if (paused) {
+            stopKitAnkleFoley();
+            clearRunIntent();
+            clearCrouchIntent();
+        }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
                 !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
@@ -6154,6 +6161,7 @@ public class MainActivity extends Activity {
     private void resetRoute() {
         clearRunIntent();
         stopChapterAmbience();
+        stopKitAnkleFoley();
         ++delayedGameplayFeedbackGeneration;
         stopPrivateLichRevivalAudio();
         clearVerticalProofFeedbackSelection();
@@ -6720,6 +6728,7 @@ public class MainActivity extends Activity {
             return;
         }
         stopChapterAmbience();
+        stopKitAnkleFoley();
         ++delayedGameplayFeedbackGeneration;
         stopPrivateLichRevivalAudio();
         campaignFromDeath=confirmed;
@@ -7018,6 +7027,11 @@ public class MainActivity extends Activity {
                         case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
                         case ChapterAmbienceFeedback.LOCAL_STOPPED:
                             if(eventIndex==latestAmbienceSignal)stopChapterAmbience();
+                            break;
+                        case KitAnkleFeedback.EVENT_TYPE:
+                            final String ankleKey = KitAnkleFeedback.soundKey(eventAudioCue);
+                            if (ankleKey != null && stereoGains != 0 && chapterSceneSfxAudible())
+                                kitAnkleStream = replaceChapterOneShot(kitAnkleStream, stereoGains, ankleKey);
                             break;
                         case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
                             playSpatialSound(wetFootstepSoundKey(playerStepVariant++), PLAYER_WET_FOOTSTEP_GAIN,
@@ -7763,6 +7777,8 @@ public class MainActivity extends Activity {
         loadSound("pond_frogs_crickets", "audio/night-ambience/runtime/pond_frogs_crickets.wav");
         loadSound("tomb_drip", "audio/chapter-local-ambience/runtime/tomb_drip.wav");
         loadSound("rope_contact", "audio/chapter-local-ambience/runtime/rope_contact.wav");
+        loadSound("kit_boot_and_gravel", "audio/kit-ankle/runtime/boot_and_gravel.wav");
+        loadSound("kit_steady_breath", "audio/kit-ankle/runtime/steady_breath.wav");
         loadSound("forest_leaf_rustle", "audio/forest-foliage/runtime/leaf_rustle.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
@@ -7859,6 +7875,7 @@ public class MainActivity extends Activity {
 
     private void updateWaterfallLoop() {
         if (!chapterAmbienceAudible()) stopChapterAmbience();
+        if (!chapterSceneSfxAudible()) stopKitAnkleFoley();
         if (waterfallPlayback == null) return;
         final boolean audible = resumed && surfaceStarted && !menuVisible && !diagnosticsVisible &&
                 !benchmarkRunning && preferences.getBoolean("sfx_enabled", true) &&
@@ -7939,7 +7956,11 @@ public class MainActivity extends Activity {
     }
 
     private boolean chapterAmbienceAudible() {
-        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() && !chapterAmbienceDialogueActive &&
+        return !chapterAmbienceDialogueActive && chapterSceneSfxAudible();
+    }
+
+    private boolean chapterSceneSfxAudible() {
+        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() &&
                 !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible &&
                 !rtLabVisible && !playtestReportVisible && !benchmarkRunning && !debugMotionActive &&
                 !deathOverlayVisible && !endingOverlayVisible && preferences.getBoolean("sfx_enabled", true) &&
@@ -7951,14 +7972,24 @@ public class MainActivity extends Activity {
         chapterAmbienceStream=0;
     }
 
+    private void stopKitAnkleFoley() {
+        if (soundPool != null && kitAnkleStream != 0) soundPool.stop(kitAnkleStream);
+        kitAnkleStream = 0;
+    }
+
     private void playChapterAmbience(long packedStereoGains, String soundKey) {
-        if (!chapterAmbienceAudible() || soundPool==null) return;
+        if (chapterAmbienceAudible())
+            chapterAmbienceStream = replaceChapterOneShot(chapterAmbienceStream, packedStereoGains, soundKey);
+    }
+
+    private int replaceChapterOneShot(int stream, long packedStereoGains, String soundKey) {
+        if (soundPool == null) return stream;
         final Integer id=sounds.get(soundKey);
-        if (id==null) return;
-        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return; }
-        stopChapterAmbience(); // One finite voice; never queue/retry a missed ambience cue.
+        if (id==null) return stream;
+        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return stream; }
+        if (stream != 0) soundPool.stop(stream);
         final float gain=preferences.getInt("sfx_volume",70)/100.f;
-        chapterAmbienceStream=soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
+        return soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
                 gain*clamp(Float.intBitsToFloat((int)(packedStereoGains>>>32)),0,1),0,0,1.f);
     }
 
@@ -8412,6 +8443,7 @@ public class MainActivity extends Activity {
         if (!focused) {
             if(lookoutObjectiveVisible)showMainMenu(false);
             stopChapterAmbience();
+            stopKitAnkleFoley();
             stopPrivateLichRevivalAudio();
             clearRunIntent();
             clearCrouchIntent();
@@ -9298,6 +9330,7 @@ public class MainActivity extends Activity {
             Log.w(TAG, "Pending performance motion cancelled by pause before arming.");
         }
         stopChapterAmbience();
+        stopKitAnkleFoley();
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
         dismissCampaignConfirmation();

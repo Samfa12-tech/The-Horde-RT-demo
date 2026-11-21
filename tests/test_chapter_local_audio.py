@@ -79,4 +79,32 @@ class ChapterLocalAudioTests(unittest.TestCase):
         self.assertNotIn('leaves rustle 1.wav',gradle);self.assertNotIn('leaves rustle 1.wav',windows)
         self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text(encoding='utf-8'))
 
+    def test_kit_ankle_packages_two_finite_cues_and_their_provenance(self):
+        directory = ROOT / 'assets/audio/kit-ankle'
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        gradle = (ROOT / 'android/app/build.gradle').read_text(encoding='utf-8')
+        windows = (ROOT / 'tools/horde-night-audio-policy.ps1').read_text(encoding='utf-8')
+        self.assertFalse(manifest['listeningAcceptance'])
+        roster = {'asset.manifest.json', 'runtime/boot_and_gravel.wav', 'runtime/steady_breath.wav'}
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}, roster)
+        self.assertEqual({a['runtimeFile']: a['frames'] for a in manifest['assets']},
+                         {'runtime/boot_and_gravel.wav': 17280, 'runtime/steady_breath.wav': 21120})
+        self.assertEqual([p['file'] for p in manifest['assets'][0]['sources']],
+                         ['footstep dirt 7.wav', 'rock 19.wav'])
+        self.assertIn('Original Horde foley', manifest['assets'][1]['license'])
+        for asset in manifest['assets']:
+            path = directory / asset['runtimeFile']
+            raw = path.read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), asset['runtimeSha256'])
+            self.assertEqual(len(raw), asset['bytes'])
+            with wave.open(str(path), 'rb') as wav:
+                self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+                self.assertEqual(wav.getnframes(), asset['frames'])
+                pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+            self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+            self.assertTrue(2000 < max(map(abs, pcm)) < 8192)
+        for relative in roster:
+            self.assertIn('audio/kit-ankle/' + relative, gradle)
+            self.assertIn('audio/kit-ankle/' + relative, windows)
+
 if __name__=='__main__': unittest.main()

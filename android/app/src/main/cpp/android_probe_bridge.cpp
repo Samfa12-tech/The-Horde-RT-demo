@@ -1090,7 +1090,8 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
-    const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
+    const auto gains = event.type==horde::gameplay::simulation::GameplayEventType::KitAnkleFoley ?
+        horde::audio::KitAnkleGains(event) : horde::gameplay::CalculateSpatialAudio(
         horde::gameplay::simulation::ChapterAmbienceEmitter(event),
         {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);

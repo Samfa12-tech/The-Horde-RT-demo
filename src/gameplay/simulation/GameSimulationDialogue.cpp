@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "audio/KitAnkleAudio.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
 void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seconds) {
@@ -56,11 +57,24 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint &&
        chapterDialogue_.State().line==Line::None && playerSupport_.grounded)
         chapterCompanion_.TryStartBellwetherArrival(playerX_,playerZ_,*terrain);
+    const float previousAnkleTime=chapterCompanion_.State().motion.anklePlaybackSeconds;
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
         chapterDialogue_.State().proofAccepted && (!guidePending || readyToLead),c.paused,
         terrain,
         config_.authoredChapterTerrain,c.alive&&!c.traversing,
         guidePending && readyToLead);
+    const auto& kit=chapterCompanion_.State();
+    if(kit.grounded && kit.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment &&
+       kit.motion.anklePlaybackSeconds>previousAnkleTime) {
+        const float headingX=std::sin(kit.yaw), headingZ=std::cos(kit.yaw);
+        for(const auto& beat:audio::kKitAnkleBeats) {
+            if(previousAnkleTime<beat.seconds && kit.motion.anklePlaybackSeconds>=beat.seconds)
+                Emit(GameplayEventType::KitAnkleFoley,EntityId::Kit,EntityId::Invalid,
+                    kit.x+headingX*beat.forward+headingZ*beat.right,
+                    kit.z-headingZ*beat.forward+headingX*beat.right,beat.gain,
+                    static_cast<std::int32_t>(beat.cue),kit.y+beat.height);
+        }
+    }
     bindCompanion();
     chapterDialogue_.RefreshCompanionSpatial(c);
     chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,

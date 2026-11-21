@@ -20,6 +20,7 @@ enum class EntityId : std::uint32_t
     SkeletonB = 4,
     RewardChest = 5,
     RewardLantern = 6,
+    Kit = 7,
 };
 
 enum class GameplayEventType : std::uint8_t
@@ -63,10 +64,11 @@ enum class GameplayEventType : std::uint8_t
     ForestFoliage,
     LichRevivalCry,
     PlayerGuardBlocked,
+    KitAnkleFoley,
 };
 
 inline constexpr std::size_t kGameplayEventTypeCount =
-    static_cast<std::size_t>(GameplayEventType::PlayerGuardBlocked) + 1u;
+    static_cast<std::size_t>(GameplayEventType::KitAnkleFoley) + 1u;
 
 struct GameplayEvent
 {

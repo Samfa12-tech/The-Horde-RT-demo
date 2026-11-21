@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "sampleRate": 48000,
+  "channels": 1,
+  "bitsPerSample": 16,
+  "listeningAcceptance": false,
+  "assets": [
+    {
+      "runtimeFile": "runtime/boot_and_gravel.wav",
+      "runtimeSha256": "6ae8da65c5fad29383c728ca61df873d55acbe0e103e0d677c3950c70aa1ef47",
+      "frames": 17280,
+      "bytes": 34604,
+      "peakDbfs": -15.39,
+      "license": "FilmCow custom royalty-free project-use licence",
+      "licenseEvidence": "docs/licenses/filmcow-sfx-license.pdf",
+      "licenseSha256": "bda56a077aa8ba8e053ae916dd4c19038baa12cd33d10209658646ac9351b73f",
+      "sources": [
+        {
+          "file": "footstep dirt 7.wav",
+          "sha256": "2ba4863c2f5b055fc191dffbe51d43da869fdc782997b95e5a0ff6a29e810108",
+          "cropFrames": [
+            1200,
+            17184
+          ]
+        },
+        {
+          "file": "rock 19.wav",
+          "sha256": "3fa86c60a95e5cdf1f0df60f24bab967db55b29f8fae9460c1ed70d0a25db4c1",
+          "cropFrames": [
+            1960,
+            8200
+          ]
+        }
+      ]
+    },
+    {
+      "runtimeFile": "runtime/steady_breath.wav",
+      "runtimeSha256": "b897bc24c514a804fccad3969210dec493bb1618811839bd52728518e00d5163",
+      "frames": 21120,
+      "bytes": 42284,
+      "peakDbfs": -19.251,
+      "license": "Original Horde foley, Samfa12/Codex",
+      "source": "Locally synthesized unvoiced filtered noise, seed 47519"
+    }
+  ]
+}

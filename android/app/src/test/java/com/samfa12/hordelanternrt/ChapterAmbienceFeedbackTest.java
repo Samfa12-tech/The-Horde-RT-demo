@@ -52,4 +52,12 @@ public class ChapterAmbienceFeedbackTest {
         assertEquals(-1, ChapterAmbienceFeedback.latestSignalIndex(new long[]{35,0}));
         assertEquals(0, ChapterAmbienceFeedback.latestSignalIndex(new long[]{35,0,0,29,0}));
     }
+    @Test public void kitAnkleFoleyUsesItsOwnClosedCueRoster() {
+        assertEquals(38, KitAnkleFeedback.EVENT_TYPE);
+        assertFalse(ChapterAmbienceFeedback.isSignal(KitAnkleFeedback.EVENT_TYPE));
+        assertEquals(0, ChapterAmbienceFeedback.latestSignalIndex(batch(35, KitAnkleFeedback.EVENT_TYPE)));
+        assertEquals("kit_boot_and_gravel", KitAnkleFeedback.soundKey(1));
+        assertEquals("kit_steady_breath", KitAnkleFeedback.soundKey(2));
+        for (int cue : new int[]{0, 3, 255}) assertNull(KitAnkleFeedback.soundKey(cue));
+    }
 }

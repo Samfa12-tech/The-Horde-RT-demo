@@ -16,6 +16,17 @@ contact in the existing consolidated world owner. No new material, texture
 layer, light, transparency, instance, save field or road interaction is added.
 Native image/grounding and physical-device acceptance remain separate.
 
+## Kit's roadside ankle foley (1.8 development)
+
+`assets/audio/kit-ankle/runtime/boot_and_gravel.wav` is a short in-game blend
+of `footstep dirt 7.wav` and `rock 19.wav` from the existing private FilmCow
+Recorded SFX archive. The FilmCow project-use terms documented below apply.
+`steady_breath.wav` is original unvoiced Horde foley by Samfa12/Codex,
+made from locally synthesized filtered noise. The
+[asset manifest](assets/audio/kit-ankle/asset.manifest.json) pins the licensed
+sources, crop frames and exact WAVs. Packages carry the bounded derivatives
+and manifest. The archive originals stay private.
+
 ## Original tomb-floor masonry chips (1.7 development)
 
 `src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in

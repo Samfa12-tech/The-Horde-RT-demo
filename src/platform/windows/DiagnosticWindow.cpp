@@ -110,6 +110,7 @@
 #include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "audio/KitAnkleAudio.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsSubtitleBitmap.h"
@@ -2289,10 +2290,17 @@ bool PlayXAudioFile(const std::filesystem::path& path,
 
 #include "windows_private_lich_revival_audio.inl"
 
+bool KitAnkleAudioAudible(const VulkanSurfaceContext& context)
+{
+    return context.controlsEnabled && !context.unattendedBenchmark && !MeasurementPausedByUi(context) &&
+        context.sfxVolumePercent>0 && GetForegroundWindow()==context.windowHandle;
+}
+
 void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
     if(gCampaignHiddenValidation)return;
     UpdatePrivateLichRevivalAudio(context);
+    if(!KitAnkleAudioAudible(context))SpatialAudioEngine().StopLoop("kit_ankle_foley");
     if((!horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ChapterLocalAmbience::Eligible(context.simulation.Snapshot())) ||
@@ -2690,6 +2698,18 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::ChapterLocalAmbienceStopped:
             if(event.sequence!=latestAmbienceSignal)break;
             SpatialAudioEngine().StopLoop("chapter_ambience");break;
+        case GameplayEventType::KitAnkleFoley:
+            if(KitAnkleAudioAudible(context)) {
+                const auto* clip=horde::audio::KitAnkleClip(horde::audio::KitAnkleCueForEvent(event));
+                const auto gains=horde::audio::KitAnkleGains(event);
+                if(clip && (gains.left>0 || gains.right>0)) {
+                    auto& audio=SpatialAudioEngine();
+                    audio.StopLoop("kit_ankle_foley");
+                    (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,"kit_ankle_foley",0,0,
+                        horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
+                }
+            }
+            break;
         case GameplayEventType::PlayerWetFootstep:
         {
             const unsigned variant = static_cast<unsigned>(context.playerFootstepVariant++) & 3u;
@@ -4724,7 +4744,10 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
     StopPrivateLichRevivalAudio(context);
-    if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("chapter_ambience");
+    if(!gCampaignHiddenValidation) {
+        SpatialAudioEngine().StopLoop("chapter_ambience");
+        SpatialAudioEngine().StopLoop("kit_ankle_foley");
+    }
     if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
     context.crouchHeld = false;
     context.controllerCrouchHeld = false;
