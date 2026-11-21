@@ -1,0 +1,30 @@
+{
+  "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "chart": "Engine XYZ in metres, +Y up. Polylines run downstream.",
+  "channelWidth": 2.3,
+  "headrace": [
+    [143.6, -18.90, 74.0],
+    [140.2, -19.49, 80.0],
+    [139.2, -19.71, 88.0],
+    [138.8, -19.88, 94.0],
+    [137.8, -20.03, 101.0],
+    [137.2, -20.16, 108.3]
+  ],
+  "tailrace": [
+    [137.2, -22.35, 109.35],
+    [137.2, -22.45, 112.0],
+    [137.7, -22.68, 115.0],
+    [139.5, -23.045, 119.0]
+  ],
+  "wheel": {
+    "axleCentre": [137.2, -21.10, 109.35],
+    "radius": 1.5,
+    "faceWidth": 1.76,
+    "axleHalfLength": 1.76
+  },
+  "crossing": {
+    "centreXZ": [138.8, 94.0],
+    "reservedDeckMetres": [7.0, 3.0]
+  },
+  "protectedPracticeLanding": [138.11, 122.55]
+}

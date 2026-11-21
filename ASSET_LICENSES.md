@@ -1019,6 +1019,16 @@ Samfa12/Codex. The editable source and authoring script are retained alongside
 the checked-in runtime GLB. The model uses one opaque material and no external
 textures or third-party asset inputs.
 
+## Bellwether waterwheel source - 22 November 2026
+
+The rigid wheel is original Horde geometry authored in Blender by Samfa12/Codex.
+Its oak finish reuses the three original chest-wood textures produced by
+tools/generate-production-prop-textures.py. The iron is a local PBR material.
+The editable master packs the existing wood maps. No external model, textures
+or provider assets were used. The source and receipt are stored under
+assets/models/world/source/bellwether-waterwheel-v1/. The GLB candidate is
+reproducible from the recipe and remains outside game packages.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

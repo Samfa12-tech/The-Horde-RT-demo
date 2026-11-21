@@ -1,0 +1,97 @@
+{
+  "layoutSha256": "8c98a8df1885fae56b77b7ba69fe0d8a9d5ee54e7389d760dd7bf72b2646ff2a",
+  "recipeSha256": "177c73fb3a46ca2ab425eded4a3e04956208bc94ee65d27b44cfcf2f410ff228",
+  "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "atlasSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+  "masterSha256": "114ff792a7abc0bf5f89feab3d78654a20a0d17763d3093945cdb765b29ed6df",
+  "glbSha256": "68ce5b5edaf57f667a6464eaf56c6b83f364a6f6b4b60d1a1374e505808612e7",
+  "textureSha256": {
+    "chest-wood-base-color.png": "bee7f831234a81bfd4e06db501adb49f566ebac601ad6eb42255a23d2824e2d7",
+    "chest-wood-normal.png": "5225309ca33f2c12c0d26d5e156d935b9108fb8d6c617cda4100886cd8c506d2",
+    "chest-wood-orm.png": "55fa9ef60a1f03bc00bbe3b75c9e112481e430a9a3b07eb3492621452ec5a2c3"
+  },
+  "triangles": 2180,
+  "materials": 2,
+  "origin": "Axle centre, +X rigid rotation axis",
+  "survey": {
+    "headrace": {
+      "stationTerrainWestCentreEast": [
+        [
+          -19.32,
+          -19.83,
+          -19.83
+        ],
+        [
+          -16.718,
+          -18.002,
+          -19.26
+        ],
+        [
+          -16.454,
+          -17.721,
+          -18.986
+        ],
+        [
+          -16.534,
+          -17.822,
+          -19.109
+        ],
+        [
+          -17.93,
+          -18.541,
+          -19.461
+        ],
+        [
+          -19.992,
+          -20.677,
+          -21.251
+        ]
+      ],
+      "maxSampledCutToBed": 3.746,
+      "maxSampledFillToBed": 0.691
+    },
+    "tailrace": {
+      "stationTerrainWestCentreEast": [
+        [
+          -20.211,
+          -20.896,
+          -21.47
+        ],
+        [
+          -20.762,
+          -21.447,
+          -21.981
+        ],
+        [
+          -21.728,
+          -22.189,
+          -22.763
+        ],
+        [
+          -23.22,
+          -23.846,
+          -23.95
+        ]
+      ],
+      "maxSampledCutToBed": 2.539,
+      "maxSampledFillToBed": 0.505
+    },
+    "lipsBelowExistingRiver": [
+      [
+        0.024,
+        0.035,
+        0.047
+      ],
+      [
+        0.04,
+        0.046,
+        0.051
+      ]
+    ],
+    "assumedBedDepth": 0.4,
+    "wheelStationTerrainY": -20.896,
+    "wheelHeadContactRadius": 1.409,
+    "wheelTailwaterEngagement": 0.25,
+    "dropAtWheel": 2.19
+  }
+}
