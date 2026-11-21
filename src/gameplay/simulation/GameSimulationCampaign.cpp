@@ -316,6 +316,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.config_.swordStartsStowed=config_.swordStartsStowed;
     if(c.contentRevision==campaign::kBellwetherContentRevision) {
         if(!next.chapterCompanion_.RestoreCampaignTavernSeat(*next.chapterTerrain_,chapterCompanion_.State().generation))return false;
+        if(next.config_.bellwetherTavernKeeperAdmitted)next.tavernKeeper_.RestoreAtHearth(*next.chapterTerrain_);
     } else if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     else if(upper && config_.healingFlask1_7 &&

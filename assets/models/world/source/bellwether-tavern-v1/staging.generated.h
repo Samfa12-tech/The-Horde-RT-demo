@@ -9,6 +9,11 @@ inline constexpr std::array<float, 3> kChairApproach{{82.980000f, -8.709551f, 10
 inline constexpr std::array<float, 3> kChairTurn{{84.300000f, -8.709551f, 107.300000f}};
 inline constexpr std::array<float, 3> kTableTop{{82.520000f, -7.959551f, 106.130000f}};
 inline constexpr std::array<float, 3> kConversation{{84.520000f, -8.709551f, 107.680000f}};
+inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.200000f}};
+inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
+inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};
 
 inline constexpr float kChairFacingRadians=1.570796327f;
+inline constexpr float kKeeperDoorFacingRadians=-2.165010031f;
+inline constexpr float kKeeperHearthFacingRadians=-0.930264771f;
 }

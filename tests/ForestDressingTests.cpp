@@ -1161,7 +1161,9 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     namespace cp=gameplay::campaign;
     using namespace gameplay::dialogue;
     using Stage=BellwetherArrivalStage;
-    sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=stayAtIncident;
+    sim::GameSimulation game(config);
     const auto record=LookoutCheckpoint(*terrain);
     const auto token=game.BeginCampaignRestore(record);
     const bool restored=token && game.CommitCampaignRestore(
@@ -1196,6 +1198,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     unsigned injuryEntries=0;
     bool assessmentStayedPlanted=true,protectivePhaseMatchesTravel=true;
     unsigned assessmentTicks=0,assessmentSampleTicks=0,protectiveTicks=0;
+    bool keeperAtDoor=false,keeperWalkedAfterSeat=true;
+    float keeperTravel=0.f,minimumSpeakerGap=100.f;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
     bool stoneMovesOnlyAfterContact=true;
@@ -1215,6 +1219,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         const auto before=game.Snapshot().chapterCompanion;
         game.StepFixed(input);
         const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
+        if(const auto& keeper=after.tavernKeeper) {
+            keeperAtDoor|=keeper->stage==TavernKeeperStage::AtDoor;
+            if(keeper->travelled>0.f) {
+                keeperWalkedAfterSeat&=kit.bellwetherArrival==Stage::Seated;
+                keeperTravel+=keeper->travelled;
+            }
+            minimumSpeakerGap=std::min(minimumSpeakerGap,std::hypot(keeper->foot[0]-kit.x,keeper->foot[2]-kit.z));
+        }
         if(BellwetherRoadStoneWorldFromModel(before)!=BellwetherRoadStoneWorldFromModel(kit)) {
             ++stoneMotionTicks;
             stoneMovesOnlyAfterContact &= kit.bellwetherArrival==Stage::AnkleAssessment &&
@@ -1377,6 +1389,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(firstCaptionAtChair && hearthSpoken==std::vector{Line::TavernSit,Line::TavernLimit,Line::TavernWork} &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->dialogue.hearthLinesResolved==3,
           "the real route delivers all three hearth captions in order and records the completed sequence");
+    const auto& keeper=game.Snapshot().tavernKeeper;
+    Check(stayAtIncident ? (keeper && keeperAtDoor && keeperWalkedAfterSeat && keeperTravel>9.7f && keeperTravel<10.f &&
+          minimumSpeakerGap>.85f && keeper->stage==TavernKeeperStage::AtHearth &&
+          std::abs(keeper->foot[1]-kKeeperHearth[1])<.001f && game.Snapshot().tavernConversationAvailable)
+          : (!keeper && !game.Snapshot().tavernConversationAvailable),
+          "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {

@@ -3,7 +3,7 @@
 #include <cmath>
 namespace horde::gameplay::simulation {
 void GameSimulation::InteractWithClaimedChapter() {
-    if(!TryRescueInteraction() && !TryFlaskUpgradeInteraction() && config_.bellwetherTavernKeeperSource)
+    if(!TryRescueInteraction() && !TryFlaskUpgradeInteraction() && config_.bellwetherTavernKeeperAdmitted)
         chapterDialogue_.TryStartTavernConversation(TavernConversationContext(false));
 }
 
@@ -29,8 +29,11 @@ horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(boo
         const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
         c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
     }
-    if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && chapterTerrainGeneration_==worldRoute_.generation)
-        c.tavernKeeperSource=config_.bellwetherTavernKeeperSource;
+    const auto& keeper=tavernKeeper_.Pose();
+    if(keeper && keeper->stage==TavernKeeperStage::AtHearth && c.exterior && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation && config_.bellwetherTavernKeeperAdmitted &&
+       config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
+        c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
     return c;
 }
 
@@ -38,6 +41,12 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     // Historical replay/capture fixtures keep their old timing and semantics.
     if(!config_.combatFoundation1_7 || legacyCombatCheckpoint_) return;
     using namespace horde::gameplay::dialogue;
+    const auto* terrain=chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr;
+    const auto arrival=chapterCompanion_.State().bellwetherArrival;
+    if(config_.bellwetherTavernKeeperAdmitted && terrain && !input.paused &&
+       rescueTraversal_.Snapshot().exteriorSide && !rescueTraversal_.IsActive() &&
+       playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
+        tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
     auto c=TavernConversationContext(input.paused);
     if(c.exterior&&!c.traversing&&!chapterFirstExterior_) {
         chapterFirstExterior_=true;
@@ -79,7 +88,6 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     const bool guidePending=config_.healingFlask1_7 && chapterDialogue_.BasinGuidePending();
     const bool readyToLead=chapterDialogue_.State().line!=Line::ReunionProof &&
         chapterDialogue_.State().line!=Line::ReunionFirstPiece;
-    const auto* terrain=chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr;
     if(c.exterior && c.alive && !c.traversing && !c.paused && terrain &&
        campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint &&
        chapterDialogue_.State().line==Line::None && playerSupport_.grounded)

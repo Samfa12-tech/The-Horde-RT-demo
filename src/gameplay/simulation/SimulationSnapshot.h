@@ -1,4 +1,6 @@
 #pragma once
+
+#include "gameplay/dialogue/TavernKeeperPlacement.h"
 #include "gameplay/effects/WaterContact.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/CompanionRouteFixture.h"
@@ -69,6 +71,7 @@ struct SimulationSnapshot
 {
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
+    std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

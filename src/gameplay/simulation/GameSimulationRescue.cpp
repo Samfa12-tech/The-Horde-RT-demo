@@ -26,6 +26,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     config_.developmentRescueJourney=enabled;
     dialogueDucking_.Reset();
     config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
+    tavernKeeper_={};
     rescueTraversal_.Reset(); rescueOpeningSeconds_=0;worldRoute_.Invalidate();
     worldRoute_.current=WorldZoneId::Dungeon;
     if(enabled) {

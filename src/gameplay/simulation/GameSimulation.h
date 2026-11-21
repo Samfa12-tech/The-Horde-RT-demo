@@ -88,7 +88,7 @@ struct GameSimulationConfig
     // Explicit source/native integration trial; normal platform callers stay OFF.
     bool flaskUtilityCandidate = false;
     // Set by the scene profile when the placed tavern keeper is admitted.
-    std::optional<horde::gameplay::dialogue::Tuple> bellwetherTavernKeeperSource;
+    bool bellwetherTavernKeeperAdmitted = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -372,6 +372,7 @@ private:
     std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
     horde::gameplay::dialogue::Director chapterDialogue_{};
+    horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};
     ChapterLocalAmbience localAmbience_{};

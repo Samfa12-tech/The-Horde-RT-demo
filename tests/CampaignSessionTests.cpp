@@ -165,21 +165,24 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     Check(!resumed.Snapshot().tavernConversationAvailable && resumed.Snapshot().chapterDialogue.line==Line::None,
           "the real tavern remains quiet on Interact until a keeper is admitted");
     auto staffedConfig=sim::ProductionGameSimulationConfig();
-    staffedConfig.bellwetherTavernKeeperSource=Tuple{85.5f,record.position.y+kCompanionSpeechHeight,109.f};
+    staffedConfig.bellwetherTavernKeeperAdmitted=true;
     sim::GameSimulation staffed(staffedConfig);
     Check(Seed(staffed,complete,terrain),"staffed tavern uses the same real room and campaign transaction");
     cp::PlaySession staffedPlay(staffed,directory.path);
     Check(staffedPlay.BeginNewGame(2),"the exchange test uses a separate autosave slot");
     sim::InputSnapshot talk;talk.yawRadians=record.yaw;talk.pitchRadians=record.pitch;
     staffed.StepFixed(talk);
-    Check(staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::None,
+    const auto& keeper=staffed.Snapshot().tavernKeeper;
+    Check(keeper && keeper->stage==TavernKeeperStage::AtHearth &&
+          keeper->foot[0]==horde::gameplay::bellwether::kKeeperHearth[0] &&
+          staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::None,
           "restored hearth offers Talk and waits for the player");
     ++talk.commands.interact;staffed.StepFixed(talk);
     Check(!staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::TavernIntroduce,
           "normal fixed-step Interact starts Kit's introduction");
     ++talk.commands.dialogueSkip;staffed.StepFixed(talk);
     Check(staffed.Snapshot().chapterDialogue.line==Line::TavernHordeArmy &&
-          staffed.Snapshot().chapterDialogue.source.x==staffedConfig.bellwetherTavernKeeperSource->x,
+          staffed.Snapshot().chapterDialogue.source.x==horde::gameplay::bellwether::kKeeperHearth[0],
           "the keeper speaks from her admitted position");
     const auto beforeReply=staffed.LatestCampaignBoundary();
     Check(beforeReply && beforeReply->schema==cp::kTavernConversationSchema &&
