@@ -33,7 +33,8 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
-        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,c.airWardLearned);};
+        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,
+        c.airWardLearned,c.millPreparation);};
     return facts(a)==facts(b);
 }
 }
@@ -70,6 +71,12 @@ static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::Treas
     checkpoint.treasurePurse=purse;
     checkpoint.schema=std::max(checkpoint.schema,purse.lanternFittingPurchased?
         campaign::kLanternFittingSchema:campaign::kTreasurePurseSchema);
+}
+
+static void RecordMillPreparation(campaign::Checkpoint& checkpoint,bellwether::MillPreparation preparation) {
+    if(preparation==bellwether::MillPreparation::Unexamined)return;
+    checkpoint.millPreparation=preparation;
+    checkpoint.schema=std::max(checkpoint.schema,campaign::kMillPreparationSchema);
 }
 
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
@@ -206,6 +213,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         RecordWaysideArchive(c,waysideArchive_);
     if(c.dialogue.tavernLanternLinesStarted)c.schema=std::max(c.schema,campaign::kTavernLanternExchangeSchema);
     RecordTreasurePurse(c,treasurePurse_);
+    RecordMillPreparation(c,millPreparation_);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -314,6 +322,23 @@ void GameSimulation::LatchCampaignBoundary() {
     }
 }
 
+void GameSimulation::InteractWithMill(bellwether::MillAction action) {
+    using namespace bellwether;
+    MillPreparation preparation;
+    switch(action) {
+    case MillAction::InspectGearing: preparation=MillPreparation::BearingNeeded;break;
+    case MillAction::RecoverBearing: preparation=MillPreparation::BearingRecovered;break;
+    case MillAction::CheckFit: preparation=MillPreparation::FitChecked;break;
+    default: return;
+    }
+    auto updated=*campaignBoundary_;
+    RecordMillPreparation(updated,preparation);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return;
+    millPreparation_=preparation;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
+}
+
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {
     // An invalid request does not cancel an already validated pending request.
     // Normal gameplay keeps schema3 unavailable until admission. The explicit
@@ -403,6 +428,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
     next.treasurePurse_=c.treasurePurse;
+    next.millPreparation_=c.millPreparation;
     if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;

@@ -65,6 +65,9 @@
     <string name="listen_to_lantern">Listen to the lantern</string>
     <string name="take_road_register">Take the road register</string>
     <string name="restore_shrine_binding">Restore shrine binding</string>
+    <string name="inspect_mill_gearing">Inspect mill gearing</string>
+    <string name="take_spare_bearing">Take a spare bearing</string>
+    <string name="check_mill_bearing_fit">Check bearing fit</string>
     <string name="open_tavern_door">Open tavern door</string>
     <string name="close_tavern_door">Close tavern door</string>
     <string name="show_road_mark">Show the road mark</string>

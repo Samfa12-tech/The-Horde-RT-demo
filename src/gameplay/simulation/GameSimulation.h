@@ -336,6 +336,8 @@ private:
     std::optional<dialogue::Tuple> HeldRewardLanternSource() const;
     void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
+    bellwether::MillAction CurrentMillAction(const dialogue::Context&) const;
+    void InteractWithMill(bellwether::MillAction);
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
     bool CanBuyLanternFitting(const dialogue::Context&) const;
@@ -392,6 +394,7 @@ private:
     std::optional<dialogue::RecordKeeperPose> recordKeeper_;
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
+    bellwether::MillPreparation millPreparation_{};
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};

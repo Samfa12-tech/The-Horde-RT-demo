@@ -60,6 +60,16 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.take_lantern, MainActivity.contextualInteractLabel((4 << 3) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel(0));
     }
+
+    @Test
+    public void millWorkbenchActionsShareTheContextControlWithoutQuotingAPrice() {
+        final int workbench = (7 << 16) | 1;
+        assertEquals(R.string.inspect_mill_gearing, MainActivity.contextualInteractLabel(workbench | (1 << 25)));
+        assertEquals(R.string.take_spare_bearing, MainActivity.contextualInteractLabel(workbench | (2 << 25)));
+        assertEquals(R.string.check_mill_bearing_fit, MainActivity.contextualInteractLabel(workbench | (3 << 25)));
+        assertEquals(0, MainActivity.contextualInteractLabel(workbench | (3 << 25) | (1 << 9)));
+        assertEquals(0, MainActivity.lanternFittingPrice(workbench | (2 << 25)));
+    }
     private static Rect bounds(final View view) {
         return new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }

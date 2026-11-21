@@ -11,8 +11,8 @@
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
-  "runtimeSha256": "971ba0b72d3990ca6013234973ff4e5adb4332caf2191e7fef0db1780c3de1e7",
-  "solidTriangles": 3564,
+  "runtimeSha256": "a133ad2ff5134c1520696aadc1037c019af5c795535a4fe9e4077625342f19f5",
+  "solidTriangles": 3744,
   "walkableTriangles": 24,
   "windowSha256": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
   "windowTriangles": 12,
@@ -183,6 +183,16 @@
     116.1,
     -13.559898376464844,
     115.74000000000001
+  ],
+  "millComparison": [
+    117.05,
+    -12.675765380859374,
+    116.3
+  ],
+  "millBearingBin": [
+    112.9,
+    -11.611985168457032,
+    128.3
   ],
   "millLanding": {
     "west": 116.24,

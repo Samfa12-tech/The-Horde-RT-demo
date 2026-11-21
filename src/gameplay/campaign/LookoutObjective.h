@@ -84,7 +84,8 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     return "";
 }
 
-inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse, AirWardDirections ward)
+inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse, AirWardDirections ward,
+    bellwether::MillPreparation mill={})
 {
     std::string text=PauseObjectiveText(objective);
     if (objective==PauseObjective::BellwetherExpeditions) {
@@ -95,6 +96,24 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
         case AirWardDirections::RestoreBinding:text+="\r\n\r\nFor an air ward, return to the wayside shrine and restore its binding.";break;
         case AirWardDirections::LearnWard:text+="\r\n\r\nBinding restored. Ask the record keeper to teach you the air ward.";break;
         case AirWardDirections::Learned:text+="\r\n\r\nAir ward learned for the Abbey crossing.";break;
+        }
+    }
+    if(objective!=PauseObjective::None && objective!=PauseObjective::Lookout) {
+        using bellwether::MillPreparation;
+        switch(mill) {
+        case MillPreparation::Unexamined:
+            if(objective==PauseObjective::BellwetherExpeditions)
+                text+="\r\n\r\nFollow the MILL signs east to inspect the gearing at the workbench.";
+            break;
+        case MillPreparation::BearingNeeded:
+            text+="\r\n\r\nFind a spare bearing in the parts bin south of the mill path.";
+            break;
+        case MillPreparation::BearingRecovered:
+            text+="\r\n\r\nTake the spare bearing to the mill workbench and check its fit.";
+            break;
+        case MillPreparation::FitChecked:
+            text+="\r\n\r\nMill bearing matched and ready for repair.";
+            break;
         }
     }
     return text;

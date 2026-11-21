@@ -824,6 +824,7 @@ void GameSimulation::ResetRoute()
     chapterTerrain_.reset();
     chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
     treasurePurse_={};
+    millPreparation_={};
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -3480,6 +3481,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
     snapshot_.waysideArchive=waysideArchive_;
     snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);
+    snapshot_.millPreparation=millPreparation_;
+    snapshot_.millAction=CurrentMillAction(chapterContext);
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&

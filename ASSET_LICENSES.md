@@ -135,9 +135,9 @@ The three runtime GLBs and their manifests are byte-identical copies under
 `assets/models/world/runtime/bellwether-tavern-v1/`.
 The floor-standing candlestick, wax and wick are original Horde geometry in that source.
 They reuse the existing TombEarthenware and TombCharredWick material rows.
-The west mill entrance, stone landing, timber workbench and two mill arrows
-are original Horde geometry in the same Blender master. The stone, timber and
-inlays reuse the existing town material rows.
+The west mill entrance, stone landing, timber workbench, reference bearing,
+spare parts bin and two mill arrows are original Horde geometry in the same
+Blender master. They reuse the existing town material rows.
 The church approach's stone deck and retaining sides are original Horde geometry
 from the same editable town master. They reuse MedievalWall02.
 The church arrow, post and chisel-stroke lettering are original Horde meshes.

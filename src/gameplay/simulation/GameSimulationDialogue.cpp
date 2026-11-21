@@ -16,6 +16,10 @@ void GameSimulation::InteractWithClaimedChapter() {
         BuyLanternFitting(context);
         return;
     }
+    if(const auto mill=CurrentMillAction(context);mill!=bellwether::MillAction::None) {
+        InteractWithMill(mill);
+        return;
+    }
     const auto records=RecordKeeperAction(context);
     if(records==dialogue::RecordKeeperAction::CollectReward) {
         ClaimRegisterReward(context);
@@ -55,6 +59,27 @@ void GameSimulation::InteractWithClaimedChapter() {
             waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
         chapterDialogue_.ShowTavernDirections(context,guidance);
     }
+}
+
+bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context& c) const {
+    using namespace bellwether;
+    if(millPreparation_==MillPreparation::FitChecked || !c.claimed || !c.exterior ||
+       !c.alive || c.paused || c.traversing || c.combat || !c.kitSeated || !playerSupport_.grounded ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       !campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
+       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size() ||
+       chapterDialogue_.State().line!=dialogue::Line::None)
+        return MillAction::None;
+    const bool atBin=millPreparation_==MillPreparation::BearingNeeded;
+    const auto& mark=atBin?kMillBearingBin:kMillComparison;
+    const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
+    const float distance=std::hypot(dx,dz);
+    if(distance>1.75f || std::abs(c.listener.y-mark[1])>1.1f ||
+       std::sin(c.yaw)*dx-std::cos(c.yaw)*dz<.75f*distance ||
+       !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
+           mark[1]-.02f,mark[1]+.02f,.025f))return MillAction::None;
+    if(atBin)return MillAction::RecoverBearing;
+    return millPreparation_==MillPreparation::Unexamined?MillAction::InspectGearing:MillAction::CheckFit;
 }
 
 dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::Context& c) const {

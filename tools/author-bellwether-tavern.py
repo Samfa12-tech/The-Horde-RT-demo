@@ -497,6 +497,38 @@ for side in (-1, 1):
         bench_top, bench_top + .13, ember)
 mill_work_mark = (mill_west - 2.20, ground(mill_west - 2.20, bench_z), bench_z)
 mill_door = (mill_west, mill_floor, mill_z)
+mill_comparison = (bench_west + .32, bench_top + .16, bench_south - .28)
+# The old bearing remains as a reference at the bench. The spare stock is
+# kept in an open bin, with individual contents below the front board.
+ring_x, ring_y, ring_z = mill_comparison
+segments = 12
+ring = [(ring_x + radius * math.cos(i * math.tau / segments), ring_y + height,
+         ring_z + radius * math.sin(i * math.tau / segments))
+        for height, radius in ((-.16, .19), (-.16, .105), (-.07, .19), (-.07, .105))
+        for i in range(segments)]
+ring_faces = []
+for i in range(segments):
+    j = (i + 1) % segments
+    outer, inner = segments * 2, segments * 3
+    ring_faces.extend(((i, j, segments + j, segments + i), (outer + i, inner + i, inner + j, outer + j),
+                       (i, outer + i, outer + j, j), (segments + i, segments + j, inner + j, inner + i)))
+mesh("B05_old_bearing", ring, ring_faces, solids, ember)
+
+bin_x, bin_z = 112.90, 128.30
+bin_west, bin_east = bin_x - .39, bin_x + .39
+bin_north, bin_south = bin_z - .46, bin_z + .46
+bin_bottom = min(ground(x, z) for x in (bin_west, bin_east) for z in (bin_north, bin_south)) - .06
+bin_top = ground(bin_x, bin_z) + .70
+box("B05_spare_parts_bin_base", bin_west, bin_east, bin_north, bin_south, bin_bottom, bin_top - .32, oak)
+for x in (bin_west, bin_east - .055):
+    box(f"B05_spare_parts_bin_end_{x}", x, x + .055, bin_north, bin_south, bin_top - .33, bin_top, oak)
+for z in (bin_north, bin_south - .055):
+    box(f"B05_spare_parts_bin_side_{z}", bin_west + .055, bin_east - .055, z, z + .055,
+        bin_top - .33, bin_top, oak)
+for y in (bin_top - .23, bin_top - .055):
+    box(f"B05_spare_parts_bin_strap_{y}", bin_west - .015, bin_west + .002, bin_north, bin_south,
+        y - .011, y + .013, ember)
+mill_bearing_bin = (bin_x, bin_top + .09, bin_z)
 
 
 # The mapped church path crosses a steep diagonal terrain band around the
@@ -716,7 +748,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=8600, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=8700, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -773,6 +805,7 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                churchWaymarker=church_waymarker,
                churchApproach=dict(width=2*church_half_width, sections=church_sections),
                millWaymarkers=mill_waymarkers, millWestDoor=mill_door, millWorkMark=mill_work_mark,
+               millComparison=mill_comparison, millBearingBin=mill_bearing_bin,
                millLanding=dict(west=landing_west, east=mill_west, north=landing_north,
                                 south=landing_south, height=landing_top),
                waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
@@ -791,6 +824,7 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("TavernCandleFlame", candle_flame), ("TavernCandleLight", candle_light),
                    ("ChurchWaymarker", church_waymarker),
                    ("MillWestDoor", mill_door), ("MillWorkMark", mill_work_mark),
+                   ("MillComparison", mill_comparison), ("MillBearingBin", mill_bearing_bin),
                    ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
                    ("WaysideInspection", shrine_view), ("WaysideRoadRegister", register_mark),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):

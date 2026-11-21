@@ -1609,29 +1609,87 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         --index;
         if(!walkTo(route[index])) {Check(false,"the player can return from the tavern to the same lookout");return;}
         if(stayAtIncident && index==kBellwetherMillJunction) {
+            using gameplay::bellwether::MillAction;
+            using gameplay::bellwether::MillPreparation;
+            using gameplay::bellwether::kMillBearingBin;
+            using gameplay::bellwether::kMillComparison;
             const auto& mill=kBellwetherMillApproach;
             const auto before=game.LatestCampaignBoundary();
-            bool visited=walkTo(mill[1]) &&
+            const auto walkStations=[&](auto first,auto last) {
+                for(;first!=last;++first)if(!walkTo(*first))return false;
+                return true;
+            };
+            const auto turnToward=[&](const auto& mark) {
+                input.moveForward=0;input.runHeld=false;
+                input.yawRadians=std::atan2(mark[0]-game.Snapshot().playerX,game.Snapshot().playerZ-mark[2]);
+                step();
+            };
+            const auto interact=[&] {++input.commands.interact;step();};
+            const bool visited=walkTo(mill[1]) &&
                 walkTo(kBellwetherSalvagerMark) && game.Snapshot().playerGrounded &&
-                walkTo(mill[1]);
-            for(auto station=mill.begin()+2;visited && station!=mill.end();++station)
-                visited=walkTo(*station);
-            visited=visited && game.Snapshot().playerGrounded;
+                walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) && game.Snapshot().playerGrounded;
             Check(visited,"the walk from the square reaches the mapped salvager mark and mill landing");
             if(!visited)return;
-            const bool benchReached=walkTo(kBellwetherMillWorkMark) && game.Snapshot().playerGrounded &&
-                walkTo(mill.back());
-            Check(benchReached,"the player can walk to the mill workbench and back to the landing");
+            const bool benchReached=walkTo(kBellwetherMillWorkMark) && game.Snapshot().playerGrounded;
+            Check(benchReached,"the player can walk to the mill workbench");
             if(!benchReached)return;
-            bool returned=true;
-            for(auto station=mill.rbegin()+1;returned && station!=mill.rend();++station)
-                returned=walkTo(*station);
+            turnToward(kMillComparison);
+            Check(game.Snapshot().millAction==MillAction::InspectGearing,"the workbench offers a gearing inspection");
+            interact();
+            const auto inspected=game.LatestCampaignBoundary();
+            Check(game.Snapshot().millAction==MillAction::None && inspected &&
+                  inspected->millPreparation==MillPreparation::BearingNeeded,
+                  "inspection notes the missing bearing without awarding one at the bench");
+            input.moveForward=1;input.runHeld=true;
+            const bool reachedBin=walkTo(mill.back()) && walkStations(mill.rbegin()+1,mill.rend()-1) &&
+                walkTo(kBellwetherBearingBinApproach);
+            Check(reachedBin,"the normal player motor can reach the spare parts bin from the workbench");
+            if(!reachedBin)return;
+            turnToward(kMillBearingBin);
+            const auto facing=input.yawRadians;
+            input.yawRadians+=3.14159265f;step();
+            interact();
+            Check(game.Snapshot().millAction==MillAction::None &&
+                  game.Snapshot().millPreparation==MillPreparation::BearingNeeded,
+                  "looking away from the bin cannot recover a bearing");
+            input.yawRadians=facing;step();
+            Check(game.Snapshot().millAction==MillAction::RecoverBearing,"the parts bin offers a spare bearing in reach");
+            interact();
+            const auto recovered=game.LatestCampaignBoundary();
+            Check(recovered && recovered->millPreparation==MillPreparation::BearingRecovered &&
+                  game.Snapshot().millAction==MillAction::None && !recovered->airWardLearned &&
+                  !recovered->treasurePurse.lanternFittingPurchased,
+                  "recovering a spare saves once without depending on or granting the other preparations");
+            if(!recovered)return;
+            sim::GameSimulation reloaded(config);
+            const auto reloadToken=reloaded.BeginCampaignRestore(*recovered);
+            Check(reloadToken && reloaded.CommitCampaignRestore(*reloadToken,
+                    {reloadToken->worldGeneration,recovered->zone},terrain,{}) &&
+                  reloaded.Snapshot().millPreparation==MillPreparation::BearingRecovered &&
+                  reloaded.Snapshot().playerX==recovered->position.x,
+                  "a recovered bearing reloads at the existing tavern return point");
+            input.moveForward=1;input.runHeld=true;
+            const bool backAtBench=walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) &&
+                walkTo(kBellwetherMillWorkMark);
+            Check(backAtBench,"the bearing can be brought back to the workbench");
+            if(!backAtBench)return;
+            turnToward(kMillComparison);
+            Check(game.Snapshot().millAction==MillAction::CheckFit,"the recovered bearing enables the fit check");
+            interact();
+            const auto fittedRevision=game.CampaignBoundaryRevision();
+            interact();
+            Check(game.Snapshot().millPreparation==MillPreparation::FitChecked &&
+                  game.Snapshot().millAction==MillAction::None && game.CampaignBoundaryRevision()==fittedRevision,
+                  "the same interaction cannot repeat the completed bearing check");
+            input.moveForward=1;input.runHeld=true;
+            const bool returned=walkTo(mill.back()) && walkStations(mill.rbegin()+1,mill.rend());
             const auto after=game.LatestCampaignBoundary();
             Check(returned && before && after && before->position.x==after->position.x &&
                   before->position.z==after->position.z && before->dialogue.tavernConversationLinesResolved==
                   after->dialogue.tavernConversationLinesResolved &&
+                  after->schema==cp::kMillPreparationSchema && after->millPreparation==MillPreparation::FitChecked &&
                   game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated,
-                  "walking back from B05 keeps Kit seated and the tavern return point earned");
+                  "the fitted bearing keeps Kit seated and preserves the earned tavern return point");
             if(!returned)return;
         }
         if(stayAtIncident && index==kBellwetherChurchJunction) {
@@ -1736,7 +1794,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 Check(game.Snapshot().chapterDialogue.line==expected,"the reveal keeps its scripted order");
             }
             const auto opened=game.LatestCampaignBoundary();
-            Check(opened && opened->schema==cp::kShrineLanternSchema && !opened->waysideRegisterRecovered,
+            Check(opened && opened->schema==cp::kMillPreparationSchema && !opened->waysideRegisterRecovered,
                   "the open shrine is an earned autosave even before the register is taken");
             Check(game.Snapshot().waysideArchiveAction==ArchiveAction::TakeRegister,
                   "the open niche offers the register after the reveal");
@@ -1746,7 +1804,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   RequiresChapterCaption(Line::LanternRegisterReturn),
                   "the pickup independently earns the register and gives the return instruction");
             const auto boundary=game.LatestCampaignBoundary();
-            Check(boundary && boundary->schema==cp::kWaysideRegisterSchema &&
+            Check(boundary && boundary->schema==cp::kMillPreparationSchema &&
                   boundary->waysideArchive==cp::WaysideArchiveProgress::Open && boundary->waysideLanternRevealStarted &&
                   boundary->waysideRegisterRecovered && boundary->dialogue.activeLine==Line::None && opened &&
                   boundary->position.x==opened->position.x && boundary->position.z==opened->position.z &&
@@ -1768,7 +1826,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   "collecting the register offers a physical handoff without earning its routes");
             ++input.commands.interact;step();
             const auto read=game.LatestCampaignBoundary();
-            Check(read && read->schema==cp::kRegisterInterpretationSchema && read->waysideRegisterInterpreted &&
+            Check(read && read->schema==cp::kMillPreparationSchema && read->waysideRegisterInterpreted &&
                   read->dialogue.activeLine==Line::None && boundary && read->position.x==boundary->position.x &&
                   read->position.z==boundary->position.z && read->flask==boundary->flask,
                   "showing the register updates the earned tavern save without changing its anchor or saving active speech");
@@ -1802,7 +1860,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   state.waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(0.f).worldFromModel &&
                   state.waysideArchiveAction==ArchiveAction::Recap && restored &&
                   restored->waysideArchive==cp::WaysideArchiveProgress::Restored && !restored->airWardLearned &&
-                  restored->schema==cp::kAirWardSchema && restored->waysideRegisterRecovered,
+                  restored->schema==cp::kMillPreparationSchema && restored->waysideRegisterRecovered,
                   "the real stone closes while preserving the collected register and the lantern recap");
             input.moveForward=1;input.runHeld=true;
             if(!(walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
@@ -1825,7 +1883,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const auto rewarded=game.LatestCampaignBoundary();
             const cp::TreasurePurse earned{cp::TreasurePurse::kRegisterRewardCoins,true};
             Check(state.chapterDialogue.line==Line::RecordKeeperReward && state.treasurePurse==earned &&
-                  rewarded && read && rewarded->schema==cp::kAirWardSchema && rewarded->treasurePurse==earned &&
+                  rewarded && read && rewarded->schema==cp::kMillPreparationSchema && rewarded->treasurePurse==earned &&
                   rewarded->position.x==read->position.x && rewarded->position.z==read->position.z &&
                   rewarded->dialogue.activeLine==Line::None && rewarded->flask==read->flask,
                   "the player collects the coins once and updates the existing return point and resources atomically");
@@ -1861,7 +1919,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const cp::TreasurePurse fitted{earned.coins-cp::TreasurePurse::kLanternFittingPrice,true,true};
             const auto bought=game.LatestCampaignBoundary();
             Check(state.chapterDialogue.line==Line::TavernLanternFitting && state.treasurePurse==fitted &&
-                  bought && rewarded && bought->schema==cp::kAirWardSchema && bought->treasurePurse==fitted &&
+                  bought && rewarded && bought->schema==cp::kMillPreparationSchema && bought->treasurePurse==fitted &&
                   bought->position.x==rewarded->position.x && bought->position.z==rewarded->position.z &&
                   bought->vitality==rewarded->vitality && bought->flask==rewarded->flask,
                   "one fitting purchase saves its debit and ownership at the earned return point");
@@ -1925,7 +1983,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 ++input.commands.dialogueSkip;step();
             }
             const auto introduced=game.LatestCampaignBoundary();
-            Check(introduced && introduced->schema==cp::kAirWardSchema && introduced->treasurePurse==fitted && introduced->airWardLearned &&
+            Check(introduced && introduced->schema==cp::kMillPreparationSchema && introduced->treasurePurse==fitted && introduced->airWardLearned &&
+                  introduced->millPreparation==gameplay::bellwether::MillPreparation::FitChecked &&
                   introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
                   introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
                   "the direct exchange updates the earned save and retains the independently interpreted register");

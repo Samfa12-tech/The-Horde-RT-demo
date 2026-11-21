@@ -319,7 +319,13 @@ The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts b
 
 The square and the eastern fork now have timber **MILL** arrows. The working edge has the mapped west entrance, a stone landing with a buried approach, and a timber bench with an empty bearing cradle. The player can walk to the bench and back to the landing. The original mill footprint stays closed. The landing, door and bench share render and contact geometry and reuse the existing material rows. The editable town master and its authoring receipt record the work mark and surveyed heights.
 
-The `bellwether-mill-yard` development checkpoint restores a completed tavern visit, walks to the landing and workbench, then steps back to frame the exterior. Both Windows hardware RT backends presented the updated yard at 960 × 540. The Android ARM64 debug package contains the same town export. Phone performance, the salvager encounter, the millrace crossing and the access quest remain open.
+The `bellwether-mill-yard` development checkpoint restores a completed tavern visit, walks to the landing and workbench, then steps back to frame the exterior. Both Windows hardware RT backends presented the yard at 960 × 540.
+
+#### Mill bearing preparation
+
+After the hearth conversation, the player can **Inspect mill gearing** at the workbench. Bellwether Directions points to an open spare-parts bin south of the mill path. **Take a spare bearing** records the selected part, and **Check bearing fit** compares it with the retained reference at the bench. Each step updates the earned return record while preserving its position and resources. Earlier saves still start with the gearing unexamined. The fit check is optional and independent of the shrine ward and lantern fitting. It leaves the bearing ready for the artificer's repair. Running the mill and receiving the breathing rig remain later steps. The salvager encounter, millrace crossing and phone performance remain open.
+
+The two fixtures add 180 triangles to the shared town mesh and reuse its existing materials. Both Windows hardware RT backends presented the bench reference, and the ARM64 debug package contains the same export. Save tests cover earlier records and all three updates to the existing autosave slot.
 
 ## Open decisions deliberately preserved
 

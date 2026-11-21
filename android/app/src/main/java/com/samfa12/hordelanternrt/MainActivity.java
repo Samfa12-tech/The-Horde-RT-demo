@@ -268,6 +268,7 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
     private static final int CONTEXTUAL_ARCHIVE_SHIFT = 16;
     private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
+    private static final int CONTEXTUAL_MILL_TAG = 7;
     private static final int CONTEXTUAL_RECORD_KEEPER_SHIFT = 19;
     private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
     private static final int CONTEXTUAL_TAVERN_DOOR_SHIFT = 22;
@@ -8987,6 +8988,13 @@ public class MainActivity extends Activity {
             case 4: return R.string.recall_lantern_words;
             case 5: return R.string.take_road_register;
             case 6: return R.string.restore_shrine_binding;
+            case CONTEXTUAL_MILL_TAG:
+                switch ((state >>> 25) & 63) {
+                    case 1: return R.string.inspect_mill_gearing;
+                    case 2: return R.string.take_spare_bearing;
+                    case 3: return R.string.check_mill_bearing_fit;
+                    default: return 0;
+                }
             default: break;
         }
         if (lanternFittingPrice(state) != 0) return R.string.fit_lantern_hinge;
@@ -9010,7 +9018,10 @@ public class MainActivity extends Activity {
         }
     }
 
-    static int lanternFittingPrice(int state) { return (state >>> 25) & 63; }
+    static int lanternFittingPrice(int state) {
+        return ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) == CONTEXTUAL_MILL_TAG
+                ? 0 : (state >>> 25) & 63;
+    }
 
     private void updateContextualControls(final boolean controlsAllowed) {
         updateHealingFlaskHud(controlsAllowed);

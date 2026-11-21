@@ -3562,6 +3562,16 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         text = "LEFT-CLICK / A TO FIT LANTERN HINGE";
         context.tavernInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.millAction!=horde::gameplay::bellwether::MillAction::None) {
+        using horde::gameplay::bellwether::MillAction;
+        switch(snapshot.millAction) {
+        case MillAction::InspectGearing: text = "LEFT-CLICK / A TO INSPECT MILL GEARING"; break;
+        case MillAction::RecoverBearing: text = "LEFT-CLICK / A TO TAKE A SPARE BEARING"; break;
+        case MillAction::CheckFit: text = "LEFT-CLICK / A TO CHECK BEARING FIT"; break;
+        default: break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
     else if(chapterInteract) {
         using horde::gameplay::bellwether::ArchiveAction;
         switch (snapshot.waysideArchiveAction) {
@@ -3765,7 +3775,7 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         LookoutPanel::Objective::None;
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
         snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse,
-        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive)};
+        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive),snapshot.millPreparation};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)

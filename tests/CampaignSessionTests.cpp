@@ -313,6 +313,30 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
         archive.schema=cp::kTavernConversationSchema;
         Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
     }
+    {
+        using horde::gameplay::bellwether::MillPreparation;
+        Directory millDirectory;
+        sim::GameSimulation millGame(staffedConfig);
+        cp::PlaySession millPlay(millGame,millDirectory.path);
+        auto mill=complete;
+        mill.schema=cp::kTavernConversationSchema;
+        mill.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+        Check(millPlay.BeginNewGame(0) && Seed(millGame,mill,terrain) &&
+              millPlay.ObserveSafeBoundary() && awaitSave(millPlay,0),
+              "the mill autosave check starts with an ordinary completed tavern record");
+        mill.schema=cp::kMillPreparationSchema;
+        for(auto stage:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked}) {
+            const auto previous=millPlay.State().operationRevision;
+            mill.millPreparation=stage;
+            Check(Seed(millGame,mill,terrain) && millPlay.ObserveSafeBoundary() && awaitSave(millPlay,previous),
+                  "each mill step refreshes the same earned autosave");
+            const auto saved=Read(millDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+            Check(saved.millPreparation==stage && saved.position.x==complete.position.x &&
+                  saved.position.z==complete.position.z && saved.flask==complete.flask &&
+                  saved.treasurePurse==complete.treasurePurse,
+                  "the actual save file contains the mill step with unchanged return point and resources");
+        }
+    }
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
     Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,

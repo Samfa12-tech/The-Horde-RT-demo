@@ -11,6 +11,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/StaticDetailLease.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
+#include "gameplay/traversal/BellwetherMill.h"
 
 #include <array>
 #include <cstddef>
@@ -83,12 +84,14 @@ struct SimulationSnapshot
     campaign::TreasurePurse treasurePurse{};
     bellwether::WaysideArchive waysideArchive;
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
+    bellwether::MillPreparation millPreparation{};
+    bellwether::MillAction millAction{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
-            tavernDoorAction!=bellwether::DoorAction::None;
+            tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;

@@ -961,6 +961,7 @@ std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
 horde::gameplay::campaign::TreasurePurse gLookoutObjectivePurse{}; // guarded by gChapterDialogueUiMutex
 horde::gameplay::campaign::AirWardDirections gLookoutObjectiveWard{}; // guarded by gChapterDialogueUiMutex
+horde::gameplay::bellwether::MillPreparation gLookoutObjectiveMill{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -1221,6 +1222,7 @@ void PublishSimulationUiState()
                 gGameSimulation.LatestCampaignBoundary()))};
         gLookoutObjectivePurse=simulation.treasurePurse;
         gLookoutObjectiveWard=horde::gameplay::campaign::CurrentAirWardDirections(simulation.waysideArchive);
+        gLookoutObjectiveMill=simulation.millPreparation;
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -1297,6 +1299,13 @@ void PublishSimulationUiState()
         constexpr auto price=horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice;
         static_assert(price>0 && price<64); // Bits 25-30 carry the quoted price.
         contextualControls |= static_cast<int>(price << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.millAction != horde::gameplay::bellwether::MillAction::None) {
+        // Tag 7 extends the mutually exclusive archive/fitting prompt lanes.
+        constexpr int millTag=7, detailShift=25;
+        static_assert(static_cast<int>(horde::gameplay::bellwether::ArchiveAction::RestoreBinding)<millTag);
+        contextualControls |= (millTag << 16) | (static_cast<int>(simulation.millAction) << detailShift) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
              simulation.waysideArchiveAction != horde::gameplay::bellwether::ArchiveAction::None)
@@ -7354,7 +7363,8 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
         gLookoutObjectiveUiState[3]!=objective)
         return env->NewStringUTF("");
     using namespace horde::gameplay::campaign;
-    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse,gLookoutObjectiveWard);
+    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse,
+        gLookoutObjectiveWard,gLookoutObjectiveMill);
     return env->NewStringUTF(text.c_str());
 }
 
