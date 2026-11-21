@@ -3,6 +3,7 @@
 #include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include "audio/BellwetherVoiceFixture.h"
+#include "vulkan/raytracing/BellwetherResidents.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
@@ -216,7 +217,18 @@ bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
 #if defined(_DEBUG)
 std::filesystem::path gBellwetherVoiceDirectory;
+std::filesystem::path gBellwetherCampaignActors;
 #endif
+
+horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
+{
+    auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+#if defined(_DEBUG)
+    config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
+    config.bellwetherRecordKeeperAdmitted = !gBellwetherCampaignActors.empty();
+#endif
+    return config;
+}
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
 horde::platform::windows::WindowsAcceptanceProfile gAcceptanceProfile;
@@ -456,6 +468,7 @@ struct CaptureLaunchOptions
 {
     std::filesystem::path chapterResidentFixture;
     std::filesystem::path bellwetherVoiceDirectory;
+    std::filesystem::path bellwetherCampaignDirectory;
     bool staffedTavernCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
@@ -1297,6 +1310,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if (argument == L"--bellwether-campaign-dir")
+        {
+#if defined(_DEBUG)
+            if (!options.bellwetherCampaignDirectory.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--bellwether-campaign-dir requires one local resident directory.";
+                break;
+            }
+            options.bellwetherCampaignDirectory = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--bellwether-campaign-dir is Debug only.";
+#endif
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -1551,6 +1578,31 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
     }
     gBellwetherVoiceDirectory = root;
     std::cerr << "Bellwether private Kit WAVs verified.\n";
+    return true;
+}
+
+bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
+{
+    if (directory.empty()) return true;
+    constexpr std::pair<std::string_view, std::string_view> pinned[]{
+        {"tavern-keeper/asset.manifest.json", "a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7"},
+        {"tavern-keeper/resident.glb", "67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696"},
+        {"record-keeper/asset.manifest.json", "5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864"},
+        {"record-keeper/resident.glb", "10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884"},
+        {"record-keeper/base-color.windows.ktx2", "38b1c2ece28db386be8c2633311c487c3a8b4d70a0cd1852ae16c362d718e6dc"},
+        {"record-keeper/normal.windows.ktx2", "ac7b1b04940c66b88176b2209a4d934467c67ece2e85497aae3c387c73f091a0"},
+        {"record-keeper/orm.windows.ktx2", "98163b1d3313ed5aa6fbab5cc00b37f25bbba9546c73f370ad1fcd3ae2bdded6"}
+    };
+    std::error_code error;
+    const auto root = std::filesystem::canonical(directory, error);
+    if (error) return false;
+    for (const auto& [relative, expected] : pinned) {
+        const auto path = root / relative;
+        std::string digest, diagnostic;
+        if (!std::filesystem::is_regular_file(path, error) || error ||
+            !Sha256File(path, digest, diagnostic) || digest != expected) return false;
+    }
+    gBellwetherCampaignActors = root;
     return true;
 }
 #endif
@@ -6694,7 +6746,15 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
-    if (!ctx.chapterResidentFixture.empty()) {
+    if (!gBellwetherCampaignActors.empty()) {
+        const bool authoredShowcase = rescueJourney &&
+            ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+        if (!horde::vulkan::raytracing::SetBellwetherResidentSources(ctx.rtScene,
+                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            return false;
+        }
+    } else if (!ctx.chapterResidentFixture.empty()) {
         using horde::vulkan::raytracing::ChapterResidentActorSource;
         const std::vector<horde::scene::SkinnedClipBinding> clips{
             {"Warden|idle", true, true}, {"Warden|walk", true, true}};
@@ -9867,13 +9927,13 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             horde::vulkan::raytracing::kProductionPlayerRenderRoute;
     if (!graphicsPreviewCapture) {
         auto simulationConfig=explicitComparison?horde::gameplay::simulation::GameSimulationConfig{}:
-            horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+            WindowsApplicationSimulationConfig();
 #if defined(_DEBUG)
         // Only the strictly isolated existing route validator may opt in.
         // Normal application configuration, settings and save schema stay OFF.
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
-        simulationConfig.bellwetherTavernKeeperAdmitted=context.staffedTavernCapture;
-        simulationConfig.bellwetherRecordKeeperAdmitted=!context.chapterResidentFixture.empty() &&
+        simulationConfig.bellwetherTavernKeeperAdmitted |= context.staffedTavernCapture;
+        simulationConfig.bellwetherRecordKeeperAdmitted |= !context.chapterResidentFixture.empty() &&
             (context.combinedBellwetherResidents ||
              (developmentCheckpoint && *developmentCheckpoint=="bellwether-record-keeper-handoff"));
 #endif
@@ -10267,7 +10327,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if(gCampaignHiddenValidation){
         context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
-        const int result=gRouteHiddenValidation?RunHiddenRouteValidation(context):
+        const int result=!gBellwetherCampaignActors.empty()?RunHiddenBellwetherCampaignValidation(context,capabilities):
+            gRouteHiddenValidation?RunHiddenRouteValidation(context):
             gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
         return renderOwner.Retire()?result:1;
     }
@@ -13820,6 +13881,18 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     }
 #if defined(_DEBUG)
+    if (!launchOptions.bellwetherCampaignDirectory.empty() &&
+        (launchOptions.requested || launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
+         launchOptions.graphicsPreview || launchOptions.outputResizeValidation ||
+         !launchOptions.nativeMotionScenario.empty() || gOpeningBenchmarkMenuValidation || gRouteHiddenValidation ||
+         gAcceptanceProfile.Active())) {
+        std::cerr << "Bellwether campaign residents require the normal Debug campaign entry.\n";
+        return 2;
+    }
+    if (!ConfigureBellwetherCampaignActors(launchOptions.bellwetherCampaignDirectory)) {
+        std::cerr << "Bellwether campaign directory failed the pinned resident identity check.\n";
+        return 2;
+    }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
         std::cerr << "Bellwether voice directory failed the approved WAV identity check.\n";
         return 2;

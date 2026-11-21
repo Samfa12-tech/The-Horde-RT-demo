@@ -1144,6 +1144,93 @@ int RunHiddenCampaignValidation(VulkanSurfaceContext& ctx)
     if(!WriteReportFile(gCampaignValidationDirectory/"windows-validation.json",receipt.str()))return 1;
     return failures?1:0;
 }
+int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulkan::DeviceCapabilities& capabilities)
+{
+    using horde::gameplay::campaign::CampaignLoadBarrier;
+    using horde::gameplay::dialogue::BellwetherArrivalStage;
+    using horde::telemetry::RtPresentationOutcome;
+    using horde::vulkan::raytracing::RtSceneProfile;
+    std::ostringstream newGameReceipt;
+    auto& receipt = gLookoutHiddenValidation ? gHiddenLookout.receipt : newGameReceipt;
+    receipt << "{\"schema\":1,\"checks\":[";
+    unsigned checks = 0, failures = 0;
+    const auto check = [&](bool pass, const char* name) {
+        if (checks++) receipt << ',';
+        if (!pass) ++failures;
+        receipt << "{\"name\":\"" << name << "\",\"pass\":" << (pass ? "true" : "false") << '}';
+        std::cerr << "HORDE_BELLWETHER_CAMPAIGN " << name << " pass=" << pass << '\n';
+        return pass;
+    };
+    const HWND foreground = GetForegroundWindow();
+    const auto hidden = [&] { return GetForegroundWindow() == foreground && !IsWindowVisible(ctx.windowHandle); };
+    const auto click = [&](int id) {
+        const auto control = GetDlgItem(ctx.windowHandle, id);
+        if (!hidden() || !control || !IsWindowEnabled(control) || !(GetWindowLongPtrA(control, GWL_STYLE) & WS_VISIBLE)) return false;
+        SendMessageA(ctx.windowHandle, WM_COMMAND, MAKEWPARAM(id, BN_CLICKED), reinterpret_cast<LPARAM>(control));
+        return hidden();
+    };
+    const auto frame = [&] {
+        bool presented = false;
+        if (!RenderFrame(ctx, VkClearColorValue{{0,0,0,1}}, presented)) return false;
+        FinishGraphicsFrame(ctx, presented);
+        ObserveCampaignPresentation(ctx, presented);
+        return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
+    };
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(65);
+    const auto until = [&](auto done, bool render) {
+        while (std::chrono::steady_clock::now() < deadline && hidden()) {
+            PumpCampaign(ctx);
+            if (ctx.campaignPhase == CampaignMenu::Phase::Failed || ctx.campaignRetirementUnproved) return false;
+            if (done()) return true;
+            if (render) { if (!frame()) return false; }
+            else std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        return false;
+    };
+    const bool lookout = gLookoutHiddenValidation;
+    ApplyOverlayState(ctx);
+    const bool chooser = ctx.campaign && ctx.campaignMenu &&
+        (lookout ? click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) : click(kResumeButtonId));
+    const bool loaded = chooser && ctx.campaignMenu->Visible() && until([&] {
+        return std::none_of(ctx.campaign->Catalogue().begin(), ctx.campaign->Catalogue().end(),
+            [](const auto& entry) { return entry.status == campaign::CatalogueStatus::Checking; });
+    }, false) && click(CampaignMenu::FirstChoiceId) && (lookout || click(CampaignMenu::ConfirmId)) && until([&] {
+        return ctx.campaignBarrier.State().phase == CampaignLoadBarrier::Phase::Complete;
+    }, true);
+    const auto& state = ctx.simulation.Snapshot();
+    const bool entered = loaded && !ctx.campaignMenu->Visible() && !ctx.simulationPaused && !ctx.campaignPause &&
+        ctx.campaign->State().activeSlot == 0 && ctx.rtScene.Profile() == RtSceneProfile::Showcase &&
+        state.playerAlive && state.developmentRescueJourney && ctx.rtScene.ChapterResidentSourceCount() ==
+            horde::vulkan::raytracing::kBellwetherResidentCount;
+    if (lookout) {
+        if (check(entered && state.rescue.exteriorSide && state.chapterDialogue.forestVillageConsumed &&
+            state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::AtLookout,
+            "ordinary Lookout load prepares both Bellwether residents with its presented scene")) {
+            SendMessageA(ctx.windowHandle, WM_COMMAND, MAKEWPARAM(kMenuPauseId,0), 0);
+            std::vector<double> timings;
+            check(click(kLookoutObjectiveButtonId) && click(LookoutPanel::MenuId) &&
+                ApplyPendingSceneReplacement(ctx, capabilities, timings) && frame() &&
+                ctx.rtScene.Profile() == RtSceneProfile::EntryMenu && ctx.rtScene.ChapterResidentSourceCount() == 0,
+                "title replacement drops chapter resident resources");
+        }
+        campaign::storage::StoredCheckpoint current;
+        check(campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",current).status ==
+            campaign::storage::Status::Read && current.encoded == gHiddenLookout.source.encoded &&
+            !gHiddenCampaignFaults.rejectedWrites, "source lookout autosave bytes preserved");
+    } else {
+        check(entered && !state.rescue.exteriorSide && state.playerVitals.vitality == 3,
+            "New Game presents with the same Bellwether resident resource admission");
+    }
+    check(hidden(), "isolated hidden campaign retains foreground ownership");
+    receipt << "],\"count\":" << checks << ",\"failures\":" << failures
+        << ",\"stagesComplete\":" << (failures ? "false" : "true");
+    if (!lookout) {
+        receipt << "}\n";
+        if (!WriteReportFile(gCampaignValidationDirectory / "windows-validation.json", receipt.str())) return 1;
+    }
+    return failures ? 1 : 0;
+}
+
 #include "windows_route_validation.inl"
 #endif
 

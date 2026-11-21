@@ -39,6 +39,11 @@ manifest, and three Android ASTC KTX2 files. The build verifies the seven file
 identities. Its application ID is `com.samfa12.hordelanternrt.debug.bellwether`,
 which gives it separate saves and settings.
 
+Play, New Game, Continue and Load use the ordinary campaign menus in this
+build. Both residents are prepared with the authored chapter scene before a
+save is resumed. The same campaign can continue on foot from the lookout to
+the tavern, where the game can earn and restore the tavern checkpoint.
+
 ```powershell
 .\gradlew.bat :app:assembleDebug "-PhordeBellwetherResidentDir=<local-root>" '-Pandroid.injected.build.abi=arm64-v8a'
 ```

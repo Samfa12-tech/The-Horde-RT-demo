@@ -77,6 +77,9 @@ bool PrepareCampaignResources(SwapchainContext& context)
     using Scene=horde::vulkan::raytracing::PresentableTinyRtScene;
     if(context.sceneProfile==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
        context.developmentRescueJourney && context.rtScene.IsReady() &&
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+       context.rtScene.ChapterResidentSourceCount()==horde::vulkan::raytracing::kBellwetherResidentCount &&
+#endif
        context.rtScene.StaticGeometryHasCompleteContributors())return true;
     if(gCampaignPreparedScene)return gCampaignPreparedScene->IsReady();
     if(!DrainCampaignResources(context))return false;
@@ -87,6 +90,9 @@ bool PrepareCampaignResources(SwapchainContext& context)
     const auto extent=ScaledRenderExtent(context.swapchainExtent,context.renderScale);
     const auto root=context.reportDirectory+"/..";
     std::string diagnostic;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    if(!horde::vulkan::raytracing::SetBellwetherResidentSources(scene, AndroidBellwetherResidentRoot(context), diagnostic))return false;
+#endif
     auto skeletonPath=root+"/skeleton_biped_merged_animations_v01.glb";
     std::vector<horde::scene::SkinnedClipBinding> bindings;
 #if HORDE_RT_REVIVAL_ADMITTED
@@ -228,7 +234,7 @@ void PumpCampaignOnOwnerImpl(SwapchainContext& context)
                    (gCampaignCommand && gCampaignCommand->action==4)) {
                     gCampaignPhase=8;gCampaignError=8;gCampaignPauseGate.store(false,std::memory_order_release);
                 } else if(gCampaignSession->BeginNewGame(command->slot)) {
-                gGameSimulation=horde::gameplay::simulation::CreateApplicationGameSimulation();
+                gGameSimulation=horde::gameplay::simulation::GameSimulation(AndroidApplicationSimulationConfig());
                 gGameSimulation.StartLiveDevelopmentRescueJourney(true);
                 gGameSimulation.SynchronizePausedInput(gInputPublisherState,gInputMailbox.PublishedSequence());
                 gCampaignNewGameYaw=gGameSimulation.Snapshot().playerYawRadians;

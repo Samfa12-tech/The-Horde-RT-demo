@@ -50,6 +50,7 @@
 #include "graphics/GraphicsPreviewPerformance.h"
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
 #include "BellwetherDoorwayMeasurement.h"
+#include "vulkan/raytracing/BellwetherResidents.h"
 #endif
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
 #include "platform/android/AndroidMotionEvidencePolicy.h"
@@ -3673,6 +3674,13 @@ void DestroyRtEvidenceOnOwnerThread(SwapchainContext& context)
     context.rtFrameEvidenceInitialised = false;
 }
 
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+std::filesystem::path AndroidBellwetherResidentRoot(const SwapchainContext& context)
+{
+    return std::filesystem::path(context.reportDirectory).parent_path() / "private_bellwether";
+}
+#endif
+
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 {
     if (!context.useRtPath)
@@ -3695,19 +3703,10 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-    using horde::vulkan::raytracing::ChapterResidentActorSource;
-    std::vector<ChapterResidentActorSource> residents;
-    if (context.developmentRescueJourney && context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
-    {
-        const auto root = (std::filesystem::path(context.reportDirectory) / ".." / "private_bellwether").lexically_normal();
-        residents = {
-            {horde::gameplay::dialogue::kTavernKeeperActorId, root / "tavern-keeper", "resident.glb",
-                {{"Warden|idle", true, true}, {"Warden|walk", true, true}}},
-            {horde::gameplay::dialogue::kRecordKeeperActorId, root / "record-keeper", "resident.glb",
-                {{"Warden|idle", true, true}}}
-        };
-    }
-    if (!context.rtScene.SetChapterResidentActors(residents, diagnostic)) {
+    const bool authoredShowcase = context.developmentRescueJourney &&
+        context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
+            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{}, diagnostic)) {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
         return false;
     }
