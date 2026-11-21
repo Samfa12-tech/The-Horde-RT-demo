@@ -347,7 +347,13 @@ The native walkthrough checks early retreat, pause, retry, the full wet hold and
 
 The private artificer candidate wears a fitted iron-blue doublet and short leather apron. The original concept, Meshy source and 24-joint rig, supplied walk and run, editable Blender assembly and runtime files are archived with verified hashes. The prepared actor is 1.68 m tall with 15,360 triangles. Blender grounds the idle and retimes the 1.3-second walk to 1.08 m/s. The native character loader and CPU skinning checked the idle and 16 samples of that walk. Khronos validation reported no errors and one warning for the skinned mesh's parent node. Both platform sets of three one-layer 1K KTX2 textures passed validation.
 
-The repair scene still needs the artificer's playable placement and fitting interaction. The current native renderer admits two additional residents alongside Kit. A further resident needs an explicit residency and performance check on the actual route. Phone validation and exact distribution clearance remain open.
+#### Artificer at the mill workbench
+
+The Windows Debug checkpoint `bellwether-mill-artificer` restores the completed tavern return point and follows the authored route to the working side of the mill bench. The shared simulation grounds the artificer at the south end of the bench and checks her clearance against the same terrain used for player movement. The checkpoint keeps the existing limit of three actors with Kit, the tavern keeper and the artificer. The ordinary church route retains the record keeper.
+
+For a local capture, use the checkpoint with `--capture-hidden` and `--chapter-resident-fixture` pointing to a directory containing `tavern-keeper` and `artificer` runtime packages. The capture records the artificer's foot position and requires all three submitted instance masks. Both Windows hardware RT backends presented the scene at 960 × 540. The native walkthrough verified grounded feet and a clear approach and rejected the checkpoint with the church roster. The separate return-to-Kit replay now uses the full first register reading, including the air ward offer, and presented the return with the original roster. The mill still uses the existing dim night lighting. The ARM64 Debug package and Android tests cover the existing church roster.
+
+The mill repair and rig fitting still need their gameplay interactions. Moving between the church and mill rosters during play, phone performance and exact distribution clearance remain open.
 
 ## Open decisions deliberately preserved
 

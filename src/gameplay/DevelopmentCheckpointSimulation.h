@@ -197,14 +197,17 @@ inline bool StageDevelopmentCheckpointSimulation(
     if(checkpoint.bellwetherBranchView!=BellwetherBranchView::None) {
         using namespace simulation;
         using namespace bellwether;
-        const bool millYard=checkpoint.bellwetherBranchView==BellwetherBranchView::MillYard;
+        const bool artificer=checkpoint.bellwetherBranchView==BellwetherBranchView::MillArtificer;
+        const bool millYard=artificer || checkpoint.bellwetherBranchView==BellwetherBranchView::MillYard;
         const bool rigTrial=checkpoint.bellwetherBranchView==BellwetherBranchView::RigLeakTrial;
         const bool riverLanding=rigTrial || checkpoint.bellwetherBranchView==BellwetherBranchView::RiverLanding;
         const bool east=millYard || riverLanding;
         const auto junction=east?traversal::kBellwetherMillJunction:traversal::kBellwetherChurchJunction;
         const bool returnsToKit=checkpoint.bellwetherBranchView==BellwetherBranchView::KitIntroduction;
         const bool handoff=checkpoint.bellwetherBranchView==BellwetherBranchView::RegisterHandoff || returnsToKit;
-        if(handoff && !gameSimulation.config_.bellwetherRecordKeeperAdmitted)return finalize(false);
+        if(handoff && gameSimulation.config_.bellwetherSpecialist!=Specialist::RecordKeeper)return finalize(false);
+        if(artificer && (gameSimulation.config_.bellwetherSpecialist!=Specialist::Artificer ||
+               !gameSimulation.config_.bellwetherTavernKeeperAdmitted))return finalize(false);
         if(returnsToKit && !gameSimulation.config_.bellwetherTavernKeeperAdmitted)return finalize(false);
         if(!chapterTerrain || checkpoint.bellwetherStations!=junction+1)
             return finalize(false);
@@ -259,7 +262,8 @@ inline bool StageDevelopmentCheckpointSimulation(
                 if(!walkStation(*station))return finalize(false);
             if(!walkStation(traversal::kBellwetherMillWorkMark) || !walkStation(mill.back()))
                 return finalize(false);
-            if(!walkStation(traversal::kBellwetherMillYardView))return finalize(false);
+            const auto view=artificer?traversal::kBellwetherMillArtificerView:traversal::kBellwetherMillYardView;
+            if(!walkStation(view))return finalize(false);
         } else {
             for(const auto& station:traversal::kBellwetherNorthApproach)
                 if(!walkStation(station))return finalize(false);
@@ -278,6 +282,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         if(east || checkpoint.bellwetherBranchView==BellwetherBranchView::Church)
             return finalize(state.playerGrounded &&
                 state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated &&
+                (!artificer || (state.artificer && state.tavernKeeper && !state.recordKeeper)) &&
                 (!east || std::hypot(state.playerX-checkpoint.cameraX,state.playerZ-checkpoint.cameraZ)<.02f));
         if(state.waysideArchiveAction!=ArchiveAction::Inspect)return finalize(false);
         if(checkpoint.bellwetherBranchView==BellwetherBranchView::Archive)return finalize(true);
@@ -330,10 +335,11 @@ inline bool StageDevelopmentCheckpointSimulation(
             }
         }
         if(returnsToKit) {
-            for(const auto line:{dialogue::Line::RecordKeeperTwoRoads,dialogue::Line::RecordKeeperRoadOrder,dialogue::Line::None}) {
-                gameSimulation.chapterDialogue_.Skip();advance();
+            for(const auto line:dialogue::kRecordKeeperFirstReading) {
                 if(state.chapterDialogue.line!=line)return finalize(false);
+                gameSimulation.chapterDialogue_.Skip();advance();
             }
+            if(state.chapterDialogue.line!=dialogue::Line::None)return finalize(false);
             if(!walkStation(traversal::kBellwetherChurchApproach.front()))return finalize(false);
             const auto& north=traversal::kBellwetherNorthApproach;
             for(auto station=north.rbegin();station!=north.rend();++station)

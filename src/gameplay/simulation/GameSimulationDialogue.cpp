@@ -5,6 +5,16 @@
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
+std::optional<std::array<float,3>> PlaceBellwetherResident(const TriangleSupportSurface& terrain,
+    traversal::BellwetherStation mark) {
+    constexpr float radius=.28f,height=1.78f;
+    const auto support=traversal::ChapterExteriorStepSupport(terrain,mark.x,mark.z,radius,height);
+    if(!support.grounded || !traversal::ResolveChapterStepMovement(terrain,mark.x,mark.z,mark.x,mark.z,
+            support.worldY,radius,height).accepted)
+        return std::nullopt;
+    return std::array{mark.x,support.worldY,mark.z};
+}
+
 bool AtRiverLeakTest(const dialogue::Context& c) {
     constexpr auto station=traversal::kBellwetherRiverLanding.back();
     return std::hypot(c.player.x-station.x,c.player.z-station.z)<=.5f;
@@ -334,14 +344,15 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        rescueTraversal_.Snapshot().exteriorSide && !rescueTraversal_.IsActive() &&
        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
-    if(!recordKeeper_ && config_.bellwetherRecordKeeperAdmitted && terrain &&
-       arrival==BellwetherArrivalStage::Seated) {
-        constexpr auto mark=traversal::kBellwetherRecordKeeperMark;
-        constexpr float radius=.28f,height=1.78f;
-        const auto support=traversal::ChapterExteriorStepSupport(*terrain,mark.x,mark.z,radius,height);
-        if(support.grounded && traversal::ResolveChapterStepMovement(*terrain,mark.x,mark.z,mark.x,mark.z,
-                support.worldY,radius,height).accepted)
-            recordKeeper_=RecordKeeperPose{{mark.x,support.worldY,mark.z}};
+    if(terrain && arrival==BellwetherArrivalStage::Seated) {
+        if(!recordKeeper_ && config_.bellwetherSpecialist==bellwether::Specialist::RecordKeeper) {
+            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherRecordKeeperMark))
+                recordKeeper_=RecordKeeperPose{*foot};
+        }
+        if(!artificer_ && config_.bellwetherSpecialist==bellwether::Specialist::Artificer) {
+            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherMillArtificerMark))
+                artificer_=bellwether::ArtificerPose{*foot};
+        }
     }
     auto c=ChapterInteractionContext(input.paused);
     if(recordKeeper_ && !c.paused && c.alive && !c.traversing) {

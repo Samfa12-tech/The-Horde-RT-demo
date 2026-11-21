@@ -16,6 +16,9 @@ inline constexpr std::array kBellwetherMillApproach{
 };
 inline constexpr auto kBellwetherSalvagerMark = BellwetherMapStation(36.f, 0.f);
 inline constexpr auto kBellwetherMillYardView = BellwetherMapStation(35.45f, 13.22f);
+// The artificer stands beyond the south end of the bench, outside the approach.
+inline constexpr BellwetherStation kBellwetherMillArtificerMark{117.45f,117.15f};
+inline constexpr BellwetherStation kBellwetherMillArtificerView{115.16f,117.00f};
 inline constexpr BellwetherStation kBellwetherMillWorkMark{bellwether::kMillWorkMark[0], bellwether::kMillWorkMark[2]};
 inline constexpr BellwetherStation kBellwetherBearingBinApproach{
     bellwether::kMillBearingBin[0]-1.f, bellwether::kMillBearingBin[2]};

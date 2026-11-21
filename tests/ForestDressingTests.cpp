@@ -1268,7 +1268,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     using Stage=BellwetherArrivalStage;
     auto config=sim::ProductionGameSimulationConfig();
     config.bellwetherTavernKeeperAdmitted=stayAtIncident;
-    config.bellwetherRecordKeeperAdmitted=stayAtIncident;
+    config.bellwetherSpecialist=stayAtIncident ? gameplay::bellwether::Specialist::RecordKeeper :
+        gameplay::bellwether::Specialist::None;
     sim::GameSimulation game(config);
     const auto record=LookoutCheckpoint(*terrain);
     const auto token=game.BeginCampaignRestore(record);
@@ -2084,6 +2085,48 @@ void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSu
     }
 }
 
+void TestBellwetherResidentRosters(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    using gameplay::bellwether::Specialist;
+    using namespace gameplay::traversal;
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-mill-artificer");
+    if(!view) {Check(false,"the mill artificer checkpoint is registered");return;}
+    for(const auto specialist:{Specialist::RecordKeeper,Specialist::Artificer}) {
+        auto config=sim::ProductionGameSimulationConfig();
+        config.bellwetherTavernKeeperAdmitted=true;
+        config.bellwetherSpecialist=specialist;
+        sim::GameSimulation game(config);
+        game.SetDevelopmentRescueJourney(true,true);
+        const auto generation=game.Snapshot().worldRoute.generation;
+        if(!game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain)) {
+            Check(false,"the mill checkpoint can publish authored terrain");
+            return;
+        }
+        const bool staged=gameplay::StageDevelopmentCheckpointSimulation(game,*view);
+        const auto& state=game.Snapshot();
+        if(specialist==Specialist::RecordKeeper) {
+            Check(!staged && !state.artificer,"the church roster cannot stage the mill artificer");
+            const auto* returnView=gameplay::FindDevelopmentCheckpoint("bellwether-return-to-kit");
+            Check(returnView && gameplay::StageDevelopmentCheckpointSimulation(game,*returnView) &&
+                  state.tavernKeeper && state.recordKeeper && !state.artificer &&
+                  state.waysideArchive.registerInterpreted,
+                  "the church roster completes the first register reading including the air ward offer and returns to Kit");
+            continue;
+        }
+        Check(staged && state.artificer && state.tavernKeeper && !state.recordKeeper && state.playerGrounded,
+              "the authored route reaches the artificer with Kit and the tavern keeper in the mill roster");
+        if(!staged || !state.artificer)return;
+        const auto& foot=state.artificer->foot;
+        const auto support=ChapterExteriorStepSupport(*terrain,foot[0],foot[2],.28f,1.78f);
+        const float sightY=std::min(state.playerSupportWorldY+1.5f,foot[1]+1.5f);
+        Check(support.grounded && foot[0]==kBellwetherMillArtificerMark.x && foot[2]==kBellwetherMillArtificerMark.z &&
+              std::abs(foot[1]-support.worldY)<.001f &&
+              terrain->NonWalkableVolumeClear(state.playerX,state.playerZ,foot[0],foot[2],sightY-.025f,sightY+.025f,.025f),
+              "the artificer stands on real support at a clear working-side approach");
+    }
+}
+
 void TestBellwetherRigLeakTrial(
     const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
     namespace sim=gameplay::simulation;
@@ -2434,6 +2477,7 @@ void TestFullSurroundings()
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
             TestBellwetherRigLeakTrial(recreatedTerrain);
+            TestBellwetherResidentRosters(recreatedTerrain);
         }
     }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns

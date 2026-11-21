@@ -28,6 +28,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
     tavernKeeper_={};
     recordKeeper_.reset();
+    artificer_.reset();
     waysideArchive_={};
     treasurePurse_={};
     tavernDoor_={};

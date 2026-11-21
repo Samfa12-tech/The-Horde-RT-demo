@@ -96,6 +96,7 @@ struct SimulationSnapshot
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;
+    std::optional<bellwether::ArtificerPose> artificer;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

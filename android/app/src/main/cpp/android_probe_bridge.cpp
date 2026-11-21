@@ -666,7 +666,7 @@ horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationCo
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = true;
-    config.bellwetherRecordKeeperAdmitted = true;
+    config.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;
 #endif
     return config;
 }

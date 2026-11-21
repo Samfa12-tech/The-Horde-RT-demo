@@ -311,6 +311,10 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
         const auto& keeper = *simulation.recordKeeper;
         frame.chapterResidents[1] = {horde::gameplay::dialogue::kRecordKeeperActorId, keeper.foot,
             horde::scene::CompanionModelYaw(keeper.yaw), horde::scene::SkinnedClip::Idle, keeper.idleSeconds};
+    } else if (simulation.artificer) {
+        const auto& artificer = *simulation.artificer;
+        frame.chapterResidents[1] = {horde::gameplay::bellwether::kArtificerActorId, artificer.foot,
+            horde::scene::CompanionModelYaw(artificer.yaw), horde::scene::SkinnedClip::Idle, 0.f};
     }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;

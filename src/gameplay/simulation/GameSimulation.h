@@ -89,7 +89,7 @@ struct GameSimulationConfig
     bool flaskUtilityCandidate = false;
     // Set by the scene profile when the placed tavern keeper is admitted.
     bool bellwetherTavernKeeperAdmitted = false;
-    bool bellwetherRecordKeeperAdmitted = false;
+    bellwether::Specialist bellwetherSpecialist = bellwether::Specialist::None;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -393,6 +393,7 @@ private:
     horde::gameplay::dialogue::Director chapterDialogue_{};
     horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
     std::optional<dialogue::RecordKeeperPose> recordKeeper_;
+    std::optional<bellwether::ArtificerPose> artificer_;
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
     bellwether::MillPreparation millPreparation_{};
