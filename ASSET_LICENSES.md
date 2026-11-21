@@ -500,9 +500,16 @@ runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
 The editable `assets/models/characters/source/kit-hearth-sit-study-v1/` take uses
 the same owner-approved source rig and original Horde tavern furniture.
 Blender motion authoring is by Samfa12/Codex. The Blender study and sampled
-references stay outside runtime packages. The 1.8 runtime GLB appends only its
-83-frame joint animation to the preserved 1.7 payload described below. The new
-runtime SHA-256 is `799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d`.
+references stay outside runtime packages. The intermediate hearth export appends
+its 83-frame joint animation to the preserved 1.7 payload described below. Its
+SHA-256 is `799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d`.
+
+The editable `assets/models/characters/source/kit-ankle-approach-v1/` takes use
+the same owner-approved Kit rig. Samfa12/Codex authored the joint motion in
+Blender. The 1.8 runtime appends the ankle assessment and protective walk to
+the intermediate hearth export. The new runtime is 2,545,820 bytes with SHA-256
+`d80194bb696fb021c3361ec59225e87f3e46c0f494fe71837ace9d776aad021a`.
+Editable source, measurements and reference samples remain outside packages.
 
 ### Kit same-rig turn runtime promotion (24 October 2026)
 

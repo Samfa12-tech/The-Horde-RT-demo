@@ -10,9 +10,10 @@ inline std::array<SkinnedClipBinding,6> CompanionTurnClipBindings() {
         {"",false,false},{"",false,false},
         {"KitProof|turn_left",false,true},{"KitProof|turn_right",false,true}}};
 }
-inline std::array<SkinnedClipBinding,7> CompanionChapterClipBindings() {
+inline std::array<SkinnedClipBinding,9> CompanionChapterClipBindings() {
     const auto turns=CompanionTurnClipBindings();
     return {turns[0],turns[1],turns[2],turns[3],turns[4],turns[5],
-        {"Kit|hearth_sit",false,true,true}};
+        {"Kit|hearth_sit",false,true,true},{"Kit|ankle_assess",false,true,true},
+        {"Kit|protective_walk",true,true,true}};
 }
 }

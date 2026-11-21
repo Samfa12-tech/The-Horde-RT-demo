@@ -1191,18 +1191,30 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     bool replayedLookoutLine=false;
     bool injuryOnRoad=false;
     unsigned injuryEntries=0;
+    bool assessmentStayedPlanted=true,protectivePhaseMatchesTravel=true;
+    unsigned assessmentTicks=0,protectiveTicks=0;
     float maximumKitStep=0;
     Stage previousStage=Stage::AtLookout;
     const auto step=[&] {
         const auto before=game.Snapshot().chapterCompanion;
         game.StepFixed(input);
         const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
+        const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
         replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
-        maximumKitStep=std::max(maximumKitStep,std::hypot(kit.x-before.x,kit.z-before.z));
+        maximumKitStep=std::max(maximumKitStep,travelled);
         if(kit.bellwetherArrival==Stage::AnkleAssessment && previousStage!=Stage::AnkleAssessment) {
             ++injuryEntries;
             const auto station=route[gameplay::traversal::kBellwetherAnkleStation];
             injuryOnRoad=kit.grounded && std::hypot(kit.x-station.x,kit.z-station.z)<.002f;
+        }
+        if(kit.bellwetherArrival==Stage::AnkleAssessment) {
+            ++assessmentTicks;
+            assessmentStayedPlanted&=kit.grounded && !kit.walking && travelled<.001f;
+        }
+        if(kit.bellwetherArrival==Stage::ProtectiveApproach && kit.walking) {
+            ++protectiveTicks;
+            const float expected=std::fmod(before.locomotion.walkPhase + travelled/kProtectiveWalkStrideMetres,1.f);
+            protectivePhaseMatchesTravel&=std::abs(std::remainder(kit.locomotion.walkPhase-expected,1.f))<.00005f;
         }
         previousStage=kit.bellwetherArrival;
     };
@@ -1270,6 +1282,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(injuryEntries==1 && injuryOnRoad && maximumKitStep<.032f && seated.grounded &&
           seated.bellwetherArrival==Stage::Seated && seated.x==kChairSitRoot[0] && seated.z==kChairSitRoot[2],
           "from the earned lookout Kit crosses the real road once, assesses at the mapped mark, and settles without a teleport or player tether");
+    Check(assessmentTicks==96 && assessmentStayedPlanted && protectiveTicks>120 && protectivePhaseMatchesTravel,
+          "Kit stays planted for the one-shot ankle take, then ties the protective cycle to supported travel");
     Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.LatestCampaignBoundary()->contentRevision==cp::kBellwetherContentRevision,
           "standing near the hearth after Kit sits earns the canonical tavern boundary");

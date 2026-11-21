@@ -8264,6 +8264,7 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"yaw\": " << capture.chapterCompanion.yaw << ", \"animationSeconds\": " << capture.chapterCompanion.animationSeconds
                  << ", \"motionMode\": " << static_cast<unsigned>(capture.chapterCompanion.motion.mode)
                  << ", \"sitSeconds\": " << capture.chapterCompanion.motion.sitPlaybackSeconds
+                 << ", \"ankleSeconds\": " << capture.chapterCompanion.motion.anklePlaybackSeconds
                  << ", \"bellwetherArrival\": " << static_cast<unsigned>(capture.chapterCompanion.bellwetherArrival)
                  << ", \"bellwetherStation\": " << capture.chapterCompanion.bellwetherStation
                  << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}"
@@ -8673,7 +8674,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                     << ", exterior=" << state.rescue.exteriorSide << ", worldGeneration="
                     << state.worldRoute.generation << ", terrain=" << bool(context.rtScene.ChapterTerrainSurface());
                 for(const auto ready:state.worldRoute.readiness)trace << ',' << static_cast<unsigned>(ready);
-                if(development && development->bellwetherSitTicks!=0) {
+                if(development && (development->bellwetherSitTicks!=0 || development->bellwetherAnkleTicks!=0)) {
                     const auto boundary=context.simulation.LatestCampaignBoundary();
                     trace << "; currentZone=" << static_cast<unsigned>(state.worldRoute.current)
                           << ", KitArrival=" << static_cast<unsigned>(state.chapterCompanion.bellwetherArrival)

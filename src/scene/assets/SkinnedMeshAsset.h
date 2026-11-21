@@ -65,7 +65,9 @@ enum class SkinnedClip
     Dead = 3,
     TurnLeft = 4,
     TurnRight = 5,
-    Sit = 6
+    Sit = 6,
+    AnkleAssessment = 7,
+    ProtectiveWalk = 8
 };
 using SkeletonClip = SkinnedClip;
 
@@ -194,7 +196,7 @@ public:
     bool LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic);
     // Bindings follow SkinnedClip slot order; omitted trailing slots stay unmapped.
     // Explicit empty optional bindings preserve holes such as Attack and Dead.
-    static constexpr std::size_t kMaximumClipBindings = static_cast<std::size_t>(SkinnedClip::Sit) + 1u;
+    static constexpr std::size_t kMaximumClipBindings = static_cast<std::size_t>(SkinnedClip::ProtectiveWalk) + 1u;
     bool LoadClips(const std::string& glbPath, std::span<const SkinnedClipBinding> bindings,
                    std::string& diagnostic);
     bool LoadCombatClips(const std::string& glbPath, std::string& diagnostic);

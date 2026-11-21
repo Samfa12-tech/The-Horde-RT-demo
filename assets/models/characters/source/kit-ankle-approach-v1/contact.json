@@ -1,0 +1,2111 @@
+{
+  "sourceSha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e",
+  "fps": 60,
+  "injuredLeg": "Right",
+  "protectiveStrideMetres": 0.76,
+  "localFloorMetres": -1.172074689748115e-06,
+  "assessment": [
+    {
+      "frame": 1,
+      "targetErrorMetres": 3.003425057343598e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644980147622846,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.0029737525671862386,
+          "forwardMetres": -0.05240878462791443
+        }
+      }
+    },
+    {
+      "frame": 2,
+      "targetErrorMetres": 1.4905817079352256e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644980147622846,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.006693776236488702,
+          "forwardMetres": -0.04479452967643738
+        }
+      }
+    },
+    {
+      "frame": 3,
+      "targetErrorMetres": 3.003425057343598e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644980147622846,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.015047760219886186,
+          "forwardMetres": -0.025059670209884644
+        }
+      }
+    },
+    {
+      "frame": 4,
+      "targetErrorMetres": 3.003425057343598e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644980147622846,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.02382253343762386,
+          "forwardMetres": 0.002134050941094756
+        }
+      }
+    },
+    {
+      "frame": 5,
+      "targetErrorMetres": 1.3498716750736115e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644980147622846,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.028806915977611425,
+          "forwardMetres": 0.032124824821949005
+        }
+      }
+    },
+    {
+      "frame": 6,
+      "targetErrorMetres": 4.470348358154297e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002964421180649879,
+          "forwardMetres": -0.05016527697443962
+        },
+        "Right": {
+          "soleMetres": 0.027444039011015775,
+          "forwardMetres": 0.0602509044110775
+        }
+      }
+    },
+    {
+      "frame": 7,
+      "targetErrorMetres": 9.094592642585711e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029644232761256717,
+          "forwardMetres": -0.05016528442502022
+        },
+        "Right": {
+          "soleMetres": 0.0222819042444371,
+          "forwardMetres": 0.08185049146413803
+        }
+      }
+    },
+    {
+      "frame": 8,
+      "targetErrorMetres": 6.006850114687196e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029643024370216153,
+          "forwardMetres": -0.050165269523859024
+        },
+        "Right": {
+          "soleMetres": 0.01535589295031059,
+          "forwardMetres": 0.09226179867982864
+        }
+      }
+    },
+    {
+      "frame": 9,
+      "targetErrorMetres": 3.003425057343598e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029635368898652814,
+          "forwardMetres": -0.050165265798568726
+        },
+        "Right": {
+          "soleMetres": 0.008625076623275163,
+          "forwardMetres": 0.09259120374917984
+        }
+      }
+    },
+    {
+      "frame": 10,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029615378059588693,
+          "forwardMetres": -0.050165288150310516
+        },
+        "Right": {
+          "soleMetres": 0.003924275753661277,
+          "forwardMetres": 0.09259120374917984
+        }
+      }
+    },
+    {
+      "frame": 11,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0033863259066038154,
+          "forwardMetres": -0.050368838012218475
+        },
+        "Right": {
+          "soleMetres": 0.003032285725339534,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 12,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.007691937969639184,
+          "forwardMetres": -0.05255047231912613
+        },
+        "Right": {
+          "soleMetres": 0.003026976488172295,
+          "forwardMetres": 0.09259120374917984
+        }
+      }
+    },
+    {
+      "frame": 13,
+      "targetErrorMetres": 4.53201124839352e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.015392892533554914,
+          "forwardMetres": -0.056856222450733185
+        },
+        "Right": {
+          "soleMetres": 0.0029999779123954795,
+          "forwardMetres": 0.09259124845266342
+        }
+      }
+    },
+    {
+      "frame": 14,
+      "targetErrorMetres": 7.487740830422111e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.024947591596856,
+          "forwardMetres": -0.06295417249202728
+        },
+        "Right": {
+          "soleMetres": 0.00300010666774142,
+          "forwardMetres": 0.09259120374917984
+        }
+      }
+    },
+    {
+      "frame": 15,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.03481355915369022,
+          "forwardMetres": -0.07051248103380203
+        },
+        "Right": {
+          "soleMetres": 0.002999986992790582,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 16,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.04344709823431003,
+          "forwardMetres": -0.07919918745756149
+        },
+        "Right": {
+          "soleMetres": 0.0030000256426774286,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 17,
+      "targetErrorMetres": 5.960464477539063e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0493041337520026,
+          "forwardMetres": -0.08868244290351868
+        },
+        "Right": {
+          "soleMetres": 0.0030001015454672597,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 18,
+      "targetErrorMetres": 7.450580596923828e-09,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.050873058387651326,
+          "forwardMetres": -0.09863036125898361
+        },
+        "Right": {
+          "soleMetres": 0.0030000398453466914,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 19,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.048296748200073125,
+          "forwardMetres": -0.10871101915836334
+        },
+        "Right": {
+          "soleMetres": 0.0029999872256212257,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 20,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.04280379275382984,
+          "forwardMetres": -0.11859253793954849
+        },
+        "Right": {
+          "soleMetres": 0.0029899207927428506,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 21,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.035365941473855855,
+          "forwardMetres": -0.1279430240392685
+        },
+        "Right": {
+          "soleMetres": 0.0029884579178087733,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 22,
+      "targetErrorMetres": 1.0848209096909341e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.026955560320629957,
+          "forwardMetres": -0.13643066585063934
+        },
+        "Right": {
+          "soleMetres": 0.0029874979570649884,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 23,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.01854522387088764,
+          "forwardMetres": -0.14372341334819794
+        },
+        "Right": {
+          "soleMetres": 0.0029870411433421395,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 24,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.01110679237694967,
+          "forwardMetres": -0.14948949217796326
+        },
+        "Right": {
+          "soleMetres": 0.003118013269840958,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 25,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.005612511658682706,
+          "forwardMetres": -0.15339693427085876
+        },
+        "Right": {
+          "soleMetres": 0.0031729133386306785,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 26,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0030342482548348926,
+          "forwardMetres": -0.15511395037174225
+        },
+        "Right": {
+          "soleMetres": 0.0031624676246337913,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 27,
+      "targetErrorMetres": 7.634573255449234e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002954503992214086,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.0031551427725844405,
+          "forwardMetres": 0.09259125590324402
+        }
+      }
+    },
+    {
+      "frame": 28,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029551696550242923,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.0031533022463463567,
+          "forwardMetres": 0.09259124845266342
+        }
+      }
+    },
+    {
+      "frame": 29,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029557312425367854,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.0031582822609834693,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 30,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029563778132342122,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.0036256886139653943,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 31,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002957089110850575,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.0053275143779956124,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 32,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002957759663104298,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.00799616845847595,
+          "forwardMetres": 0.09259124845266342
+        }
+      }
+    },
+    {
+      "frame": 33,
+      "targetErrorMetres": 4.7706993203109864e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002958485396220567,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.011336796456589582,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 34,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002959496579705956,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.015057590329661252,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 35,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029604770295463823,
+          "forwardMetres": -0.15516522526741028
+        },
+        "Right": {
+          "soleMetres": 0.01886596950294006,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 36,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002961843279763343,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.022468243265166166,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 37,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029630782134972833,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.025570471310629728,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 38,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002964317571013453,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.02787928702832687,
+          "forwardMetres": 0.09259119629859924
+        }
+      }
+    },
+    {
+      "frame": 39,
+      "targetErrorMetres": 7.742870483855355e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029654284060143254,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.029100826480998876,
+          "forwardMetres": 0.09259945899248123
+        }
+      }
+    },
+    {
+      "frame": 40,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029661131609373115,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.029049532958879354,
+          "forwardMetres": 0.09287851303815842
+        }
+      }
+    },
+    {
+      "frame": 41,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966320613040807,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.028071640530242803,
+          "forwardMetres": 0.09352675825357437
+        }
+      }
+    },
+    {
+      "frame": 42,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002965882891430738,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.026359813758745076,
+          "forwardMetres": 0.0945068746805191
+        }
+      }
+    },
+    {
+      "frame": 43,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029653974395387195,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.024071503901495817,
+          "forwardMetres": 0.09578161686658859
+        }
+      }
+    },
+    {
+      "frame": 44,
+      "targetErrorMetres": 4.53201124839352e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002964942255630376,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.021362858364000203,
+          "forwardMetres": 0.09731361269950867
+        }
+      }
+    },
+    {
+      "frame": 45,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029643250215940498,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.018389516049637677,
+          "forwardMetres": 0.09906567633152008
+        }
+      }
+    },
+    {
+      "frame": 46,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029636605229370616,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.01530752378107536,
+          "forwardMetres": 0.10100044310092926
+        }
+      }
+    },
+    {
+      "frame": 47,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002963135722666266,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.012272245721533181,
+          "forwardMetres": 0.1030806452035904
+        }
+      }
+    },
+    {
+      "frame": 48,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002962588803484323,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.009439290972068193,
+          "forwardMetres": 0.10526899993419647
+        }
+      }
+    },
+    {
+      "frame": 49,
+      "targetErrorMetres": 7.598131170262075e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029620695911489747,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.006963883531852844,
+          "forwardMetres": 0.1075281873345375
+        }
+      }
+    },
+    {
+      "frame": 50,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002961492171152713,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.005000870214416864,
+          "forwardMetres": 0.10982093214988708
+        }
+      }
+    },
+    {
+      "frame": 51,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002961083320542457,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003705467801182749,
+          "forwardMetres": 0.11210998147726059
+        }
+      }
+    },
+    {
+      "frame": 52,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029606234800212405,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003232790628089788,
+          "forwardMetres": 0.11435801535844803
+        }
+      }
+    },
+    {
+      "frame": 53,
+      "targetErrorMetres": 9.094592642585711e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029603214986764215,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.0032233048748366855,
+          "forwardMetres": 0.11652769148349762
+        }
+      }
+    },
+    {
+      "frame": 54,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029599012393646262,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.0032143255282335303,
+          "forwardMetres": 0.11858180910348892
+        }
+      }
+    },
+    {
+      "frame": 55,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.00295961089955199,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003205925464271786,
+          "forwardMetres": 0.12048299610614777
+        }
+      }
+    },
+    {
+      "frame": 56,
+      "targetErrorMetres": 3.414284955677271e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029593859851502202,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.003198273950829389,
+          "forwardMetres": 0.12219402194023132
+        }
+      }
+    },
+    {
+      "frame": 57,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029590325482331536,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.003191594970985534,
+          "forwardMetres": 0.1236775740981102
+        }
+      }
+    },
+    {
+      "frame": 58,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029590486135475658,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003186069666980984,
+          "forwardMetres": 0.12489635497331619
+        }
+      }
+    },
+    {
+      "frame": 59,
+      "targetErrorMetres": 1.4975481660844222e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029590111278139375,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.0031817967590086482,
+          "forwardMetres": 0.1258130818605423
+        }
+      }
+    },
+    {
+      "frame": 60,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029588146187506936,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.0031791401613645576,
+          "forwardMetres": 0.1263904720544815
+        }
+      }
+    },
+    {
+      "frame": 61,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002958805072694304,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.0033081234485052846,
+          "forwardMetres": 0.12659123539924622
+        }
+      }
+    },
+    {
+      "frame": 62,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.00295878062547672,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.0040510222368084214,
+          "forwardMetres": 0.12619000673294067
+        }
+      }
+    },
+    {
+      "frame": 63,
+      "targetErrorMetres": 7.598131170262075e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002959006005539777,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.0053450739994787,
+          "forwardMetres": 0.12505799531936646
+        }
+      }
+    },
+    {
+      "frame": 64,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029592244006835244,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.007065224000825765,
+          "forwardMetres": 0.1233026459813118
+        }
+      }
+    },
+    {
+      "frame": 65,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002959437207891824,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.009086636365964296,
+          "forwardMetres": 0.12103148549795151
+        }
+      }
+    },
+    {
+      "frame": 66,
+      "targetErrorMetres": 1.4975481660844222e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002960079587637665,
+          "forwardMetres": -0.15516522526741028
+        },
+        "Right": {
+          "soleMetres": 0.011284250305607202,
+          "forwardMetres": 0.11835187673568726
+        }
+      }
+    },
+    {
+      "frame": 67,
+      "targetErrorMetres": 9.094592642585711e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029605163779251598,
+          "forwardMetres": -0.15516524016857147
+        },
+        "Right": {
+          "soleMetres": 0.01353292959333885,
+          "forwardMetres": 0.11537138372659683
+        }
+      }
+    },
+    {
+      "frame": 68,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002960945484801414,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.015707808086290242,
+          "forwardMetres": 0.11219745129346848
+        }
+      }
+    },
+    {
+      "frame": 69,
+      "targetErrorMetres": 4.712160915387242e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002961697993441703,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.017683240124597432,
+          "forwardMetres": 0.10893753916025162
+        }
+      }
+    },
+    {
+      "frame": 70,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029624516662352107,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.01933424408139217,
+          "forwardMetres": 0.10569910705089569
+        }
+      }
+    },
+    {
+      "frame": 71,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002963281474649193,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.020535758236064794,
+          "forwardMetres": 0.10258965194225311
+        }
+      }
+    },
+    {
+      "frame": 72,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029642493516348623,
+          "forwardMetres": -0.15516528487205505
+        },
+        "Right": {
+          "soleMetres": 0.02116275439561832,
+          "forwardMetres": 0.09971661120653152
+        }
+      }
+    },
+    {
+      "frame": 73,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002964997436492922,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.021111140498533132,
+          "forwardMetres": 0.09718750417232513
+        }
+      }
+    },
+    {
+      "frame": 74,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002965772995366933,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.020441223406805875,
+          "forwardMetres": 0.0951097384095192
+        }
+      }
+    },
+    {
+      "frame": 75,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966147852703216,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.01926366845668781,
+          "forwardMetres": 0.09359085559844971
+        }
+      }
+    },
+    {
+      "frame": 76,
+      "targetErrorMetres": 3.414284955677271e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029665355157248996,
+          "forwardMetres": -0.15516526997089386
+        },
+        "Right": {
+          "soleMetres": 0.017686132812514188,
+          "forwardMetres": 0.09273827075958252
+        }
+      }
+    },
+    {
+      "frame": 77,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.015816325792684438,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 78,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.013763669417812707,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 79,
+      "targetErrorMetres": 7.598131170262075e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.011636605025842073,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 80,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.009542498277141931,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 81,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.007589008664353969,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 82,
+      "targetErrorMetres": 9.094592642585711e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.005883439449235084,
+          "forwardMetres": 0.09259121865034103
+        }
+      }
+    },
+    {
+      "frame": 83,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.004532720433189752,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 84,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003643810521452906,
+          "forwardMetres": 0.09259123355150223
+        }
+      }
+    },
+    {
+      "frame": 85,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 86,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 87,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 88,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 89,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 90,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 91,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 92,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 93,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 94,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 95,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 96,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 97,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002966669160514357,
+          "forwardMetres": -0.15516525506973267
+        },
+        "Right": {
+          "soleMetres": 0.003323776187016847,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    }
+  ],
+  "protectiveGait": [
+    {
+      "frame": 1,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029537770949445985,
+          "forwardMetres": -0.15496526658535004
+        },
+        "Right": {
+          "soleMetres": 0.0031258373107903026,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    },
+    {
+      "frame": 2,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002953405497237327,
+          "forwardMetres": -0.16958068311214447
+        },
+        "Right": {
+          "soleMetres": 0.003108875831230762,
+          "forwardMetres": 0.07797583937644958
+        }
+      }
+    },
+    {
+      "frame": 3,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029531884990774415,
+          "forwardMetres": -0.18419606983661652
+        },
+        "Right": {
+          "soleMetres": 0.0030961772479258798,
+          "forwardMetres": 0.06336044520139694
+        }
+      }
+    },
+    {
+      "frame": 4,
+      "targetErrorMetres": 5.972094663188382e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002952909102305057,
+          "forwardMetres": -0.19881142675876617
+        },
+        "Right": {
+          "soleMetres": 0.003088013041406157,
+          "forwardMetres": 0.048745058476924896
+        }
+      }
+    },
+    {
+      "frame": 5,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002952678367137196,
+          "forwardMetres": -0.21342681348323822
+        },
+        "Right": {
+          "soleMetres": 0.0030843245383493922,
+          "forwardMetres": 0.03412969037890434
+        }
+      }
+    },
+    {
+      "frame": 6,
+      "targetErrorMetres": 9.06402249678704e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029527572967253946,
+          "forwardMetres": -0.22804217040538788
+        },
+        "Right": {
+          "soleMetres": 0.0030852444522224687,
+          "forwardMetres": 0.019514305517077446
+        }
+      }
+    },
+    {
+      "frame": 7,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029528441425554774,
+          "forwardMetres": -0.2426575869321823
+        },
+        "Right": {
+          "soleMetres": 0.0030907215602837823,
+          "forwardMetres": 0.004898920655250549
+        }
+      }
+    },
+    {
+      "frame": 8,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002953170105456593,
+          "forwardMetres": -0.2572729289531708
+        },
+        "Right": {
+          "soleMetres": 0.003100285078971865,
+          "forwardMetres": -0.009716472588479519
+        }
+      }
+    },
+    {
+      "frame": 9,
+      "targetErrorMetres": 4.2146848510894035e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029534825641803764,
+          "forwardMetres": -0.2718883156776428
+        },
+        "Right": {
+          "soleMetres": 0.003113388089104774,
+          "forwardMetres": -0.02433185465633869
+        }
+      }
+    },
+    {
+      "frame": 10,
+      "targetErrorMetres": 4.2146848510894035e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029540914163135312,
+          "forwardMetres": -0.28650370240211487
+        },
+        "Right": {
+          "soleMetres": 0.0031073524203293346,
+          "forwardMetres": -0.038947246968746185
+        }
+      }
+    },
+    {
+      "frame": 11,
+      "targetErrorMetres": 4.2146848510894035e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029545237828187965,
+          "forwardMetres": -0.3011190891265869
+        },
+        "Right": {
+          "soleMetres": 0.003103450644402983,
+          "forwardMetres": -0.053562626242637634
+        }
+      }
+    },
+    {
+      "frame": 12,
+      "targetErrorMetres": 6.188917057900187e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029550660453878663,
+          "forwardMetres": -0.31573450565338135
+        },
+        "Right": {
+          "soleMetres": 0.0031014599423997424,
+          "forwardMetres": -0.06817800551652908
+        }
+      }
+    },
+    {
+      "frame": 13,
+      "targetErrorMetres": 8.940696716308594e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002955411333232405,
+          "forwardMetres": -0.3303499221801758
+        },
+        "Right": {
+          "soleMetres": 0.003101274609207394,
+          "forwardMetres": -0.08279338479042053
+        }
+      }
+    },
+    {
+      "frame": 14,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002955334731950643,
+          "forwardMetres": -0.3449653089046478
+        },
+        "Right": {
+          "soleMetres": 0.003102187305330517,
+          "forwardMetres": -0.09740874916315079
+        }
+      }
+    },
+    {
+      "frame": 15,
+      "targetErrorMetres": 5.960464477539063e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.005958128260090234,
+          "forwardMetres": -0.34856337308883667
+        },
+        "Right": {
+          "soleMetres": 0.003103659260659697,
+          "forwardMetres": -0.11202417314052582
+        }
+      }
+    },
+    {
+      "frame": 16,
+      "targetErrorMetres": 5.960464477539063e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.014375506439819219,
+          "forwardMetres": -0.33232390880584717
+        },
+        "Right": {
+          "soleMetres": 0.003105361718326094,
+          "forwardMetres": -0.12663954496383667
+        }
+      }
+    },
+    {
+      "frame": 17,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.026549267122163656,
+          "forwardMetres": -0.29954206943511963
+        },
+        "Right": {
+          "soleMetres": 0.003106674184664371,
+          "forwardMetres": -0.14125493168830872
+        }
+      }
+    },
+    {
+      "frame": 18,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.040079912641658666,
+          "forwardMetres": -0.2535130977630615
+        },
+        "Right": {
+          "soleMetres": 0.0031075258791588567,
+          "forwardMetres": -0.15587030351161957
+        }
+      }
+    },
+    {
+      "frame": 19,
+      "targetErrorMetres": 2.1073424255447017e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.052301088818921926,
+          "forwardMetres": -0.19753247499465942
+        },
+        "Right": {
+          "soleMetres": 0.0031075938657068036,
+          "forwardMetres": -0.170485720038414
+        }
+      }
+    },
+    {
+      "frame": 20,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.06080558384360302,
+          "forwardMetres": -0.13489526510238647
+        },
+        "Right": {
+          "soleMetres": 0.0031068958394371293,
+          "forwardMetres": -0.18510106205940247
+        }
+      }
+    },
+    {
+      "frame": 21,
+      "targetErrorMetres": 6.322027276634104e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.06392030651272762,
+          "forwardMetres": -0.06889688968658447
+        },
+        "Right": {
+          "soleMetres": 0.0031054688204221748,
+          "forwardMetres": -0.1997164487838745
+        }
+      }
+    },
+    {
+      "frame": 22,
+      "targetErrorMetres": 2.1073424255447017e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.06103493879140842,
+          "forwardMetres": -0.0028326152823865414
+        },
+        "Right": {
+          "soleMetres": 0.0035121031157814286,
+          "forwardMetres": -0.21317489445209503
+        }
+      }
+    },
+    {
+      "frame": 23,
+      "targetErrorMetres": 7.459888009168501e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.052721122750654104,
+          "forwardMetres": 0.06000226363539696
+        },
+        "Right": {
+          "soleMetres": 0.005414917604639413,
+          "forwardMetres": -0.2224857062101364
+        }
+      }
+    },
+    {
+      "frame": 24,
+      "targetErrorMetres": 7.450580596923828e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0406189807742976,
+          "forwardMetres": 0.11631247401237488
+        },
+        "Right": {
+          "soleMetres": 0.008712443993999841,
+          "forwardMetres": -0.22775590419769287
+        }
+      }
+    },
+    {
+      "frame": 25,
+      "targetErrorMetres": 1.4901161193847656e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.027112843939676168,
+          "forwardMetres": 0.16280275583267212
+        },
+        "Right": {
+          "soleMetres": 0.013253225484504583,
+          "forwardMetres": -0.2292712926864624
+        }
+      }
+    },
+    {
+      "frame": 26,
+      "targetErrorMetres": 4.712160915387242e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.014862063811733606,
+          "forwardMetres": 0.19617776572704315
+        },
+        "Right": {
+          "soleMetres": 0.01891494216920364,
+          "forwardMetres": -0.22731760144233704
+        }
+      }
+    },
+    {
+      "frame": 27,
+      "targetErrorMetres": 2.1073424255447017e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.006276132544144275,
+          "forwardMetres": 0.21314223110675812
+        },
+        "Right": {
+          "soleMetres": 0.025475288280858877,
+          "forwardMetres": -0.2221805900335312
+        }
+      }
+    },
+    {
+      "frame": 28,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0030403111647956393,
+          "forwardMetres": 0.21040084958076477
+        },
+        "Right": {
+          "soleMetres": 0.032672981271161916,
+          "forwardMetres": -0.2141459733247757
+        }
+      }
+    },
+    {
+      "frame": 29,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0030274435464434646,
+          "forwardMetres": 0.1958039551973343
+        },
+        "Right": {
+          "soleMetres": 0.04022421548665989,
+          "forwardMetres": -0.20349958539009094
+        }
+      }
+    },
+    {
+      "frame": 30,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.003020087029426577,
+          "forwardMetres": 0.18118852376937866
+        },
+        "Right": {
+          "soleMetres": 0.04783233115972507,
+          "forwardMetres": -0.19052712619304657
+        }
+      }
+    },
+    {
+      "frame": 31,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0030132995505027793,
+          "forwardMetres": 0.1665731817483902
+        },
+        "Right": {
+          "soleMetres": 0.0551983774691962,
+          "forwardMetres": -0.17551438510417938
+        }
+      }
+    },
+    {
+      "frame": 32,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.003007096476494553,
+          "forwardMetres": 0.15195780992507935
+        },
+        "Right": {
+          "soleMetres": 0.06203339482249248,
+          "forwardMetres": -0.1587471067905426
+        }
+      }
+    },
+    {
+      "frame": 33,
+      "targetErrorMetres": 7.742870483855355e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0030013884004347346,
+          "forwardMetres": 0.1373424082994461
+        },
+        "Right": {
+          "soleMetres": 0.06806947524250972,
+          "forwardMetres": -0.14051106572151184
+        }
+      }
+    },
+    {
+      "frame": 34,
+      "targetErrorMetres": 3.0719530773294423e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002996066590412738,
+          "forwardMetres": 0.12272702902555466
+        },
+        "Right": {
+          "soleMetres": 0.0730705582589053,
+          "forwardMetres": -0.12109194695949554
+        }
+      }
+    },
+    {
+      "frame": 35,
+      "targetErrorMetres": 3.0719530773294423e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002991269347830894,
+          "forwardMetres": 0.10811162739992142
+        },
+        "Right": {
+          "soleMetres": 0.07684130454958904,
+          "forwardMetres": -0.10077556222677231
+        }
+      }
+    },
+    {
+      "frame": 36,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002986752200513365,
+          "forwardMetres": 0.09349627047777176
+        },
+        "Right": {
+          "soleMetres": 0.07923493767680156,
+          "forwardMetres": -0.07984767109155655
+        }
+      }
+    },
+    {
+      "frame": 37,
+      "targetErrorMetres": 3.0719530773294423e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029826990846686385,
+          "forwardMetres": 0.07888086140155792
+        },
+        "Right": {
+          "soleMetres": 0.08015876496733654,
+          "forwardMetres": -0.05859401077032089
+        }
+      }
+    },
+    {
+      "frame": 38,
+      "targetErrorMetres": 1.498011444723837e-07,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029788871813707374,
+          "forwardMetres": 0.06426548957824707
+        },
+        "Right": {
+          "soleMetres": 0.07957776869238842,
+          "forwardMetres": -0.03730035573244095
+        }
+      }
+    },
+    {
+      "frame": 39,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029755453631423734,
+          "forwardMetres": 0.04965011402964592
+        },
+        "Right": {
+          "soleMetres": 0.07751622284354198,
+          "forwardMetres": -0.016252437606453896
+        }
+      }
+    },
+    {
+      "frame": 40,
+      "targetErrorMetres": 3.003425057343598e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002972432650267365,
+          "forwardMetres": 0.035034723579883575
+        },
+        "Right": {
+          "soleMetres": 0.07405531639756191,
+          "forwardMetres": 0.004263969138264656
+        }
+      }
+    },
+    {
+      "frame": 41,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029695902537696384,
+          "forwardMetres": 0.020419349893927574
+        },
+        "Right": {
+          "soleMetres": 0.06933129812182415,
+          "forwardMetres": 0.02396310679614544
+        }
+      }
+    },
+    {
+      "frame": 42,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002967017475157263,
+          "forwardMetres": 0.005803951993584633
+        },
+        "Right": {
+          "soleMetres": 0.06352928514183986,
+          "forwardMetres": 0.042559221386909485
+        }
+      }
+    },
+    {
+      "frame": 43,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002964801160260322,
+          "forwardMetres": -0.008811437524855137
+        },
+        "Right": {
+          "soleMetres": 0.05687619979084957,
+          "forwardMetres": 0.059766583144664764
+        }
+      }
+    },
+    {
+      "frame": 44,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029627578385316156,
+          "forwardMetres": -0.023426810279488564
+        },
+        "Right": {
+          "soleMetres": 0.04963188106717098,
+          "forwardMetres": 0.07529940456151962
+        }
+      }
+    },
+    {
+      "frame": 45,
+      "targetErrorMetres": 8.948454372185702e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.002960904972269418,
+          "forwardMetres": -0.03804220259189606
+        },
+        "Right": {
+          "soleMetres": 0.042078769305362584,
+          "forwardMetres": 0.08887196332216263
+        }
+      }
+    },
+    {
+      "frame": 46,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029593920387469552,
+          "forwardMetres": -0.052657585591077805
+        },
+        "Right": {
+          "soleMetres": 0.034511084207906606,
+          "forwardMetres": 0.10019844770431519
+        }
+      }
+    },
+    {
+      "frame": 47,
+      "targetErrorMetres": 8.971687092477304e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029580041352801345,
+          "forwardMetres": -0.06727296859025955
+        },
+        "Right": {
+          "soleMetres": 0.027222974696769597,
+          "forwardMetres": 0.10899314284324646
+        }
+      }
+    },
+    {
+      "frame": 48,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029569836385689996,
+          "forwardMetres": -0.081888347864151
+        },
+        "Right": {
+          "soleMetres": 0.020497389608635785,
+          "forwardMetres": 0.11497028917074203
+        }
+      }
+    },
+    {
+      "frame": 49,
+      "targetErrorMetres": 7.487740830422111e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029559556912772678,
+          "forwardMetres": -0.09650373458862305
+        },
+        "Right": {
+          "soleMetres": 0.014594521844401243,
+          "forwardMetres": 0.1178441196680069
+        }
+      }
+    },
+    {
+      "frame": 50,
+      "targetErrorMetres": 3.332000937312528e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029551831592016242,
+          "forwardMetres": -0.11111912131309509
+        },
+        "Right": {
+          "soleMetres": 0.009742639498426797,
+          "forwardMetres": 0.11732888966798782
+        }
+      }
+    },
+    {
+      "frame": 51,
+      "targetErrorMetres": 2.9802322387695312e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029546029452376388,
+          "forwardMetres": -0.12573449313640594
+        },
+        "Right": {
+          "soleMetres": 0.00612907857225764,
+          "forwardMetres": 0.1131388247013092
+        }
+      }
+    },
+    {
+      "frame": 52,
+      "targetErrorMetres": 3.414284955677271e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029540655721120856,
+          "forwardMetres": -0.14034989476203918
+        },
+        "Right": {
+          "soleMetres": 0.0038939691200994275,
+          "forwardMetres": 0.10498817265033722
+        }
+      }
+    },
+    {
+      "frame": 53,
+      "targetErrorMetres": 6.143906154658885e-08,
+      "feet": {
+        "Left": {
+          "soleMetres": 0.0029537770949445985,
+          "forwardMetres": -0.15496526658535004
+        },
+        "Right": {
+          "soleMetres": 0.0031258373107903026,
+          "forwardMetres": 0.09259122610092163
+        }
+      }
+    }
+  ]
+}

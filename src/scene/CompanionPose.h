@@ -22,6 +22,18 @@ inline CompanionAnimationRecipe CompanionAnimation(
     const auto& m=snapshot.motion;
     if(m.mode==CompanionMotionMode::Sitting || m.mode==CompanionMotionMode::Seated)
         return {SkinnedClip::Sit,m.sitPlaybackSeconds,{}};
+    if(snapshot.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment) {
+        constexpr float entrySeconds=.12f;
+        if(m.anklePlaybackSeconds<entrySeconds)
+            return {SkinnedClip::Walking,recipe.blend.timeSeconds,
+                {SkinnedClip::AnkleAssessment,m.anklePlaybackSeconds,m.anklePlaybackSeconds/entrySeconds}};
+        return {SkinnedClip::AnkleAssessment,m.anklePlaybackSeconds,{}};
+    }
+    if(snapshot.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach ||
+       (snapshot.bellwetherArrival==BellwetherArrivalStage::ChairTurn && m.mode==CompanionMotionMode::Idle))
+        return {SkinnedClip::AnkleAssessment,kAnkleAssessmentDurationSeconds,
+            {SkinnedClip::ProtectiveWalk,snapshot.locomotion.walkPhase*kProtectiveWalkDurationSeconds,
+             snapshot.locomotion.walkWeight}};
     if(!m.turnStartEnabled)return recipe;
     if(m.mode==CompanionMotionMode::Turning) {
         if(m.entryWeight<1)recipe.blend={SkinnedClip::Idle,0,m.entryWeight};

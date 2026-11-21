@@ -19,11 +19,13 @@
         state_.wait=CompanionWait::Tavern;
         state_.animationSeconds+=dt;
         if(stage==Stage::AnkleAssessment) {
-            locomotion_.Step(dt,0,false);state_.locomotion=locomotion_.State();
-            // The shared incident timing reserves the brief independent
-            // assessment before the authored protective gait takes over.
-            ankleAssessmentSeconds_+=dt;
-            if(ankleAssessmentSeconds_>=1.1f)stage=Stage::ProtectiveApproach;
+            motion.anklePlaybackSeconds=std::min(motion.anklePlaybackSeconds+dt,kAnkleAssessmentDurationSeconds);
+            if(motion.anklePlaybackSeconds>=kAnkleAssessmentDurationSeconds-.00001f) {
+                motion.anklePlaybackSeconds=kAnkleAssessmentDurationSeconds;
+                locomotion_.Reset();state_.locomotion=locomotion_.State();
+                motion.mode=CompanionMotionMode::Walking;
+                stage=Stage::ProtectiveApproach;
+            }
             return;
         }
         constexpr float aligned=.01745329252f;
@@ -45,6 +47,7 @@
             const auto arrived=state_.bellwetherStation++;
             if(arrived==traversal::kBellwetherAnkleStation) {
                 ClearMotion();stage=Stage::AnkleAssessment;
+                acting_.Reset();state_.acting=acting_.State();
             } else if(state_.bellwetherStation==kKitBellwetherRoute.size()) {
                 ClearMotion();stage=Stage::ChairTurn;
             }
@@ -61,7 +64,8 @@
             BeginTurn(error,true);
             return;
         }
-        const float speed=stage==Stage::OnRoad ? 1.65f : 1.12f;
+        const bool protective=stage==Stage::ProtectiveApproach;
+        const float speed=protective?.88f:1.65f;
         const float travel=std::min(distance,speed*dt);
         const float x=travel==distance ? target.x : state_.x+dx/distance*travel;
         const float z=travel==distance ? target.z : state_.z+dz/distance*travel;
@@ -74,5 +78,6 @@
         state_.walking=true;motion.mode=CompanionMotionMode::Walking;motion.speed=speed;
         state_.x=x;state_.y=move.support.worldY;state_.z=z;state_.grounded=move.support.grounded;
         state_.yaw+=std::clamp(error,-2.4f*dt,2.4f*dt);
-        locomotion_.Step(dt,travel,true);state_.locomotion=locomotion_.State();
+        const float stride=protective?kProtectiveWalkStrideMetres:CompanionLocomotion::kWalkCycleDistanceMetres;
+        locomotion_.Step(dt,travel,true,stride);state_.locomotion=locomotion_.State();
     }

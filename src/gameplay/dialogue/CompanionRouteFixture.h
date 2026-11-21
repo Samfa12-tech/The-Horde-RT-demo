@@ -12,6 +12,9 @@ namespace horde::gameplay::dialogue {
 enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing,Tavern };
 enum class BellwetherArrivalStage { AtLookout, OnRoad, AnkleAssessment, ProtectiveApproach, ChairTurn, Lowering, Seated };
 inline constexpr float kTavernSitDurationSeconds=82.f/60.f;
+inline constexpr float kAnkleAssessmentDurationSeconds=96.f/60.f;
+inline constexpr float kProtectiveWalkDurationSeconds=52.f/60.f;
+inline constexpr float kProtectiveWalkStrideMetres=.76f;
 struct CompanionSnapshot {
     // Logical engineering fixture only. No admitted mesh, enemy slot or GPU
     // skinning allocation is implied by this reusable route contract.
@@ -31,9 +34,10 @@ class CompanionRouteFixture {
 public:
     explicit CompanionRouteFixture(bool turnStartEnabled=false):turnStartEnabled_(turnStartEnabled) {ClearMotion();}
     const CompanionSnapshot& State() const {return state_;}
-    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();ankleAssessmentSeconds_=0;state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
     void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
-        if(TavernSitActive())return;
+        if(TavernSitActive() || state_.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment ||
+           state_.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach)return;
         acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
         state_.acting=acting_.State();
     }
@@ -293,6 +297,5 @@ private:
     bool turnStartEnabled_=false;
     double turnElapsed_=0,entryElapsed_=0;
     float turnStartYaw_=0,entryStartWeight_=0;
-    float ankleAssessmentSeconds_=0;
 };
 } // namespace horde::gameplay::dialogue

@@ -3,14 +3,19 @@ import bpy,json,struct,pathlib,hashlib,math,argparse,sys,copy
 from mathutils import Matrix,Vector,Quaternion
 ROOT=next(p for p in pathlib.Path(__file__).resolve().parents if (p/'src/gameplay/dialogue/CompanionRouteFixture.h').is_file())
 parser=argparse.ArgumentParser();parser.add_argument('--output',type=pathlib.Path,required=True)
-parser.add_argument('--hearth-sit',action='store_true',help='Append the chair-fitted take to the preserved turn payload')
+mode=parser.add_mutually_exclusive_group()
+mode.add_argument('--hearth-sit',action='store_true',help='Append the chair-fitted take to the preserved turn payload')
+mode.add_argument('--ankle-approach',type=pathlib.Path,metavar='HEARTH_GLB',
+ help='Append the two road takes to a rebuilt, pinned hearth-sit GLB')
 args=parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
 OUT=args.output.resolve();OUT.mkdir(parents=True,exist_ok=False)
 runtime=ROOT/'assets/models/characters/runtime/kit-warden-v1'
-base=(pathlib.Path(__file__).parent/'native/kit-turn-proof.glb' if args.hearth_sit else runtime/'kit-warden-lod0.runtime.glb')
+base=args.ankle_approach or (pathlib.Path(__file__).parent/'native/kit-turn-proof.glb' if args.hearth_sit else runtime/'kit-warden-lod0.runtime.glb')
 data=base.read_bytes()
-assert hashlib.sha256(data).hexdigest()==('a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11'
- if args.hearth_sit else '1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713')
+base_hash=('799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d' if args.ankle_approach else
+ 'a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11' if args.hearth_sit else
+ '1ba628235814b5912ae1439b180347dd8e1cce85b0f4d1fae5bbacb41e7d3713')
+assert hashlib.sha256(data).hexdigest()==base_hash
 size=struct.unpack_from('<I',data,12)[0];doc=json.loads(data[20:20+size]);original=copy.deepcopy(doc)
 binary=bytearray(data[28+size:]);old_binary=bytes(binary)
 def accessor(i):
@@ -83,6 +88,38 @@ def finish_payload():
  encoded=json.dumps(doc,separators=(',',':')).encode();encoded+=b' '*((-len(encoded))%4);binary.extend(bytes((-len(binary))%4))
  return struct.pack('<III',0x46546c67,2,28+len(encoded)+len(binary))+struct.pack('<II',len(encoded),0x4e4f534a)+encoded+struct.pack('<II',len(binary),0x004e4942)+binary
 
+def calibrate(scene,arm,mesh,inverse_root):
+ # Only the original, undisplaced idle can calibrate Blender's local bone axes.
+ neutral=bpy.data.actions['Warden|idle']
+ arm.animation_data.action=neutral;arm.animation_data.action_slot=neutral.slots[0]
+ scene.frame_set(0)
+ initial=[Ci@inverse_root@p for p in mesh_points(mesh)]
+ assert len(initial)==len(native_idle)
+ initial_error=max((p-q).length for p,q in zip(initial,native_idle));assert initial_error<.0001,initial_error
+ bones={i:inverse_root@arm.matrix_world@arm.pose.bones[names[i]].matrix for i in joints}
+ calibration_error=max((m.translation-(C@g0[i]).translation).length for i,m in bones.items())
+ assert calibration_error<.0001,calibration_error
+ correction={i:m.inverted()@C@g0[i] for i,m in bones.items()}
+
+ def at_frame(frame):
+  scene.frame_set(frame)
+  return {i:Ci@inverse_root@arm.matrix_world@arm.pose.bones[names[i]].matrix@correction[i] for i in joints}
+ return initial,initial_error,calibration_error,at_frame
+
+def reference_samples(filename,samples,fps,scene,mesh,initial,inverse_root):
+ indices=set(range(0,len(initial),211))|{len(initial)-1}
+ floor=min(p.y for p in initial)
+ indices.update(i for i in range(0,len(initial),29) if initial[i].y<floor+.06)
+ indices=sorted(indices)
+ assert len(indices)<512
+ with (OUT/filename).open('xb') as stream:
+  stream.write(struct.pack('<4sI',b'KSP1',len(samples)))
+  for frame in samples:
+   scene.frame_set(frame)
+   points=mesh_points(mesh)
+   stream.write(struct.pack('<fI',(frame-1)/fps,len(indices)))
+   for index in indices:stream.write(struct.pack('<Ifff',index,*(Ci@inverse_root@points[index])))
+
 def export_hearth_sit():
  scene=bpy.data.scenes['Bellwether B01 - Kit protected sit']
  bpy.context.window.scene=scene
@@ -92,44 +129,16 @@ def export_hearth_sit():
  take,slot=arm.animation_data.action,arm.animation_data.action_slot
  frames=range(scene.frame_start,scene.frame_end+1);fps=scene.render.fps
  assert frames==range(1,84) and fps==60 and len(joints)==24
-
- # Recover the same bone-axis correction from the original, undisplaced idle.
- # The take's first frame already has a staggered stance and cannot calibrate it.
- neutral=bpy.data.actions['Warden|idle']
- arm.animation_data.action=neutral;arm.animation_data.action_slot=neutral.slots[0]
- scene.frame_set(0)
  inverse_root=root.matrix_world.inverted()
- initial=[Ci@inverse_root@p for p in mesh_points(mesh)]
- assert len(initial)==len(native_idle)
- initial_error=max((p-q).length for p,q in zip(initial,native_idle));assert initial_error<.0001,initial_error
- bones={i:inverse_root@arm.matrix_world@arm.pose.bones[names[i]].matrix for i in joints}
- calibration_error=max((m.translation-(C@g0[i]).translation).length for i,m in bones.items())
- assert calibration_error<.0001,calibration_error
- correction={i:m.inverted()@C@g0[i] for i,m in bones.items()}
+ initial,initial_error,calibration_error,at_frame=calibrate(scene,arm,mesh,inverse_root)
  arm.animation_data.action=take;arm.animation_data.action_slot=slot
-
- def at_frame(frame):
-  scene.frame_set(frame)
-  return {i:Ci@inverse_root@arm.matrix_world@arm.pose.bones[names[i]].matrix@correction[i] for i in joints}
 
  name='Kit|hearth_sit'
  append_joint_clip(name,frames,fps,at_frame)
  result=finish_payload()
  output=OUT/'kit-warden-turn.runtime.glb'
  output.write_bytes(result)
- indices=set(range(0,len(initial),211))|{len(initial)-1}
- floor=min(p.y for p in initial)
- indices.update(i for i in range(0,len(initial),29) if initial[i].y<floor+.06)
- indices=sorted(indices)
- assert len(indices)<512
- with (OUT/'native-sit-reference.bin').open('xb') as stream:
-  samples=(1,9,21,35,42,56,70,83)
-  stream.write(struct.pack('<4sI',b'KSP1',len(samples)))
-  for frame in samples:
-   scene.frame_set(frame)
-   points=mesh_points(mesh)
-   stream.write(struct.pack('<fI',(frame-1)/fps,len(indices)))
-   for index in indices:stream.write(struct.pack('<Ifff',index,*(Ci@inverse_root@points[index])))
+ reference_samples('native-sit-reference.bin',(1,9,21,35,42,56,70,83),fps,scene,mesh,initial,inverse_root)
  receipt={'schema':1,'sourceBlendSha256':hashlib.sha256(pathlib.Path(bpy.data.filepath).read_bytes()).hexdigest(),
   'baseGlbSha256':hashlib.sha256(data).hexdigest(),'outputGlbSha256':hashlib.sha256(result).hexdigest(),
   'outputBytes':len(result),'originalBinaryPrefixBytes':len(old_binary),'clip':name,
@@ -138,8 +147,38 @@ def export_hearth_sit():
  (OUT/'export-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8',newline='\n')
  print('HEARTH_SIT_EXPORT',json.dumps(receipt),flush=True)
 
+def export_ankle_approach():
+ scene=bpy.data.scenes['Bellwether road - Kit ankle and protective gait']
+ bpy.context.window.scene=scene
+ arm=next(obj for obj in scene.objects if obj.type=='ARMATURE')
+ mesh=scene.objects['briarhold-warden']
+ fps=scene.render.fps
+ assert fps==60 and len(joints)==24
+ identity=Matrix.Identity(4)
+ initial,initial_error,calibration_error,at_frame=calibrate(scene,arm,mesh,identity)
+ clips=[]
+ for name,last,samples in (('ankle_assess',97,(1,9,15,21,33,61,73,97)),
+                           ('protective_walk',53,(1,8,15,21,27,34,42,53))):
+  take=bpy.data.actions[f'Kit|{name}']
+  assert tuple(take.frame_range)==(1,last)
+  arm.animation_data.action=take;arm.animation_data.action_slot=take.slots[0]
+  append_joint_clip(take.name,range(1,last+1),fps,at_frame)
+  reference_samples(f'{name}-reference.bin',samples,fps,scene,mesh,initial,identity)
+  clips.append({'name':take.name,'frames':last})
+ result=finish_payload()
+ (OUT/'kit-warden-turn.runtime.glb').write_bytes(result)
+ receipt={'schema':1,'sourceBlendSha256':hashlib.sha256(pathlib.Path(bpy.data.filepath).read_bytes()).hexdigest(),
+  'baseGlbSha256':base_hash,'outputGlbSha256':hashlib.sha256(result).hexdigest(),
+  'outputBytes':len(result),'originalBinaryPrefixBytes':len(old_binary),'clips':clips,
+  'fps':fps,'jointCount':len(joints),'calibrationJointOriginMaxErrorM':calibration_error,'idleGeometryMaxErrorM':initial_error}
+ (OUT/'export-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8',newline='\n')
+ print('ANKLE_APPROACH_EXPORT',json.dumps(receipt),flush=True)
+
 if args.hearth_sit:
  export_hearth_sit()
+ sys.exit(0)
+if args.ankle_approach:
+ export_ankle_approach()
  sys.exit(0)
 
 references=[];motions=[];summaries=[];sole_indices=None

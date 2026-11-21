@@ -175,10 +175,13 @@ inline bool StageDevelopmentCheckpointSimulation(
         return false;
     };
 
-    if(checkpoint.bellwetherSitTicks!=0) {
+    if(checkpoint.bellwetherSitTicks!=0 || checkpoint.bellwetherAnkleTicks!=0) {
         using namespace simulation;
-        if(!chapterTerrain || checkpoint.bellwetherSitTicks>120 ||
-           checkpoint.bellwetherStations!=traversal::kBellwetherTavernRoute.size())return finalize(false);
+        const bool ankle=checkpoint.bellwetherAnkleTicks!=0;
+        const auto stations=ankle ? traversal::kBellwetherAnkleStation+1 : traversal::kBellwetherTavernRoute.size();
+        const float ankleSeconds=checkpoint.bellwetherAnkleTicks/60.f;
+        if(!chapterTerrain || checkpoint.bellwetherSitTicks>120 || checkpoint.bellwetherStations!=stations ||
+           ankleSeconds>=dialogue::kAnkleAssessmentDurationSeconds)return finalize(false);
         // Model the public 1.7 continuation with the ordinary validated save
         // transaction. Both actors then travel the route through fixed steps.
         campaign::Checkpoint record;
@@ -205,14 +208,23 @@ inline bool StageDevelopmentCheckpointSimulation(
             accumulateEvents();gameSimulation.ClearEvents();
         };
         advance(); // Release the restored input barrier with an exact neutral publication.
-        for(const auto& station:traversal::kBellwetherTavernRoute)
+        for(std::size_t index=0;index<stations;++index) {
+            const auto& station=traversal::kBellwetherTavernRoute[index];
             if(!walkTo(input,advance,station.x,station.z))return finalize(false);
+        }
         if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
         input.moveForward=0;input.runHeld=false;
         input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
         const float wanted=std::min(checkpoint.bellwetherSitTicks/60.f,dialogue::kTavernSitDurationSeconds);
         for(unsigned tick=0;tick<5400;++tick) {
             const auto& kit=gameSimulation.Snapshot().chapterCompanion;
+            if(ankle) {
+                if(kit.bellwetherArrival==dialogue::BellwetherArrivalStage::AnkleAssessment &&
+                   kit.motion.anklePlaybackSeconds+.00001f>=ankleSeconds)
+                    return finalize(kit.grounded && !kit.walking);
+                advance();
+                continue;
+            }
             if(kit.motion.sitPlaybackSeconds+.00001f>=wanted) {
                 if(!gameSimulation.Snapshot().chapterDialogue.forestVillageConsumed)return finalize(false);
                 if(wanted<dialogue::kTavernSitDurationSeconds)return finalize(true);
