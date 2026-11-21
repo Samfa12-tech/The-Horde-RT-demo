@@ -313,6 +313,12 @@ variant. Displayed pacing and sustained phone performance remain open. The
 raw runs and both comparison receipts are retained locally under
 `bellwether-keeper-matched-20261122-032422`.
 
+### East route to the mill yard
+
+The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.
+
+The `bellwether-mill-yard` development checkpoint restores a completed tavern visit, walks to the yard, then steps back to frame the exterior. RayTracingPipeline and RayQueryCompute each presented the same 960 × 540 view on Windows. Android phone performance, the salvager encounter, the millrace crossing and the access quest remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

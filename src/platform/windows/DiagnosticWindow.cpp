@@ -1426,11 +1426,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         options.error="The private Bellwether ray witness requires one hidden automatic-detail checkpoint.";
 #endif
     const bool returnToKit = residentCheckpoint &&
-        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None || returnToKit);
     options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
-        residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::RegisterHandoff);
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RegisterHandoff);
     if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
         (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
          (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||

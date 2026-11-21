@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
@@ -30,7 +31,9 @@ enum class DevelopmentRewardPose : std::uint8_t
     MotionExtreme,
 };
 
-enum class BellwetherNorthView : std::uint8_t { None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction };
+enum class BellwetherBranchView : std::uint8_t {
+    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction, MillYard
+};
 
 struct DevelopmentCheckpoint
 {
@@ -77,7 +80,7 @@ struct DevelopmentCheckpoint
     std::size_t bellwetherStations = 0;
     std::uint32_t bellwetherSitTicks = 0;
     std::uint32_t bellwetherAnkleTicks = 0;
-    BellwetherNorthView bellwetherNorthView = BellwetherNorthView::None;
+    BellwetherBranchView bellwetherBranchView = BellwetherBranchView::None;
     BellwetherStaffedView bellwetherStaffedView = BellwetherStaffedView::None;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
@@ -92,7 +95,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 138u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 139u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -268,37 +271,42 @@ inline constexpr std::array<DevelopmentCheckpoint, 138u> kDevelopmentCheckpoints
      .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
      .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::Archive},
+     .bellwetherBranchView=BellwetherBranchView::Archive},
     {.id=332,.name="bellwether-wayside-archive-open",.baseShowcaseCheckpointId=11,
      .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
      .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::ArchiveOpen},
+     .bellwetherBranchView=BellwetherBranchView::ArchiveOpen},
     {.id=333,.name="bellwether-wayside-register-recovered",.baseShowcaseCheckpointId=11,
      .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
      .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::RegisterRecovered},
+     .bellwetherBranchView=BellwetherBranchView::RegisterRecovered},
     {.id=334,.name="bellwether-church-approach",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRecordKeeperMark.x,.cameraZ=traversal::kBellwetherRecordKeeperMark.z,
      .yaw=-1.57f,.pitch=-.24f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::Church},
+     .bellwetherBranchView=BellwetherBranchView::Church},
+    {.id=341,.name="bellwether-mill-yard",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherMillYardView.x,.cameraZ=traversal::kBellwetherMillYardView.z,
+     .yaw=1.57f,.pitch=-.21f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::MillYard},
     {.id=335,.name="bellwether-record-keeper-handoff",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z,
      .yaw=1.57079632679f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::RegisterHandoff},
+     .bellwetherBranchView=BellwetherBranchView::RegisterHandoff},
     {.id=340,.name="bellwether-record-keeper-listener",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z+.66f,
      .yaw=1.20f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::RegisterHandoff},
+     .bellwetherBranchView=BellwetherBranchView::RegisterHandoff},
     {.id=336,.name="bellwether-return-to-kit",.baseShowcaseCheckpointId=11,
      .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
      .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
-     .bellwetherNorthView=BellwetherNorthView::KitIntroduction},
+     .bellwetherBranchView=BellwetherBranchView::KitIntroduction},
     {.id=338,.name="bellwether-south-door",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].x,
      .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,

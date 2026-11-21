@@ -25,6 +25,7 @@
 #include "scene/assets/StaticTriangleSelection.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "scene/assets/AssetManifest.h"
@@ -1607,6 +1608,28 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     for(auto index=route.size()-1;index>0;) {
         --index;
         if(!walkTo(route[index])) {Check(false,"the player can return from the tavern to the same lookout");return;}
+        if(stayAtIncident && index==kBellwetherMillJunction) {
+            const auto& mill=kBellwetherMillApproach;
+            const auto before=game.LatestCampaignBoundary();
+            bool visited=walkTo(mill[1]) &&
+                walkTo(kBellwetherSalvagerMark) && game.Snapshot().playerGrounded &&
+                walkTo(mill[1]);
+            for(auto station=mill.begin()+2;visited && station!=mill.end();++station)
+                visited=walkTo(*station);
+            visited=visited && game.Snapshot().playerGrounded;
+            Check(visited,"the walk from the square reaches the mapped salvager mark and mill yard");
+            if(!visited)return;
+            bool returned=true;
+            for(auto station=mill.rbegin()+1;returned && station!=mill.rend();++station)
+                returned=walkTo(*station);
+            const auto after=game.LatestCampaignBoundary();
+            Check(returned && before && after && before->position.x==after->position.x &&
+                  before->position.z==after->position.z && before->dialogue.tavernConversationLinesResolved==
+                  after->dialogue.tavernConversationLinesResolved &&
+                  game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated,
+                  "walking back from B05 keeps Kit seated and the tavern return point earned");
+            if(!returned)return;
+        }
         if(stayAtIncident && index==kBellwetherChurchJunction) {
             const auto walkStations=[&](auto first,auto last) {
                 for(;first!=last;++first)if(!walkTo(*first))return false;
