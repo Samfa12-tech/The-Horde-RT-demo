@@ -25,6 +25,7 @@
 #include "scene/assets/StaticTriangleSelection.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "scene/assets/AssetManifest.h"
 
@@ -1184,6 +1185,11 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           "restoring at the lookout leaves Kit waiting for the player to take the road");
 
     const auto& route=gameplay::traversal::kBellwetherTavernRoute;
+    const auto [signX,signY,signZ]=gameplay::bellwether::kChurchWaymarker;
+    const auto signGround=terrain->Query(signX,signZ);
+    Check(signGround.found && std::abs(signGround.worldY-signY)<.01f &&
+          !terrain->NonWalkableVolumeClear(signX,signZ,signX,signZ,signY+.05f,signY+1.50f,.03f),
+          "the church waymarker is grounded and the rendered post has native contact");
     const auto approach=route[gameplay::traversal::kBellwetherSouthApproachStation];
     const auto ramp=terrain->Query(approach.x,approach.z);
     const auto clearance=gameplay::items::ComputeRewardLanternForwardClearance(
@@ -1472,8 +1478,33 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     }
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
-    for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
-        if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
+    using namespace gameplay::traversal;
+    for(auto index=route.size()-1;index>0;) {
+        --index;
+        if(!walkTo(route[index])) {Check(false,"the player can return from the tavern to the same lookout");return;}
+        if(stayAtIncident && index==kBellwetherChurchJunction) {
+            const auto walkStations=[&](auto first,auto last) {
+                for(;first!=last;++first)if(!walkTo(*first))return false;
+                return true;
+            };
+            const bool visited=walkStations(std::next(kBellwetherNorthApproach.begin()),kBellwetherNorthApproach.end()) &&
+                walkStations(kBellwetherChurchApproach.begin(),kBellwetherChurchApproach.end());
+            Check(visited && game.Snapshot().playerGrounded,
+                  "the completed tavern visit can reach the mapped exterior record keeper mark on foot");
+            if(!visited)return;
+            const bool shrineReached=walkTo(kBellwetherChurchApproach.front()) &&
+                walkTo(kBellwetherNorthApproach.back()) &&
+                walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end());
+            Check(shrineReached && game.Snapshot().playerGrounded,
+                  "the church junction gives continuous surface support to the wayside forecourt");
+            if(!shrineReached)return;
+            const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+                walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
+            Check(returned && game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+                  game.Snapshot().chapterDialogue.tavernConversationLinesResolved==kTavernConversation.size(),
+                  "returning from the wayside branch preserves seated Kit and the completed tavern exchange");
+            if(!returned)return;
+        }
     }
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&

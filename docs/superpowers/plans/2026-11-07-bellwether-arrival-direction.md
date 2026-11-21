@@ -136,6 +136,10 @@ Use [`tools/measure-chapter-shipping-route.ps1`](../../../tools/measure-chapter-
 
 On the RTX 5050 Laptop GPU, RayTracingPipeline and RayQueryCompute each completed both live trips in 5,232 simulation ticks. The runs covered 1,580 and 1,586 successfully presented frames respectively, all with valid GPU timing. After the first five seconds, room GPU p95 was 5.04 ms for Pipeline and 4.75 ms for Query. At the square it was 11.49 ms and 10.91 ms. Both used 34 TLAS definitions, 25 BLAS owners and 422,934,704 bytes of device-local RT allocations across the route. Kit, the window and the stand-in stayed live throughout. Three lights were uploaded in the room and two at the square. These are single hidden Debug runs. Production pacing, the final keeper and physical phone budgets still need their own evidence.
 
+The northwest approach now has a west-facing **CHURCH** arrow at the actual fork. The original post and chisel-stroke lettering are part of the editable Bellwether tavern source. The closed meshes add 364 triangles to the shared render and contact geometry and use the existing timber and char finishes. The wider timber inlay is clearer at the fork than the trial stone lettering in a matched Windows RT view. Both hardware RT backends presented it at 960 × 540 using the normal night and carried lantern.
+
+The native route test walks from the completed tavern visit to the mapped church-side service mark and then to the wayside forecourt. It retraces the path with Kit still seated and the exchange complete. The [north route](../../../src/gameplay/traversal/BellwetherNorthRoute.h) uses the existing map transform and terrain support. The confirmed endpoints are outdoors. The record keeper encounter and the shrine story beat are still open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

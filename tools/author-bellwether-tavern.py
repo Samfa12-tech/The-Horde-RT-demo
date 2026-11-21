@@ -67,7 +67,7 @@ terrain = BVHTree.FromPolygons(points, faces)
 def ground(x, z):
     hit, _, _, _ = terrain.ray_cast(Vector((x, -z, 100)), Vector((0, 0, -1)), 300)
     if hit is None:
-        raise RuntimeError(f"Missing B01 ground at {x}, {z}")
+        raise RuntimeError(f"Missing Bellwether ground at {x}, {z}")
     return hit.z
 
 
@@ -309,6 +309,53 @@ billet("B01_hearth_billet_back", 80.53, 110.04, .055, -.23, .49, .057)
 billet("B01_hearth_billet_cross", 80.54, 109.89, .12, 1.43, .50, .047)
 
 
+# West-facing waymarker in the wedge between the north path and tavern road.
+# From that approach the left-pointing board follows the church branch.
+sign_x, sign_z = 34.65, 82.10
+sign_y = ground(sign_x, sign_z)
+post_bottom = min(ground(sign_x + dx, sign_z + dz)
+                  for dx in (-.10, .10) for dz in (-.10, .10)) - .17
+box("B02_waymarker_post", sign_x - .10, sign_x + .10, sign_z - .10, sign_z + .10,
+    post_bottom, sign_y + 1.60, oak)
+sign_centre_y = sign_y + 1.37
+outline = [(-.77, 0), (-.51, -.20), (.73, -.20), (.73, .20), (-.51, .20)]
+edge_count = len(outline)
+mesh("B02_church_arrow_board",
+     [(sign_x + depth, sign_centre_y + height, sign_z + along)
+      for depth in (-.13, .03) for along, height in outline],
+     [tuple(range(edge_count)), tuple(reversed(range(edge_count, edge_count * 2)))] +
+     [((i + 1) % edge_count, i, i + edge_count, (i + 1) % edge_count + edge_count)
+      for i in range(edge_count)], solids, ember)
+
+# Original chisel strokes with a light timber inlay on the west face.
+# Each strip shares the board's real surface and RT lighting.
+strokes = {
+    "C": [((1, 1), (.26, 1), (0, .8), (0, .2), (.26, 0), (1, 0))],
+    "H": [((0, 0), (0, 1)), ((1, 0), (1, 1)), ((0, .5), (1, .5))],
+    "U": [((0, 1), (0, .22), (.25, 0), (.75, 0), (1, .22), (1, 1))],
+    "R": [((0, 0), (0, 1), (.79, 1), (1, .87), (1, .61), (.79, .5), (0, .5)),
+          ((.52, .5), (1, 0))],
+}
+letter_vertices, letter_faces = [], []
+for index, letter in enumerate("CHURCH"):
+    left = sign_z - .451 + index * .182
+    for path in strokes[letter]:
+        for start, end in zip(path, path[1:]):
+            a = Vector((left + start[0] * .135, sign_centre_y + (start[1] - .5) * .225))
+            b = Vector((left + end[0] * .135, sign_centre_y + (end[1] - .5) * .225))
+            tangent = (b - a).normalized() * .017
+            normal = Vector((-tangent.y, tangent.x))
+            face = (a - tangent - normal, b + tangent - normal, b + tangent + normal, a - tangent + normal)
+            first = len(letter_vertices)
+            front = sign_x - .132 - (first // 8) * .00003
+            letter_vertices.extend((x, y, z) for x in (front, sign_x - .128) for z, y in face)
+            letter_faces.extend((tuple(range(first, first + 4)), tuple(range(first + 7, first + 3, -1))))
+            for corner in range(4):
+                a_index, b_index = first + corner, first + (corner + 1) % 4
+                letter_faces.append((b_index, a_index, a_index + 4, b_index + 4))
+mesh("B02_church_arrow_letters", letter_vertices, letter_faces, solids, oak)
+
+
 def joined_copy(group, name):
     bpy.ops.object.select_all(action="DESELECT")
     copies = []
@@ -369,7 +416,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=5300, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=6250, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -398,6 +445,7 @@ receipt = dict(sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                                   chair_z - .296, chair_z + .296],
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
                tableCandleFlame=candle_flame, tableCandleLight=candle_light,
+               churchWaymarker=[sign_x,sign_y,sign_z],
                keeperRoute=[keeper_door, keeper_aisle, keeper_hearth],
                keeperDoorYaw=keeper_door_yaw, keeperHearthYaw=keeper_hearth_yaw)
 (OUTPUT / "authoring-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -408,6 +456,7 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("ChairApproach", approach_mark), ("ChairTurn", turn_mark),
                    ("TableTop", receipt["tableTop"]), ("Conversation", talk_mark),
                    ("TableCandleFlame", candle_flame), ("TableCandleLight", candle_light),
+                   ("ChurchWaymarker", receipt["churchWaymarker"]),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
