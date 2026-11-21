@@ -1203,9 +1203,124 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         state.playerAlive && state.developmentRescueJourney && ctx.rtScene.ChapterResidentSourceCount() ==
             horde::vulkan::raytracing::kBellwetherResidentCount;
     if (lookout) {
-        if (check(entered && state.rescue.exteriorSide && state.chapterDialogue.forestVillageConsumed &&
+        const bool atLookout = check(entered && state.rescue.exteriorSide && state.chapterDialogue.forestVillageConsumed &&
             state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::AtLookout,
-            "ordinary Lookout load prepares both Bellwether residents with its presented scene")) {
+            "ordinary Lookout load prepares both Bellwether residents with its presented scene");
+        if (gBellwetherEarnTavernValidation) {
+            using namespace horde::gameplay::dialogue;
+            using horde::gameplay::traversal::BellwetherStation;
+            using horde::gameplay::traversal::kBellwetherTavernRoute;
+            const auto catalogueReady = [&] {
+                return std::none_of(ctx.campaign->Catalogue().begin(), ctx.campaign->Catalogue().end(),
+                    [](const auto& entry) { return entry.status == campaign::CatalogueStatus::Checking; });
+            };
+            const auto atHearth = [&] {
+                return state.playerGrounded && state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated &&
+                    state.tavernKeeper && state.tavernKeeper->stage == TavernKeeperStage::AtHearth;
+            };
+            auto input = ctx.simulationInput;
+            input.damageEnabled = input.tutorialEnabled = false;
+            input.paused = false;
+            input.moveForward = input.moveStrafe = 0;
+            input.pitchRadians = -.15f;
+            unsigned ticks = 0, exchangeLines = 0;
+            const auto step = [&] {
+                if (std::chrono::steady_clock::now() >= deadline || !hidden() || ctx.simulationPaused ||
+                    ctx.campaignRetirementUnproved || ctx.campaignPhase == CampaignMenu::Phase::Failed)
+                    return false;
+                ctx.simulationInput = input;
+                ctx.inputPublicationSequence = std::max(ctx.inputPublicationSequence, state.inputPublicationSequence) + 1;
+                ctx.simulation.StepFixed(input, 1.f / 60.f, ctx.inputPublicationSequence);
+                if (exchangeLines < kTavernConversation.size() &&
+                    state.chapterDialogue.line == kTavernConversation[exchangeLines])
+                    ++exchangeLines;
+                PumpCampaign(ctx);
+                return state.playerAlive && (++ticks % 60 != 0 || frame());
+            };
+            const auto walkTo = [&](BellwetherStation target) {
+                input.runHeld = true;
+                for (unsigned tick = 0; tick < 1200; ++tick) {
+                    const float dx = target.x - state.playerX, dz = target.z - state.playerZ;
+                    const float distance = std::hypot(dx, dz);
+                    if (distance < .135f) {
+                        input.moveForward = 0;
+                        input.runHeld = false;
+                        return frame();
+                    }
+                    input.yawRadians = std::atan2(dx, -dz);
+                    input.moveForward = std::min(distance / .20f, 1.f);
+                    if (!step()) break;
+                }
+                std::cerr << "Bellwether walk stopped at " << state.playerX << ',' << state.playerZ
+                          << " en route to " << target.x << ',' << target.z << '\n';
+                return false;
+            };
+            const auto waitFor = [&](auto ready, unsigned maxTicks) {
+                for (unsigned tick = 0; tick < maxTicks && !ready(); ++tick)
+                    if (!step()) return false;
+                return ready();
+            };
+            const auto target = campaign::kBellwetherCheckpointPosition;
+            bool progressed = atLookout && step() &&
+                std::all_of(kBellwetherTavernRoute.begin(), kBellwetherTavernRoute.end(), walkTo) &&
+                walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, 5400);
+            progressed = check(progressed && atHearth() && frame(),
+                "fixed-step movement from the loaded lookout reaches the staffed hearth through the south door");
+            if (progressed) {
+                input.commands.interact = state.lastConsumedInteractSequence + 1;
+                const auto conversationComplete = [&] {
+                    return state.chapterDialogue.tavernConversationLinesResolved == kTavernConversation.size() &&
+                        state.chapterDialogue.line == Line::None;
+                };
+                const auto savedTavern = [&] {
+                    const auto& boundary = ctx.simulation.LatestCampaignBoundary();
+                    return boundary && boundary->id == campaign::CheckpointId::BellwetherTavern &&
+                        boundary->dialogue.tavernConversationLinesResolved == kTavernConversation.size();
+                };
+                progressed = check(step() && waitFor(conversationComplete, 1800) &&
+                    exchangeLines == kTavernConversation.size() && savedTavern(),
+                    "one Talk input earns a tavern boundary carrying the complete three-line exchange");
+            }
+            campaign::storage::StoredCheckpoint stored;
+            if (progressed) {
+                progressed = check(until([&] {
+                    return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", stored).status ==
+                        campaign::storage::Status::Read && stored.checkpoint.id == campaign::CheckpointId::BellwetherTavern &&
+                        stored.checkpoint.dialogue.tavernConversationLinesResolved == kTavernConversation.size() &&
+                        ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                }, false) && stored.checkpoint.vitality == gHiddenLookout.source.checkpoint.vitality &&
+                    !gHiddenCampaignFaults.rejectedWrites,
+                    "ordinary autosave persists the earned tavern and conserves loaded vitality");
+            }
+            if (progressed) {
+                const auto generation = state.worldRoute.generation;
+                const auto operation = ctx.campaign->State().operationRevision;
+                ShowPauseMenu(ctx, true);
+                const bool reloaded = click(kCampaignLoadButtonId) && until(catalogueReady, false) &&
+                    click(CampaignMenu::FirstChoiceId) && until([&] {
+                        const auto play = ctx.campaign->State();
+                        return play.operationRevision > operation && play.operation == campaign::PlayOperation::Load &&
+                            play.outcome == campaign::PlayOutcome::Succeeded &&
+                            ctx.campaignBarrier.State().phase == CampaignLoadBarrier::Phase::Complete;
+                    }, true);
+                // The current native chooser continues immediately after the
+                // matching presentation. Start from its rebased neutral input.
+                input = ctx.simulationInput;
+                input.paused = false;
+                progressed = check(reloaded && state.worldRoute.generation > generation &&
+                    ctx.campaign->State().activeSlot == 0 && !ctx.campaignMenu->Visible() &&
+                    !ctx.campaignPause && !ctx.simulationPaused && step() && atHearth() &&
+                    state.chapterDialogue.line == Line::None && !state.tavernConversationAvailable &&
+                    state.tavernDirectionsAvailable && exchangeLines == kTavernConversation.size() &&
+                    frame(), "native Load presents and resumes the earned tavern with completed Talk");
+                if (progressed) {
+                    campaign::storage::StoredCheckpoint resumed;
+                    check(campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
+                        campaign::storage::Status::Read && resumed.encoded == stored.encoded,
+                        "resuming the tavern preserves the earned autosave bytes");
+                }
+            }
+        } else if (atLookout) {
             SendMessageA(ctx.windowHandle, WM_COMMAND, MAKEWPARAM(kMenuPauseId,0), 0);
             std::vector<double> timings;
             check(click(kLookoutObjectiveButtonId) && click(LookoutPanel::MenuId) &&
@@ -1213,10 +1328,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 ctx.rtScene.Profile() == RtSceneProfile::EntryMenu && ctx.rtScene.ChapterResidentSourceCount() == 0,
                 "title replacement drops chapter resident resources");
         }
-        campaign::storage::StoredCheckpoint current;
-        check(campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",current).status ==
-            campaign::storage::Status::Read && current.encoded == gHiddenLookout.source.encoded &&
-            !gHiddenCampaignFaults.rejectedWrites, "source lookout autosave bytes preserved");
+        if (!gBellwetherEarnTavernValidation) {
+            campaign::storage::StoredCheckpoint current;
+            check(campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",current).status ==
+                campaign::storage::Status::Read && current.encoded == gHiddenLookout.source.encoded &&
+                !gHiddenCampaignFaults.rejectedWrites, "source lookout autosave bytes preserved");
+        }
     } else {
         check(entered && !state.rescue.exteriorSide && state.playerVitals.vitality == 3,
             "New Game presents with the same Bellwether resident resource admission");
@@ -1237,7 +1354,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
 bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
-    bool requested=false,lookoutRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
+    bool requested=false,lookoutRequested=false,earnTavernRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -1245,6 +1362,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--benchmark-menu-detached-cancel")detachedCancelRequested=true;
         if(arg==L"--benchmark-menu-detached-close")detachedCloseRequested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
+        if(arg==L"--bellwether-earn-tavern")earnTavernRequested=true;
         if(arg==L"--route-validate-hidden")routeRequested=true;
         if(arg==L"--route-kit-turn-start")routeTurnStartRequested=true;
         if(arg==L"--route-natural-walk")routeNaturalWalkRequested=true;
@@ -1259,6 +1377,10 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
+    if (earnTavernRequested && (!lookoutRequested || inspectKit)) {
+        std::cerr << "Earning a tavern save requires the isolated hidden lookout fixture without actor inspection.\n";
+        return false;
+    }
     if((routeTurnStartRequested || routeNaturalWalkRequested) && !routeRequested) {
         std::cerr<<"Kit turn/start opt-in requires the isolated hidden route validator.\n";return false;
     }
@@ -1299,6 +1421,8 @@ bool ConfigureHiddenCampaignValidation()
     if(lookoutRequested && !PrepareHiddenLookoutFixture(absolute)){
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }
+    gBellwetherEarnTavernValidation = earnTavernRequested;
+    if (earnTavernRequested) gHiddenCampaignFaults.lookoutReadOnly = false;
     gRouteReturnRecovery=returnRequested;
     if((routeRequested || returnRequested) && !PrepareHiddenRouteFixture(absolute)){
         std::cerr<<"Hidden route validation requires the unchanged exported single LowerClaimed manual record and canonical manifest only.\n";return false;

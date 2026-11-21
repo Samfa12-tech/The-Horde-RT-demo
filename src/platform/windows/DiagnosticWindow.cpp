@@ -218,6 +218,7 @@ bool gShowcaseCaptureHidden=false;
 #if defined(_DEBUG)
 std::filesystem::path gBellwetherVoiceDirectory;
 std::filesystem::path gBellwetherCampaignActors;
+bool gBellwetherEarnTavernValidation = false;
 #endif
 
 horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
@@ -13891,6 +13892,10 @@ int RunDiagnosticWindow(const int showCommand)
     }
     if (!ConfigureBellwetherCampaignActors(launchOptions.bellwetherCampaignDirectory)) {
         std::cerr << "Bellwether campaign directory failed the pinned resident identity check.\n";
+        return 2;
+    }
+    if (gBellwetherEarnTavernValidation && gBellwetherCampaignActors.empty()) {
+        std::cerr << "The hidden tavern save check requires private Bellwether campaign residents.\n";
         return 2;
     }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
