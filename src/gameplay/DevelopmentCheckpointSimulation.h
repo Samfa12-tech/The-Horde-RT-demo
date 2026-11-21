@@ -213,8 +213,18 @@ inline bool StageDevelopmentCheckpointSimulation(
         const float wanted=std::min(checkpoint.bellwetherSitTicks/60.f,dialogue::kTavernSitDurationSeconds);
         for(unsigned tick=0;tick<5400;++tick) {
             const auto& kit=gameSimulation.Snapshot().chapterCompanion;
-            if(kit.motion.sitPlaybackSeconds+.00001f>=wanted)
-                return finalize(gameSimulation.Snapshot().chapterDialogue.forestVillageConsumed);
+            if(kit.motion.sitPlaybackSeconds+.00001f>=wanted) {
+                if(!gameSimulation.Snapshot().chapterDialogue.forestVillageConsumed)return finalize(false);
+                if(wanted<dialogue::kTavernSitDurationSeconds)return finalize(true);
+                const auto earned=gameSimulation.LatestCampaignBoundary();
+                if(!earned || earned->id!=campaign::CheckpointId::BellwetherTavern)return finalize(false);
+                const auto reload=gameSimulation.BeginCampaignRestore(*earned);
+                if(!reload || !gameSimulation.CommitCampaignRestore(*reload,{reload->worldGeneration,earned->zone},
+                        chapterTerrain,input,gameSimulation.Snapshot().inputPublicationSequence))return finalize(false);
+                advance();
+                return finalize(gameSimulation.Snapshot().chapterCompanion.bellwetherArrival==
+                    dialogue::BellwetherArrivalStage::Seated);
+            }
             advance();
         }
         return finalize(false);

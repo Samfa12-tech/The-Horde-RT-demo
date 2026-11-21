@@ -16,7 +16,7 @@ inline bool LookoutObjectiveAvailable(const simulation::SimulationSnapshot& s,
     // The turnaround includes the visible timber stop beyond its centre.
     const bool onApproach=std::hypot(s.playerX-(p.x+dx*t),s.playerZ-(p.z+dz*t))<=2.f ||
         std::hypot(s.playerX-end.x,s.playerZ-end.z)<=3.8f;
-    return boundary && boundary->contentRevision==2 && Validate(*boundary) &&
+    return boundary && boundary->contentRevision==kForestContentRevision && Validate(*boundary) &&
         s.developmentRescueJourney && s.playerAlive && s.playerGrounded &&
         s.rescue.exteriorSide && s.rescue.firstAscentCompleted && !s.rescue.equipmentStowed &&
         s.worldRoute.readiness[static_cast<std::size_t>(simulation::WorldZoneId::Lookout)]==simulation::ZoneReadiness::Ready &&

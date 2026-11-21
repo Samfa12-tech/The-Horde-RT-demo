@@ -8673,6 +8673,12 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                     << ", exterior=" << state.rescue.exteriorSide << ", worldGeneration="
                     << state.worldRoute.generation << ", terrain=" << bool(context.rtScene.ChapterTerrainSurface());
                 for(const auto ready:state.worldRoute.readiness)trace << ',' << static_cast<unsigned>(ready);
+                if(development && development->bellwetherSitTicks!=0) {
+                    const auto boundary=context.simulation.LatestCampaignBoundary();
+                    trace << "; currentZone=" << static_cast<unsigned>(state.worldRoute.current)
+                          << ", KitArrival=" << static_cast<unsigned>(state.chapterCompanion.bellwetherArrival)
+                          << ", boundary=" << (boundary?static_cast<unsigned>(boundary->id):0u);
+                }
                 return fail(trace.str());
             }
             context.simulation.ResetTiming();

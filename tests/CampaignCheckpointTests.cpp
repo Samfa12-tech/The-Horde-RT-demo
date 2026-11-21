@@ -766,7 +766,7 @@ int main(int argc,char** argv) {
             Check(SameSession(original,sim.Snapshot()),"rejected forest record preserves live gameplay");
         };
         auto bad=c;bad.contentRevision=1;reject(bad);
-        bad=c;bad.contentRevision=3;reject(bad);
+        bad=c;bad.contentRevision=4;reject(bad);
         bad=c;bad.zone=WorldZoneId::TombExterior;reject(bad);
         bad=c;bad.firstAscentCompleted=false;reject(bad);
         bad=c;bad.dialogue.proofAccepted=false;reject(bad);

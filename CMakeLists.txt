@@ -317,6 +317,7 @@ set(ENV{HORDE_RT_EARNED_JOURNEY_RUN} "${_horde_earned_run}")
 ]=])
     set_property(DIRECTORY APPEND PROPERTY TEST_INCLUDE_FILES "${CMAKE_CURRENT_BINARY_DIR}/PlaySessionFixture.cmake")
     add_executable(horde_rt_campaign_session_tests tests/CampaignSessionTests.cpp
+        src/scene/BellwetherShell.cpp
         src/scene/assets/AssetManifest.cpp src/scene/assets/AssetValidation.cpp
         src/scene/assets/GltfDocument.cpp src/scene/assets/StaticMeshAsset.cpp)
     target_link_libraries(horde_rt_campaign_session_tests PRIVATE horde_campaign_session)

@@ -1270,15 +1270,18 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(injuryEntries==1 && injuryOnRoad && maximumKitStep<.032f && seated.grounded &&
           seated.bellwetherArrival==Stage::Seated && seated.x==kChairSitRoot[0] && seated.z==kChairSitRoot[2],
           "from the earned lookout Kit crosses the real road once, assesses at the mapped mark, and settles without a teleport or player tether");
+    Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
+          game.LatestCampaignBoundary()->contentRevision==cp::kBellwetherContentRevision,
+          "standing near the hearth after Kit sits earns the canonical tavern boundary");
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
         if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
     }
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
-          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint &&
+          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1,
-          "return keeps the earned lookout checkpoint, completed dialogue and seated Kit in the same session");
+          "return keeps the earned tavern checkpoint, completed dialogue and seated Kit in the same session");
 }
 
 void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {

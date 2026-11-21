@@ -1,7 +1,9 @@
 #include "gameplay/campaign/CampaignSession.h"
 #include "gameplay/simulation/InputMailbox.h"
 #include "scene/ChapterTerrainSurface.h"
+#include "scene/BellwetherShell.h"
 #include "scene/assets/AssetManifest.h"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -50,6 +52,86 @@ io::StoredCheckpoint Read(const fs::path& root,unsigned slot,cp::SaveKind kind){
     Check(io::Read(root,cp::SaveBasename(*cp::SaveTarget(slot,kind)),record).status==io::Status::Read,"real slot file reads");return record;}
 std::vector<std::byte> Raw(const fs::path& path){std::ifstream f(path,std::ios::binary);
     std::vector<std::byte> bytes;char c;while(f.get(c))bytes.push_back(std::byte(static_cast<unsigned char>(c)));return bytes;}
+
+void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurface>& base,
+                          horde::scene::assets::StaticMeshAsset world) {
+    using namespace horde::gameplay::dialogue;
+    for(const auto* name:{"MedievalWall02","TombEarthenware","TombCharredWick"}) {
+        if(std::none_of(world.materials.begin(),world.materials.end(),[&](const auto& material){return material.name==name;})) {
+            horde::scene::assets::StaticMaterial material;material.name=name;world.materials.push_back(material);
+        }
+    }
+    auto terrain=base;
+    std::string diagnostic;
+    const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets";
+    const bool admitted=horde::scene::AppendBellwetherShell(assets,world,terrain,diagnostic);
+    Check(admitted,"tavern restore uses the real imported chair and floor");
+    if(!admitted)return;
+    auto record=ForestRecord(*terrain);
+    record.id=cp::CheckpointId::BellwetherTavern;record.contentRevision=cp::kBellwetherContentRevision;
+    record.zone=cp::Destination(record.id);
+    record.position=cp::kBellwetherCheckpointPosition;record.yaw=-1.40f;record.pitch=-.22f;
+    record.vitality=2;record.swordStowed=true;
+    Directory directory;
+    {
+        sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+        cp::Session session(game,directory.path);
+        const bool saved=Seed(game,record,terrain) && session.SelectSlot(0) &&
+            session.Save(cp::SaveKind::Autosave,record.id) && Finish(session) && session.State().phase==cp::SessionPhase::Idle;
+        Check(saved,"the ordinary autosave worker writes the admitted tavern checkpoint");
+        if(!saved)return;
+    }
+    const auto stored=Read(directory.path,0,cp::SaveKind::Autosave);
+    Check(stored.checkpoint.id==record.id && stored.checkpoint.schema==record.schema &&
+          stored.checkpoint.contentRevision==record.contentRevision,
+          "disk records the new boundary and keeps its original save schema");
+    sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());
+    cp::Session session(fresh,directory.path);
+    sim::InputSnapshot input;
+    if(!session.SelectSlot(0) || !session.Load(cp::SaveKind::Autosave) || !Finish(session)) {
+        Check(false,"fresh session reads the tavern file");return;
+    }
+    const auto plan=session.PrepareLoad();
+    Check(plan && !session.CommitLoad(*plan,plan->destination,base,input,0) && !fresh.LatestCampaignBoundary(),
+          "bare terrain cannot admit a tavern reload or mutate the old game");
+    using Terrain=sim::TriangleSupportSurface;
+    const float floor=record.position.y;
+    const Terrain::Point nw{80.f,floor,106.f},sw{80.f,floor,111.f},ne{88.f,floor,106.f},se{88.f,floor,111.f};
+    const std::array floorOnly{Terrain::Triangle{{nw,sw,ne},sim::SupportSurface::Stone},
+                               Terrain::Triangle{{sw,se,ne},sim::SupportSurface::Stone}};
+    const auto withoutChair=Terrain::WithAdditionalGroundGeometry(*base,floorOnly,diagnostic);
+    Check(plan && withoutChair && std::abs(withoutChair->Query(record.position.x,record.position.z).worldY-floor)<.001f &&
+          !session.CommitLoad(*plan,plan->destination,withoutChair,input,0) && !fresh.LatestCampaignBoundary(),
+          "a valid room floor still cannot restore Kit without his chair");
+    if(!plan || !session.CommitLoad(*plan,plan->destination,terrain,input,0)) {
+        Check(false,"loaded tavern commits through ordinary readiness and input rebasing");return;
+    }
+    const auto seated=[&] {
+        const auto& kit=fresh.Snapshot().chapterCompanion;
+        return kit.bellwetherArrival==BellwetherArrivalStage::Seated && kit.grounded &&
+            kit.motion.mode==CompanionMotionMode::Seated && kit.motion.sitPlaybackSeconds==kTavernSitDurationSeconds;
+    };
+    Check(seated() && fresh.Snapshot().playerX==record.position.x && fresh.Snapshot().playerZ==record.position.z &&
+          fresh.Snapshot().chapterDialogue.forestVillageConsumed,
+          "fresh game restores the tavern position, settled Kit and completed lookout");
+    for(unsigned tick=0;tick<120;++tick)fresh.StepFixed(input,1.f/60.f,tick+1);
+    Check(seated() && fresh.Snapshot().worldRoute.current==record.zone &&
+          fresh.CaptureAuthoredCampaignBoundary(record.id).has_value() &&
+          fresh.Snapshot().chapterDialogue.line==Line::None && stored.encoded==
+          Read(directory.path,0,cp::SaveKind::Autosave).encoded,
+          "load and subsequent fixed steps neither replay nor rewrite the saved milestone");
+    auto returned=record;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
+    returned.position=horde::gameplay::traversal::kExteriorLanding;
+    Check(Seed(fresh,returned,terrain) && seated(),"a later safe-side save keeps Kit settled back at the tavern");
+    auto lookout=ForestRecord(*terrain);lookout.contentRevision=cp::kBellwetherContentRevision;
+    Check(Seed(fresh,lookout,terrain) && seated(),"returning to the old lookout anchor keeps the earned tavern state");
+    const auto atLookout=fresh.CaptureCampaignCheckpoint(cp::CheckpointId::ForestEndpoint);
+    Check(atLookout && atLookout->contentRevision==cp::kBellwetherContentRevision,
+          "the lookout safe boundary remains available after Kit moves to town");
+    Check(Seed(fresh,ForestRecord(*terrain),terrain) &&
+          fresh.Snapshot().chapterCompanion.bellwetherArrival==BellwetherArrivalStage::AtLookout,
+          "loading a genuine old lookout record still starts before the town journey");
+}
 }
 int main(){
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
@@ -58,6 +140,7 @@ int main(){
        !horde::scene::assets::StaticMeshAsset::Load(assets/"chapter-terrain-lod0.runtime.glb",manifest,mesh,error)){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
+    CheckTavernRoundTrip(terrain,mesh);
     Directory directory;
     auto config=sim::ProductionGameSimulationConfig();config.movementSpeedMetresPerSecond=1.4f;
     sim::GameSimulation game(config);sim::InputSnapshot controls;sim::InputMailbox mailbox;

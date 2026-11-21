@@ -85,18 +85,18 @@ public:
     // Explicit diagnostic seed for the arrival handoff. The placement is
     // validated against the same scene as travel, before fixed-step playback.
     bool PlaceForTavernSitInspection(const simulation::TriangleSupportSurface& terrain) {
-        using namespace bellwether;
-        const auto [x,y,z]=kChairSitRoot;
-        constexpr float radius=.24f;
-        const auto support=traversal::ChapterExteriorStepSupport(terrain,x,z,radius);
-        if(!support.grounded || std::abs(support.worldY-y)>.001f ||
-           !traversal::ResolveChapterStepMovement(terrain,x,z,x,z,support.worldY,radius).accepted ||
-           terrain.NonWalkableVolumeClear(kChairSeat[0],kChairSeat[2],kChairSeat[0],kChairSeat[2],
-               kChairSeat[1]-.001f,kChairSeat[1]+.001f,.025f))return false;
-        Reset();
-        state_.x=x;state_.y=support.worldY;state_.z=z;
-        state_.yaw=kChairFacingRadians;state_.grounded=true;
-        return BeginTavernSit();
+        return BindTavernChair(terrain) && BeginTavernSit();
+    }
+    bool RestoreCampaignTavernSeat(const simulation::TriangleSupportSurface& terrain,std::uint64_t generationFloor) {
+        if(generationFloor==UINT64_MAX || !BindTavernChair(terrain))return false;
+        state_.generation=generationFloor+1;
+        state_.waypoint=simulation::kWorldRoutePoints.size();
+        state_.wait=CompanionWait::Tavern;
+        state_.motion.mode=CompanionMotionMode::Seated;
+        state_.motion.sitPlaybackSeconds=kTavernSitDurationSeconds;
+        state_.bellwetherArrival=BellwetherArrivalStage::Seated;
+        state_.bellwetherStation=kKitBellwetherRoute.size();
+        return true;
     }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false,bool active=true,
@@ -178,6 +178,20 @@ public:
         return true;
     }
 private:
+    bool BindTavernChair(const simulation::TriangleSupportSurface& terrain) {
+        using namespace bellwether;
+        const auto [x,y,z]=kChairSitRoot;
+        constexpr float radius=.24f;
+        const auto support=traversal::ChapterExteriorStepSupport(terrain,x,z,radius);
+        if(!support.grounded || std::abs(support.worldY-y)>.001f ||
+           !traversal::ResolveChapterStepMovement(terrain,x,z,x,z,support.worldY,radius).accepted ||
+           terrain.NonWalkableVolumeClear(kChairSeat[0],kChairSeat[2],kChairSeat[0],kChairSeat[2],
+               kChairSeat[1]-.001f,kChairSeat[1]+.001f,.025f))return false;
+        Reset();
+        state_.x=x;state_.y=support.worldY;state_.z=z;
+        state_.yaw=kChairFacingRadians;state_.grounded=true;
+        return true;
+    }
     bool TavernSitActive() const {
         return state_.motion.mode==CompanionMotionMode::Sitting || state_.motion.mode==CompanionMotionMode::Seated;
     }

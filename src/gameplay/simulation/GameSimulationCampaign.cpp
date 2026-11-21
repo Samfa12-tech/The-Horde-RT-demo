@@ -14,7 +14,7 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
         return IsShowcasePlayerPositionWalkable(c.position.x,c.position.z) &&
             scene::TombDressingMovementClear(c.position.x,c.position.z,c.position.x,c.position.z);
     const auto support=traversal::ChapterExteriorSupport(&terrain,c.position.x,c.position.z);
-    if(c.id==campaign::CheckpointId::ForestEndpoint &&
+    if((c.id==campaign::CheckpointId::ForestEndpoint || c.id==campaign::CheckpointId::BellwetherTavern) &&
        (!terrain.HorizontalBodyVolumeClear(c.position.x,c.position.z,c.position.x,c.position.z,
             c.position.y,kStandingBodyHeight,kPlayerCollisionRadius) ||
         !traversal::ChapterExteriorObstacleClear(terrain,c.position.x,c.position.z,c.position.x,c.position.z,
@@ -58,7 +58,8 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
         pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
     const bool forest=id==campaign::CheckpointId::ForestEndpoint;
-    const bool upper=id==campaign::CheckpointId::SafeExit || forest;
+    const bool tavern=id==campaign::CheckpointId::BellwetherTavern;
+    const bool upper=id==campaign::CheckpointId::SafeExit || forest || tavern;
     if (!config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
         !config_.developmentRescueJourney || !config_.authoredChapterTerrain || legacyCombatCheckpoint_ ||
         !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
@@ -85,22 +86,35 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     const auto zone=campaign::Destination(id);
     if(worldRoute_.readiness[static_cast<std::size_t>(zone)]!=ZoneReadiness::Ready) return std::nullopt;
     const auto progress=chapterDialogue_.ExportProgress();
-    if(forest && !campaign::CompletedForestProgress(progress))return std::nullopt;
+    if((forest || tavern) && !campaign::CompletedForestProgress(progress))return std::nullopt;
+    const auto& kit=chapterCompanion_.State();
+    const auto tavernAnchor=campaign::kBellwetherCheckpointPosition;
+    if(tavern && (worldRoute_.current!=zone || !kit.grounded || kit.walking ||
+       kit.bellwetherArrival!=dialogue::BellwetherArrivalStage::Seated ||
+       kit.motion.mode!=dialogue::CompanionMotionMode::Seated ||
+       std::hypot(s.playerX-tavernAnchor.x,s.playerZ-tavernAnchor.z)>1.75f ||
+       std::abs(s.playerSupportWorldY-tavernAnchor.y)>.001f))return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
+    const auto retainedRevision=campaignBoundary_?campaignBoundary_->contentRevision:1u;
     if(forest) {
-        const auto& kit=chapterCompanion_.State();
+        const bool kitAtLookout=kit.grounded && !kit.walking && kit.waypoint==kWorldRoutePoints.size() &&
+           std::hypot(kit.x-(endpoint.x+1.0f),kit.z-endpoint.z)<=.07f;
+        // The already-earned basin still works after Kit has left the lookout.
+        const bool kitDeparted=retainedRevision>=campaign::kForestContentRevision &&
+            kit.bellwetherArrival!=dialogue::BellwetherArrivalStage::AtLookout;
         if(worldRoute_.current!=WorldZoneId::Lookout ||
            std::hypot(s.playerX-endpoint.x,s.playerZ-endpoint.z)>2.0f ||
-           !kit.grounded || kit.walking || kit.waypoint!=kWorldRoutePoints.size() ||
-           std::hypot(kit.x-(endpoint.x+1.0f),kit.z-endpoint.z)>.07f)return std::nullopt;
-        dialogue::CompanionRouteFixture restoredKit;
-        restoredKit.RestoreCampaignLookout(endpoint.x,endpoint.z,chapterTerrain_.get(),0);
-        if(!restoredKit.State().grounded)return std::nullopt;
+           (!kitAtLookout && !kitDeparted))return std::nullopt;
+        if(retainedRevision<campaign::kBellwetherContentRevision) {
+            dialogue::CompanionRouteFixture restoredKit;
+            restoredKit.RestoreCampaignLookout(endpoint.x,endpoint.z,chapterTerrain_.get(),0);
+            if(!restoredKit.State().grounded)return std::nullopt;
+        }
     }
     campaign::Checkpoint c;
-    // Speech flags alone can finish before Kit reaches the lookout. Only the
-    // admitted endpoint (or its retained later safe side) establishes content 2.
-    c.contentRevision=forest || (campaignBoundary_ && campaignBoundary_->contentRevision==2)?2u:1u;
+    // Later safe-side saves carry the last earned chapter milestone with them.
+    c.contentRevision=tavern ? campaign::kBellwetherContentRevision :
+        forest ? std::max(retainedRevision,campaign::kForestContentRevision) : retainedRevision;
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
     c.halfHeart=s.playerVitals.halfHeart;c.schema=c.halfHeart?2u:1u;
@@ -112,6 +126,9 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
             const auto support=traversal::ChapterExteriorSupport(chapterTerrain_.get(),endpoint.x,endpoint.z);
             if(!support.grounded)return std::nullopt;
             c.position={endpoint.x,support.worldY,endpoint.z};c.yaw=2.51f;c.pitch=-.15f;
+        }
+        if(tavern) {
+            c.position=tavernAnchor;c.yaw=-1.40f;c.pitch=-.22f;
         }
         // Respawn standing at the authored anchor must itself be safe. Live
         // pose/velocity is discarded; geometry/readiness and durable facts are
@@ -152,6 +169,18 @@ void GameSimulation::LatchCampaignBoundary() {
     // The last earned exterior boundary survives exploration away from its
     // arrival radius. A completed return descent may still earn the lower side.
     if(snapshot_.rescue.exteriorSide) {
+        const auto tavern=campaign::CheckpointId::BellwetherTavern;
+        const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
+        if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
+            if(!atTavernBoundary || config_.healingFlask1_7) {
+                const auto arrived=CaptureAuthoredCampaignBoundary(tavern);
+                if(arrived && (!campaignBoundary_ || !SameBoundary(*arrived,*campaignBoundary_))) {
+                    campaignBoundary_=*arrived;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
+            if(atTavernBoundary)return;
+        }
         if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint) {
             // Preserve endpoint ownership away from it, but an eligible Rest or
             // resource change at that earned anchor must refresh logical state.
@@ -206,8 +235,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
         return false;
     const auto c=pendingCampaignRestore_->checkpoint;
     if(!campaign::Validate(c) || (campaign::HasFlaskResources(c) && !config_.healingFlask1_7) || !SafeSupport(c,*terrain)) return false;
-    const bool completedForest=c.contentRevision==2;
-    const bool upper=c.id==campaign::CheckpointId::SafeExit || c.id==campaign::CheckpointId::ForestEndpoint;
+    const bool completedForest=c.contentRevision>=campaign::kForestContentRevision;
+    const bool upper=c.id!=campaign::CheckpointId::LowerClaimed;
     auto config=config_;
     config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
     config.developmentWorldRoute=false;config.developmentSupportFixture=false;
@@ -272,7 +301,9 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     // Saved equipment belongs to this session. A later New Game/reset keeps
     // the caller's configured opening equipment policy.
     next.config_.swordStartsStowed=config_.swordStartsStowed;
-    if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
+    if(c.contentRevision==campaign::kBellwetherContentRevision) {
+        if(!next.chapterCompanion_.RestoreCampaignTavernSeat(*next.chapterTerrain_,chapterCompanion_.State().generation))return false;
+    } else if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     else if(upper && config_.healingFlask1_7 &&
             (c.dialogue.activeLine==dialogue::Line::FlaskEmpty ||

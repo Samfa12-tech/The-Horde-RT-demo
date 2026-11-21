@@ -87,6 +87,13 @@ int main() {
             "forest checkpoint is an independently named loadable autosave");
         Click(parent,4112);Check(commands.size()==1 && commands.back().action==Menu::Action::Load &&
             commands.back().slot==2 && commands.back().kind==cp::SaveKind::Autosave,"forest choice retains exact slot and record kind");
+        auto tavern=forest;tavern.checkpoint->id=cp::CheckpointId::BellwetherTavern;
+        tavern.checkpoint->contentRevision=cp::kBellwetherContentRevision;
+        tavern.checkpoint->zone=cp::Destination(tavern.checkpoint->id);
+        tavern.checkpoint->position=cp::kBellwetherCheckpointPosition;
+        view.catalogue[5]=tavern;++view.catalogueRevision;menu.Refresh(view);
+        Check(Enabled(parent,4112) && Text(parent,4112).find("Bellwether tavern | 2 / 3 hearts")!=std::string::npos,
+            "the seated milestone appears as a distinct loadable tavern checkpoint");
         commands.clear();menu.Open(Menu::Page::Save,Menu::Origin::Pause);
         view.catalogue[1].status=cp::CatalogueStatus::Empty;++view.catalogueRevision;menu.Refresh(view);
         Check(!Enabled(parent,4111) && Enabled(parent,4112),"manual invalid slot blocked; independent empty manual allowed");

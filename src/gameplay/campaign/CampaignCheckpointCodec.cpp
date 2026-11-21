@@ -49,7 +49,7 @@ private:
 };
 Error VersionError(const Checkpoint& c) {
     if(c.schema!=1 && c.schema!=2 && c.schema!=3 && c.schema!=4 && c.schema!=5) return Error::UnsupportedSchema;
-    if(c.contentRevision!=1 && c.contentRevision!=2) return Error::UnsupportedContent;
+    if(c.contentRevision<1 || c.contentRevision>kBellwetherContentRevision) return Error::UnsupportedContent;
     return Error::None;
 }
 }

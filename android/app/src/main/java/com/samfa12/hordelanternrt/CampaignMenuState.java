@@ -34,7 +34,7 @@ final class CampaignMenuState {
         if(v[0]==2)for(int i=34;i<40;i++)if(v[i]<0 || v[i]>253402300799L)return null;
         for(int i=0;i<6;i++) {
             int p=12+3*i;
-            if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>3 || v[p+2]<0 || v[p+2]>3) return null;
+            if(v[p]<UNKNOWN || v[p]>READ_ERROR || v[p+1]<0 || v[p+1]>4 || v[p+2]<0 || v[p+2]>3) return null;
             if(v[p]==VALID && (v[p+1]<1 || v[p+2]<1)) return null;
         }
         float yaw=Float.intBitsToFloat((int)v[9]), pitch=Float.intBitsToFloat((int)v[10]);
@@ -69,6 +69,15 @@ final class CampaignMenuState {
         format.setTimeZone(zone);
         return format.format(new java.util.Date(seconds*1000L));
     }
+    private static String checkpointName(int id) {
+        switch(id) {
+            case 1:return "Lower chamber";
+            case 2:return "Safe exit";
+            case 3:return "Forest lookout";
+            case 4:return "Bellwether tavern";
+            default:return "Save unavailable";
+        }
+    }
     String slotDescription(int slot) {
         int kind=selectedKind(slot);
         if(kind<0) {
@@ -77,7 +86,7 @@ final class CampaignMenuState {
             return "Save unavailable. Your files have been kept.";
         }
         int p=(slot*2+kind)*3;
-        return (entries[p+1]==1?"Lower chamber":entries[p+1]==2?"Safe exit":"Forest lookout")+
+        return checkpointName(entries[p+1])+
                 " | "+entries[p+2]+" / 3 hearts\n"+formatSavedTime(savedTime(slot,kind),java.util.Locale.getDefault(),java.util.TimeZone.getDefault());
     }
     boolean canStartNewGame(int slot) {
@@ -97,8 +106,7 @@ final class CampaignMenuState {
         switch(entries[p]) {
             case EMPTY:return prefix+"Empty";
             case CHECKING:return prefix+"Checking…";
-            case VALID:return prefix+(entries[p+1]==1 ? "Lower chamber" :
-                    entries[p+1]==2 ? "Safe exit" : "Forest lookout")+" · "+entries[p+2]+" / 3 hearts";
+            case VALID:return prefix+checkpointName(entries[p+1])+" · "+entries[p+2]+" / 3 hearts";
             case INVALID:return prefix+"Cannot be loaded · kept";
             case READ_ERROR:return prefix+"Could not be opened · kept";
             default:return prefix+"Not checked yet";

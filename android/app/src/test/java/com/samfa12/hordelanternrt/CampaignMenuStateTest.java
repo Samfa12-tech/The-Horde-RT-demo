@@ -71,11 +71,14 @@ public final class CampaignMenuStateTest {
         v[5]=10; s=CampaignMenuState.decode(v); assertFalse(s.completes(42,3,31));
         assertFalse(s.message().contains("saved")); assertTrue(s.message().contains("could not confirm"));
     }
-    @Test public void forestEndpointIsNamedAndUnknownCheckpointIsRejected() {
+    @Test public void forestAndTavernAreNamedAndUnknownCheckpointIsRejected() {
         long[] v=ready();v[15]=CampaignMenuState.VALID;v[16]=3;v[17]=2;
         CampaignMenuState s=CampaignMenuState.decode(v);assertNotNull(s);
         assertEquals("Autosave: Forest lookout · 2 / 3 hearts",s.description(0,1));
-        v[16]=4;assertNull(CampaignMenuState.decode(v));
+        v[16]=4;s=CampaignMenuState.decode(v);assertNotNull(s);
+        assertEquals("Autosave: Bellwether tavern · 2 / 3 hearts",s.description(0,1));
+        assertTrue(s.slotDescription(0).startsWith("Bellwether tavern | 2 / 3 hearts"));
+        v[16]=5;assertNull(CampaignMenuState.decode(v));
     }
     @Test public void unknownErrorNeverBecomesSuccessOrSpecificCorruptionClaim() {
         long[] v=ready(); v[4]=8; v[5]=99;

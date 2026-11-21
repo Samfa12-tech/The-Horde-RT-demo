@@ -67,6 +67,18 @@ void RoundTrip(const cp::Checkpoint& c) {
 }
 }
 int main() {
+    auto tavern=Endpoint();
+    tavern.contentRevision=cp::kBellwetherContentRevision;tavern.id=cp::CheckpointId::BellwetherTavern;
+    tavern.zone=cp::Destination(tavern.id);
+    tavern.position=cp::kBellwetherCheckpointPosition;tavern.yaw=-1.40f;tavern.pitch=-.22f;
+    RoundTrip(tavern);
+    auto wrongChair=tavern;wrongChair.position.y+=.05f;
+    Check(!cp::Validate(wrongChair),"the tavern record pins the real safe floor height");
+    auto earlyTavern=tavern;earlyTavern.dialogue.forestVillageConsumed=false;
+    Check(!cp::Validate(earlyTavern),"the tavern record requires completed lookout progress");
+    auto revisit=tavern;revisit.id=cp::CheckpointId::SafeExit;revisit.zone=sim::WorldZoneId::TombExterior;
+    revisit.position=tr::kExteriorLanding;
+    RoundTrip(revisit);
     // Schema5 is used only when a safe exterior save must retain bypassed
     // guards. Their health and defeated bits are independent authoritative data.
     for(int a:{0,1,2})for(int b:{0,1,2}) {
@@ -283,7 +295,7 @@ int main() {
     for(std::uint32_t version:{0u,6u,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
-    for(std::uint32_t version:{0u,3u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,4u,0xffffffffu}) {
         auto bad=baseline;
         Put(bad,24,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedContent);
     }
@@ -326,7 +338,7 @@ int main() {
             "invalid encode leaves the caller's complete byte output untouched");
     };
     auto invalid=cp::Checkpoint{};invalid.schema=6;invalidEncode(invalid,codec::Error::UnsupportedSchema);
-    invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
+    invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Endpoint();invalid.contentRevision=1;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
