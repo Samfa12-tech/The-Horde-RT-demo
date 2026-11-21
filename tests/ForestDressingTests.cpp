@@ -1189,6 +1189,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         approach.x,approach.z,0,-1,false,true,ramp.worldY,terrain.get());
     Check(ramp.found && clearance>2.69f,
           "the uphill tavern approach keeps the normal carried-item reach");
+    const auto& door=route[gameplay::traversal::kBellwetherSouthDoorStation];
+    const auto& greetingMark=gameplay::bellwether::kKeeperDoor;
+    const float greetingHeight=greetingMark[1]+1.2f;
+    Check(terrain->NonWalkableVolumeClear(greetingMark[0],greetingMark[2],door.x,door.z+1.f,
+              greetingHeight-.025f,greetingHeight+.025f,.025f) &&
+          !terrain->NonWalkableVolumeClear(greetingMark[0],greetingMark[2],greetingMark[0],door.z+1.f,
+              greetingHeight-.025f,greetingHeight+.025f,.025f),
+          "the south portal carries the doorway cue while the adjacent stone wall blocks it");
     sim::InputSnapshot input;
     input.moveForward=1.f;
     input.runHeld=true;
@@ -1200,6 +1208,9 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     unsigned assessmentTicks=0,assessmentSampleTicks=0,protectiveTicks=0;
     bool keeperAtDoor=false,keeperWalkedAfterSeat=true;
     float keeperTravel=0.f,minimumSpeakerGap=100.f;
+    std::uint64_t welcomeGeneration=0;
+    unsigned welcomes=0;
+    bool welcomeAtDoor=true,kitWalkedDuringWelcome=false;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
     bool stoneMovesOnlyAfterContact=true;
@@ -1234,6 +1245,18 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 kit.motion.anklePlaybackSeconds<=horde::audio::kKitAnkleBeats.back().seconds+.00001f;
         }
         const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
+        if(after.chapterDialogue.line==Line::TavernWelcome) {
+            const auto& speech=after.chapterDialogue;
+            if(speech.generation!=welcomeGeneration) {
+                welcomeGeneration=speech.generation;
+                ++welcomes;
+                const auto& keeper=after.tavernKeeper;
+                welcomeAtDoor&=keeper && keeper->stage==TavernKeeperStage::AtDoor &&
+                    speech.source.x==keeper->foot[0] && speech.source.z==keeper->foot[2] &&
+                    kit.bellwetherArrival==Stage::ProtectiveApproach && hearthSpoken.empty();
+            }
+            kitWalkedDuringWelcome|=kit.walking && travelled>0.f;
+        }
         replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
         if(IsRoadLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=roadCaptionGeneration) {
             const auto& speech=after.chapterDialogue;
@@ -1314,10 +1337,16 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     };
     for(std::size_t i=0;i<route.size();++i) {
         if(!walkTo(route[i])) {Check(false,"the normal player motor enters the tavern by its mapped south entrance");return;}
-        if(!stayAtIncident || i!=gameplay::traversal::kBellwetherAnkleStation)continue;
-        input.moveForward=0;
-        for(unsigned tick=0;tick<3600 && roadSpoken.size()<kRoadLines.size();++tick)step();
-        input.moveForward=1;
+        if(stayAtIncident && i==gameplay::traversal::kBellwetherAnkleStation) {
+            input.moveForward=0;
+            for(unsigned tick=0;tick<3600 && roadSpoken.size()<kRoadLines.size();++tick)step();
+            input.moveForward=1;
+        }
+        if(stayAtIncident && i==gameplay::traversal::kBellwetherSouthDoorStation) {
+            input.moveForward=0;
+            for(unsigned tick=0;tick<3600 && welcomes==0;++tick)step();
+            input.moveForward=1;
+        }
     }
     Check(game.Snapshot().playerZ<118.4f &&
           std::abs(game.Snapshot().playerSupportWorldY-(-8.70955f))<.001f,
@@ -1395,6 +1424,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           std::abs(keeper->foot[1]-kKeeperHearth[1])<.001f && game.Snapshot().tavernConversationAvailable)
           : (!keeper && !game.Snapshot().tavernConversationAvailable),
           "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");
+    Check(stayAtIncident ? (welcomes==1 && welcomeAtDoor && kitWalkedDuringWelcome) : welcomes==0,
+          "the welcome plays once at the mapped door while Kit keeps walking, and requires the keeper");
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
@@ -1403,7 +1434,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2 &&
-          hearthSpoken.size()==3 && roadSpoken==expectedRoad && std::abs(stoneTravel()-.284f)<.001f,
+          hearthSpoken.size()==3 && roadSpoken==expectedRoad && welcomes==(stayAtIncident?1u:0u) &&
+          std::abs(stoneTravel()-.284f)<.001f,
           "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
 }
 

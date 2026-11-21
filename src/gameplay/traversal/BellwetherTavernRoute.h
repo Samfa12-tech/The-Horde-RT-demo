@@ -19,5 +19,6 @@ inline constexpr auto kBellwetherTavernRoute=[] {
     return stations;
 }();
 inline constexpr std::size_t kBellwetherSouthApproachStation=9;
+inline constexpr std::size_t kBellwetherSouthDoorStation=10;
 inline constexpr std::size_t kBellwetherAnkleStation=5;
 }

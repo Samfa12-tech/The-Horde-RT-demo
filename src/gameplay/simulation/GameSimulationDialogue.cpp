@@ -30,10 +30,12 @@ horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(boo
         c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
     }
     const auto& keeper=tavernKeeper_.Pose();
-    if(keeper && keeper->stage==TavernKeeperStage::AtHearth && c.exterior && chapterTerrain_ &&
+    if(keeper && c.exterior && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation && config_.bellwetherTavernKeeperAdmitted &&
-       config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
+       config_.combatFoundation1_7 && !legacyCombatCheckpoint_) {
         c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
+        c.keeperAtHearth=keeper->stage==TavernKeeperStage::AtHearth;
+    }
     return c;
 }
 
@@ -48,6 +50,25 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
     auto c=TavernConversationContext(input.paused);
+    if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
+       !c.paused && c.alive && !c.traversing && !c.combat) {
+        const auto door=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation];
+        const auto& kit=chapterCompanion_.State();
+        const bool approaching=arrival==BellwetherArrivalStage::ProtectiveApproach &&
+            kit.bellwetherStation>traversal::kBellwetherSouthApproachStation &&
+            kit.bellwetherStation<=traversal::kBellwetherSouthDoorStation+1 &&
+            std::hypot(kit.x-door.x,kit.z-door.z)<=2.5f && c.companionSource;
+        const auto audibleFromDoor=[&](Tuple other) {
+            const auto& source=*c.tavernKeeperSource;
+            const float height=std::min(source.y,other.y);
+            return std::abs(source.y-other.y)<=1.4f && std::hypot(other.x-source.x,other.z-source.z)<=4.5f &&
+                terrain->NonWalkableVolumeClear(source.x,source.z,other.x,other.z,
+                    height-.025f,height+.025f,.025f);
+        };
+        if(approaching || chapterDialogue_.State().line==Line::TavernWelcome)
+            c.tavernDoorInReach=playerSupport_.grounded && audibleFromDoor(c.listener);
+        c.kitAtSouthDoor=c.tavernDoorInReach && approaching && audibleFromDoor(*c.companionSource);
+    }
     if(c.exterior&&!c.traversing&&!chapterFirstExterior_) {
         chapterFirstExterior_=true;
         interactionState_.heldLightPose=interactions::HeldLightPose::Low;

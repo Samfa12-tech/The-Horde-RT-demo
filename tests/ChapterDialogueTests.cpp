@@ -514,6 +514,36 @@ int main() {
               "leaving mid-line releases the route and doubling back never repeats the injury speech");
     }
     {
+        Director door;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context entrance;
+        entrance.exterior=entrance.claimed=entrance.kitAtSouthDoor=true;
+        entrance.tavernKeeperSource=Tuple{83.78f,-7.31f,118.2f};
+        Check(door.RestoreProgress(progress,entrance,1,0),"lookout progress permits the later doorway cue");
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None,"the keeper stays quiet when the player is out of earshot");
+        entrance.tavernDoorInReach=true;entrance.paused=true;
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None,"the doorway cue does not start while paused");
+        entrance.paused=false;
+        door.Step(.05f,entrance);
+        const auto greeting=door.State();
+        auto fabricated=door.ExportProgress();
+        fabricated.activeLine=Line::TavernWelcome;
+        Check(greeting.line==Line::TavernWelcome && greeting.source.x==83.78f &&
+              door.ExportProgress().activeLine==Line::None && !Director::ValidateProgress(fabricated),
+              "the doorway cue originates at the keeper and stays out of saves");
+        entrance.tavernDoorInReach=false;
+        door.Step(.05f,entrance);
+        entrance.tavernDoorInReach=true;
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None && !door.Complete(greeting.line,greeting.generation),
+              "walking out of earshot clears playback and returning never repeats the greeting");
+    }
+    {
         Director hearth;
         Progress progress;
         progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
@@ -558,6 +588,7 @@ int main() {
         Check(hearth.State().line==Line::None,"the resolved hearth sequence remains quiet");
         Check(!hearth.TryStartTavernConversation(room),"a missing tavern keeper cannot offer the exchange");
         room.tavernKeeperSource=Tuple{85.5f,-7.31f,109.0f};
+        room.keeperAtHearth=true;
         hearth.Step(.05f,room);
         Check(hearth.CanStartTavernConversation(room) && hearth.State().line==Line::None &&
               hearth.TryStartTavernConversation(room),"after settling, only deliberate interaction starts the exchange");
