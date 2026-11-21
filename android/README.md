@@ -74,10 +74,13 @@ and authored chapter simulation as the other builds. The explicit ARM64 build
 is marked test-only. Install that APK with `adb install -r -t` when the phone
 is available for testing.
 
-From a fresh launch of the Bellwether package, the live church start uses:
+Set the package name to match the APK receipt. Use the `.flask` suffix
+for the combined keeper and hearth Rest playtest. From a fresh launch, the
+live church start uses:
 
 ```powershell
-adb shell am start -n com.samfa12.hordelanternrt.debug.bellwether/com.samfa12.hordelanternrt.MainActivity --ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-record-keeper-handoff
+$bellwetherPackage = 'com.samfa12.hordelanternrt.debug.bellwether.flask'
+adb shell am start -n "${bellwetherPackage}/com.samfa12.hordelanternrt.MainActivity" --ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-record-keeper-handoff
 ```
 
 For a repeatable moving baseline, launch the same activity with
@@ -85,14 +88,17 @@ For a repeatable moving baseline, launch the same activity with
 This runs the Windows proof's two room-to-square returns using the shared player
 motor at 60 Hz. It begins after the staffed pose has reached hardware RT
 presentation. Use a fresh launch with GPU timing enabled and keep it in the
-foreground until the `HORDE_BELLWETHER_DOORWAY complete returns=2` log marker.
+foreground until the `HORDE_BELLWETHER_DOORWAY complete returns=2` log marker
+from that launch. Record the installed APK hash, backend, actual internal and
+output extents, and thermal readings. Check that the CSV was written by the
+same launch before recording a result.
 The CSV joins the route phase, instance masks, GPU timing and accepted present
 for each submitted frame. The run requires the tavern door to stay fully open
 and the rendered leaf to remain present. `present_return_ns` records the native
 present call, while actual display timing requires a display capture.
 
 ```powershell
-adb exec-out run-as com.samfa12.hordelanternrt.debug.bellwether cat files/reports/bellwether-doorway.csv
+adb exec-out run-as $bellwetherPackage cat files/reports/bellwether-doorway.csv
 ```
 
 Save that output as `bellwether-doorway.csv` in the local run directory. From

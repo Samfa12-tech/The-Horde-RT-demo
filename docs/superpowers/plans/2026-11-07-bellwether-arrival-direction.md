@@ -268,7 +268,36 @@ The open hinged-door baseline uses source `82ce5828` and Windows Debug executabl
 
 The measurement rejects a closed or closing door in the input replay and requires the submitted door instance on both platforms. The Windows receipt pins the tavern and separate leaf exports. The verifier rejected a missing door during the outbound leg and a mismatched journal mask. The private ARM64 APK from the same source has SHA-256 `86aa207d8302cf678e0001644b8b4052993fdcc072d5b53fcf76ec7e409f9a6e`. The new baseline consists of hidden Windows GPU timings. Phone pacing and sustained performance await an on-device run.
 
-The [separate ARM64 Bellwether Debug build](../../../android/README.md#bellwether-three-actor-playtest) now uses the same two prepared residents on the phone. Both staged checkpoints entered live controls on SM-S948B, with Kit visible at the tavern and the textured record keeper visible outside the church. Short native timings on the phone identify a performance gap at the tavern threshold. The full moving route, displayed pacing and sustained performance remain open. See the [exact Android device record](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#2026-11-21---bellwether-three-actor-debug-checkpoints).
+The original [ARM64 Bellwether Debug build](../../../android/README.md#bellwether-three-actor-playtest) used the stand-in and the textured record keeper. Both staged checkpoints entered live controls on SM-S948B, with Kit visible at the tavern and the textured record keeper visible outside the church. Short native timings identify a performance gap at the tavern threshold. The textured tavern keeper's moving route, displayed pacing and sustained performance remain open. See the [exact Android device record](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#2026-11-21---bellwether-three-actor-debug-checkpoints).
+
+The [doorway verifier](../../../tools/analyze-chapter-route-measurement.py)
+accepts `--compare-bellwether-keeper <stand-in-run> <textured-keeper-run>`
+for a same-backend Windows pair. It verifies both complete routes and
+checks the executable, settings, open door, window, roster, and fixed-step
+range before comparing phase GPU p95 and allocated resources. The keeper is
+standing at the hearth during this measurement. Use the separate native
+arrival route to check her walk from the door.
+
+The textured keeper comparison used the same `4af3dad3` Debug executable
+(SHA-256 `6b36c335946a8f02d18a54c4fa6062b7750218856022435aa39e19cec6d33803`)
+and Diagnostic High at 960 × 540 on the RTX 5050 Laptop GPU. Each of the four
+runs completed two returns and 5,232 simulation ticks. All 5,758 presented
+frames had valid GPU timings. Each pair held the same room, settings, Kit,
+record keeper, window and open door.
+
+| GPU p95 after the five-second warmup | Pipeline stand-in → textured | Query stand-in → textured |
+| --- | ---: | ---: |
+| Tavern | 8.06 → 8.11 ms | 7.55 → 7.56 ms |
+| Outbound doorway | 9.24 → 9.19 ms | 8.29 → 8.61 ms |
+| Square | 11.51 → 11.50 ms | 10.82 → 10.84 ms |
+| Inbound doorway | 11.44 → 11.19 ms | 10.62 → 10.68 ms |
+
+Both backends peaked at 38 TLAS definitions and 29 BLAS owners with either
+keeper. Peak device-local allocations rose from 441,811,472 to
+456,752,912 bytes with the textured keeper. Each cell compares one run per
+variant. Displayed pacing and sustained phone performance remain open. The
+raw runs and both comparison receipts are retained locally under
+`bellwether-keeper-matched-20261122-032422`.
 
 ## Open decisions deliberately preserved
 

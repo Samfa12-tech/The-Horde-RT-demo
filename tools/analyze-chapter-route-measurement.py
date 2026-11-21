@@ -168,7 +168,7 @@ def analyze(name, analysis_name='analysis-v3.json'):
     print('phase GPU (median/p95 ms):',json.dumps({k:(v['gpuMilliseconds'].get('median'),v['gpuMilliseconds'].get('p95')) for k,v in summary['phases'].items()}))
     print(interval_key,':',json.dumps(summary[interval_key]), 'throughput Hz:',summary[throughput_key])
 
-def analyze_bellwether(name, analysis_name):
+def analyze_bellwether(name, analysis_name, *, print_phases=True):
     root = pathlib.Path(name)
     directory = root / 'bellwether-doorway'
     run = json.loads((directory / 'run.json').read_text())
@@ -259,7 +259,69 @@ def analyze_bellwether(name, analysis_name):
         assert json.loads(target.read_text()) == summary, 'stored doorway analysis differs from verified arithmetic'
     else:
         target.write_text(json.dumps(summary, indent=2) + '\n')
-    print(json.dumps(summary['phases']))
+    if print_phases:
+        print(json.dumps(summary['phases']))
+    return summary
+
+
+def compare_bellwether_keeper(baseline, candidate, analysis_name):
+    """Compare verified Windows routes with only the tavern keeper fixture changed."""
+    runs = []
+    for name in (baseline, candidate):
+        directory = pathlib.Path(name) / 'bellwether-doorway'
+        summary = analyze_bellwether(name, analysis_name, print_phases=False)
+        receipt = json.loads(pathlib.Path(name + '.candidate.json').read_text(encoding='utf-8-sig'))
+        with (directory / 'completed-frames.csv').open(newline='') as source:
+            rows = list(csv.DictReader(source))
+        assert summary.get('openDoorWitness') and summary['run']['recordKeeperIncluded']
+        assert all(row['gpu_status'] == 'valid' and int(row['gpu_ns']) > 0 for row in rows), (
+            'Both routes need a valid GPU interval for every presented frame')
+        actor_masks = ('kit_mask', 'window_mask', 'resident_mask', 'record_keeper_mask')
+        assert all(all(row[key] == '1' for key in actor_masks) for row in rows), (
+            'Both routes must retain all three actors and the window')
+        fixtures = summary['residentFixtureHashes']
+        keeper = {key: value for key, value in fixtures.items() if key.startswith('tavern-keeper/')}
+        assert {'tavern-keeper/asset.manifest.json', 'tavern-keeper/resident.glb'} <= keeper.keys()
+        render_settings = []
+        for line in (directory / 'identities.jsonl').read_text().splitlines():
+            sample = json.loads(line)['evidence']
+            pipeline = sample['pipeline']
+            render_settings.append((
+                sample['submittedDimensions'], sample['shadowQuality'], sample['fireQuality'],
+                sample['actualUploadedDustQuality'], sample['actualUploadedMistEnabled'],
+                pipeline['instrumentation'], pipeline['waterQuality'], pipeline['dielectricQuality'],
+                pipeline['opaqueFast'], pipeline['genericDielectric']))
+        assert all(item == render_settings[0] for item in render_settings)
+        route = summary['run']
+        comparison_identity = {
+            key: receipt[key] for key in ('backend', 'executableSha256', 'buildProfile',
+                                          'scope', 'sources', 'tavernAssetHashes')}
+        comparison_identity.update(
+            otherResidents={key: value for key, value in fixtures.items() if key not in keeper},
+            hardware=summary['hardware'], presentation=summary['presentation'],
+            renderSettings=render_settings[0], simulationTicks=route['simulationTicks'],
+            tickBounds=[int(rows[0]['tick']), int(rows[-1]['tick'])],
+            simulationHz=route['simulationHz'], warmupSeconds=route['warmupSeconds'])
+        runs.append((summary, comparison_identity, keeper))
+
+    (old, old_identity, old_keeper), (new, new_identity, new_keeper) = runs
+    mismatches = [key for key, value in old_identity.items() if value != new_identity[key]]
+    assert not mismatches, f'Unmatched routes: {", ".join(mismatches)}'
+    assert old_keeper['tavern-keeper/resident.glb'] != new_keeper['tavern-keeper/resident.glb'], (
+        'The two fixtures use the same tavern keeper')
+    result = dict(scope=old['scope'], backend=old['backend'], executableSha256=old['executableSha256'],
+                  hardware=old['hardware'], presentation=old['presentation'],
+                  simulationTicks=old['run']['simulationTicks'],
+                  baselineKeeper=old_keeper, candidateKeeper=new_keeper, phases={})
+    for phase, before in old['phases'].items():
+        after = new['phases'][phase]
+        old_p95, new_p95 = (item['gpuMilliseconds']['p95'] for item in (before, after))
+        result['phases'][phase] = dict(
+            baselineSamples=before['samples'], candidateSamples=after['samples'],
+            baselineGpuP95Ms=old_p95, candidateGpuP95Ms=new_p95,
+            changeGpuP95Ms=new_p95 - old_p95,
+            baselineResourcePeaks=before['resourcePeaks'], candidateResourcePeaks=after['resourcePeaks'])
+    print(json.dumps(result, indent=2))
 
 
 def analyze_android_bellwether(name, analysis_name):
@@ -355,8 +417,14 @@ if __name__=='__main__':
     parser.add_argument('--analysis-name',default='analysis-v3.json')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--bellwether-doorway', action='store_true')
+    mode.add_argument('--compare-bellwether-keeper', action='store_true')
     mode.add_argument('--android-bellwether-doorway', action='store_true')
     args=parser.parse_args()
+    if args.compare_bellwether_keeper:
+        if len(args.directories) != 2:
+            parser.error('--compare-bellwether-keeper expects a baseline and a candidate directory')
+        compare_bellwether_keeper(*args.directories, args.analysis_name)
+        raise SystemExit(0)
     analyzer = (analyze_android_bellwether if args.android_bellwether_doorway else
                 analyze_bellwether if args.bellwether_doorway else analyze)
     for name in args.directories:
