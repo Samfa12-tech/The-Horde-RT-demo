@@ -6,6 +6,7 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
+#include "scene/assets/WorldTriangleKey.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <algorithm>
 #include <cstring>
@@ -43,15 +44,12 @@ bool CheckTavernDetailCandidates(const std::filesystem::path& directory, const h
         }
         return result;
     };
-    using TriangleKey=std::array<std::array<long long,3>,3>;
-    const auto key=[](const Surface::Triangle& triangle) {
-        const auto corner=[](const Surface::Point& p) {
-            constexpr double unitsPerMetre=10000;
-            return std::array{std::llround(p[0]*unitsPerMetre),std::llround(p[1]*unitsPerMetre),std::llround(p[2]*unitsPerMetre)};
-        };
-        const auto a=corner(triangle.points[0]),b=corner(triangle.points[1]),c=corner(triangle.points[2]);
-        // Rotate the corner order without reversing winding.
-        return std::min({TriangleKey{a,b,c},TriangleKey{b,c,a},TriangleKey{c,a,b}});
+    const auto keys=[](const StaticMeshAsset& mesh) {
+        std::map<WorldTriangleKey,std::size_t> result;
+        for(const auto& primitive:mesh.primitives) {
+            for(std::size_t i=0;i<primitive.indexCount;i+=3)++result[KeyWorldTriangle(mesh,primitive,i)];
+        }
+        return result;
     };
     StaticMeshAsset shared,near,mid,far;
     constexpr auto furnitureNode="BellwetherTavernFurniture";
@@ -61,17 +59,15 @@ bool CheckTavernDetailCandidates(const std::filesystem::path& directory, const h
        !load("tavern-furniture-lod2",furnitureNode,144,far)) {
         std::cerr<<"B01 detail candidate import: "<<diagnostic<<'\n';return false;
     }
-    const auto sharedTriangles=triangles(shared);
-    const auto nearTriangles=triangles(near);
-    std::map<TriangleKey,std::size_t> townTriangles;
-    for(const auto& triangle:triangles(town))++townTriangles[key(triangle)];
-    for(const auto* selected:{&sharedTriangles,&nearTriangles}) {
-        for(const auto& triangle:*selected) {
-            const auto found=townTriangles.find(key(triangle));
-            if(found==townTriangles.end() || !found->second)return false;
-            --found->second;
+    auto townTriangles=keys(town);
+    for(const auto* selected:{&shared,&near}) {
+        for(const auto& [triangle,count]:keys(*selected)) {
+            const auto found=townTriangles.find(triangle);
+            if(found==townTriangles.end() || found->second<count)return false;
+            found->second-=count;
         }
     }
+    const auto sharedTriangles=triangles(shared);
     const auto architecture=Surface::Build(sharedTriangles,diagnostic);
     constexpr float floorY=kSouthDoorHinge[1];
     if(!architecture ||
@@ -124,8 +120,28 @@ int main(int argc,char** argv) {
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
-        if(argc==2)check(CheckTavernDetailCandidates(argv[1],world),
-                        "source-review detail candidates match the tavern registration, apertures and furniture levels");
+        if(argc==2) {
+            check(CheckTavernDetailCandidates(argv[1],world),
+                  "source-review detail candidates match the tavern registration, apertures and furniture levels");
+            for(const auto detail:{BellwetherFurnitureDetail::Mid,BellwetherFurnitureDetail::Far}) {
+                auto comparison=before;
+                auto comparisonSupport=originalTerrain;
+                const auto level=static_cast<std::size_t>(detail);
+                const auto delta=kBellwetherFurnitureTriangles.front()-kBellwetherFurnitureTriangles[level];
+                const bool admitted=AppendBellwetherShell(root,comparison,comparisonSupport,error,
+                    nullptr,nullptr,nullptr,nullptr,detail);
+                if(!admitted)std::cerr<<error<<'\n';
+                check(admitted && comparison.indices.size()+delta*3==world.indices.size() &&
+                      comparison.vertices.size()<world.vertices.size() && comparison.materials.size()==world.materials.size() &&
+                      comparison.primitives.size()==world.primitives.size(),
+                      "each fixed render tier replaces only the source furniture under the same owning primitive");
+                if(admitted)check(comparisonSupport->RetainedBytes()==support->RetainedBytes() &&
+                      comparisonSupport->Query(82.3f,119.2f).worldY==support->Query(82.3f,119.2f).worldY &&
+                      !comparisonSupport->NonWalkableVolumeClear(82.f,107.3f,82.f,107.3f,
+                          horde::gameplay::bellwether::kChairSeat[1]-.002f,horde::gameplay::bellwether::kChairSeat[1]+.002f,.025f),
+                      "render detail preserves the original gameplay contact and route support");
+            }
+        }
         check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
             "the complete bounded town and tavern geometry is rendered");
         check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");

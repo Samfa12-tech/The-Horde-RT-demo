@@ -10,6 +10,8 @@ inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=22;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
+enum class BellwetherFurnitureDetail { Near, Mid, Far };
+inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};
 // The town and B01 interior use one render and physical geometry source.
 // Architecture, furniture and the fuel bed reuse existing material rows.
 bool AppendBellwetherShell(const std::filesystem::path& assetsRoot,
@@ -18,5 +20,6 @@ bool AppendBellwetherShell(const std::filesystem::path& assetsRoot,
     std::string& diagnostic, assets::StaticMeshAsset* glazing = nullptr,
     assets::StaticMeshAsset* archiveCover = nullptr,
     assets::StaticMeshAsset* roadRegister = nullptr,
-    assets::StaticMeshAsset* southDoor = nullptr);
+    assets::StaticMeshAsset* southDoor = nullptr,
+    BellwetherFurnitureDetail furnitureDetail = BellwetherFurnitureDetail::Near);
 }

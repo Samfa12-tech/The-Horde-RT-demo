@@ -496,6 +496,7 @@ struct CaptureLaunchOptions
     bool validateStaticTriangleCutover = false;
     std::vector<std::uint32_t> staticTriangleOmissions;
     std::string inspectStaticWorldMaterial;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     std::string forestContentCandidate;
     bool validateForestContentCandidate = false;
     bool validateChapterRoundTrip = false;
@@ -714,6 +715,7 @@ struct VulkanSurfaceContext
     bool staffedTavernCapture = false;
     bool recordKeeperCapture = false;
     bool combinedBellwetherResidents = false;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
@@ -1209,6 +1211,21 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--bellwether-furniture-detail") {
+#if defined(_DEBUG)
+            using Detail=horde::scene::BellwetherFurnitureDetail;
+            if(options.bellwetherFurnitureDetail!=Detail::Near || index+1>=argumentCount) {
+                options.error="Bellwether furniture detail requires lod1 or lod2, once.";break;
+            }
+            const std::wstring_view level=arguments[++index];
+            if(level==L"lod1")options.bellwetherFurnitureDetail=Detail::Mid;
+            else if(level==L"lod2")options.bellwetherFurnitureDetail=Detail::Far;
+            else {options.error="Bellwether furniture detail requires lod1 or lod2.";break;}
+#else
+            options.error="Bellwether furniture detail is Debug-only.";
+#endif
+            continue;
+        }
         if(argument==L"--forest-content-candidate") {
 #if defined(_DEBUG)
             if(!options.forestContentCandidate.empty() || index+1>=argumentCount) {
@@ -1377,6 +1394,17 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
     }
     const auto* residentCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+    if(options.error.empty() && options.bellwetherFurnitureDetail!=horde::scene::BellwetherFurnitureDetail::Near &&
+       (!options.requested || !options.captureHidden || !residentCheckpoint ||
+        !options.developmentCheckpoint.starts_with("bellwether-") ||
+        !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*residentCheckpoint) ||
+        options.measureChapterShippingRoute || options.validateChapterRoundTrip || options.validateStaticZoneCutover ||
+        !options.forestContentCandidate.empty() || options.validateForestContentCandidate ||
+        options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled ||
+        options.environmentSurvey.requested || options.graphicsPreview || options.outputResizeValidation ||
+        !options.nativeMotionScenario.empty() || options.benchmark.requested || options.chapterLandingOnly ||
+        !options.inspectStaticWorldMaterial.empty()))
+        options.error="Bellwether furniture comparisons require an isolated hidden authored Bellwether capture.";
     const bool returnToKit = residentCheckpoint &&
         residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
@@ -6757,6 +6785,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
+    if (!ctx.rtScene.SetBellwetherFurnitureDetail(ctx.bellwetherFurnitureDetail)) {
+        ctx.lastRtFrameError="Bellwether furniture detail must be selected before scene creation.";
+        return false;
+    }
     if (!gBellwetherCampaignActors.empty()) {
         const bool authoredShowcase = rescueJourney &&
             ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
@@ -8272,8 +8304,15 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      horde::gameplay::items::PlayerMountProfile::AnatomicalBody
                  ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
              << "  \"executionBackend\": \""
-             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n"
-             << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n";
+#if defined(_DEBUG)
+    if(context.bellwetherFurnitureDetail!=horde::scene::BellwetherFurnitureDetail::Near) {
+        const auto level=static_cast<std::size_t>(context.bellwetherFurnitureDetail);
+        manifest<<"  \"bellwetherFurnitureLod\": "<<level<<",\n"
+                <<"  \"bellwetherFurnitureTriangles\": "<<horde::scene::kBellwetherFurnitureTriangles[level]<<",\n";
+    }
+#endif
+    manifest << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))
              << "\", \"sha256\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastSha256()))
@@ -9910,6 +9949,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
     context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
     context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
+    context.bellwetherFurnitureDetail=ParseCaptureLaunchOptions().bellwetherFurnitureDetail;
     std::error_code fixtureError;
     context.combinedBellwetherResidents=developmentCheckpoint &&
         (*developmentCheckpoint=="bellwether-return-to-kit" ||

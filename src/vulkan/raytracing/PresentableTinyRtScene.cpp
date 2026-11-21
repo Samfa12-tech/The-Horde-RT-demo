@@ -834,6 +834,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
     developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
+    bellwetherFurnitureDetail_=std::exchange(other.bellwetherFurnitureDetail_,horde::scene::BellwetherFurnitureDetail::Near);
     playerUtilityCandidateAsset_=std::exchange(other.playerUtilityCandidateAsset_,{});
     regionalWaterDiagnosticEnabled_=std::exchange(other.regionalWaterDiagnosticEnabled_,true);
     floorDebrisEnabled_=std::exchange(other.floorDebrisEnabled_,true);
@@ -3513,7 +3514,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
-                &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_, &tavernDoorAsset_))
+                &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_, &tavernDoorAsset_,
+                bellwetherFurnitureDetail_))
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {

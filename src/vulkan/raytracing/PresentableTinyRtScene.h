@@ -25,6 +25,7 @@
 #include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
+#include "scene/BellwetherShell.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/ForestDressing.h"
@@ -433,6 +434,11 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    bool SetBellwetherFurnitureDetail(horde::scene::BellwetherFurnitureDetail detail) {
+        if(detail==bellwetherFurnitureDetail_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureDetail_=detail;return true;
+    }
     bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
     // Candidate source binding only, chosen before resource creation. Empty
@@ -1462,6 +1468,7 @@ private:
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
     std::string playerUtilityCandidateAsset_;
     bool jointPropPresentationActive_ = false;
     bool regionalWaterDiagnosticEnabled_ = true;
