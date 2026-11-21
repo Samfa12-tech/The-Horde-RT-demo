@@ -208,6 +208,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         InputSnapshot input;
         input.damageEnabled=false;input.tutorialEnabled=false;
         input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
+        input.commands.interact=gameSimulation.latestInteractSequence_;
+        input.commands.dialogueSkip=gameSimulation.chapterSkipFloor_;
         const auto token=gameSimulation.BeginCampaignRestore(record);
         if(!token || !gameSimulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},chapterTerrain,
                 input,gameSimulation.Snapshot().inputPublicationSequence))return finalize(false);
@@ -234,11 +236,18 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(unsigned tick=0;tick<120;++tick)advance();
         if(state.waysideArchiveAction!=ArchiveAction::Inspect)return finalize(false);
         if(!checkpoint.bellwetherArchiveOpen)return finalize(true);
-        input.commands.interact=state.lastConsumedInteractSequence+1;advance();
+        // Stage through the same handlers without consuming sequence numbers
+        // reserved for the next live interact or skip from a platform publisher.
+        gameSimulation.InteractWithClaimedChapter();advance();
+        if(state.chapterDialogue.line!=dialogue::Line::LanternFirstHelp)return finalize(false);
+        gameSimulation.chapterDialogue_.Skip();advance();
         if(state.waysideArchiveAction!=ArchiveAction::Open)return finalize(false);
-        ++input.commands.interact;advance();
+        gameSimulation.InteractWithClaimedChapter();advance();
         for(unsigned tick=0;tick<70 && state.waysideArchive.stage!=ArchiveStage::Open;++tick)advance();
         return finalize(state.waysideArchive.stage==ArchiveStage::Open &&
+            state.chapterDialogue.line==dialogue::Line::LanternFirstIdentity &&
+            state.lastConsumedInteractSequence==input.commands.interact &&
+            gameSimulation.chapterSkipFloor_==input.commands.dialogueSkip &&
             state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated);
     }
     const bool repeatVisit=checkpoint.bellwetherStaffedView==BellwetherStaffedView::RepeatVisit;

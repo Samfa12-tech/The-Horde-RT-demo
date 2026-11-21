@@ -6,7 +6,7 @@
 namespace horde::gameplay::bellwether {
 
 enum class ArchiveStage : std::uint8_t { Closed, Inspected, Opening, Open };
-enum class ArchiveAction : std::uint8_t { None, Inspect, Open };
+enum class ArchiveAction : std::uint8_t { None, Inspect, Open, Listen, Recap };
 
 struct ArchivePose {
     std::array<float,12> worldFromModel{{
@@ -32,6 +32,7 @@ struct WaysideArchive {
     ArchiveStage stage=ArchiveStage::Closed;
     float opening=0;
     ArchivePose pose{};
+    bool lanternRevealStarted=false;
 };
 
 } // namespace horde::gameplay::bellwether

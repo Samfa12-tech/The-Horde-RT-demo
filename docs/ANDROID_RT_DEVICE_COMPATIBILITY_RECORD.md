@@ -4203,3 +4203,26 @@ latest signed package retained. This complements the earlier scoped owner route
 acceptance at `627c6485`; it does not silently transfer every earlier gameplay
 observation to the final binary. See the [published artifact and validation
 receipt](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md).
+
+### 21 November 2026: Bellwether shrine and first lantern recap
+
+**Evidence class: actual-device scripted UI and RT checkpoint evidence.**
+Galaxy S26 Ultra (SM-S948B, Android API 37, Adreno 840) ran the ARM64 test APK
+`com.samfa12.hordelanternrt.debug`. Installed and local APK SHA-256 matched
+`9c7be340b17727b2c5f016e4438bce984652a415a1263cf1b255a0d9a81e4c85`.
+The build used a separate debug package for the `bellwether-wayside-archive-open`
+checkpoint. The production app and its saves were untouched.
+
+RayTracingPipeline reported successful RT presentation at 33% scale
+(475 × 980 internal extent). After 120 warmup frames, the three 120-frame
+windows averaged 55.005, 46.486 and 35.798 ms on the CPU-side draw loop.
+Android thermal status was 1 before and after the test session, with battery
+temperature rising from 36.9 °C to 39.4 °C. These measurements cover the staged
+shrine checkpoint. Sustained gameplay and compositor frame pacing remain
+unmeasured for this APK.
+
+After the opening captions completed, the first live tap on **Recall the
+lantern’s words** displayed the treasury request and exposed its text with the
+**Lantern voice** speaker label in the Android accessibility hierarchy.
+The debug process was stopped after collection. Raw evidence is retained locally
+under `build/phone-shrine-20261121-184741`.

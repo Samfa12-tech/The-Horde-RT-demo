@@ -330,7 +330,9 @@ private:
     void InteractWithClaimedChapter();
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
-    horde::gameplay::dialogue::Context TavernConversationContext(bool paused) const;
+    dialogue::Context ChapterInteractionContext(bool paused) const;
+    std::optional<dialogue::Tuple> HeldRewardLanternSource() const;
+    void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
     void AdvanceWaysideArchive(float seconds);
     bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;

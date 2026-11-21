@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kWaysideArchiveSchema+1> lengths{0,162,163,168,177,185,186,187,188};
+    constexpr std::array<std::size_t,cp::kShrineLanternSchema+1> lengths{0,162,163,168,177,185,186,187,188,189};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -199,7 +199,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kWaysideArchiveSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kShrineLanternSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -320,7 +320,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kWaysideArchiveSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kShrineLanternSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -365,7 +365,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kWaysideArchiveSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kShrineLanternSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;
@@ -381,7 +381,13 @@ int main() {
         if(encoded.size()==188) {
             encoded.back()=std::byte{3};Rechecksum(encoded);Reject(encoded,codec::Error::InvalidCheckpoint);
         }
-        archive.dialogue.hearthLinesResolved=0;
+        archive.waysideLanternRevealStarted=true;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.schema=cp::kShrineLanternSchema;
+        RoundTrip(archive);
+        auto reveal=Encode(archive);
+        reveal.back()=std::byte{2};Rechecksum(reveal);Reject(reveal,codec::Error::Malformed);
+        archive.waysideArchive=cp::WaysideArchiveProgress::Inspected;
         invalidEncode(archive,codec::Error::InvalidCheckpoint);
     }
     invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);

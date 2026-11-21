@@ -4,14 +4,21 @@
 namespace horde::gameplay::simulation {
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
-    const auto context=TavernConversationContext(false);
+    const auto context=ChapterInteractionContext(false);
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
     switch(WaysideArchiveAction(context)) {
     case bellwether::ArchiveAction::Inspect:
-        waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
+        if(chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Help,context))
+            waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
         return;
     case bellwether::ArchiveAction::Open:
         waysideArchive_.stage=bellwether::ArchiveStage::Opening;
+        return;
+    case bellwether::ArchiveAction::Listen:
+        TryStartShrineReveal(context);
+        return;
+    case bellwether::ArchiveAction::Recap:
+        chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Recap,context);
         return;
     default:
         chapterDialogue_.ShowTavernDirections(context);
@@ -21,11 +28,8 @@ void GameSimulation::InteractWithClaimedChapter() {
 bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::Context& c) const {
     using namespace bellwether;
     const auto stage=waysideArchive_.stage;
-    if(!config_.combatFoundation1_7 || legacyCombatCheckpoint_ || !c.alive || !c.claimed ||
-       !c.exterior || c.paused || c.combat || c.traversing || !c.kitSeated || !playerSupport_.grounded ||
-       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation || !chapterTerrain_->HingedContact() ||
-       chapterDialogue_.State().line!=dialogue::Line::None ||
-       chapterDialogue_.State().hearthLinesResolved!=dialogue::kHearthLines.size() || stage>=ArchiveStage::Opening)
+    if(!c.shrineLanternSource || c.paused || chapterDialogue_.State().line!=dialogue::Line::None ||
+       stage==ArchiveStage::Opening)
         return ArchiveAction::None;
     const float dx=kWaysideMechanism[0]-c.player.x,dz=kWaysideMechanism[2]-c.player.z;
     const float distance=std::hypot(dx,dz);
@@ -36,7 +40,9 @@ bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::C
     const float y=kWaysideMechanism[1];
     if(!chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,kWaysideMechanism[0],
             kWaysideMechanism[2]+.08f,y-.06f,y+.06f,.025f))return ArchiveAction::None;
-    return stage==ArchiveStage::Closed?ArchiveAction::Inspect:ArchiveAction::Open;
+    if(stage==ArchiveStage::Closed)return ArchiveAction::Inspect;
+    if(stage==ArchiveStage::Inspected)return ArchiveAction::Open;
+    return waysideArchive_.lanternRevealStarted?ArchiveAction::Recap:ArchiveAction::Listen;
 }
 
 void GameSimulation::AdvanceWaysideArchive(float seconds) {
@@ -52,7 +58,10 @@ void GameSimulation::AdvanceWaysideArchive(float seconds) {
             playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+swingMargin))return;
     waysideArchive_.opening=progress;
     waysideArchive_.pose=candidate;
-    if(progress>=1.f)waysideArchive_.stage=ArchiveStage::Open;
+    if(progress>=1.f) {
+        waysideArchive_.stage=ArchiveStage::Open;
+        TryStartShrineReveal(ChapterInteractionContext(false));
+    }
 }
 
 bool GameSimulation::ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
@@ -61,7 +70,24 @@ bool GameSimulation::ArchiveContactClear(float x0,float z0,float x1,float z1,flo
     return waysideArchive_.pose.VolumeClear(*chapterTerrain_->HingedContact(),x0,z0,x1,z1,y0,y1,radius);
 }
 
-horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(bool paused) const {
+void GameSimulation::TryStartShrineReveal(const dialogue::Context& context) {
+    if(waysideArchive_.stage==bellwether::ArchiveStage::Open && !waysideArchive_.lanternRevealStarted &&
+       chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Reveal,context))
+        waysideArchive_.lanternRevealStarted=true;
+}
+
+std::optional<dialogue::Tuple> GameSimulation::HeldRewardLanternSource() const {
+    const auto& lantern=lanternPendulum_.Snapshot();
+    if(rescueTraversal_.Snapshot().equipmentStowed ||
+       interactionState_.heldLightKind!=interactions::HeldLightKind::RewardLantern || !lantern.initialized)
+        return std::nullopt;
+    const auto& body=lantern.worldFromBody;
+    constexpr float lightBelowHinge=items::kRewardLanternLightBelowHinge*items::kClaimedRewardLanternScale;
+    return dialogue::Tuple{body[12]-body[4]*lightBelowHinge,body[13]-body[5]*lightBelowHinge,
+                           body[14]-body[6]*lightBelowHinge};
+}
+
+dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
     using namespace horde::gameplay::dialogue;
     Context c;
     c.player={playerX_,playerSupport_.worldY,playerZ_};
@@ -90,6 +116,13 @@ horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(boo
         c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
         c.keeperAtHearth=keeper->stage==TavernKeeperStage::AtHearth;
     }
+    const auto& mark=bellwether::kWaysideMechanism;
+    if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && c.alive && c.claimed && c.exterior &&
+       !c.combat && !c.traversing && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation && chapterTerrain_->HingedContact() &&
+       chapterDialogue_.State().hearthLinesResolved==kHearthLines.size() &&
+       std::hypot(c.player.x-mark[0],c.player.z-mark[2])<=4.f && std::abs(c.listener.y-mark[1])<=1.5f)
+        c.shrineLanternSource=HeldRewardLanternSource();
     return c;
 }
 
@@ -103,7 +136,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        rescueTraversal_.Snapshot().exteriorSide && !rescueTraversal_.IsActive() &&
        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
-    auto c=TavernConversationContext(input.paused);
+    auto c=ChapterInteractionContext(input.paused);
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {
         const auto door=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation];
@@ -185,17 +218,9 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
                     static_cast<std::int32_t>(beat.cue),kit.y+beat.height);
         }
     }
-    chapterDialogue_.RefreshCompanionSpatial(TavernConversationContext(input.paused));
-    std::optional<Tuple> lanternPosition;
+    chapterDialogue_.RefreshCompanionSpatial(ChapterInteractionContext(input.paused));
     const auto& speech=chapterDialogue_.State();
-    const auto& lantern=lanternPendulum_.Snapshot();
-    if(speech.line==Line::TavernIntroduce && !rescueTraversal_.Snapshot().equipmentStowed &&
-       interactionState_.heldLightKind==interactions::HeldLightKind::RewardLantern && lantern.initialized) {
-        const auto& body=lantern.worldFromBody;
-        constexpr float lightBelowHinge=items::kRewardLanternLightBelowHinge*items::kClaimedRewardLanternScale;
-        lanternPosition=Tuple{body[12]-body[4]*lightBelowHinge,body[13]-body[5]*lightBelowHinge,
-                              body[14]-body[6]*lightBelowHinge};
-    }
+    const auto lanternPosition=speech.line==Line::TavernIntroduce?HeldRewardLanternSource():std::nullopt;
     chapterCompanion_.AdvanceActing(seconds,speech,c.exterior,c.alive,
         !proofWasAccepted && speech.proofAccepted,lanternPosition);
 }

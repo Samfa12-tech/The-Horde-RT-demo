@@ -629,5 +629,32 @@ int main() {
         Check(hearth.State().line==Line::None && hearth.CanShowTavernDirections(room),
               "returning allows rereading without automatically replaying anything");
     }
+    {
+        Director shrine;
+        Context site;
+        site.claimed=site.exterior=site.kitSeated=true;
+        Progress arrived;
+        arrived.grateConsumed=arrived.rescueConsumed=true;
+        Check(shrine.RestoreProgress(arrived,site,1,0),"the fixture has passed the rescue scene");
+        Check(!shrine.TryStartShrineSpeech(ShrineSpeech::Help,site),"shrine speech requires the held lantern in reach");
+        site.shrineLanternSource=Tuple{103.f,-2.7f,33.f};
+        site.companionSource=Tuple{85.f,-8.f,108.f};
+        Check(shrine.TryStartShrineSpeech(ShrineSpeech::Reveal,site) &&
+              shrine.State().line==Line::LanternFirstIdentity && shrine.State().source.x==103.f &&
+              WindowsSubtitleCaption(Spec(shrine.State().line).speaker,Spec(shrine.State().line).text)
+                  .starts_with("Lantern voice:"),
+              "the reveal uses the held lantern's source and labels the speaker without endorsing the claim");
+        const auto identity=shrine.State();
+        site.paused=true;shrine.Step(.05f,site);
+        Check(shrine.State().generation==identity.generation && shrine.State().elapsed==identity.elapsed,
+              "pausing keeps the shrine line and its place");
+        site.paused=false;site.shrineLanternSource.reset();shrine.Step(.05f,site);
+        Check(shrine.State().line==Line::None && !shrine.Complete(identity.line,identity.generation),
+              "leaving the shrine cancels its queued story and invalidates stale callbacks");
+        site.shrineLanternSource=Tuple{103.f,-2.7f,33.f};shrine.Step(.05f,site);
+        Check(shrine.State().line==Line::None && shrine.TryStartShrineSpeech(ShrineSpeech::Recap,site) &&
+              shrine.State().line==Line::LanternFirstRequest,
+              "a return stays quiet until a deliberate practical recap");
+    }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

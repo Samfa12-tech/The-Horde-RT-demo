@@ -7181,7 +7181,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env,
         state[2] = static_cast<jlong>(std::max(0.0f, snapshot.elapsed) * 1000.0f + 0.5f);
         state[3] = static_cast<jlong>(std::max(0.0f, snapshot.duration) * 1000.0f + 0.5f);
         state[4] = snapshot.paused ? 1 : 0;
-        state[5] = horde::gameplay::dialogue::IsGuidanceLine(snapshot.line) ? 1 : 0;
+        state[5] = horde::gameplay::dialogue::RequiresChapterCaption(snapshot.line) ? 1 : 0;
     }
     jlongArray result = env->NewLongArray(6);
     if (result != nullptr) env->SetLongArrayRegion(result, 0, 6, state);

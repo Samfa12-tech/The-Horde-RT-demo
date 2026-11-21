@@ -32,7 +32,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
-        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.waysideArchive);};
+        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.waysideArchive,c.waysideLanternRevealStarted);};
     return facts(a)==facts(b);
 }
 }
@@ -176,6 +176,10 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size()) {
         c.waysideArchive=WaysideArchiveProgressForSave(waysideArchive_);
         if(c.waysideArchive!=campaign::WaysideArchiveProgress::Closed)c.schema=campaign::kWaysideArchiveSchema;
+        if(waysideArchive_.lanternRevealStarted) {
+            c.waysideLanternRevealStarted=true;
+            c.schema=campaign::kShrineLanternSchema;
+        }
     }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
@@ -196,7 +200,8 @@ void GameSimulation::LatchCampaignBoundary() {
             const bool hearthAdvanced=atTavernBoundary &&
                 (speech.hearthLinesResolved>campaignBoundary_->dialogue.hearthLinesResolved ||
                  speech.tavernConversationLinesResolved>campaignBoundary_->dialogue.tavernConversationLinesResolved ||
-                 WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive);
+                 WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
+                 (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted));
             if(!atTavernBoundary || config_.healingFlask1_7 || hearthAdvanced) {
                 const auto arrived=CaptureAuthoredCampaignBoundary(tavern);
                 if(arrived && (!campaignBoundary_ || !SameBoundary(*arrived,*campaignBoundary_))) {
@@ -275,7 +280,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     if(c.waysideArchive==campaign::WaysideArchiveProgress::Inspected)
         next.waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
     else if(c.waysideArchive==campaign::WaysideArchiveProgress::Open)
-        next.waysideArchive_={bellwether::ArchiveStage::Open,1.f,bellwether::ArchivePose::AtOpening(1.f)};
+        next.waysideArchive_={bellwether::ArchiveStage::Open,1.f,bellwether::ArchivePose::AtOpening(1.f),
+            c.waysideLanternRevealStarted};
     if(!next.worldRoute_.Publish(readyDestination,ZoneReadiness::Ready)) return false;
     next.playerX_=c.position.x;next.playerZ_=c.position.z;
     next.playerYawRadians_=c.yaw;next.playerPitchRadians_=c.pitch;

@@ -272,6 +272,11 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
               restoredArchive.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
               restoredArchive.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel,
               "a saved open archive restores the matching hinge and contact pose without replay");
+        archive.schema=cp::kShrineLanternSchema;
+        archive.waysideLanternRevealStarted=true;
+        Check(Seed(restoredArchive,archive,terrain) && restoredArchive.Snapshot().waysideArchive.lanternRevealStarted &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "a started shrine reveal restores as consumed without restarting active speech");
         archive.schema=cp::kTavernConversationSchema;
         Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
     }

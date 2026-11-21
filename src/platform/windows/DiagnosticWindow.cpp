@@ -2404,7 +2404,7 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
     if (subtitle == nullptr) return;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
-    if ((!context.subtitlesEnabled && !horde::gameplay::dialogue::IsGuidanceLine(dialogue.line)) ||
+    if ((!context.subtitlesEnabled && !horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line)) ||
         dialogue.line == horde::gameplay::dialogue::Line::None ||
         dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
     {
@@ -3356,6 +3356,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         switch (snapshot.waysideArchiveAction) {
         case ArchiveAction::Inspect: text = "LEFT-CLICK / A TO INSPECT ARCHIVE"; break;
         case ArchiveAction::Open: text = "LEFT-CLICK / A TO OPEN LOWER STONE"; break;
+        case ArchiveAction::Listen: text = "LEFT-CLICK / A TO LISTEN TO THE LANTERN"; break;
+        case ArchiveAction::Recap: text = "LEFT-CLICK / A TO RECALL THE LANTERN'S WORDS"; break;
         default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
         }
         context.tavernInteractionPromptPresented=visible;

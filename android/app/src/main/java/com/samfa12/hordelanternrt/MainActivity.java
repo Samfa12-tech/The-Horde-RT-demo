@@ -262,8 +262,8 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
-    private static final int CONTEXTUAL_INSPECT_ARCHIVE = 1 << 16;
-    private static final int CONTEXTUAL_OPEN_ARCHIVE = 1 << 17;
+    private static final int CONTEXTUAL_ARCHIVE_SHIFT = 16;
+    private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -4317,9 +4317,9 @@ public class MainActivity extends Activity {
             return;
         }
         final long generation = state[1];
-        final boolean guidance = state[5] != 0;
-        chapterAmbienceDialogueActive = !guidance;
-        if (!guidance) stopChapterAmbience(); // Speech keeps priority when Voice or subtitles are muted.
+        final boolean requiresCaption = state[5] != 0;
+        chapterAmbienceDialogueActive = !requiresCaption;
+        if (!requiresCaption) stopChapterAmbience(); // Speech keeps priority when Voice or subtitles are muted.
         if (chapterDialogueSkipPendingGeneration != generation)
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
         final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
@@ -4330,7 +4330,7 @@ public class MainActivity extends Activity {
             stopChapterVoice();
             chapterVoiceGeneration = generation;
         } else updateChapterVoice(line, generation, paused);
-        final boolean subtitles = guidance || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
+        final boolean subtitles = requiresCaption || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
         if (chapterSubtitleGeneration != generation) {
             chapterSubtitleGeneration = generation;
@@ -7309,6 +7309,8 @@ public class MainActivity extends Activity {
             case "world-route": return 190;
             case "world-route-staged": return 191;
             case "rescue-journey-start": return 192;
+            case "bellwether-wayside-archive": return 331;
+            case "bellwether-wayside-archive-open": return 332;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7653,6 +7655,8 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 331:
+            case 332: return new float[]{0.0f, -0.12f};
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};
@@ -8866,8 +8870,13 @@ public class MainActivity extends Activity {
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
         if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
         if ((state & CONTEXTUAL_TAVERN_DIRECTIONS) != 0) return R.string.directions;
-        if ((state & CONTEXTUAL_INSPECT_ARCHIVE) != 0) return R.string.inspect_archive;
-        if ((state & CONTEXTUAL_OPEN_ARCHIVE) != 0) return R.string.open_lower_stone;
+        switch ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) {
+            case 1: return R.string.inspect_archive;
+            case 2: return R.string.open_lower_stone;
+            case 3: return R.string.listen_to_lantern;
+            case 4: return R.string.recall_lantern_words;
+            default: break;
+        }
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
             case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
             case CHEST_PROMPT_OPEN: return R.string.open_chest;

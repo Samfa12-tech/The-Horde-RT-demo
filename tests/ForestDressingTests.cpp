@@ -1514,8 +1514,17 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   "the inspection action is offered at the real wayside mark with Kit still seated");
             ++input.commands.interact;step();
             Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Inspected &&
-                  game.Snapshot().waysideArchiveAction==ArchiveAction::Open,
-                  "one ordinary interaction inspects the archive and enables a separate open action");
+                  game.Snapshot().chapterDialogue.line==Line::LanternFirstHelp &&
+                  game.Snapshot().waysideArchiveAction==ArchiveAction::None,
+                  "inspection starts the practical lantern line before any identity claim");
+            const auto& help=game.Snapshot().chapterDialogue;
+            Check(RequiresChapterCaption(help.line) && std::hypot(help.source.x-game.Snapshot().playerX,
+                  help.source.z-game.Snapshot().playerZ)<1.f,
+                  "the draft caption is essential and its source follows the carried lantern");
+            ++input.commands.dialogueSkip;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Open &&
+                  game.Snapshot().chapterDialogue.line==Line::None,
+                  "skip preserves the open interaction and does not jump ahead to the claim");
             ++input.commands.interact;step();
             Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Opening &&
                   game.Snapshot().waysideArchive.pose.worldFromModel!=ArchivePose{}.worldFromModel,
@@ -1526,11 +1535,21 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             for(unsigned tick=0;tick<65;++tick)step();
             Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
                   game.Snapshot().waysideArchiveAction==ArchiveAction::None &&
-                  game.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel,
-                  "the outward motion completes without replaying or changing the tavern exchange");
+                  game.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel &&
+                  game.Snapshot().chapterDialogue.line==Line::LanternFirstIdentity &&
+                  game.Snapshot().waysideArchive.lanternRevealStarted,
+                  "the lantern makes its identity claim after the stone finishes opening");
+            for(const auto expected:{Line::LanternKingName,Line::LanternFirstRequest,Line::None}) {
+                ++input.commands.dialogueSkip;step();
+                Check(game.Snapshot().chapterDialogue.line==expected,"the reveal keeps its scripted order");
+            }
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Recap,"the final line can be recalled explicitly");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().chapterDialogue.line==Line::LanternFirstRequest,"recap repeats the practical request");
             const auto boundary=game.LatestCampaignBoundary();
-            Check(boundary && boundary->schema==cp::kWaysideArchiveSchema &&
-                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open,
+            Check(boundary && boundary->schema==cp::kShrineLanternSchema &&
+                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open && boundary->waysideLanternRevealStarted &&
+                  boundary->dialogue.activeLine==Line::None,
                   "opening updates the earned tavern autosave even from the shrine spur");
             input.moveForward=1;input.runHeld=true;
             const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
