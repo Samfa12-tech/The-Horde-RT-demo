@@ -1789,8 +1789,10 @@ void TestBellwetherRepeatVisitCheckpoint(
     if(!closed)return;
     const auto carryReach=[&] {
         const auto pose=gameplay::bellwether::TavernDoor::PoseAt(state.tavernDoor.opening);
-        const float floor=terrain->Query(closedView->cameraX,closedView->cameraZ).worldY;
-        return gameplay::items::ComputeRewardLanternForwardClearance(closedView->cameraX,closedView->cameraZ,
+        const auto sill=gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation];
+        const float z=sill.z+.29f;
+        const float floor=terrain->Query(sill.x,z).worldY;
+        return gameplay::items::ComputeRewardLanternForwardClearance(sill.x,z,
             0.f,-1.f,false,true,floor,terrain.get(),&pose);
     };
     const float closedReach=carryReach();
@@ -1804,8 +1806,9 @@ void TestBellwetherRepeatVisitCheckpoint(
         }
     };
     input.yawRadians=0.f;input.moveForward=1.f;
-    step(45);
-    Check(state.playerZ>gameplay::bellwether::kSouthDoorHinge[2] && state.tavernDoor.opening==0.f,
+    step(100);
+    const float stoppedAt=state.playerZ-gameplay::bellwether::kSouthDoorHinge[2];
+    Check(stoppedAt>.24f && stoppedAt<.38f && state.tavernDoor.opening==0.f,
           "the normal player motor cannot pass the closed door");
     input.moveForward=0.f;input.yawRadians=.95f;
     step(1);

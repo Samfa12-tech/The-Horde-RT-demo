@@ -468,7 +468,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             if(doorClosed) {
                 for(std::size_t index=route.size();index>traversal::kBellwetherSouthDoorStation;--index)
                     if(!walkStation(index-1))return finalize(false);
-                if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+                const auto sill=route[traversal::kBellwetherSouthDoorStation];
+                if(!walkTo(input,advance,sill.x,sill.z+.29f))return finalize(false);
                 input.moveForward=0;input.runHeld=false;
                 input.yawRadians=-.41f;
                 input.pitchRadians=checkpoint.pitch;
@@ -477,7 +478,10 @@ inline bool StageDevelopmentCheckpointSimulation(
                 input.commands.interact=state.lastConsumedInteractSequence+1;
                 advance();
                 if(!waitFor([&]{return state.tavernDoor.opening==0.f;},100))return finalize(false);
+                if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+                input.moveForward=0;input.runHeld=false;
                 input.yawRadians=checkpoint.yaw;
+                input.pitchRadians=checkpoint.pitch;
                 advance();
                 return finalize(conversationSaved() && state.tavernDoorAction==bellwether::DoorAction::Open);
             }

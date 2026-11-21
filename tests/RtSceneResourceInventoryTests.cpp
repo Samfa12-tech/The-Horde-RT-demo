@@ -1416,8 +1416,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 38u &&
-                  tomb.staticMeshSlot_.Materials().size() == 37u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 40u &&
+                  tomb.staticMeshSlot_.Materials().size() == 39u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)

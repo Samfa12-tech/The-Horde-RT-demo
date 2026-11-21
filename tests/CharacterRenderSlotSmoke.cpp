@@ -1882,7 +1882,7 @@ int main()
         ok &= Require(
                       CountOccurrences(
                           androidBridgeSource,
-                          "horde::telemetry::RtStage::SimulationStep") == 7u &&
+                          "horde::telemetry::RtStage::SimulationStep") == 8u &&
                       CountOccurrences(
                           windowsSource,
                           "horde::telemetry::RtStage::SimulationStep") == 1u,
