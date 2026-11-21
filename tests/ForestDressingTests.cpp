@@ -1320,6 +1320,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
     unsigned hearthCues=0;
     bool hearthSourceCorrect=true, hearthStoppedForTalk=false;
+    unsigned riverWetFootsteps=0;
+    bool riverSourcesOnSurface=true;
     bool stoneMovesOnlyAfterContact=true;
     unsigned stoneMotionTicks=0;
     std::vector<Line> hearthSpoken;
@@ -1388,6 +1390,11 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         }
         using namespace horde::audio;
         for(const auto& event:game.Events().Events()) {
+            if(event.type==sim::GameplayEventType::PlayerWetFootstep) {
+                ++riverWetFootsteps;
+                const auto waterY=horde::scene::ChapterRegionalWaterSurfaceAt(event.worldX,event.worldZ);
+                riverSourcesOnSurface &= waterY && std::abs(*waterY-event.worldY)<.001f;
+            }
             if(event.type==sim::GameplayEventType::BellwetherHearth) {
                 ++hearthCues;
                 const auto source=sim::ChapterLocalAmbience::kHearthPosition;
@@ -1625,6 +1632,28 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 step();
             };
             const auto interact=[&] {++input.commands.interact;step();};
+            const auto& landing=kBellwetherRiverLanding;
+            const bool reachedShallows=walkTo(mill[1]) && walkTo(kBellwetherSalvagerMark) &&
+                walkStations(landing.begin(),landing.end());
+            Check(reachedShallows && game.Snapshot().playerGrounded && game.Snapshot().waterContact.wetGround,
+                  "the normal motor can descend from the salvager's shore path into the river shallows");
+            if(!reachedShallows)return;
+            const auto wetSteps=game.Snapshot().waterContact.stepCount;
+            for(unsigned crossing=0;crossing<3 && game.Snapshot().waterContact.stepCount==wetSteps;++crossing) {
+                input.runHeld=false;
+                if(!walkTo(kBellwetherRiverDryMark) || !walkTo(landing.back())) {
+                    Check(false,"shallow practice allows repeated entries from dry ground");
+                    return;
+                }
+            }
+            Check(game.Snapshot().waterContact.stepCount>wetSteps && riverWetFootsteps>0 && riverSourcesOnSurface,
+                  "shallow walking emits fixed-step cues with the actual river height");
+            input.runHeld=true;
+            const bool dryReturn=walkTo(kBellwetherRiverDryMark) && !game.Snapshot().waterContact.wetGround &&
+                walkStations(landing.rbegin()+2,landing.rend()) && walkTo(kBellwetherSalvagerMark);
+            Check(dryReturn && game.Snapshot().playerGrounded,
+                  "the same supported causeway lets the player leave the water and return to Bellwether");
+            if(!dryReturn)return;
             const bool visited=walkTo(mill[1]) &&
                 walkTo(kBellwetherSalvagerMark) && game.Snapshot().playerGrounded &&
                 walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) && game.Snapshot().playerGrounded;

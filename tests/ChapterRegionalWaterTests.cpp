@@ -80,6 +80,8 @@ int main(int argc,char** argv){
         const s::ChapterWaterPoint centre{(t[0][0]+t[1][0]+t[2][0])/3,
             (t[0][1]+t[1][1]+t[2][1])/3,(t[0][2]+t[1][2]+t[2][2])/3};
         Check(Distance(centre)<1e-7f,"actual surface triangle interior has zero proximity distance");
+        const auto waterY=s::ChapterRegionalWaterSurfaceAt(centre[0],centre[2]);
+        Check(waterY && Close(*waterY,centre[1]),"vertical contact uses the actual height of each finite face");
         if(i<14){
             lakeArea+=normalY*.5;
             Check(t[0][1]==s::kChapterLakeWorldY && t[1][1]==s::kChapterLakeWorldY && t[2][1]==s::kChapterLakeWorldY,
@@ -105,6 +107,8 @@ int main(int argc,char** argv){
     Check(s::IsNearChapterRegionalWater(lake[0],lake[1]+2,lake[2],2.001f) &&
           !s::IsNearChapterRegionalWater(lake[0],lake[1]+2,lake[2],1.999f),"distance includes vertical separation above actual lake faces");
     const auto dry=s::ChapterWaterFromAtlas(-15,-275,0);
+    Check(!s::ChapterRegionalWaterSurfaceAt(dry[0],dry[2]) && !s::ChapterRegionalWaterSurfaceAt(-4.6f,-15.2f),
+          "vertical contact excludes the lake notch and independently authored tomb runoff");
     Check(!s::IsNearChapterRegionalWater(dry[0],dry[1],dry[2],.1f),"concave shore notch is dry rather than a fabricated inlet pond");
     Check(!s::IsNearChapterRegionalWater(-2.32f,-.925f,-15.26f,20),"tomb runoff never becomes regional water proximity");
     Check(!s::IsNearChapterRegionalWater(-33.7f,2.05f,-12.8f,20) &&

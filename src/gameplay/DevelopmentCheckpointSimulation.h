@@ -198,7 +198,9 @@ inline bool StageDevelopmentCheckpointSimulation(
         using namespace simulation;
         using namespace bellwether;
         const bool millYard=checkpoint.bellwetherBranchView==BellwetherBranchView::MillYard;
-        const auto junction=millYard?traversal::kBellwetherMillJunction:traversal::kBellwetherChurchJunction;
+        const bool riverLanding=checkpoint.bellwetherBranchView==BellwetherBranchView::RiverLanding;
+        const bool east=millYard || riverLanding;
+        const auto junction=east?traversal::kBellwetherMillJunction:traversal::kBellwetherChurchJunction;
         const bool returnsToKit=checkpoint.bellwetherBranchView==BellwetherBranchView::KitIntroduction;
         const bool handoff=checkpoint.bellwetherBranchView==BellwetherBranchView::RegisterHandoff || returnsToKit;
         if(handoff && !gameSimulation.config_.bellwetherRecordKeeperAdmitted)return finalize(false);
@@ -238,7 +240,14 @@ inline bool StageDevelopmentCheckpointSimulation(
         const auto& route=traversal::kBellwetherTavernRoute;
         for(std::size_t i=route.size();i>junction;--i)
             if(!walkStation(route[i-1]))return finalize(false);
-        if(millYard) {
+        if(riverLanding) {
+            if(!walkStation(traversal::kBellwetherMillApproach[1]) || !walkStation(traversal::kBellwetherSalvagerMark))
+                return finalize(false);
+            for(const auto& station:traversal::kBellwetherRiverLanding)
+                if(!walkStation(station))return finalize(false);
+            if(!state.waterContact.wetGround || !walkStation(traversal::kBellwetherRiverLandingView) ||
+               state.waterContact.wetGround)return finalize(false);
+        } else if(millYard) {
             const auto& mill=traversal::kBellwetherMillApproach;
             for(auto station=mill.begin()+1;station!=mill.end();++station)
                 if(!walkStation(*station))return finalize(false);
@@ -260,10 +269,10 @@ inline bool StageDevelopmentCheckpointSimulation(
         input.yawRadians=handoff?0.f:checkpoint.yaw;
         input.pitchRadians=handoff?-.12f:checkpoint.pitch;
         for(unsigned tick=0;tick<120;++tick)advance();
-        if(millYard || checkpoint.bellwetherBranchView==BellwetherBranchView::Church)
+        if(east || checkpoint.bellwetherBranchView==BellwetherBranchView::Church)
             return finalize(state.playerGrounded &&
                 state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated &&
-                (!millYard || std::hypot(state.playerX-checkpoint.cameraX,state.playerZ-checkpoint.cameraZ)<.02f));
+                (!east || std::hypot(state.playerX-checkpoint.cameraX,state.playerZ-checkpoint.cameraZ)<.02f));
         if(state.waysideArchiveAction!=ArchiveAction::Inspect)return finalize(false);
         if(checkpoint.bellwetherBranchView==BellwetherBranchView::Archive)return finalize(true);
         // Stage through the same handlers without consuming sequence numbers

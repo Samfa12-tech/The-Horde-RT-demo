@@ -541,43 +541,68 @@ church_sections = [
     (73.50, 75.20, None),
 ]
 church_half_width = 1.1
-church_centres = [Vector((x, z)) for x, z, _ in church_sections]
-church_normals = []
-for a, b in zip(church_centres, church_centres[1:]):
-    dx, dz = (b - a).normalized()
-    church_normals.append(Vector((-dz, dx)))
-church_top = []
-church_base = []
-for index, (centre, (_, _, height)) in enumerate(zip(church_centres, church_sections)):
-    if index == 0:
-        normal = church_normals[0]
-    elif index == len(church_sections) - 1:
-        normal = church_normals[-1]
-    else:
-        incoming, outgoing = church_normals[index - 1:index + 1]
-        normal = (incoming + outgoing) / (1 + incoming.dot(outgoing))
-    offset = normal * church_half_width
-    edges = (centre - offset, centre + offset)
-    heights = [ground(*point) for point in edges]
-    if height is None:
-        height = min(heights + [ground(*centre)]) - .035
-    for (x, z), terrain_y in zip(edges, heights):
-        church_top.append((x, height, z))
-        church_base.append((x, min(height, terrain_y) - .20, z))
-church_deck = []
-church_walls = []
-offset = len(church_top)
-for index in range(len(church_sections) - 1):
-    left, right = 2 * index, 2 * index + 1
-    next_left, next_right = left + 2, right + 2
-    church_deck.append((left, right, next_right, next_left))
-    church_walls.extend(((next_left, left, left + offset, next_left + offset),
-                         (right, next_right, next_right + offset, right + offset)))
-church_walls.extend(((0, 1, 1 + offset, offset),
-                     (offset - 1, offset - 2, 2 * offset - 2, 2 * offset - 1)))
-mesh("B02_church_approach_deck", church_top, church_deck, walkable)
-mesh("B02_church_approach_retaining", church_top + church_base,
-     [tuple(reversed(face)) for face in church_walls], solids)
+
+
+def stone_approach(name, sections, half_width):
+    centres = [Vector((x, z)) for x, z, _ in sections]
+    normals = []
+    for a, b in zip(centres, centres[1:]):
+        dx, dz = (b - a).normalized()
+        normals.append(Vector((-dz, dx)))
+    top, base = [], []
+    for index, (centre, (_, _, height)) in enumerate(zip(centres, sections)):
+        if index == 0:
+            normal = normals[0]
+        elif index == len(sections) - 1:
+            normal = normals[-1]
+        else:
+            incoming, outgoing = normals[index - 1:index + 1]
+            normal = (incoming + outgoing) / (1 + incoming.dot(outgoing))
+        offset = normal * half_width
+        edges = (centre - offset, centre + offset)
+        heights = [ground(*point) for point in edges]
+        if height is None:
+            height = min(heights + [ground(*centre)]) - .035
+        for (x, z), terrain_y in zip(edges, heights):
+            top.append((x, height, z))
+            base.append((x, min(height, terrain_y) - .20, z))
+
+    deck, walls = [], []
+    offset = len(top)
+    for index in range(len(sections) - 1):
+        left, right = 2 * index, 2 * index + 1
+        next_left, next_right = left + 2, right + 2
+        deck.append((left, right, next_right, next_left))
+        walls.extend(((next_left, left, left + offset, next_left + offset),
+                      (right, next_right, next_right + offset, right + offset)))
+    walls.extend(((0, 1, 1 + offset, offset),
+                  (offset - 1, offset - 2, 2 * offset - 2, 2 * offset - 1)))
+    mesh(name + "_deck", top, deck, walkable)
+    mesh(name + "_retaining", top + base, [tuple(reversed(face)) for face in walls], solids)
+
+
+stone_approach("B02_church_approach", church_sections, church_half_width)
+
+# One continuous stone causeway follows the south edge of the mill and
+# ends under the original river surface. The first section starts below
+# the grade, with retaining sides reaching the bed on the exposed slope.
+river_half_width = .95
+river_sections = [
+    (115.20, 127.80, None), (116.45, 124.57, -10.73), (118.90, 122.75, -12.24),
+    (121.02, 122.55, -13.365), (124.40, 122.55, -15.51),
+    (129.40, 122.55, -18.64), (134.70, 122.55, -21.81),
+    (137.50, 122.55, -23.48), (138.55, 122.55, -23.48),
+]
+stone_approach("B05_river_landing", river_sections, river_half_width)
+river_stations = [(113.68, 127.86), (114.94, 128.44)]
+river_stations += [(x, z) for x, z, _ in river_sections[:-1]] + [(138.11, 122.55)]
+river_dry_mark = (136.55, 122.55)
+river_view = (135.80, 122.55)
+for z in (121.68, 123.42):
+    post_bottom = min(ground(138.46 + dx, z + dz) for dx in (-.08, .08) for dz in (-.08, .08)) - .10
+    box(f"B05_river_landing_post_{z}", 138.38, 138.54, z - .08, z + .08,
+        post_bottom, -22.43, oak)
+box("B05_river_landing_rail", 138.40, 138.52, 121.60, 123.50, -22.71, -22.53, oak)
 
 
 # B09 keeps its mapped footprint and distant silhouette. The old archive
@@ -748,7 +773,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=8700, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=9000, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -806,6 +831,8 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                churchApproach=dict(width=2*church_half_width, sections=church_sections),
                millWaymarkers=mill_waymarkers, millWestDoor=mill_door, millWorkMark=mill_work_mark,
                millComparison=mill_comparison, millBearingBin=mill_bearing_bin,
+               riverLanding=dict(width=2*river_half_width, sections=river_sections, stations=river_stations,
+                                 dryMark=river_dry_mark, view=river_view),
                millLanding=dict(west=landing_west, east=mill_west, north=landing_north,
                                 south=landing_south, height=landing_top),
                waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
@@ -830,6 +857,11 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
+stage.append(f"inline constexpr std::array<std::array<float, 2>, {len(river_stations)}> kRiverLandingStations{{{{")
+stage.extend(f"    {{{x:.6f}f, {z:.6f}f}}," for x, z in river_stations)
+stage.append("}};")
+for name, (x, z) in (("RiverLandingDryMark", river_dry_mark), ("RiverLandingView", river_view)):
+    stage.append(f"inline constexpr std::array<float, 2> k{name}{{{x:.6f}f, {z:.6f}f}};")
 stage += ["", f"inline constexpr unsigned kSolidTriangles={solid_triangles};",
           f"inline constexpr unsigned kGroundTriangles={walkable_triangles};",
           f"inline constexpr unsigned kSouthDoorTriangles={door_triangles};",

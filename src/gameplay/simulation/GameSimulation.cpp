@@ -2350,7 +2350,9 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                                 playerSupport_.grounded);
     const auto wetContact = CurrentCombatRules() ? waterContact_.Step(deltaSeconds,
         playerX_,playerSupport_.worldY,playerZ_,playerSupport_.grounded,footstep,
-        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale)
+        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale,false,
+        UsesRescueExterior() && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation ?
+            effects::WaterContactDomain::RegionalExterior:effects::WaterContactDomain::Tomb)
         : horde::gameplay::effects::WaterContactResult{};
     if(wetContact.streamEntry && config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
         Emit(GameplayEventType::WaterfallContact,EntityId::Player,EntityId::Invalid,
@@ -2364,7 +2366,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
              playerX_,
              playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,
              wetStep ? 0 : dryFootstepCues_.Next(playerSupport_.surface),
-             wetContact.wetStep ? playerSupport_.worldY : 0.f);
+             wetContact.wetStep ? wetContact.sourceY : 0.f);
     }
 }
 

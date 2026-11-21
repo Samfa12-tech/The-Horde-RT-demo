@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <optional>
 #include <string_view>
 
 namespace horde::scene {
@@ -21,6 +22,7 @@ inline constexpr float kChapterRiverHalfWidth = 5.f;
 inline constexpr float kChapterLakeWorldY = -31.55f; // atlas Up=0 lake datum
 inline constexpr std::size_t kChapterLakeWaterTriangles = 14;
 inline constexpr std::size_t kChapterRegionalWaterTriangleCount = 42;
+inline constexpr std::array<std::size_t,4> kChapterRegionalWaterBodyStarts{0,14,38,42};
 inline constexpr ChapterWaterPoint ChapterWaterFromAtlas(float east,float north,float up) {
     return {east+78.3f,up-31.55f,126.2f-north};
 }
@@ -123,7 +125,7 @@ struct ChapterWaterBounds { ChapterWaterPoint minimum{},maximum{}; };
 inline const std::array<ChapterWaterBounds,3>& ChapterRegionalWaterBounds() {
     static const auto bounds=[] {
         std::array<ChapterWaterBounds,3> result{};
-        constexpr std::array<std::size_t,4> starts{0,14,38,42};
+        constexpr auto& starts=kChapterRegionalWaterBodyStarts;
         const auto& triangles=ChapterRegionalWaterTriangles();
         for(std::size_t body=0;body<3;++body) {
             result[body]={triangles[starts[body]][0],triangles[starts[body]][0]};
@@ -137,6 +139,32 @@ inline const std::array<ChapterWaterBounds,3>& ChapterRegionalWaterBounds() {
     }();
     return bounds;
 }
+
+// Vertical intersection against the same finite, sloped faces uploaded for RT.
+inline std::optional<float> ChapterRegionalWaterSurfaceAt(float x,float z) {
+    if(!std::isfinite(x) || !std::isfinite(z))return std::nullopt;
+    const auto& bounds=ChapterRegionalWaterBounds();
+    const auto& triangles=ChapterRegionalWaterTriangles();
+    std::optional<float> surface;
+    for(std::size_t body=0;body<bounds.size();++body) {
+        const auto& box=bounds[body];
+        if(x<box.minimum[0] || x>box.maximum[0] || z<box.minimum[2] || z>box.maximum[2])continue;
+        for(std::size_t i=kChapterRegionalWaterBodyStarts[body];i<kChapterRegionalWaterBodyStarts[body+1];++i) {
+            const auto& [a,b,c]=triangles[i];
+            const double bx=double(b[0])-a[0],bz=double(b[2])-a[2];
+            const double cx=double(c[0])-a[0],cz=double(c[2])-a[2];
+            const double px=double(x)-a[0],pz=double(z)-a[2];
+            const double area=bx*cz-bz*cx;
+            if(area==0.)continue;
+            const double beta=(px*cz-pz*cx)/area,gamma=(bx*pz-bz*px)/area;
+            if(beta<0. || gamma<0. || beta+gamma>1.)continue;
+            const auto y=static_cast<float>(a[1]+beta*(double(b[1])-a[1])+gamma*(double(c[1])-a[1]));
+            if(!surface || y>*surface)surface=y;
+        }
+    }
+    return surface;
+}
+
 // Euclidean distance to the actual triangulated faces (including shore edges),
 // not lake AABB, terrain depression, infinite river line or tomb runoff.
 // Does not establish renderer residency/visibility or automatically enable audio.

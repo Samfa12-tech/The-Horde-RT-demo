@@ -1,9 +1,11 @@
 #include "scene/BellwetherShell.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
+#include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
 #include "scene/ChapterTerrainSurface.h"
+#include "scene/ChapterRegionalWater.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
@@ -195,6 +197,40 @@ int main(int argc,char** argv) {
               !support->NonWalkableVolumeClear(kMillWorkMark[0],kMillWorkMark[2],kMillWorkMark[0]+1.2f,kMillWorkMark[2],
                   workGround.worldY+.05f,workGround.worldY+1.8f,.24f),
               "the workbench has a clear standing mark but blocks movement through its timber");
+        constexpr auto shore=horde::gameplay::traversal::kBellwetherRiverLanding.back();
+        const auto shoreGround=support->Query(shore.x,shore.z);
+        const auto riverY=ChapterRegionalWaterSurfaceAt(shore.x,shore.z);
+        check(shoreGround.found && shoreGround.walkable && shoreGround.triangle>=originalTerrain->TriangleCount() &&
+              riverY && *riverY-shoreGround.worldY>.15f && *riverY-shoreGround.worldY<.28f &&
+              !support->NonWalkableVolumeClear(shore.x,shore.z,shore.x+.55f,shore.z,
+                  shoreGround.worldY+.05f,shoreGround.worldY+1.8f,.24f),
+              "the river terrace supplies shallow stone support and the timber rail blocks the end of the landing");
+        {
+            using namespace horde::gameplay::traversal;
+            auto point=kBellwetherMillApproach[1];
+            constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
+            float foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
+            const auto follow=[&](BellwetherStation target) {
+                const auto start=point;
+                const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/.05f)));
+                for(int i=1;i<=steps;++i) {
+                    const float t=static_cast<float>(i)/steps;
+                    const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
+                    const auto result=ResolveChapterStepMovement(*support,point.x,point.z,next.x,next.z,foot,radius);
+                    if(!result.accepted) {
+                        std::cerr<<"River sweep blocked at "<<next.x<<','<<next.z<<'\n';
+                        return false;
+                    }
+                    point=next;
+                    foot=result.support.worldY;
+                }
+                return true;
+            };
+            const auto& route=kBellwetherRiverLanding;
+            check(follow(kBellwetherSalvagerMark) && std::all_of(route.begin(),route.end(),follow) &&
+                  std::all_of(route.rbegin(),route.rend(),follow) && follow(kBellwetherSalvagerMark),
+                  "ground and body sweeps stay continuous on the way into the river and back");
+        }
         constexpr auto wayside=horde::gameplay::traversal::kBellwetherWaysideApproach.back();
         auto waysideGround=support->Query(wayside.x,wayside.z);
         check(std::abs(wayside.x-kWaysideInspection[0])<.001f && std::abs(wayside.z-kWaysideInspection[2])<.001f &&

@@ -327,6 +327,14 @@ After the hearth conversation, the player can **Inspect mill gearing** at the wo
 
 The two fixtures add 180 triangles to the shared town mesh and reuse its existing materials. Both Windows hardware RT backends presented the bench reference, and the ARM64 debug package contains the same export. Save tests cover earlier records and all three updates to the existing autosave slot.
 
+#### River practice landing
+
+A 1.9 m stone causeway starts just south of the salvager's existing mark, follows the mill's south edge and reaches the west bank of the main river. A timber rail marks the end of the terrace. The river covers the lower stone platform by about 20 cm. The shared collision and render mesh gives the player a continuous walk to and from dry ground.
+
+Shallow contact queries the existing, finite Vulkan water faces and compares their height with the grounded player's feet. Wet steps use the surface height for the sound source and splash droplets. The landing gives the future breathing rig trial and salvager lesson a common place to practise and retreat. The millrace, rig trial and training encounter remain open.
+
+The native walkthrough enters and leaves the shallows, verifies wet-footstep positions against the river height, and continues through the existing mill and shrine interactions. The `bellwether-river-landing` Debug checkpoint walks through the same geometry and then returns to its dry camera position. Both Windows hardware RT backends presented the view at 960 × 540. The Android ARM64 Debug package contains the same town export, with phone performance and listening checks pending.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

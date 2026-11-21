@@ -26,9 +26,24 @@ inline constexpr std::array<float, 3> kWaysideRoadRegister{{103.450000f, -2.9066
 inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.200000f}};
 inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
 inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};
+inline constexpr std::array<std::array<float, 2>, 11> kRiverLandingStations{{
+    {113.680000f, 127.860000f},
+    {114.940000f, 128.440000f},
+    {115.200000f, 127.800000f},
+    {116.450000f, 124.570000f},
+    {118.900000f, 122.750000f},
+    {121.020000f, 122.550000f},
+    {124.400000f, 122.550000f},
+    {129.400000f, 122.550000f},
+    {134.700000f, 122.550000f},
+    {137.500000f, 122.550000f},
+    {138.110000f, 122.550000f},
+}};
+inline constexpr std::array<float, 2> kRiverLandingDryMark{136.550000f, 122.550000f};
+inline constexpr std::array<float, 2> kRiverLandingView{135.800000f, 122.550000f};
 
-inline constexpr unsigned kSolidTriangles=3744;
-inline constexpr unsigned kGroundTriangles=24;
+inline constexpr unsigned kSolidTriangles=3816;
+inline constexpr unsigned kGroundTriangles=40;
 inline constexpr unsigned kSouthDoorTriangles=264;
 inline constexpr float kSouthDoorOpenRadians=1.640609497f;
 inline constexpr float kSouthDoorSwingRadius=2.030f;

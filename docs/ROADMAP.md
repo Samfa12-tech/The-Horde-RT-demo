@@ -126,6 +126,8 @@ The [wayside air ward](superpowers/plans/2026-11-07-bellwether-arrival-direction
 
 The [east route](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#east-route-to-the-mill-yard) leads to the mill's western landing and workbench. The optional [bearing preparation](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#mill-bearing-preparation) adds inspection, recovery and a fit check with saved progress. The artificer's repair, breathing rig, salvager encounter and millrace crossing remain open.
 
+The [river practice landing](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#river-practice-landing) reaches shallow water south of the mill. The native movement and sound systems resolve contact against the same finite surface the renderer uses.
+
 The [arrival plan](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#18-route-and-tavern-checkpoint) records the textured and rigged tavern keeper candidate. Private Debug builds can use her standing pose and retimed walk with the existing door and hearth marks. Both Windows hardware RT backends presented her at the hearth. Phone validation and distribution clearance remain open.
 
 Bounded light RPG direction means ordinary treasure currency, scarce named components, gear/training/upgrades and access preparation through mixable **Magic, Tech and Constitution**. Preserve viable mixed builds, independently sufficient access alternatives, recoverable named-relic sell/return choices and meaningful hub consequences. Exact service menus, prices, XP/skill-point/respec rules, crafting, component quests and rewards remain unresolved or proposed. No automatic general inventory grid, simulated economy, universal quest engine or extra currencies.

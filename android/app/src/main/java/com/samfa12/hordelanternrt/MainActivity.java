@@ -7404,6 +7404,7 @@ public class MainActivity extends Activity {
             case "bellwether-wayside-register-recovered": return 333;
             case "bellwether-church-approach": return 334;
             case "bellwether-mill-yard": return 341;
+            case "bellwether-river-landing": return 342;
             case "bellwether-record-keeper-handoff": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
@@ -7756,6 +7757,7 @@ public class MainActivity extends Activity {
             case 333: return new float[]{0.0f, -0.12f};
             case 334: return new float[]{-1.57f, -0.24f};
             case 341: return new float[]{1.76f, -0.21f};
+            case 342: return new float[]{1.68f, -0.28f};
             case 335: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{1.57079632679f, -0.07f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
