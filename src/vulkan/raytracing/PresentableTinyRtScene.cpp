@@ -3438,7 +3438,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !viewmodelSkin_.ValidateStaticVertexLayout(viewmodelAsset_, diagnostic)) return false;
     }
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
-        const auto clips=horde::scene::CompanionTurnClipBindings();
+        const auto clips=horde::scene::CompanionChapterClipBindings();
         if (!chapterActor_.Load(root / "models/characters/runtime/kit-warden-v1",
                 horde::scene::kCompanionTurnRuntimeFile, clips, diagnostic)) return false;
         if (chapterActor_.Asset().primitives.size() != 1) {

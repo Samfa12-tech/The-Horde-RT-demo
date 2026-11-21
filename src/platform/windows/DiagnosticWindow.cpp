@@ -8262,6 +8262,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"walking\": " << (capture.chapterCompanion.walking ? "true" : "false")
                  << ", \"position\": [" << capture.chapterCompanion.x << ", " << capture.chapterCompanion.y << ", " << capture.chapterCompanion.z << "]"
                  << ", \"yaw\": " << capture.chapterCompanion.yaw << ", \"animationSeconds\": " << capture.chapterCompanion.animationSeconds
+                 << ", \"motionMode\": " << static_cast<unsigned>(capture.chapterCompanion.motion.mode)
+                 << ", \"sitSeconds\": " << capture.chapterCompanion.motion.sitPlaybackSeconds
                  << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}"
                  << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";

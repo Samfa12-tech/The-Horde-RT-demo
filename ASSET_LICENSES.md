@@ -499,17 +499,19 @@ runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
 
 The editable `assets/models/characters/source/kit-hearth-sit-study-v1/` take uses
 the same owner-approved source rig and original Horde tavern furniture.
-Blender motion authoring is by Samfa12/Codex. The take is source-only and
-excluded from runtime packages. The receipt pins both original inputs.
+Blender motion authoring is by Samfa12/Codex. The Blender study and sampled
+references stay outside runtime packages. The 1.8 runtime GLB appends only its
+83-frame joint animation to the preserved 1.7 payload described below. The new
+runtime SHA-256 is `799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d`.
 
 ### Kit same-rig turn runtime promotion (24 October 2026)
 
-`assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
-is a byte-identical promotion of the owned native export
+For 1.7, `assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
+was a byte-identical promotion of the owned native export
 `assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb`:
 2,272,652 bytes, SHA-256
 `a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11`.
-It retains the original seven animations, mesh, materials, skin/bind hierarchy,
+That payload retains the original seven animations, mesh, materials, skin/bind hierarchy,
 accessors and original binary payload, appending only the two offline-authored
 joint-only turn takes. The shared runtime applies the exported yaw separately
 and controls playback timing; no root yaw is embedded in those joint clips.

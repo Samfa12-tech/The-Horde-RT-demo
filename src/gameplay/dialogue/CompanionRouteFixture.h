@@ -4,10 +4,12 @@
 #include "gameplay/dialogue/CompanionTurnProfile.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <algorithm>
 #include <cmath>
 namespace horde::gameplay::dialogue {
-enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing };
+enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing,Tavern };
+inline constexpr float kTavernSitDurationSeconds=82.f/60.f;
 struct CompanionSnapshot {
     // Logical engineering fixture only. No admitted mesh, enemy slot or GPU
     // skinning allocation is implied by this reusable route contract.
@@ -27,6 +29,7 @@ public:
     const CompanionSnapshot& State() const {return state_;}
     void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
     void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
+        if(TavernSitActive())return;
         acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
         state_.acting=acting_.State();
     }
@@ -63,9 +66,49 @@ public:
         state_.y=support.worldY;state_.wait=state_.grounded?CompanionWait::Reunion:CompanionWait::Obstacle;
         state_.yaw=std::atan2(playerX-state_.x,state_.z-playerZ);
     }
+    bool BeginTavernSit() {
+        using namespace bellwether;
+        if(TavernSitActive() || !state_.grounded || state_.walking ||
+           std::hypot(state_.x-kChairSitRoot[0],state_.z-kChairSitRoot[2])>.015f ||
+           std::abs(state_.y-kChairSitRoot[1])>.01f ||
+           std::abs(std::remainder(state_.yaw-kChairFacingRadians,6.28318530718f))>.02f)return false;
+        locomotion_.Reset();acting_.Reset();ClearMotion();
+        state_.locomotion=locomotion_.State();state_.acting=acting_.State();
+        state_.motion.mode=CompanionMotionMode::Sitting;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
+    // Explicit diagnostic seed for the arrival handoff. The placement is
+    // validated against the same scene as travel, before fixed-step playback.
+    bool PlaceForTavernSitInspection(const simulation::TriangleSupportSurface& terrain) {
+        using namespace bellwether;
+        const auto [x,y,z]=kChairSitRoot;
+        constexpr float radius=.24f;
+        const auto support=traversal::ChapterExteriorStepSupport(terrain,x,z,radius);
+        if(!support.grounded || std::abs(support.worldY-y)>.001f ||
+           !traversal::ResolveChapterStepMovement(terrain,x,z,x,z,support.worldY,radius).accepted ||
+           terrain.NonWalkableVolumeClear(kChairSeat[0],kChairSeat[2],kChairSeat[0],kChairSeat[2],
+               kChairSeat[1]-.001f,kChairSeat[1]+.001f,.025f))return false;
+        Reset();
+        state_.x=x;state_.y=support.worldY;state_.z=z;
+        state_.yaw=kChairFacingRadians;state_.grounded=true;
+        return BeginTavernSit();
+    }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false,bool active=true,
               bool guideBasin=false) {
+        if(TavernSitActive()) {
+            if(exterior && active && !paused && std::isfinite(dt) && dt>0 &&
+               state_.motion.mode==CompanionMotionMode::Sitting) {
+                auto& seconds=state_.motion.sitPlaybackSeconds;
+                seconds+=std::min(dt,.05f);
+                if(seconds>=kTavernSitDurationSeconds-.00001f) {
+                    seconds=kTavernSitDurationSeconds;
+                    state_.motion.mode=CompanionMotionMode::Seated;
+                }
+            }
+            return;
+        }
         if(guideBasin && active && exterior && proof) {
             StepBasinGuide(dt,playerX,playerZ,paused,terrain,requireTerrain);return;
         }
@@ -100,6 +143,9 @@ public:
         state_.locomotion=locomotion_.State();
     }
 private:
+    bool TavernSitActive() const {
+        return state_.motion.mode==CompanionMotionMode::Sitting || state_.motion.mode==CompanionMotionMode::Seated;
+    }
 #include "gameplay/dialogue/CompanionTurnPrototype.inl"
     void StepBasinGuide(float dt,float playerX,float playerZ,bool paused,
                         const simulation::TriangleSupportSurface* terrain,bool requireTerrain) {

@@ -633,7 +633,7 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
     vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
     if (bindings.empty() || bindings.size() > kMaximumClipBindings)
     {
-        diagnostic = "Skinned clip bindings must contain between one and six semantic slots.";
+        diagnostic = "Skinned clip bindings must contain between one and seven semantic slots.";
         return false;
     }
     std::ifstream stream(glbPath, std::ios::binary);

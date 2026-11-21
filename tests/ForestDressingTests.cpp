@@ -1224,6 +1224,24 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
               kBellwetherHearthFlame[1]+hearth.height,hearth.radius),
           "the stationary fire fits inside the rendered hearth, over its imported floor");
     using namespace gameplay::bellwether;
+    using namespace gameplay::dialogue;
+    CompanionRouteFixture kit(true);
+    Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
+          "Kit requires the real supported seat handoff before sitting");
+    constexpr float fixed=1.f/60.f;
+    kit.Step(fixed,kConversation[0],kConversation[2],true,true,true,terrain.get(),true);
+    Check(kit.State().motion.sitPlaybackSeconds==0,"pausing leaves the sit at its current pose");
+    for(unsigned tick=0;tick<41;++tick)
+        kit.Step(fixed,kConversation[0],kConversation[2],true,true,false,terrain.get(),true);
+    Check(kit.State().motion.mode==CompanionMotionMode::Sitting &&
+          std::abs(kit.State().motion.sitPlaybackSeconds-41*fixed)<.00001f,
+          "the shared fixed step advances the real lowering sample");
+    for(unsigned tick=0;tick<110;++tick)
+        kit.Step(fixed,record.position.x,record.position.z,true,true,false,terrain.get(),true);
+    Check(kit.State().motion.mode==CompanionMotionMode::Seated &&
+          kit.State().motion.sitPlaybackSeconds==kTavernSitDurationSeconds &&
+          kit.State().x==kChairSitRoot[0] && kit.State().z==kChairSitRoot[2] && !kit.BeginTavernSit(),
+          "the final seat remains planted and does not replay when the player leaves");
     for(const auto& mark:{kChairTurn,kChairApproach,kConversation}) {
         if(!walkTo({mark[0],mark[2]})) {Check(false,"the normal player motor reaches the staged seat and conversation");return;}
     }

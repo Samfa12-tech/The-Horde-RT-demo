@@ -4,6 +4,7 @@
 namespace horde::gameplay::bellwether {
 
 inline constexpr std::array<float, 3> kChairSeat{{82.000000f, -8.219551f, 107.300000f}};
+inline constexpr std::array<float, 3> kChairSitRoot{{82.460000f, -8.709551f, 107.300000f}};
 inline constexpr std::array<float, 3> kChairApproach{{82.980000f, -8.709551f, 107.300000f}};
 inline constexpr std::array<float, 3> kChairTurn{{84.300000f, -8.709551f, 107.300000f}};
 inline constexpr std::array<float, 3> kTableTop{{82.520000f, -7.959551f, 106.130000f}};

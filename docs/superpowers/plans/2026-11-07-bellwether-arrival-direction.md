@@ -94,7 +94,9 @@ The west-wall hearth uses the shared fire system above three charred billets. Or
 
 On the south ramp, the flat carry sweep read the rising floor as a wall after 0.64 m. The shared sweep now follows the standing slope for upward walkable faces. The host fixture recovered the full 2.7 m carry lookahead, and the matched Windows RT view recovered 22,119 primary arm pixels from zero. Separate host collision tests still reject raised ground and low ceilings.
 
-The editable [Kit hearth sit](../../../assets/models/characters/source/kit-hearth-sit-study-v1/README.md) establishes a planted stance and measures the lowering pose on the actual seat. Use it with the existing [same-rig step-turn proof](../../../assets/models/characters/source/kit-step-turn-proof-v1/README.md) to build the short protective approach from the lower road and connect it to the seated pose. The injury and walk, native sit playback, keeper, conversation, tavern checkpoint and combined scene timing remain open.
+The editable [Kit hearth sit](../../../assets/models/characters/source/kit-hearth-sit-study-v1/README.md) establishes a planted stance on the actual seat. The new native clip appends to the existing Kit payload, preserving the earlier mesh, skin and animation bytes. Eight native samples agreed with Blender to within 0.026 mm. The Windows RTX lowering and seated views presented the actor at the same supported root at 0.683 s and 1.367 s, with the final pose held. The player walks to both views through the south door. The diagnostic explicitly places Kit at the handoff before running his fixed-step sit. Kit reads mostly in silhouette under the current hearth and player lantern, so the final conversation needs a dedicated lighting review.
+
+Use the [same-rig step-turn proof](../../../assets/models/characters/source/kit-step-turn-proof-v1/README.md) to build the protective approach from the lower road and connect to the existing native seated pose. The injury and walk, campaign handoff, keeper, conversation, tavern checkpoint and combined scene timing remain open.
 
 ## Open decisions deliberately preserved
 

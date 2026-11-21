@@ -69,8 +69,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 120u,
-          "development registry retains prior views and adds the two tavern inspections");
+    Check(kDevelopmentCheckpoints.size() == 122u,
+          "development registry retains prior views and adds lowering and seated inspections");
     {
         simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
         const auto* hit=FindDevelopmentCheckpoint(238);
@@ -103,6 +103,12 @@ int main()
               view->cameraZ==route[view->bellwetherStations-1].z &&
               FindShowcaseCheckpoint(name)==nullptr,
               "tavern inspections use the mapped, authored movement route and remain development views");
+    }
+    for(const auto name : {"bellwether-kit-lowering","bellwether-kit-seated"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && DevelopmentCheckpointRequiresAuthoredChapter(*view) && view->bellwetherSitTicks!=0 &&
+              view->bellwetherStations==traversal::kBellwetherTavernRoute.size() && FindShowcaseCheckpoint(name)==nullptr,
+              "Kit sit inspections require the full authored player route and explicit fixed-step actor staging");
     }
     for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
         const auto* view=FindDevelopmentCheckpoint(name);

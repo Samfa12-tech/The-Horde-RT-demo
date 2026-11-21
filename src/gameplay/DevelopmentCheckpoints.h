@@ -6,6 +6,7 @@
 
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
 namespace horde::gameplay
 {
@@ -70,6 +71,7 @@ struct DevelopmentCheckpoint
     std::uint8_t rescueTraversalCapture = 0u;
     bool walksBeyondExteriorStation = false;
     std::size_t bellwetherStations = 0;
+    std::uint32_t bellwetherSitTicks = 0;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
 };
@@ -83,7 +85,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 120u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 122u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -214,6 +216,14 @@ inline constexpr std::array<DevelopmentCheckpoint, 120u> kDevelopmentCheckpoints
      .cameraZ=traversal::kBellwetherTavernRoute.back().z,
      .yaw=-.79f,.pitch=-.27f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size()},
+    {.id=322,.name="bellwether-kit-lowering",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=41u},
+    {.id=323,.name="bellwether-kit-seated",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=100u},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

@@ -61,7 +61,8 @@ for obj in rig_objects:
         obj.parent = root
     if obj.name == "Icosphere":
         obj.hide_viewport = obj.hide_render = True
-root.location = (seat.x + .46, seat.y, floor)
+root_x, root_y, root_z = staging["chairSitRoot"]
+root.location = (root_x, -root_z, root_y)
 # +Z authored glTF forward becomes -Y in Blender. The chair faces east.
 root.rotation_euler.z = math.pi / 2
 skin.color = (.28, .37, .43, 1)

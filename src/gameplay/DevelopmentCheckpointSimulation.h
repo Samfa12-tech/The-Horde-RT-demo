@@ -301,6 +301,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             const auto destination=traversal::kBellwetherTavernRoute[station];
             if(!walkTo(destination.x,destination.z))return finalize(false);
         }
+        if(checkpoint.bellwetherSitTicks!=0 && !walkTo(checkpoint.cameraX,checkpoint.cameraZ))
+            return finalize(false);
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a
         // camera-only exterior or invent ready resources for a missing scene.
@@ -309,6 +311,13 @@ inline bool StageDevelopmentCheckpointSimulation(
         // the physical lantern and locomotion pose settle in simulation time;
         // render-only settling frames cannot advance those owners.
         for(int tick=0;tick<120;++tick)advance();
+        if(checkpoint.bellwetherSitTicks!=0) {
+            const auto& terrain=gameSimulation.chapterTerrain_;
+            if(checkpoint.bellwetherSitTicks>120 || !terrain ||
+               !gameSimulation.chapterCompanion_.PlaceForTavernSitInspection(*terrain))return finalize(false);
+            for(std::uint32_t tick=0;tick<checkpoint.bellwetherSitTicks;++tick)advance();
+            if(gameSimulation.Snapshot().chapterCompanion.motion.sitPlaybackSeconds<=0)return finalize(false);
+        }
         if(checkpoint.raisesLanternForCompanion) {
             routeInput.commands.toggleHeldLightPose=gameSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence+1;
             for(int tick=0;tick<100;++tick) {

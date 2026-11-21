@@ -577,18 +577,71 @@ int ValidateNamedTurnBindings(const std::filesystem::path& path,bool normalRunti
           rejected.ClipDuration(SkinnedClip::TurnRight)==0 && rejected.ClipDuration(SkinnedClip::Attack)==0 &&
           rejected.ClipDuration(SkinnedClip::Dead)==0,"optional missing turn retains its own empty slot");
 
-    std::array<SkinnedClipBinding,7> oversized{};
+    std::array<SkinnedClipBinding,8> oversized{};
     std::copy(bindings.begin(),bindings.end(),oversized.begin());
-    const std::string boundsDiagnostic="Skinned clip bindings must contain between one and six semantic slots.";
+    const std::string boundsDiagnostic="Skinned clip bindings must contain between one and seven semantic slots.";
     // Empty paths make precedence observable without creating a test file: an
     // allowed roster reaches the existing open error; invalid rosters do not.
     check(!rejected.LoadClips("",std::span<const SkinnedClipBinding>{},diagnostic) &&
           !rejected.IsLoaded() && diagnostic==boundsDiagnostic,"zero bindings reject before GLB file IO");
     check(!rejected.LoadClips("",oversized,diagnostic) && !rejected.IsLoaded() && diagnostic==boundsDiagnostic,
-          "more than six bindings reject before GLB file IO");
+          "more than seven bindings reject before GLB file IO");
     check(!rejected.LoadClips("",bindings,diagnostic) && !rejected.IsLoaded() &&
           diagnostic.find("Could not open skeleton GLB:")==0,"six bindings reach the existing GLB open diagnostic");
     return finish();
+}
+
+bool CheckHearthSit(const std::filesystem::path& directory) {
+    using namespace horde::scene;
+    const auto path=directory/kCompanionTurnRuntimeFile;
+    const auto reference=directory.parent_path().parent_path()/"source/kit-hearth-sit-study-v1/native/native-sit-reference.bin";
+    const auto bindings=CompanionChapterClipBindings();
+    SkinnedMeshAsset skin;
+    assets::SkinnedPbrActor actor;
+    std::string diagnostic;
+    constexpr auto sit=SkinnedClip::Sit;
+    constexpr float end=horde::gameplay::dialogue::kTavernSitDurationSeconds;
+    if(!skin.LoadClips(path.string(),bindings,diagnostic) ||
+       !actor.Load(directory,kCompanionTurnRuntimeFile,bindings,diagnostic)) {
+        std::cerr<<"Hearth sit import: "<<diagnostic<<'\n';return false;
+    }
+    if(std::abs(skin.ClipDuration(sit)-end)>1e-6f)return false;
+
+    std::ifstream input(reference,std::ios::binary);
+    auto read=[&](auto& value){return bool(input.read(reinterpret_cast<char*>(&value),sizeof(value)));};
+    std::array<char,4> magic{};
+    std::uint32_t samples=0;
+    if(!read(magic) || magic!=std::array<char,4>{'K','S','P','1'} || !read(samples) || samples!=8)return false;
+    std::vector<TexturedSkinnedRtVertex> vertices;
+    std::vector<SkinnedPbrTangent> tangents;
+    float maximum=0,previous=-1;
+    unsigned vertexCount=0;
+    for(unsigned sample=0;sample<samples;++sample) {
+        float seconds=0;
+        std::uint32_t count=0;
+        if(!read(seconds) || !read(count) || !std::isfinite(seconds) || seconds<=previous || seconds>end ||
+           count<64 || count>512 || !skin.SkinUniquePbr(sit,seconds,vertices,tangents,diagnostic) ||
+           !actor.Pose(sit,seconds,diagnostic) || actor.Asset().vertices.size()!=vertices.size())return false;
+        previous=seconds;
+        for(unsigned i=0;i<count;++i) {
+            std::uint32_t index=0;
+            std::array<float,3> expected{};
+            if(!read(index) || !read(expected) || index>=vertices.size())return false;
+            const auto& position=vertices[index].position;
+            for(unsigned axis=0;axis<3;++axis) {
+                if(!std::isfinite(expected[axis]) || !std::isfinite(position[axis]) ||
+                   position[axis]!=actor.Asset().vertices[index].position[axis])return false;
+            }
+            maximum=std::max(maximum,std::hypot(position[0]-expected[0],position[1]-expected[1],position[2]-expected[2]));
+            ++vertexCount;
+        }
+    }
+    if(std::abs(previous-end)>1e-6f || input.peek()!=std::char_traits<char>::eof())return false;
+    const auto seated=actor.Asset();
+    if(!actor.Pose(sit,end+1,diagnostic) || !SameAdmittedActor(seated,actor.Asset()))return false;
+    std::cout<<"Hearth sit native samples="<<samples<<" compared_vertices="<<vertexCount
+        <<" max_blender_error_m="<<maximum<<'\n';
+    return maximum<.00015f;
 }
 
 int main(int argc,char** argv) {
@@ -743,6 +796,7 @@ int main(int argc,char** argv) {
     // runtime additionally has the two named turns; it must pass the shared
     // six-slot roster, optional-hole, endpoint and original Idle/Walk byte gates.
     if(ValidateNamedTurnBindings(runtimeDirectory/kCompanionTurnRuntimeFile,true)!=0)++failures;
+    if(!CheckHearthSit(runtimeDirectory)) { std::cerr<<"Native hearth sit correspondence failed.\n"; ++failures; }
     std::cout<<"Kit source intake clips=7 sampled_poses="<<poses<<" failures="<<failures
         <<" normal_turn_runtime_contract=CHECKED\n";
     return failures?1:0;
