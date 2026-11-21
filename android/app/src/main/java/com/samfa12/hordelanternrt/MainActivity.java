@@ -8863,6 +8863,8 @@ public class MainActivity extends Activity {
         String hint="";
         if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
         else if(flask.hint==5 && now<flaskLessonUntil)hint=getString(flaskLessonResource);
+        else if(flask.hearthNearby())
+            hint=getString(flask.allows(true)?R.string.flask_hearth_rest:R.string.flask_hearth_rest_wait);
         else if(flask.nearbyRestAnchor!=0 && !flask.allows(true))hint=getString(R.string.flask_rest_wait_hint);
         else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
         if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
@@ -8872,8 +8874,9 @@ public class MainActivity extends Activity {
         drinkFlaskButton.setEnabled(flask.allows(false));drinkFlaskButton.setContentDescription(actionDescription);
         restButton.setVisibility(touch && flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
         restButton.setEnabled(flask.allows(true));
-        restButton.setContentDescription(getString(R.string.flask_rest)+". "+getString(flask.restAnchor!=0?
-                R.string.flask_rest_touch_guidance:R.string.flask_rest_wait_hint));
+        restButton.setContentDescription(getString(flask.hearthNearby()?R.string.flask_hearth_rest:R.string.flask_rest)+
+                ". "+getString(flask.restAnchor!=0?R.string.flask_rest_touch_guidance:
+                        flask.hearthNearby()?R.string.flask_hearth_rest_wait:R.string.flask_rest_wait_hint));
         flaskPanel.setVisibility(View.VISIBLE);layoutHealingFlaskHud();positionFlaskTeachingPrompt();
     }
 
@@ -8884,7 +8887,7 @@ public class MainActivity extends Activity {
     private static int flaskHintResource(HealingFlaskUiState state) {
         switch(state.hint) {
             case 1:return R.string.flask_health_full_hint;
-            case 2:return R.string.flask_empty_hint;
+            case 2:return state.hearthNearby()?R.string.flask_hearth_rest:R.string.flask_empty_hint;
             case 3:return R.string.flask_still_hint;
             case 4:return R.string.flask_returning_hint;
             case 5:return R.string.flask_interrupted_hint;

@@ -1157,6 +1157,85 @@ gameplay::campaign::Checkpoint LookoutCheckpoint(
     return record;
 }
 
+void TestBellwetherHearthRest() {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::dialogue;
+    using gameplay::healing::FlaskAction;
+    using gameplay::healing::FlaskResources;
+    std::string diagnostic;
+    auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const sim::TriangleSupportSurface> terrain;
+    TombDressingBuildReport tomb;
+    GraveyardDressingReport graves;
+    const bool admitted=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic);
+    Check(admitted,diagnostic);
+    if(!admitted)return;
+
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=true;
+    config.healingFlask1_7=true;
+    sim::GameSimulation game(config);
+    auto record=LookoutCheckpoint(*terrain);
+    record.id=cp::CheckpointId::BellwetherTavern;
+    record.zone=cp::Destination(record.id);
+    record.position=cp::kBellwetherCheckpointPosition;
+    record.yaw=-1.40f;record.pitch=-.22f;
+    record.vitality=2;record.halfHeart=true;
+    record.schema=cp::kHearthSpeechSchema;record.contentRevision=cp::kBellwetherContentRevision;
+    record.dialogue.hearthLinesResolved=kHearthLines.size();
+    sim::InputSnapshot input;
+    input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
+    const auto restore=[&](const cp::Checkpoint& checkpoint) {
+        const auto token=game.BeginCampaignRestore(checkpoint);
+        return token && game.CommitCampaignRestore(*token,{token->worldGeneration,checkpoint.zone},terrain,input);
+    };
+    const auto step=[&](unsigned count=1) {
+        for(unsigned tick=0;tick<count;++tick)game.StepFixed(input);
+        game.ClearEvents();
+    };
+    if(!restore(record)) {Check(false,"hearth Rest test loads before the tavern Talk");return;}
+    step();
+    const auto& state=game.Snapshot();
+    constexpr auto hearth=static_cast<std::uint32_t>(cp::CheckpointId::BellwetherTavern);
+    Check(!state.flaskRestAnchor && !state.flaskNearbyRestAnchor && state.tavernConversationAvailable,
+          "an earned arrival before the first Talk hides Rest on the actual tavern floor");
+
+    record.schema=cp::kTavernConversationSchema;
+    record.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+    if(!restore(record)) {Check(false,"hearth Rest test loads the completed tavern Talk");return;}
+    step();
+    const auto stillHurt=[&] {
+        return state.healingFlask.resources.charges==0 && state.playerVitals.vitality==2 && state.playerVitals.halfHeart;
+    };
+    Check(state.flaskRestAnchor==hearth && state.flaskNearbyRestAnchor==hearth && stillHurt(),
+          "reloading completed Talk offers hearth Rest and preserves saved injuries and empty charges");
+    const auto generation=state.completedRestGeneration;
+    ++input.commands.rest;step(60);
+    Check(state.healingFlask.action==FlaskAction::Resting,"the shared Rest command starts the hearth service");
+    input.paused=true;step();
+    input.paused=false;step();
+    Check(state.healingFlask.action==FlaskAction::Idle && state.completedRestGeneration==generation && stillHurt(),
+          "pausing interrupts a partial hearth Rest without awarding resources");
+    ++input.commands.rest;step(119);
+    Check(state.healingFlask.action==FlaskAction::Resting && state.completedRestGeneration==generation && stillHurt(),
+          "hearth Rest cannot complete before two seconds");
+    step(4);
+    const auto rested=game.LatestCampaignBoundary();
+    Check(state.completedRestGeneration==generation+1 && state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
+          state.healingFlask.resources==FlaskResources{false,2} && rested && rested->flaskRecorded &&
+          rested->vitality==3 && !rested->halfHeart && rested->flask==state.healingFlask.resources &&
+          rested->position.x==record.position.x && rested->position.z==record.position.z &&
+          rested->dialogue.tavernConversationLinesResolved==kTavernConversation.size(),
+          "hearth Rest heals and refills once and updates the same earned save");
+    input.guardHeld=true;step();
+    Check(!state.flaskRestAnchor && state.flaskNearbyRestAnchor==hearth,
+          "hearth discovery persists during guard without allowing Rest");
+}
+
 void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain,
                               bool stayAtIncident) {
     namespace sim=gameplay::simulation;
@@ -2706,6 +2785,7 @@ void TestTriangleRegionFailures()
 
 int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--bellwether-hearth-rest") {TestBellwetherHearthRest();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--flask-basins") {auditRestBasins=true;TestNativeChapterPrimitiveOwnership();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--containment") {auditContainment=true;TestFullSurroundings();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }

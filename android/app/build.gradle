@@ -374,7 +374,7 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
 if (bellwetherResidentDirectory && (actorWorkerExperiment || hordeStagedPrimaryDebugValidation ||
-        viewmodelCandidate || privateRevivalDirectory || flaskCandidateDirectory)) {
+        viewmodelCandidate || privateRevivalDirectory)) {
     throw new GradleException('Bellwether Debug uses its own application and resident fixture.')
 }
 if (hordeBenchmarkMinRenderScale == 33 &&
@@ -814,8 +814,8 @@ android {
             buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
-                applicationIdSuffix '.debug.bellwether'
-                resValue 'string', 'app_name', 'Horde RT Bellwether Debug'
+                applicationIdSuffix flaskCandidateDirectory ? '.debug.bellwether.flask' : '.debug.bellwether'
+                resValue 'string', 'app_name', flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug'
             } else {
                 applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             }

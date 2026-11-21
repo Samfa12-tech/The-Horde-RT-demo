@@ -220,6 +220,7 @@ std::filesystem::path gBellwetherVoiceDirectory;
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherExpeditionValidation = false;
+bool gBellwetherHearthRestValidation = false;
 #endif
 
 horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
@@ -3385,19 +3386,25 @@ void UpdateFlaskHud(VulkanSurfaceContext& context)
         context.flaskLessonUntil=now+3500;
     }
     std::string hint;
+    using horde::gameplay::campaign::CheckpointId;
+    const bool hearth = s.flaskNearbyRestAnchor==static_cast<std::uint32_t>(CheckpointId::BellwetherTavern);
     switch(s.flaskHint) {
     case FlaskHint::Returning:hint="Returning flask...";break;
     case FlaskHint::Interrupted:hint="Interrupted. No charge used.";break;
     case FlaskHint::Drinking:hint="Drinking... stay still.";break;
     case FlaskHint::Resting:hint="Resting... stay still.";break;
-    case FlaskHint::Empty:if(quiet && (now<context.flaskEmptyHintUntil || now<context.flaskAttemptHintUntil))
+    case FlaskHint::Empty:if(!hearth && quiet && (now<context.flaskEmptyHintUntil || now<context.flaskAttemptHintUntil))
         hint="Empty. Rest at a basin.";break;
     case FlaskHint::FullHealth:if(now<context.flaskAttemptHintUntil)hint="Health full.";break;
     case FlaskHint::StandStill:if(now<context.flaskAttemptHintUntil)hint="Stand still; lower guard.";break;
     default:break;
     }
-    if(hint.empty() && s.flaskNearbyRestAnchor)hint=s.flaskRestAnchor?
-        (controller?"D-pad Down: Rest":"J: Rest"):"Basin nearby";
+    if(hint.empty() && s.flaskNearbyRestAnchor) {
+        if(s.flaskRestAnchor) {
+            hint=controller?"D-pad Down: Rest":"J: Rest";
+            if(hearth)hint+=" by the hearth";
+        } else hint=hearth?"Rest by the hearth":"Basin nearby";
+    }
     if(hint.empty() && quiet && now<context.flaskLessonUntil &&
        (s.flaskHint==FlaskHint::Ready || s.flaskHint==FlaskHint::FullHealth))hint=flask.resources.upgraded?
         "Capacity 3. Rest refills.":"Drink heals one heart. Stay still.";

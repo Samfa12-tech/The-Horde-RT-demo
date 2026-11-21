@@ -1,6 +1,7 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
 #include "gameplay/healing/FlaskRestSites.h"
 
 #include <algorithm>
@@ -3277,11 +3278,23 @@ bool GameSimulation::FlaskCompetingIntent(const InputSnapshot& input) const
         pendingRouteResetCommands_ || pendingRetryCommands_;
 }
 
+bool GameSimulation::AtEarnedBellwetherRestSite() const
+{
+    return campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::BellwetherTavern &&
+        campaignBoundary_->dialogue.tavernConversationLinesResolved==dialogue::kTavernConversation.size() &&
+        traversal::IsOnBellwetherTavernRoomFloor(playerX_,playerSupport_.worldY,playerZ_);
+}
+
 std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() const
 {
     if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
     if(!rescueTraversal_.Snapshot().exteriorSide)return std::nullopt;
+    const auto tavern=campaign::CheckpointId::BellwetherTavern;
+    if(AtEarnedBellwetherRestSite() &&
+       healing::FlaskRestReachClear(*chapterTerrain_,{playerX_,playerSupport_.worldY,playerZ_},
+           campaign::kBellwetherCheckpointPosition) &&
+       BuildCampaignCheckpoint(tavern,true,true))return tavern;
     for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
         auto anchor=traversal::kExteriorLanding;
         if(id==campaign::CheckpointId::ForestEndpoint) {
@@ -3307,6 +3320,12 @@ std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
     // A latched campaign record proves the story was actually earned. Do not
     // rerun usable-now checks here: walking/guarding must not erase discovery.
     const bool exterior=rescueTraversal_.Snapshot().exteriorSide;
+    const auto hearth=campaign::kBellwetherCheckpointPosition;
+    const auto tavern=campaign::CheckpointId::BellwetherTavern;
+    if(exterior && AtEarnedBellwetherRestSite() &&
+       worldRoute_.readiness[static_cast<std::size_t>(campaign::Destination(tavern))]==ZoneReadiness::Ready &&
+       std::hypot(playerX_-hearth.x,playerZ_-hearth.z)<=3.f)
+        return static_cast<std::uint32_t>(tavern);
     for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
         if(!exterior || !rescueTraversal_.Snapshot().firstAscentCompleted ||
            (id==campaign::CheckpointId::ForestEndpoint &&

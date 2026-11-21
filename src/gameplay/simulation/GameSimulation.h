@@ -322,6 +322,7 @@ private:
     bool FlaskCompetingIntent(const InputSnapshot& input) const;
     std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
     std::uint32_t NearbyFlaskRestAnchor() const;
+    bool AtEarnedBellwetherRestSite() const;
     void RefreshFlaskGuidance(const InputSnapshot& input);
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
     void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,

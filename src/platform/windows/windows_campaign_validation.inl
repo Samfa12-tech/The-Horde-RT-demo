@@ -987,7 +987,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
 int FinishHiddenLookoutValidation(HWND owner,int result)
 {
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
-    const int timeLimit = gBellwetherExpeditionValidation ? 190 : 90;
+    const int timeLimit = gBellwetherExpeditionValidation ? 190 : gBellwetherHearthRestValidation ? 110 : 90;
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1181,7 +1181,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
     };
     const auto deadline = std::chrono::steady_clock::now() +
-        std::chrono::seconds(gBellwetherExpeditionValidation ? 165 : 65);
+        std::chrono::seconds(gBellwetherExpeditionValidation ? 165 : gBellwetherHearthRestValidation ? 85 : 65);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1347,6 +1347,43 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     check(campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                         campaign::storage::Status::Read && resumed.encoded == stored.encoded,
                         "resuming the tavern preserves the earned autosave bytes");
+                }
+            }
+            if (progressed && gBellwetherHearthRestValidation) {
+                using namespace horde::gameplay::healing;
+                constexpr auto hearth = static_cast<std::uint32_t>(campaign::CheckpointId::BellwetherTavern);
+                progressed = check(state.healingFlaskEnabled && state.flaskRestAnchor == hearth &&
+                    state.flaskNearbyRestAnchor == hearth && state.healingFlask.resources.charges == 0 &&
+                    stored.checkpoint.flaskRecorded && stored.checkpoint.flask == state.healingFlask.resources,
+                    "the rendered tavern reload offers hearth Rest with the exact empty flask");
+                if (progressed) {
+                    const auto restGeneration = state.completedRestGeneration;
+                    ++input.commands.rest;
+                    progressed = check(step() && state.healingFlask.action == FlaskAction::Resting &&
+                        state.healingFlask.resources.charges == 0 && waitFor([&] {
+                            return state.completedRestGeneration > restGeneration;
+                        }, 123) && state.completedRestGeneration == restGeneration + 1 &&
+                        state.healingFlask.resources == FlaskResources{false,2} && frame(),
+                        "a deliberate fixed-step Rest completes once and presents the refilled flask state");
+                }
+                if (progressed) {
+                    campaign::storage::StoredCheckpoint rested;
+                    progressed = check(until([&] {
+                        return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", rested).status ==
+                            campaign::storage::Status::Read && rested.checkpoint.flask == FlaskResources{false,2} &&
+                            ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                    }, false) && rested.checkpoint.id == stored.checkpoint.id &&
+                        rested.checkpoint.position.x == stored.checkpoint.position.x &&
+                        rested.checkpoint.position.z == stored.checkpoint.position.z &&
+                        rested.checkpoint.dialogue.tavernConversationLinesResolved == kTavernConversation.size(),
+                        "native autosave persists the refilled flask at the same earned tavern boundary");
+                    if (progressed) {
+                        const auto restGeneration = state.completedRestGeneration;
+                        check(reloadTavern() && step() && atHearth() && frame() &&
+                            state.healingFlask.resources == rested.checkpoint.flask &&
+                            state.healingFlask.action == FlaskAction::Idle && state.completedRestGeneration == restGeneration,
+                            "native Load presents the rested save without replaying Rest");
+                    }
                 }
             }
             if (progressed && gBellwetherExpeditionValidation) {
@@ -1541,7 +1578,7 @@ bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
     bool requested=false,lookoutRequested=false,earnTavernRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
-    bool expeditionRequested = false;
+    bool expeditionRequested = false, hearthRestRequested = false;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -1551,6 +1588,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--bellwether-earn-tavern")earnTavernRequested=true;
         if(arg==L"--bellwether-verify-expedition-leads"){earnTavernRequested=true;expeditionRequested=true;}
+        if(arg==L"--bellwether-verify-hearth-rest"){earnTavernRequested=true;hearthRestRequested=true;}
         if(arg==L"--route-validate-hidden")routeRequested=true;
         if(arg==L"--route-kit-turn-start")routeTurnStartRequested=true;
         if(arg==L"--route-natural-walk")routeNaturalWalkRequested=true;
@@ -1565,6 +1603,10 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--campaign-test-root" && i+1<count)directory=args[++i];
     }
     LocalFree(args);
+    if (hearthRestRequested && (expeditionRequested || !HORDE_RT_FLASK_ADMITTED)) {
+        std::cerr << "Hidden hearth Rest requires its own flask-enabled campaign validation run.\n";
+        return false;
+    }
     if (earnTavernRequested && (!lookoutRequested || inspectKit)) {
         std::cerr << "Earning a tavern save requires the isolated hidden lookout fixture without actor inspection.\n";
         return false;
@@ -1611,6 +1653,7 @@ bool ConfigureHiddenCampaignValidation()
     }
     gBellwetherEarnTavernValidation = earnTavernRequested;
     gBellwetherExpeditionValidation = expeditionRequested;
+    gBellwetherHearthRestValidation = hearthRestRequested;
     if (earnTavernRequested) gHiddenCampaignFaults.lookoutReadOnly = false;
     gRouteReturnRecovery=returnRequested;
     if((routeRequested || returnRequested) && !PrepareHiddenRouteFixture(absolute)){
