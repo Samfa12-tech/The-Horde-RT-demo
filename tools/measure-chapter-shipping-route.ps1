@@ -25,8 +25,17 @@ if($doorway) {
  foreach($argument in @('bellwether-repeat-visit','--measure-bellwether-doorway','--capture-hidden',
   '--chapter-resident-fixture',$fixture)){$start.ArgumentList.Add($argument)}
  $fixtureHashes=@{}
- foreach($name in @('asset.manifest.json','resident.glb')) {
-  $fixtureHashes[$name]=(Get-FileHash -LiteralPath (Join-Path $fixture $name) -Algorithm SHA256).Hash.ToLowerInvariant()
+ $rolePrefixes=@('')
+ if(Test-Path -LiteralPath (Join-Path $fixture 'tavern-keeper') -PathType Container) {
+  $rolePrefixes=@('tavern-keeper/','record-keeper/')
+ }
+ foreach($prefix in $rolePrefixes) {
+  foreach($name in @('asset.manifest.json','resident.glb','base-color.windows.ktx2','normal.windows.ktx2','orm.windows.ktx2')) {
+   $relative=$prefix+$name
+   $path=Join-Path $fixture $relative
+   if($name.EndsWith('.ktx2') -and !(Test-Path -LiteralPath $path -PathType Leaf)){continue}
+   $fixtureHashes[$relative]=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+  }
  }
 }else{
  $start.ArgumentList.Add('chapter-kit-reunion')

@@ -655,6 +655,7 @@ public:
     {
         return lastInstanceMasks_;
     }
+    [[nodiscard]] std::uint8_t SubmittedInstanceMask(std::uint32_t metadataIndex) const noexcept;
     bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
     std::uint32_t LastPlayerWorldBodyInstanceFlags() const { return lastPlayerWorldBodyInstanceFlags_; }
     const PlayerGripAgreement& RewardLanternGripAgreement() const

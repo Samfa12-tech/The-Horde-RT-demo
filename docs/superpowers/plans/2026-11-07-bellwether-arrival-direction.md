@@ -134,6 +134,8 @@ The Windows **doorway measurement** starts from the completed repeat-visit check
 
 Use [`tools/measure-chapter-shipping-route.ps1`](../../../tools/measure-chapter-shipping-route.ps1) with `-Configuration Debug`, `-BellwetherResidentFixture`, an exact `-Executable`, and a fresh `-Output`. `-Query` selects RayQueryCompute. Run [`tools/analyze-chapter-route-measurement.py`](../../../tools/analyze-chapter-route-measurement.py) with `--bellwether-doorway` and the output directory. The launcher hashes the binary and fixture, and the verifier checks the complete sequence of returned frames before reporting phase GPU statistics.
 
+The doorway replay also accepts the two-role directory from `bellwether-return-to-kit`. The launcher hashes each role's GLB, manifest, and available Windows texture arrays. For this configuration the verifier requires the record keeper's submitted instance in every frame. The native journal looks up submitted metadata IDs for Kit, the window and both residents so that inserting unrelated props into the TLAS cannot change which instances it measures.
+
 On the RTX 5050 Laptop GPU, RayTracingPipeline and RayQueryCompute each completed both live trips in 5,232 simulation ticks. The runs covered 1,580 and 1,586 successfully presented frames respectively, all with valid GPU timing. After the first five seconds, room GPU p95 was 5.04 ms for Pipeline and 4.75 ms for Query. At the square it was 11.49 ms and 10.91 ms. Both used 34 TLAS definitions, 25 BLAS owners and 422,934,704 bytes of device-local RT allocations across the route. Kit, the window and the stand-in stayed live throughout. Three lights were uploaded in the room and two at the square. These are single hidden Debug runs. Production pacing, the final keeper and physical phone budgets still need their own evidence.
 
 The northwest approach now has a west-facing **CHURCH** arrow at the actual fork. The original post and chisel-stroke lettering are part of the editable Bellwether tavern source. The closed meshes add 364 triangles to the shared render and contact geometry and use the existing timber and char finishes. The wider timber inlay is clearer at the fork than the trial stone lettering in a matched Windows RT view. Both hardware RT backends presented it at 960 × 540 using the normal night and carried lantern.
@@ -175,6 +177,19 @@ The hidden Windows `bellwether-return-to-kit` checkpoint starts from the earned 
 The replay raises the lantern through the normal input command. The exchange waits for an acknowledged hardware RT presentation of that pose. The capture then advances to Kit's first reply and verifies that the save retains both the register interpretation and the start of Kit's response. The manifest records the raised-lantern presentation tick and the later reply frame.
 
 At 960 × 540 on the RTX 5050 Laptop GPU, both RayTracingPipeline and RayQueryCompute acknowledged the raise at simulation tick 8,822 and presented the reply at tick 8,985. All three actor instances were active, with 37 TLAS definitions, 28 BLAS owners, three uploaded lights and 441,697,264 bytes in device-local RT allocations on each backend. The fixed-step route stages the reply view before capture. Continuous route performance, streaming retirement, the final tavern keeper and phone validation remain open.
+
+### Measured doorway route with three actors
+
+With the textured record keeper and tavern keeper stand-in loaded, both Windows hardware RT backends completed two live doorway round trips on the RTX 5050 Laptop GPU. The 960 × 540 runs used the same Debug executable and Diagnostic High profile. RayTracingPipeline presented 1,575 frames over 97.33 seconds and RayQueryCompute presented 1,565 over 98.58 seconds. All frames had valid GPU timings, joined to their owning presentations. The submitted masks for Kit, both residents and the window stayed active in every measured frame. Each run advanced 5,232 simulation ticks.
+
+| GPU p95 after the five-second warmup | RayTracingPipeline | RayQueryCompute |
+| --- | ---: | ---: |
+| Tavern | 5.06 ms | 4.72 ms |
+| Outbound doorway | 5.33 ms | 4.81 ms |
+| Square | 11.47 ms | 10.74 ms |
+| Inbound doorway | 10.74 ms | 10.52 ms |
+
+Both runs held 37 TLAS definitions, 28 BLAS owners and 441,697,264 bytes of device-local RT allocations throughout. A negative replay of the journal rejected a missing record keeper mask at the square. Display pacing, streaming retirement, the final tavern keeper and physical phone performance remain open.
 
 ## Open decisions deliberately preserved
 

@@ -692,6 +692,7 @@ struct VulkanSurfaceContext
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
     std::filesystem::path chapterResidentFixture;
     bool staffedTavernCapture = false;
+    bool combinedBellwetherResidents = false;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
@@ -6647,15 +6648,14 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         const std::vector<horde::scene::SkinnedClipBinding> clips{
             {"Warden|idle", true, true}, {"Warden|walk", true, true}};
         std::vector<ChapterResidentActorSource> fixtures;
-        const bool returnToKit = ctx.developmentCheckpoint == "bellwether-return-to-kit";
         if (ctx.staffedTavernCapture) {
             fixtures.push_back({horde::gameplay::dialogue::kTavernKeeperActorId,
-                returnToKit ? ctx.chapterResidentFixture / "tavern-keeper" : ctx.chapterResidentFixture,
+                ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "tavern-keeper" : ctx.chapterResidentFixture,
                 "resident.glb", clips});
         }
-        if (returnToKit || ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
+        if (ctx.combinedBellwetherResidents || ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
             fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
-                returnToKit ? ctx.chapterResidentFixture / "record-keeper" : ctx.chapterResidentFixture,
+                ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "record-keeper" : ctx.chapterResidentFixture,
                 "resident.glb", {clips.front()}});
         }
         if (fixtures.empty()) {
@@ -9787,6 +9787,11 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
     context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
     context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
+    std::error_code fixtureError;
+    context.combinedBellwetherResidents=developmentCheckpoint &&
+        (*developmentCheckpoint=="bellwether-return-to-kit" ||
+         (*developmentCheckpoint=="bellwether-repeat-visit" && !context.chapterResidentFixture.empty() &&
+          std::filesystem::is_directory(context.chapterResidentFixture / "tavern-keeper", fixtureError)));
 #if HORDE_RT_FRAME_STAGE_PROBE
     context.captureGpuStages=ParseCaptureLaunchOptions().captureGpuStages;
 #endif
@@ -9817,9 +9822,9 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         // Normal application configuration, settings and save schema stay OFF.
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
         simulationConfig.bellwetherTavernKeeperAdmitted=context.staffedTavernCapture;
-        simulationConfig.bellwetherRecordKeeperAdmitted=developmentCheckpoint &&
-            (*developmentCheckpoint=="bellwether-record-keeper-handoff" ||
-             *developmentCheckpoint=="bellwether-return-to-kit") && !context.chapterResidentFixture.empty();
+        simulationConfig.bellwetherRecordKeeperAdmitted=!context.chapterResidentFixture.empty() &&
+            (context.combinedBellwetherResidents ||
+             (developmentCheckpoint && *developmentCheckpoint=="bellwether-record-keeper-handoff"));
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }

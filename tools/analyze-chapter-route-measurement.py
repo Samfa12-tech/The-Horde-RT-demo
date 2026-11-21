@@ -180,6 +180,8 @@ def analyze_bellwether(name, analysis_name):
     assert 60 <= run['durationSeconds'] <= 150 and run['simulationHz'] == 60
     assert not run['unoccludedClientChecks'] and not run['foregroundRequested']
     assert run['scope'].startswith('Debug CPU') and receipt['residentFixtureHashes']
+    record_keeper_included = run.get('recordKeeperIncluded', False)
+    assert record_keeper_included == ('record-keeper/resident.glb' in receipt['residentFixtureHashes'])
     assert manifest['complete'] and receipt['backend'] == manifest['executionBackend']
     assert manifest['captures'][0]['bellwetherVisit']['quietReturns'] == 2
     assert len(rows) == run['completedSamples'] == run['renderedFrames']
@@ -198,6 +200,8 @@ def analyze_bellwether(name, analysis_name):
         assert all(int(row[column]) == 0 for column in row if column.endswith('_overflow'))
         if row['phase'] == 'room':
             assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', '1', '1']
+        if record_keeper_included:
+            assert row['record_keeper_mask'] == '1'
     keys = set()
     for item in journal:
         frame = item['evidence']
@@ -206,6 +210,9 @@ def analyze_bellwether(name, analysis_name):
         row = by_serial[serial]
         assert serial not in keys
         keys.add(serial)
+        assert identity['sceneEpoch'] == int(row['scene_epoch'])
+        assert identity['measurementGeneration'] == int(row['generation'])
+        assert identity['completionSerial'] == serial
         assert identity['simulationTick'] == int(row['tick']) and item['phase'] == row['phase']
         assert item['station'] == int(row['station'])
         assert frame['presentation']['outcome'] == 'presented'
@@ -213,7 +220,12 @@ def analyze_bellwether(name, analysis_name):
         assert frame['pipeline']['executionBackend'] == receipt['backend']
         assert frame['pipeline']['activeSha256'] == row['shader_sha256']
         assert frame['gpu']['status'] == row['gpu_status']
+        if frame['gpu']['status'] == 'valid':
+            assert frame['gpu']['completedSubmissionSerial'] == serial
+            assert math.isclose(frame['gpu']['wholeRtGpuMs'], int(row['gpu_ns']) / 1e6, abs_tol=0.0001)
         assert frame['resources']['deviceLocalBytes'] == int(row['device_local_bytes'])
+        assert frame['resources']['tlasInstanceCount'] == int(row['tlas_instances'])
+        assert frame['resources']['bottomLevelAccelerationStructureCount'] == int(row['blas_owners'])
         assert frame['fireLighting']['count'] == int(row['fire_count'])
     assert serials[0] in keys and serials[-1] in keys
     assert {item['phase'] for item in journal} == set(phases)
