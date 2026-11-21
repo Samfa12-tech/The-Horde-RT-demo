@@ -161,6 +161,64 @@ inline bool StageDevelopmentCheckpointSimulation(
         gameSimulation.ClearEvents();
         return staged;
     };
+    const auto walkTo=[&](simulation::InputSnapshot& input,const auto& advance,float x,float z) {
+        for(int tick=0;tick<2600;++tick) {
+            const auto& state=gameSimulation.Snapshot();
+            const float dx=x-state.playerX,dz=z-state.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.008f)return true;
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.0f,distance/.055f);
+            input.runHeld=distance>.3f;
+            advance();
+        }
+        return false;
+    };
+
+    if(checkpoint.bellwetherSitTicks!=0) {
+        using namespace simulation;
+        if(!chapterTerrain || checkpoint.bellwetherSitTicks>120 ||
+           checkpoint.bellwetherStations!=traversal::kBellwetherTavernRoute.size())return finalize(false);
+        // Model the public 1.7 continuation with the ordinary validated save
+        // transaction. Both actors then travel the route through fixed steps.
+        campaign::Checkpoint record;
+        record.contentRevision=2;record.id=campaign::CheckpointId::ForestEndpoint;
+        record.zone=WorldZoneId::Lookout;record.firstAscentCompleted=true;
+        const auto lookout=kWorldRoutePoints.back();
+        const auto support=traversal::ChapterExteriorSupport(chapterTerrain.get(),lookout.x,lookout.z);
+        if(!support.grounded)return finalize(false);
+        record.position={lookout.x,support.worldY,lookout.z};record.yaw=2.51f;record.pitch=-.15f;
+        auto& progress=record.dialogue;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        InputSnapshot input;
+        input.damageEnabled=false;input.tutorialEnabled=false;
+        input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
+        const auto token=gameSimulation.BeginCampaignRestore(record);
+        if(!token || !gameSimulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},chapterTerrain,
+                input,gameSimulation.Snapshot().inputPublicationSequence))return finalize(false);
+        for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+            if(!gameSimulation.PublishChapterTerrain({token->worldGeneration,static_cast<WorldZoneId>(zone)},chapterTerrain))
+                return finalize(false);
+        const auto advance=[&] {
+            stepFixed(input,1.f/60.f,gameSimulation.Snapshot().inputPublicationSequence+1);
+            accumulateEvents();gameSimulation.ClearEvents();
+        };
+        advance(); // Release the restored input barrier with an exact neutral publication.
+        for(const auto& station:traversal::kBellwetherTavernRoute)
+            if(!walkTo(input,advance,station.x,station.z))return finalize(false);
+        if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+        input.moveForward=0;input.runHeld=false;
+        input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+        const float wanted=std::min(checkpoint.bellwetherSitTicks/60.f,dialogue::kTavernSitDurationSeconds);
+        for(unsigned tick=0;tick<5400;++tick) {
+            const auto& kit=gameSimulation.Snapshot().chapterCompanion;
+            if(kit.motion.sitPlaybackSeconds+.00001f>=wanted)
+                return finalize(gameSimulation.Snapshot().chapterDialogue.forestVillageConsumed);
+            advance();
+        }
+        return finalize(false);
+    }
 
     if(checkpoint.combatFeedbackCapture) {
         if(checkpoint.combatFeedbackCapture>5u || !gameSimulation.config_.combatFoundation1_7 ||
@@ -274,35 +332,20 @@ inline bool StageDevelopmentCheckpointSimulation(
         if(checkpoint.rescueTraversalCapture!=0u)return finalize(false);
         // Capture route stations through real fixed-step movement and native
         // support/collision after ascent, never a teleport through blockers.
-        const auto walkTo=[&](float x,float z) {
-            for(int tick=0;tick<2600;++tick) {
-                const auto& state=gameSimulation.Snapshot();
-                const float dx=x-state.playerX,dz=z-state.playerZ;
-                const float distance=std::hypot(dx,dz);
-                if(distance<.008f)return true;
-                routeInput.yawRadians=std::atan2(dx,-dz);
-                routeInput.moveForward=std::min(1.0f,distance/.055f);
-                routeInput.runHeld=distance>.3f;
-                advance();
-            }
-            return false;
-        };
         if(checkpoint.exteriorRouteStation>=simulation::kWorldRoutePoints.size() ||
            checkpoint.bellwetherStations>traversal::kBellwetherTavernRoute.size())return finalize(false);
         for(std::size_t station=3;station<=checkpoint.exteriorRouteStation;++station) {
             const auto destination=simulation::kWorldRoutePoints[station];
-            if(!walkTo(destination.x,destination.z))return finalize(false);
+            if(!walkTo(routeInput,advance,destination.x,destination.z))return finalize(false);
         }
         // A mapped approach capture continues from F04 using the same motor;
         // the camera target is never used as an authoritative teleport.
-        if(checkpoint.walksBeyondExteriorStation && !walkTo(checkpoint.cameraX,checkpoint.cameraZ))
+        if(checkpoint.walksBeyondExteriorStation && !walkTo(routeInput,advance,checkpoint.cameraX,checkpoint.cameraZ))
             return finalize(false);
         for(std::size_t station=0;station<checkpoint.bellwetherStations;++station) {
             const auto destination=traversal::kBellwetherTavernRoute[station];
-            if(!walkTo(destination.x,destination.z))return finalize(false);
+            if(!walkTo(routeInput,advance,destination.x,destination.z))return finalize(false);
         }
-        if(checkpoint.bellwetherSitTicks!=0 && !walkTo(checkpoint.cameraX,checkpoint.cameraZ))
-            return finalize(false);
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a
         // camera-only exterior or invent ready resources for a missing scene.
@@ -311,13 +354,6 @@ inline bool StageDevelopmentCheckpointSimulation(
         // the physical lantern and locomotion pose settle in simulation time;
         // render-only settling frames cannot advance those owners.
         for(int tick=0;tick<120;++tick)advance();
-        if(checkpoint.bellwetherSitTicks!=0) {
-            const auto& terrain=gameSimulation.chapterTerrain_;
-            if(checkpoint.bellwetherSitTicks>120 || !terrain ||
-               !gameSimulation.chapterCompanion_.PlaceForTavernSitInspection(*terrain))return finalize(false);
-            for(std::uint32_t tick=0;tick<checkpoint.bellwetherSitTicks;++tick)advance();
-            if(gameSimulation.Snapshot().chapterCompanion.motion.sitPlaybackSeconds<=0)return finalize(false);
-        }
         if(checkpoint.raisesLanternForCompanion) {
             routeInput.commands.toggleHeldLightPose=gameSimulation.Snapshot().lastConsumedToggleHeldLightPoseSequence+1;
             for(int tick=0;tick<100;++tick) {

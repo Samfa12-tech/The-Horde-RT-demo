@@ -15,6 +15,26 @@
         turnStartYaw_=state_.yaw;turnElapsed_=entryElapsed_=0;
         entryStartWeight_=m.idleZeroWeight;m.entryWeight=entryStartWeight_;
     }
+    bool AdvanceTurn(float dt) {
+        auto& m=state_.motion;
+        locomotion_.StepWeighted(dt,0,0);state_.locomotion=locomotion_.State();
+        if(m.entryWeight<1) {
+            entryElapsed_+=dt;
+            m.entryWeight=entryStartWeight_+(1-entryStartWeight_)*std::min(float(entryElapsed_/.18),1.f);
+            m.idleZeroWeight=m.entryWeight;
+            // Keep progress through the entry and the foot exchange on separate ticks.
+            return false;
+        }
+        constexpr float minimumTurn=.01745329252f;
+        if(std::abs(m.turnAngleRadians)>minimumTurn) {
+            turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/m.turnPlaybackSeconds),1.f);
+            state_.yaw=turnStartYaw_-companion_turn::ModelYaw(m.turnAngleRadians>0,m.turnPhase)*
+                (std::abs(m.turnAngleRadians)/companion_turn::maxAngle);
+            if(m.turnPhase<1)return false;
+        }
+        m.idleZeroWeight=1;
+        return true;
+    }
     void StepTurnStart(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
                        const simulation::TriangleSupportSurface* terrain,bool requireTerrain,bool active) {
         if(paused) {state_.wait=CompanionWait::Paused;return;}
@@ -73,22 +93,7 @@
         const float error=HeadingError(target,state_.yaw);
         constexpr float departureBand=.01745329252f,idleBand=.1745329252f;
         if(m.mode==CompanionMotionMode::Turning) {
-            locomotion_.StepWeighted(dt,0,0);state_.locomotion=locomotion_.State();
-            if(m.entryWeight<1) {
-                entryElapsed_+=dt;
-                m.entryWeight=entryStartWeight_+(1-entryStartWeight_)*std::min(float(entryElapsed_/.18),1.f);
-                m.idleZeroWeight=m.entryWeight;
-                // The entry uses the entire fixed step; active root/joint time
-                // starts on the next step. No double advancement at the join.
-                return;
-            }
-            if(std::abs(m.turnAngleRadians)>departureBand) {
-                turnElapsed_+=dt;m.turnPhase=std::min(float(turnElapsed_/m.turnPlaybackSeconds),1.f);
-                state_.yaw=turnStartYaw_-companion_turn::ModelYaw(m.turnAngleRadians>0,m.turnPhase)*
-                    (std::abs(m.turnAngleRadians)/companion_turn::maxAngle);
-                if(m.turnPhase<1)return;
-            }
-            m.idleZeroWeight=1;
+            if(!AdvanceTurn(dt))return;
             const float latest=HeadingError(target,state_.yaw);
             if(std::abs(latest)>(lead?departureBand:idleBand)) {BeginTurn(latest,travelIntent);return;}
             m.mode=lead?CompanionMotionMode::Starting:CompanionMotionMode::Idle;m.speed=0;

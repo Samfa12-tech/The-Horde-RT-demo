@@ -51,9 +51,14 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     const bool guidePending=config_.healingFlask1_7 && chapterDialogue_.BasinGuidePending();
     const bool readyToLead=chapterDialogue_.State().line!=Line::ReunionProof &&
         chapterDialogue_.State().line!=Line::ReunionFirstPiece;
+    const auto* terrain=chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr;
+    if(c.exterior && c.alive && !c.traversing && !c.paused && terrain &&
+       campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint &&
+       chapterDialogue_.State().line==Line::None && playerSupport_.grounded)
+        chapterCompanion_.TryStartBellwetherArrival(playerX_,playerZ_,*terrain);
     chapterCompanion_.Step(seconds,playerX_,playerZ_,c.exterior,
         chapterDialogue_.State().proofAccepted && (!guidePending || readyToLead),c.paused,
-        chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr,
+        terrain,
         config_.authoredChapterTerrain,c.alive&&!c.traversing,
         guidePending && readyToLead);
     bindCompanion();

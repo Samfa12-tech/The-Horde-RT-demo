@@ -16,7 +16,7 @@ Editable study SHA-256 `74833c7727fbf319b9f0701b8b62d20d422df5ad018f82838e7aa19f
 
 ## Native take
 
-`Kit|hearth_sit` is bound on the existing Kit asset and keeps its authored floor height. The shared simulation advances the one-shot take and holds its last frame. Two explicit development views drive the player to the room and stage Kit at his measured contact mark. The lower-road injury, walk and turn will lead to that mark in campaign play.
+`Kit|hearth_sit` is bound on the existing Kit asset and keeps its authored floor height. The shared simulation advances the one-shot take and holds its last frame. The development views begin at a restored 1.7 lookout and exercise the campaign route to the measured chair mark. The route already turns into the sit. The lower-road ankle catch and protective gait still need their authored clips.
 
 ```powershell
 blender --background --disable-autoexec assets/models/characters/source/kit-hearth-sit-study-v1/kit-hearth-sit.blend --python-exit-code 1 --python assets/models/characters/source/kit-step-turn-proof-v1/export_native.py -- --hearth-sit --output build/kit-hearth-native-rebuild

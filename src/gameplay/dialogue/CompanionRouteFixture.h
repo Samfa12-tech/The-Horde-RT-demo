@@ -4,11 +4,13 @@
 #include "gameplay/dialogue/CompanionTurnProfile.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
 #include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <algorithm>
 #include <cmath>
 namespace horde::gameplay::dialogue {
 enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing,Tavern };
+enum class BellwetherArrivalStage { AtLookout, OnRoad, AnkleAssessment, ProtectiveApproach, ChairTurn, Lowering, Seated };
 inline constexpr float kTavernSitDurationSeconds=82.f/60.f;
 struct CompanionSnapshot {
     // Logical engineering fixture only. No admitted mesh, enemy slot or GPU
@@ -22,12 +24,14 @@ struct CompanionSnapshot {
     CompanionActingPose acting{};
     CompanionLocomotionPose locomotion{};
     CompanionMotionPose motion{}; // Transient shared recipe, never serialized.
+    BellwetherArrivalStage bellwetherArrival=BellwetherArrivalStage::AtLookout;
+    std::size_t bellwetherStation=1;
 };
 class CompanionRouteFixture {
 public:
     explicit CompanionRouteFixture(bool turnStartEnabled=false):turnStartEnabled_(turnStartEnabled) {ClearMotion();}
     const CompanionSnapshot& State() const {return state_;}
-    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
+    void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();ankleAssessmentSeconds_=0;state_.generation=gen==UINT64_MAX?gen:gen+1; }
     void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
         if(TavernSitActive())return;
         acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
@@ -105,8 +109,15 @@ public:
                 if(seconds>=kTavernSitDurationSeconds-.00001f) {
                     seconds=kTavernSitDurationSeconds;
                     state_.motion.mode=CompanionMotionMode::Seated;
+                    if(state_.bellwetherArrival==BellwetherArrivalStage::Lowering)
+                        state_.bellwetherArrival=BellwetherArrivalStage::Seated;
                 }
             }
+            return;
+        }
+        if(state_.bellwetherArrival!=BellwetherArrivalStage::AtLookout) {
+            if(exterior && active && !paused && terrain && std::isfinite(dt) && dt>0)
+                StepBellwetherArrival(std::min(dt,.05f),*terrain);
             return;
         }
         if(guideBasin && active && exterior && proof) {
@@ -142,11 +153,36 @@ public:
         locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking);
         state_.locomotion=locomotion_.State();
     }
+    bool TryStartBellwetherArrival(float playerX,float playerZ,const simulation::TriangleSupportSurface& terrain) {
+        using namespace traversal;
+        if(state_.bellwetherArrival!=BellwetherArrivalStage::AtLookout ||
+           !state_.grounded || state_.waypoint!=simulation::kWorldRoutePoints.size() ||
+           !std::isfinite(playerX) || !std::isfinite(playerZ))return false;
+        const auto lookout=kBellwetherTavernRoute[0];
+        const auto turnaround=kBellwetherTavernRoute[1];
+        const float dx=turnaround.x-lookout.x,dz=turnaround.z-lookout.z;
+        const float along=((playerX-lookout.x)*dx+(playerZ-lookout.z)*dz)/(dx*dx+dz*dz);
+        if(along<.16f || along>1.12f || std::hypot(playerX-(lookout.x+dx*along),
+            playerZ-(lookout.z+dz*along))>2.0f)return false;
+
+        // Admitted ground and solids are the authority for the road opening.
+        // A historical scene with the old turnaround rails cannot start it.
+        const auto road=kBellwetherTavernRoute[2];
+        const auto roadX=[&](float z){return std::lerp(turnaround.x,road.x,(z-turnaround.z)/(road.z-turnaround.z));};
+        constexpr float beforeRails=52.8f,afterRails=55.6f;
+        const auto support=ChapterExteriorSupport(&terrain,roadX(beforeRails),beforeRails);
+        if(!support.grounded || !ChapterExteriorMovementClear(terrain,roadX(beforeRails),beforeRails,
+                roadX(afterRails),afterRails,support.worldY,.24f))return false;
+        state_.bellwetherArrival=BellwetherArrivalStage::OnRoad;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
 private:
     bool TavernSitActive() const {
         return state_.motion.mode==CompanionMotionMode::Sitting || state_.motion.mode==CompanionMotionMode::Seated;
     }
 #include "gameplay/dialogue/CompanionTurnPrototype.inl"
+#include "gameplay/dialogue/CompanionBellwetherArrival.inl"
     void StepBasinGuide(float dt,float playerX,float playerZ,bool paused,
                         const simulation::TriangleSupportSurface* terrain,bool requireTerrain) {
         state_.basinGuide=true;state_.walking=false;
@@ -243,5 +279,6 @@ private:
     bool turnStartEnabled_=false;
     double turnElapsed_=0,entryElapsed_=0;
     float turnStartYaw_=0,entryStartWeight_=0;
+    float ankleAssessmentSeconds_=0;
 };
 } // namespace horde::gameplay::dialogue
