@@ -1481,16 +1481,16 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           "the stationary fire fits inside the rendered hearth, over its imported floor");
     using namespace gameplay::bellwether;
     const auto& candle=room.fireEmitters[2];
-    Check(candle.stableId==gameplay::effects::kBellwetherTableCandleEmitterId &&
+    Check(candle.stableId==gameplay::effects::kBellwetherCandleEmitterId &&
           candle.strength>0 && candle.zone==gameplay::ShowcaseZone::Outside &&
-          candle.worldFromFlame[12]==kTableCandleFlame[0] &&
-          candle.worldFromFlame[13]==kTableCandleFlame[1] &&
-          candle.worldFromFlame[14]==kTableCandleFlame[2] &&
-          candle.worldFromLight[13]==kTableCandleLight[1] &&
-          terrain->NonWalkableVolumeClear(kTableCandleFlame[0],kTableCandleFlame[2],
-              kTableCandleLight[0],kTableCandleLight[2],kTableCandleFlame[1]+.004f,
-              kTableCandleFlame[1]+candle.height,candle.radius),
-          "the table candle publishes a flame and direct light above its authored wick");
+          candle.worldFromFlame[12]==kTavernCandleFlame[0] &&
+          candle.worldFromFlame[13]==kTavernCandleFlame[1] &&
+          candle.worldFromFlame[14]==kTavernCandleFlame[2] &&
+          candle.worldFromLight[13]==kTavernCandleLight[1] &&
+          terrain->NonWalkableVolumeClear(kTavernCandleFlame[0],kTavernCandleFlame[2],
+              kTavernCandleLight[0],kTavernCandleLight[2],kTavernCandleFlame[1]+.004f,
+              kTavernCandleFlame[1]+candle.height,candle.radius),
+          "the candlestick publishes a flame and direct light above its authored wick");
     CompanionRouteFixture kit(true);
     Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
           "Kit requires the real supported seat handoff before sitting");

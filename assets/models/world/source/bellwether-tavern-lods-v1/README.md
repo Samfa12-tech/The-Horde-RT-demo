@@ -1,6 +1,6 @@
 # Bellwether tavern detail candidates
 
-The B01 exports use metres and identity transforms in the registered town position. All three share the same 494-triangle architecture. It includes the roof, chimney, foundation, approach ramp, fixed opening frames, room floor, hearth and candle. The [authoring receipt](authoring-receipt.json) pins the tavern Blender master, the window glass and hinged door shared by the three levels, and each candidate.
+The B01 exports use metres and identity transforms in the registered town position. All three share the same 542-triangle architecture. It includes the roof, chimney, foundation, approach ramp, fixed opening frames, room floor, hearth and floor-standing candlestick. The [authoring receipt](authoring-receipt.json) pins the tavern Blender master, the window glass and hinged door shared by the three levels, and each candidate.
 
 | Furnishings | Chair and table geometry | Triangles |
 | --- | --- | ---: |

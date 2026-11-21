@@ -321,13 +321,22 @@ def candle_piece(name, profile, material):
     return mesh(name, vertices, faces, solids, material)
 
 
-candle_x, candle_y, candle_z = 82.93, floor + table_top, 106.39
-candle_piece("B01_table_candle_holder", [(0, .086), (.018, .094), (.042, .079)], ember)
-candle_piece("B01_table_candle_wax", [(.03, .045), (.232, .042), (.251, .034)], oak)
-box("B01_table_candle_wick", candle_x - .005, candle_x + .005, candle_z - .005,
-    candle_z + .005, candle_y + .248, candle_y + .27, ember)
-candle_flame = (candle_x, candle_y + .269, candle_z)
-candle_light = (candle_x, candle_y + .326, candle_z)
+candle_x, candle_y, candle_z = 83.15, floor, 106.66
+candle_stand_height = 1.00
+holder_radius = .115
+if not (table_z + .3065 < candle_z - holder_radius and candle_z + holder_radius < chair_z - .296):
+    raise RuntimeError("The candlestick foot must clear the table and chair.")
+candle_piece("B01_candlestick_stand", [(0, .104), (.021, holder_radius), (.065, .026),
+             (candle_stand_height, .024), (candle_stand_height + .018, .053),
+             (candle_stand_height + .042, .062)], ember)
+candle_piece("B01_candlestick_wax",
+             [(candle_stand_height + height, radius) for height, radius in
+              [(.03, .045), (.232, .042), (.251, .034)]], oak)
+box("B01_candlestick_wick", candle_x - .005, candle_x + .005, candle_z - .005,
+    candle_z + .005, candle_y + candle_stand_height + .248,
+    candle_y + candle_stand_height + .27, ember)
+candle_flame = (candle_x, candle_y + candle_stand_height + .269, candle_z)
+candle_light = (candle_x, candle_y + candle_stand_height + .326, candle_z)
 
 
 def billet(name, x, z, offset_y, heading, length, radius):
@@ -677,7 +686,7 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                chairSeatBoundsXZ=[chair_board_x - chair_depth / 2, chair_board_x + chair_depth / 2,
                                   chair_z - .296, chair_z + .296],
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
-               tableCandleFlame=candle_flame, tableCandleLight=candle_light,
+               tavernCandleFlame=candle_flame, tavernCandleLight=candle_light,
                churchWaymarker=[sign_x,sign_y,sign_z],
                churchApproach=dict(width=2*church_half_width, sections=church_sections),
                waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
@@ -693,7 +702,7 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("RoomMin", (west + wall_depth, floor, north + wall_depth)),
                    ("RoomMax", (east - wall_depth, floor, south - wall_depth)),
                    ("SouthDoorHinge", door_hinge),
-                   ("TableCandleFlame", candle_flame), ("TableCandleLight", candle_light),
+                   ("TavernCandleFlame", candle_flame), ("TavernCandleLight", candle_light),
                    ("ChurchWaymarker", receipt["churchWaymarker"]),
                    ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
                    ("WaysideInspection", shrine_view), ("WaysideRoadRegister", register_mark),

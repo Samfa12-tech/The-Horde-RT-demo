@@ -91,7 +91,7 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
     bellwetherFireEmitters_={effects::MakeBellwetherHearthFireEmitter(),
-                           effects::MakeBellwetherTableCandleFireEmitter()};
+                           effects::MakeBellwetherCandleFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2074,7 +2074,7 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[0],
             effects::BellwetherHearthFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[1],
-            effects::BellwetherTableCandleFireInput(),fixedDeltaSeconds);
+            effects::BellwetherCandleFireInput(),fixedDeltaSeconds);
     }
 }
 

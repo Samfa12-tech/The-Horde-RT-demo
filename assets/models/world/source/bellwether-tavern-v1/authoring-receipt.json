@@ -11,8 +11,8 @@
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
-  "runtimeSha256": "b410efe001a13246f976e0976db94f4ac59184f059f2dbdeab18e37ffef3599d",
-  "solidTriangles": 2936,
+  "runtimeSha256": "6945284cb141f162294ab40c462ca0b37664e0bdbd197bb3eb9915dece1a6f43",
+  "solidTriangles": 2984,
   "walkableTriangles": 22,
   "windowSha256": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
   "windowTriangles": 12,
@@ -92,15 +92,15 @@
     -8.70955078125,
     107.68
   ],
-  "tableCandleFlame": [
-    82.93,
-    -7.69055078125,
-    106.39
+  "tavernCandleFlame": [
+    83.15,
+    -7.44055078125,
+    106.66
   ],
-  "tableCandleLight": [
-    82.93,
-    -7.63355078125,
-    106.39
+  "tavernCandleLight": [
+    83.15,
+    -7.38355078125,
+    106.66
   ],
   "churchWaymarker": [
     34.65,

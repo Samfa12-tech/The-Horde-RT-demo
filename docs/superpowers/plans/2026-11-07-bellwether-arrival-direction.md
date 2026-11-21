@@ -166,6 +166,20 @@ In a matched doorway view, doubling the hearth output mainly brightened its maso
 
 The closer Windows RayTracingPipeline view replayed the 1.7 lookout continuation and restored the earned tavern seat. At the conversation mark, the candle brings out Kit's hood and armour while keeping the room dim. The earlier view is within 6 mm of the new camera position and has the same angles and seated pose. The staffed reply view also presented with all three lights and retained the `hub.horde_army` caption.
 
+The candle now stands on the floor beside the table, clear of Kit's seating
+path. Raising it on the tabletop brightened the keeper's face and darkened
+Kit's hood slightly. The floor position brings the flame closer to Kit while
+keeping it a quarter metre above the original wick. Matched 960 × 540 native
+captures on both Windows RT backends retained the actor poses, camera,
+three-light roster and light strengths. In the same 8-bit luminance crops,
+Kit's hood and face rose from 7.12 to 8.45, his upper body from 12.77 to
+14.81, and the keeper's head and neck from 27.61 to 35.80. The keeper's
+tunic stayed dark. The final candlestick adds 48 solid triangles and
+10,496 bytes of device-local allocations in these captures. The door,
+glass, register, shrine cover and all three furniture tiers are
+byte-identical. The Android Debug package contains the matching room and
+manifest. Phone rendering and performance remain open.
+
 During `hub.kit_introduce`, Kit now glances toward the light inside the player's lantern cage. The shared simulation follows the held pendulum and the authored Light socket offset. The seated clip still owns his hands, feet and body contact. The cue eases in and out during the caption, pauses with the scene and settles when the line ends or is skipped. The Windows `bellwether-kit-lantern-glance` checkpoint restores the authored tavern seat and presses Talk with the development keeper stand-in. Both hardware RT backends presented the same seated pose and roughly 15° of additive head yaw at 960 × 540. The native rig test verifies the seated Head position and checks that adding the glance preserves all vertices below one metre. The Android debug build passed. Voiced timing, continuous motion review and physical phone performance remain open.
 
 The `bellwether-repeat-visit` replay continues from a 1.7 lookout record through the actual road and south door. It observes all three roadside captions and the doorway welcome, waits for Kit to sit and the keeper to reach the hearth, then plays the full exchange after Talk. It exits to the square and returns twice on foot in the same game session. Both return attempts keep Kit seated, the keeper at the hearth and the completed exchange quiet. The host check runs the same replay on authored terrain. Both Windows hardware RT backends presented the final room at 960 × 540 with the development keeper stand-in, glazing and all three lights. Each capture records two quiet returns and the same final simulation tick. The Windows frames cover the final room, with continuous rendered motion and sustained phone performance still open.

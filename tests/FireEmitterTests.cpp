@@ -218,16 +218,16 @@ bool TestAllFourEligibleEmittersRemainActive()
 bool TestBellwetherHearthUsesTheOrdinaryFireBudget()
 {
     using namespace horde::gameplay::effects;
-    std::array worldFires{MakeBellwetherHearthFireEmitter(),MakeBellwetherTableCandleFireEmitter()};
+    std::array worldFires{MakeBellwetherHearthFireEmitter(),MakeBellwetherCandleFireEmitter()};
     auto& [hearth,candle]=worldFires;
     StepFireEmitterFixed(hearth,BellwetherHearthFireInput(),kFixedDelta);
-    StepFireEmitterFixed(candle,BellwetherTableCandleFireInput(),kFixedDelta);
+    StepFireEmitterFixed(candle,BellwetherCandleFireInput(),kFixedDelta);
     FireEmitterUpload upload;
     std::string diagnostic;
     const std::array<float,3> camera{{84.3f,-7.f,111.7f}};
     bool ok=Require(BuildFireEmitterUpload(worldFires,
         {camera,ShowcaseZone::Outside,24.f},{},FireEmitterQuality::Mobile,upload,diagnostic) &&
-        upload.activeCount==2 && upload.selectedStableIds[0]==kBellwetherTableCandleEmitterId &&
+        upload.activeCount==2 && upload.selectedStableIds[0]==kBellwetherCandleEmitterId &&
         upload.selectedStableIds[1]==kBellwetherHearthEmitterId &&
         Approx(upload.emitters[0].shape[1],candle.height) && Approx(upload.emitters[1].shape[1],hearth.height) &&
         upload.emitters[0].lightPositionStrength[3]>0 && upload.emitters[1].lightPositionStrength[3]>0 &&

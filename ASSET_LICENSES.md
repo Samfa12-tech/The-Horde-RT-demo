@@ -133,7 +133,7 @@ They reuse the existing finishes and are stored with the source assets under
 `assets/models/world/source/bellwether-tavern-lods-v1/`.
 The three runtime GLBs and their manifests are byte-identical copies under
 `assets/models/world/runtime/bellwether-tavern-v1/`.
-The table candle, holder and wick are original Horde geometry in that source.
+The floor-standing candlestick, wax and wick are original Horde geometry in that source.
 They reuse the existing TombEarthenware and TombCharredWick material rows.
 The church approach's stone deck and retaining sides are original Horde geometry
 from the same editable town master. They reuse MedievalWall02.

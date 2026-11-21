@@ -3,10 +3,10 @@
   "status": "source review",
   "blender": "5.2.0 LTS",
   "inputSha256": {
-    "assets/models/world/source/bellwether-tavern-v1/bellwether-tavern-v1.blend": "4f13016c996c5d276dd5086001166719a0fe2d48401e09dab71e1652dfb03042",
-    "assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json": "91ee061807a74fa4ebacb50d64233df91361797fb35869f69b1084d8144de4c2",
-    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "b410efe001a13246f976e0976db94f4ac59184f059f2dbdeab18e37ffef3599d",
-    "assets/models/world/runtime/bellwether-tavern-v1/asset.manifest.json": "ce63685b9e66db081bca9fd54088dd9b697091ffe1683dcf9346c6ec188b0032",
+    "assets/models/world/source/bellwether-tavern-v1/bellwether-tavern-v1.blend": "abd4bd5e3fec780d0c261490add507c9302c5a747acd3e956f2427df4541b46a",
+    "assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json": "aac7d4bfee905df9a4bf5dcf0ce9294588b1c0ef7819e4a49a74d793195f8c8d",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "6945284cb141f162294ab40c462ca0b37664e0bdbd197bb3eb9915dece1a6f43",
+    "assets/models/world/runtime/bellwether-tavern-v1/asset.manifest.json": "2cf9fe911033c18455e0542e6ca2871cdabd20baec8011415f4ca366802cc21c",
     "assets/models/world/runtime/bellwether-tavern-v1/bellwether-window.glb": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
     "assets/models/world/runtime/bellwether-tavern-v1/window.manifest.json": "4fc919a3851ba6f890c8c8d518abe5975a46cd0e1fc4384a4346be3edf34540f",
     "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb": "65e78893ef1a5cf5ebd572ffa1dc67507526948fa3fce7a73796b2eaac239fb9",
@@ -14,9 +14,9 @@
   },
   "shared": {
     "mesh": "tavern-architecture.glb",
-    "sha256": "34506efb8f5fef517c330e6500888e79982bbc83afe9be05f9a91af0aaad52dd",
+    "sha256": "04e82f85b94c8d2e3afae6f60815b5adeeab7a919c9e4060296cfaed7b08c9a6",
     "manifest": "tavern-architecture.manifest.json",
-    "manifestSha256": "f2744ee138281b8d5169d879a4e75eb89198c75442cc4a8c0dc38cf47760be3a",
+    "manifestSha256": "fb590e0ab8fd7b02daf1ca909ed6fa3f013488b565c1bc8b85ebbbce8d58603c",
     "bounds": [
       [
         79.05000305175781,
@@ -29,8 +29,8 @@
         130.6999969482422
       ]
     ],
-    "vertices": 1095,
-    "triangles": 494,
+    "vertices": 1236,
+    "triangles": 542,
     "materials": [
       "HordeTownRoofClay",
       "HordeTownStone",
@@ -66,9 +66,9 @@
       "B01_window_mullion",
       "B01_window_lower_rail",
       "B01_window_upper_rail",
-      "B01_table_candle_holder",
-      "B01_table_candle_wax",
-      "B01_table_candle_wick",
+      "B01_candlestick_stand",
+      "B01_candlestick_wax",
+      "B01_candlestick_wick",
       "B01_hearth_billet_front",
       "B01_hearth_billet_back",
       "B01_hearth_billet_cross"

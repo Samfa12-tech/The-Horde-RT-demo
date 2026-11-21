@@ -6,7 +6,7 @@
 namespace horde::gameplay::effects
 {
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
-inline constexpr std::uint32_t kBellwetherTableCandleEmitterId=0x42303143u;
+inline constexpr std::uint32_t kBellwetherCandleEmitterId=0x42303143u;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -26,9 +26,9 @@ inline FireEmitterState MakeBellwetherHearthFireEmitter()
     return emitter;
 }
 
-inline FireEmitterState MakeBellwetherTableCandleFireEmitter()
+inline FireEmitterState MakeBellwetherCandleFireEmitter()
 {
-    auto emitter=MakeWorldTorchFireEmitter(kBellwetherTableCandleEmitterId,0x5749434bu);
+    auto emitter=MakeWorldTorchFireEmitter(kBellwetherCandleEmitterId,0x5749434bu);
     emitter.colourTemperatureKelvin=1950.f;
     emitter.radius=.044f;
     emitter.height=.158f;
@@ -57,8 +57,8 @@ inline FireEmitterFixedStepInput BellwetherHearthFireInput()
     return BellwetherFireInput(kBellwetherHearthFlame,kBellwetherHearthLight,1.f);
 }
 
-inline FireEmitterFixedStepInput BellwetherTableCandleFireInput()
+inline FireEmitterFixedStepInput BellwetherCandleFireInput()
 {
-    return BellwetherFireInput(bellwether::kTableCandleFlame,bellwether::kTableCandleLight,.58f);
+    return BellwetherFireInput(bellwether::kTavernCandleFlame,bellwether::kTavernCandleLight,.58f);
 }
 }

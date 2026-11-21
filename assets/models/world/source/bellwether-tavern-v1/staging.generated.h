@@ -12,8 +12,8 @@ inline constexpr std::array<float, 3> kConversation{{84.520000f, -8.709551f, 107
 inline constexpr std::array<float, 3> kRoomMin{{79.720000f, -8.709551f, 103.620000f}};
 inline constexpr std::array<float, 3> kRoomMax{{100.880000f, -8.709551f, 118.780000f}};
 inline constexpr std::array<float, 3> kSouthDoorHinge{{81.288000f, -8.709551f, 118.695000f}};
-inline constexpr std::array<float, 3> kTableCandleFlame{{82.930000f, -7.690551f, 106.390000f}};
-inline constexpr std::array<float, 3> kTableCandleLight{{82.930000f, -7.633551f, 106.390000f}};
+inline constexpr std::array<float, 3> kTavernCandleFlame{{83.150000f, -7.440551f, 106.660000f}};
+inline constexpr std::array<float, 3> kTavernCandleLight{{83.150000f, -7.383551f, 106.660000f}};
 inline constexpr std::array<float, 3> kChurchWaymarker{{34.650000f, -5.981606f, 82.100000f}};
 inline constexpr std::array<float, 3> kWaysideMechanism{{103.300000f, -2.706654f, 31.400000f}};
 inline constexpr std::array<float, 3> kWaysideHinge{{102.690000f, -2.946654f, 31.410000f}};
@@ -23,7 +23,7 @@ inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.2
 inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
 inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};
 
-inline constexpr unsigned kSolidTriangles=2936;
+inline constexpr unsigned kSolidTriangles=2984;
 inline constexpr unsigned kSouthDoorTriangles=264;
 inline constexpr float kSouthDoorOpenRadians=1.640609497f;
 inline constexpr float kSouthDoorSwingRadius=2.030f;
