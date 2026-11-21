@@ -1154,6 +1154,14 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
     using horde::gameplay::dialogue::BellwetherArrivalStage;
     using horde::telemetry::RtPresentationOutcome;
     using horde::vulkan::raytracing::RtSceneProfile;
+    // The scripted arrival owns every movement and look input. Rendering that
+    // snapshot must not also step the desktop input owner with its saved camera.
+    struct RestoreInputOwner {
+        VulkanSurfaceContext& context;
+        bool previouslyScripted;
+        ~RestoreInputOwner() { context.chapterRoundTripCaptureActive = previouslyScripted; }
+    } restoreInputOwner{ctx,ctx.chapterRoundTripCaptureActive};
+    if (gBellwetherEarnTavernValidation) ctx.chapterRoundTripCaptureActive = true;
     std::ostringstream newGameReceipt;
     auto& receipt = gLookoutHiddenValidation ? gHiddenLookout.receipt : newGameReceipt;
     receipt << "{\"schema\":1,\"checks\":[";
@@ -1174,8 +1182,16 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         return hidden();
     };
     const auto frame = [&] {
+        const auto tick = ctx.simulation.Snapshot().tickIndex;
         bool presented = false;
-        if (!RenderFrame(ctx, VkClearColorValue{{0,0,0,1}}, presented)) return false;
+        if (!RenderFrame(ctx, VkClearColorValue{{0,0,0,1}}, presented)) {
+            std::cerr << "Bellwether render at tick " << tick << " failed: " << ctx.lastRtFrameError << '\n';
+            return false;
+        }
+        if (gBellwetherEarnTavernValidation && ctx.simulation.Snapshot().tickIndex != tick) {
+            std::cerr << "Bellwether presentation advanced the scripted campaign tick.\n";
+            return false;
+        }
         FinishGraphicsFrame(ctx, presented);
         ObserveCampaignPresentation(ctx, presented);
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
@@ -1284,11 +1300,22 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     !ctx.campaignPause && !ctx.simulationPaused;
             };
             const auto target = campaign::kBellwetherCheckpointPosition;
+            // The scripted player runs ahead. Let Kit complete his independent
+            // walk, sit and hearth lines on the same fixed-step clock.
+            constexpr unsigned hearthWaitTicks = 120 * 60;
             bool progressed = atLookout && step() &&
                 std::all_of(kBellwetherTavernRoute.begin(), kBellwetherTavernRoute.end(), walkTo) &&
-                walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, 5400);
+                walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, hearthWaitTicks);
             progressed = check(progressed && atHearth() && frame(),
                 "fixed-step movement from the loaded lookout reaches the staffed hearth through the south door");
+            if (!progressed)
+                std::cerr << "Bellwether arrival steps=" << ticks << " player=" << state.playerX << ',' << state.playerZ
+                          << " kit=" << state.chapterCompanion.x << ',' << state.chapterCompanion.z
+                          << " kitStation=" << state.chapterCompanion.bellwetherStation
+                          << " kitArrival=" << static_cast<unsigned>(state.chapterCompanion.bellwetherArrival)
+                          << " hearthLines=" << state.chapterDialogue.hearthLinesResolved
+                          << " currentLine=" << static_cast<unsigned>(state.chapterDialogue.line)
+                          << " talk=" << state.tavernConversationAvailable << '\n';
             if (progressed) {
                 const auto& lifetime = ctx.rtScene.BellwetherFurnitureLifetimeEvidence();
                 const auto tier = ctx.rtScene.DebugRecordedBellwetherFurnitureDetail();
