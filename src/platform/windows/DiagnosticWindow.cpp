@@ -3468,6 +3468,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         text = "FLASK UPGRADE | LEFT-CLICK / A TO TAKE";
         context.flaskUpgradeInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.tavernDoorAction!=horde::gameplay::bellwether::DoorAction::None) {
+        text = snapshot.tavernDoorAction==horde::gameplay::bellwether::DoorAction::Open
+            ? "LEFT-CLICK / A TO OPEN THE TAVERN DOOR" : "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR";
+    }
     else if(chapterInteract) {
         using horde::gameplay::bellwether::ArchiveAction;
         switch (snapshot.waysideArchiveAction) {

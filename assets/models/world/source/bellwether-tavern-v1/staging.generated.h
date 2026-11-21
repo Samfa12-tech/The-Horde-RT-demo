@@ -23,7 +23,10 @@ inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.2
 inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
 inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};
 
-inline constexpr unsigned kSolidTriangles=3200;
+inline constexpr unsigned kSolidTriangles=2936;
+inline constexpr unsigned kSouthDoorTriangles=264;
+inline constexpr float kSouthDoorOpenRadians=1.640609497f;
+inline constexpr float kSouthDoorSwingRadius=2.030f;
 inline constexpr float kChairFacingRadians=1.570796327f;
 inline constexpr float kKeeperDoorFacingRadians=-2.165010031f;
 inline constexpr float kKeeperHearthFacingRadians=-0.930264771f;

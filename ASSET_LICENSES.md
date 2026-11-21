@@ -126,7 +126,8 @@ master, recipe and hashes are retained with the tavern authoring records.
 The south-window frame and closed glass volume are original Horde geometry
 from the same Blender source. The untextured window has no third-party inputs.
 The south door leaf, jambs, straps and pulls are original meshes in that
-Blender source. They reuse the existing timber and char material rows.
+Blender source. The moving leaf has two untextured finishes in its hinge-local
+export. The fixed frame and pintles use the existing town material rows.
 The table candle, holder and wick are original Horde geometry in that source.
 They reuse the existing TombEarthenware and TombCharredWick material rows.
 The church approach's stone deck and retaining sides are original Horde geometry

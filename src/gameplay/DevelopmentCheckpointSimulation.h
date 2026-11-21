@@ -316,7 +316,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             gameSimulation.chapterSkipFloor_==input.commands.dialogueSkip &&
             state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated);
     }
-    const bool repeatVisit=checkpoint.bellwetherStaffedView==BellwetherStaffedView::RepeatVisit;
+    const bool doorClosed=checkpoint.bellwetherStaffedView==BellwetherStaffedView::DoorClosed;
+    const bool repeatVisit=checkpoint.bellwetherStaffedView==BellwetherStaffedView::RepeatVisit || doorClosed;
     if (checkpoint.bellwetherStaffedView != BellwetherStaffedView::None && !repeatVisit) {
         using namespace simulation;
         if (!chapterTerrain || !gameSimulation.config_.bellwetherTavernKeeperAdmitted)
@@ -463,6 +464,23 @@ inline bool StageDevelopmentCheckpointSimulation(
             advance();
             if(!waitFor(conversationSaved,1800) || visit.exchangeCaptions!=kTavernConversation.size())
                 return finalize(false);
+
+            if(doorClosed) {
+                for(std::size_t index=route.size();index>traversal::kBellwetherSouthDoorStation;--index)
+                    if(!walkStation(index-1))return finalize(false);
+                if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+                input.moveForward=0;input.runHeld=false;
+                input.yawRadians=-.41f;
+                input.pitchRadians=checkpoint.pitch;
+                advance();
+                if(state.tavernDoorAction!=bellwether::DoorAction::Close)return finalize(false);
+                input.commands.interact=state.lastConsumedInteractSequence+1;
+                advance();
+                if(!waitFor([&]{return state.tavernDoor.opening==0.f;},100))return finalize(false);
+                input.yawRadians=checkpoint.yaw;
+                advance();
+                return finalize(conversationSaved() && state.tavernDoorAction==bellwether::DoorAction::Open);
+            }
 
             // Retrace the mapped portal from the hearth to the square and back.
             // Use one campaign session throughout and check that Directions is offered on both returns.

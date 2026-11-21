@@ -36,6 +36,7 @@
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
 #include "gameplay/traversal/WaysideArchive.h"
+#include "gameplay/traversal/BellwetherTavernDoor.h"
 
 namespace horde::gameplay::simulation
 {
@@ -78,9 +79,12 @@ struct SimulationSnapshot
     dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
     bellwether::WaysideArchive waysideArchive;
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
+    bellwether::TavernDoor tavernDoor;
+    bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable ||
-            recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None;
+            recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
+            tavernDoorAction!=bellwether::DoorAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;

@@ -1282,6 +1282,9 @@ void PublishSimulationUiState()
     }
     if ((contextualControls & (1 << 9)) == 0 && simulation.flaskUpgrade.interactEligible)
         contextualControls |= (1 << 12) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.tavernDoorAction != horde::gameplay::bellwether::DoorAction::None)
+        contextualControls |= (static_cast<int>(simulation.tavernDoorAction) << 22) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
         contextualControls |= (1 << 14) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)

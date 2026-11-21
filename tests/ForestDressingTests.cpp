@@ -1780,6 +1780,63 @@ void TestBellwetherRepeatVisitCheckpoint(
     }
     Check(probe.Complete() && !probe.Failed() && squareReached && probe.Returns()==2 && steps>3600,
           "the wall-clock runner's exact input schedule walks through the authored portal both ways for two visits");
+
+    using gameplay::bellwether::DoorAction;
+    const auto* closedView=gameplay::FindDevelopmentCheckpoint("bellwether-south-door-closed");
+    const bool closed=closedView && gameplay::StageDevelopmentCheckpointSimulation(capture,*closedView);
+    Check(closed && state.tavernDoor.opening==0.f && state.tavernDoorAction==DoorAction::Open,
+          "the ordinary interaction closes the real tavern door after the staffed arrival");
+    if(!closed)return;
+    const auto carryReach=[&] {
+        const auto pose=gameplay::bellwether::TavernDoor::PoseAt(state.tavernDoor.opening);
+        const float floor=terrain->Query(closedView->cameraX,closedView->cameraZ).worldY;
+        return gameplay::items::ComputeRewardLanternForwardClearance(closedView->cameraX,closedView->cameraZ,
+            0.f,-1.f,false,true,floor,terrain.get(),&pose);
+    };
+    const float closedReach=carryReach();
+    Check(closedReach<.65f,"the shared carry clearance retracts the lantern before the closed leaf");
+    sim::InputSnapshot input;
+    input.damageEnabled=false;
+    const auto step=[&](unsigned ticks) {
+        for(unsigned tick=0;tick<ticks;++tick) {
+            capture.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+            capture.ClearEvents();
+        }
+    };
+    input.yawRadians=0.f;input.moveForward=1.f;
+    step(45);
+    Check(state.playerZ>gameplay::bellwether::kSouthDoorHinge[2] && state.tavernDoor.opening==0.f,
+          "the normal player motor cannot pass the closed door");
+    input.moveForward=0.f;input.yawRadians=.95f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Open,"the player can reach the latch from the ramp");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    Check(state.tavernDoor.opening==1.f,"the door opens from the ramp through the shared interaction input");
+    Check(carryReach()>closedReach+1.f,"opening the leaf restores held-item clearance down the doorway lane");
+    input.yawRadians=0.f;input.moveForward=1.f;
+    for(unsigned tick=0;tick<140 && state.playerZ>117.76f;++tick)step(1);
+    Check(state.playerZ<117.8f,"the ordinary player motor crosses the same threshold once open");
+    input.moveForward=0.f;input.yawRadians=-.94f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Close,"the open leaf can be operated from inside the room");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    const float stopped=state.tavernDoor.opening;
+    step(30);
+    Check(stopped>0.f && stopped<1.f && state.tavernDoor.opening==stopped,
+          "the inward swing stops at the player and never pushes them");
+    input.yawRadians=0.f;input.moveForward=1.f;
+    for(unsigned tick=0;tick<140 && state.playerZ>116.24f;++tick)step(1);
+    input.moveForward=0.f;
+    step(100);
+    Check(state.tavernDoor.opening==0.f,"the door finishes closing when the player steps clear");
+    input.yawRadians=2.81f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Open,"the player can reach the closed latch from the hearth side");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    Check(state.tavernDoor.opening==1.f,"the same interaction reopens the door from inside");
 }
 
 void TestFullSurroundings()

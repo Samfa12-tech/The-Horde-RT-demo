@@ -355,6 +355,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         UpdateSwordSheathHold(input,gestureSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
         AdvanceWaysideArchive(fixedDeltaSeconds);
+        AdvanceTavernDoor(fixedDeltaSeconds);
         ResolveHeldItems();
         RecordSuccessfulHitParticles();
         RecordSwordContactTrace();
@@ -651,12 +652,13 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, 
                 *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,posture_.Height());
             clear=movement.accepted;support=movement.support;
         }
-        const auto archiveClear=[&](float destinationY,float height) {
-            return ArchiveContactClear(previousX,previousZ,playerX_,playerZ_,
-                std::min(playerSupport_.worldY,destinationY)+.001f,
-                std::max(playerSupport_.worldY,destinationY)+height,kPlayerCollisionRadius);
+        const auto hingedContactClear=[&](float destinationY,float height) {
+            const float bottom=std::min(playerSupport_.worldY,destinationY)+.001f;
+            const float top=std::max(playerSupport_.worldY,destinationY)+height;
+            return ArchiveContactClear(previousX,previousZ,playerX_,playerZ_,bottom,top,kPlayerCollisionRadius) &&
+                   TavernDoorContactClear(previousX,previousZ,playerX_,playerZ_,bottom,top,kPlayerCollisionRadius);
         };
-        clear=clear && archiveClear(support.worldY,posture_.Height());
+        clear=clear && hingedContactClear(support.worldY,posture_.Height());
         if(CurrentCombatRules())clear=clear && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
             std::max(playerSupport_.worldY,support.worldY),posture_.Height(),kPlayerCollisionRadius);
         // Reuse ordinary collision admission. Only a failed standing sweep (or
@@ -666,7 +668,7 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, 
             const auto admitsHeight=[&](float height) {
                 const auto candidate=horde::gameplay::traversal::ResolveChapterStepMovement(
                     *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,height);
-                return candidate.accepted && archiveClear(candidate.support.worldY,height) &&
+                return candidate.accepted && hingedContactClear(candidate.support.worldY,height) &&
                     AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
                     std::max(playerSupport_.worldY,candidate.support.worldY),height,kPlayerCollisionRadius);
             };
@@ -817,7 +819,7 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();waysideArchive_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -1720,6 +1722,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 void GameSimulation::ResolveHeldItems()
 {
     std::string diagnostic;
+    const auto tavernDoorPose=bellwether::TavernDoor::PoseAt(tavernDoor_.opening);
     const PlayerCombatSnapshot presentationCombat =
         combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player);
     const horde::gameplay::items::HeldItemFixedStepInput input{
@@ -1739,7 +1742,7 @@ void GameSimulation::ResolveHeldItems()
         presentationAspect_,
         playerSupport_.worldY,config_.developmentWorldRoute, false, UsesRescueExterior(),
         config_.authoredChapterTerrain && chapterTerrainGeneration_==worldRoute_.generation
-            ? chapterTerrain_.get() : nullptr,posture_.drop};
+            ? chapterTerrain_.get() : nullptr,posture_.drop,&tavernDoorPose};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -2099,6 +2102,8 @@ bool GameSimulation::BodyHeightClear(float height) const
     if(UsesRescueExterior() && config_.authoredChapterTerrain) {
         if(!chapterTerrain_||chapterTerrainGeneration_!=worldRoute_.generation)return false;
         return ArchiveContactClear(playerX_,playerZ_,playerX_,playerZ_,
+            playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
+            TavernDoorContactClear(playerX_,playerZ_,playerX_,playerZ_,
             playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
             horde::gameplay::traversal::ChapterExteriorObstacleClear(*chapterTerrain_,playerX_,playerZ_,playerX_,playerZ_,
             playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
@@ -3451,6 +3456,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
     snapshot_.waysideArchive=waysideArchive_;
     snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);
+    snapshot_.tavernDoor=tavernDoor_;
+    snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
         playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();

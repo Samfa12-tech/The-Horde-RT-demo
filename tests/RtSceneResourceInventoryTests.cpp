@@ -801,8 +801,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==37u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?39u:38u);
+        ok &= materials.size()==39u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?41u:40u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==37846u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -823,6 +823,10 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= ledger.primitiveCount==2u && ledger.assetIndex!=cover.assetIndex &&
               ledger.stableObjectId==0x42303952u &&
               scene.waysideRegisterAsset_.indices.size()==horde::scene::kWaysideRegisterTriangles*3;
+        const auto& door=instances[PresentableTinyRtScene::kTavernDoorMetadataIndex];
+        ok &= door.primitiveCount==2u && door.assetIndex!=ledger.assetIndex &&
+              door.stableObjectId==0x42303144u &&
+              scene.tavernDoorAsset_.indices.size()==horde::gameplay::bellwether::kSouthDoorTriangles*3;
         ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
               ring.primitiveBase!=flask.primitiveBase &&
               scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&

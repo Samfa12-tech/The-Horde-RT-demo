@@ -17,5 +17,6 @@ bool AppendBellwetherShell(const std::filesystem::path& assetsRoot,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     std::string& diagnostic, assets::StaticMeshAsset* glazing = nullptr,
     assets::StaticMeshAsset* archiveCover = nullptr,
-    assets::StaticMeshAsset* roadRegister = nullptr);
+    assets::StaticMeshAsset* roadRegister = nullptr,
+    assets::StaticMeshAsset* southDoor = nullptr);
 }

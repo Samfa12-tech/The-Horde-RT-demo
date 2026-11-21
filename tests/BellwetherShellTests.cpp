@@ -1,6 +1,7 @@
 #include "scene/BellwetherShell.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/traversal/WaysideArchive.h"
+#include "gameplay/traversal/BellwetherTavernDoor.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
@@ -32,8 +33,8 @@ int main() {
     }
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
     auto support=originalTerrain;
-    assets::StaticMeshAsset glazing,cover,ledger;
-    const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger);
+    assets::StaticMeshAsset glazing,cover,ledger,door;
+    const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger,&door);
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
@@ -91,14 +92,24 @@ int main() {
                  after.worldY+.01f,after.worldY+1.8f,.24f),
              "the mapped south opening admits the capsule while the adjacent wall stays solid");
         const auto& hinge=kSouthDoorHinge;
-        const auto crossesLeaf=[&](float z) {
-            return !support->NonWalkableVolumeClear(hinge[0]-.43f,z,hinge[0]+.42f,z,
-                after.worldY+.90f,after.worldY+1.22f,.07f);
-        };
-        check(crossesLeaf(hinge[2]-1.10f) && !crossesLeaf(hinge[2]-2.45f) &&
-              support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,116.1f,
-                  after.worldY+.01f,after.worldY+1.8f,.28f),
-              "the parked leaf is solid beside the throat and leaves the central lane open deep into the room");
+        const auto* doorContact=support->HingedContact(
+            horde::gameplay::simulation::TriangleSupportSurface::HingedPart::TavernDoor);
+        check(doorContact && doorContact->TriangleCount()==kSouthDoorTriangles &&
+              door.indices.size()==kSouthDoorTriangles*3 && door.bounds.minimum[0]>-.05f &&
+              door.bounds.maximum[0]<kSouthDoorSwingRadius && door.bounds.minimum[1]>=0.f,
+              "the dedicated render leaf and contact have identical hinge-local geometry");
+        if(doorContact) {
+            const auto open=TavernDoor::PoseAt(1.f);
+            const auto closed=TavernDoor::PoseAt(0.f);
+            const auto central=[&](const auto& pose) {
+                return pose.VolumeClear(*doorContact,southDoorX,121.f,southDoorX,116.1f,
+                    after.worldY+.01f,after.worldY+1.8f,.28f);
+            };
+            check(central(open) && !central(closed) &&
+                  !open.VolumeClear(*doorContact,hinge[0]-.43f,hinge[2]-1.1f,hinge[0]+.42f,hinge[2]-1.1f,
+                      after.worldY+.9f,after.worldY+1.22f,.07f),
+                  "the same leaf blocks the mapped threshold closed and swings clear when open");
+        }
         using namespace horde::gameplay::bellwether;
         const auto exactHorizontalFace=[&](const auto& mark) {
             constexpr float epsilon=.001f;

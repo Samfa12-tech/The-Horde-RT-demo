@@ -338,6 +338,9 @@ private:
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void AdvanceWaysideArchive(float seconds);
     bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
+    bellwether::DoorAction TavernDoorAction(const dialogue::Context&) const;
+    void AdvanceTavernDoor(float seconds);
+    bool TavernDoorContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;
@@ -382,6 +385,7 @@ private:
     horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
     std::optional<dialogue::RecordKeeperPose> recordKeeper_;
     bellwether::WaysideArchive waysideArchive_;
+    bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};
     ChapterLocalAmbience localAmbience_{};

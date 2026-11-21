@@ -270,6 +270,8 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
     private static final int CONTEXTUAL_RECORD_KEEPER_SHIFT = 19;
     private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
+    private static final int CONTEXTUAL_TAVERN_DOOR_SHIFT = 22;
+    private static final int CONTEXTUAL_TAVERN_DOOR_MASK = 3;
     private static final int CONTEXTUAL_RERAISE_OBJECTIVE = 1 << 21;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
@@ -1100,6 +1102,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/south-door.manifest.json", "models/world/runtime/bellwether-tavern-v1/south-door.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
@@ -8935,6 +8939,11 @@ public class MainActivity extends Activity {
     static int contextualInteractLabel(final int state) {
         if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
+        switch ((state >> CONTEXTUAL_TAVERN_DOOR_SHIFT) & CONTEXTUAL_TAVERN_DOOR_MASK) {
+            case 1: return R.string.open_tavern_door;
+            case 2: return R.string.close_tavern_door;
+            default: break;
+        }
         if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
         if ((state & CONTEXTUAL_TAVERN_DIRECTIONS) != 0) return R.string.directions;
         switch ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) {

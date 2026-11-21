@@ -6,6 +6,7 @@
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/HingedYawPose.h"
 
 #include <algorithm>
 #include <cmath>
@@ -359,13 +360,18 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float forwardX,
                                            const float forwardZ, const bool developmentWorldRoute,
                                            const bool rescueExterior, const float supportWorldY,
-                                           const simulation::TriangleSupportSurface* chapterTerrain)
+                                           const simulation::TriangleSupportSurface* chapterTerrain,
+                                           const traversal::HingedYawPose* tavernDoorPose)
 {
+    const auto* doorContact=chapterTerrain && tavernDoorPose ? chapterTerrain->HingedContact(
+        simulation::TriangleSupportSurface::HingedPart::TavernDoor) : nullptr;
     const auto walkable=[&](float x,float z) {
         if (rescueExterior && chapterTerrain)
             return traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded &&
                 traversal::ChapterExteriorCarryClear(*chapterTerrain,
-                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius);
+                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius) &&
+                (!doorContact || tavernDoorPose->VolumeClear(*doorContact,cameraX,cameraZ,x,z,
+                    supportWorldY+.25f,supportWorldY+2.30f,kPlayerCollisionRadius));
         if (rescueExterior)
             return horde::gameplay::traversal::RescueExteriorSupport(x,z).grounded &&
                 horde::gameplay::traversal::RescueExteriorMovementClear(
@@ -739,7 +745,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
         input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute,
-        input.rescueExterior, input.playerSupportWorldY, input.chapterTerrain);
+        input.rescueExterior, input.playerSupportWorldY, input.chapterTerrain,input.tavernDoorPose);
     // All rigid hand props share the continuous collision clearance. The
     // legacy 7.5 cm sampled helper produced a visible one-tick sword/forearm
     // jump while approaching a wall and could feed a discontinuous pose into
@@ -1270,7 +1276,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,input.chapterTerrain,input.playerCrouchDropMetres});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,
+        input.chapterTerrain,input.playerCrouchDropMetres,input.tavernDoorPose});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

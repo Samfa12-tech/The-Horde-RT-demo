@@ -296,6 +296,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.rescue = simulation.rescue;
     frame.chapterCompanion = simulation.chapterCompanion;
     frame.waysideArchivePose = simulation.waysideArchive.pose;
+    frame.tavernDoorOpening = simulation.tavernDoor.opening;
     frame.waysideRegisterRecovered = simulation.waysideArchive.registerRecovered;
     if (simulation.tavernKeeper) {
         using namespace horde::gameplay::dialogue;

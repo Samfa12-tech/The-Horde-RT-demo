@@ -11,7 +11,7 @@
 namespace horde::gameplay
 {
 
-enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply, LanternGlance, RepeatVisit };
+enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply, LanternGlance, RepeatVisit, DoorClosed };
 
 enum class DevelopmentCombatPose : std::uint8_t
 {
@@ -92,7 +92,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 136u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 137u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -240,6 +240,10 @@ inline constexpr std::array<DevelopmentCheckpoint, 136u> kDevelopmentCheckpoints
      .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,
      .yaw=2.43f,.pitch=.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthDoorStation+2},
+    {.id=339,.name="bellwether-south-door-closed",.baseShowcaseCheckpointId=11,
+     .cameraX=82.3f,.cameraZ=119.49f,.yaw=0.f,.pitch=-.03f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=120u,
+     .bellwetherStaffedView=BellwetherStaffedView::DoorClosed},
     {.id=326,.name="bellwether-staffed-room",.baseShowcaseCheckpointId=11,
      .cameraX=83.97f,.cameraZ=114.04f,.yaw=-.14f,.pitch=-.11f,.stagesRescueExterior=true,
      .bellwetherStaffedView=BellwetherStaffedView::Room},

@@ -279,13 +279,13 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 27u &&
-                      PresentableTinyRtScene::kBlasCount == 29u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 29u &&
+                      PresentableTinyRtScene::kBlasCount == 31u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 116u &&
-                      kRtInstanceMetadataCapacity == 35u &&
-                      kRtStaticAssetCapacity == 20u &&
-                      kRtPrimitiveMetadataCapacity == 43u && kRtMaterialCapacity == 39u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 118u &&
+                      kRtInstanceMetadataCapacity == 37u &&
+                      kRtStaticAssetCapacity == 22u &&
+                      kRtPrimitiveMetadataCapacity == 47u && kRtMaterialCapacity == 43u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
@@ -303,8 +303,9 @@ int main()
                       PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
                       PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u &&
                       PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u &&
-                      PresentableTinyRtScene::kRoadStoneMetadataIndex == 30u,
-                  "the road stone appends metadata after the ring and flask and preserves their physical slots");
+                      PresentableTinyRtScene::kRoadStoneMetadataIndex == 30u &&
+                      PresentableTinyRtScene::kTavernDoorMetadataIndex == 36u,
+                  "the chapter props retain independent metadata and preserve the ordinary prefix");
     ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 80u == 111u,

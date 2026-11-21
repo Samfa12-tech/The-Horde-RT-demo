@@ -185,20 +185,27 @@ public:
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
     }
+    enum class HingedPart { WaysideCover, TavernDoor };
+
     // Keep small local-space contact separate from immutable world solids.
     static std::shared_ptr<const TriangleSupportSurface> WithHingedContact(
-        const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic)
+        const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic,
+        HingedPart part=HingedPart::WaysideCover)
     {
-        if(ground.hingedContact_ || input.empty() || input.size()>64) {
+        const auto index=static_cast<std::size_t>(part);
+        const std::size_t limit=part==HingedPart::WaysideCover?64:288;
+        if(ground.hingedContact_[index] || input.empty() || input.size()>limit) {
             diagnostic="Hinged contact is empty, already attached or exceeds its intake bound.";return {};
         }
         auto contact=Build(input,diagnostic);
         if(!contact)return {};
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
-        result->hingedContact_=std::move(contact);
+        result->hingedContact_[index]=std::move(contact);
         return result;
     }
-    const TriangleSupportSurface* HingedContact() const {return hingedContact_.get();}
+    const TriangleSupportSurface* HingedContact(HingedPart part=HingedPart::WaysideCover) const {
+        return hingedContact_[static_cast<std::size_t>(part)].get();
+    }
     std::size_t NonWalkableTriangleCount() const {return nonWalkable_?nonWalkable_->TriangleCount():0;}
     // Collision query for an elevated horizontal volume, independent of ground
     // eligibility. Empty space over a hole is clear; upward/downward and steep
@@ -280,7 +287,8 @@ public:
     std::size_t TriangleCount() const { return triangles_.size(); }
     std::size_t RetainedBytes() const {
         return (nonWalkable_?nonWalkable_->RetainedBytes():0)+(steps_?steps_->RetainedBytes():0)+
-            (hingedContact_?hingedContact_->RetainedBytes():0)+
+            (hingedContact_[0]?hingedContact_[0]->RetainedBytes():0)+
+            (hingedContact_[1]?hingedContact_[1]->RetainedBytes():0)+
                triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
                order_.capacity()*sizeof(std::uint32_t)+nodes_.capacity()*sizeof(Node);
     }
@@ -291,7 +299,7 @@ private:
     std::vector<Triangle> triangles_;
     std::shared_ptr<const TriangleSupportSurface> nonWalkable_;
     std::shared_ptr<const TriangleSupportSurface> steps_;
-    std::shared_ptr<const TriangleSupportSurface> hingedContact_;
+    std::array<std::shared_ptr<const TriangleSupportSurface>,2> hingedContact_;
     std::vector<Point> normals_;
     std::vector<std::uint32_t> order_;
     std::vector<Node> nodes_;

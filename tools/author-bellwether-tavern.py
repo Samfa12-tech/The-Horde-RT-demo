@@ -188,10 +188,8 @@ def opaque_finish(name, color, roughness):
 oak = opaque_finish("HordeTavernTimber", (.25, .115, .065), .84)
 ember = opaque_finish("HordeHearthChar", (.025, .019, .013), .95)
 
-# B01's timber leaf is held inward against the west jamb for the arrival.
-# Keep the pieces local to an editable hinge so a later moving export can
-# reuse this exact leaf and axis. The held-open mesh shares the room BLAS
-# and ordinary static contact in the current build.
+# B01's editable hinge is posed open for the arrival. Its leaf is exported
+# in hinge-local space for shared rendering and contact.
 door_hinge = (door_west + .088, floor, south - wall_depth - .085)
 door_open_degrees = 94
 door_width = 2.02
@@ -537,7 +535,6 @@ box("B09_register_spine", register_x - .263, register_x - .224, register_z - .15
     group=archive_register)
 register_mark = [register_x, opening_bottom + .12, register_z]
 solids.extend(door_frame)
-solids.extend(door_leaf)
 
 
 def joined_copy(group, name):
@@ -611,6 +608,12 @@ register_path = RUNTIME / "wayside-road-register.glb"
 bpy.ops.export_scene.gltf(filepath=str(register_path), export_format="GLB", use_selection=True,
                           export_apply=True, export_texcoords=True, export_normals=True,
                           export_tangents=True, export_animations=False)
+door_mesh = joined_copy(door_leaf, "BellwetherSouthDoor")
+door_mesh.parent = None
+door_path = RUNTIME / "bellwether-south-door.glb"
+bpy.ops.export_scene.gltf(filepath=str(door_path), export_format="GLB", use_selection=True,
+                          export_apply=True, export_texcoords=True, export_normals=True,
+                          export_tangents=True, export_animations=False)
 
 
 def digest(path):
@@ -651,6 +654,13 @@ register_manifest["budgets"] = dict(manifest["budgets"], maxVertices=112, maxInd
 register_manifest["lods"] = [{"name": "lod0", "maxTriangles": register_triangles}]
 (RUNTIME / "wayside-road-register.manifest.json").write_text(json.dumps(register_manifest, indent=2) + "\n",
                                                              encoding="utf-8", newline="\n")
+door_triangles = len(door_mesh.data.polygons)
+door_manifest = dict(manifest, asset="bellwether-south-door", materialOverrides=[])
+door_manifest["budgets"] = dict(manifest["budgets"], maxVertices=1100, maxIndices=door_triangles * 3,
+                                maxPrimitives=2, maxMaterials=2)
+door_manifest["lods"] = [{"name": "lod0", "maxTriangles": door_triangles}]
+(RUNTIME / "south-door.manifest.json").write_text(json.dumps(door_manifest, indent=2) + "\n",
+                                                   encoding="utf-8", newline="\n")
 receipt = dict(registerSha256=digest(register_path), registerTriangles=register_triangles, registerMark=register_mark,
                coverSha256=digest(cover_path), coverTriangles=cover_triangles, sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                layoutSha256=parent["planSha256"], runtimeSha256=digest(path),
@@ -660,6 +670,7 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                southDoor=[door_x, floor, south], clearDoorWidth=2.2 - 2 * door_frame_width,
                clearDoorHeight=2.65 - .068, southDoorHinge=door_hinge,
                southDoorOpenDegrees=door_open_degrees, southDoorLeafWidth=door_width,
+               southDoorSha256=digest(door_path), southDoorTriangles=door_triangles,
                rampToe=[door_x, toe_y, toe_z], rampWidth=3, highestGroundUnderFloor=highest_inside,
                hearthMouth=[hearth_front, floor, (hearth_north + hearth_south) / 2],
                chairSeat=seat_mark, chairSitRoot=sit_root, chairApproach=approach_mark, chairTurn=turn_mark,
@@ -690,6 +701,9 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
 stage += ["", f"inline constexpr unsigned kSolidTriangles={solid_triangles};",
+          f"inline constexpr unsigned kSouthDoorTriangles={door_triangles};",
+          f"inline constexpr float kSouthDoorOpenRadians={math.radians(door_open_degrees):.9f}f;",
+          f"inline constexpr float kSouthDoorSwingRadius={door_width + .01:.3f}f;",
           "inline constexpr float kChairFacingRadians=1.570796327f;",
           f"inline constexpr float kKeeperDoorFacingRadians={keeper_door_yaw:.9f}f;",
           f"inline constexpr float kKeeperHearthFacingRadians={keeper_hearth_yaw:.9f}f;", "}", ""]

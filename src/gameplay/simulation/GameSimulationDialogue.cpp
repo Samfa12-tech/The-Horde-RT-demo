@@ -6,6 +6,11 @@ namespace horde::gameplay::simulation {
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=ChapterInteractionContext(false);
+    const auto door=TavernDoorAction(context);
+    if(door!=bellwether::DoorAction::None) {
+        tavernDoor_.destination=door==bellwether::DoorAction::Open?1.f:0.f;
+        return;
+    }
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
     const auto records=RecordKeeperAction(context);
     if(chapterDialogue_.TryStartRecordKeeper(records,context)) {
@@ -96,6 +101,49 @@ bool GameSimulation::ArchiveContactClear(float x0,float z0,float x1,float z1,flo
     if(!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
        !chapterTerrain_->HingedContact())return true;
     return waysideArchive_.pose.VolumeClear(*chapterTerrain_->HingedContact(),x0,z0,x1,z1,y0,y1,radius);
+}
+
+bellwether::DoorAction GameSimulation::TavernDoorAction(const dialogue::Context& c) const {
+    using namespace bellwether;
+    if(!c.claimed || !c.exterior || !c.alive || c.paused || c.traversing || c.combat || !c.kitSeated ||
+       !playerSupport_.grounded || !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       !chapterTerrain_->HingedContact(TriangleSupportSurface::HingedPart::TavernDoor) ||
+       (tavernKeeper_.Pose() && tavernKeeper_.Pose()->stage!=dialogue::TavernKeeperStage::AtHearth) ||
+       chapterDialogue_.State().line!=dialogue::Line::None || tavernDoor_.opening!=tavernDoor_.destination)
+        return DoorAction::None;
+    const auto pose=TavernDoor::PoseAt(tavernDoor_.opening);
+    const auto& m=pose.worldFromModel;
+    constexpr float pullX=1.82f,pullY=1.12f;
+    const float x=m[3]+m[0]*pullX,y=m[7]+pullY,z=m[11]+m[8]*pullX;
+    const float dx=x-c.player.x,dz=z-c.player.z,distance=std::hypot(dx,dz);
+    if(distance>3.f || std::abs(c.listener.y-y)>1.25f ||
+       std::sin(c.yaw)*dx-std::cos(c.yaw)*dz<.65f*distance ||
+       !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,x,z,y-.02f,y+.02f,.02f))
+        return DoorAction::None;
+    return tavernDoor_.opening==0.f?DoorAction::Open:DoorAction::Close;
+}
+
+void GameSimulation::AdvanceTavernDoor(float seconds) {
+    using namespace bellwether;
+    if(seconds<=0 || tavernDoor_.opening==tavernDoor_.destination || !chapterTerrain_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation)return;
+    const auto* contact=chapterTerrain_->HingedContact(TriangleSupportSurface::HingedPart::TavernDoor);
+    if(!contact)return;
+    constexpr float duration=1.35f;
+    const float delta=tavernDoor_.destination-tavernDoor_.opening;
+    const float step=seconds/duration;
+    const float next=std::abs(delta)<=step?tavernDoor_.destination:tavernDoor_.opening+std::copysign(step,delta);
+    const float travel=std::abs(next-tavernDoor_.opening)*kSouthDoorOpenRadians*kSouthDoorSwingRadius;
+    if(UsesRescueExterior() && !TavernDoor::PoseAt(next).VolumeClear(*contact,
+            playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY+.001f,
+            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+travel))return;
+    tavernDoor_.opening=next;
+}
+
+bool GameSimulation::TavernDoorContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+    if(!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return true;
+    const auto* contact=chapterTerrain_->HingedContact(TriangleSupportSurface::HingedPart::TavernDoor);
+    return !contact || bellwether::TavernDoor::PoseAt(tavernDoor_.opening).VolumeClear(*contact,x0,z0,x1,z1,y0,y1,radius);
 }
 
 void GameSimulation::TryStartShrineReveal(const dialogue::Context& context) {

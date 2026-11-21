@@ -13,6 +13,7 @@
 #include <string_view>
 
 namespace horde::gameplay::simulation { class TriangleSupportSurface; }
+namespace horde::gameplay::traversal { struct HingedYawPose; }
 
 namespace horde::gameplay::items
 {
@@ -83,6 +84,7 @@ struct HeldItemKinematicsInput
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
     float playerCrouchDropMetres=0;
+    const traversal::HingedYawPose* tavernDoorPose=nullptr;
 };
 
 struct HeldSwordPose
@@ -159,6 +161,7 @@ struct HeldItemFixedStepInput
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
     float playerCrouchDropMetres=0;
+    const traversal::HingedYawPose* tavernDoorPose=nullptr;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -247,7 +250,8 @@ float ComputeRewardLanternForwardClearance(float cameraX,
                                            float forwardZ, bool developmentWorldRoute = false,
                                            bool rescueExterior = false,
                                            float supportWorldY = kRouteFloorWorldY,
-                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr);
+                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr,
+                                           const traversal::HingedYawPose* tavernDoorPose = nullptr);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 
