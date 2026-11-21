@@ -1521,23 +1521,41 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(visited && game.Snapshot().playerGrounded,
                   "the completed tavern visit can reach the mapped exterior record keeper mark on foot");
             if(!visited)return;
-            input.moveForward=0;input.runHeld=false;input.yawRadians=-1.57079632679f;step();
+            const BellwetherStation sideMark{kBellwetherRecordKeeperApproach.x,kBellwetherRecordKeeperApproach.z+.66f};
+            const bool sideReached=walkTo(sideMark);
+            Check(sideReached,"the mapped church deck lets the player reach the keeper from the side");
+            if(!sideReached)return;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=-1.57079632679f;
+            for(unsigned tick=0;tick<35;++tick)step();
+            constexpr float restYaw=kRecordKeeperRestYaw;
             Check(game.Snapshot().recordKeeper && game.Snapshot().recordKeeperAction==RecordKeeperAction::None,
                   "the grounded record keeper waits until the player faces the service mark");
-            input.yawRadians=1.57079632679f;step();
+            const auto& state=game.Snapshot();
+            const float dx=kBellwetherRecordKeeperMark.x-state.playerX,dz=kBellwetherRecordKeeperMark.z-state.playerZ;
+            const float expectedFacing=std::atan2(-dx,dz);
+            input.yawRadians=std::atan2(dx,-dz);step();
             const auto recordKeeper=game.Snapshot().recordKeeper;
             Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&
                   game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRoadMark,
                   "at the church the player can show the forest road mark before finding the register");
+            Check(recordKeeper && recordKeeper->yaw<restYaw && recordKeeper->yaw>expectedFacing &&
+                  restYaw-recordKeeper->yaw<.03f,"the record keeper turns toward the prospective listener at a bounded rate");
             const float idleBeforePause=recordKeeper ? recordKeeper->idleSeconds : 0.f;
             input.paused=true;step();
-            Check(idleBeforePause>0 && game.Snapshot().recordKeeper &&
-                  game.Snapshot().recordKeeper->idleSeconds==idleBeforePause,
-                  "the admitted record keeper animates in earshot and holds pose while paused");
-            input.paused=false;step();
-            Check(game.Snapshot().recordKeeper && game.Snapshot().recordKeeper->idleSeconds>idleBeforePause,
-                  "the record keeper resumes from the held idle pose");
+            Check(idleBeforePause>0 && recordKeeper && game.Snapshot().recordKeeper &&
+                  game.Snapshot().recordKeeper->idleSeconds==idleBeforePause &&
+                  game.Snapshot().recordKeeper->yaw==recordKeeper->yaw,
+                  "the admitted record keeper holds idle time and facing while paused");
+            input.paused=false;
+            for(unsigned tick=0;tick<35;++tick)step();
+            Check(recordKeeper && state.recordKeeper && state.recordKeeper->idleSeconds>idleBeforePause &&
+                  state.recordKeeper->foot==recordKeeper->foot && std::abs(state.recordKeeper->yaw-expectedFacing)<.001f,
+                  "the record keeper resumes and faces the player from the same grounded mark");
             ++input.commands.interact;step();
+            input.yawRadians=-1.57079632679f;step();
+            Check(state.recordKeeper && std::abs(state.recordKeeper->yaw-expectedFacing)<.001f &&
+                  state.chapterDialogue.line==Line::RecordKeeperInspect,
+                  "the speaking record keeper keeps addressing the listener when the player looks away");
             for(const auto line:kRecordKeeperLead) {
                 Check(game.Snapshot().chapterDialogue.line==line &&
                       game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
@@ -1553,6 +1571,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(shrineReached && game.Snapshot().playerGrounded,
                   "the church junction leads on continuous support to the archive inspection mark");
             if(!shrineReached)return;
+            Check(state.recordKeeper && std::abs(state.recordKeeper->yaw-restYaw)<.001f,
+                  "the record keeper returns to the church-path stance when the player leaves");
             using namespace gameplay::bellwether;
             input.moveForward=0;input.runHeld=false;input.yawRadians=3.14159265359f;
             step();

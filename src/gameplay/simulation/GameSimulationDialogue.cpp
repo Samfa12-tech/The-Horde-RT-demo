@@ -239,11 +239,22 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         const auto support=traversal::ChapterExteriorStepSupport(*terrain,mark.x,mark.z,radius,height);
         if(support.grounded && traversal::ResolveChapterStepMovement(*terrain,mark.x,mark.z,mark.x,mark.z,
                 support.worldY,radius,height).accepted)
-            recordKeeper_=RecordKeeperPose{{mark.x,support.worldY,mark.z},-1.57079632679f};
+            recordKeeper_=RecordKeeperPose{{mark.x,support.worldY,mark.z}};
     }
     auto c=ChapterInteractionContext(input.paused);
-    if(recordKeeper_ && c.recordKeeperSource && !c.paused && c.alive && !c.traversing)
-        recordKeeper_->idleSeconds+=seconds;
+    if(recordKeeper_ && !c.paused && c.alive && !c.traversing) {
+        auto& keeper=*recordKeeper_;
+        if(c.recordKeeperSource)keeper.idleSeconds+=seconds;
+        const auto line=chapterDialogue_.State().line;
+        const bool attending=c.recordKeeperSource && !c.combat &&
+            ((line==Line::None && c.recordKeeperInReach) || IsRecordKeeperLine(line));
+        const float dx=c.player.x-keeper.foot[0],dz=c.player.z-keeper.foot[2];
+        const float target=attending && std::hypot(dx,dz)>.001f?std::atan2(dx,-dz):kRecordKeeperRestYaw;
+        constexpr float turnRadiansPerSecond=1.5f,fullTurn=6.28318530718f;
+        const float turnLimit=turnRadiansPerSecond*seconds;
+        const float turn=std::remainder(target-keeper.yaw,fullTurn);
+        keeper.yaw=std::remainder(keeper.yaw+std::clamp(turn,-turnLimit,turnLimit),fullTurn);
+    }
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {
         const auto door=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation];

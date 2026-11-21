@@ -92,7 +92,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 137u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 138u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -287,6 +287,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 137u> kDevelopmentCheckpoints
     {.id=335,.name="bellwether-record-keeper-handoff",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z,
      .yaw=1.57079632679f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherNorthView=BellwetherNorthView::RegisterHandoff},
+    {.id=340,.name="bellwether-record-keeper-listener",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z+.66f,
+     .yaw=1.20f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
      .bellwetherNorthView=BellwetherNorthView::RegisterHandoff},
     {.id=336,.name="bellwether-return-to-kit",.baseShowcaseCheckpointId=11,

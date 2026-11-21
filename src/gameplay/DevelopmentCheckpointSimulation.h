@@ -275,11 +275,14 @@ inline bool StageDevelopmentCheckpointSimulation(
             const auto& wayside=traversal::kBellwetherWaysideApproach;
             for(std::size_t i=wayside.size()-1;i>0;--i)
                 if(!walkStation(wayside[i-1]))return finalize(false);
+            const auto approach=returnsToKit?traversal::kBellwetherRecordKeeperApproach:
+                traversal::BellwetherStation{checkpoint.cameraX,checkpoint.cameraZ};
             if(!walkStation(traversal::kBellwetherNorthApproach.back()) ||
                !walkStation(traversal::kBellwetherChurchApproach.front()) ||
-               !walkStation(traversal::kBellwetherRecordKeeperApproach))return finalize(false);
+               !walkStation(approach))return finalize(false);
             input.moveForward=0;input.runHeld=false;
-            input.yawRadians=1.57079632679f;input.pitchRadians=-.07f;
+            input.yawRadians=returnsToKit?1.57079632679f:checkpoint.yaw;
+            input.pitchRadians=returnsToKit?-.07f:checkpoint.pitch;
             advance();
             if(state.recordKeeperAction!=dialogue::RecordKeeperAction::ShowRegister || !state.recordKeeper)
                 return finalize(false);
@@ -287,6 +290,12 @@ inline bool StageDevelopmentCheckpointSimulation(
             const auto saved=gameSimulation.LatestCampaignBoundary();
             if(!saved || !saved->waysideRegisterInterpreted || state.chapterDialogue.line!=dialogue::Line::RecordKeeperRegister)
                 return finalize(false);
+            if(!returnsToKit && approach.z!=traversal::kBellwetherRecordKeeperApproach.z) {
+                const auto& foot=state.recordKeeper->foot;
+                const float facing=std::atan2(state.playerX-foot[0],foot[2]-state.playerZ);
+                for(unsigned tick=0;tick<40 && std::abs(state.recordKeeper->yaw-facing)>.01f;++tick)advance();
+                if(std::abs(state.recordKeeper->yaw-facing)>.01f)return finalize(false);
+            }
         }
         if(returnsToKit) {
             for(const auto line:{dialogue::Line::RecordKeeperTwoRoads,dialogue::Line::RecordKeeperRoadOrder,dialogue::Line::None}) {
