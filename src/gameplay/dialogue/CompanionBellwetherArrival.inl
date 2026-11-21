@@ -11,7 +11,7 @@
         return route;
     }();
 
-    void StepBellwetherArrival(float dt,const simulation::TriangleSupportSurface& terrain) {
+    void StepBellwetherArrival(float dt,const simulation::TriangleSupportSurface& terrain,bool holdAnkleAssessment) {
         using Stage=BellwetherArrivalStage;
         auto& stage=state_.bellwetherArrival;
         auto& motion=state_.motion;
@@ -22,6 +22,7 @@
             motion.anklePlaybackSeconds=std::min(motion.anklePlaybackSeconds+dt,kAnkleAssessmentDurationSeconds);
             if(motion.anklePlaybackSeconds>=kAnkleAssessmentDurationSeconds-.00001f) {
                 motion.anklePlaybackSeconds=kAnkleAssessmentDurationSeconds;
+                if(holdAnkleAssessment)return;
                 locomotion_.Reset();state_.locomotion=locomotion_.State();
                 motion.mode=CompanionMotionMode::Walking;
                 stage=Stage::ProtectiveApproach;

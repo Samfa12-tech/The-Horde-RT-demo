@@ -1155,7 +1155,8 @@ gameplay::campaign::Checkpoint LookoutCheckpoint(
     return record;
 }
 
-void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain,
+                              bool stayAtIncident) {
     namespace sim=gameplay::simulation;
     namespace cp=gameplay::campaign;
     using namespace gameplay::dialogue;
@@ -1194,12 +1195,17 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     bool injuryOnRoad=false;
     unsigned injuryEntries=0;
     bool assessmentStayedPlanted=true,protectivePhaseMatchesTravel=true;
-    unsigned assessmentTicks=0,protectiveTicks=0;
+    unsigned assessmentTicks=0,assessmentSampleTicks=0,protectiveTicks=0;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
     bool stoneMovesOnlyAfterContact=true;
     unsigned stoneMotionTicks=0;
     std::vector<Line> hearthSpoken;
+    std::vector<Line> roadSpoken;
+    const std::vector<Line> expectedRoad = stayAtIncident ? std::vector(kRoadLines.begin(),kRoadLines.end())
+                                                         : std::vector<Line>{};
+    std::uint64_t roadCaptionGeneration=0;
+    bool roadCaptionsMatchMotion=true;
     std::uint64_t hearthVoiceGeneration=0;
     bool firstCaptionAtChair=false;
     float maximumKitStep=0;
@@ -1217,6 +1223,15 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         }
         const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
         replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
+        if(IsRoadLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=roadCaptionGeneration) {
+            const auto& speech=after.chapterDialogue;
+            roadCaptionGeneration=speech.generation;
+            roadSpoken.push_back(speech.line);
+            roadCaptionsMatchMotion&=speech.source.x==kit.x && speech.source.z==kit.z &&
+                (speech.line==Line::RoadSlow ? kit.bellwetherArrival==Stage::ProtectiveApproach :
+                    kit.bellwetherArrival==Stage::AnkleAssessment &&
+                    kit.motion.anklePlaybackSeconds>=horde::audio::kKitAnkleBeats.back().seconds);
+        }
         if(IsHearthLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=hearthVoiceGeneration) {
             if(hearthSpoken.empty())firstCaptionAtChair=kit.bellwetherArrival==Stage::ChairTurn ||
                 kit.bellwetherArrival==Stage::Lowering;
@@ -1245,6 +1260,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             ankleCues.push_back(cue);
         }
         game.ClearEvents();
+        if(kit.motion.anklePlaybackSeconds>before.motion.anklePlaybackSeconds)++assessmentSampleTicks;
         if(kit.bellwetherArrival==Stage::AnkleAssessment) {
             ++assessmentTicks;
             assessmentStayedPlanted&=kit.grounded && !kit.walking && travelled<.001f;
@@ -1284,8 +1300,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                  <<" en route to "<<x<<','<<z<<'\n';
         return false;
     };
-    for(const auto& point:route) {
-        if(!walkTo(point)) {Check(false,"the normal player motor enters the tavern by its mapped south entrance");return;}
+    for(std::size_t i=0;i<route.size();++i) {
+        if(!walkTo(route[i])) {Check(false,"the normal player motor enters the tavern by its mapped south entrance");return;}
+        if(!stayAtIncident || i!=gameplay::traversal::kBellwetherAnkleStation)continue;
+        input.moveForward=0;
+        for(unsigned tick=0;tick<3600 && roadSpoken.size()<kRoadLines.size();++tick)step();
+        input.moveForward=1;
     }
     Check(game.Snapshot().playerZ<118.4f &&
           std::abs(game.Snapshot().playerSupportWorldY-(-8.70955f))<.001f,
@@ -1333,8 +1353,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(injuryEntries==1 && injuryOnRoad && maximumKitStep<.032f && seated.grounded &&
           seated.bellwetherArrival==Stage::Seated && seated.x==kChairSitRoot[0] && seated.z==kChairSitRoot[2],
           "from the earned lookout Kit crosses the real road once, assesses at the mapped mark, and settles without a teleport or player tether");
-    Check(assessmentTicks==96 && assessmentStayedPlanted && protectiveTicks>120 && protectivePhaseMatchesTravel,
+    Check(assessmentSampleTicks==96 && (stayAtIncident ? assessmentTicks>96 : assessmentTicks==96) &&
+          assessmentStayedPlanted && protectiveTicks>120 && protectivePhaseMatchesTravel,
           "Kit stays planted for the one-shot ankle take, then ties the protective cycle to supported travel");
+    Check(roadSpoken==expectedRoad && roadCaptionsMatchMotion,
+          stayAtIncident ? "all three roadside captions follow contact, hold and departure on the actual Bellwether road"
+                         : "overtaking the injury beat leaves the road quiet and Kit continues independently");
     Check(ankleCuesMatchContact && anklePausedBeforeCue && ankleCues==std::vector{
         horde::audio::KitAnkleCue::BootAndGravel,horde::audio::KitAnkleCue::SteadyBreath},
         "the real ankle take emits the two local audio beats in order and waits through pause");
@@ -1361,7 +1385,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
           game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2 &&
-          hearthSpoken.size()==3 && std::abs(stoneTravel()-.284f)<.001f,
+          hearthSpoken.size()==3 && roadSpoken==expectedRoad && std::abs(stoneTravel()-.284f)<.001f,
           "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
 }
 
@@ -1542,7 +1566,8 @@ void TestFullSurroundings()
                   road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
                   road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
                   "the live forest opens only the two road spans and retains the closed sections and full tree roster");
-            TestBellwetherTavernRoute(recreatedTerrain);
+            TestBellwetherTavernRoute(recreatedTerrain,true);
+            TestBellwetherTavernRoute(recreatedTerrain,false);
         }
     }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns

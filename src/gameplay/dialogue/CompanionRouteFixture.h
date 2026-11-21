@@ -104,7 +104,7 @@ public:
     }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false,bool active=true,
-              bool guideBasin=false) {
+              bool guideBasin=false,bool holdAnkleAssessment=false) {
         if(TavernSitActive()) {
             if(exterior && active && !paused && std::isfinite(dt) && dt>0 &&
                state_.motion.mode==CompanionMotionMode::Sitting) {
@@ -121,7 +121,7 @@ public:
         }
         if(state_.bellwetherArrival!=BellwetherArrivalStage::AtLookout) {
             if(exterior && active && !paused && terrain && std::isfinite(dt) && dt>0)
-                StepBellwetherArrival(std::min(dt,.05f),*terrain);
+                StepBellwetherArrival(std::min(dt,.05f),*terrain,holdAnkleAssessment);
             return;
         }
         if(guideBasin && active && exterior && proof) {

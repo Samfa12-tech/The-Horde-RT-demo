@@ -60,8 +60,8 @@ int main() {
     for (const auto& spec : kLines) {
         if (spec.id == Line::None) continue;
         const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
-        if(IsHearthLine(spec.id)) {
-            Check(path.empty() && spec.text[0]!='\0',"a private tavern take is timed by its caption alone");
+        if(IsHearthLine(spec.id) || IsRoadLine(spec.id)) {
+            Check(path.empty() && spec.text[0]!='\0',"unadmitted Bellwether takes use timed captions");
             continue;
         }
         Check(!path.empty() && std::filesystem::is_regular_file(path),
@@ -459,6 +459,60 @@ int main() {
     forest.Reset();Check(!forest.State().forestNightConsumed&&!forest.State().forestWaystoneConsumed&&
         !forest.State().forestClueConsumed&&!forest.State().forestVillageConsumed,
         "new route clears outdoor once flags");
+    {
+        Director road;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context trail;
+        trail.exterior=trail.claimed=trail.roadInReach=true;
+        trail.companionSource=Tuple{59.3f,-8.45f,108.2f};
+        Check(road.RestoreProgress(progress,trail,1,0),"completed lookout can start the roadside scene");
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::None,"Kit cannot speak before the ankle catch");
+        trail.kitCaughtAnkle=true;
+        road.Step(.05f,trail);
+        const auto stop=road.State();
+        auto forged=road.ExportProgress();
+        forged.activeLine=Line::RoadStop;
+        Check(stop.line==Line::RoadStop && road.HoldingAnkleAssessment() &&
+              Spec(stop.line).audio[0]=='\0' && road.ExportProgress().activeLine==Line::None &&
+              !Director::ValidateProgress(forged),"the roadside beat is a transient positional caption");
+        road.Step(.05f,trail);
+        const auto beforePause=road.State();
+        trail.paused=true;
+        road.Step(.05f,trail);
+        Check(road.State().elapsed==beforePause.elapsed,"pause freezes the roadside cadence");
+        trail.paused=false;
+        road.Skip();road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadAnkle && !road.Complete(stop.line,stop.generation),
+              "skip advances once and rejects a stale completion");
+        road.Skip();road.Step(.05f,trail);
+        Check(road.State().line==Line::None && road.HoldingAnkleAssessment(),
+              "rapid skips still leave time for the authored weight test");
+        trail.kitReadyForProtectiveWalk=true;
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadSlow && !road.HoldingAnkleAssessment(),
+              "the last line releases Kit into his protective walk");
+        trail.kitCaughtAnkle=trail.kitReadyForProtectiveWalk=false;
+        trail.companionSource->x+=.5f;
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadSlow && road.State().source.x==trail.companionSource->x,
+              "the last caption follows Kit onto the road");
+
+        Check(road.RestoreProgress(progress,trail,1,0),"an old lookout save starts before the incident");
+        trail.kitCaughtAnkle=true;
+        road.Step(.05f,trail);
+        const auto departed=road.State();
+        trail.roadInReach=false;
+        road.Step(.05f,trail);
+        trail.roadInReach=true;
+        road.Step(.05f,trail);
+        Check(departed.line==Line::RoadStop && road.State().line==Line::None &&
+              !road.HoldingAnkleAssessment() && !road.Complete(departed.line,departed.generation),
+              "leaving mid-line releases the route and doubling back never repeats the injury speech");
+    }
     {
         Director hearth;
         Progress progress;

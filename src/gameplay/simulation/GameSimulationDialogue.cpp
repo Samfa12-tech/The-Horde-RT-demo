@@ -39,6 +39,12 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     const bool proofWasAccepted=chapterDialogue_.State().proofAccepted;
     const auto bindCompanion=[&] {
         const auto& kit=chapterCompanion_.State();
+        const bool assessing=kit.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment;
+        c.kitCaughtAnkle=assessing && kit.motion.anklePlaybackSeconds>=audio::kKitAnkleBeats.back().seconds;
+        c.kitReadyForProtectiveWalk=assessing && kit.motion.anklePlaybackSeconds>=kAnkleAssessmentDurationSeconds;
+        c.roadInReach=(assessing || kit.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach) &&
+            playerSupport_.grounded && std::abs(playerSupport_.worldY-kit.y)<=1.6f &&
+            std::hypot(playerX_-kit.x,playerZ_-kit.z)<=5.f;
         c.kitAtChair=kit.grounded && kit.bellwetherArrival>=BellwetherArrivalStage::ChairTurn;
         c.kitSeated=c.kitAtChair && kit.bellwetherArrival==BellwetherArrivalStage::Seated;
         const auto hearthMark=campaign::kBellwetherCheckpointPosition;
@@ -70,7 +76,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         chapterDialogue_.State().proofAccepted && (!guidePending || readyToLead),c.paused,
         terrain,
         config_.authoredChapterTerrain,c.alive&&!c.traversing,
-        guidePending && readyToLead);
+        guidePending && readyToLead,chapterDialogue_.HoldingAnkleAssessment());
     const auto& kit=chapterCompanion_.State();
     if(kit.grounded && kit.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment &&
        kit.motion.anklePlaybackSeconds>previousAnkleTime) {

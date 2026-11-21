@@ -51,7 +51,7 @@ public final class ChapterVoiceAssetsTest {
         assertNull(ChapterVoiceAssets.soundIdForLine(21, sounds));
     }
 
-    @Test public void privateTavernTakesRemainCaptionOnly() {
-        for (int line : new int[]{18, 19, 20}) assertNull(ChapterVoiceAssets.forLine(line));
+    @Test public void privateBellwetherTakesRemainCaptionOnly() {
+        for (int line : new int[]{18, 19, 20, 21, 22, 23}) assertNull(ChapterVoiceAssets.forLine(line));
     }
 }
