@@ -209,6 +209,17 @@ With the textured record keeper and tavern keeper stand-in loaded, both Windows 
 
 Both runs held 37 TLAS definitions, 28 BLAS owners and 441,697,264 bytes of device-local RT allocations throughout. A negative replay of the journal rejected a missing record keeper mask at the square. Display pacing, streaming retirement, the final tavern keeper and physical phone performance remain open.
 
+The open hinged-door baseline uses source `82ce5828` and Windows Debug executable SHA-256 `cd7cd0317bd8763da032b2a70ef2d048e2e8621d7ad1cea7932b7e0ce5ae7229`. At 960 × 540 on the same RTX 5050 Laptop GPU, Pipeline presented 1,578 measured frames in 97.82 seconds and Query presented 1,583 in 96.35 seconds. Each run advanced 5,232 simulation ticks and completed two returns. The open door, window, Kit and both residents had active masks throughout. The two runs each held 38 TLAS definitions, 29 BLAS owners and 441,767,696 device-local RT allocation bytes.
+
+| GPU p95 after the five-second warmup | RayTracingPipeline | RayQueryCompute |
+| --- | ---: | ---: |
+| Tavern | 5.05 ms | 4.72 ms |
+| Outbound doorway | 5.32 ms | 4.80 ms |
+| Square | 11.50 ms | 10.80 ms |
+| Inbound doorway | 10.98 ms | 10.10 ms |
+
+The measurement rejects a closed or closing door in the input replay and requires the submitted door instance on both platforms. The Windows receipt pins the tavern and separate leaf exports. The verifier rejected a missing door during the outbound leg and a mismatched journal mask. The private ARM64 APK from the same source has SHA-256 `86aa207d8302cf678e0001644b8b4052993fdcc072d5b53fcf76ec7e409f9a6e`. The new baseline consists of hidden Windows GPU timings. Phone pacing and sustained performance await an on-device run.
+
 The [separate ARM64 Bellwether Debug build](../../../android/README.md#bellwether-three-actor-playtest) now uses the same two prepared residents on the phone. Both staged checkpoints entered live controls on SM-S948B, with Kit visible at the tavern and the textured record keeper visible outside the church. Short native timings on the phone identify a performance gap at the tavern threshold. The full moving route, displayed pacing and sustained performance remain open. See the [exact Android device record](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#2026-11-21---bellwether-three-actor-debug-checkpoints).
 
 ## Open decisions deliberately preserved

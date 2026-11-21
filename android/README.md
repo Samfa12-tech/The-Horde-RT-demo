@@ -98,6 +98,11 @@ The voice overlay is optional. The shared dialogue clock uses the measured takes
 and an unavailable cue retains its caption. The release guard also covers this
 overlay.
 
+The post-benchmark Back fix from `3caefd67` is in this build. On the host,
+the opening benchmark, Android controller and campaign menu suites passed all
+115 tests. Physical confirmation of the return from benchmark results to the
+main menu and Stay/Quit dialog remains open. [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
 ### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
