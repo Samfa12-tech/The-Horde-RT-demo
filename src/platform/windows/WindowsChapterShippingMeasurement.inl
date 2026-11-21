@@ -70,7 +70,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     }
     for(const auto name:kChapterHostPhaseNames)csv<<','<<name;
     csv<<",host_previous_evidence_ns,host_phases_available";
-    if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask";
+    if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
     csv<<'\n';
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
@@ -91,7 +91,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements detail{};
         ChapterRouteHostPhases host;
         std::array<unsigned,3> roomMasks{};
-        unsigned recordKeeperMask=0;
+        unsigned recordKeeperMask=0,tavernDoorMask=0;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -185,10 +185,13 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             if(context.combinedBellwetherResidents && tag.recordKeeperMask!=1) {
                 error="Doorway frame lost the submitted record keeper instance.";return false;
             }
+            if(tag.tavernDoorMask!=1) {
+                error="Doorway frame lost the submitted tavern door instance.";return false;
+            }
             csv<<','<<sample.scene.fireLighting->count<<','<<sample.scene.resources.tlasInstanceCount<<','
                <<sample.scene.resources.bottomLevelAccelerationStructureCount;
             for(const auto mask:tag.roomMasks)csv<<','<<mask;
-            csv<<','<<tag.recordKeeperMask;
+            csv<<','<<tag.recordKeeperMask<<','<<tag.tavernDoorMask;
         }
         csv<<'\n';
         if(samples%120==0 || tag.phase!=lastPhase) {
@@ -200,7 +203,9 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             // real formatting CR/LF so each journal record is one valid line.
             std::erase_if(json,[](char c){return c=='\r'||c=='\n';});
             snapshots<<"{\"phase\":\""<<tag.phase<<"\",\"station\":"<<tag.station
-                <<",\"elapsedSeconds\":"<<tag.elapsedSeconds<<",\"evidence\":"<<json<<"}\n";
+                <<",\"elapsedSeconds\":"<<tag.elapsedSeconds;
+            if(doorway)snapshots<<",\"tavernDoorMask\":"<<tag.tavernDoorMask;
+            snapshots<<",\"evidence\":"<<json<<"}\n";
             csv.flush();snapshots.flush();
         }
         lastSerial=id.submissionSerial;lastPhase=tag.phase;++samples;
@@ -302,6 +307,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
                            context.rtScene.SubmittedInstanceMask(Scene::kChapterWindowMetadataIndex),
                            context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex)};
             tag.recordKeeperMask=context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1);
+            tag.tavernDoorMask=context.rtScene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex);
         }
         const auto evidenceStartNs=steadyNs();
         if(!append())return false;
@@ -332,7 +338,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
 #else
     constexpr auto build="Optimized Release CPU";
 #endif
-    summary<<"{\"schema\":4,\"scope\":\""<<build;
+    summary<<"{\"schema\":"<<(doorway?5:4)<<",\"scope\":\""<<build;
     if(doorway)summary<<" with "<<RtInstrumentationModeName(instrumentation)
         <<" High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\","
         <<"\"quietReturns\":"<<bellwether.Returns()<<','

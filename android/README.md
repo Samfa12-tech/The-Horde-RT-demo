@@ -78,8 +78,9 @@ motor at 60 Hz. It begins after the staffed pose has reached hardware RT
 presentation. Use a fresh launch with GPU timing enabled and keep it in the
 foreground until the `HORDE_BELLWETHER_DOORWAY complete returns=2` log marker.
 The CSV joins the route phase, instance masks, GPU timing and accepted present
-for each submitted frame. `present_return_ns` records the native present call,
-while actual display timing requires a display capture.
+for each submitted frame. The run requires the tavern door to stay fully open
+and the rendered leaf to remain present. `present_return_ns` records the native
+present call, while actual display timing requires a display capture.
 
 ```powershell
 adb exec-out run-as com.samfa12.hordelanternrt.debug.bellwether cat files/reports/bellwether-doorway.csv
@@ -88,6 +89,7 @@ adb exec-out run-as com.samfa12.hordelanternrt.debug.bellwether cat files/report
 Save that output as `bellwether-doorway.csv` in the local run directory. From
 the repository root, verify and summarize it with
 `python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
+For the hinged-door build, the analysis must report `openDoorWitness: true`.
 
 The five privately approved Kit takes can be enabled by adding
 `-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.

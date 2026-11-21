@@ -102,6 +102,7 @@ private:
             state.interaction.heldLightKind == interactions::HeldLightKind::RewardLantern &&
             state.chapterCompanion.grounded && state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated &&
             state.tavernKeeper && state.tavernKeeper->stage == TavernKeeperStage::AtHearth &&
+            state.tavernDoor.opening == 1.f && state.tavernDoor.destination == 1.f &&
             state.chapterDialogue.line == Line::None &&
             state.chapterDialogue.tavernConversationLinesResolved == kTavernConversation.size();
     }

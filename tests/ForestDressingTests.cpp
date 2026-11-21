@@ -1767,6 +1767,15 @@ void TestBellwetherRepeatVisitCheckpoint(
           evidence.bellwetherVisit->quietReturns==2 && std::hypot(state.playerX-view->cameraX,state.playerZ-view->cameraZ)<.01f,
           "the exact render replay starts at the old lookout and reaches the authored room again after two quiet returns");
     if(!staged)return;
+    auto obstructed=state;
+    obstructed.tavernDoor.opening=0.f;
+    gameplay::validation::BellwetherDoorwayProbe blockedProbe;
+    Check(!blockedProbe.Start(obstructed),"the performance route rejects a closed tavern door at admission");
+    Check(blockedProbe.Start(state),"the performance route accepts the staffed open entrance");
+    obstructed=state;
+    obstructed.tavernDoor.destination=0.f;
+    const auto interrupted=blockedProbe.Next(obstructed);
+    Check(interrupted.paused && blockedProbe.Failed(),"a closing door invalidates an in-progress performance route");
     gameplay::validation::BellwetherDoorwayProbe probe;
     if(!probe.Start(state)) {Check(false,"the measured route admits the completed tavern visit");return;}
     unsigned steps=0;

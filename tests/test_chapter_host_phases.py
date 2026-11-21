@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import pathlib
 import csv
 from contextlib import redirect_stdout
@@ -63,31 +64,36 @@ def verify_android_route():
     with TemporaryDirectory() as root:
         report = pathlib.Path(root) / 'bellwether-doorway.csv'
 
-        def analyze(rows):
+        def analyze(rows, name='analysis.json'):
             with report.open('w', newline='') as output:
                 writer = csv.DictWriter(output, fieldnames=rows[0])
                 writer.writeheader()
                 writer.writerows(rows)
             with redirect_stdout(StringIO()):
-                m.analyze_android_bellwether(root, 'analysis.json')
+                m.analyze_android_bellwether(root, name)
 
         analyze(rows)
         analyze(rows)
+        assert 'openDoorWitness' not in json.loads((report.parent / 'analysis.json').read_text())
+        rows = [dict(row, tavern_door_mask=1) for row in rows]
+        analyze(rows, 'door-analysis.json')
+        assert json.loads((report.parent / 'door-analysis.json').read_text())['openDoorWitness']
         for column, bad, message in (
                 ('gpu_serial', 0, 'GPU-to-present join'),
                 ('record_keeper_mask', 0, 'lost the record keeper'),
+                ('tavern_door_mask', 0, 'lost the open tavern door'),
                 ('window_mask', 1, 'changed the staffed tavern workload'),
                 ('generation', 2, 'changed scene'),
                 ('present_return_ns', 0, 'broke the clock')):
             invalid = [dict(rows[0], **{column: bad}), *rows[1:]]
             try:
-                analyze(invalid)
+                analyze(invalid, 'door-analysis.json')
             except ValueError as error:
                 assert message in str(error), error
             else:
                 raise AssertionError(f'Bad Android frame passed: {column}')
         try:
-            analyze(rows[:-1])
+            analyze(rows[:-1], 'door-analysis.json')
         except ValueError as error:
             assert 'two complete' in str(error), error
         else:

@@ -177,7 +177,13 @@ def analyze_bellwether(name, analysis_name):
     with (directory / 'completed-frames.csv').open(newline='') as source:
         rows = list(csv.DictReader(source))
     journal = [json.loads(line) for line in (directory / 'identities.jsonl').read_text().splitlines()]
-    assert run['schema'] == 4 and run['complete'] and run['quietReturns'] == 2
+    assert run['schema'] in (4, 5) and run['complete'] and run['quietReturns'] == 2
+    door_witness = run['schema'] == 5
+    if door_witness:
+        hashes = receipt['tavernAssetHashes']
+        assert set(hashes) == {'asset.manifest.json', 'bellwether-tavern-v1.glb',
+                               'south-door.manifest.json', 'bellwether-south-door.glb'}
+        assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in hashes.values())
     assert 60 <= run['durationSeconds'] <= 150 and run['simulationHz'] == 60
     assert not run['unoccludedClientChecks'] and not run['foregroundRequested']
     assert run['scope'].startswith('Debug CPU') and receipt['residentFixtureHashes']
@@ -203,6 +209,8 @@ def analyze_bellwether(name, analysis_name):
             assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', '1', '1']
         if record_keeper_included:
             assert row['record_keeper_mask'] == '1'
+        if door_witness:
+            assert row.get('tavern_door_mask') == '1', 'Frame lost the open tavern door instance'
     keys = set()
     for item in journal:
         frame = item['evidence']
@@ -216,6 +224,8 @@ def analyze_bellwether(name, analysis_name):
         assert identity['completionSerial'] == serial
         assert identity['simulationTick'] == int(row['tick']) and item['phase'] == row['phase']
         assert item['station'] == int(row['station'])
+        if door_witness:
+            assert item.get('tavernDoorMask') == int(row['tavern_door_mask'])
         assert frame['presentation']['outcome'] == 'presented'
         assert frame['presentation']['lastSuccessfulPresentSubmissionSerial'] == serial
         assert frame['pipeline']['executionBackend'] == receipt['backend']
@@ -233,6 +243,8 @@ def analyze_bellwether(name, analysis_name):
     summary = dict(scope=run['scope'], backend=receipt['backend'], executableSha256=receipt['executableSha256'],
                    residentFixtureHashes=receipt['residentFixtureHashes'], hardware=manifest['device'],
                    presentation=manifest['presentation'], run=run, phases={})
+    if door_witness:
+        summary.update(openDoorWitness=True, tavernAssetHashes=hashes)
     for phase in dict.fromkeys(phases[:-1]):
         samples = [row for row in rows if row['phase'] == phase and float(row['elapsed_s']) >= run['warmupSeconds']]
         valid = [int(row['gpu_ns']) / 1e6 for row in samples if row['gpu_status'] == 'valid' and int(row['gpu_ns']) > 0]
@@ -253,7 +265,9 @@ def analyze_bellwether(name, analysis_name):
 def analyze_android_bellwether(name, analysis_name):
     directory = pathlib.Path(name)
     with (directory / 'bellwether-doorway.csv').open(newline='') as source:
-        rows = list(csv.DictReader(source))
+        reader = csv.DictReader(source)
+        door_witness = 'tavern_door_mask' in (reader.fieldnames or ())
+        rows = list(reader)
 
     def require(condition, detail):
         if not condition:
@@ -295,6 +309,8 @@ def analyze_android_bellwether(name, analysis_name):
         require(int(row['record_serial']) > 0 and int(row['gpu_ns']) > 0 and int(row['cpu_cycle_ns']) > 0 and
                 re.fullmatch(r'[0-9a-f]{64}', row['shader_sha256']), f'Frame {serial} lacks timing or shader evidence')
         require(row['record_keeper_mask'] == '1', f'Frame {serial} lost the record keeper instance')
+        if door_witness:
+            require(row['tavern_door_mask'] == '1', f'Frame {serial} lost the open tavern door instance')
         if row['phase'] == 'room':
             require([row[key] for key in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', str(glass), '1'],
                     f'Frame {serial} changed the staffed tavern workload')
@@ -308,6 +324,8 @@ def analyze_android_bellwether(name, analysis_name):
                    simulationTicks=ticks[-1] - ticks[0], shaderHashes=sorted({row['shader_sha256'] for row in rows}),
                    internalExtent=[width, height], outputExtent=[surface_width, surface_height], glassEnabled=bool(glass),
                    phases={})
+    if door_witness:
+        summary['openDoorWitness'] = True
     for phase in dict.fromkeys(phase for phase, _ in expected):
         indices = [i for i, row in enumerate(rows) if row['phase'] == phase and elapsed[i] >= 5e9]
         require(bool(indices), f'No post-warmup frames for {phase}')

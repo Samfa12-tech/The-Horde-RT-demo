@@ -67,10 +67,17 @@ foreach($source in @('src/platform/windows/DiagnosticWindow.cpp','src/platform/w
  'src/gameplay/validation/ChapterRoundTripProbe.h')){
  $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
 }
+$tavernAssetHashes=$null
 if($doorway) {
  foreach($source in @('src/gameplay/validation/BellwetherDoorwayProbe.h','src/gameplay/DevelopmentCheckpointSimulation.h',
-  'src/gameplay/DevelopmentCheckpoints.h','src/gameplay/traversal/BellwetherTavernRoute.h')) {
+  'src/gameplay/DevelopmentCheckpoints.h','src/gameplay/traversal/BellwetherTavernRoute.h',
+  'src/gameplay/traversal/BellwetherTavernDoor.h')) {
   $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
+ }
+ $tavernAssetHashes=@{}
+ $tavernRoot=Join-Path $assetRoot 'models/world/runtime/bellwether-tavern-v1'
+ foreach($name in @('asset.manifest.json','bellwether-tavern-v1.glb','south-door.manifest.json','bellwether-south-door.glb')) {
+  $tavernAssetHashes[$name]=(Get-FileHash -LiteralPath (Join-Path $tavernRoot $name) -Algorithm SHA256).Hash.ToLowerInvariant()
  }
 }
 $cachePath=Join-Path (Split-Path -Parent (Split-Path -Parent $start.FileName)) 'CMakeCache.txt'
@@ -91,6 +98,7 @@ $scope=if($doorway){'Debug CPU; hidden Bellwether doorway route with resident fi
  executablePath=$start.FileName;buildProfile=$buildProfile;
  executableSha256=(Get-FileHash -LiteralPath $start.FileName -Algorithm SHA256).Hash.ToLowerInvariant();
  sources=$sourceHashes;residentFixtureHashes=$fixtureHashes;backend=if($Query){'RayQueryCompute'}else{'RayTracingPipeline'};
+ tavernAssetHashes=$tavernAssetHashes;
  maximumSimulationTicksPerRender=4;simulationHz=60;deadlineSeconds=$deadlineSeconds;
  foregroundRequested=[bool]$Foreground;
 } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath ($destination+'.candidate.json') -Encoding utf8

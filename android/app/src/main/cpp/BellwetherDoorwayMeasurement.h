@@ -30,7 +30,7 @@ public:
                    "submission_serial,tick,completion_serial,present_serial,gpu_serial,gpu_ns,cpu_cycle_ns,"
                    "backend,shader_sha256,internal_width,internal_height,output_width,output_height,glass_enabled,"
                    "fire_count,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
-                   "kit_mask,window_mask,resident_mask,record_keeper_mask\n";
+                   "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask\n";
         return static_cast<bool>(frames_);
     }
 
@@ -55,7 +55,8 @@ public:
             {scene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
              scene.SubmittedInstanceMask(Scene::kChapterWindowMetadataIndex),
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
-             scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1)}};
+             scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1)},
+            scene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex)};
         return true;
     }
 
@@ -76,7 +77,7 @@ public:
             sample.presentation.lastSuccessfulPresentSubmissionSerial != serial ||
             sample.gpu.status != RtSampleStatus::Valid || !sample.gpu.hasDuration ||
             sample.gpu.completedSubmissionSerial != serial || sample.gpu.durationNanoseconds == 0 ||
-            !sample.scene.fireLighting || !sample.scene.dimensions || tag.masks[3] != 1 ||
+            !sample.scene.fireLighting || !sample.scene.dimensions || tag.masks[3] != 1 || tag.tavernDoorMask != 1 ||
             (phase == "room" && (sample.scene.fireLighting->count != 3 ||
                                  tag.masks != std::array<unsigned, 4>{1, tag.glassEnabled ? 1u : 0u, 1, 1}))) return false;
 
@@ -94,7 +95,7 @@ public:
                 << sample.scene.fireLighting->count << ',' << resources.tlasInstanceCount << ','
                 << resources.bottomLevelAccelerationStructureCount << ',' << resources.deviceLocalBytes << ',' << resources.hostVisibleBytes;
         for (const unsigned mask : tag.masks) frames_ << ',' << mask;
-        frames_ << '\n';
+        frames_ << ',' << tag.tavernDoorMask << '\n';
         lastSerial_ = serial;
         pending_.reset();
         if (probe.Complete()) frames_.close();
@@ -110,6 +111,7 @@ private:
         std::int64_t presentReturnNs;
         bool glassEnabled;
         std::array<unsigned, 4> masks;
+        unsigned tavernDoorMask;
     };
 
     std::ofstream frames_;
