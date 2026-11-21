@@ -69,8 +69,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 123u,
-          "development registry retains prior views and adds lowering and seated inspections");
+    Check(kDevelopmentCheckpoints.size() == 124u,
+          "development registry retains prior views and adds the tavern window inspection");
     {
         simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
         const auto* hit=FindDevelopmentCheckpoint(238);
@@ -93,7 +93,7 @@ int main()
               std::abs(view->cameraZ-simulation::kPrivateChapterDemoEndpoint.z)<.00001f,
               "endpoint views walk from F04 to the mapped turnaround through simulation");
     }
-    for(const auto name : {"bellwether-south-approach","bellwether-tavern-hearth"}) {
+    for(const auto name : {"bellwether-south-approach","bellwether-tavern-hearth","bellwether-tavern-window"}) {
         const auto* view=FindDevelopmentCheckpoint(name);
         const auto& route=traversal::kBellwetherTavernRoute;
         Check(view && view->stagesRescueExterior && view->exteriorRouteStation==7u &&

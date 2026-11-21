@@ -47,23 +47,23 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 31 -or $definition.capacities.tlasInstances -ne 112 -or $definition.capacities.primitives -ne 39 -or
-        $definition.capacities.staticAssets -ne 16 -or $definition.capacities.materials -ne 35 -or $definition.capacities.textureLayers -ne 18 -or
-        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 112u;' -or
+    if ($definition.capacities.instanceMetadata -ne 32 -or $definition.capacities.tlasInstances -ne 113 -or $definition.capacities.primitives -ne 40 -or
+        $definition.capacities.staticAssets -ne 17 -or $definition.capacities.materials -ne 36 -or $definition.capacities.textureLayers -ne 18 -or
+        $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 113u;' -or
         $capacityCpu -notmatch 'kRtOrdinaryShowcaseInstanceCount = 31u;' -or
-        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 31u;' -or
-        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 39u;' -or
-        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 16u;' -or
-        $capacityCpu -notmatch 'kRtMaterialCapacity = 35u;' -or
+        $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 32u;' -or
+        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 40u;' -or
+        $capacityCpu -notmatch 'kRtStaticAssetCapacity = 17u;' -or
+        $capacityCpu -notmatch 'kRtMaterialCapacity = 36u;' -or
         $capacityCpu -notmatch 'kRtTextureLayerCapacity = 18u;' -or
         $capacityCpu -notmatch 'kRtActiveFireEmitterCapacity = 4u;' -or
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
-        $generatedGlsl -notmatch 'const uint kRtInstanceMetadataCapacity = 31u;' -or
-        $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 112u;' -or
-        $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 39u;' -or
-        $generatedGlsl -notmatch 'const uint kRtMaterialCapacity = 35u;' -or
+        $generatedGlsl -notmatch 'const uint kRtInstanceMetadataCapacity = 32u;' -or
+        $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 113u;' -or
+        $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 40u;' -or
+        $generatedGlsl -notmatch 'const uint kRtMaterialCapacity = 36u;' -or
         $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 18u;') {
-        throw 'Generated owners must admit 112 TLAS storage slots, 31 metadata records, 39 primitive records, 16 static assets, 35 materials, 18 texture layers, and four fire storage records.'
+        throw 'Generated owners must admit 113 TLAS storage slots, 32 metadata records, 40 primitive records, 17 static assets, 36 materials, 18 texture layers, and four fire storage records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },

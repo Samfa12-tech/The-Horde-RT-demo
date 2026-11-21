@@ -86,7 +86,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 123u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 124u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -229,6 +229,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 123u> kDevelopmentCheckpoints
      .cameraX=61.0f,.cameraZ=110.4f,.yaw=-.66f,.pitch=-.20f,
      .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u,
      .bellwetherStations=traversal::kBellwetherAnkleStation+1,.bellwetherAnkleTicks=20u},
+    {.id=325,.name="bellwether-tavern-window",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,
+     .yaw=2.43f,.pitch=.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthDoorStation+2},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

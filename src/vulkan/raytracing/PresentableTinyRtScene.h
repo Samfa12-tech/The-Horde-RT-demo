@@ -287,7 +287,7 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 23u;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 24u;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -304,6 +304,7 @@ public:
     // Separate physical pickup, shared immutable metadata/mesh/material/BLAS.
     static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
     static constexpr std::uint32_t kRoadStoneMetadataIndex = 30u;
+    static constexpr std::uint32_t kChapterWindowMetadataIndex = 31u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -320,13 +321,14 @@ public:
     static_assert(kAttackWarningMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 1u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 2u);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -1062,8 +1064,7 @@ private:
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     friend struct PresentableTinyRtSceneRegionPageTestAccess;
-    // Chapter packing retires the legacy glass-fixture registration when Kit
-    // owns its atlas family. Metadata9 is free and outside legacy player10-13.
+    // Chapter packing leaves the lab fixture's metadata slot free for pages.
     static constexpr std::uint32_t kRegionPageTlasSlot=9,kRegionPageMetadataSlot=9;
     std::shared_ptr<const horde::world::streaming::GeometryPayload> regionPageSource_;
     RtRegionGeometryOwner regionPageOwner_;
@@ -1252,6 +1253,10 @@ private:
         std::string& diagnostic) const;
     void ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
         const horde::gameplay::dialogue::CompanionSnapshot& companion) const;
+    void ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
+    std::uint32_t ChapterWorldPropInstanceCount() const noexcept {
+        return (roadStoneBlas_.address ? 1u : 0u) + (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u);
+    }
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,

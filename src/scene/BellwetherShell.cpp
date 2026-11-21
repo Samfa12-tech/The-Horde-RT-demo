@@ -5,7 +5,7 @@
 namespace horde::scene {
 bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMeshAsset& world,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
-    std::string& diagnostic) {
+    std::string& diagnostic, assets::StaticMeshAsset* glazing) {
     if(!support) {
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
@@ -16,9 +16,18 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
     constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
     const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
-    assets::AssetManifest manifest;assets::StaticMeshAsset source;
+    assets::AssetManifest manifest, glazingManifest;
+    assets::StaticMeshAsset source, pane;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
-       !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic))return false;
+       !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic) ||
+       !assets::AssetManifest::Load(dir/"window.manifest.json",glazingManifest,diagnostic) ||
+       !assets::StaticMeshAsset::Load(dir/"bellwether-window.glb",glazingManifest,pane,diagnostic))return false;
+    if(pane.primitives.size()!=1 || pane.materials.size()!=1 || pane.indices.size()!=kBellwetherGlazingTriangles*3 ||
+       pane.materials[0].name!="HordeTavernWindowGlass" || pane.materials[0].transmissionFactor<=0 ||
+       !(pane.materials[0].flags & assets::kStaticMaterialCertifiedClosedVolume) || pane.nodeTransforms.size()!=1 ||
+       pane.nodeTransforms[0].name!="BellwetherGlazing") {
+        diagnostic="Bellwether window requires one certified closed dielectric volume.";return false;
+    }
     if(source.primitives.size()!=5 || source.materials.size()!=names.size() ||
        source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
        world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+source.primitives.size()>32 ||
@@ -49,29 +58,32 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     }
     using Surface=gameplay::simulation::TriangleSupportSurface;
     std::vector<Surface::Triangle> contact,ground;
-    contact.reserve(kBellwetherSolidTriangles);
+    contact.reserve(kBellwetherSolidTriangles+kBellwetherGlazingTriangles);
     ground.reserve(kBellwetherGroundTriangles);
+    const auto appendContact=[&](const auto& mesh, const auto& primitive, auto surface, auto& triangles) {
+        for(std::size_t k=0;k<primitive.indexCount;k+=3) {
+            Surface::Triangle triangle;
+            triangle.surface=surface;
+            for(std::size_t corner=0;corner<3;++corner) {
+                const auto local=mesh.indices[primitive.indexOffset+k+corner];
+                const auto& position=mesh.vertices[primitive.vertexOffset+local].position;
+                triangle.points[corner]={position[0],position[1],position[2]};
+            }
+            triangles.push_back(triangle);
+        }
+    };
     for(const auto& primitive:source.primitives) {
         const auto& name=source.nodeTransforms[primitive.nodeTransformIndex].name;
         if(name!="BellwetherSolid" && name!="BellwetherWalkable") {
             diagnostic="Bellwether geometry is missing its solid or walkable role.";return false;
         }
-        auto& triangles=name=="BellwetherWalkable"?ground:contact;
-        for(std::size_t k=0;k<primitive.indexCount;k+=3) {
-            Surface::Triangle triangle;
-            triangle.surface=wood[primitive.materialIndex] ? gameplay::simulation::SupportSurface::Wood :
-                gameplay::simulation::SupportSurface::Stone;
-            for(std::size_t corner=0;corner<3;++corner) {
-                const auto local=source.indices[primitive.indexOffset+k+corner];
-                const auto& position=source.vertices[primitive.vertexOffset+local].position;
-                triangle.points[corner]={position[0],position[1],position[2]};
-            }
-            triangles.push_back(triangle);
-        }
+        appendContact(source,primitive,wood[primitive.materialIndex] ? gameplay::simulation::SupportSurface::Wood :
+            gameplay::simulation::SupportSurface::Stone,name=="BellwetherWalkable"?ground:contact);
     }
     if(contact.size()!=kBellwetherSolidTriangles || ground.size()!=kBellwetherGroundTriangles) {
         diagnostic="Bellwether solid and walkable triangle inventories differ.";return false;
     }
+    appendContact(pane,pane.primitives.front(),gameplay::simulation::SupportSurface::Stone,contact);
     const auto raised=Surface::WithAdditionalGroundGeometry(*support,ground,diagnostic);
     if(!raised)return false;
     auto prepared=Surface::WithAdditionalNonWalkableGeometry(*raised,contact,diagnostic);
@@ -95,6 +107,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     }
     world=std::move(staged);
     support=std::move(prepared);
+    if(glazing)*glazing=std::move(pane);
     diagnostic.clear();
     return true;
 }

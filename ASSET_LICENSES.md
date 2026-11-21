@@ -114,6 +114,8 @@ billets. The original untextured furniture colour reuses the existing
 TombEarthenware roughness and colour row. The billets reuse TombCharredWick.
 MedievalWall02 and TombEarthenware still supply the architecture. The editable
 master, recipe and hashes are retained with the tavern authoring records.
+The south-window frame and closed glass volume are original Horde geometry
+from the same Blender source. The untextured window has no third-party inputs.
 
 ## Generic closed dielectric fixture
 

@@ -30,18 +30,26 @@ int main() {
     }
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
     auto support=originalTerrain;
-    const auto result=AppendBellwetherShell(root,world,support,error);
+    assets::StaticMeshAsset glazing;
+    const auto result=AppendBellwetherShell(root,world,support,error,&glazing);
+    if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
         check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
             "the complete bounded town and tavern geometry is rendered");
         check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");
-        check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles &&
+        check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles+kBellwetherGlazingTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "rendered masonry stays solid while only the ramp and floor extend ground support");
         constexpr float southDoorX=82.3f,southWallZ=119.2f;
         const auto bare=originalTerrain->Query(southDoorX,southWallZ);
         const auto after=support->Query(southDoorX,southWallZ);
+        check(glazing.primitives.size()==1 && glazing.materials.size()==1 &&
+              (glazing.materials[0].flags & assets::kStaticMaterialCertifiedClosedVolume) &&
+              glazing.indices.size()==kBellwetherGlazingTriangles*3 &&
+              !support->NonWalkableVolumeClear(86.88f,118.7f,86.88f,119.3f,
+                  after.worldY+2.03f,after.worldY+2.05f,.01f),
+            "the separately rendered dielectric is a closed volume with contact across the clear pane");
         check(bare.found && after.found && after.walkable && after.triangle>=originalTerrain->TriangleCount() &&
               std::abs(after.worldY-(-8.70955f))<.001f && after.worldY-bare.worldY>2.5f,
             "real ramp and floor meet at the original tavern floor height above current ground");

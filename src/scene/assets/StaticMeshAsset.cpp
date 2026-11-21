@@ -721,7 +721,6 @@ bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
                                      std::string& diagnostic)
 {
     constexpr std::uint32_t thinWallFlag = 512u;
-    constexpr std::uint32_t certifiedClosedVolumeFlag = 1024u;
     constexpr std::uint32_t certifiedRectangularVolumeFlag =
         static_cast<std::uint32_t>(
             horde::vulkan::raytracing::RtMaterialFlag::CertifiedRectangularVolume);
@@ -983,7 +982,7 @@ bool ValidateThickDielectricTopology(StaticMeshAsset& asset,
         // Certification is loader-owned and can only be appended after every
         // component using this thick material passed closed-manifold, winding,
         // and finite weld-domain validation above.
-        material.flags |= certifiedClosedVolumeFlag;
+        material.flags |= kStaticMaterialCertifiedClosedVolume;
         if (everyComponentIsRectangular)
         {
             material.flags |= certifiedRectangularVolumeFlag;

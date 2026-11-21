@@ -35,6 +35,7 @@ bpy.context.preferences.filepaths.save_version = 0
 stone = bpy.data.materials["HordeTownStone"]
 solids = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and not obj.hide_get()]
 walkable = []
+glazing = []
 
 # The v4 model has a closed foundation and a solid wall block. Retain B01's
 # roof, chimney and upper shutter, and all of the other original buildings.
@@ -88,12 +89,12 @@ def mesh(name, vertices, faces, group, material=stone):
     return obj
 
 
-def box(name, west, east, north, south, bottom, top, material=stone):
+def box(name, west, east, north, south, bottom, top, material=stone, group=solids):
     lower = [(west, bottom, north), (east, bottom, north),
              (east, bottom, south), (west, bottom, south)]
     upper = [(x, top, z) for x, _, z in lower]
     return mesh(name, lower + upper, [(0, 1, 2, 3), (4, 5, 1, 0), (5, 6, 2, 1),
-                                      (6, 7, 3, 2), (7, 4, 0, 3), (7, 6, 5, 4)], solids, material)
+                                      (6, 7, 3, 2), (7, 4, 0, 3), (7, 6, 5, 4)], group, material)
 
 
 west = tavern["engineX"] - tavern["width"] / 2
@@ -108,12 +109,18 @@ door_x = 82.3
 door_west, door_east = door_x - 1.1, door_x + 1.1
 wall_depth = .42
 header_y = floor + 2.65
+window_west, window_east = 86.36, 88.18
+window_bottom, window_top = floor + 1.65, floor + 2.65
 for name, x in (("west", west), ("east", east - wall_depth)):
     box(f"B01_{name}_wall", x, x + wall_depth, north, south, base, wall_top)
 box("B01_north_wall", west + wall_depth, east - wall_depth, north, north + wall_depth, base, wall_top)
-for name, lo, hi in (("west", west + wall_depth, door_west),
-                     ("east", door_east, east - wall_depth)):
-    box(f"B01_south_{name}_wall", lo, hi, south - wall_depth, south, base, wall_top)
+for name, lo, hi, bottom, top_y in (
+        ("west", west + wall_depth, door_west, base, wall_top),
+        ("door_pier", door_east, window_west, base, wall_top),
+        ("east", window_east, east - wall_depth, base, wall_top),
+        ("sill", window_west, window_east, base, window_bottom),
+        ("window_header", window_west, window_east, window_top, wall_top)):
+    box(f"B01_south_{name}_wall", lo, hi, south - wall_depth, south, bottom, top_y)
 box("B01_south_door_header", door_west, door_east, south - wall_depth, south, header_y, wall_top)
 
 highest_inside = max(ground(west + .5 + column * .5, north + .5 + row * .5)
@@ -178,6 +185,26 @@ def opaque_finish(name, color, roughness):
 # material rows. Edge highlights and plank seams distinguish the timber.
 oak = opaque_finish("HordeTavernTimber", (.25, .115, .065), .84)
 ember = opaque_finish("HordeHearthChar", (.025, .019, .013), .95)
+# The sill and posts hold a closed, 8 mm thick glass volume. Put the
+# glazing itself in a separate draw group for the shared dielectric route.
+glass = opaque_finish("HordeTavernWindowGlass", (.96, .985, .94), .09)
+glass.node_tree.nodes.get("Principled BSDF").inputs["Transmission Weight"].default_value = .94
+window_plane = south - .22
+frame_north, frame_south = window_plane - .065, window_plane + .065
+rail = .08
+for name, lo, hi in (("left", window_west, window_west + rail),
+                     ("right", window_east - rail, window_east),
+                     ("mullion", (window_west + window_east - rail) / 2,
+                      (window_west + window_east + rail) / 2)):
+    box("B01_window_" + name, lo, hi, frame_north, frame_south, window_bottom, window_top, oak)
+for name, lo, hi in (("lower", window_bottom, window_bottom + rail),
+                     ("upper", window_top - rail, window_top)):
+    box("B01_window_" + name + "_rail", window_west + rail, window_east - rail,
+        frame_north, frame_south, lo, hi, oak)
+pane_min = (window_west + rail, window_bottom + rail, window_plane - .004)
+pane_max = (window_east - rail, window_top - rail, window_plane + .004)
+box("B01_window_pane", pane_min[0], pane_max[0], pane_min[2], pane_max[2],
+    pane_min[1], pane_max[1], glass, glazing)
 chair_x, chair_z, chair_top = 82.0, 107.30, .49
 table_x, table_z, table_top = 82.52, 106.13, .75
 chair_depth, chair_board_x = .41, chair_x - .10
@@ -304,6 +331,11 @@ path = RUNTIME / "bellwether-tavern-v1.glb"
 bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
                           export_apply=True, export_texcoords=True, export_normals=True,
                           export_tangents=True, export_animations=False)
+pane_mesh = joined_copy(glazing, "BellwetherGlazing")
+pane_path = RUNTIME / "bellwether-window.glb"
+bpy.ops.export_scene.gltf(filepath=str(pane_path), export_format="GLB", use_selection=True,
+                          export_apply=True, export_texcoords=True, export_normals=True,
+                          export_tangents=True, export_animations=False)
 
 
 def digest(path):
@@ -314,14 +346,27 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=4900, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=5300, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
 (RUNTIME / "asset.manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
+pane_triangles = len(pane_mesh.data.polygons)
+pane_manifest = dict(manifest, asset="bellwether-window", materialOverrides=[{
+    "material": glass.name, "transmissionFactor": .94, "ior": 1.52,
+    "thicknessFactor": .008, "attenuationDistance": .42,
+    "attenuationColor": [.91, .96, .84], "roughnessFactor": .09, "thinWall": False
+}])
+pane_manifest["budgets"] = dict(manifest["budgets"], maxVertices=24, maxIndices=pane_triangles * 3,
+                                maxPrimitives=1, maxMaterials=1)
+pane_manifest["lods"] = [{"name": "lod0", "maxTriangles": pane_triangles}]
+(RUNTIME / "window.manifest.json").write_text(json.dumps(pane_manifest, indent=2) + "\n",
+                                              encoding="utf-8", newline="\n")
 receipt = dict(sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                layoutSha256=parent["planSha256"], runtimeSha256=digest(path),
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
+               windowSha256=digest(pane_path), windowTriangles=pane_triangles,
+               windowBounds=[pane_min, pane_max],
                southDoor=[door_x, floor, south], clearDoorWidth=2.2, clearDoorHeight=2.65,
                rampToe=[door_x, toe_y, toe_z], rampWidth=3, highestGroundUnderFloor=highest_inside,
                hearthMouth=[hearth_front, floor, (hearth_north + hearth_south) / 2],

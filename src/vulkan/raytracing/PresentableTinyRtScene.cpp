@@ -1170,7 +1170,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
             return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
     }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
-       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+(roadStoneBlas_.address?1u:0u) ||
+       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+ChapterWorldPropInstanceCount() ||
        staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
@@ -1178,7 +1178,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=15+(roadStoneBlas_.address?1:0))
+    if(std::count(assets.begin(),assets.end(),true)!=15+ChapterWorldPropInstanceCount())
         return fail("Forest proof did not preserve every unique static asset.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
@@ -3270,12 +3270,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         !(playerUtilityCandidateAsset_.empty() ? playerRenderSlot_.LoadAsset(
             (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) :
             playerRenderSlot_.LoadUtilityCandidateAsset(playerUtilityCandidateAsset_,diagnostic)) ||
-        !horde::scene::assets::AssetManifest::Load(
+        (!developmentRescueJourney_ && (!horde::scene::assets::AssetManifest::Load(
             dielectricDirectory / "asset.manifest.json",
             dielectricManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             dielectricDirectory / "closed-glass-lod0.runtime.glb",
-            dielectricManifest, productionDielectricFixtureAsset_, diagnostic) ||
+            dielectricManifest, productionDielectricFixtureAsset_, diagnostic))) ||
         !horde::scene::assets::AssetManifest::Load(
             chestBaseDirectory / "asset.manifest.json", chestBaseManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -3350,7 +3350,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::GraveyardDressingReport graveyard;
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
-        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic))
+        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
+                &productionDielectricFixtureAsset_))
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
@@ -5711,8 +5712,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             7u, "production reward lantern ring", rewardLanternRingBlas_, true) ||
         !buildRegisteredStaticBlas(
             8u, "production reward lantern body", rewardLanternBodyBlas_, true) ||
-        (!chapterActorReady_ && !buildRegisteredStaticBlas(
-            9u, "generic dielectric fixture", dielectricFixtureBlas_)) ||
+        !buildRegisteredStaticBlas(chapterActorReady_ ? kChapterWindowMetadataIndex : 9u,
+            chapterActorReady_ ? "Bellwether window" : "generic dielectric fixture",
+            dielectricFixtureBlas_) ||
         !buildRegisteredStaticBlas(
             kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true) ||
         !buildRegisteredStaticBlas(
@@ -6232,6 +6234,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         tlasInstanceCount_=kOrdinaryTlasInstanceCount;
     if (roadStoneBlas_.address)
         ApplyRoadStoneInstance(instances[tlasInstanceCount_++], {});
+    if (chapterActorReady_)
+        ApplyChapterWindowInstance(instances[tlasInstanceCount_++], false);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -7386,6 +7390,16 @@ void PresentableTinyRtScene::ApplyRoadStoneInstance(VkAccelerationStructureInsta
     instance.accelerationStructureReference = roadStoneBlas_.address;
 }
 
+void PresentableTinyRtScene::ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR& instance,
+                                                        bool visible) const
+{
+    instance.transform = {{{1.f, 0.f, 0.f, 0.f}, {0.f, 1.f, 0.f, 0.f}, {0.f, 0.f, 1.f, 0.f}}};
+    instance.instanceCustomIndex = kChapterWindowMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = dielectricFixtureBlas_.address;
+}
+
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                                      const RtSceneFrameInputs& frame,
                                                      std::string& diagnostic,
@@ -7428,6 +7442,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const bool glassFixtureVisible =
         glassEnabled_ && clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
+    // The exterior retains the pane for secondary rays and arbitrary view
+    // reversals. The enclosed tomb has no path to this contributor.
+    const bool chapterWindowVisible = chapterActorReady_ && glassEnabled_ &&
+        frame.zone == horde::gameplay::ShowcaseZone::Outside;
     if (chapterActorReady_ && glassFixtureVisible) {
         diagnostic = "The freestanding glass fixture belongs to the separate RT Lab preview, not the chapter scene.";
         return false;
@@ -7494,7 +7512,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternBodyBlas_.handle == VK_NULL_HANDLE ||
-        (!chapterActorReady_ && dielectricFixtureBlas_.handle == VK_NULL_HANDLE) ||
+        dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
         collapseBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
@@ -8517,6 +8535,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (!glassFixtureVisible)
             frameInstanceMetadata[9u].flags = 0u;
     }
+    if (!chapterWindowVisible)
+        frameInstanceMetadata[kChapterWindowMetadataIndex].flags = 0u;
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable framePageTable;
@@ -8578,8 +8598,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
     if(UsesSharedForestRetention())
         ApplySharedForestRetentionProof(instances,frame);
+    auto chapterPropSlot = tlasInstanceCount_ - ChapterWorldPropInstanceCount();
     if (roadStoneBlas_.address)
-        ApplyRoadStoneInstance(instances[tlasInstanceCount_ - 1u], frame.chapterCompanion);
+        ApplyRoadStoneInstance(instances[chapterPropSlot++], frame.chapterCompanion);
+    if (chapterActorReady_)
+        ApplyChapterWindowInstance(instances[chapterPropSlot], chapterWindowVisible);
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
