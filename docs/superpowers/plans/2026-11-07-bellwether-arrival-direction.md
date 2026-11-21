@@ -191,6 +191,8 @@ With the textured record keeper and tavern keeper stand-in loaded, both Windows 
 
 Both runs held 37 TLAS definitions, 28 BLAS owners and 441,697,264 bytes of device-local RT allocations throughout. A negative replay of the journal rejected a missing record keeper mask at the square. Display pacing, streaming retirement, the final tavern keeper and physical phone performance remain open.
 
+The [separate ARM64 Bellwether Debug build](../../../android/README.md#bellwether-three-actor-playtest) now uses the same two prepared residents on the phone. Both staged checkpoints entered live controls on SM-S948B, with Kit visible at the tavern and the textured record keeper visible outside the church. Short native timings on the phone identify a performance gap at the tavern threshold. The full moving route, displayed pacing and sustained performance remain open. See the [exact Android device record](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#2026-11-21---bellwether-three-actor-debug-checkpoints).
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

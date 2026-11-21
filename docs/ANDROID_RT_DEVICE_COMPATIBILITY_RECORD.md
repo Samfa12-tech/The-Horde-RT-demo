@@ -1,5 +1,48 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-21 - Bellwether three-actor Debug checkpoints
+
+Physical SM-S948B / Android 17 / Adreno 840, Vulkan 1.4.295 and driver
+`2150932499` (build `089d643e2a`). Isolated ARM64 Bellwether Debug source
+`e45475b405334313ffbb2364257b19c97c3ce0f2`, APK SHA-256
+`087f1fc07cabc34f571e0d1db967161f8ea5fb3ae7aec2e3e0de871faeaa7a52`.
+The installed `base.apk` matched the local hash, and the package contained
+the seven pinned resident files. The ordinary ARM64 Debug package excluded
+the overlay, and the Release packaging guard refused it.
+
+RayTracingPipeline presented the tavern repeat-visit and record keeper church
+checkpoints as live gameplay with Diagnostic Mobile at 33% (475 × 980 RT,
+1440 × 2971 swapchain). At both checkpoints a completed frame matched its GPU
+and successful present submissions, with 37 TLAS definitions, 28 BLAS owners
+and 231,192,576 bytes of device-local RT allocations. The church view showed
+the textured record keeper and the expedition-routes prompt. At the tavern,
+an injected Android touch swipe moved the player about 2.3 m from the
+threshold into the room, with movement returning to zero when released.
+
+Stationary live windows after the initial startup sample measured 57.992 and
+57.633 ms per native frame at the tavern, and 42.818, 42.751 and 44.722 ms at
+the church. Final cumulative GPU RT averages were 48.559 ms and 32.400 ms,
+respectively. Android thermal status stayed at 0 at the start and end of both
+checks. SurfaceFlinger layer latency returned only a refresh period. These
+short Debug windows provide a performance starting point. Displayed frame
+pacing, sustained thermals, the live church-to-tavern route and owner
+acceptance remain open.
+
+RayQueryCompute also presented the tavern on a separate launch with the same
+resolution, 37 TLAS definitions and 28 BLAS owners. The completed frame joined
+the GPU and successful present at submission 270. Its two post-startup
+windows averaged 59.051 and 86.692 ms per native frame, with cumulative GPU
+averages of 49.158 and 61.160 ms. Framework thermal status was 0 at both
+endpoints. The spread warrants a controlled repeat before ranking backends.
+
+The first build (`be5869ac9c656aa8f49211dd9c6ff60d4746576e82a7a128966859e25c8b11e9`)
+presented the title and failed the transition when the resident guard used
+the retained device handle as evidence of a live scene. The fix uses the
+scene bundle's ownership boundary. The native preflight regression verifies
+roster replacement after retirement and rejection during scene ownership.
+The exact APK, bounded logs, completed-frame reports and screenshots are
+retained locally. The isolated app was stopped after collection.
+
 ## 2026-11-03 - Ordinary signed 1.7 update and retained title-return failure
 
 Physical SM-S948B / Android 17. Ordinary Release source `53d0000d`, version
