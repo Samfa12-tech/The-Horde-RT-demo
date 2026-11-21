@@ -1,5 +1,6 @@
 #include "scene/BellwetherShell.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
+#include "gameplay/traversal/WaysideArchive.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
@@ -31,8 +32,8 @@ int main() {
     }
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
     auto support=originalTerrain;
-    assets::StaticMeshAsset glazing;
-    const auto result=AppendBellwetherShell(root,world,support,error,&glazing);
+    assets::StaticMeshAsset glazing,cover;
+    const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover);
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
@@ -50,10 +51,24 @@ int main() {
             "the mapped wayside route ends on the authored archive inspection mark");
         check(support->NonWalkableVolumeClear(wayside.x,wayside.z,wayside.x,wayside.z-.55f,
                   waysideGround.worldY+.20f,waysideGround.worldY+1.7f,.32f) &&
-              !support->NonWalkableVolumeClear(kWaysideMechanism[0],kWaysideMechanism[2]+.2f,
+              support->NonWalkableVolumeClear(kWaysideMechanism[0],kWaysideMechanism[2]+.2f,
                   kWaysideMechanism[0],kWaysideMechanism[2]-.25f,
                   kWaysideMechanism[1]-.05f,kWaysideMechanism[1]+.05f,.01f),
-            "the inspection approach is clear and the closed lower stone has native contact");
+            "the inspection approach is clear and the moving stone has no duplicate static contact");
+        const auto* hinged=support->HingedContact();
+        check(hinged && hinged->TriangleCount()==kWaysideCoverTriangles && cover.indices.size()==kWaysideCoverTriangles*3,
+            "the one local cover mesh supplies native ray geometry and the independent contact owner");
+        if(hinged) {
+            const auto straight=[&](const ArchivePose& pose) {
+                return pose.VolumeClear(*hinged,kWaysideMechanism[0],kWaysideMechanism[2]+.2f,
+                    kWaysideMechanism[0],kWaysideMechanism[2]-.25f,kWaysideMechanism[1]-.05f,kWaysideMechanism[1]+.05f,.01f);
+            };
+            const auto open=ArchivePose::AtOpening(1.f);
+            check(!straight({}) && straight(open) &&
+                  !open.VolumeClear(*hinged,kWaysideHinge[0]-.05f,kWaysideHinge[2]+.65f,
+                      kWaysideHinge[0]+.25f,kWaysideHinge[2]+.65f,kWaysideMechanism[1]-.05f,kWaysideMechanism[1]+.05f,.01f),
+                "the opened cover clears its former contact and blocks at the actual rotated pose");
+        }
         constexpr float southDoorX=82.3f,southWallZ=119.2f;
         const auto bare=originalTerrain->Query(southDoorX,southWallZ);
         const auto after=support->Query(southDoorX,southWallZ);

@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignSession.h"
+#include "gameplay/campaign/CampaignCheckpointCodec.h"
 #include "gameplay/campaign/CampaignPlaySession.h"
 #include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/simulation/InputMailbox.h"
@@ -256,6 +257,24 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
                   "the restored Directions action opens the lead without changing the saved exchange");
         }
     } else Check(false,"the partial exchange is restorable");
+    {
+        using namespace horde::gameplay::bellwether;
+        auto archive=complete;
+        archive.schema=cp::kWaysideArchiveSchema;
+        archive.dialogue.hearthLinesResolved=3;
+        archive.waysideArchive=cp::WaysideArchiveProgress::Open;
+        cp::Checkpoint decoded;
+        std::vector<std::byte> bytes;
+        cp::codec::Error error{};
+        sim::GameSimulation restoredArchive(staffedConfig);
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              decoded.waysideArchive==cp::WaysideArchiveProgress::Open && Seed(restoredArchive,decoded,terrain) &&
+              restoredArchive.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
+              restoredArchive.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel,
+              "a saved open archive restores the matching hinge and contact pose without replay");
+        archive.schema=cp::kTavernConversationSchema;
+        Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
+    }
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
     Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,

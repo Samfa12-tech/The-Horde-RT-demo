@@ -5,7 +5,7 @@
 namespace horde::scene {
 bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMeshAsset& world,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
-    std::string& diagnostic, assets::StaticMeshAsset* glazing) {
+    std::string& diagnostic, assets::StaticMeshAsset* glazing, assets::StaticMeshAsset* archiveCover) {
     if(!support) {
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
@@ -16,17 +16,24 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
     constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
     const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
-    assets::AssetManifest manifest, glazingManifest;
-    assets::StaticMeshAsset source, pane;
+    assets::AssetManifest manifest, glazingManifest, coverManifest;
+    assets::StaticMeshAsset source, pane, cover;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
        !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic) ||
        !assets::AssetManifest::Load(dir/"window.manifest.json",glazingManifest,diagnostic) ||
-       !assets::StaticMeshAsset::Load(dir/"bellwether-window.glb",glazingManifest,pane,diagnostic))return false;
+       !assets::StaticMeshAsset::Load(dir/"bellwether-window.glb",glazingManifest,pane,diagnostic) ||
+       !assets::AssetManifest::Load(dir/"wayside-archive-cover.manifest.json",coverManifest,diagnostic) ||
+       !assets::StaticMeshAsset::Load(dir/"wayside-archive-cover.glb",coverManifest,cover,diagnostic))return false;
     if(pane.primitives.size()!=1 || pane.materials.size()!=1 || pane.indices.size()!=kBellwetherGlazingTriangles*3 ||
        pane.materials[0].name!="HordeTavernWindowGlass" || pane.materials[0].transmissionFactor<=0 ||
        !(pane.materials[0].flags & assets::kStaticMaterialCertifiedClosedVolume) || pane.nodeTransforms.size()!=1 ||
        pane.nodeTransforms[0].name!="BellwetherGlazing") {
         diagnostic="Bellwether window requires one certified closed dielectric volume.";return false;
+    }
+    if(cover.primitives.size()!=1 || cover.materials.size()!=1 || cover.nodeTransforms.size()!=1 ||
+       cover.nodeTransforms.front().name!="WaysideArchiveCover" || cover.indices.size()!=kWaysideCoverTriangles*3 ||
+       cover.materials.front().name!="HordeWaysideCoverStone" || cover.materials.front().transmissionFactor!=0) {
+        diagnostic="The wayside archive cover requires one opaque, local-space stone primitive.";return false;
     }
     if(source.primitives.size()!=5 || source.materials.size()!=names.size() ||
        source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
@@ -88,6 +95,10 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     if(!raised)return false;
     auto prepared=Surface::WithAdditionalNonWalkableGeometry(*raised,contact,diagnostic);
     if(!prepared)return false;
+    std::vector<Surface::Triangle> hingedContact;
+    appendContact(cover,cover.primitives.front(),gameplay::simulation::SupportSurface::Stone,hingedContact);
+    prepared=Surface::WithHingedContact(*prepared,hingedContact,diagnostic);
+    if(!prepared)return false;
 
     auto staged=world;
     const auto vertices=static_cast<std::uint32_t>(staged.vertices.size());
@@ -108,6 +119,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     world=std::move(staged);
     support=std::move(prepared);
     if(glazing)*glazing=std::move(pane);
+    if(archiveCover)*archiveCover=std::move(cover);
     diagnostic.clear();
     return true;
 }

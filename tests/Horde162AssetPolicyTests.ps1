@@ -29,6 +29,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
         'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb',
         'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
         'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
         'models/world/runtime/forest-surroundings-v1/alder-far.glb',
@@ -89,7 +91,7 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 24) 'Android equipment and chapter staging require the closed 24-file package roster.'
+    Require ($required.Count -eq 26) 'Android equipment and chapter staging require the closed 26-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -273,7 +275,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 24-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 26-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -325,9 +327,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 62 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 63) 'The base runtime roster includes the roadside stone and tavern glazing on both platforms.'
-    Require ($windows.Count -eq 122 -and $android.Count -eq 123) 'Both platforms have the expected full runtime asset roster.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 64 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 65) 'The base runtime roster includes the roadside stone, tavern glazing and wayside cover on both platforms.'
+    Require ($windows.Count -eq 124 -and $android.Count -eq 125) 'Both platforms have the expected full runtime asset roster.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name
@@ -360,10 +362,12 @@ try {
         'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
         'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb',
         'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
         'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb')
     Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count -and
-             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count) 'Both platforms admit the exact shared tavern and roadside stone payloads.'
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count) 'Both platforms admit the exact shared tavern, roadside stone and wayside cover payloads.'
     foreach($town in $townFiles) {
         Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'

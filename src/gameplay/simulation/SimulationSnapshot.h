@@ -34,6 +34,7 @@
 #include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
+#include "gameplay/traversal/WaysideArchive.h"
 
 namespace horde::gameplay::simulation
 {
@@ -72,6 +73,11 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
     bool tavernDirectionsAvailable=false;
+    bellwether::WaysideArchive waysideArchive;
+    bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
+    [[nodiscard]] bool HasChapterInteractPrompt() const {
+        return tavernConversationAvailable || tavernDirectionsAvailable || waysideArchiveAction!=bellwether::ArchiveAction::None;
+    }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;

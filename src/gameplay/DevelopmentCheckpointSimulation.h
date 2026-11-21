@@ -189,6 +189,58 @@ inline bool StageDevelopmentCheckpointSimulation(
         progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
         return progress;
     };
+    if(checkpoint.bellwetherWaysideApproach) {
+        using namespace simulation;
+        using namespace bellwether;
+        if(!chapterTerrain || checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)
+            return finalize(false);
+        campaign::Checkpoint record;
+        record.id=campaign::CheckpointId::BellwetherTavern;
+        record.zone=campaign::Destination(record.id);
+        record.contentRevision=campaign::kBellwetherContentRevision;
+        record.schema=campaign::kTavernConversationSchema;
+        record.position=campaign::kBellwetherCheckpointPosition;
+        record.firstAscentCompleted=true;
+        record.swordStowed=true;
+        record.dialogue=completedForestProgress();
+        record.dialogue.hearthLinesResolved=dialogue::kHearthLines.size();
+        record.dialogue.tavernConversationLinesResolved=dialogue::kTavernConversation.size();
+        InputSnapshot input;
+        input.damageEnabled=false;input.tutorialEnabled=false;
+        input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
+        const auto token=gameSimulation.BeginCampaignRestore(record);
+        if(!token || !gameSimulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},chapterTerrain,
+                input,gameSimulation.Snapshot().inputPublicationSequence))return finalize(false);
+        for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+            if(!gameSimulation.PublishChapterTerrain({token->worldGeneration,static_cast<WorldZoneId>(zone)},chapterTerrain))
+                return finalize(false);
+        const auto& state=gameSimulation.Snapshot();
+        const auto advance=[&] {
+            stepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+            accumulateEvents();
+            gameSimulation.ClearEvents();
+        };
+        advance();
+        const auto walkStation=[&](const auto& point){return walkTo(input,advance,point.x,point.z);};
+        const auto& route=traversal::kBellwetherTavernRoute;
+        for(std::size_t i=route.size();i>traversal::kBellwetherChurchJunction;--i)
+            if(!walkStation(route[i-1]))return finalize(false);
+        for(const auto& station:traversal::kBellwetherNorthApproach)
+            if(!walkStation(station))return finalize(false);
+        for(const auto& station:traversal::kBellwetherWaysideApproach)
+            if(!walkStation(station))return finalize(false);
+        input.moveForward=0;input.runHeld=false;
+        input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+        for(unsigned tick=0;tick<120;++tick)advance();
+        if(state.waysideArchiveAction!=ArchiveAction::Inspect)return finalize(false);
+        if(!checkpoint.bellwetherArchiveOpen)return finalize(true);
+        input.commands.interact=state.lastConsumedInteractSequence+1;advance();
+        if(state.waysideArchiveAction!=ArchiveAction::Open)return finalize(false);
+        ++input.commands.interact;advance();
+        for(unsigned tick=0;tick<70 && state.waysideArchive.stage!=ArchiveStage::Open;++tick)advance();
+        return finalize(state.waysideArchive.stage==ArchiveStage::Open &&
+            state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated);
+    }
     const bool repeatVisit=checkpoint.bellwetherStaffedView==BellwetherStaffedView::RepeatVisit;
     if (checkpoint.bellwetherStaffedView != BellwetherStaffedView::None && !repeatVisit) {
         using namespace simulation;
@@ -520,13 +572,6 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(std::size_t station=0;station<checkpoint.bellwetherStations;++station) {
             const auto destination=traversal::kBellwetherTavernRoute[station];
             if(!walkTo(routeInput,advance,destination.x,destination.z))return finalize(false);
-        }
-        if(checkpoint.bellwetherWaysideApproach) {
-            if(checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)return finalize(false);
-            for(const auto& station:traversal::kBellwetherNorthApproach)
-                if(!walkTo(routeInput,advance,station.x,station.z))return finalize(false);
-            for(const auto& station:traversal::kBellwetherWaysideApproach)
-                if(!walkTo(routeInput,advance,station.x,station.z))return finalize(false);
         }
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a

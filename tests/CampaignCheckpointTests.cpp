@@ -488,7 +488,7 @@ int main(int argc,char** argv) {
         auto dated=good;dated.schema=4;dated.savedAtUnixSeconds=1767225600;
         GameSimulation datedGame(ProductionGameSimulationConfig());
         Check(cp::Validate(dated) && Restore(datedGame,dated,terrain),"ordinary dated save restores without gated flask ownership");
-        auto bad=good;bad.schema=cp::kTavernConversationSchema+1;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        auto bad=good;bad.schema=cp::kWaysideArchiveSchema+1;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}

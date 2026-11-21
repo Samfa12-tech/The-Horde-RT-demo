@@ -57,6 +57,8 @@
     <string name="take_flask_upgrade">Upgrade flask</string>
     <string name="talk_to_kit">Talk to Kit</string>
     <string name="directions">Directions</string>
+    <string name="inspect_archive">Inspect archive</string>
+    <string name="open_lower_stone">Open lower stone</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>
     <string name="chest_unlocking">SEAL BREAKING…</string>

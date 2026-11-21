@@ -1504,6 +1504,35 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(shrineReached && game.Snapshot().playerGrounded,
                   "the church junction leads on continuous support to the archive inspection mark");
             if(!shrineReached)return;
+            using namespace gameplay::bellwether;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=3.14159265359f;
+            step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::None,
+                  "the archive waits until the player faces the lower stone");
+            input.yawRadians=0.f;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Inspect,
+                  "the inspection action is offered at the real wayside mark with Kit still seated");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Inspected &&
+                  game.Snapshot().waysideArchiveAction==ArchiveAction::Open,
+                  "one ordinary interaction inspects the archive and enables a separate open action");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Opening &&
+                  game.Snapshot().waysideArchive.pose.worldFromModel!=ArchivePose{}.worldFromModel,
+                  "the second interaction begins the physical hinge motion in fixed-step simulation");
+            const auto opening=game.Snapshot().waysideArchive.opening;
+            auto paused=input;paused.paused=true;game.StepFixed(paused);
+            Check(game.Snapshot().waysideArchive.opening==opening,"the hinge holds its pose while paused");
+            for(unsigned tick=0;tick<65;++tick)step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
+                  game.Snapshot().waysideArchiveAction==ArchiveAction::None &&
+                  game.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel,
+                  "the outward motion completes without replaying or changing the tavern exchange");
+            const auto boundary=game.LatestCampaignBoundary();
+            Check(boundary && boundary->schema==cp::kWaysideArchiveSchema &&
+                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open,
+                  "opening updates the earned tavern autosave even from the shrine spur");
+            input.moveForward=1;input.runHeld=true;
             const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
             Check(returned && game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&

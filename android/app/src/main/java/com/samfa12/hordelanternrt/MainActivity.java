@@ -262,6 +262,8 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
+    private static final int CONTEXTUAL_INSPECT_ARCHIVE = 1 << 16;
+    private static final int CONTEXTUAL_OPEN_ARCHIVE = 1 << 17;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -1075,6 +1077,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/window.manifest.json", "models/world/runtime/bellwether-tavern-v1/window.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-window.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-window.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
@@ -8862,6 +8866,8 @@ public class MainActivity extends Activity {
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
         if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
         if ((state & CONTEXTUAL_TAVERN_DIRECTIONS) != 0) return R.string.directions;
+        if ((state & CONTEXTUAL_INSPECT_ARCHIVE) != 0) return R.string.inspect_archive;
+        if ((state & CONTEXTUAL_OPEN_ARCHIVE) != 0) return R.string.open_lower_stone;
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
             case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
             case CHEST_PROMPT_OPEN: return R.string.open_chest;

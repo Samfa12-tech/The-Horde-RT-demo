@@ -55,11 +55,15 @@ std::vector<std::byte> Encode(const cp::Checkpoint& c) {
 void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     auto output=Upper();output.schema=3;output.flask={true,3};output.vitality=2;output.yaw=.33f;output.swordStowed=true;
     const auto original=Encode(output);codec::Error error=codec::Error::None;
-    Check(!codec::Decode(bytes,output,error) && error==expected,"invalid bytes reject with the expected typed error");
+    const bool decoded=codec::Decode(bytes,output,error);
+    if(decoded || error!=expected)
+        std::cerr<<"Decode rejection expected "<<static_cast<int>(expected)<<", got "<<static_cast<int>(error)
+            <<" for "<<bytes.size()<<" bytes\n";
+    Check(!decoded && error==expected,"invalid bytes reject with the expected typed error");
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kTavernConversationSchema+1> lengths{0,162,163,168,177,185,186,187};
+    constexpr std::array<std::size_t,cp::kWaysideArchiveSchema+1> lengths{0,162,163,168,177,185,186,187,188};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -195,7 +199,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,8);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kWaysideArchiveSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -316,7 +320,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,8u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kWaysideArchiveSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -361,7 +365,25 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=8;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kWaysideArchiveSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    {
+        auto archive=Endpoint();
+        archive.schema=cp::kWaysideArchiveSchema;
+        archive.contentRevision=cp::kBellwetherContentRevision;
+        archive.id=cp::CheckpointId::BellwetherTavern;
+        archive.zone=cp::Destination(archive.id);
+        archive.position=cp::kBellwetherCheckpointPosition;
+        archive.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+        archive.waysideArchive=cp::WaysideArchiveProgress::Open;
+        RoundTrip(archive);
+        auto encoded=Encode(archive);
+        Check(encoded.size()==188 && encoded.back()==std::byte{2},"schema8 appends only the archive progress byte");
+        if(encoded.size()==188) {
+            encoded.back()=std::byte{3};Rechecksum(encoded);Reject(encoded,codec::Error::InvalidCheckpoint);
+        }
+        archive.dialogue.hearthLinesResolved=0;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+    }
     invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

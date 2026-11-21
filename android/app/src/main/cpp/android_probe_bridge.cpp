@@ -1256,6 +1256,9 @@ void PublishSimulationUiState()
         contextualControls |= (1 << 14) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
         contextualControls |= (1 << 15) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.waysideArchiveAction != horde::gameplay::bellwether::ArchiveAction::None)
+        contextualControls |= (static_cast<int>(simulation.waysideArchiveAction) << 16) | 1;
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
     if (simulation.crouchActive) contextualControls |= 1 << 10;

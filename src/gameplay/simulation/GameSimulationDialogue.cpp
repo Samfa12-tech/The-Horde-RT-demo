@@ -6,7 +6,59 @@ void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=TavernConversationContext(false);
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
-    chapterDialogue_.ShowTavernDirections(context);
+    switch(WaysideArchiveAction(context)) {
+    case bellwether::ArchiveAction::Inspect:
+        waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
+        return;
+    case bellwether::ArchiveAction::Open:
+        waysideArchive_.stage=bellwether::ArchiveStage::Opening;
+        return;
+    default:
+        chapterDialogue_.ShowTavernDirections(context);
+    }
+}
+
+bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::Context& c) const {
+    using namespace bellwether;
+    const auto stage=waysideArchive_.stage;
+    if(!config_.combatFoundation1_7 || legacyCombatCheckpoint_ || !c.alive || !c.claimed ||
+       !c.exterior || c.paused || c.combat || c.traversing || !c.kitSeated || !playerSupport_.grounded ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation || !chapterTerrain_->HingedContact() ||
+       chapterDialogue_.State().line!=dialogue::Line::None ||
+       chapterDialogue_.State().hearthLinesResolved!=dialogue::kHearthLines.size() || stage>=ArchiveStage::Opening)
+        return ArchiveAction::None;
+    const float dx=kWaysideMechanism[0]-c.player.x,dz=kWaysideMechanism[2]-c.player.z;
+    const float distance=std::hypot(dx,dz);
+    // Leave room for the entire outward sweep of the lower stone.
+    if(-dz<1.60f || distance>2.7f || std::abs(dx)>.8f ||
+       (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)<.90f*distance ||
+       std::abs(c.listener.y-kWaysideMechanism[1])>.9f) return ArchiveAction::None;
+    const float y=kWaysideMechanism[1];
+    if(!chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,kWaysideMechanism[0],
+            kWaysideMechanism[2]+.08f,y-.06f,y+.06f,.025f))return ArchiveAction::None;
+    return stage==ArchiveStage::Closed?ArchiveAction::Inspect:ArchiveAction::Open;
+}
+
+void GameSimulation::AdvanceWaysideArchive(float seconds) {
+    using namespace bellwether;
+    if(waysideArchive_.stage!=ArchiveStage::Opening || seconds<=0 || !chapterTerrain_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation || !chapterTerrain_->HingedContact())return;
+    const float progress=std::min(1.f,waysideArchive_.opening+seconds);
+    const auto candidate=ArchivePose::AtOpening(progress);
+    // Expand the body query by the greatest point travel between poses.
+    const float swingMargin=(progress-waysideArchive_.opening)*1.57079632679f*1.30f;
+    if(UsesRescueExterior() && !candidate.VolumeClear(*chapterTerrain_->HingedContact(),
+            playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY+.001f,
+            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+swingMargin))return;
+    waysideArchive_.opening=progress;
+    waysideArchive_.pose=candidate;
+    if(progress>=1.f)waysideArchive_.stage=ArchiveStage::Open;
+}
+
+bool GameSimulation::ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+    if(!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       !chapterTerrain_->HingedContact())return true;
+    return waysideArchive_.pose.VolumeClear(*chapterTerrain_->HingedContact(),x0,z0,x1,z1,y0,y1,radius);
 }
 
 horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(bool paused) const {

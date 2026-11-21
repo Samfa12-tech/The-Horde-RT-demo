@@ -36,6 +36,7 @@ stone = bpy.data.materials["HordeTownStone"]
 solids = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and not obj.hide_get()]
 walkable = []
 glazing = []
+archive_cover = []
 
 # The v4 model has a closed foundation and a solid wall block. Retain B01's
 # roof, chimney and upper shutter, and all of the other original buildings.
@@ -384,17 +385,18 @@ for name, lo, hi in (("west", -archive_half_width, -.66), ("east", .66, archive_
 shrine_box("archive_lintel", -archive_half_width, archive_half_width, -1.40, .06, archive_lintel, archive_lintel + .31)
 
 
-def shrine_face(name, outline, back, front, material=stone):
+def shrine_face(name, outline, back, front, material=stone, group=solids):
     size = len(outline)
     mesh("B09_" + name,
          [(shrine_x + x, opening_bottom + y, archive_front + z)
           for z in (back, front) for x, y in outline],
          [tuple(reversed(range(size))), tuple(range(size, size * 2))] +
-         [(i, (i + 1) % size, (i + 1) % size + size, i + size) for i in range(size)], solids, material)
+         [(i, (i + 1) % size, (i + 1) % size + size, i + size) for i in range(size)], group, material)
 
 
+cover_stone = opaque_finish("HordeWaysideCoverStone", (.12, .084, .060), .91)
 shrine_face("lower_stone", [(-.61, .03), (.50, .03), (.62, .14), (.60, .49), (.47, .60),
-                           (-.50, .60), (-.61, .48)], -.19, -.045)
+                           (-.50, .60), (-.61, .48)], -.19, -.045, cover_stone, group=archive_cover)
 # Two readable knuckles straddle the cover seam. The roots partly conceal the
 # bottom knuckle, leaving the upper pin and the edge of the stone discoverable.
 hinge_x = -.61
@@ -408,6 +410,12 @@ shrine_face("root_at_sill", [(-1.11, -.63), (-.98, -.61), (-.89, -.38), (-.69, -
                             (-.36, -.08), (-.39, -.035), (-.61, -.066), (-.77, -.22), (-1.02, -.27)], .01, .10, oak)
 shrine_mechanism = [shrine_x, opening_bottom + .32, archive_front]
 shrine_hinge = [shrine_x + hinge_x, opening_bottom + .08, archive_front + .01]
+# Move the editable object's origin to its real hinge without changing world placement.
+cover = archive_cover[0]
+pivot = Vector((shrine_hinge[0], -shrine_hinge[2], shrine_hinge[1]))
+for vertex in cover.data.vertices:
+    vertex.co -= pivot
+cover.location = pivot
 shrine_view = [shrine_x, ground(shrine_x, archive_front + 2.2), archive_front + 2.2]
 
 
@@ -469,6 +477,12 @@ pane_path = RUNTIME / "bellwether-window.glb"
 bpy.ops.export_scene.gltf(filepath=str(pane_path), export_format="GLB", use_selection=True,
                           export_apply=True, export_texcoords=True, export_normals=True,
                           export_tangents=True, export_animations=False)
+cover_mesh = joined_copy(archive_cover, "WaysideArchiveCover")
+cover_mesh.location = (0, 0, 0)
+cover_path = RUNTIME / "wayside-archive-cover.glb"
+bpy.ops.export_scene.gltf(filepath=str(cover_path), export_format="GLB", use_selection=True,
+                          export_apply=True, export_texcoords=True, export_normals=True,
+                          export_tangents=True, export_animations=False)
 
 
 def digest(path):
@@ -495,7 +509,14 @@ pane_manifest["budgets"] = dict(manifest["budgets"], maxVertices=24, maxIndices=
 pane_manifest["lods"] = [{"name": "lod0", "maxTriangles": pane_triangles}]
 (RUNTIME / "window.manifest.json").write_text(json.dumps(pane_manifest, indent=2) + "\n",
                                               encoding="utf-8", newline="\n")
-receipt = dict(sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
+cover_triangles = len(cover_mesh.data.polygons)
+cover_manifest = dict(manifest, asset="wayside-archive-cover", materialOverrides=[])
+cover_manifest["budgets"] = dict(manifest["budgets"], maxVertices=72, maxIndices=cover_triangles * 3,
+                                 maxPrimitives=1, maxMaterials=1)
+cover_manifest["lods"] = [{"name": "lod0", "maxTriangles": cover_triangles}]
+(RUNTIME / "wayside-archive-cover.manifest.json").write_text(json.dumps(cover_manifest, indent=2) + "\n",
+                                                             encoding="utf-8", newline="\n")
+receipt = dict(coverSha256=digest(cover_path), coverTriangles=cover_triangles, sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                layoutSha256=parent["planSha256"], runtimeSha256=digest(path),
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
                windowSha256=digest(pane_path), windowTriangles=pane_triangles,

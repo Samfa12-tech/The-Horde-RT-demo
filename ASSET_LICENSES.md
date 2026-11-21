@@ -122,7 +122,8 @@ The church arrow, post and chisel-stroke lettering are original Horde meshes.
 They reuse the existing timber and char material rows from the same export.
 The wayside archive, lower stone, hinge and stylised roots are original Horde
 meshes in the same Blender source. They reuse MedievalWall02, TombEarthenware
-and TombCharredWick.
+and TombCharredWick. The separately exported hinged cover uses its original
+opaque Blender stone finish without a new texture layer.
 
 ## Generic closed dielectric fixture
 

@@ -211,17 +211,17 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 34u,
-          "resident actor metadata appends two rows");
-    Check(kRtTlasInstanceCapacity == 115u,
-          "storage fits the legacy 31-slot prefix, forest reserves, two Bellwether props and two residents");
+    Check(kRtInstanceMetadataCapacity == 35u,
+          "chapter residents and the archive cover retain independent metadata");
+    Check(kRtTlasInstanceCapacity == 116u,
+          "storage fits the legacy 31-slot prefix, forest reserves, three Bellwether props and two residents");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 19u, "static asset capacity includes two resident actors");
-    Check(kRtPrimitiveMetadataCapacity == 42u, "primitive storage retains two resident actor primitives");
-    Check(kRtMaterialCapacity == 38u, "material storage retains two resident finishes and the shared world palette");
+    Check(kRtStaticAssetCapacity == 20u, "static asset capacity includes the archive cover and two resident actors");
+    Check(kRtPrimitiveMetadataCapacity == 43u, "primitive storage includes the archive cover and two resident actor primitives");
+    Check(kRtMaterialCapacity == 39u, "material storage includes the archive cover, two resident finishes and the shared world palette");
     Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
@@ -313,7 +313,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-              slot.Measurements().instanceMetadataBytes == 34u * 32u &&
+              slot.Measurements().instanceMetadataBytes == 35u * 32u &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");

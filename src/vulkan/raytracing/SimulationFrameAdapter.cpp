@@ -295,6 +295,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.developmentRescueJourney = simulation.developmentRescueJourney;
     frame.rescue = simulation.rescue;
     frame.chapterCompanion = simulation.chapterCompanion;
+    frame.waysideArchivePose = simulation.waysideArchive.pose;
     if (simulation.tavernKeeper) {
         using namespace horde::gameplay::dialogue;
         const auto& keeper = *simulation.tavernKeeper;

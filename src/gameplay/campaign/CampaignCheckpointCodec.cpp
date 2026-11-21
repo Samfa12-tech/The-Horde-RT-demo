@@ -1,4 +1,5 @@
 #include "gameplay/campaign/CampaignCheckpointCodec.h"
+#include <algorithm>
 #include <array>
 #include <bit>
 #include <limits>
@@ -9,15 +10,12 @@ namespace {
 static_assert(sizeof(float)==4 && std::numeric_limits<float>::is_iec559);
 constexpr std::array<std::byte,8> kMagic{std::byte{'H'},std::byte{'R'},std::byte{'D'},
     std::byte{'C'},std::byte{'P'},std::byte{'K'},std::byte{'T'},std::byte{0}};
-constexpr std::uint32_t kFormat=1,kLegacyPayloadBytes=142,kHalfHeartPayloadBytes=143,
-    kFlaskPayloadBytes=148,kDatedPayloadBytes=157,kGuardHealthPayloadBytes=165,kHearthSpeechPayloadBytes=166,
-    kTavernConversationPayloadBytes=167;
+constexpr std::uint32_t kFormat=1;
 constexpr std::size_t kHeaderBytes=20;
-static_assert(kHeaderBytes+kTavernConversationPayloadBytes<=kMaxFileBytes);
+constexpr std::array<std::uint32_t,kWaysideArchiveSchema> kPayloadBytesBySchema{142,143,148,157,165,166,167,168};
+static_assert(kHeaderBytes+kPayloadBytesBySchema.back()<=kMaxFileBytes);
 constexpr std::uint32_t PayloadBytes(std::uint32_t schema) {
-    if(schema==kTavernConversationSchema)return kTavernConversationPayloadBytes;
-    if(schema==kHearthSpeechSchema)return kHearthSpeechPayloadBytes;
-    return schema==5?kGuardHealthPayloadBytes:(schema==4?kDatedPayloadBytes:(schema==3?kFlaskPayloadBytes:(schema==2?kHalfHeartPayloadBytes:kLegacyPayloadBytes)));
+    return kPayloadBytesBySchema[schema-1];
 }
 std::uint32_t Crc32(std::span<const std::byte> bytes) {
     std::uint32_t crc=0xffffffffu;
@@ -52,7 +50,7 @@ private:
     std::span<const std::byte> bytes_;std::size_t offset_=0;bool valid_=true;
 };
 Error VersionError(const Checkpoint& c) {
-    if(c.schema<1 || c.schema>kTavernConversationSchema) return Error::UnsupportedSchema;
+    if(c.schema<1 || c.schema>kWaysideArchiveSchema) return Error::UnsupportedSchema;
     if(c.contentRevision<1 || c.contentRevision>kBellwetherContentRevision) return Error::UnsupportedContent;
     return Error::None;
 }
@@ -87,6 +85,7 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     if(c.schema>=5)for(auto health:c.guardHealth)U32(payload,static_cast<std::uint32_t>(health));
     if(c.schema>=kHearthSpeechSchema)payload.push_back(static_cast<std::byte>(p.hearthLinesResolved));
     if(c.schema>=kTavernConversationSchema)payload.push_back(static_cast<std::byte>(p.tavernConversationLinesResolved));
+    if(c.schema>=kWaysideArchiveSchema)payload.push_back(static_cast<std::byte>(c.waysideArchive));
     std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+payloadBytes);
     encoded.insert(encoded.end(),kMagic.begin(),kMagic.end());
     U32(encoded,kFormat);U32(encoded,payloadBytes);U32(encoded,Crc32(payload));
@@ -102,9 +101,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(header.U32()!=kFormat) {error=Error::UnsupportedFormat;return false;}
     const auto length=header.U32(),crc=header.U32();
     if(length>kMaxFileBytes-kHeaderBytes) {error=Error::TooLarge;return false;}
-    if((length!=kLegacyPayloadBytes && length!=kHalfHeartPayloadBytes &&
-        length!=kFlaskPayloadBytes && length!=kDatedPayloadBytes && length!=kGuardHealthPayloadBytes &&
-        length!=kHearthSpeechPayloadBytes && length!=kTavernConversationPayloadBytes) ||
+    if(std::find(kPayloadBytesBySchema.begin(),kPayloadBytesBySchema.end(),length)==kPayloadBytesBySchema.end() ||
        bytes.size()!=kHeaderBytes+length) {error=Error::Malformed;return false;}
     const auto payload=bytes.subspan(kHeaderBytes);
     if(Crc32(payload)!=crc) {error=Error::Corrupt;return false;}
@@ -132,6 +129,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(c.schema>=5)for(auto& health:c.guardHealth)health=std::bit_cast<std::int32_t>(r.U32());
     if(c.schema>=kHearthSpeechSchema)p.hearthLinesResolved=r.Byte();
     if(c.schema>=kTavernConversationSchema)p.tavernConversationLinesResolved=r.Byte();
+    if(c.schema>=kWaysideArchiveSchema)c.waysideArchive=static_cast<WaysideArchiveProgress>(r.Byte());
     if(!r.Valid()) {error=Error::Malformed;return false;}
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
     out=std::move(c);error=Error::None;return true;

@@ -331,6 +331,9 @@ private:
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
     horde::gameplay::dialogue::Context TavernConversationContext(bool paused) const;
+    bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
+    void AdvanceWaysideArchive(float seconds);
+    bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;
@@ -373,6 +376,7 @@ private:
     SimulationSnapshot snapshot_{};
     horde::gameplay::dialogue::Director chapterDialogue_{};
     horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
+    bellwether::WaysideArchive waysideArchive_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};
     ChapterLocalAmbience localAmbience_{};
