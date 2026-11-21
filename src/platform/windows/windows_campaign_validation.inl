@@ -1267,6 +1267,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             progressed = check(progressed && atHearth() && frame(),
                 "fixed-step movement from the loaded lookout reaches the staffed hearth through the south door");
             if (progressed) {
+                const auto& lifetime = ctx.rtScene.BellwetherFurnitureLifetimeEvidence();
+                const auto tier = ctx.rtScene.DebugRecordedBellwetherFurnitureDetail();
+                const bool active = ctx.rtScene.PackagedBellwetherFurnitureActive();
+                progressed = check(active && lifetime.retirements > 0 && lifetime.restorations > 0 &&
+                    tier == horde::scene::BellwetherFurnitureDetail::Near,
+                    "normal campaign approach retires and restores packaged near furniture before the hearth");
+                if (!progressed)
+                    std::cerr << "Bellwether furniture active=" << active << " retirements=" << lifetime.retirements
+                              << " restorations=" << lifetime.restorations << " deferred=" << lifetime.deferredNearFrames
+                              << " failures=" << lifetime.preparationFailures
+                              << " tier=" << (tier ? static_cast<int>(*tier) : -1) << '\n';
+            }
+            if (progressed) {
                 input.commands.interact = state.lastConsumedInteractSequence + 1;
                 const auto conversationComplete = [&] {
                     return state.chapterDialogue.tavernConversationLinesResolved == kTavernConversation.size() &&
@@ -1295,6 +1308,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             if (progressed) {
                 const auto generation = state.worldRoute.generation;
                 const auto operation = ctx.campaign->State().operationRevision;
+                const auto deferredBeforeReload = ctx.rtScene.BellwetherFurnitureLifetimeEvidence().deferredNearFrames;
                 ShowPauseMenu(ctx, true);
                 const bool reloaded = click(kCampaignLoadButtonId) && until(catalogueReady, false) &&
                     click(CampaignMenu::FirstChoiceId) && until([&] {
@@ -1303,6 +1317,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             play.outcome == campaign::PlayOutcome::Succeeded &&
                             ctx.campaignBarrier.State().phase == CampaignLoadBarrier::Phase::Complete;
                     }, true);
+                const bool nearPresentedOnLoad = reloaded &&
+                    ctx.rtScene.DebugRecordedBellwetherFurnitureDetail()==horde::scene::BellwetherFurnitureDetail::Near &&
+                    ctx.rtScene.BellwetherFurnitureLifetimeEvidence().deferredNearFrames==deferredBeforeReload;
                 // The current native chooser continues immediately after the
                 // matching presentation. Start from its rebased neutral input.
                 input = ctx.simulationInput;
@@ -1314,6 +1331,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     state.tavernDirectionsAvailable && exchangeLines == kTavernConversation.size() &&
                     frame(), "native Load presents and resumes the earned tavern with completed Talk");
                 if (progressed) {
+                    check(nearPresentedOnLoad && ctx.rtScene.PackagedBellwetherFurnitureActive() &&
+                        ctx.rtScene.BellwetherNearOwnerBytes()>0 &&
+                        ctx.rtScene.DebugRecordedBellwetherFurnitureDetail()==horde::scene::BellwetherFurnitureDetail::Near,
+                        "loading a tavern save presents ready near furniture without a coarse interim frame");
                     campaign::storage::StoredCheckpoint resumed;
                     check(campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                         campaign::storage::Status::Read && resumed.encoded == stored.encoded,

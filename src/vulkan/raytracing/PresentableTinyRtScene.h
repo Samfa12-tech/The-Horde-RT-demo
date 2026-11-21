@@ -449,6 +449,8 @@ public:
         if(ready_ || device_!=VK_NULL_HANDLE)return false;
         bellwetherFurnitureResidency_=enabled;return true;
     }
+    void RequestPackagedBellwetherFurniture(bool requested) { bellwetherFurniturePackaged_=requested; }
+    bool PackagedBellwetherFurnitureActive() const noexcept { return bellwetherFurnitureWarmStart_; }
     struct BellwetherFurnitureLifetime {
         std::uint64_t retirements=0, restorations=0, deferredNearFrames=0, preparationFailures=0;
         VkDeviceSize retiredAllocationBytes=0, preparationPeakBytes=0;
@@ -1505,6 +1507,8 @@ private:
     horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
     bool bellwetherFurnitureTransitions_=false;
     bool bellwetherFurnitureResidency_=false;
+    bool bellwetherFurniturePackaged_=false;
+    bool bellwetherFurnitureWarmStart_=false;
     BellwetherFurnitureLifetime bellwetherFurnitureLifetime_{};
     AccelerationStructure bellwetherNearCandidate_{};
     Buffer bellwetherNearBuildScratch_{};

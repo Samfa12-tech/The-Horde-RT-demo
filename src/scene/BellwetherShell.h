@@ -12,6 +12,7 @@ inline constexpr std::size_t kBellwetherGroundTriangles=22;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 enum class BellwetherFurnitureDetail { Near, Mid, Far };
 inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};
+bool HasBellwetherFurnitureRuntime(const std::filesystem::path& assetsRoot);
 float BellwetherFurnitureRoomDistanceSquared(float x, float z) noexcept;
 // Selects one room contributor for every ray type, independently of camera facing.
 BellwetherFurnitureDetail SelectBellwetherFurnitureDetail(

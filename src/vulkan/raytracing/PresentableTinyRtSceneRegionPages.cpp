@@ -80,8 +80,9 @@ bool PresentableTinyRtScene::CreateInitialRegionPage(std::string& error) {
         as.minAccelerationStructureScratchOffsetAlignment,as.maxPrimitiveCount,as.maxGeometryCount,
         executionPolicy_.shaderPipelineStage};
     regionPagePreparation_=std::make_unique<RtRegionGeometryPreparation>(gpuResources_,context);
-    if(UsesBellwetherNearPage())return true;
+    if(UsesBellwetherNearPage() && !bellwetherFurnitureWarmStart_)return true;
     const horde::world::streaming::Token token{staticGeometryGeneration_,1,1};
+    if(UsesBellwetherNearPage())regionCutoverToken_=token;
     if(!regionPagePreparation_->Begin(token,regionPageSource_,staticMeshSlot_.Materials(),error))return false;
     // Heavy startup only. Normal return uses bounded application-turn advances.
     // A timed-out/unproved submission stays owned until platform idle teardown.

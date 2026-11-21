@@ -637,6 +637,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
     bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
     bellwetherFurnitureResidency_=std::exchange(other.bellwetherFurnitureResidency_,false);
+    bellwetherFurniturePackaged_=std::exchange(other.bellwetherFurniturePackaged_,false);
+    bellwetherFurnitureWarmStart_=std::exchange(other.bellwetherFurnitureWarmStart_,false);
     bellwetherFurnitureLifetime_=std::exchange(other.bellwetherFurnitureLifetime_,{});
     bellwetherNearCandidate_=std::exchange(other.bellwetherNearCandidate_,{});
     bellwetherNearBuildScratch_=std::exchange(other.bellwetherNearBuildScratch_,{});
@@ -1760,6 +1762,7 @@ void PresentableTinyRtScene::Destroy()
     jointPropPresentationActive_ = false;
     keeperVertexLifetime_ = {};
     bellwetherFurnitureLifetime_={};
+    bellwetherFurnitureWarmStart_=false;
     bellwetherNearRetryTick_=0;
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
@@ -3388,6 +3391,14 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         return LoadPreviewStaticAssets(productionAssetRoot, diagnostic);
 
     const std::filesystem::path root(productionAssetRoot);
+    if(bellwetherFurniturePackaged_ && developmentRescueJourney_ &&
+       !bellwetherFurnitureTransitions_ && !bellwetherFurnitureResidency_ &&
+       bellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near &&
+       horde::scene::HasBellwetherFurnitureRuntime(root)) {
+        bellwetherFurnitureTransitions_=true;
+        bellwetherFurnitureResidency_=true;
+        bellwetherFurnitureWarmStart_=true;
+    }
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
     const auto playerTorchDirectory = root / "models/props/runtime/player-rag-torch";
@@ -5959,7 +5970,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             "Bellwether tavern door", tavernDoorBlas_, true)))
         return false;
     if(bellwetherFurnitureTransitions_) {
-        const std::uint32_t firstTier=bellwetherFurnitureResidency_ ? 1u : 0u;
+        const std::uint32_t firstTier=(UsesBellwetherNearPage() ||
+            (bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_)) ? 1u : 0u;
         for(std::uint32_t tier=firstTier;tier<bellwetherFurnitureBlas_.size();++tier)
             if(!buildRegisteredStaticBlas(kBellwetherFurnitureLane,"Bellwether furniture",
                 bellwetherFurnitureBlas_[tier],true,nullptr,tier-(UsesBellwetherNearPage()?1u:0u)))return false;
@@ -6487,7 +6499,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
     tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
     if(bellwetherFurnitureTransitions_) {
-        activeBellwetherFurnitureDetail_=bellwetherFurnitureResidency_ ?
+        activeBellwetherFurnitureDetail_=(bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_) ?
             horde::scene::BellwetherFurnitureDetail::Far : horde::scene::BellwetherFurnitureDetail::Near;
         ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
     }
@@ -6501,6 +6513,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     for(std::size_t i=9;i<=16;++i)instances[i].mask=initialPlayerMasks.instanceMasks[i];
     instances[kPlayerWorldBodyInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerWorldBodyInstanceIndex];
     instances[kPlayerViewmodelInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerViewmodelInstanceIndex];
+    if(UsesBellwetherNearPage())
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
     auto initialMetadata=staticMeshSlot_.InstanceMetadata();
     horde::world::streaming::GeometryPageTable initialTable;
     if(!ApplyRegionPage(instances,initialMetadata,initialTable,diagnostic))return false;

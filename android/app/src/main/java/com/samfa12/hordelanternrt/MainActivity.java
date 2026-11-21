@@ -1098,6 +1098,12 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/window.manifest.json", "models/world/runtime/bellwether-tavern-v1/window.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-window.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-window.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json") &&

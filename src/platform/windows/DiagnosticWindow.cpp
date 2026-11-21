@@ -7917,23 +7917,16 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
             return false;
         }
-#if defined(_DEBUG)
-        if(ctx.bellwetherFurnitureResidency &&
-           !ctx.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
+        if(!ctx.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
             ctx.lastRtFrameError=diagnostic;
             if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
             return false;
         }
-#endif
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
         DetailFrame detail=DetailFrame::Render;
         if(!ctx.environmentSurveyActive && !ctx.rtScene.AdvanceOrdinaryStaticDetail(ctx.simulation,frameInputs,
             !previewFrame && !frozenDevelopmentCheckpoint && !ctx.nativeMotionValidation && !ctx.outputResizeValidation &&
-            !ctx.graphicsPreviewCapture && !ctx.benchmark.IsRunning()
-#if defined(_DEBUG)
-            && !ctx.bellwetherFurnitureResidency
-#endif
-            ,detail,diagnostic)) {
+            !ctx.graphicsPreviewCapture && !ctx.benchmark.IsRunning(),detail,diagnostic)) {
             ctx.lastRtFrameError=diagnostic;
             if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
             return false;

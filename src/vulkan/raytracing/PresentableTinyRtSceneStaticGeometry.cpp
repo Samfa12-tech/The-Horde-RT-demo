@@ -371,6 +371,8 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     // Current input must force full restoration before any new presentation.
     jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible || frame.playerUtilityHand.has_value();
     decision=StaticDetailFrame::Render;
+    // Both Bellwether paths pin the shared geometry behind queued near preparation.
+    if(bellwetherFurnitureResidency_){diagnostic.clear();return true;}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled){diagnostic.clear();return true;}
 #endif
@@ -395,7 +397,6 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     const bool restore=ordinaryStaticReduced_ && (!allowEviction || !safe ||
         frame.cameraX< -22.5f || frame.cameraX> -21.5f || snapshot.staticDetailLease.restoreRequested);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
-    if(UsesBellwetherNearPage()){diagnostic.clear();return true;}
     if(regionPageSource_)return AdvanceRegionPage(simulation,frame,safe,inner,allowEviction,decision,diagnostic);
 #endif
     if(!ordinaryStaticCandidate_ && preparedStaticGeometry_) {
@@ -489,10 +490,54 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         diagnostic="Forest route proof retains every contributor; filtered packing is not admitted.";return false;
     }
 #endif
-    horde::scene::assets::StaticMeshAsset regionSelectedWorld;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset regionSelectedWorld;
     if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions &&
        !horde::scene::assets::SelectStaticTriangleRegions(collapseStaticAsset_,retainedTriangleRegions,
             regionSelectedWorld,diagnostic))return false;
+    const auto* world = retainedTriangleRegions==horde::scene::assets::kAllStaticTriangleRegions ?
+        &collapseStaticAsset_ : &regionSelectedWorld;
+    const auto* furniture = &bellwetherFurnitureAsset_;
+    const StaticMeshAsset* furnitureOwner = furniture;
+    StaticMeshAsset worldWithFurniture;
+    std::uint32_t furnitureOffset = 0;
+    if (bellwetherFurnitureWarmStart_) {
+        // The authored tiers use the existing world timber. Keep their own
+        // BLAS ranges and instance identity while sharing that source and row.
+        if (furniture->materials.size() != 1u) {
+            diagnostic = "Bellwether tiers must use one authored timber finish.";
+            return false;
+        }
+        const auto timber = std::find_if(world->materials.begin(), world->materials.end(),
+            [&](const auto& material) { return material.name == furniture->materials.front().name; });
+        if (timber == world->materials.end() ||
+            world->vertices.size() > UINT32_MAX - furniture->vertices.size() ||
+            world->indices.size() > UINT32_MAX - furniture->indices.size() ||
+            world->nodeTransforms.size() > UINT32_MAX - furniture->nodeTransforms.size() ||
+            (!retainedWorldFamilies.empty() && retainedWorldFamilies.back() >= world->primitives.size())) {
+            diagnostic = "Bellwether tiers require bounded geometry and the existing world timber.";
+            return false;
+        }
+        worldWithFurniture = *world;
+        furnitureOffset = static_cast<std::uint32_t>(world->primitives.size());
+        const auto vertexOffset = static_cast<std::uint32_t>(world->vertices.size());
+        const auto indexOffset = static_cast<std::uint32_t>(world->indices.size());
+        const auto transformOffset = static_cast<std::uint32_t>(world->nodeTransforms.size());
+        const auto materialIndex = static_cast<std::uint32_t>(timber - world->materials.begin());
+        for (auto primitive : furniture->primitives) {
+            primitive.vertexOffset += vertexOffset;
+            primitive.indexOffset += indexOffset;
+            primitive.nodeTransformIndex += transformOffset;
+            primitive.materialIndex = materialIndex;
+            worldWithFurniture.primitives.push_back(primitive);
+        }
+        worldWithFurniture.vertices.insert(worldWithFurniture.vertices.end(), furniture->vertices.begin(), furniture->vertices.end());
+        worldWithFurniture.indices.insert(worldWithFurniture.indices.end(), furniture->indices.begin(), furniture->indices.end());
+        worldWithFurniture.nodeTransforms.insert(worldWithFurniture.nodeTransforms.end(),
+            furniture->nodeTransforms.begin(), furniture->nodeTransforms.end());
+        world = &worldWithFurniture;
+        furnitureOwner = world;
+    }
     std::vector<StaticRtAssetRegistration> registrations{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
@@ -521,7 +566,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
     registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-        &collapseStaticAsset_});
+        world});
     // Player Rag torch gets its own metadata/material route. The original
     // production torch remains layer1 for permanent Keeper/world instances.
     registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
@@ -545,7 +590,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     for (auto& row : registrations)
         if (row.instanceCustomIndex == kCollapseInstanceIndex) {
             row.primitiveSelection = retainedWorldFamilies;
-            if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
+            if (retainedWorldFamilies.empty()) row.primitiveCount = furnitureOffset;
         }
     if(UsesSharedForestGeometry()) {
         if(!forestSharedLayout_.prepared || !forestSharedLayout_.commonPrimitiveCount ||
@@ -559,7 +604,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveCount=static_cast<std::uint32_t>(forestSharedLayout_.commonPrimitiveCount);
         for(unsigned m=0;m<2;++m) {
             StaticRtAssetRegistration row{26u+m,m==0?0x50494e45u:0x414c4452u,
-                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&collapseStaticAsset_};
+                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,world};
             row.primitiveOffset=static_cast<std::uint32_t>(forestSharedLayout_.masters[m].primitiveOffset);
             row.primitiveCount=3u;registrations.push_back(row);
         }
@@ -588,9 +633,13 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!tavernDoorAsset_.primitives.empty())
         registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
-    if(!bellwetherFurnitureAsset_.primitives.empty())
-        registrations.push_back({kBellwetherFurnitureLane,0x42303146u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&bellwetherFurnitureAsset_});
+    if (!furniture->primitives.empty()) {
+        StaticRtAssetRegistration tiers{kBellwetherFurnitureLane, 0x42303146u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, furnitureOwner};
+        tiers.primitiveOffset = furnitureOffset;
+        if (furnitureOffset) tiers.primitiveCount = static_cast<std::uint32_t>(furniture->primitives.size());
+        registrations.push_back(tiers);
+    }
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -620,7 +669,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
                 return false;
             }
         if (!out.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
-        if(!bellwetherFurnitureAsset_.primitives.empty()) {
+        if(!furnitureOffset && !furniture->primitives.empty()) {
             RtImmutableMaterialAlias furniture;
             const auto& metadata=out.InstanceMetadata()[kBellwetherFurnitureLane];
             furniture.consumer=out.PrimitiveMetadata()[metadata.primitiveBase].materialIndex;

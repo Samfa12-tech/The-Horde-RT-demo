@@ -8,6 +8,7 @@ namespace horde::scene {
 namespace {
 using assets::StaticMeshAsset;
 constexpr std::string_view kTavernTimber="HordeTavernTimber";
+constexpr std::string_view kTavernRuntimeDirectory="models/world/runtime/bellwether-tavern-v1";
 
 bool LoadFurniture(const std::filesystem::path& directory,std::size_t level,StaticMeshAsset& mesh,
                    std::string& diagnostic) {
@@ -34,7 +35,7 @@ bool PrepareFurnitureGeometry(const std::filesystem::path& root,StaticMeshAsset&
                               BellwetherFurnitureDetail detail,StaticMeshAsset* isolated,
                               std::string& diagnostic) {
     const auto level=static_cast<std::size_t>(detail);
-    const auto directory=root/"models/world/source/bellwether-tavern-lods-v1";
+    const auto directory=root/kTavernRuntimeDirectory;
     StaticMeshAsset original,replacement;
     if(level>=kBellwetherFurnitureTriangles.size()) {
         diagnostic="Unknown Bellwether furniture detail level.";return false;
@@ -139,6 +140,18 @@ bool PrepareFurnitureGeometry(const std::filesystem::path& root,StaticMeshAsset&
 }
 }
 
+bool HasBellwetherFurnitureRuntime(const std::filesystem::path& root) {
+    const auto directory=root/kTavernRuntimeDirectory;
+    for(std::size_t tier=0;tier<kBellwetherFurnitureTriangles.size();++tier) {
+        const auto stem="tavern-furniture-lod"+std::to_string(tier);
+        for(const auto extension:{".manifest.json",".glb"}) {
+            std::error_code error;
+            if(!std::filesystem::is_regular_file(directory/(stem+extension),error))return false;
+        }
+    }
+    return true;
+}
+
 float BellwetherFurnitureRoomDistanceSquared(float x,float z) noexcept {
     const auto& low=gameplay::bellwether::kRoomMin;
     const auto& high=gameplay::bellwether::kRoomMax;
@@ -173,7 +186,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     }
     constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
     constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
-    const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
+    const auto dir=root/kTavernRuntimeDirectory;
     assets::AssetManifest manifest, glazingManifest, coverManifest, registerManifest, doorManifest;
     assets::StaticMeshAsset source, pane, cover, ledger, door;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||

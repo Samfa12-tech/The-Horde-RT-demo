@@ -23,8 +23,10 @@ inline auto BellwetherResidentSources(const std::filesystem::path& root)
 inline bool SetBellwetherResidentSources(PresentableTinyRtScene& scene,
     const std::filesystem::path& root, std::string& diagnostic)
 {
-    if (root.empty()) return scene.SetChapterResidentActors({}, diagnostic);
-    return scene.SetChapterResidentActors(BellwetherResidentSources(root), diagnostic);
+    const bool ready = root.empty() ? scene.SetChapterResidentActors({}, diagnostic) :
+        scene.SetChapterResidentActors(BellwetherResidentSources(root), diagnostic);
+    if (ready) scene.RequestPackagedBellwetherFurniture(!root.empty());
+    return ready;
 }
 
 } // namespace horde::vulkan::raytracing

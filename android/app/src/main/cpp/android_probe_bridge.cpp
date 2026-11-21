@@ -3715,6 +3715,11 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     const bool authoredShowcase = context.developmentRescueJourney &&
         context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    if (!context.rtScene.SetBellwetherFurnitureTransitions(false) ||
+        !context.rtScene.SetBellwetherFurnitureResidency(false)) {
+        __android_log_print(ANDROID_LOG_ERROR,kTag,"Bellwether furniture setup must precede scene initialization.");
+        return false;
+    }
     if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
             authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{}, diagnostic)) {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
@@ -5079,6 +5084,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "%s", diagnostic.c_str());
+            return false;
+        }
+        if(!context.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
+            if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
+            __android_log_print(ANDROID_LOG_ERROR,kTag,"Bellwether furniture: %s",diagnostic.c_str());
             return false;
         }
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
