@@ -90,6 +90,15 @@ int main() {
              !support->NonWalkableVolumeClear(southDoorX+1.5f,121.f,southDoorX+1.5f,118.8f,
                  after.worldY+.01f,after.worldY+1.8f,.24f),
              "the mapped south opening admits the capsule while the adjacent wall stays solid");
+        const auto& hinge=kSouthDoorHinge;
+        const auto crossesLeaf=[&](float z) {
+            return !support->NonWalkableVolumeClear(hinge[0]-.43f,z,hinge[0]+.42f,z,
+                after.worldY+.90f,after.worldY+1.22f,.07f);
+        };
+        check(crossesLeaf(hinge[2]-1.10f) && !crossesLeaf(hinge[2]-2.45f) &&
+              support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,116.1f,
+                  after.worldY+.01f,after.worldY+1.8f,.28f),
+              "the parked leaf is solid beside the throat and leaves the central lane open deep into the room");
         using namespace horde::gameplay::bellwether;
         const auto exactHorizontalFace=[&](const auto& mark) {
             constexpr float epsilon=.001f;

@@ -1,10 +1,11 @@
 #pragma once
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "scene/assets/StaticMeshAsset.h"
+#include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
-inline constexpr std::size_t kBellwetherSolidTriangles=2876;
+inline constexpr std::size_t kBellwetherSolidTriangles=gameplay::bellwether::kSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=22;

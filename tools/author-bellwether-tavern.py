@@ -187,6 +187,57 @@ def opaque_finish(name, color, roughness):
 # material rows. Edge highlights and plank seams distinguish the timber.
 oak = opaque_finish("HordeTavernTimber", (.25, .115, .065), .84)
 ember = opaque_finish("HordeHearthChar", (.025, .019, .013), .95)
+
+# B01's timber leaf is held inward against the west jamb for the arrival.
+# Keep the pieces local to an editable hinge so a later moving export can
+# reuse this exact leaf and axis. The held-open mesh shares the room BLAS
+# and ordinary static contact in the current build.
+door_hinge = (door_west + .088, floor, south - wall_depth - .085)
+door_open_degrees = 94
+door_width = 2.02
+door_leaf = []
+door_frame = []
+hinge = bpy.data.objects.new("B01_SouthDoorHinge", None)
+bpy.context.collection.objects.link(hinge)
+hinge.empty_display_type = "ARROWS"
+hinge.empty_display_size = .28
+hinge.location = (door_hinge[0], -door_hinge[2], door_hinge[1])
+hinge.rotation_euler.z = math.radians(door_open_degrees)
+
+
+def leaf_piece(name, x0, x1, z0, z1, y0, y1, material=oak):
+    piece = box("B01_door_" + name, x0, x1, z0, z1, y0, y1, material, door_leaf)
+    piece.parent = hinge
+
+
+for index in range(8):
+    start, end = index * door_width / 8, (index + 1) * door_width / 8
+    leaf_piece(f"plank_{index + 1}", start + .0018, end - .0018, -.045, .045,
+               .038 + .002 * (index % 3), 2.536 - .002 * ((index + 1) % 3))
+for suffix, height in (("lower", .49), ("upper", 1.98)):
+    leaf_piece(suffix + "_rail", .08, door_width - .065, -.087, -.043, height, height + .17)
+    leaf_piece(suffix + "_strap", -.022, .71, .042, .062, height + .058, height + .12, ember)
+    leaf_piece(suffix + "_hinge_knuckle", -.032, .032, -.031, .034, height + .029, height + .145, ember)
+    # Fixed pintles stay with the jamb when editing the hinge.
+    box("B01_door_fixed_" + suffix + "_pintle", door_west - .014, door_hinge[0] + .016,
+        door_hinge[2] - .045, south - wall_depth + .036, floor + height + .047,
+        floor + height + .105, ember, door_frame)
+for face, side in (("inside", -1), ("outside", 1)):
+    plate_z = sorted((side * .046, side * .069))
+    pull_z = sorted((side * .061, side * .117))
+    leaf_piece(face + "_latch_plate", 1.74, 1.87, *plate_z, .99, 1.25, ember)
+    leaf_piece(face + "_pull_low", 1.799, 1.839, *pull_z, 1.035, 1.069, ember)
+    leaf_piece(face + "_pull_high", 1.799, 1.839, *pull_z, 1.174, 1.208, ember)
+    leg_z = sorted((side * .102, side * .128))
+    leaf_piece(face + "_pull_grip", 1.799, 1.839, *leg_z, 1.048, 1.193, ember)
+
+door_frame_width = .068
+for label, x0 in (("west", door_west), ("east", door_east - door_frame_width)):
+    box("B01_door_" + label + "_jamb", x0, x0 + door_frame_width, south - .426, south - .129,
+        floor + .002, header_y, oak, door_frame)
+box("B01_door_head_frame", door_west + door_frame_width, door_east - door_frame_width,
+    south - .426, south - .129, header_y - .068, header_y, oak, door_frame)
+
 # The sill and posts hold a closed, 8 mm thick glass volume. Put the
 # glazing itself in a separate draw group for the shared dielectric route.
 glass = opaque_finish("HordeTavernWindowGlass", (.96, .985, .94), .09)
@@ -485,6 +536,8 @@ box("B09_register_spine", register_x - .263, register_x - .224, register_z - .15
     register_z + .151, opening_bottom + .022, opening_bottom + .107, register_leather,
     group=archive_register)
 register_mark = [register_x, opening_bottom + .12, register_z]
+solids.extend(door_frame)
+solids.extend(door_leaf)
 
 
 def joined_copy(group, name):
@@ -568,7 +621,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=6500, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=7250, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -604,7 +657,9 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
                windowSha256=digest(pane_path), windowTriangles=pane_triangles,
                windowBounds=[pane_min, pane_max],
-               southDoor=[door_x, floor, south], clearDoorWidth=2.2, clearDoorHeight=2.65,
+               southDoor=[door_x, floor, south], clearDoorWidth=2.2 - 2 * door_frame_width,
+               clearDoorHeight=2.65 - .068, southDoorHinge=door_hinge,
+               southDoorOpenDegrees=door_open_degrees, southDoorLeafWidth=door_width,
                rampToe=[door_x, toe_y, toe_z], rampWidth=3, highestGroundUnderFloor=highest_inside,
                hearthMouth=[hearth_front, floor, (hearth_north + hearth_south) / 2],
                chairSeat=seat_mark, chairSitRoot=sit_root, chairApproach=approach_mark, chairTurn=turn_mark,
@@ -626,6 +681,7 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("TableTop", receipt["tableTop"]), ("Conversation", talk_mark),
                    ("RoomMin", (west + wall_depth, floor, north + wall_depth)),
                    ("RoomMax", (east - wall_depth, floor, south - wall_depth)),
+                   ("SouthDoorHinge", door_hinge),
                    ("TableCandleFlame", candle_flame), ("TableCandleLight", candle_light),
                    ("ChurchWaymarker", receipt["churchWaymarker"]),
                    ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
@@ -633,7 +689,8 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
-stage += ["", "inline constexpr float kChairFacingRadians=1.570796327f;",
+stage += ["", f"inline constexpr unsigned kSolidTriangles={solid_triangles};",
+          "inline constexpr float kChairFacingRadians=1.570796327f;",
           f"inline constexpr float kKeeperDoorFacingRadians={keeper_door_yaw:.9f}f;",
           f"inline constexpr float kKeeperHearthFacingRadians={keeper_hearth_yaw:.9f}f;", "}", ""]
 (OUTPUT / "staging.generated.h").write_text("\n".join(stage), encoding="utf-8", newline="\n")

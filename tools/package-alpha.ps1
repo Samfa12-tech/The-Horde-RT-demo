@@ -520,6 +520,8 @@ try {
         "assets/models/world/runtime/bellwether-tavern-v1/bellwether-window.glb",
         "assets/models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json",
         "assets/models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb",
+        "assets/models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json",
+        "assets/models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb",
         "assets/models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json",
         "assets/models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb",
         "assets/models/world/runtime/forest-deadwood-v1/asset.manifest.json",
