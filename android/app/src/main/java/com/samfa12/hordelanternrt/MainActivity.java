@@ -7754,7 +7754,7 @@ public class MainActivity extends Activity {
             case 332:
             case 333: return new float[]{0.0f, -0.12f};
             case 334: return new float[]{-1.57f, -0.24f};
-            case 341: return new float[]{1.57f, -0.21f};
+            case 341: return new float[]{1.76f, -0.21f};
             case 335: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{1.57079632679f, -0.07f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};

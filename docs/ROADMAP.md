@@ -124,7 +124,7 @@ The [lantern hinge fitting](superpowers/plans/2026-11-07-bellwether-arrival-dire
 
 The [wayside air ward](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#wayside-air-ward-preparation) adds an optional Magic preparation. After the register reading, the player restores the shrine's binding with the original hinged stone and returns to the record keeper for the lesson. The preparation saves independently of the coin reward and the Tech fitting.
 
-The shared player motor now verifies a [walk east](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#east-route-to-the-mill-yard) from the square to the mapped salvager's spot and the closed mill yard. The approach follows the existing terrain. The salvager encounter and mill crossing remain open.
+The [east route](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#east-route-to-the-mill-yard) leads from the square to the mill's western landing and workbench, with a fork to the salvager's mapped spot. Two local mill arrows mark the route. The salvager encounter, crossing and repair quest remain open.
 
 The [arrival plan](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#18-route-and-tavern-checkpoint) records the textured and rigged tavern keeper candidate. Private Debug builds can use her standing pose and retimed walk with the existing door and hearth marks. Both Windows hardware RT backends presented her at the hearth. Phone validation and distribution clearance remain open.
 

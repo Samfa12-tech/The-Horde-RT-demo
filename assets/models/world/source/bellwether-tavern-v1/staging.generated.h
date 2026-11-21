@@ -15,6 +15,8 @@ inline constexpr std::array<float, 3> kSouthDoorHinge{{81.288000f, -8.709551f, 1
 inline constexpr std::array<float, 3> kTavernCandleFlame{{83.150000f, -7.440551f, 106.660000f}};
 inline constexpr std::array<float, 3> kTavernCandleLight{{83.150000f, -7.383551f, 106.660000f}};
 inline constexpr std::array<float, 3> kChurchWaymarker{{34.650000f, -5.981606f, 82.100000f}};
+inline constexpr std::array<float, 3> kMillWestDoor{{118.300000f, -13.764971f, 113.200000f}};
+inline constexpr std::array<float, 3> kMillWorkMark{{116.100000f, -13.559898f, 115.740000f}};
 inline constexpr std::array<float, 3> kWaysideMechanism{{103.300000f, -2.706654f, 31.400000f}};
 inline constexpr std::array<float, 3> kWaysideHinge{{102.690000f, -2.946654f, 31.410000f}};
 inline constexpr std::array<float, 3> kWaysideInspection{{103.300000f, -4.133766f, 33.600000f}};
@@ -23,7 +25,8 @@ inline constexpr std::array<float, 3> kKeeperDoor{{83.780000f, -8.709551f, 118.2
 inline constexpr std::array<float, 3> kKeeperAisle{{85.650000f, -8.709551f, 116.150000f}};
 inline constexpr std::array<float, 3> kKeeperHearth{{85.650000f, -8.709551f, 109.100000f}};
 
-inline constexpr unsigned kSolidTriangles=2984;
+inline constexpr unsigned kSolidTriangles=3564;
+inline constexpr unsigned kGroundTriangles=24;
 inline constexpr unsigned kSouthDoorTriangles=264;
 inline constexpr float kSouthDoorOpenRadians=1.640609497f;
 inline constexpr float kSouthDoorSwingRadius=2.030f;

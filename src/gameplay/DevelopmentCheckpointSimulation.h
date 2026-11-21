@@ -242,6 +242,8 @@ inline bool StageDevelopmentCheckpointSimulation(
             const auto& mill=traversal::kBellwetherMillApproach;
             for(auto station=mill.begin()+1;station!=mill.end();++station)
                 if(!walkStation(*station))return finalize(false);
+            if(!walkStation(traversal::kBellwetherMillWorkMark) || !walkStation(mill.back()))
+                return finalize(false);
             if(!walkStation(traversal::kBellwetherMillYardView))return finalize(false);
         } else {
             for(const auto& station:traversal::kBellwetherNorthApproach)

@@ -1,4 +1,4 @@
-"""Author the B01 interior and B09 wayside mechanism from the preserved Bellwether master.
+"""Author the B01 interior, B05 mill yard and B09 archive from the preserved master.
 
 blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT [OUTPUT_WORLD]
 The editable and runtime output directories must both be new.
@@ -30,6 +30,7 @@ if OUTPUT.exists() or RUNTIME.exists():
 
 parent = json.loads(MASTER.with_name("authoring-receipt.json").read_text())
 tavern = next(building for building in parent["buildings"] if building["id"] == "B01")
+mill = next(building for building in parent["buildings"] if building["id"] == "B05")
 bpy.ops.wm.open_mainfile(filepath=str(MASTER))
 bpy.context.preferences.filepaths.save_version = 0
 stone = bpy.data.materials["HordeTownStone"]
@@ -40,9 +41,11 @@ archive_cover = []
 archive_register = []
 
 # The v4 model has a closed foundation and a solid wall block. Retain B01's
-# roof, chimney and upper shutter, and all of the other original buildings.
+# roof, chimney and upper shutter. B05 keeps its shell, with the entrance
+# detail moving to the mapped west working edge.
 for name in ("B01_stone_foundation", "B01_closed_walls", "B01_door_post_-1",
-             "B01_door_post_1", "B01_door_lintel", "B01_front_step"):
+             "B01_door_post_1", "B01_door_lintel", "B01_front_step",
+             "B05_door_post_-1", "B05_door_post_1", "B05_door_lintel", "B05_front_step"):
     obj = bpy.data.objects[name]
     solids.remove(obj)
     bpy.data.objects.remove(obj, do_unlink=True)
@@ -369,51 +372,131 @@ billet("B01_hearth_billet_back", 80.53, 110.04, .055, -.23, .49, .057)
 billet("B01_hearth_billet_cross", 80.54, 109.89, .12, 1.43, .50, .047)
 
 
-# West-facing waymarker in the wedge between the north path and tavern road.
-# From that approach the left-pointing board follows the church branch.
-sign_x, sign_z = 34.65, 82.10
-sign_y = ground(sign_x, sign_z)
-post_bottom = min(ground(sign_x + dx, sign_z + dz)
-                  for dx in (-.10, .10) for dz in (-.10, .10)) - .17
-box("B02_waymarker_post", sign_x - .10, sign_x + .10, sign_z - .10, sign_z + .10,
-    post_bottom, sign_y + 1.60, oak)
-sign_centre_y = sign_y + 1.37
-outline = [(-.77, 0), (-.51, -.20), (.73, -.20), (.73, .20), (-.51, .20)]
-edge_count = len(outline)
-mesh("B02_church_arrow_board",
-     [(sign_x + depth, sign_centre_y + height, sign_z + along)
-      for depth in (-.13, .03) for along, height in outline],
-     [tuple(range(edge_count)), tuple(reversed(range(edge_count, edge_count * 2)))] +
-     [((i + 1) % edge_count, i, i + edge_count, (i + 1) % edge_count + edge_count)
-      for i in range(edge_count)], solids, ember)
-
-# Original chisel strokes with a light timber inlay on the west face.
-# Each strip shares the board's real surface and RT lighting.
-strokes = {
+# Timber waymarkers with original chisel-stroke inlays.
+letter_strokes = {
     "C": [((1, 1), (.26, 1), (0, .8), (0, .2), (.26, 0), (1, 0))],
     "H": [((0, 0), (0, 1)), ((1, 0), (1, 1)), ((0, .5), (1, .5))],
     "U": [((0, 1), (0, .22), (.25, 0), (.75, 0), (1, .22), (1, 1))],
     "R": [((0, 0), (0, 1), (.79, 1), (1, .87), (1, .61), (.79, .5), (0, .5)),
           ((.52, .5), (1, 0))],
+    "M": [((0, 0), (0, 1), (.5, .48), (1, 1), (1, 0))],
+    "I": [((.5, 0), (.5, 1)), ((.13, 0), (.87, 0)), ((.13, 1), (.87, 1))],
+    "L": [((0, 1), (0, 0), (1, 0))],
 }
-letter_vertices, letter_faces = [], []
-for index, letter in enumerate("CHURCH"):
-    left = sign_z - .451 + index * .182
-    for path in strokes[letter]:
-        for start, end in zip(path, path[1:]):
-            a = Vector((left + start[0] * .135, sign_centre_y + (start[1] - .5) * .225))
-            b = Vector((left + end[0] * .135, sign_centre_y + (end[1] - .5) * .225))
-            tangent = (b - a).normalized() * .017
-            normal = Vector((-tangent.y, tangent.x))
-            face = (a - tangent - normal, b + tangent - normal, b + tangent + normal, a - tangent + normal)
-            first = len(letter_vertices)
-            front = sign_x - .132 - (first // 8) * .00003
-            letter_vertices.extend((x, y, z) for x in (front, sign_x - .128) for z, y in face)
-            letter_faces.extend((tuple(range(first, first + 4)), tuple(range(first + 7, first + 3, -1))))
-            for corner in range(4):
-                a_index, b_index = first + corner, first + (corner + 1) % 4
-                letter_faces.append((b_index, a_index, a_index + 4, b_index + 4))
-mesh("B02_church_arrow_letters", letter_vertices, letter_faces, solids, oak)
+
+
+def waymarker(post, board, label, x, z, *, north_facing=False, glyph_width=.135, spacing=.182):
+    y = ground(x, z)
+    bottom = min(ground(x + dx, z + dz) for dx in (-.10, .10) for dz in (-.10, .10)) - .17
+    box(post, x - .10, x + .10, z - .10, z + .10, bottom, y + 1.60, oak)
+    board_axis = -x if north_facing else z
+    board_y = y + 1.37
+
+    def point(depth, along, height):
+        if north_facing:
+            return (-along, height, z + depth)
+        return (x + depth, height, along)
+
+    outline = [(-.77, 0), (-.51, -.20), (.73, -.20), (.73, .20), (-.51, .20)]
+    count = len(outline)
+    mesh(board + "_board",
+         [point(depth, board_axis + along, board_y + height)
+          for depth in (-.13, .03) for along, height in outline],
+         [tuple(range(count)), tuple(reversed(range(count, count * 2)))] +
+         [((i + 1) % count, i, i + count, (i + 1) % count + count) for i in range(count)],
+         solids, ember)
+    letters, faces = [], []
+    first_glyph = board_axis + (.0715 - ((len(label) - 1) * spacing + glyph_width) / 2)
+    for index, letter in enumerate(label):
+        left = first_glyph + index * spacing
+        for path in letter_strokes[letter]:
+            for start, end in zip(path, path[1:]):
+                a = Vector((left + start[0] * glyph_width, board_y + (start[1] - .5) * .225))
+                b = Vector((left + end[0] * glyph_width, board_y + (end[1] - .5) * .225))
+                tangent = (b - a).normalized() * .017
+                normal = Vector((-tangent.y, tangent.x))
+                corners = (a - tangent - normal, b + tangent - normal,
+                           b + tangent + normal, a - tangent + normal)
+                first = len(letters)
+                front = -.132 - (first // 8) * .00003
+                letters.extend(point(depth, along, height)
+                               for depth in (front, -.128) for along, height in corners)
+                faces.extend((tuple(range(first, first + 4)), tuple(range(first + 7, first + 3, -1))))
+                for corner in range(4):
+                    a_index, b_index = first + corner, first + (corner + 1) % 4
+                    faces.append((b_index, a_index, a_index + 4, b_index + 4))
+    mesh(board + "_letters", letters, faces, solids, oak)
+    return [x, y, z]
+
+
+church_waymarker = waymarker("B02_waymarker_post", "B02_church_arrow", "CHURCH", 34.65, 82.10)
+# The arrows point east from the square and north at the fork. Keep the
+# posts outside the player lane and its branch toward the salvager.
+mill_waymarkers = [
+    waymarker("B05_square_waymarker_post", "B05_square_arrow", "MILL", 85.55, 131.85,
+              north_facing=True, glyph_width=.18, spacing=.23),
+    waymarker("B05_fork_waymarker_post", "B05_fork_arrow", "MILL", 104.6, 123.8,
+              glyph_width=.18, spacing=.23),
+]
+
+
+# The preserved B05 shell stays shut. The west door, landing and the repair
+# bench establish the working edge facing Bellwether, above the river cut.
+mill_west = mill["engineX"] - mill["width"] / 2
+mill_floor, mill_z = mill["actualFloorY"], mill["engineZ"]
+for side in (-1, 1):
+    jamb_z = mill_z + side * 1.19
+    box(f"B05_west_jamb_{side}", mill_west - .17, mill_west + .02, jamb_z - .17, jamb_z + .17,
+        mill_floor - .03, mill_floor + 2.60)
+box("B05_west_lintel", mill_west - .18, mill_west + .02, mill_z - 1.36, mill_z + 1.36,
+    mill_floor + 2.32, mill_floor + 2.62)
+for plank in range(7):
+    start = mill_z - 1.05 + plank * .30
+    box(f"B05_west_door_plank_{plank}", mill_west - .12, mill_west + .01, start, start + .287,
+        mill_floor, mill_floor + 2.32, oak)
+for height in (.42, 1.88):
+    box(f"B05_door_strap_{height}", mill_west - .147, mill_west - .115, mill_z - 1.07, mill_z + .97,
+        mill_floor + height, mill_floor + height + .095, ember)
+box("B05_door_latch", mill_west - .195, mill_west - .142, mill_z + .78, mill_z + .98,
+    mill_floor + 1.05, mill_floor + 1.18, ember)
+
+landing_west = mill_west - 2.06
+landing_north, landing_south = mill_z - 1.28, mill_z + 1.28
+landing_top = mill_floor - .015
+landing_bottom = min(ground(x, z) for x in (landing_west, mill_west)
+                     for z in (landing_north, landing_south)) - .12
+# The western edge of the top meets the grade while still under the terrain.
+if min(ground(landing_west, landing_north + i * .08) for i in range(33)) <= landing_top:
+    raise RuntimeError("B05 landing must have a buried approach from the village.")
+landing_outline = [(landing_west, landing_top, landing_north),
+                   (mill_west, landing_top, landing_north), (mill_west, landing_top, landing_south),
+                   (landing_west, landing_top, landing_south)]
+mesh("B05_west_landing_top", landing_outline, [(3, 2, 1, 0)], walkable)
+mesh("B05_west_landing_retaining_stone",
+     [(x, landing_bottom, z) for x, _, z in landing_outline] + landing_outline,
+     [(0, 1, 2, 3), (4, 5, 1, 0), (6, 7, 3, 2), (7, 4, 0, 3)], solids)
+
+bench_west, bench_east = mill_west - 1.57, mill_west - .54
+bench_north, bench_south = mill_z + 1.70, mill_z + 3.38
+bench_top = ground(bench_west, (bench_north + bench_south) / 2) + .98
+for z in (bench_north + .15, bench_south - .15):
+    for x in (bench_west + .14, bench_east - .14):
+        bottom = min(ground(x + dx, z + dz) for dx in (-.08, .08) for dz in (-.08, .08)) - .08
+        box(f"B05_workbench_leg_{x}_{z}", x - .08, x + .08, z - .08, z + .08,
+            bottom, bench_top - .07, oak)
+    box(f"B05_workbench_trestle_{z}", bench_west + .05, bench_east - .05, z - .08, z + .08,
+        bench_top - .27, bench_top - .075, oak)
+for board in range(4):
+    x = bench_west + board * .26
+    box(f"B05_workbench_top_{board}", x, x + .25, bench_north, bench_south,
+        bench_top - .085, bench_top, oak)
+bench_z = (bench_north + bench_south) / 2
+for side in (-1, 1):
+    z = bench_z + side * .29
+    box(f"B05_bearing_cradle_{side}", bench_east - .45, bench_east - .11, z - .09, z + .09,
+        bench_top, bench_top + .13, ember)
+mill_work_mark = (mill_west - 2.20, ground(mill_west - 2.20, bench_z), bench_z)
+mill_door = (mill_west, mill_floor, mill_z)
 
 
 # The mapped church path crosses a steep diagonal terrain band around the
@@ -633,7 +716,7 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=7250, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=8600, maxIndices=(solid_triangles + walkable_triangles) * 3,
                            maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
@@ -687,8 +770,11 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                                   chair_z - .296, chair_z + .296],
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
                tavernCandleFlame=candle_flame, tavernCandleLight=candle_light,
-               churchWaymarker=[sign_x,sign_y,sign_z],
+               churchWaymarker=church_waymarker,
                churchApproach=dict(width=2*church_half_width, sections=church_sections),
+               millWaymarkers=mill_waymarkers, millWestDoor=mill_door, millWorkMark=mill_work_mark,
+               millLanding=dict(west=landing_west, east=mill_west, north=landing_north,
+                                south=landing_south, height=landing_top),
                waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
                keeperRoute=[keeper_door, keeper_aisle, keeper_hearth],
                keeperDoorYaw=keeper_door_yaw, keeperHearthYaw=keeper_hearth_yaw)
@@ -703,13 +789,15 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("RoomMax", (east - wall_depth, floor, south - wall_depth)),
                    ("SouthDoorHinge", door_hinge),
                    ("TavernCandleFlame", candle_flame), ("TavernCandleLight", candle_light),
-                   ("ChurchWaymarker", receipt["churchWaymarker"]),
+                   ("ChurchWaymarker", church_waymarker),
+                   ("MillWestDoor", mill_door), ("MillWorkMark", mill_work_mark),
                    ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
                    ("WaysideInspection", shrine_view), ("WaysideRoadRegister", register_mark),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
 stage += ["", f"inline constexpr unsigned kSolidTriangles={solid_triangles};",
+          f"inline constexpr unsigned kGroundTriangles={walkable_triangles};",
           f"inline constexpr unsigned kSouthDoorTriangles={door_triangles};",
           f"inline constexpr float kSouthDoorOpenRadians={math.radians(door_open_degrees):.9f}f;",
           f"inline constexpr float kSouthDoorSwingRadius={door_width + .01:.3f}f;",

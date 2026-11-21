@@ -289,7 +289,7 @@ inline constexpr std::array<DevelopmentCheckpoint, 139u> kDevelopmentCheckpoints
      .bellwetherBranchView=BellwetherBranchView::Church},
     {.id=341,.name="bellwether-mill-yard",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherMillYardView.x,.cameraZ=traversal::kBellwetherMillYardView.z,
-     .yaw=1.57f,.pitch=-.21f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .yaw=1.76f,.pitch=-.21f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
      .bellwetherBranchView=BellwetherBranchView::MillYard},
     {.id=335,.name="bellwether-record-keeper-handoff",.baseShowcaseCheckpointId=11,

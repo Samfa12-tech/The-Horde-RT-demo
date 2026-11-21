@@ -8,7 +8,7 @@ namespace horde::scene {
 inline constexpr std::size_t kBellwetherSolidTriangles=gameplay::bellwether::kSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
-inline constexpr std::size_t kBellwetherGroundTriangles=22;
+inline constexpr std::size_t kBellwetherGroundTriangles=gameplay::bellwether::kGroundTriangles;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 enum class BellwetherFurnitureDetail { Near, Mid, Far };
 inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};

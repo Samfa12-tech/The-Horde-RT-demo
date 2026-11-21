@@ -317,7 +317,9 @@ raw runs and both comparison receipts are retained locally under
 
 The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.
 
-The `bellwether-mill-yard` development checkpoint restores a completed tavern visit, walks to the yard, then steps back to frame the exterior. RayTracingPipeline and RayQueryCompute each presented the same 960 × 540 view on Windows. Android phone performance, the salvager encounter, the millrace crossing and the access quest remain open.
+The square and the eastern fork now have timber **MILL** arrows. The working edge has the mapped west entrance, a stone landing with a buried approach, and a timber bench with an empty bearing cradle. The player can walk to the bench and back to the landing. The original mill footprint stays closed. The landing, door and bench share render and contact geometry and reuse the existing material rows. The editable town master and its authoring receipt record the work mark and surveyed heights.
+
+The `bellwether-mill-yard` development checkpoint restores a completed tavern visit, walks to the landing and workbench, then steps back to frame the exterior. Both Windows hardware RT backends presented the updated yard at 960 × 540. The Android ARM64 debug package contains the same town export. Phone performance, the salvager encounter, the millrace crossing and the access quest remain open.
 
 ## Open decisions deliberately preserved
 

@@ -1,4 +1,5 @@
 #include "scene/BellwetherShell.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
@@ -53,7 +54,7 @@ bool CheckTavernDetailCandidates(const std::filesystem::path& directory, const h
     };
     StaticMeshAsset shared,near,mid,far;
     constexpr auto furnitureNode="BellwetherTavernFurniture";
-    if(!load("tavern-architecture","BellwetherTavernArchitecture",494,shared) ||
+    if(!load("tavern-architecture","BellwetherTavernArchitecture",542,shared) ||
        !load("tavern-furniture-lod0",furnitureNode,1012,near) ||
        !load("tavern-furniture-lod1",furnitureNode,276,mid) ||
        !load("tavern-furniture-lod2",furnitureNode,144,far)) {
@@ -178,8 +179,22 @@ int main(int argc,char** argv) {
         check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");
         check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles+kBellwetherGlazingTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
-            "rendered masonry stays solid while only the ramp and floor extend ground support");
+            "render contact preserves the authored distinction between solids and walkable surfaces");
         using namespace horde::gameplay::bellwether;
+        constexpr auto mill=horde::gameplay::traversal::kBellwetherMillApproach.back();
+        const auto landing=support->Query(mill.x,mill.z);
+        check(landing.found && landing.walkable && landing.triangle>=originalTerrain->TriangleCount() &&
+              std::abs(landing.worldY-(kMillWestDoor[1]-.015f))<.001f &&
+              !support->NonWalkableVolumeClear(mill.x,mill.z,kMillWestDoor[0]+.3f,kMillWestDoor[2],
+                  landing.worldY+.05f,landing.worldY+1.8f,.24f),
+              "the mill landing carries the player to the physically closed west door");
+        const auto workGround=support->Query(kMillWorkMark[0],kMillWorkMark[2]);
+        check(workGround.found && workGround.walkable && std::abs(workGround.worldY-kMillWorkMark[1])<.001f &&
+              support->NonWalkableVolumeClear(kMillWorkMark[0],kMillWorkMark[2],kMillWorkMark[0],kMillWorkMark[2],
+                  workGround.worldY+.05f,workGround.worldY+1.8f,.24f) &&
+              !support->NonWalkableVolumeClear(kMillWorkMark[0],kMillWorkMark[2],kMillWorkMark[0]+1.2f,kMillWorkMark[2],
+                  workGround.worldY+.05f,workGround.worldY+1.8f,.24f),
+              "the workbench has a clear standing mark but blocks movement through its timber");
         constexpr auto wayside=horde::gameplay::traversal::kBellwetherWaysideApproach.back();
         auto waysideGround=support->Query(wayside.x,wayside.z);
         check(std::abs(wayside.x-kWaysideInspection[0])<.001f && std::abs(wayside.z-kWaysideInspection[2])<.001f &&

@@ -1617,8 +1617,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             for(auto station=mill.begin()+2;visited && station!=mill.end();++station)
                 visited=walkTo(*station);
             visited=visited && game.Snapshot().playerGrounded;
-            Check(visited,"the walk from the square reaches the mapped salvager mark and mill yard");
+            Check(visited,"the walk from the square reaches the mapped salvager mark and mill landing");
             if(!visited)return;
+            const bool benchReached=walkTo(kBellwetherMillWorkMark) && game.Snapshot().playerGrounded &&
+                walkTo(mill.back());
+            Check(benchReached,"the player can walk to the mill workbench and back to the landing");
+            if(!benchReached)return;
             bool returned=true;
             for(auto station=mill.rbegin()+1;returned && station!=mill.rend();++station)
                 returned=walkTo(*station);
