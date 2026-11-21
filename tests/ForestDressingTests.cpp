@@ -1543,14 +1543,27 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 ++input.commands.dialogueSkip;step();
                 Check(game.Snapshot().chapterDialogue.line==expected,"the reveal keeps its scripted order");
             }
-            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Recap,"the final line can be recalled explicitly");
+            const auto opened=game.LatestCampaignBoundary();
+            Check(opened && opened->schema==cp::kShrineLanternSchema && !opened->waysideRegisterRecovered,
+                  "the open shrine is an earned autosave even before the register is taken");
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::TakeRegister,
+                  "the open niche offers the register after the reveal");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.registerRecovered &&
+                  game.Snapshot().chapterDialogue.line==Line::LanternRegisterReturn &&
+                  RequiresChapterCaption(Line::LanternRegisterReturn),
+                  "the pickup independently earns the register and gives the return instruction");
+            const auto boundary=game.LatestCampaignBoundary();
+            Check(boundary && boundary->schema==cp::kWaysideRegisterSchema &&
+                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open && boundary->waysideLanternRevealStarted &&
+                  boundary->waysideRegisterRecovered && boundary->dialogue.activeLine==Line::None && opened &&
+                  boundary->position.x==opened->position.x && boundary->position.z==opened->position.z &&
+                  boundary->vitality==opened->vitality && boundary->flask==opened->flask,
+                  "taking the register updates the tavern autosave without changing its saved pose, resources or speech");
+            ++input.commands.dialogueSkip;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Recap,"the player can recall the request after pickup");
             ++input.commands.interact;step();
             Check(game.Snapshot().chapterDialogue.line==Line::LanternFirstRequest,"recap repeats the practical request");
-            const auto boundary=game.LatestCampaignBoundary();
-            Check(boundary && boundary->schema==cp::kShrineLanternSchema &&
-                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open && boundary->waysideLanternRevealStarted &&
-                  boundary->dialogue.activeLine==Line::None,
-                  "opening updates the earned tavern autosave even from the shrine spur");
             input.moveForward=1;input.runHeld=true;
             const bool returned=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());

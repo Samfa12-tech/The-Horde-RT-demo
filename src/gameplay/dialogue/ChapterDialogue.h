@@ -15,12 +15,12 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage,
     FlaskEmpty, FlaskTopup, TavernSit, TavernLimit, TavernWork, RoadStop, RoadAnkle, RoadSlow,
     TavernIntroduce, TavernHordeArmy, TavernHoardAnswer, TavernWelcome, TavernDirections,
-    LanternFirstHelp, LanternFirstIdentity, LanternKingName, LanternFirstRequest };
+    LanternFirstHelp, LanternFirstIdentity, LanternKingName, LanternFirstRequest, LanternRegisterReturn };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,33> kLines{{
+inline constexpr std::array<LineSpec,34> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -53,7 +53,8 @@ inline constexpr std::array<LineSpec,33> kLines{{
     {Line::LanternFirstHelp,"lantern.first_help","Lantern voice","The lower stone. Its hinge is hidden under the roots.","",4.6f,2},
     {Line::LanternFirstIdentity,"lantern.first_identity","Lantern voice","I was king here. My keepers sealed me away.","",4.5f,2},
     {Line::LanternKingName,"lantern.king_name","Lantern voice","Veyr. If the name still means anything.","",3.8f,2},
-    {Line::LanternFirstRequest,"lantern.first_request","Lantern voice","Three seals guard the treasury. Find them, and I can put an end to this.","",6.1f,2}
+    {Line::LanternFirstRequest,"lantern.first_request","Lantern voice","Three seals guard the treasury. Find them, and I can put an end to this.","",6.1f,2},
+    {Line::LanternRegisterReturn,"shrine.recap_register","Lantern voice","Take the register back to Bellwether. It will help you find the seals.","",5.8f,2}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -66,9 +67,9 @@ inline constexpr bool IsTavernConversationLine(Line line) {
 }
 inline constexpr bool IsGuidanceLine(Line line) { return line==Line::TavernDirections; }
 inline constexpr std::array kShrineReveal{Line::LanternFirstIdentity,Line::LanternKingName,Line::LanternFirstRequest};
-enum class ShrineSpeech { Help, Reveal, Recap };
+enum class ShrineSpeech { Help, Reveal, Recap, RegisterReturn };
 inline constexpr bool IsShrineLanternLine(Line line) {
-    return line>=Line::LanternFirstHelp && line<=Line::LanternFirstRequest;
+    return line>=Line::LanternFirstHelp && line<=Line::LanternRegisterReturn;
 }
 inline constexpr bool IsBellwetherLine(Line line) {
     return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
@@ -144,7 +145,8 @@ public:
     bool TryStartShrineSpeech(ShrineSpeech speech,const Context& c) {
         if(state_.line!=Line::None || continuationCount_!=0 || shrineRevealIndex_<kShrineReveal.size() ||
            !CanHearShrineLantern(c))return false;
-        constexpr std::array starts{Line::LanternFirstHelp,Line::LanternFirstIdentity,Line::LanternFirstRequest};
+        constexpr std::array starts{Line::LanternFirstHelp,Line::LanternFirstIdentity,Line::LanternFirstRequest,
+            Line::LanternRegisterReturn};
         Start(starts[static_cast<std::size_t>(speech)],*c.shrineLanternSource,c);
         if(speech==ShrineSpeech::Reveal)shrineRevealIndex_=1;
         return true;

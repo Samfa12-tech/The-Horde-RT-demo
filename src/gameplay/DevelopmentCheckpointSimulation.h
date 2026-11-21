@@ -244,9 +244,20 @@ inline bool StageDevelopmentCheckpointSimulation(
         if(state.waysideArchiveAction!=ArchiveAction::Open)return finalize(false);
         gameSimulation.InteractWithClaimedChapter();advance();
         for(unsigned tick=0;tick<70 && state.waysideArchive.stage!=ArchiveStage::Open;++tick)advance();
-        return finalize(state.waysideArchive.stage==ArchiveStage::Open &&
-            state.chapterDialogue.line==dialogue::Line::LanternFirstIdentity &&
-            state.lastConsumedInteractSequence==input.commands.interact &&
+        if(state.waysideArchive.stage!=ArchiveStage::Open ||
+           state.chapterDialogue.line!=dialogue::Line::LanternFirstIdentity)return finalize(false);
+        if(checkpoint.bellwetherRegisterRecovered) {
+            for(const auto line:{dialogue::Line::LanternKingName,dialogue::Line::LanternFirstRequest,dialogue::Line::None}) {
+                gameSimulation.chapterDialogue_.Skip();advance();
+                if(state.chapterDialogue.line!=line)return finalize(false);
+            }
+            if(state.waysideArchiveAction!=ArchiveAction::TakeRegister)return finalize(false);
+            gameSimulation.InteractWithClaimedChapter();advance();
+            const auto saved=gameSimulation.LatestCampaignBoundary();
+            if(!state.waysideArchive.registerRecovered || !saved || !saved->waysideRegisterRecovered ||
+               state.chapterDialogue.line!=dialogue::Line::LanternRegisterReturn)return finalize(false);
+        }
+        return finalize(state.lastConsumedInteractSequence==input.commands.interact &&
             gameSimulation.chapterSkipFloor_==input.commands.dialogueSkip &&
             state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated);
     }

@@ -15,6 +15,7 @@ inline constexpr std::uint32_t kHearthSpeechSchema=6;
 inline constexpr std::uint32_t kTavernConversationSchema=7;
 inline constexpr std::uint32_t kWaysideArchiveSchema=8;
 inline constexpr std::uint32_t kShrineLanternSchema=9;
+inline constexpr std::uint32_t kWaysideRegisterSchema=10;
 enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
@@ -53,6 +54,7 @@ struct Checkpoint {
     dialogue::Progress dialogue{};
     WaysideArchiveProgress waysideArchive=WaysideArchiveProgress::Closed;
     bool waysideLanternRevealStarted=false;
+    bool waysideRegisterRecovered=false;
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
     return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
@@ -75,7 +77,8 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kShrineLanternSchema ||
+    if (c.schema < 1 || c.schema > kWaysideRegisterSchema ||
+        (c.waysideRegisterRecovered && (c.schema<kWaysideRegisterSchema || !c.waysideLanternRevealStarted)) ||
         (c.waysideLanternRevealStarted && (c.schema<kShrineLanternSchema || c.waysideArchive!=WaysideArchiveProgress::Open)) ||
         c.waysideArchive>WaysideArchiveProgress::Open ||
         (c.waysideArchive!=WaysideArchiveProgress::Closed &&

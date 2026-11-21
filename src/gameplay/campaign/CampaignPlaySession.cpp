@@ -73,7 +73,8 @@ bool PlaySession::ObserveSafeBoundary() {
         captured->dialogue.hearthLinesResolved>latest_->dialogue.hearthLinesResolved ||
         captured->dialogue.tavernConversationLinesResolved>latest_->dialogue.tavernConversationLinesResolved ||
         captured->waysideArchive>latest_->waysideArchive ||
-        (captured->waysideLanternRevealStarted && !latest_->waysideLanternRevealStarted));
+        (captured->waysideLanternRevealStarted && !latest_->waysideLanternRevealStarted) ||
+        (captured->waysideRegisterRecovered && !latest_->waysideRegisterRecovered));
     const bool changed=SetLatest(*captured);
     if(!boundary_ || *boundary_!=captured->id || ((restCompleted || bellwetherProgressAdvanced) && changed)) {
         boundary_=captured->id;

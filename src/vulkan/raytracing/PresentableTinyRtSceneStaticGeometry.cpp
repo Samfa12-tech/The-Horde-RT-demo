@@ -581,6 +581,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!waysideCoverAsset_.primitives.empty())
         registrations.push_back({kWaysideCoverMetadataIndex, 0x4230394cu,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &waysideCoverAsset_});
+    if (!waysideRegisterAsset_.primitives.empty())
+        registrations.push_back({kWaysideRegisterMetadataIndex, 0x42303952u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &waysideRegisterAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)

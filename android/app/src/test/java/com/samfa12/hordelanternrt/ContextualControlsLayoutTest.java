@@ -41,6 +41,7 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.open_lower_stone, MainActivity.contextualInteractLabel((2 << 16) | 1));
         assertEquals(R.string.listen_to_lantern, MainActivity.contextualInteractLabel((3 << 16) | 1));
         assertEquals(R.string.recall_lantern_words, MainActivity.contextualInteractLabel((4 << 16) | 1));
+        assertEquals(R.string.take_road_register, MainActivity.contextualInteractLabel((5 << 16) | 1));
         assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 15) | (1 << 12) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 15) | (1 << 9) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 14) | (1 << 9) | 1));

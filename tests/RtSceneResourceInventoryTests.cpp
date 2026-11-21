@@ -801,8 +801,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==35u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?37u:36u);
+        ok &= materials.size()==37u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?39u:38u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==37846u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -819,6 +819,10 @@ struct PresentableTinyRtSceneObservationTestAccess
         const auto& cover=instances[PresentableTinyRtScene::kWaysideCoverMetadataIndex];
         ok &= cover.primitiveCount==1u && cover.assetIndex!=stone.assetIndex && cover.stableObjectId==0x4230394cu &&
               scene.waysideCoverAsset_.indices.size()==horde::scene::kWaysideCoverTriangles*3;
+        const auto& ledger=instances[PresentableTinyRtScene::kWaysideRegisterMetadataIndex];
+        ok &= ledger.primitiveCount==2u && ledger.assetIndex!=cover.assetIndex &&
+              ledger.stableObjectId==0x42303952u &&
+              scene.waysideRegisterAsset_.indices.size()==horde::scene::kWaysideRegisterTriangles*3;
         ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
               ring.primitiveBase!=flask.primitiveBase &&
               scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&
@@ -1408,8 +1412,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 36u &&
-                  tomb.staticMeshSlot_.Materials().size() == 35u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 38u &&
+                  tomb.staticMeshSlot_.Materials().size() == 37u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)

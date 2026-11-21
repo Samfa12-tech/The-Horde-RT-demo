@@ -631,6 +631,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     healingFlaskBlas_ = std::exchange(other.healingFlaskBlas_, AccelerationStructure{});
     roadStoneBlas_ = std::exchange(other.roadStoneBlas_, AccelerationStructure{});
     waysideCoverBlas_ = std::exchange(other.waysideCoverBlas_, AccelerationStructure{});
+    waysideRegisterBlas_ = std::exchange(other.waysideRegisterBlas_, AccelerationStructure{});
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
@@ -679,6 +680,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     healingFlaskAsset_ = std::move(other.healingFlaskAsset_);
     roadStoneAsset_ = std::move(other.roadStoneAsset_);
     waysideCoverAsset_ = std::move(other.waysideCoverAsset_);
+    waysideRegisterAsset_ = std::move(other.waysideRegisterAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -1759,10 +1761,12 @@ void PresentableTinyRtScene::Destroy()
         healingFlaskBlas_ = {};
         roadStoneBlas_ = {};
         waysideCoverBlas_ = {};
+        waysideRegisterBlas_ = {};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
         roadStoneAsset_ = {};
         waysideCoverAsset_ = {};
+        waysideRegisterAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1814,6 +1818,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(healingFlaskBlas_);
     DestroyAccelerationStructure(roadStoneBlas_);
     DestroyAccelerationStructure(waysideCoverBlas_);
+    DestroyAccelerationStructure(waysideRegisterBlas_);
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -1886,6 +1891,7 @@ void PresentableTinyRtScene::Destroy()
     healingFlaskAsset_ = {};
     roadStoneAsset_ = {};
     waysideCoverAsset_ = {};
+    waysideRegisterAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -2002,7 +2008,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (const auto& resident : chapterResidents_)
         append(result.bottomLevelAccelerationStructures, resident.blas.handle);
@@ -2069,7 +2075,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -3318,6 +3324,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     healingFlaskAsset_ = {};
     roadStoneAsset_ = {};
     waysideCoverAsset_ = {};
+    waysideRegisterAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -3483,7 +3490,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
-                &productionDielectricFixtureAsset_, &waysideCoverAsset_))
+                &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_))
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
@@ -5861,7 +5868,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!roadStoneAsset_.primitives.empty() && !buildRegisteredStaticBlas(kRoadStoneMetadataIndex,
             "Bellwether road stone", roadStoneBlas_, true)) ||
         (!waysideCoverAsset_.primitives.empty() && !buildRegisteredStaticBlas(kWaysideCoverMetadataIndex,
-            "Bellwether wayside cover", waysideCoverBlas_, true)))
+            "Bellwether wayside cover", waysideCoverBlas_, true)) ||
+        (!waysideRegisterAsset_.primitives.empty() && !buildRegisteredStaticBlas(kWaysideRegisterMetadataIndex,
+            "Bellwether road register", waysideRegisterBlas_, true)))
         return false;
     if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
         healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
@@ -6373,6 +6382,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         ApplyRoadStoneInstance(instances[tlasInstanceCount_++], {});
     if (waysideCoverBlas_.address)
         ApplyWaysideCoverInstance(instances[tlasInstanceCount_++], {});
+    if (waysideRegisterBlas_.address)
+        ApplyWaysideRegisterInstance(instances[tlasInstanceCount_++], true);
     if (chapterActorReady_)
         ApplyChapterWindowInstance(instances[tlasInstanceCount_++], false);
     if (!BuildChapterResidentStructures(diagnostic) ||
@@ -7531,6 +7542,16 @@ void PresentableTinyRtScene::ApplyRoadStoneInstance(VkAccelerationStructureInsta
     instance.mask = 0x01u;
     instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
     instance.accelerationStructureReference = roadStoneBlas_.address;
+}
+
+void PresentableTinyRtScene::ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR& instance,
+    const bool visible) const
+{
+    instance.transform = {{{1.f, 0.f, 0.f, 0.f}, {0.f, 1.f, 0.f, 0.f}, {0.f, 0.f, 1.f, 0.f}}};
+    instance.instanceCustomIndex = kWaysideRegisterMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = waysideRegisterBlas_.address;
 }
 
 void PresentableTinyRtScene::ApplyWaysideCoverInstance(VkAccelerationStructureInstanceKHR& instance,
@@ -8761,6 +8782,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         ApplyRoadStoneInstance(instances[chapterPropSlot++], frame.chapterCompanion);
     if (waysideCoverBlas_.address)
         ApplyWaysideCoverInstance(instances[chapterPropSlot++], frame.waysideArchivePose);
+    if (waysideRegisterBlas_.address)
+        ApplyWaysideRegisterInstance(instances[chapterPropSlot++], !frame.waysideRegisterRecovered);
     if (chapterActorReady_)
         ApplyChapterWindowInstance(instances[chapterPropSlot++], chapterWindowVisible);
     const auto residentInstances = std::span(instances).subspan(chapterPropSlot, chapterResidentSources_.size());

@@ -17,6 +17,10 @@ void GameSimulation::InteractWithClaimedChapter() {
     case bellwether::ArchiveAction::Listen:
         TryStartShrineReveal(context);
         return;
+    case bellwether::ArchiveAction::TakeRegister:
+        waysideArchive_.registerRecovered=true;
+        chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::RegisterReturn,context);
+        return;
     case bellwether::ArchiveAction::Recap:
         chapterDialogue_.TryStartShrineSpeech(dialogue::ShrineSpeech::Recap,context);
         return;
@@ -42,7 +46,14 @@ bellwether::ArchiveAction GameSimulation::WaysideArchiveAction(const dialogue::C
             kWaysideMechanism[2]+.08f,y-.06f,y+.06f,.025f))return ArchiveAction::None;
     if(stage==ArchiveStage::Closed)return ArchiveAction::Inspect;
     if(stage==ArchiveStage::Inspected)return ArchiveAction::Open;
-    return waysideArchive_.lanternRevealStarted?ArchiveAction::Recap:ArchiveAction::Listen;
+    if(!waysideArchive_.lanternRevealStarted)return ArchiveAction::Listen;
+    if(waysideArchive_.registerRecovered)return ArchiveAction::Recap;
+    const auto& mark=kWaysideRoadRegister;
+    if(!chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
+            mark[1],mark[1]+.025f,.025f) ||
+       !ArchiveContactClear(c.player.x,c.player.z,mark[0],mark[2],mark[1],mark[1]+.025f,.025f))
+        return ArchiveAction::None;
+    return ArchiveAction::TakeRegister;
 }
 
 void GameSimulation::AdvanceWaysideArchive(float seconds) {

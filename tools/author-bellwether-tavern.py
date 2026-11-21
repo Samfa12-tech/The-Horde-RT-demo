@@ -37,6 +37,7 @@ solids = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and not
 walkable = []
 glazing = []
 archive_cover = []
+archive_register = []
 
 # The v4 model has a closed foundation and a solid wall block. Retain B01's
 # roof, chimney and upper shutter, and all of the other original buildings.
@@ -418,6 +419,24 @@ for vertex in cover.data.vertices:
 cover.location = pivot
 shrine_view = [shrine_x, ground(shrine_x, archive_front + 2.2), archive_front + 2.2]
 
+# A closed ledger resting on the sill behind the hinged stone.
+register_leather = opaque_finish("HordeRegisterLeather", (.19, .065, .029), .78)
+register_pages = opaque_finish("HordeRegisterPaper", (.61, .47, .29), .84)
+register_z = archive_front - .34
+register_x = shrine_x + .15
+for name, width, depth, low, high, material in (
+    ("lower_binding", .49, .30, .001, .026, register_leather),
+    ("page_block", .45, .27, .026, .103, register_pages),
+    ("upper_binding", .49, .30, .103, .128, register_leather),
+):
+    box("B09_register_" + name, register_x - width / 2, register_x + width / 2,
+        register_z - depth / 2, register_z + depth / 2, opening_bottom + low,
+        opening_bottom + high, material, group=archive_register)
+box("B09_register_spine", register_x - .263, register_x - .224, register_z - .151,
+    register_z + .151, opening_bottom + .022, opening_bottom + .107, register_leather,
+    group=archive_register)
+register_mark = [register_x, opening_bottom + .12, register_z]
+
 
 def joined_copy(group, name):
     bpy.ops.object.select_all(action="DESELECT")
@@ -457,7 +476,8 @@ for name, mark, yaw in (("Door greeting", keeper_door, keeper_door_yaw),
     blocking.objects.link(marker)
 archive_blocking = bpy.data.collections.new("B09 - Wayside archive blocking")
 bpy.context.scene.collection.children.link(archive_blocking)
-for name, mark in (("Hinge rotation origin", shrine_hinge), ("Player inspection mark", shrine_view)):
+for name, mark in (("Hinge rotation origin", shrine_hinge), ("Player inspection mark", shrine_view),
+                   ("Road register", register_mark)):
     marker = bpy.data.objects.new(name, None)
     marker.empty_display_type = "PLAIN_AXES"
     marker.empty_display_size = .25
@@ -481,6 +501,12 @@ cover_mesh = joined_copy(archive_cover, "WaysideArchiveCover")
 cover_mesh.location = (0, 0, 0)
 cover_path = RUNTIME / "wayside-archive-cover.glb"
 bpy.ops.export_scene.gltf(filepath=str(cover_path), export_format="GLB", use_selection=True,
+                          export_apply=True, export_texcoords=True, export_normals=True,
+                          export_tangents=True, export_animations=False)
+
+register_mesh = joined_copy(archive_register, "WaysideRoadRegister")
+register_path = RUNTIME / "wayside-road-register.glb"
+bpy.ops.export_scene.gltf(filepath=str(register_path), export_format="GLB", use_selection=True,
                           export_apply=True, export_texcoords=True, export_normals=True,
                           export_tangents=True, export_animations=False)
 
@@ -516,7 +542,15 @@ cover_manifest["budgets"] = dict(manifest["budgets"], maxVertices=72, maxIndices
 cover_manifest["lods"] = [{"name": "lod0", "maxTriangles": cover_triangles}]
 (RUNTIME / "wayside-archive-cover.manifest.json").write_text(json.dumps(cover_manifest, indent=2) + "\n",
                                                              encoding="utf-8", newline="\n")
-receipt = dict(coverSha256=digest(cover_path), coverTriangles=cover_triangles, sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
+register_triangles = len(register_mesh.data.polygons)
+register_manifest = dict(manifest, asset="wayside-road-register", materialOverrides=[])
+register_manifest["budgets"] = dict(manifest["budgets"], maxVertices=112, maxIndices=register_triangles * 3,
+                                    maxPrimitives=2, maxMaterials=2)
+register_manifest["lods"] = [{"name": "lod0", "maxTriangles": register_triangles}]
+(RUNTIME / "wayside-road-register.manifest.json").write_text(json.dumps(register_manifest, indent=2) + "\n",
+                                                             encoding="utf-8", newline="\n")
+receipt = dict(registerSha256=digest(register_path), registerTriangles=register_triangles, registerMark=register_mark,
+               coverSha256=digest(cover_path), coverTriangles=cover_triangles, sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                layoutSha256=parent["planSha256"], runtimeSha256=digest(path),
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
                windowSha256=digest(pane_path), windowTriangles=pane_triangles,
@@ -543,7 +577,7 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("TableCandleFlame", candle_flame), ("TableCandleLight", candle_light),
                    ("ChurchWaymarker", receipt["churchWaymarker"]),
                    ("WaysideMechanism", shrine_mechanism), ("WaysideHinge", shrine_hinge),
-                   ("WaysideInspection", shrine_view),
+                   ("WaysideInspection", shrine_view), ("WaysideRoadRegister", register_mark),
                    ("KeeperDoor", keeper_door), ("KeeperAisle", keeper_aisle), ("KeeperHearth", keeper_hearth)):
     position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
     stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")

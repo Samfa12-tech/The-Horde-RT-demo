@@ -1,4 +1,11 @@
 {
+  "registerSha256": "e2a7714c5cce4ecac3daf95bfdf577c41b26bcdd4b8e8ce3bf06c852bb5c6ea5",
+  "registerTriangles": 48,
+  "registerMark": [
+    103.45,
+    -2.9066543579101562,
+    31.060000000000002
+  ],
   "coverSha256": "9fe9834e587b9c3f37093db8c7f8bc3ea8279f9c3edaedbdfa7ce9c003818e91",
   "coverTriangles": 24,
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",

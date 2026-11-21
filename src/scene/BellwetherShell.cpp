@@ -5,7 +5,8 @@
 namespace horde::scene {
 bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMeshAsset& world,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
-    std::string& diagnostic, assets::StaticMeshAsset* glazing, assets::StaticMeshAsset* archiveCover) {
+    std::string& diagnostic, assets::StaticMeshAsset* glazing, assets::StaticMeshAsset* archiveCover,
+    assets::StaticMeshAsset* roadRegister) {
     if(!support) {
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
@@ -16,14 +17,16 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
     constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
     const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
-    assets::AssetManifest manifest, glazingManifest, coverManifest;
-    assets::StaticMeshAsset source, pane, cover;
+    assets::AssetManifest manifest, glazingManifest, coverManifest, registerManifest;
+    assets::StaticMeshAsset source, pane, cover, ledger;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
        !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic) ||
        !assets::AssetManifest::Load(dir/"window.manifest.json",glazingManifest,diagnostic) ||
        !assets::StaticMeshAsset::Load(dir/"bellwether-window.glb",glazingManifest,pane,diagnostic) ||
        !assets::AssetManifest::Load(dir/"wayside-archive-cover.manifest.json",coverManifest,diagnostic) ||
-       !assets::StaticMeshAsset::Load(dir/"wayside-archive-cover.glb",coverManifest,cover,diagnostic))return false;
+       !assets::StaticMeshAsset::Load(dir/"wayside-archive-cover.glb",coverManifest,cover,diagnostic) ||
+       !assets::AssetManifest::Load(dir/"wayside-road-register.manifest.json",registerManifest,diagnostic) ||
+       !assets::StaticMeshAsset::Load(dir/"wayside-road-register.glb",registerManifest,ledger,diagnostic))return false;
     if(pane.primitives.size()!=1 || pane.materials.size()!=1 || pane.indices.size()!=kBellwetherGlazingTriangles*3 ||
        pane.materials[0].name!="HordeTavernWindowGlass" || pane.materials[0].transmissionFactor<=0 ||
        !(pane.materials[0].flags & assets::kStaticMaterialCertifiedClosedVolume) || pane.nodeTransforms.size()!=1 ||
@@ -34,6 +37,14 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
        cover.nodeTransforms.front().name!="WaysideArchiveCover" || cover.indices.size()!=kWaysideCoverTriangles*3 ||
        cover.materials.front().name!="HordeWaysideCoverStone" || cover.materials.front().transmissionFactor!=0) {
         diagnostic="The wayside archive cover requires one opaque, local-space stone primitive.";return false;
+    }
+    if(ledger.primitives.size()!=2 || ledger.materials.size()!=2 || ledger.nodeTransforms.size()!=1 ||
+       ledger.nodeTransforms.front().name!="WaysideRoadRegister" || ledger.indices.size()!=kWaysideRegisterTriangles*3 ||
+       std::any_of(ledger.materials.begin(),ledger.materials.end(),[](const auto& material) {
+           return material.baseColorTexture>=0 || material.normalTexture>=0 || material.ormTexture>=0 ||
+                  material.emissiveTexture>=0 || material.transmissionFactor!=0;
+       })) {
+        diagnostic="The wayside register requires two untextured opaque finishes.";return false;
     }
     if(source.primitives.size()!=5 || source.materials.size()!=names.size() ||
        source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
@@ -120,6 +131,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     support=std::move(prepared);
     if(glazing)*glazing=std::move(pane);
     if(archiveCover)*archiveCover=std::move(cover);
+    if(roadRegister)*roadRegister=std::move(ledger);
     diagnostic.clear();
     return true;
 }

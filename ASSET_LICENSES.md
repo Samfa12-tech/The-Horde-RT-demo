@@ -123,7 +123,9 @@ They reuse the existing timber and char material rows from the same export.
 The wayside archive, lower stone, hinge and stylised roots are original Horde
 meshes in the same Blender source. They reuse MedievalWall02, TombEarthenware
 and TombCharredWick. The separately exported hinged cover uses its original
-opaque Blender stone finish without a new texture layer.
+opaque Blender stone finish without a new texture layer. The separately exported
+road register uses original leather and parchment finishes from the same master.
+Its geometry and materials use no third-party inputs.
 
 ## Generic closed dielectric fixture
 

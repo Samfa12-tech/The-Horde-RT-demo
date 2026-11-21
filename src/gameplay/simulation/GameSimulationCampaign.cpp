@@ -32,7 +32,8 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
-        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.waysideArchive,c.waysideLanternRevealStarted);};
+        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.waysideArchive,
+        c.waysideLanternRevealStarted,c.waysideRegisterRecovered);};
     return facts(a)==facts(b);
 }
 }
@@ -42,6 +43,18 @@ static campaign::WaysideArchiveProgress WaysideArchiveProgressForSave(const bell
     using campaign::WaysideArchiveProgress;
     if(archive.stage==ArchiveStage::Closed)return WaysideArchiveProgress::Closed;
     return archive.stage==ArchiveStage::Open?WaysideArchiveProgress::Open:WaysideArchiveProgress::Inspected;
+}
+
+static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellwether::WaysideArchive& archive) {
+    checkpoint.waysideArchive=WaysideArchiveProgressForSave(archive);
+    checkpoint.waysideLanternRevealStarted=archive.lanternRevealStarted;
+    checkpoint.waysideRegisterRecovered=archive.registerRecovered;
+    if(checkpoint.waysideArchive!=campaign::WaysideArchiveProgress::Closed)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideArchiveSchema);
+    if(checkpoint.waysideLanternRevealStarted)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kShrineLanternSchema);
+    if(checkpoint.waysideRegisterRecovered)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideRegisterSchema);
 }
 
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
@@ -173,14 +186,8 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         c.schema=c.dialogue.tavernConversationLinesResolved?campaign::kTavernConversationSchema:campaign::kHearthSpeechSchema;
         c.flaskRecorded=config_.healingFlask1_7;
     }
-    if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size()) {
-        c.waysideArchive=WaysideArchiveProgressForSave(waysideArchive_);
-        if(c.waysideArchive!=campaign::WaysideArchiveProgress::Closed)c.schema=campaign::kWaysideArchiveSchema;
-        if(waysideArchive_.lanternRevealStarted) {
-            c.waysideLanternRevealStarted=true;
-            c.schema=campaign::kShrineLanternSchema;
-        }
-    }
+    if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
+        RecordWaysideArchive(c,waysideArchive_);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -197,11 +204,23 @@ void GameSimulation::LatchCampaignBoundary() {
         const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
         if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
             const auto& speech=chapterDialogue_.State();
+            const bool shrineAdvanced=atTavernBoundary &&
+                (WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
+                 (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted) ||
+                 (waysideArchive_.registerRecovered && !campaignBoundary_->waysideRegisterRecovered));
+            if(shrineAdvanced && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
+                // Record the discovery in the existing tavern save. The distant
+                // pickup does not replace the player's saved pose or resources.
+                auto updated=*campaignBoundary_;
+                RecordWaysideArchive(updated,waysideArchive_);
+                if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_)) {
+                    campaignBoundary_=updated;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
             const bool hearthAdvanced=atTavernBoundary &&
                 (speech.hearthLinesResolved>campaignBoundary_->dialogue.hearthLinesResolved ||
-                 speech.tavernConversationLinesResolved>campaignBoundary_->dialogue.tavernConversationLinesResolved ||
-                 WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
-                 (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted));
+                 speech.tavernConversationLinesResolved>campaignBoundary_->dialogue.tavernConversationLinesResolved);
             if(!atTavernBoundary || config_.healingFlask1_7 || hearthAdvanced) {
                 const auto arrived=CaptureAuthoredCampaignBoundary(tavern);
                 if(arrived && (!campaignBoundary_ || !SameBoundary(*arrived,*campaignBoundary_))) {
@@ -281,7 +300,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
         next.waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
     else if(c.waysideArchive==campaign::WaysideArchiveProgress::Open)
         next.waysideArchive_={bellwether::ArchiveStage::Open,1.f,bellwether::ArchivePose::AtOpening(1.f),
-            c.waysideLanternRevealStarted};
+            c.waysideLanternRevealStarted,c.waysideRegisterRecovered};
     if(!next.worldRoute_.Publish(readyDestination,ZoneReadiness::Ready)) return false;
     next.playerX_=c.position.x;next.playerZ_=c.position.z;
     next.playerYawRadians_=c.yaw;next.playerPitchRadians_=c.pitch;

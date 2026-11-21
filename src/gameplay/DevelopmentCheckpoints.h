@@ -77,6 +77,7 @@ struct DevelopmentCheckpoint
     std::uint32_t bellwetherAnkleTicks = 0;
     bool bellwetherWaysideApproach = false;
     bool bellwetherArchiveOpen = false;
+    bool bellwetherRegisterRecovered = false;
     BellwetherStaffedView bellwetherStaffedView = BellwetherStaffedView::None;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
@@ -91,7 +92,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 131u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 132u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -269,6 +270,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 131u> kDevelopmentCheckpoints
      .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
      .bellwetherWaysideApproach=true,.bellwetherArchiveOpen=true},
+    {.id=333,.name="bellwether-wayside-register-recovered",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
+     .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherWaysideApproach=true,.bellwetherArchiveOpen=true,.bellwetherRegisterRecovered=true},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

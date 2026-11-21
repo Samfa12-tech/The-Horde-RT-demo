@@ -176,6 +176,7 @@ struct RtSceneFrameInputs
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     horde::gameplay::bellwether::ArchivePose waysideArchivePose{};
+    bool waysideRegisterRecovered=false;
     std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
@@ -310,7 +311,7 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 25u + kAdditionalChapterActorCapacity;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 26u + kAdditionalChapterActorCapacity;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -330,6 +331,7 @@ public:
     static constexpr std::uint32_t kChapterWindowMetadataIndex = 31u;
     static constexpr std::uint32_t kFirstResidentMetadataIndex = 32u;
     static constexpr std::uint32_t kWaysideCoverMetadataIndex = kFirstResidentMetadataIndex + kAdditionalChapterActorCapacity;
+    static constexpr std::uint32_t kWaysideRegisterMetadataIndex = kWaysideCoverMetadataIndex + 1u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -347,14 +349,14 @@ public:
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
-    static_assert(kWaysideCoverMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kWaysideRegisterMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 3u +
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 4u +
                   kAdditionalChapterActorCapacity);
 
     PresentableTinyRtScene() = default;
@@ -1281,10 +1283,12 @@ private:
     void ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
         const horde::gameplay::dialogue::CompanionSnapshot& companion) const;
     void ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
+    void ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
     void ApplyWaysideCoverInstance(VkAccelerationStructureInstanceKHR&,
         const horde::gameplay::bellwether::ArchivePose&) const;
     std::uint32_t ChapterTailInstanceCount() const noexcept {
         return (roadStoneBlas_.address ? 1u : 0u) + (waysideCoverBlas_.address ? 1u : 0u) +
+            (waysideRegisterBlas_.address ? 1u : 0u) +
             (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
@@ -1433,6 +1437,7 @@ private:
     AccelerationStructure healingFlaskBlas_;
     AccelerationStructure roadStoneBlas_;
     AccelerationStructure waysideCoverBlas_;
+    AccelerationStructure waysideRegisterBlas_;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
@@ -1588,6 +1593,7 @@ private:
     horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
     horde::scene::assets::StaticMeshAsset roadStoneAsset_;
     horde::scene::assets::StaticMeshAsset waysideCoverAsset_;
+    horde::scene::assets::StaticMeshAsset waysideRegisterAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

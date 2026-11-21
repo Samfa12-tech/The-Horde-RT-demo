@@ -1079,6 +1079,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-window.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-window.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
@@ -7311,6 +7313,7 @@ public class MainActivity extends Activity {
             case "rescue-journey-start": return 192;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
+            case "bellwether-wayside-register-recovered": return 333;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -8875,6 +8878,7 @@ public class MainActivity extends Activity {
             case 2: return R.string.open_lower_stone;
             case 3: return R.string.listen_to_lantern;
             case 4: return R.string.recall_lantern_words;
+            case 5: return R.string.take_road_register;
             default: break;
         }
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {

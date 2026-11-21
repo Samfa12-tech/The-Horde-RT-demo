@@ -32,8 +32,8 @@ int main() {
     }
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
     auto support=originalTerrain;
-    assets::StaticMeshAsset glazing,cover;
-    const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover);
+    assets::StaticMeshAsset glazing,cover,ledger;
+    const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger);
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
@@ -58,6 +58,11 @@ int main() {
         const auto* hinged=support->HingedContact();
         check(hinged && hinged->TriangleCount()==kWaysideCoverTriangles && cover.indices.size()==kWaysideCoverTriangles*3,
             "the one local cover mesh supplies native ray geometry and the independent contact owner");
+        check(ledger.indices.size()==kWaysideRegisterTriangles*3 &&
+              ledger.bounds.minimum[0]<kWaysideRoadRegister[0] && ledger.bounds.maximum[0]>kWaysideRoadRegister[0] &&
+              ledger.bounds.minimum[1]<kWaysideRoadRegister[1] && ledger.bounds.maximum[1]>kWaysideRoadRegister[1] &&
+              ledger.bounds.minimum[2]<kWaysideRoadRegister[2] && ledger.bounds.maximum[2]<kWaysideMechanism[2],
+            "the register is rendered inside the stone niche at its authored pickup mark");
         if(hinged) {
             const auto straight=[&](const ArchivePose& pose) {
                 return pose.VolumeClear(*hinged,kWaysideMechanism[0],kWaysideMechanism[2]+.2f,
