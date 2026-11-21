@@ -124,6 +124,8 @@ In a matched doorway view, doubling the hearth output mainly brightened its maso
 
 The closer Windows RayTracingPipeline view replayed the 1.7 lookout continuation and restored the earned tavern seat. At the conversation mark, the candle brings out Kit's hood and armour while keeping the room dim. The earlier view is within 6 mm of the new camera position and has the same angles and seated pose. The staffed reply view also presented with all three lights and retained the `hub.horde_army` caption.
 
+During `hub.kit_introduce`, Kit now glances toward the light inside the player's lantern cage. The shared simulation follows the held pendulum and the authored Light socket offset. The seated clip still owns his hands, feet and body contact. The cue eases in and out during the caption, pauses with the scene and settles when the line ends or is skipped. The Windows `bellwether-kit-lantern-glance` checkpoint restores the authored tavern seat and presses Talk with the development keeper stand-in. Both hardware RT backends presented the same seated pose and roughly 15° of additive head yaw at 960 × 540. The native rig test verifies the seated Head position and checks that adding the glance preserves all vertices below one metre. The Android debug build passed. Voiced timing, continuous motion review and physical phone performance remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

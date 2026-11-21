@@ -219,6 +219,15 @@ inline bool StageDevelopmentCheckpointSimulation(
         advance();
         if (gameSimulation.Snapshot().chapterDialogue.line != dialogue::Line::TavernIntroduce)
             return finalize(false);
+        if (checkpoint.bellwetherStaffedView == BellwetherStaffedView::LanternGlance) {
+            for (int tick=0; tick<124; ++tick) advance();
+            const auto& staged=gameSimulation.Snapshot();
+            return finalize(staged.chapterDialogue.line==dialogue::Line::TavernIntroduce &&
+                staged.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated &&
+                staged.chapterCompanion.motion.sitPlaybackSeconds==dialogue::kTavernSitDurationSeconds &&
+                std::abs(staged.chapterCompanion.acting.headYaw)>.1f &&
+                staged.chapterCompanion.acting.chestPitch==0.f);
+        }
         ++input.commands.dialogueSkip;
         advance();
         const auto& reply = gameSimulation.Snapshot();

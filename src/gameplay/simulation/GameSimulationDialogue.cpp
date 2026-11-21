@@ -132,8 +132,18 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         }
     }
     chapterDialogue_.RefreshCompanionSpatial(TavernConversationContext(input.paused));
-    chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,
-        !proofWasAccepted && chapterDialogue_.State().proofAccepted);
+    std::optional<Tuple> lanternPosition;
+    const auto& speech=chapterDialogue_.State();
+    const auto& lantern=lanternPendulum_.Snapshot();
+    if(speech.line==Line::TavernIntroduce && !rescueTraversal_.Snapshot().equipmentStowed &&
+       interactionState_.heldLightKind==interactions::HeldLightKind::RewardLantern && lantern.initialized) {
+        const auto& body=lantern.worldFromBody;
+        constexpr float lightBelowHinge=items::kRewardLanternLightBelowHinge*items::kClaimedRewardLanternScale;
+        lanternPosition=Tuple{body[12]-body[4]*lightBelowHinge,body[13]-body[5]*lightBelowHinge,
+                              body[14]-body[6]*lightBelowHinge};
+    }
+    chapterCompanion_.AdvanceActing(seconds,speech,c.exterior,c.alive,
+        !proofWasAccepted && speech.proofAccepted,lanternPosition);
 }
 bool GameSimulation::AcknowledgeChapterPresentation(std::uint64_t tick,std::uint64_t generation) {
     if(tick!=snapshot_.tickIndex||generation!=chapterDialogue_.State().generation||

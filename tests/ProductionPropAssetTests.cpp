@@ -787,7 +787,7 @@ int main()
               MatrixNear(ringGrip->world, Translation(0.0f, 0.085f, 0.0f)) &&
               MatrixNear(ringHinge->world, Translation(0.0f, -0.012f, 0.0f)) &&
               MatrixNear(flameSocket->world, Translation(0.0f, -0.545f, 0.0f)) &&
-              MatrixNear(lightSocket->world, Translation(0.0f, -0.515f, 0.0f)) &&
+              MatrixNear(lightSocket->world, Translation(0.0f, -horde::gameplay::items::kRewardLanternLightBelowHinge, 0.0f)) &&
               MatrixNear(lidNode->world, Translation(0.0f, 0.0f, 0.0f)),
           "all sixteen authored matrix elements retain identity-basis GripRing, chest/lantern hinges, flame, light, and lid contracts");
 

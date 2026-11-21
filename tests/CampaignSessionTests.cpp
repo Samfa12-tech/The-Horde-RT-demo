@@ -167,7 +167,10 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
           "the real tavern remains quiet on Interact until a keeper is admitted");
     auto staffedConfig=sim::ProductionGameSimulationConfig();
     staffedConfig.bellwetherTavernKeeperAdmitted=true;
-    for (const auto name : {"bellwether-keeper-reply", "bellwether-staffed-room"}) {
+    for (const auto& [name,expected] : std::array{
+            std::pair{"bellwether-keeper-reply",Line::TavernHordeArmy},
+            std::pair{"bellwether-staffed-room",Line::None},
+            std::pair{"bellwether-kit-lantern-glance",Line::TavernIntroduce}}) {
         sim::GameSimulation capture(staffedConfig);
         capture.SetDevelopmentRescueJourney(true, true);
         const auto generation = capture.Snapshot().worldRoute.generation;
@@ -177,11 +180,9 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
         Check(staged, "the staffed diagnostic uses the authored terrain, restore and fixed-step Talk interaction");
         if (staged) {
             const auto& frame = capture.Snapshot();
-            const auto expected = view->bellwetherStaffedView == horde::gameplay::BellwetherStaffedView::KeeperReply
-                ? Line::TavernHordeArmy : Line::None;
             Check(frame.tavernKeeper && frame.chapterDialogue.line == expected &&
                   std::hypot(frame.playerX - view->cameraX, frame.playerZ - view->cameraZ) < .01f,
-                "reply holds the keeper line and the room view walks outside interaction reach");
+                "each view holds its own speaker or the quiet room at the authored camera mark");
         }
     }
     sim::GameSimulation staffed(staffedConfig);

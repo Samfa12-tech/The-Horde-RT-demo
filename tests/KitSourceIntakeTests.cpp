@@ -637,6 +637,34 @@ bool CheckAuthoredKitClip(const std::filesystem::path& directory,
     if(std::abs(previous-end)>1e-6f || input.peek()!=std::char_traits<char>::eof())return false;
     const auto finalPose=actor.Asset();
     if(!actor.Pose(clip,loops ? end*2 : end+1,diagnostic) || !SameAdmittedActor(finalPose,actor.Asset()))return false;
+    if(clip==SkinnedClip::Sit) {
+        using namespace horde::gameplay::dialogue;
+        constexpr std::array<std::string_view,2> names{"Head","headfront"};
+        std::array<SkinnedNodeTransform,2> nodes{};
+        if(!skin.NodeTransforms(clip,end,names,nodes,diagnostic))return false;
+        const auto& [head,front]=nodes;
+        const float pitch=std::atan2(head[13]-front[13],std::hypot(front[12]-head[12],front[14]-head[14]));
+        if(std::hypot(head[12]-kTavernSeatedHead.x,head[13]-kTavernSeatedHead.y,
+            head[14]-kTavernSeatedHead.z)>.001f || std::abs(pitch-kTavernSeatedHeadRestPitch)>.002f)return false;
+        CompanionActing seated;
+        Snapshot speech;
+        speech.line=Line::TavernIntroduce;speech.duration=Spec(speech.line).duration;
+        for(int tick=0;tick<126;++tick) {
+            speech.elapsed=tick/60.f;
+            seated.Step(1.f/60.f,speech,true,true,true,false,false,true,Tuple{.4f,-.48f,1.4f});
+        }
+        const auto rotations=CompanionUpperBodyRotations(seated.State());
+        if(!actor.Pose(clip,end,diagnostic,rotations) ||
+           actor.Asset().vertices.size()!=finalPose.vertices.size())return false;
+        std::size_t changedHeadRows=0;
+        for(std::size_t i=0;i<finalPose.vertices.size();++i) {
+            const auto& before=finalPose.vertices[i].position;
+            const auto& after=actor.Asset().vertices[i].position;
+            if(before[1]<1.f && before!=after)return false;
+            if(before[1]>1.33f && before!=after)++changedHeadRows;
+        }
+        if(changedHeadRows==0)return false;
+    }
     std::cout<<reference.filename().string()<<" native samples="<<samples<<" compared_vertices="<<vertexCount
         <<" max_blender_error_m="<<maximum<<'\n';
     return maximum<.00015f;

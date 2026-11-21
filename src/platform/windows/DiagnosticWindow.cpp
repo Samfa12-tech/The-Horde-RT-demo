@@ -8355,6 +8355,8 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"yaw\": " << capture.chapterCompanion.yaw << ", \"animationSeconds\": " << capture.chapterCompanion.animationSeconds
                  << ", \"motionMode\": " << static_cast<unsigned>(capture.chapterCompanion.motion.mode)
                  << ", \"sitSeconds\": " << capture.chapterCompanion.motion.sitPlaybackSeconds
+                 << ", \"headPitch\": " << capture.chapterCompanion.acting.headPitch
+                 << ", \"headYaw\": " << capture.chapterCompanion.acting.headYaw
                  << ", \"ankleSeconds\": " << capture.chapterCompanion.motion.anklePlaybackSeconds
                  << ", \"bellwetherArrival\": " << static_cast<unsigned>(capture.chapterCompanion.bellwetherArrival)
                  << ", \"bellwetherStation\": " << capture.chapterCompanion.bellwetherStation

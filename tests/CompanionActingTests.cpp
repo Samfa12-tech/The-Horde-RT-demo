@@ -22,7 +22,8 @@ int main() {
             moved|=!Neutral(actor.State());recognition|=actor.State().recognitionActive;
             if(!Bounded(actor.State())) {Check(false,"all catalogue speech poses stay finite and restrained");break;}
         }
-        Check(moved==(spec.id>=Line::ReunionQuestion),"only visible conversational Kit lines animate the upper body");
+        Check(moved==(spec.id>=Line::ReunionQuestion && spec.id<=Line::FlaskTopup),
+              "only the standing conversational Kit lines animate standing Kit");
         Check(!recognition,"accepted story or restored active proof speech alone cannot replay recognition");
     }
     for(unsigned invalid=0;invalid<4;++invalid) {
@@ -74,6 +75,26 @@ int main() {
     speech.elapsed=speech.duration=std::numeric_limits<float>::max();
     walking.Step(dt,speech,true,true,true,false,false);
     Check(Bounded(walking.State()),"finite extreme speech metadata cannot produce nonfinite rotations");
+
+    CompanionActing seatedLeft,seatedRight,noLantern;
+    speech.line=Line::TavernIntroduce;speech.duration=Spec(speech.line).duration;
+    for(int tick=0;tick<126;++tick) {
+        speech.elapsed=tick*dt;
+        seatedLeft.Step(dt,speech,true,true,true,false,false,true,Tuple{.4f,-.48f,1.4f});
+        seatedRight.Step(dt,speech,true,true,true,false,false,true,Tuple{-.4f,-.48f,1.4f});
+        noLantern.Step(dt,speech,true,true,true,false,false,true);
+    }
+    const auto glance=seatedLeft.State();
+    Check(glance.headYaw>.18f && seatedRight.State().headYaw<-.18f &&
+          glance.headPitch>noLantern.State().headPitch+.13f && glance.chestPitch==0 &&
+          seatedRight.State().chestPitch==0 && std::abs(noLantern.State().headYaw)<=.026f,
+          "seated Kit looks toward the live lantern side and height with his body planted");
+    speech.paused=true;
+    seatedLeft.Step(dt,speech,true,true,true,false,false,true,Tuple{-.8f,-.15f,1.4f});
+    Check(seatedLeft.State()==glance,"pause freezes the lantern glance even if the light target changes");
+    speech.paused=false;speech.line=Line::TavernHordeArmy;
+    for(int i=0;i<60;++i) seatedLeft.Step(dt,speech,true,true,true,false,false,true,Tuple{.4f,-.48f,1.4f});
+    Check(Neutral(seatedLeft.State()),"the keeper reply lets a skipped or finished glance settle to the base pose");
 
     CompanionRouteFixture route;const auto start=route.State();
     route.Step(.05f,start.x,start.z,true,true,false);

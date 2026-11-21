@@ -12,6 +12,8 @@ namespace horde::gameplay::dialogue {
 enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing,Tavern };
 enum class BellwetherArrivalStage { AtLookout, OnRoad, AnkleAssessment, ProtectiveApproach, ChairTurn, Lowering, Seated };
 inline constexpr float kTavernSitDurationSeconds=82.f/60.f;
+// Native Head transform at the last frame of Kit|hearth_sit, in model metres.
+inline constexpr Tuple kTavernSeatedHead{-.022f,1.321f,-.319f};
 inline constexpr float kAnkleAssessmentDurationSeconds=96.f/60.f;
 inline constexpr float kProtectiveWalkDurationSeconds=52.f/60.f;
 inline constexpr float kProtectiveWalkStrideMetres=.76f;
@@ -35,10 +37,20 @@ public:
     explicit CompanionRouteFixture(bool turnStartEnabled=false):turnStartEnabled_(turnStartEnabled) {ClearMotion();}
     const CompanionSnapshot& State() const {return state_;}
     void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
-    void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
-        if(TavernSitActive() || state_.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment ||
+    void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof,
+                       std::optional<Tuple> lantern={}) {
+        if(state_.motion.mode==CompanionMotionMode::Sitting || state_.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment ||
            state_.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach)return;
-        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
+        const bool seated=state_.bellwetherArrival==BellwetherArrivalStage::Seated;
+        std::optional<Tuple> lanternFromHead;
+        if(seated && lantern) {
+            const float dx=lantern->x-state_.x,dz=lantern->z-state_.z;
+            const float s=std::sin(state_.yaw),c=std::cos(state_.yaw);
+            // Imported +Z faces forward and imported +X faces to Kit's left.
+            lanternFromHead=Tuple{-c*dx-s*dz-kTavernSeatedHead.x,lantern->y-state_.y-kTavernSeatedHead.y,
+                                  s*dx-c*dz-kTavernSeatedHead.z};
+        }
+        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof,seated,lanternFromHead);
         state_.acting=acting_.State();
     }
     void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,

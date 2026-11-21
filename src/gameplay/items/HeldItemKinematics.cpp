@@ -1138,9 +1138,10 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             for(float z:{-.213827f,.213827f})
                 include({{x*kClaimedRewardLanternScale,y*kClaimedRewardLanternScale,z*kClaimedRewardLanternScale}},
                     .736323f*kClaimedRewardLanternScale,0,0);
+        constexpr float lightBelowHinge=kRewardLanternLightBelowHinge*kClaimedRewardLanternScale;
         for(const auto offset:std::array{std::array{-.075f,-.045f},std::array{.070f,.060f},
              std::array{-.075f,.060f},std::array{.070f,-.045f}})
-            include({{0,-.515f*kClaimedRewardLanternScale,0}},.515f*kClaimedRewardLanternScale,offset[0],offset[1]);
+            include({{0,-lightBelowHinge,0}},lightBelowHinge,offset[0],offset[1]);
         const float radial=kRewardLanternHorizontalOriginEnvelope;
         offsets.minX=std::max(offsets.minX,-radial);offsets.maxX=std::min(offsets.maxX,radial);
         offsets.minZ=std::max(offsets.minZ,-radial);offsets.maxZ=std::min(offsets.maxZ,radial);

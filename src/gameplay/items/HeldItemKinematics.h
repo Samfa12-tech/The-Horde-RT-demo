@@ -21,6 +21,8 @@ namespace horde::gameplay::items
 // dielectric geometry and authored Flame/Light sockets share this scale;
 // the gameplay-owned hand Grip remains fixed.
 inline constexpr float kClaimedRewardLanternScale = 0.44f;
+// Unscaled Y distance from the body hinge to its authored Light socket.
+inline constexpr float kRewardLanternLightBelowHinge = .515f;
 
 // Native glass radius .736322*.44, ring socket separation .097*.44,
 // final skinned Grip tolerance .015, and dielectric spawn .006 fit below .40.
