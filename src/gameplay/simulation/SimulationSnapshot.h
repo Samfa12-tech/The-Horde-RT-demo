@@ -68,6 +68,7 @@ struct SkeletonEnemySnapshot
 struct SimulationSnapshot
 {
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
+    bool tavernConversationAvailable=false;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

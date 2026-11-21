@@ -2,19 +2,43 @@
 #include "audio/KitAnkleAudio.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
-void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seconds) {
-    // Historical replay/capture fixtures keep their old timing and semantics.
-    if(!config_.combatFoundation1_7 || legacyCombatCheckpoint_) return;
+void GameSimulation::InteractWithClaimedChapter() {
+    if(!TryRescueInteraction() && !TryFlaskUpgradeInteraction() && config_.bellwetherTavernKeeperSource)
+        chapterDialogue_.TryStartTavernConversation(TavernConversationContext(false));
+}
+
+horde::gameplay::dialogue::Context GameSimulation::TavernConversationContext(bool paused) const {
     using namespace horde::gameplay::dialogue;
     Context c;
     c.player={playerX_,playerSupport_.worldY,playerZ_};
     c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
-    c.yaw=playerYawRadians_;c.paused=input.paused;
+    c.yaw=playerYawRadians_;c.paused=paused;
     c.alive=playerVitals_.Snapshot().phase==PlayerLifePhase::Alive;
     c.combat=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;
     c.claimed=chestRewardSequence_.Snapshot().phase==interactions::ChestRewardPhase::LanternClaimed;
     c.exterior=config_.developmentRescueJourney&&rescueTraversal_.Snapshot().exteriorSide;
     c.traversing=config_.developmentRescueJourney&&rescueTraversal_.IsActive();
+    const auto& kit=chapterCompanion_.State();
+    c.kitAtChair=kit.grounded && kit.bellwetherArrival>=BellwetherArrivalStage::ChairTurn;
+    c.kitSeated=c.kitAtChair && kit.bellwetherArrival==BellwetherArrivalStage::Seated;
+    const auto hearthMark=campaign::kBellwetherCheckpointPosition;
+    c.tavernInReach=c.kitAtChair && playerSupport_.grounded &&
+        std::abs(playerSupport_.worldY-hearthMark.y)<.001f &&
+        std::hypot(playerX_-hearthMark.x,playerZ_-hearthMark.z)<=1.75f;
+    if(c.exterior && kit.grounded) {
+        const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
+        c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
+    }
+    if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && chapterTerrainGeneration_==worldRoute_.generation)
+        c.tavernKeeperSource=config_.bellwetherTavernKeeperSource;
+    return c;
+}
+
+void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seconds) {
+    // Historical replay/capture fixtures keep their old timing and semantics.
+    if(!config_.combatFoundation1_7 || legacyCombatCheckpoint_) return;
+    using namespace horde::gameplay::dialogue;
+    auto c=TavernConversationContext(input.paused);
     if(c.exterior&&!c.traversing&&!chapterFirstExterior_) {
         chapterFirstExterior_=true;
         interactionState_.heldLightPose=interactions::HeldLightPose::Low;
@@ -45,17 +69,6 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         c.roadInReach=(assessing || kit.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach) &&
             playerSupport_.grounded && std::abs(playerSupport_.worldY-kit.y)<=1.6f &&
             std::hypot(playerX_-kit.x,playerZ_-kit.z)<=5.f;
-        c.kitAtChair=kit.grounded && kit.bellwetherArrival>=BellwetherArrivalStage::ChairTurn;
-        c.kitSeated=c.kitAtChair && kit.bellwetherArrival==BellwetherArrivalStage::Seated;
-        const auto hearthMark=campaign::kBellwetherCheckpointPosition;
-        c.tavernInReach=c.kitAtChair && playerSupport_.grounded &&
-            std::abs(playerSupport_.worldY-hearthMark.y)<.001f &&
-            std::hypot(playerX_-hearthMark.x,playerZ_-hearthMark.z)<=1.75f;
-        c.companionSource.reset();
-        if(c.exterior && kit.grounded) {
-            const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
-            c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
-        }
         const auto basin=kWorldRoutePoints[2];
         c.companionAtBasin=kit.basinGuide && kit.basinArrived && kit.grounded;
         c.playerNearBasin=c.exterior &&
@@ -89,8 +102,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
                     static_cast<std::int32_t>(beat.cue),kit.y+beat.height);
         }
     }
-    bindCompanion();
-    chapterDialogue_.RefreshCompanionSpatial(c);
+    chapterDialogue_.RefreshCompanionSpatial(TavernConversationContext(input.paused));
     chapterCompanion_.AdvanceActing(seconds,chapterDialogue_.State(),c.exterior,c.alive,
         !proofWasAccepted && chapterDialogue_.State().proofAccepted);
 }

@@ -32,7 +32,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
-        c.dialogue.hearthLinesResolved);};
+        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved);};
     return facts(a)==facts(b);
 }
 }
@@ -147,7 +147,10 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.torchDropX=s.torchFailure.droppedX;c.torchDropZ=s.torchFailure.droppedZ;
     c.torchDropYaw=s.torchFailure.droppedYawRadians;c.torchDropPitch=s.torchFailure.droppedViewPitchRadians;
     c.dialogue=progress;
-    if(c.contentRevision<campaign::kBellwetherContentRevision)c.dialogue.hearthLinesResolved=0;
+    if(c.contentRevision<campaign::kBellwetherContentRevision) {
+        c.dialogue.hearthLinesResolved=0;
+        c.dialogue.tavernConversationLinesResolved=0;
+    }
     c.defeatedGuards=0;
     for(std::size_t i=0;i<c.guards.size();++i) {
         const auto& actor=s.skeletonEnemies[i];
@@ -160,7 +163,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.defeatedGuards!=3) {c.schema=5;c.flaskRecorded=config_.healingFlask1_7;}
     else c.guardHealth={};
     if(c.dialogue.hearthLinesResolved) {
-        c.schema=campaign::kHearthSpeechSchema;
+        c.schema=c.dialogue.tavernConversationLinesResolved?campaign::kTavernConversationSchema:campaign::kHearthSpeechSchema;
         c.flaskRecorded=config_.healingFlask1_7;
     }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
@@ -178,8 +181,10 @@ void GameSimulation::LatchCampaignBoundary() {
         const auto tavern=campaign::CheckpointId::BellwetherTavern;
         const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
         if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
-            const bool hearthAdvanced=atTavernBoundary && chapterDialogue_.State().hearthLinesResolved>
-                campaignBoundary_->dialogue.hearthLinesResolved;
+            const auto& speech=chapterDialogue_.State();
+            const bool hearthAdvanced=atTavernBoundary &&
+                (speech.hearthLinesResolved>campaignBoundary_->dialogue.hearthLinesResolved ||
+                 speech.tavernConversationLinesResolved>campaignBoundary_->dialogue.tavernConversationLinesResolved);
             if(!atTavernBoundary || config_.healingFlask1_7 || hearthAdvanced) {
                 const auto arrived=CaptureAuthoredCampaignBoundary(tavern);
                 if(arrived && (!campaignBoundary_ || !SameBoundary(*arrived,*campaignBoundary_))) {

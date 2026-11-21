@@ -87,6 +87,8 @@ struct GameSimulationConfig
     bool healingFlask1_7 = false;
     // Explicit source/native integration trial; normal platform callers stay OFF.
     bool flaskUtilityCandidate = false;
+    // Set by the scene profile when the placed tavern keeper is admitted.
+    std::optional<horde::gameplay::dialogue::Tuple> bellwetherTavernKeeperSource;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -325,8 +327,10 @@ private:
                           bool competingIntent, int healthBeforeEncounter);
     bool FlaskUpgradeEligible(const InputSnapshot&) const;
     bool TryFlaskUpgradeInteraction();
+    void InteractWithClaimedChapter();
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
+    horde::gameplay::dialogue::Context TavernConversationContext(bool paused) const;
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;

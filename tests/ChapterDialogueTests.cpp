@@ -60,7 +60,7 @@ int main() {
     for (const auto& spec : kLines) {
         if (spec.id == Line::None) continue;
         const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
-        if(IsHearthLine(spec.id) || IsRoadLine(spec.id)) {
+        if(IsBellwetherLine(spec.id)) {
             Check(path.empty() && spec.text[0]!='\0',"unadmitted Bellwether takes use timed captions");
             continue;
         }
@@ -556,6 +556,29 @@ int main() {
               "natural subtitle completion resolves the last beat without a voice callback");
         hearth.Step(.05f,room);
         Check(hearth.State().line==Line::None,"the resolved hearth sequence remains quiet");
+        Check(!hearth.TryStartTavernConversation(room),"a missing tavern keeper cannot offer the exchange");
+        room.tavernKeeperSource=Tuple{85.5f,-7.31f,109.0f};
+        hearth.Step(.05f,room);
+        Check(hearth.CanStartTavernConversation(room) && hearth.State().line==Line::None &&
+              hearth.TryStartTavernConversation(room),"after settling, only deliberate interaction starts the exchange");
+        Check(hearth.State().line==Line::TavernIntroduce && hearth.State().source.x==room.companionSource->x &&
+              !hearth.TryStartTavernConversation(room),"the first line belongs to Kit and cannot restart on a second interact");
+        hearth.Skip();hearth.Step(.05f,room);
+        const auto keeper=hearth.State();
+        Check(keeper.line==Line::TavernHordeArmy && keeper.source.x==room.tavernKeeperSource->x &&
+              hearth.ExportProgress().activeLine==Line::None && hearth.ExportProgress().tavernConversationLinesResolved==1,
+              "the keeper has a distinct source and the save carries only resolved lines");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.Complete(keeper.line,keeper.generation) &&
+              hearth.TryStartTavernConversation(room) && hearth.State().line==keeper.line,
+              "leaving cancels playback and deliberate return resumes the unfinished reply");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernHoardAnswer && hearth.State().source.x==room.companionSource->x,
+              "Kit owns the final response");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(!hearth.CanStartTavernConversation(room) && hearth.ExportProgress().tavernConversationLinesResolved==3,
+              "the completed exchange cannot replay");
     }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

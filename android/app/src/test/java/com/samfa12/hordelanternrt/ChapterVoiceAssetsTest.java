@@ -52,6 +52,6 @@ public final class ChapterVoiceAssetsTest {
     }
 
     @Test public void privateBellwetherTakesRemainCaptionOnly() {
-        for (int line : new int[]{18, 19, 20, 21, 22, 23}) assertNull(ChapterVoiceAssets.forLine(line));
+        for (int line : new int[]{18, 19, 20, 21, 22, 23, 24, 25, 26}) assertNull(ChapterVoiceAssets.forLine(line));
     }
 }

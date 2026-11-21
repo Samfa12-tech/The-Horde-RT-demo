@@ -260,6 +260,7 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
+    private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -8854,6 +8855,7 @@ public class MainActivity extends Activity {
     static int contextualInteractLabel(final int state) {
         if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
+        if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
             case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
             case CHEST_PROMPT_OPEN: return R.string.open_chest;

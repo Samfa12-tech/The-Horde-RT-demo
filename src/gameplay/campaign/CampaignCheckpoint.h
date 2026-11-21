@@ -12,6 +12,7 @@ namespace horde::gameplay::campaign {
 enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2, ForestEndpoint = 3, BellwetherTavern = 4 };
 inline constexpr std::uint32_t kForestContentRevision=2, kBellwetherContentRevision=3;
 inline constexpr std::uint32_t kHearthSpeechSchema=6;
+inline constexpr std::uint32_t kTavernConversationSchema=7;
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
 inline constexpr traversal::Vec3 kBellwetherCheckpointPosition{84.52f,-8.709551f,107.68f};
@@ -69,8 +70,9 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kHearthSpeechSchema ||
+    if (c.schema < 1 || c.schema > kTavernConversationSchema ||
         (c.dialogue.hearthLinesResolved && (c.schema<kHearthSpeechSchema || c.contentRevision<kBellwetherContentRevision)) ||
+        (c.dialogue.tavernConversationLinesResolved && c.schema<kTavernConversationSchema) ||
         c.savedAtUnixSeconds > 253402300799ULL || (c.schema < 4 && c.savedAtUnixSeconds != 0) ||
         (c.schema < 4 && c.flaskRecorded) ||
         (c.schema >= 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||

@@ -129,11 +129,11 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     cp::PlaySession play(fresh,directory.path);
     Check(play.BeginNewGame(1),"test owner activates a separate autosave slot");
     std::uint64_t publication=120;
-    const auto awaitSave=[&](std::uint64_t operation) {
+    const auto awaitSave=[](cp::PlaySession& session,std::uint64_t operation) {
         const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
         do {
-            play.Poll();
-            const auto state=play.State();
+            session.Poll();
+            const auto state=session.State();
             if(state.operationRevision>operation && state.outcome==cp::PlayOutcome::Succeeded)return true;
             std::this_thread::yield();
         } while(std::chrono::steady_clock::now()<deadline);
@@ -141,7 +141,7 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     };
     ++input.commands.dialogueSkip;
     fresh.StepFixed(input,1.f/60.f,++publication);
-    Check(play.ObserveSafeBoundary() && awaitSave(0),"advancing at the hearth writes the same tavern boundary");
+    Check(play.ObserveSafeBoundary() && awaitSave(play,0),"advancing at the hearth writes the same tavern boundary");
     const auto partial=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
     Check(partial.schema==cp::kHearthSpeechSchema && partial.dialogue.hearthLinesResolved==2 &&
           partial.dialogue.activeLine==Line::None,"dated autosave retains only the resolved hearth beats");
@@ -150,7 +150,7 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     const auto previousSave=play.State().operationRevision;
     ++input.commands.dialogueSkip;
     fresh.StepFixed(input,1.f/60.f,++publication);
-    Check(play.ObserveSafeBoundary() && awaitSave(previousSave),"another resolved line refreshes the existing autosave");
+    Check(play.ObserveSafeBoundary() && awaitSave(play,previousSave),"another resolved line refreshes the existing autosave");
     const auto complete=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
     sim::GameSimulation resumed(sim::ProductionGameSimulationConfig());
     Check(Seed(resumed,partial,terrain),"partial dialogue can restore from the saved hearth boundary");
@@ -160,6 +160,49 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     Check(complete.dialogue.hearthLinesResolved==3 && Seed(resumed,complete,terrain),"completed dialogue restores from disk");
     resumed.StepFixed(resumedInput,1.f/60.f,2);
     Check(resumed.Snapshot().chapterDialogue.line==Line::None,"completed hearth captions remain quiet on reload");
+    ++resumedInput.commands.interact;
+    resumed.StepFixed(resumedInput,1.f/60.f,3);
+    Check(!resumed.Snapshot().tavernConversationAvailable && resumed.Snapshot().chapterDialogue.line==Line::None,
+          "the real tavern remains quiet on Interact until a keeper is admitted");
+    auto staffedConfig=sim::ProductionGameSimulationConfig();
+    staffedConfig.bellwetherTavernKeeperSource=Tuple{85.5f,record.position.y+kCompanionSpeechHeight,109.f};
+    sim::GameSimulation staffed(staffedConfig);
+    Check(Seed(staffed,complete,terrain),"staffed tavern uses the same real room and campaign transaction");
+    cp::PlaySession staffedPlay(staffed,directory.path);
+    Check(staffedPlay.BeginNewGame(2),"the exchange test uses a separate autosave slot");
+    sim::InputSnapshot talk;talk.yawRadians=record.yaw;talk.pitchRadians=record.pitch;
+    staffed.StepFixed(talk);
+    Check(staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::None,
+          "restored hearth offers Talk and waits for the player");
+    ++talk.commands.interact;staffed.StepFixed(talk);
+    Check(!staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::TavernIntroduce,
+          "normal fixed-step Interact starts Kit's introduction");
+    ++talk.commands.dialogueSkip;staffed.StepFixed(talk);
+    Check(staffed.Snapshot().chapterDialogue.line==Line::TavernHordeArmy &&
+          staffed.Snapshot().chapterDialogue.source.x==staffedConfig.bellwetherTavernKeeperSource->x,
+          "the keeper speaks from her admitted position");
+    const auto beforeReply=staffed.LatestCampaignBoundary();
+    Check(beforeReply && beforeReply->schema==cp::kTavernConversationSchema &&
+          beforeReply->dialogue.tavernConversationLinesResolved==1 && beforeReply->dialogue.activeLine==Line::None,
+          "the ordinary autosave boundary includes only the resolved introduction");
+    Check(staffedPlay.ObserveSafeBoundary() && awaitSave(staffedPlay,0),"the conversation boundary reaches the save worker");
+    const auto savedReply=Read(directory.path,2,cp::SaveKind::Autosave).checkpoint;
+    sim::GameSimulation reopened(staffedConfig);
+    if(savedReply.dialogue.tavernConversationLinesResolved==1 && Seed(reopened,savedReply,terrain)) {
+        sim::InputSnapshot again;again.yawRadians=record.yaw;again.pitchRadians=record.pitch;
+        reopened.StepFixed(again);
+        Check(reopened.Snapshot().tavernConversationAvailable && reopened.Snapshot().chapterDialogue.line==Line::None,
+              "reloading mid-exchange does not resume without the player's action");
+        ++again.commands.interact;reopened.StepFixed(again);
+        Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHordeArmy,"Talk resumes the unfinished keeper reply");
+        ++again.commands.dialogueSkip;reopened.StepFixed(again);
+        Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHoardAnswer,"the last line returns to Kit");
+        ++again.commands.dialogueSkip;reopened.StepFixed(again);
+        const auto done=reopened.LatestCampaignBoundary();
+        Check(done && done->dialogue.tavernConversationLinesResolved==3 &&
+              Seed(staffed,*done,terrain) && !staffed.Snapshot().tavernConversationAvailable,
+              "a completed conversation remains complete across reload");
+    } else Check(false,"the partial exchange is restorable");
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
     Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,

@@ -1930,7 +1930,8 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
             continue;
         }
         if(config_.developmentRescueJourney && chestRewardSequence_.Snapshot().phase == ChestRewardPhase::LanternClaimed) {
-            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction(); continue;
+            InteractWithClaimedChapter();
+            continue;
         }
         const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
         if (action == ChestRewardAction::OpeningStarted)
@@ -3423,6 +3424,8 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.chapterDialogue=chapterDialogue_.State();
+    snapshot_.tavernConversationAvailable=config_.bellwetherTavernKeeperSource &&
+        chapterDialogue_.CanStartTavernConversation(TavernConversationContext(input.paused));
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
         playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();

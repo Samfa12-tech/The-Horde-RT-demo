@@ -1252,6 +1252,8 @@ void PublishSimulationUiState()
     }
     if ((contextualControls & (1 << 9)) == 0 && simulation.flaskUpgrade.interactEligible)
         contextualControls |= (1 << 12) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
+        contextualControls |= (1 << 14) | 1;
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
     if (simulation.crouchActive) contextualControls |= 1 << 10;
