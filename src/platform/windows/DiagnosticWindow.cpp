@@ -535,6 +535,7 @@ struct ShowcaseCaptureRecord
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     horde::gameplay::dialogue::Line chapterLine = horde::gameplay::dialogue::Line::None;
+    std::optional<horde::gameplay::DevelopmentCheckpointStageEvidence::BellwetherVisit> bellwetherVisit;
     float keeperDissolve = 0.0f;
     float playerHeightDelta = 0.0f;
     std::uint8_t playerSupportId = 0u;
@@ -8321,8 +8322,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"height\": " << capture.height << ",\n"
                  << "      \"rescueTraversal\": " << traversalEvidence.str() << ",\n"
                   << "      \"honestlyPresentedRtFrame\": true,\n"
-                  << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
-                  << "      \"indoorDust\": {\"requestedQuality\": "
+                  << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n";
+        if (const auto& visit = capture.bellwetherVisit) {
+            manifest << "      \"bellwetherVisit\": {\"roadsideCaptions\": " << visit->roadsideCaptions
+                     << ", \"welcomeCaption\": " << (visit->welcomeCaption ? "true" : "false")
+                     << ", \"exchangeCaptions\": " << visit->exchangeCaptions
+                     << ", \"quietReturns\": " << visit->quietReturns << "},\n";
+        }
+        manifest << "      \"indoorDust\": {\"requestedQuality\": "
                   << static_cast<unsigned>(context.requestedDustQuality)
                   << ", \"actualUploadedQuality\": "
                   << static_cast<unsigned>(capture.actualUploadedDustQuality)
@@ -8737,6 +8744,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 #endif
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
+        horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
 #if defined(_DEBUG)
         if(forestProof && forestRecreated)
         {
@@ -8755,7 +8763,6 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
-            horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
             if (development == nullptr ||
                 !horde::gameplay::StageDevelopmentCheckpointSimulation(
                     context.simulation, *development, &stageEvidence))
@@ -8780,6 +8787,9 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                           << ", KitArrival=" << static_cast<unsigned>(state.chapterCompanion.bellwetherArrival)
                           << ", boundary=" << (boundary?static_cast<unsigned>(boundary->id):0u);
                 }
+                if (const auto& visit = stageEvidence.bellwetherVisit)
+                    trace << "; roadsideCaptions=" << visit->roadsideCaptions << ", welcomeCaption=" << visit->welcomeCaption
+                          << ", exchangeCaptions=" << visit->exchangeCaptions << ", quietReturns=" << visit->quietReturns;
                 return fail(trace.str());
             }
             context.simulation.ResetTiming();
@@ -8969,6 +8979,7 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.chapterCompanion = simulation.chapterCompanion;
         record.tavernKeeper = simulation.tavernKeeper;
         record.chapterLine = simulation.chapterDialogue.line;
+        record.bellwetherVisit = stageEvidence.bellwetherVisit;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
         record.playerHeightDelta = simulation.playerHeightDelta;
         record.playerSupportId = static_cast<std::uint8_t>(simulation.playerSupportId);

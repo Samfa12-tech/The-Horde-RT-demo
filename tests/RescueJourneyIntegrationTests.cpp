@@ -105,12 +105,12 @@ int main(int argc,char** argv) {
        checkpoint.name=="bellwether-kit-lowering" || checkpoint.name=="bellwether-kit-seated" ||
        checkpoint.name=="bellwether-kit-ankle-catch" || checkpoint.name=="bellwether-tavern-window" ||
        checkpoint.name=="bellwether-staffed-room" || checkpoint.name=="bellwether-keeper-reply" ||
-       checkpoint.name=="bellwether-kit-lantern-glance";
+       checkpoint.name=="bellwether-kit-lantern-glance" || checkpoint.name=="bellwether-repeat-visit";
    check(DevelopmentCheckpointRequiresAuthoredChapter(checkpoint)==expected,
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==50,"the live journey, 40 chapter views and nine Bellwether views require authored-scene admission");
+  check(chapterSelections==51,"the live journey, 40 chapter views and ten Bellwether views require authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right",
                        "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {

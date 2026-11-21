@@ -1438,6 +1438,37 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");
     Check(stayAtIncident ? (welcomes==1 && welcomeAtDoor && kitWalkedDuringWelcome) : welcomes==0,
           "the welcome plays once at the mapped door while Kit keeps walking, and requires the keeper");
+    if(stayAtIncident) {
+        input.commands.interact=game.Snapshot().lastConsumedInteractSequence+1;
+        step();
+        for(const auto line:kTavernConversation) {
+            const auto& speech=game.Snapshot().chapterDialogue;
+            const float speakerX=line==Line::TavernHordeArmy ? kKeeperHearth[0] : kChairSitRoot[0];
+            Check(speech.line==line && speech.source.x==speakerX,
+                  "the natural exchange after the live arrival follows its speaker order");
+            for(unsigned tick=0;tick<420 && game.Snapshot().chapterDialogue.line==line;++tick)step();
+        }
+        const auto finished=game.LatestCampaignBoundary();
+        Check(finished && finished->dialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+              game.Snapshot().chapterDialogue.line==Line::None,"the exchange finishes and reaches the earned checkpoint");
+
+        constexpr auto square=gameplay::traversal::kBellwetherSouthApproachStation-1;
+        input.moveForward=1;input.runHeld=true;
+        for(std::size_t index=route.size();index>square;--index)
+            if(!walkTo(route[index-1])) {Check(false,"a completed visit can exit to the square");return;}
+        Check(game.Snapshot().playerGrounded && game.Snapshot().playerZ>door.z,
+              "the return actually starts outdoors beyond the mapped portal");
+        for(std::size_t index=square+1;index<route.size();++index)
+            if(!walkTo(route[index])) {Check(false,"the player can re-enter the tavern on foot");return;}
+        if(!walkTo({kConversation[0],kConversation[2]})) {Check(false,"the return clears the furniture");return;}
+        input.moveForward=0;input.runHeld=false;
+        ++input.commands.interact;
+        step();
+        Check(game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+              game.Snapshot().tavernKeeper && game.Snapshot().tavernKeeper->stage==TavernKeeperStage::AtHearth &&
+              !game.Snapshot().tavernConversationAvailable && game.Snapshot().chapterDialogue.line==Line::None,
+              "the first physical return leaves both actors settled and the finished Talk quiet");
+    }
     input.moveForward=1;input.runHeld=true;
     if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
@@ -1502,6 +1533,33 @@ void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSu
         Check(simulation.LatestCampaignBoundary() && cp::Validate(*simulation.LatestCampaignBoundary()),
               "movement does not replace the canonical safe checkpoint with a blocked/off-trail position");
     }
+}
+
+void TestBellwetherRepeatVisitCheckpoint(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation capture(config);
+    capture.SetDevelopmentRescueJourney(true,true);
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-repeat-visit");
+    const auto generation=capture.Snapshot().worldRoute.generation;
+    gameplay::DevelopmentCheckpointStageEvidence evidence;
+    const bool staged=view && capture.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(capture,*view,&evidence);
+    const auto& state=capture.Snapshot();
+    if(!staged) {
+        std::cerr<<"Repeat visit stopped at "<<state.playerX<<','<<state.playerZ
+                 <<" with Kit phase "<<unsigned(state.chapterCompanion.bellwetherArrival);
+        if(const auto& visit=evidence.bellwetherVisit)
+            std::cerr<<", roadside captions "<<visit->roadsideCaptions<<", welcome "<<visit->welcomeCaption
+                     <<", exchange captions "<<visit->exchangeCaptions<<", quiet returns "<<visit->quietReturns;
+        std::cerr<<'\n';
+    }
+    Check(staged && evidence.bellwetherVisit && evidence.bellwetherVisit->roadsideCaptions==3 &&
+          evidence.bellwetherVisit->welcomeCaption && evidence.bellwetherVisit->exchangeCaptions==3 &&
+          evidence.bellwetherVisit->quietReturns==2 && std::hypot(state.playerX-view->cameraX,state.playerZ-view->cameraZ)<.01f,
+          "the exact render replay starts at the old lookout and reaches the authored room again after two quiet returns");
 }
 
 void TestFullSurroundings()
@@ -1630,6 +1688,7 @@ void TestFullSurroundings()
                   "the live forest opens only the two road spans and retains the closed sections and full tree roster");
             TestBellwetherTavernRoute(recreatedTerrain,true);
             TestBellwetherTavernRoute(recreatedTerrain,false);
+            TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
         }
     }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns

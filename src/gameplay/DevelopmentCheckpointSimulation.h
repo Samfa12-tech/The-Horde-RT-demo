@@ -46,6 +46,13 @@ struct DevelopmentCheckpointStageEvidence
     std::uint32_t enemyHitEvents = 0u;
     PlayerCombatAction action = PlayerCombatAction::Idle;
     float actionTime = 0.0f;
+    struct BellwetherVisit {
+        unsigned roadsideCaptions = 0;
+        bool welcomeCaption = false;
+        unsigned exchangeCaptions = 0;
+        unsigned quietReturns = 0;
+    };
+    std::optional<BellwetherVisit> bellwetherVisit;
 };
 
 // Optional, non-owning boundary callbacks for the helper's exact shared
@@ -181,7 +188,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
         return progress;
     };
-    if (checkpoint.bellwetherStaffedView != BellwetherStaffedView::None) {
+    const bool repeatVisit=checkpoint.bellwetherStaffedView==BellwetherStaffedView::RepeatVisit;
+    if (checkpoint.bellwetherStaffedView != BellwetherStaffedView::None && !repeatVisit) {
         using namespace simulation;
         if (!chapterTerrain || !gameSimulation.config_.bellwetherTavernKeeperAdmitted)
             return finalize(false);
@@ -249,6 +257,13 @@ inline bool StageDevelopmentCheckpointSimulation(
 
     if(checkpoint.bellwetherSitTicks!=0 || checkpoint.bellwetherAnkleTicks!=0) {
         using namespace simulation;
+        using namespace dialogue;
+        if(repeatVisit && !gameSimulation.config_.bellwetherTavernKeeperAdmitted)return finalize(false);
+        DevelopmentCheckpointStageEvidence::BellwetherVisit visit;
+        const auto reportVisit=[&] {
+            if(repeatVisit && evidence) evidence->bellwetherVisit=visit;
+        };
+        reportVisit();
         const bool ankle=checkpoint.bellwetherAnkleTicks!=0;
         const auto stations=ankle ? traversal::kBellwetherAnkleStation+1 : traversal::kBellwetherTavernRoute.size();
         const float ankleSeconds=checkpoint.bellwetherAnkleTicks/60.f;
@@ -263,6 +278,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         const auto support=traversal::ChapterExteriorSupport(chapterTerrain.get(),lookout.x,lookout.z);
         if(!support.grounded)return finalize(false);
         record.position={lookout.x,support.worldY,lookout.z};record.yaw=2.51f;record.pitch=-.15f;
+        record.swordStowed=repeatVisit;
         record.dialogue=completedForestProgress();
         InputSnapshot input;
         input.damageEnabled=false;input.tutorialEnabled=false;
@@ -273,14 +289,80 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(std::size_t zone=1;zone<kWorldZones.size();++zone)
             if(!gameSimulation.PublishChapterTerrain({token->worldGeneration,static_cast<WorldZoneId>(zone)},chapterTerrain))
                 return finalize(false);
+        bool returningQuietly=false,replayedCaption=false;
         const auto advance=[&] {
             stepFixed(input,1.f/60.f,gameSimulation.Snapshot().inputPublicationSequence+1);
             accumulateEvents();gameSimulation.ClearEvents();
+            if(repeatVisit) {
+                const auto line=gameSimulation.Snapshot().chapterDialogue.line;
+                if(visit.roadsideCaptions<kRoadLines.size() && line==kRoadLines[visit.roadsideCaptions])
+                    ++visit.roadsideCaptions;
+                visit.welcomeCaption|=line==Line::TavernWelcome;
+                if(visit.exchangeCaptions<kTavernConversation.size() && line==kTavernConversation[visit.exchangeCaptions])
+                    ++visit.exchangeCaptions;
+                replayedCaption|=returningQuietly && IsBellwetherLine(line);
+                reportVisit();
+            }
         };
         advance(); // Release the restored input barrier with an exact neutral publication.
+        const auto& route=traversal::kBellwetherTavernRoute;
+        const auto walkStation=[&](std::size_t index) {
+            return walkTo(input,advance,route[index].x,route[index].z);
+        };
+        const auto waitFor=[&](const auto& ready,unsigned maxTicks) {
+            input.moveForward=0;input.runHeld=false;
+            for(unsigned tick=0;tick<maxTicks && !ready();++tick)advance();
+            return ready();
+        };
         for(std::size_t index=0;index<stations;++index) {
-            const auto& station=traversal::kBellwetherTavernRoute[index];
-            if(!walkTo(input,advance,station.x,station.z))return finalize(false);
+            if(!walkStation(index))return finalize(false);
+            if(repeatVisit && index==traversal::kBellwetherAnkleStation &&
+               !waitFor([&]{return visit.roadsideCaptions==kRoadLines.size();},3600))return finalize(false);
+            if(repeatVisit && index==traversal::kBellwetherSouthDoorStation &&
+               !waitFor([&]{return visit.welcomeCaption;},3600))return finalize(false);
+        }
+        if(repeatVisit) {
+            const auto hearth=campaign::kBellwetherCheckpointPosition;
+            const auto walkToHearth=[&] {return walkTo(input,advance,hearth.x,hearth.z);};
+            const auto& state=gameSimulation.Snapshot();
+            const auto conversationSaved=[&] {
+                const auto saved=gameSimulation.LatestCampaignBoundary();
+                return saved && saved->id==campaign::CheckpointId::BellwetherTavern &&
+                    saved->dialogue.tavernConversationLinesResolved==kTavernConversation.size();
+            };
+            if(!walkToHearth() || !waitFor([&]{return state.tavernConversationAvailable;},5400))return finalize(false);
+            input.commands.interact=state.lastConsumedInteractSequence+1;
+            advance();
+            if(!waitFor(conversationSaved,1800) || visit.exchangeCaptions!=kTavernConversation.size())
+                return finalize(false);
+
+            // Retrace the mapped portal from the hearth to the square and back.
+            // Use one campaign session throughout, including both Interact retries.
+            constexpr auto square=traversal::kBellwetherSouthApproachStation-1;
+            returningQuietly=true;
+            for(unsigned trip=0;trip<2;++trip) {
+                for(std::size_t index=route.size();index>square;--index)
+                    if(!walkStation(index-1))return finalize(false);
+                if(!state.playerGrounded || state.playerZ<=route[traversal::kBellwetherSouthDoorStation].z)
+                    return finalize(false);
+                for(std::size_t index=square+1;index<route.size();++index)
+                    if(!walkStation(index))return finalize(false);
+                if(!walkToHearth())return finalize(false);
+                input.moveForward=0;input.runHeld=false;
+                ++input.commands.interact;
+                advance();
+                if(!conversationSaved() || replayedCaption || state.tavernConversationAvailable || state.chapterDialogue.line!=Line::None ||
+                   state.chapterCompanion.bellwetherArrival!=BellwetherArrivalStage::Seated ||
+                   !state.tavernKeeper || state.tavernKeeper->stage!=TavernKeeperStage::AtHearth)
+                    return finalize(false);
+                ++visit.quietReturns;
+                reportVisit();
+            }
+            if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
+            input.moveForward=0;input.runHeld=false;
+            input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
+            advance();
+            return finalize(conversationSaved() && !replayedCaption && state.chapterDialogue.line==Line::None);
         }
         if(!walkTo(input,advance,checkpoint.cameraX,checkpoint.cameraZ))return finalize(false);
         input.moveForward=0;input.runHeld=false;

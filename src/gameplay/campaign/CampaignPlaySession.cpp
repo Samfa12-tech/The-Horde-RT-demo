@@ -69,9 +69,11 @@ bool PlaySession::ObserveSafeBoundary() {
         const bool changed=latest_.has_value();latest_.reset();boundary_.reset();pendingAuto_.reset();
         return changed;
     }
-    const bool hearthAdvanced=latest_ && captured->dialogue.hearthLinesResolved>latest_->dialogue.hearthLinesResolved;
+    const bool tavernSpeechAdvanced=latest_ && (
+        captured->dialogue.hearthLinesResolved>latest_->dialogue.hearthLinesResolved ||
+        captured->dialogue.tavernConversationLinesResolved>latest_->dialogue.tavernConversationLinesResolved);
     const bool changed=SetLatest(*captured);
-    if(!boundary_ || *boundary_!=captured->id || ((restCompleted || hearthAdvanced) && changed)) {
+    if(!boundary_ || *boundary_!=captured->id || ((restCompleted || tavernSpeechAdvanced) && changed)) {
         boundary_=captured->id;
         if(state_.activeSlot && latest_ && latest_->id==captured->id)
             pendingAuto_=PendingAuto{*latest_,state_.latestRevision,*state_.activeSlot};

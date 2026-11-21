@@ -11,7 +11,7 @@
 namespace horde::gameplay
 {
 
-enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply, LanternGlance };
+enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply, LanternGlance, RepeatVisit };
 
 enum class DevelopmentCombatPose : std::uint8_t
 {
@@ -89,7 +89,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 127u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 128u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -248,6 +248,10 @@ inline constexpr std::array<DevelopmentCheckpoint, 127u> kDevelopmentCheckpoints
      .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
      .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,
      .bellwetherStaffedView=BellwetherStaffedView::LanternGlance},
+    {.id=329,.name="bellwether-repeat-visit",.baseShowcaseCheckpointId=11,
+     .cameraX=83.97f,.cameraZ=114.04f,.yaw=-.14f,.pitch=-.11f,.stagesRescueExterior=true,
+     .bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=100u,
+     .bellwetherStaffedView=BellwetherStaffedView::RepeatVisit},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

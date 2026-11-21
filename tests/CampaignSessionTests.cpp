@@ -209,9 +209,23 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
           "the ordinary autosave boundary includes only the resolved introduction");
     Check(staffedPlay.ObserveSafeBoundary() && awaitSave(staffedPlay,0),"the conversation boundary reaches the save worker");
     const auto savedReply=Read(directory.path,2,cp::SaveKind::Autosave).checkpoint;
+    Check(staffedPlay.TryEndActiveGame(),"the original session leaves the partial save available to reopen");
     sim::GameSimulation reopened(staffedConfig);
-    if(savedReply.dialogue.tavernConversationLinesResolved==1 && Seed(reopened,savedReply,terrain)) {
-        sim::InputSnapshot again;again.yawRadians=record.yaw;again.pitchRadians=record.pitch;
+    cp::PlaySession reopenedPlay(reopened,directory.path);
+    sim::InputSnapshot again;
+    const auto loadReply=[&] {
+        if(!reopenedPlay.Load(2,cp::SaveKind::Autosave))return false;
+        const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+        do {
+            reopenedPlay.Poll();
+            if(const auto preparation=reopenedPlay.PrepareLoad())
+                return reopenedPlay.CommitLoad(*preparation,preparation->destination,terrain,again,0);
+            if(reopenedPlay.State().outcome==cp::PlayOutcome::Failed)return false;
+            std::this_thread::yield();
+        } while(std::chrono::steady_clock::now()<deadline);
+        return false;
+    };
+    if(savedReply.dialogue.tavernConversationLinesResolved==1 && loadReply()) {
         reopened.StepFixed(again);
         Check(reopened.Snapshot().tavernConversationAvailable && reopened.Snapshot().chapterDialogue.line==Line::None,
               "reloading mid-exchange does not resume without the player's action");
@@ -219,11 +233,22 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
         Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHordeArmy,"Talk resumes the unfinished keeper reply");
         ++again.commands.dialogueSkip;reopened.StepFixed(again);
         Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHoardAnswer,"the last line returns to Kit");
+        const auto loadedRevision=reopenedPlay.State().operationRevision;
+        Check(reopenedPlay.ObserveSafeBoundary(),"the restored slot observes a newly resolved keeper reply");
         ++again.commands.dialogueSkip;reopened.StepFixed(again);
         const auto done=reopened.LatestCampaignBoundary();
-        Check(done && done->dialogue.tavernConversationLinesResolved==3 &&
-              Seed(staffed,*done,terrain) && !staffed.Snapshot().tavernConversationAvailable,
-              "a completed conversation remains complete across reload");
+        const bool written=done && done->dialogue.tavernConversationLinesResolved==3 &&
+            reopenedPlay.ObserveSafeBoundary() && !reopenedPlay.TryEndActiveGame() && awaitSave(reopenedPlay,loadedRevision);
+        Check(written,"the same tavern autosave coalesces the remaining lines and finishes before quit");
+        if(written) {
+            const auto savedDone=Read(directory.path,2,cp::SaveKind::Autosave).checkpoint;
+            sim::InputSnapshot idle;idle.yawRadians=record.yaw;idle.pitchRadians=record.pitch;
+            const bool restored=Seed(staffed,savedDone,terrain);
+            if(restored)staffed.StepFixed(idle);
+            Check(restored && staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3 &&
+                  staffed.Snapshot().chapterDialogue.line==Line::None && !staffed.Snapshot().tavernConversationAvailable,
+                  "reopening the completed autosave keeps the exchange quiet");
+        }
     } else Check(false,"the partial exchange is restorable");
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
