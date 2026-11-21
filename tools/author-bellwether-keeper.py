@@ -1,6 +1,7 @@
-"""Prepare the tavern keeper's editable rig and native clips from local Meshy exports.
+"""Prepare an editable Bellwether resident rig and native clips from local Meshy exports.
 
-blender --background --python-exit-code 1 --python tools/author-bellwether-keeper.py -- SOURCE_DIR NEW_OUTPUT_DIR
+blender --background --python-exit-code 1 --python tools/author-bellwether-keeper.py -- SOURCE_DIR NEW_OUTPUT_DIR [PROFILE_JSON]
+Without a profile this reproduces the tavern keeper. Other residents supply an asset ID and two source hashes.
 """
 
 import hashlib
@@ -17,7 +18,7 @@ FPS = 30
 WALK_SPEED = 1.08
 ARMS = [side + part for side in ("Left", "Right")
         for part in ("Shoulder", "Arm", "ForeArm", "Hand")]
-SOURCE_HASHES = {
+KEEPER_SOURCE_HASHES = {
     "rigged.glb": "408b338c343e6d2ea22ffc501a47a86f96607e764a5aabc1af5d659e540b0c4e",
     "walking.glb": "c8f22a6761966fc5b59adf8916faae714b3ab54ecd3fa6dada800793f1463eba",
 }
@@ -67,7 +68,7 @@ def bake(armature, name, poses):
     return action
 
 
-def write_manifest(model):
+def write_manifest(model, asset):
     with model.open("rb") as stream:
         magic, version, length, size, kind = struct.unpack("<4sIII4s", stream.read(20))
         if magic != b"glTF" or version != 2 or length != model.stat().st_size or kind != b"JSON":
@@ -84,9 +85,9 @@ def write_manifest(model):
     vertices = gltf["accessors"][primitive["attributes"]["POSITION"]]["count"]
     indices = gltf["accessors"][primitive["indices"]]["count"]
     if indices % 3 or indices // 3 > 16000:
-        raise ValueError("The keeper exceeds the triangle budget.")
+        raise ValueError(f"{asset} exceeds the triangle budget.")
     manifest = {
-        "schema": 1, "asset": "bellwether-tavern-keeper", "metresPerUnit": 1.0,
+        "schema": 1, "asset": asset, "metresPerUnit": 1.0,
         "coordinateSystem": {"up": "+Y", "forward": "+Z"},
         "budgets": {"maxVertices": vertices, "maxIndices": indices,
                     "maxPrimitives": 1, "maxMaterials": 1, "maxTextureLayersPerKind": 1},
@@ -102,10 +103,10 @@ def write_manifest(model):
                                                       encoding="utf-8")
 
 
-def main(source, output):
+def main(source, output, asset, source_hashes):
     if output.exists():
-        raise ValueError("Choose an unused keeper output directory.")
-    for name, sha256 in SOURCE_HASHES.items():
+        raise ValueError("Choose an unused resident output directory.")
+    for name, sha256 in source_hashes.items():
         if digest(source / name) != sha256:
             raise ValueError(f"Unexpected bytes for {name}.")
 
@@ -172,7 +173,7 @@ def main(source, output):
     idle_bounds = bounds(mesh)
     low, high = idle_bounds
     if not (abs(low[2]) < 0.004 and 1.63 < high[2] < 1.78 and high[0] - low[0] < 0.59):
-        raise ValueError(f"Standing pose does not fit the authored keeper: {idle_bounds}")
+        raise ValueError(f"Standing pose does not fit {asset}: {idle_bounds}")
     armature.animation_data.action = walk
     walk_bounds = []
     for frame in range(1, cycle + 2):
@@ -189,15 +190,16 @@ def main(source, output):
     armature.select_set(True)
     mesh.select_set(True)
     bpy.context.view_layer.objects.active = armature
-    bpy.ops.wm.save_as_mainfile(filepath=str(output / "tavern-keeper.blend"))
+    name = asset.removeprefix("bellwether-")
+    bpy.ops.wm.save_as_mainfile(filepath=str(output / f"{name}.blend"))
     model = output / "resident.glb"
     bpy.ops.export_scene.gltf(filepath=str(model), export_format="GLB",
                               use_selection=True, export_tangents=True,
                               export_animation_mode="ACTIONS", export_frame_range=False,
                               export_anim_slide_to_zero=True)
-    write_manifest(model)
+    write_manifest(model, asset)
     (output / "pose-report.json").write_text(json.dumps({
-        "inputs": SOURCE_HASHES, "runtimeGlbSha256": digest(model),
+        "inputs": source_hashes, "runtimeGlbSha256": digest(model),
         "walkSeconds": cycle / FPS, "walkMetresPerCycle": cycle * WALK_SPEED / FPS,
         "stockMidStanceMetresPerSecond": speeds, "idleBounds": idle_bounds,
         "walkBounds": walk_bounds,
@@ -205,5 +207,16 @@ def main(source, output):
 
 
 if __name__ == "__main__":
-    source, output = map(Path, sys.argv[sys.argv.index("--") + 1:])
-    main(source.resolve(), output.resolve())
+    args = sys.argv[sys.argv.index("--") + 1:]
+    if len(args) not in (2, 3):
+        raise ValueError("Expected SOURCE_DIR NEW_OUTPUT_DIR [PROFILE_JSON].")
+    source, output = map(Path, args[:2])
+    asset, source_hashes = "bellwether-tavern-keeper", KEEPER_SOURCE_HASHES
+    if len(args) == 3:
+        profile = json.loads(Path(args[2]).read_text(encoding="utf-8"))
+        asset, source_hashes = profile["asset"], profile["sourceHashes"]
+        if not asset.startswith("bellwether-") or not asset.replace("-", "").isalnum():
+            raise ValueError("The resident asset ID must be a Bellwether slug.")
+        if set(source_hashes) != set(KEEPER_SOURCE_HASHES):
+            raise ValueError("The resident profile must pin rigged.glb and walking.glb.")
+    main(source.resolve(), output.resolve(), asset, source_hashes)

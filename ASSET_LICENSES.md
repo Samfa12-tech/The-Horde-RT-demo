@@ -997,6 +997,21 @@ The paid Meshy account charged 20 credits. Exact distribution rights are still
 pending. Keep the source models, derived textures, and APK outside public
 source and published packages until the asset's rights are recorded.
 
+## Bellwether artificer candidate - 22 November 2026
+
+The artificer uses an original project reference created with built-in OpenAI
+image generation, Meshy T2.5 geometry, Meshy 7 PBR textures and the Meshy
+humanoid rig with its stock walk and run. Blender authoring by Samfa12/Codex
+grounds the standing pose and retimes the walk. The private source archive
+holds the prompt, provider originals, editable assembly, local previews and
+verification receipts. The prepared resident GLB has SHA-256
+`58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f`
+and 15,360 triangles.
+
+The paid Meshy account charged 20 credits. Exact redistribution rights remain
+pending. The public repository records the preparation tools and provenance.
+The private archive retains the model, textures and review images.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

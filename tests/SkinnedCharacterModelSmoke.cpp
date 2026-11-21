@@ -1,5 +1,6 @@
 #include "scene/SkeletonBipedModel.h"
 #include "scene/assets/AssetManifest.h"
+#include "scene/assets/SkinnedPbrActor.h"
 #include "scene/assets/StaticMeshAsset.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "gameplay/ShowcaseRoute.h"
@@ -1510,6 +1511,62 @@ bool RunSkeletonStandProof(const char* originalPath, const char* candidatePath,
 
 int main(int argc, char** argv)
 {
+    if (argc > 1 && std::string_view(argv[1]) == "--validate-walking-resident")
+    {
+        if (argc != 3)
+        {
+            std::cerr << "Usage: --validate-walking-resident <resident-directory>\n";
+            return 2;
+        }
+        using namespace horde::scene::assets;
+        using horde::scene::SkinnedClip;
+        using horde::scene::SkinnedClipBinding;
+        const std::array clips{SkinnedClipBinding{"Warden|idle", true, true},
+                               SkinnedClipBinding{"Warden|walk", true, true}};
+        SkinnedPbrActor resident;
+        std::string diagnostic;
+        if (!resident.Load(argv[2], "resident.glb", clips, diagnostic))
+        {
+            std::cerr << diagnostic << '\n';
+            return 1;
+        }
+        const auto& asset = resident.Asset();
+        if (!Require(asset.materials.size() == 1, "A walking resident must use one shared material"))
+            return 1;
+        const auto& material = asset.materials.front();
+        if (!Require(material.baseColorTexture >= 0 && material.normalTexture >= 0 &&
+                     material.ormTexture >= 0 && material.emissiveTexture < 0 && material.transmissionFactor == 0,
+                     "A walking resident must have opaque base-color, normal and ORM maps"))
+            return 1;
+        const auto upright = [&] {
+            const auto& low = asset.bounds.minimum;
+            const auto& high = asset.bounds.maximum;
+            return std::abs(low[1]) < .05f && high[1] > 1.55f && high[1] < 1.85f;
+        };
+        if (!Require(upright(), "The resident idle must be upright and grounded"))
+            return 1;
+        const auto idle = asset.bounds;
+        const float walk = resident.Duration(SkinnedClip::Walking);
+        if (!Require(std::isfinite(walk) && walk > 0.f, "The resident must have a playable walk"))
+            return 1;
+        bool changed = false;
+        for (unsigned sample = 0; sample < 16; ++sample)
+        {
+            if (!resident.Pose(SkinnedClip::Walking, walk * (sample / 16.f), diagnostic))
+            {
+                std::cerr << diagnostic << '\n';
+                return 1;
+            }
+            if (!Require(upright(), "The walking sample must remain upright and near the floor"))
+                return 1;
+            changed |= std::abs(asset.bounds.minimum[2] - idle.minimum[2]) > .04f;
+        }
+        if (!Require(changed, "The walk samples must move the character surface"))
+            return 1;
+        std::cout << "Resident poses passed: " << asset.vertices.size() << " vertices, "
+                  << asset.indices.size() / 3 << " triangles, " << walk << " seconds per cycle\n";
+        return 0;
+    }
     if (argc > 1 && std::string_view(argv[1]) == "--skeleton-stand-proof")
     {
         if (argc != 5)

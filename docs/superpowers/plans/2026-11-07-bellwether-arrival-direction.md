@@ -343,6 +343,12 @@ The checkpoint supplies the rig for testing. Normal campaign play ends this bran
 
 The native walkthrough checks early retreat, pause, retry, the full wet hold and the dry confirmation. It checks that an unfinished trial restarts after loading and the confirmed seal survives loading. Both Windows hardware RT backends presented the Debug starting position at 960 x 540. The ARM64 Debug package passed the Android checkpoint and prompt tests. Phone performance remains open.
 
+#### Artificer source candidate
+
+The private artificer candidate wears a fitted iron-blue doublet and short leather apron. The original concept, Meshy source and 24-joint rig, supplied walk and run, editable Blender assembly and runtime files are archived with verified hashes. The prepared actor is 1.68 m tall with 15,360 triangles. Blender grounds the idle and retimes the 1.3-second walk to 1.08 m/s. The native character loader and CPU skinning checked the idle and 16 samples of that walk. Khronos validation reported no errors and one warning for the skinned mesh's parent node. Both platform sets of three one-layer 1K KTX2 textures passed validation.
+
+The repair scene still needs the artificer's playable placement and fitting interaction. The current native renderer admits two additional residents alongside Kit. A further resident needs an explicit residency and performance check on the actual route. Phone validation and exact distribution clearance remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
