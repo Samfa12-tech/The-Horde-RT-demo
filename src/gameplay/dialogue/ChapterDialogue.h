@@ -19,14 +19,15 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     LanternFirstHelp, LanternFirstIdentity, LanternKingName, LanternFirstRequest, LanternRegisterReturn,
     RecordKeeperInspect, RecordKeeperErrand, RecordKeeperDirections,
     RecordKeeperRegister, RecordKeeperTwoRoads, RecordKeeperRoadOrder, TavernRegisterDirections, TavernExpeditionDirections,
-    TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp };
+    TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
+    RecordKeeperReward };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,48> kLines{{
+inline constexpr std::array<LineSpec,49> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -74,7 +75,8 @@ inline constexpr std::array<LineSpec,48> kLines{{
     {Line::KitVoiceReaction,"kit.voice_reaction","Kit","Next time, a little warning before the lamp starts talking.","",5.3f,2},
     {Line::KitVoiceListen,"kit.first_direct_voice.finish","Kit","Go on, then. I'm listening.","",3.3f,2},
     {Line::KitRoyalClaim,"kit.royal_claim.king","Kit","King Veyr. That's quite a claim to make from inside a lamp.","",5.5f,2},
-    {Line::KitRoadHelp,"kit.royal_claim.help","Kit","If you know the roads, help us get there and back. We can start with that.","",6.8f,2}
+    {Line::KitRoadHelp,"kit.royal_claim.help","Kit","If you know the roads, help us get there and back. We can start with that.","",6.8f,2},
+    {Line::RecordKeeperReward,"hub.register_reward","Record keeper","Here, for bringing the register back.","",2.6f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -96,9 +98,10 @@ inline constexpr bool IsShrineLanternLine(Line line) {
 }
 inline constexpr std::array kRecordKeeperLead{Line::RecordKeeperInspect,Line::RecordKeeperErrand,Line::RecordKeeperDirections};
 inline constexpr std::array kRecordKeeperReading{Line::RecordKeeperRegister,Line::RecordKeeperTwoRoads,Line::RecordKeeperRoadOrder};
-enum class RecordKeeperAction : std::uint8_t { None, ShowRoadMark, ShowRegister, RecallRoutes };
+inline constexpr std::array kRecordKeeperReward{Line::RecordKeeperReward};
+enum class RecordKeeperAction : std::uint8_t { None, ShowRoadMark, ShowRegister, RecallRoutes, CollectReward };
 inline constexpr bool IsRecordKeeperLine(Line line) {
-    return line>=kRecordKeeperLead.front() && line<=kRecordKeeperReading.back();
+    return (line>=kRecordKeeperLead.front() && line<=kRecordKeeperReading.back()) || line==Line::RecordKeeperReward;
 }
 inline constexpr std::array kTavernLanternExchange{Line::TavernLanternIdentity,Line::TavernLanternSeals,
     Line::KitVoiceReaction,Line::KitVoiceListen,Line::KitRoyalClaim,Line::KitRoadHelp};
@@ -209,7 +212,8 @@ public:
     }
     bool TryStartRecordKeeper(RecordKeeperAction action,const Context& c) {
         if(action==RecordKeeperAction::None || !CanStartRecordKeeper(c))return false;
-        recordKeeperPending_=action==RecordKeeperAction::ShowRoadMark?kRecordKeeperLead:kRecordKeeperReading;
+        if(action==RecordKeeperAction::CollectReward)recordKeeperPending_=kRecordKeeperReward;
+        else recordKeeperPending_=action==RecordKeeperAction::ShowRoadMark?kRecordKeeperLead:kRecordKeeperReading;
         StartNextRecordKeeperLine(c);
         return true;
     }

@@ -12,7 +12,7 @@ constexpr std::array<std::byte,8> kMagic{std::byte{'H'},std::byte{'R'},std::byte
     std::byte{'C'},std::byte{'P'},std::byte{'K'},std::byte{'T'},std::byte{0}};
 constexpr std::uint32_t kFormat=1;
 constexpr std::size_t kHeaderBytes=20;
-constexpr std::array<std::uint32_t,kTavernLanternExchangeSchema> kPayloadBytesBySchema{142,143,148,157,165,166,167,168,169,170,171,172};
+constexpr std::array<std::uint32_t,kTreasurePurseSchema> kPayloadBytesBySchema{142,143,148,157,165,166,167,168,169,170,171,172,177};
 static_assert(kHeaderBytes+kPayloadBytesBySchema.back()<=kMaxFileBytes);
 constexpr std::uint32_t PayloadBytes(std::uint32_t schema) {
     return kPayloadBytesBySchema[schema-1];
@@ -50,7 +50,7 @@ private:
     std::span<const std::byte> bytes_;std::size_t offset_=0;bool valid_=true;
 };
 Error VersionError(const Checkpoint& c) {
-    if(c.schema<1 || c.schema>kTavernLanternExchangeSchema) return Error::UnsupportedSchema;
+    if(c.schema<1 || c.schema>kTreasurePurseSchema) return Error::UnsupportedSchema;
     if(c.contentRevision<1 || c.contentRevision>kBellwetherContentRevision) return Error::UnsupportedContent;
     return Error::None;
 }
@@ -90,6 +90,10 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     if(c.schema>=kWaysideRegisterSchema)Bool(payload,c.waysideRegisterRecovered);
     if(c.schema>=kRegisterInterpretationSchema)Bool(payload,c.waysideRegisterInterpreted);
     if(c.schema>=kTavernLanternExchangeSchema)payload.push_back(static_cast<std::byte>(p.tavernLanternLinesStarted));
+    if(c.schema>=kTreasurePurseSchema) {
+        U32(payload,c.treasurePurse.coins);
+        Bool(payload,c.treasurePurse.registerRewardClaimed);
+    }
     std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+payloadBytes);
     encoded.insert(encoded.end(),kMagic.begin(),kMagic.end());
     U32(encoded,kFormat);U32(encoded,payloadBytes);U32(encoded,Crc32(payload));
@@ -138,6 +142,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(c.schema>=kWaysideRegisterSchema)c.waysideRegisterRecovered=r.Bool();
     if(c.schema>=kRegisterInterpretationSchema)c.waysideRegisterInterpreted=r.Bool();
     if(c.schema>=kTavernLanternExchangeSchema)p.tavernLanternLinesStarted=r.Byte();
+    if(c.schema>=kTreasurePurseSchema)c.treasurePurse={r.U32(),r.Bool()};
     if(!r.Valid()) {error=Error::Malformed;return false;}
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
     out=std::move(c);error=Error::None;return true;

@@ -33,7 +33,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
-        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted);};
+        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse);};
     return facts(a)==facts(b);
 }
 }
@@ -193,8 +193,24 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
         RecordWaysideArchive(c,waysideArchive_);
     if(c.dialogue.tavernLanternLinesStarted)c.schema=campaign::kTavernLanternExchangeSchema;
+    if(treasurePurse_!=campaign::TreasurePurse{}) {
+        c.treasurePurse=treasurePurse_;
+        c.schema=campaign::kTreasurePurseSchema;
+    }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
+}
+void GameSimulation::ClaimRegisterReward(const dialogue::Context& context) {
+    if(RecordKeeperAction(context)!=dialogue::RecordKeeperAction::CollectReward ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return;
+    auto updated=*campaignBoundary_;
+    if(!updated.treasurePurse.ClaimRegisterReward())return;
+    updated.schema=campaign::kTreasurePurseSchema;
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_) ||
+       !chapterDialogue_.TryStartRecordKeeper(dialogue::RecordKeeperAction::CollectReward,context))return;
+    treasurePurse_=updated.treasurePurse;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
 }
 void GameSimulation::ClearCampaignBoundary() {
     campaignBoundary_.reset();
@@ -224,7 +240,7 @@ void GameSimulation::LatchCampaignBoundary() {
                 RecordWaysideArchive(updated,waysideArchive_);
                 if(lanternExchangeAdvanced) {
                     updated.dialogue.tavernLanternLinesStarted=speech.tavernLanternLinesStarted;
-                    updated.schema=campaign::kTavernLanternExchangeSchema;
+                    updated.schema=std::max(updated.schema,campaign::kTavernLanternExchangeSchema);
                 }
                 if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_)) {
                     campaignBoundary_=updated;++campaignBoundaryRevision_;
@@ -354,6 +370,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.enemyDirector_.Update(c.position.x,c.position.z,EnemyKind::Lich);next.enemyDirector_.MarkSelectedDead();
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
+    next.treasurePurse_=c.treasurePurse;
     if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;

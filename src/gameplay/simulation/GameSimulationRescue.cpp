@@ -29,6 +29,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     tavernKeeper_={};
     recordKeeper_.reset();
     waysideArchive_={};
+    treasurePurse_={};
     tavernDoor_={};
     rescueTraversal_.Reset(); rescueOpeningSeconds_=0;worldRoute_.Invalidate();
     worldRoute_.current=WorldZoneId::Dungeon;

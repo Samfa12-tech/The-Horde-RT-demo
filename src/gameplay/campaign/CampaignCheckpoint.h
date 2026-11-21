@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/campaign/TreasurePurse.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/traversal/RescueTraversal.h"
 #include "gameplay/healing/HealingFlask.h"
@@ -18,6 +19,7 @@ inline constexpr std::uint32_t kShrineLanternSchema=9;
 inline constexpr std::uint32_t kWaysideRegisterSchema=10;
 inline constexpr std::uint32_t kRegisterInterpretationSchema=11;
 inline constexpr std::uint32_t kTavernLanternExchangeSchema=12;
+inline constexpr std::uint32_t kTreasurePurseSchema=13;
 enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
@@ -58,6 +60,7 @@ struct Checkpoint {
     bool waysideLanternRevealStarted=false;
     bool waysideRegisterRecovered=false;
     bool waysideRegisterInterpreted=false;
+    TreasurePurse treasurePurse{};
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
     return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
@@ -80,7 +83,11 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kTavernLanternExchangeSchema ||
+    if (c.schema < 1 || c.schema > kTreasurePurseSchema ||
+        (c.schema<kTreasurePurseSchema && c.treasurePurse!=TreasurePurse{}) ||
+        c.treasurePurse.coins>TreasurePurse::kMaximumCoins ||
+        (c.treasurePurse.registerRewardClaimed && !c.waysideRegisterInterpreted) ||
+        (c.treasurePurse.coins!=0 && !c.treasurePurse.registerRewardClaimed) ||
         (c.dialogue.tavernLanternLinesStarted &&
             (c.schema<kTavernLanternExchangeSchema || !c.waysideLanternRevealStarted)) ||
         (c.waysideRegisterInterpreted && (c.schema<kRegisterInterpretationSchema || !c.waysideRegisterRecovered)) ||

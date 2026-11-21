@@ -3,6 +3,7 @@
 #include "gameplay/campaign/CampaignCheckpoint.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include <optional>
+#include <string>
 
 namespace horde::gameplay::campaign {
 // Read-only presentation eligibility. Earning progress remains the simulation's
@@ -37,7 +38,8 @@ inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot
 {
     if (boundary && boundary->contentRevision == kBellwetherContentRevision &&
         s.developmentRescueJourney && s.playerAlive && s.rescue.exteriorSide &&
-        s.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size())
+        (s.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() ||
+            s.waysideArchive.registerInterpreted))
     {
         if (s.waysideArchive.registerInterpreted) return PauseObjective::BellwetherExpeditions;
         if (s.waysideArchive.registerRecovered) return PauseObjective::BellwetherRegister;
@@ -72,5 +74,13 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     case PauseObjective::None: return "";
     }
     return "";
+}
+
+inline std::string PauseObjectiveText(PauseObjective objective, std::uint32_t coins)
+{
+    std::string text=PauseObjectiveText(objective);
+    if (objective==PauseObjective::BellwetherExpeditions)
+        text+="\r\n\r\nPurse: "+std::to_string(coins)+(coins==1?" coin.":" coins.");
+    return text;
 }
 } // namespace horde::gameplay::campaign

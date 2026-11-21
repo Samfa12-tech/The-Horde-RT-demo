@@ -3541,6 +3541,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             case RecordKeeperAction::ShowRoadMark: text = "LEFT-CLICK / A TO SHOW THE ROAD MARK"; break;
             case RecordKeeperAction::ShowRegister: text = "LEFT-CLICK / A TO SHOW THE ROAD REGISTER"; break;
             case RecordKeeperAction::RecallRoutes: text = "LEFT-CLICK / A TO RECALL THE EXPEDITION ROUTES"; break;
+            case RecordKeeperAction::CollectReward: text = "LEFT-CLICK / A TO COLLECT REGISTER REWARD"; break;
             default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
             }
             break;
@@ -3724,7 +3725,7 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
         LookoutPanel::Objective::None;
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
-        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective};
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse.coins};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)

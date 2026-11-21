@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gameplay/campaign/TreasurePurse.h"
+
 #include "gameplay/dialogue/TavernKeeperPlacement.h"
 #include "gameplay/dialogue/RecordKeeperPlacement.h"
 #include "gameplay/effects/WaterContact.h"
@@ -77,6 +79,7 @@ struct SimulationSnapshot
     bool tavernDirectionsAvailable=false;
     bool tavernLanternAvailable=false;
     dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
+    campaign::TreasurePurse treasurePurse{};
     bellwether::WaysideArchive waysideArchive;
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
     bellwether::TavernDoor tavernDoor;

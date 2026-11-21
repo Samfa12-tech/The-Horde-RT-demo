@@ -206,6 +206,12 @@ A private 23.025-second review reel collects the four available cuts in church s
 
 The `bellwether-record-keeper-handoff` debug view loads a local resident fixture. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup.
 
+#### Register reward and coin purse
+
+After the record keeper reads the recovered register, **Collect register reward** offers a one-time payment. The three-coin amount is provisional for the private playtest. The player collects it through the same interaction and sees the balance in **Bellwether directions**. After payment the keeper offers **Recall the expedition routes** again.
+
+The payment and its collection record are saved together at the existing earned checkpoint. A schema 11 or 12 save with an interpreted register still offers the reward on the next visit. Repeated interaction or loading a paid checkpoint preserves the balance and the completed routes. The interpretation, the lantern conversation with Kit and both future leads stay independent of collecting the reward. Gear prices, spending and access training remain open.
+
 The local fixture now uses the prepared 15,322-triangle record keeper. Its four-second idle preserves the standing stance, settles the arms using the supplied rig, and adds a small breathing motion and head glance. The shared simulation advances the idle in earshot and holds it while paused or outside earshot. [The source recipe](../../../tools/author-record-keeper-idle.py) preserves the rigged and walking GLBs and writes an editable Blend and a separate local export.
 
 Both Windows hardware RT backends presented the textured actor at 960 × 540 and recorded the same idle time and completed interpretation. The exact-byte texture check verified all 11 mips and the unchanged preceding layers in both Windows RGBA8 and Android ASTC. One resident adds 16,777,212 bytes of Windows texture payload and 2,650,704 bytes of Android texture payload. The Android ARM64 debug package built without the local fixture. Phone performance, model and voice distribution clearance, and normal package integration remain open.

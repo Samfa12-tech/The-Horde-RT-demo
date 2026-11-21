@@ -13,6 +13,10 @@ void GameSimulation::InteractWithClaimedChapter() {
     }
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
     const auto records=RecordKeeperAction(context);
+    if(records==dialogue::RecordKeeperAction::CollectReward) {
+        ClaimRegisterReward(context);
+        return;
+    }
     if(chapterDialogue_.TryStartRecordKeeper(records,context)) {
         if(records==dialogue::RecordKeeperAction::ShowRegister)
             waysideArchive_.registerInterpreted=true;
@@ -47,7 +51,12 @@ void GameSimulation::InteractWithClaimedChapter() {
 dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::Context& c) const {
     using Action=dialogue::RecordKeeperAction;
     if(!chapterDialogue_.CanStartRecordKeeper(c))return Action::None;
-    if(waysideArchive_.registerInterpreted)return Action::RecallRoutes;
+    if(waysideArchive_.registerInterpreted) {
+        if(campaignBoundary_ && campaignBoundary_->waysideRegisterInterpreted &&
+           campaignBoundaryRevision_!=UINT64_MAX && treasurePurse_.CanClaimRegisterReward())
+            return Action::CollectReward;
+        return Action::RecallRoutes;
+    }
     return waysideArchive_.registerRecovered?Action::ShowRegister:Action::ShowRoadMark;
 }
 

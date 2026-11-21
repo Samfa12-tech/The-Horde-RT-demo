@@ -1432,7 +1432,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     }
                     std::array<char,512> text{};
                     GetWindowTextA(GetDlgItem(ctx.windowHandle,LookoutPanel::BodyId),text.data(),static_cast<int>(text.size()));
-                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective);
+                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective,state.treasurePurse.coins);
                     const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
                         ctx.pauseMenuVisible && ctx.simulationPaused;
                     const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
@@ -1516,13 +1516,26 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
                         state.recordKeeperAction == RecordKeeperAction::ShowRegister && interact() &&
                         state.waysideArchive.registerInterpreted && frame() && dialogue(kRecordKeeperReading) &&
-                        state.recordKeeperAction == RecordKeeperAction::RecallRoutes &&
+                        state.recordKeeperAction == RecordKeeperAction::CollectReward && state.treasurePurse.coins == 0 &&
                         state.chapterDialogue.tavernLanternLinesStarted == 0,
                         "the real register handoff teaches both routes independently of Kit's firsthand knowledge");
                 }
                 if (progressed)
                     progressed = check(readDirections(PauseObjective::BellwetherExpeditions),
                         "the church pause directions show both interpreted routes as future expeditions");
+                const campaign::TreasurePurse earned{campaign::TreasurePurse::kRegisterRewardCoins,true};
+                if (progressed) {
+                    campaign::storage::StoredCheckpoint rewarded;
+                    progressed = check(interact() && state.treasurePurse == earned && frame() &&
+                        dialogue(kRecordKeeperReward) && state.recordKeeperAction == RecordKeeperAction::RecallRoutes &&
+                        until([&] {
+                            return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", rewarded).status ==
+                                campaign::storage::Status::Read && rewarded.checkpoint.treasurePurse == earned &&
+                                ctx.campaign->State().operation == campaign::PlayOperation::Autosave &&
+                                ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                        }, false) && readDirections(PauseObjective::BellwetherExpeditions),
+                        "collecting the register reward saves a single payment and shows it in the pause menu");
+                }
                 if (progressed) {
                     progressed = check(walkTo(kBellwetherChurchApproach.front()) &&
                         walk(kBellwetherNorthApproach.rbegin(), kBellwetherNorthApproach.rend()) &&
@@ -1560,12 +1573,14 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         expedition.checkpoint.position.y == original.position.y &&
                         expedition.checkpoint.position.z == original.position.z &&
                         expedition.checkpoint.vitality == original.vitality &&
-                        expedition.checkpoint.flask == original.flask && expedition.checkpoint.dialogue.activeLine == Line::None,
+                        expedition.checkpoint.flask == original.flask && expedition.checkpoint.treasurePurse == earned &&
+                        expedition.checkpoint.dialogue.activeLine == Line::None,
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
                     if (progressed) {
                         campaign::storage::StoredCheckpoint resumed;
                         progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
+                            state.treasurePurse == earned &&
                             (!state.healingFlaskEnabled || state.healingFlask.resources == expedition.checkpoint.flask) &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==

@@ -272,6 +272,7 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
     private static final int CONTEXTUAL_TAVERN_DOOR_SHIFT = 22;
     private static final int CONTEXTUAL_TAVERN_DOOR_MASK = 3;
+    private static final int CONTEXTUAL_REGISTER_REWARD = 1 << 24;
     private static final int CONTEXTUAL_RERAISE_OBJECTIVE = 1 << 21;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
@@ -8978,6 +8979,7 @@ public class MainActivity extends Activity {
             case 5: return R.string.take_road_register;
             default: break;
         }
+        if ((state & CONTEXTUAL_REGISTER_REWARD) != 0) return R.string.collect_register_reward;
         switch ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) {
             case 1: return R.string.show_road_mark;
             case 2: return R.string.show_road_register;

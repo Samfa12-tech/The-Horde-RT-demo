@@ -1751,8 +1751,27 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                       "the church reading identifies both independent routes in order");
                 ++input.commands.dialogueSkip;step();
             }
-            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::RecallRoutes,
-                  "after the interpretation the player can recall both directions");
+            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::CollectReward &&
+                  game.Snapshot().treasurePurse.coins==0 && read && read->treasurePurse==cp::TreasurePurse{},
+                  "interpretation offers a reward without crediting it before the player collects it");
+            ++input.commands.interact;step();
+            const auto rewarded=game.LatestCampaignBoundary();
+            const cp::TreasurePurse earned{cp::TreasurePurse::kRegisterRewardCoins,true};
+            Check(state.chapterDialogue.line==Line::RecordKeeperReward && state.treasurePurse==earned &&
+                  rewarded && read && rewarded->schema==cp::kTreasurePurseSchema && rewarded->treasurePurse==earned &&
+                  rewarded->position.x==read->position.x && rewarded->position.z==read->position.z &&
+                  rewarded->dialogue.activeLine==Line::None && rewarded->flask==read->flask,
+                  "the player collects the coins once and updates the existing return point and resources atomically");
+            ++input.commands.dialogueSkip;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::RecallRoutes,
+                  "the keeper offers directions again once the reward has been collected");
+            ++input.commands.interact;step();
+            Check(state.chapterDialogue.line==Line::RecordKeeperRegister && state.treasurePurse==earned,
+                  "a repeat interaction recalls the routes without paying again");
+            for(const auto line:kRecordKeeperReading) {
+                Check(state.chapterDialogue.line==line,"the reading remains repeatable after the reward");
+                ++input.commands.dialogueSkip;step();
+            }
             input.moveForward=1;input.runHeld=true;
             const bool returned=walkTo(kBellwetherChurchApproach.front()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
@@ -1786,7 +1805,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 ++input.commands.dialogueSkip;step();
             }
             const auto introduced=game.LatestCampaignBoundary();
-            Check(introduced && introduced->schema==cp::kTavernLanternExchangeSchema &&
+            Check(introduced && introduced->schema==cp::kTreasurePurseSchema && introduced->treasurePurse==earned &&
                   introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
                   introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
                   "the direct exchange updates the earned save and retains the independently interpreted register");

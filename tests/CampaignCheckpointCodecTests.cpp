@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kTavernLanternExchangeSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192};
+    constexpr std::array<std::size_t,cp::kTreasurePurseSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -199,7 +199,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kTavernLanternExchangeSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kTreasurePurseSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -320,7 +320,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kTavernLanternExchangeSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kTreasurePurseSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -365,7 +365,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kTavernLanternExchangeSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kTreasurePurseSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;
@@ -404,6 +404,23 @@ int main() {
         archive.schema=cp::kRegisterInterpretationSchema;
         RoundTrip(archive);
         auto interpreted=Encode(archive);
+        Check(codec::Decode(interpreted,legacy,error) && legacy.treasurePurse==cp::TreasurePurse{},
+            "legacy interpretation starts with an empty purse and an uncollected reward");
+        auto paid=archive;
+        Check(paid.treasurePurse.ClaimRegisterReward() && !paid.treasurePurse.ClaimRegisterReward(),
+            "the purse accepts its one-time payment exactly once");
+        invalidEncode(paid,codec::Error::InvalidCheckpoint);
+        paid.schema=cp::kTreasurePurseSchema;
+        RoundTrip(paid);
+        auto badReward=Encode(paid);badReward.back()=std::byte{2};Rechecksum(badReward);
+        Reject(badReward,codec::Error::Malformed);
+        auto tampered=paid;tampered.waysideRegisterInterpreted=false;invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        tampered=paid;tampered.treasurePurse.registerRewardClaimed=false;invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        tampered=paid;tampered.treasurePurse.coins=cp::TreasurePurse::kMaximumCoins+1;
+        invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        paid.treasurePurse.coins=0;
+        Check(!paid.treasurePurse.CanClaimRegisterReward(),"an empty purse must not erase prior collection");
+        RoundTrip(paid);
         interpreted.back()=std::byte{2};Rechecksum(interpreted);Reject(interpreted,codec::Error::Malformed);
         archive.waysideRegisterRecovered=false;
         invalidEncode(archive,codec::Error::InvalidCheckpoint);
