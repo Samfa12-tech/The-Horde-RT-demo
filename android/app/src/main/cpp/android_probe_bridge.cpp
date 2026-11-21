@@ -16,6 +16,7 @@
 #include <cstring>
 #include <ctime>
 #include <exception>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <locale>
@@ -648,8 +649,19 @@ void InvalidateBenchmarkSummaryLocked()
 }
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+
+horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationConfig()
+{
+    auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    config.bellwetherTavernKeeperAdmitted = true;
+    config.bellwetherRecordKeeperAdmitted = true;
+#endif
+    return config;
+}
+
 horde::gameplay::simulation::GameSimulation gGameSimulation =
-    horde::gameplay::simulation::CreateApplicationGameSimulation();
+    horde::gameplay::simulation::GameSimulation(AndroidApplicationSimulationConfig());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::uint64_t gPrivateRevivalResourceGeneration=1;
 std::mutex gInputPublisherMutex;
@@ -1572,7 +1584,7 @@ void ResetShowcaseSimulation()
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile !=
         horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     if (replacedQueue)
-        gGameSimulation = horde::gameplay::simulation::CreateApplicationGameSimulation();
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(AndroidApplicationSimulationConfig());
     else
         gGameSimulation.ResetRoute();
     horde::platform::android::ResetMusicSession(replacedQueue);
@@ -2066,7 +2078,7 @@ bool ApplyDebugCheckpointSimulation(
 {
     // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
     const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
-        ? horde::gameplay::simulation::PrivateRevivalApplicationConfig()
+        ? AndroidApplicationSimulationConfig()
         : horde::gameplay::simulation::GameSimulationConfig{};
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
@@ -2434,7 +2446,11 @@ bool ApplyBenchmarkCheckpoint(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    const bool liveJourney = selection.development != nullptr && selection.development->id == 192;
+    const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        || checkpoint.id == 329 || checkpoint.id == 335
+#endif
+        );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
     // Retire the preceding receipt before trying a repeated import. A failed
     // replacement must not retain a ready=true receipt from the prior run.
@@ -3636,6 +3652,24 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
     context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    using horde::vulkan::raytracing::ChapterResidentActorSource;
+    std::vector<ChapterResidentActorSource> residents;
+    if (context.developmentRescueJourney && context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase)
+    {
+        const auto root = (std::filesystem::path(context.reportDirectory) / ".." / "private_bellwether").lexically_normal();
+        residents = {
+            {horde::gameplay::dialogue::kTavernKeeperActorId, root / "tavern-keeper", "resident.glb",
+                {{"Warden|idle", true, true}, {"Warden|walk", true, true}}},
+            {horde::gameplay::dialogue::kRecordKeeperActorId, root / "record-keeper", "resident.glb",
+                {{"Warden|idle", true, true}}}
+        };
+    }
+    if (!context.rtScene.SetChapterResidentActors(residents, diagnostic)) {
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
+        return false;
+    }
+#endif
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;

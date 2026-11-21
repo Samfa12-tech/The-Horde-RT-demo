@@ -42,6 +42,34 @@ if(flaskCandidateDirectory) {
 // The source MP3, editable Blender files and previews never enter an APK.
 def hordeShipping17AssetDirectory=providers.gradleProperty('hordeShipping17AssetDir').orNull
 
+// Local Bellwether phone proof. The staged ASTC textures and two exact model
+// derivatives are admitted only to the separately installed Debug application.
+def bellwetherResidentPath = providers.gradleProperty('hordeBellwetherResidentDir').orNull
+def bellwetherResidentDirectory = bellwetherResidentPath ? file(bellwetherResidentPath).canonicalFile : null
+if (bellwetherResidentDirectory) {
+    def pinned = [
+        'private_bellwether/tavern-keeper/asset.manifest.json': 'a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7',
+        'private_bellwether/tavern-keeper/resident.glb': '67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696',
+        'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
+        'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
+        'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
+        'private_bellwether/record-keeper/normal.android.ktx2': '04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0',
+        'private_bellwether/record-keeper/orm.android.ktx2': 'f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb'
+    ]
+    if (!bellwetherResidentDirectory.isDirectory()) throw new GradleException('Bellwether Debug asset root is missing.')
+    def actual = []
+    bellwetherResidentDirectory.eachFileRecurse(groovy.io.FileType.FILES) {
+        actual.add(bellwetherResidentDirectory.toPath().relativize(it.toPath()).toString().replace('\\','/'))
+    }
+    if (actual.sort() != pinned.keySet().toList().sort())
+        throw new GradleException('Bellwether Debug requires exactly the seven pinned resident files.')
+    pinned.each { relative, expected ->
+        def asset = new File(bellwetherResidentDirectory, relative)
+        if (MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString() != expected)
+            throw new GradleException("Bellwether Debug asset differs: ${relative}")
+    }
+}
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -86,7 +114,7 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
 }
 if (hordeShipping17AssetDirectory) {
-    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory)
+    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory || bellwetherResidentDirectory)
         throw new GradleException('Ordinary 1.7 assets cannot share a private Debug admission or another version.')
     def assetRoot=file(hordeShipping17AssetDirectory)
     if (!assetRoot.isDirectory()) throw new GradleException('Ordinary 1.7 asset root is missing.')
@@ -329,6 +357,10 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (bellwetherResidentDirectory && (actorWorkerExperiment || hordeStagedPrimaryDebugValidation ||
+        viewmodelCandidate || privateRevivalDirectory || flaskCandidateDirectory)) {
+    throw new GradleException('Bellwether Debug uses its own application and resident fixture.')
+}
 if (hordeBenchmarkMinRenderScale == 33 &&
     (hordeStagedPrimaryShaderDirProperty != null || hordeStagedPrimaryDebugValidation ||
      hordeStagedPrimaryTiming || viewmodelCandidate)) {
@@ -710,6 +742,7 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
@@ -751,7 +784,13 @@ android {
         debug {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
-            applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
+            buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
+            if (bellwetherResidentDirectory) {
+                applicationIdSuffix '.debug.bellwether'
+                resValue 'string', 'app_name', 'Horde RT Bellwether Debug'
+            } else {
+                applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
+            }
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
             buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', actorWorkerExperiment ? 'true' : 'false'
@@ -763,6 +802,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -826,6 +866,7 @@ android {
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
         if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
         if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
+        if (bellwetherResidentDirectory) debug.assets.srcDir(bellwetherResidentDirectory)
         if (hordeShipping17AssetDirectory) release.assets.srcDir(file(hordeShipping17AssetDirectory))
     }
 }
@@ -836,6 +877,10 @@ dependencies {
 }
 
 gradle.taskGraph.whenReady { graph ->
+    if (bellwetherResidentDirectory &&
+        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+        throw new GradleException('Bellwether resident candidates are restricted to the separate Debug package.')
+    }
     if (hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory &&
         graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
         throw new GradleException('Ordinary 1.7 Android release requires the pinned hordeShipping17AssetDir; refusing an incomplete package.')

@@ -965,6 +965,18 @@ public class MainActivity extends Activity {
                 PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_flask/player.glb"),2719368L,
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
+            if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
+                for (String asset : new String[] {
+                        "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
+                        "record-keeper/asset.manifest.json", "record-keeper/resident.glb",
+                        "record-keeper/base-color.android.ktx2", "record-keeper/normal.android.ktx2",
+                        "record-keeper/orm.android.ktx2"
+                }) {
+                    final String path = "private_bellwether/" + asset;
+                    if (!stageAsset(path, path))
+                        throw new IllegalStateException("Bellwether Debug could not stage " + asset);
+                }
+            }
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
@@ -7314,10 +7326,12 @@ public class MainActivity extends Activity {
             case "world-route": return 190;
             case "world-route-staged": return 191;
             case "rescue-journey-start": return 192;
+            case "bellwether-repeat-visit": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 329 : -1;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
             case "bellwether-church-approach": return 334;
+            case "bellwether-record-keeper-handoff": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7662,10 +7676,12 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 329: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{-0.14f, -0.11f} : null;
             case 331:
             case 332:
             case 333: return new float[]{0.0f, -0.12f};
             case 334: return new float[]{-1.57f, -0.24f};
+            case 335: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{1.57079632679f, -0.07f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};

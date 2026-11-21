@@ -28,7 +28,36 @@ cd android
 adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
 ```
 
-The debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+The ordinary debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+
+### Bellwether three-actor playtest
+
+Build the separate phone playtest with `-PhordeBellwetherResidentDir=<local-root>`.
+The directory contains `private_bellwether/tavern-keeper` with the stand-in
+GLB and manifest, and `private_bellwether/record-keeper` with the prepared GLB,
+manifest, and three Android ASTC KTX2 files. The build verifies the seven file
+identities. Its application ID is `com.samfa12.hordelanternrt.debug.bellwether`,
+which gives it separate saves and settings.
+
+```powershell
+.\gradlew.bat :app:assembleDebug "-PhordeBellwetherResidentDir=<local-root>" '-Pandroid.injected.build.abi=arm64-v8a'
+```
+
+The existing Debug checkpoint intent accepts `bellwether-repeat-visit` for
+the staffed tavern threshold and `bellwether-record-keeper-handoff` for the
+church and return to Kit. With capture disabled, both enter normal live
+control after staging. The variant uses the same hardware RT backend selection
+and authored chapter simulation as the other builds. The output is a local
+phone-validation artifact. Build and package verification are distinct from
+on-device presentation and sustained performance.
+
+From a fresh launch of the Bellwether package, the live church start uses:
+
+```powershell
+adb shell am start -n com.samfa12.hordelanternrt.debug.bellwether/com.samfa12.hordelanternrt.MainActivity --ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-record-keeper-handoff
+```
+
+### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
 

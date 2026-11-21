@@ -16,6 +16,20 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
 public final class ChapterDebugCheckpointTest {
+    @Test public void residentCheckpointsRequireThePrivatePackage() {
+        assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 329 : -1,
+                MainActivity.checkpointId("bellwether-repeat-visit"));
+        assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1,
+                MainActivity.checkpointId("bellwether-record-keeper-handoff"));
+        if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
+            assertArrayEquals(new float[]{-.14f, -.11f}, MainActivity.developmentCheckpointViewPose(329), .000001f);
+            assertArrayEquals(new float[]{1.57079632679f, -.07f}, MainActivity.developmentCheckpointViewPose(335), .000001f);
+        } else {
+            assertNull(MainActivity.developmentCheckpointViewPose(329));
+            assertNull(MainActivity.developmentCheckpointViewPose(335));
+        }
+    }
+
     @Test public void allAuthoredChapterCapturesResolveWithTheirNativeCamera() throws Exception {
         Path root = Paths.get("../../src/gameplay/DevelopmentCheckpoints.h");
         if (!Files.exists(root)) root = Paths.get("src/gameplay/DevelopmentCheckpoints.h");
