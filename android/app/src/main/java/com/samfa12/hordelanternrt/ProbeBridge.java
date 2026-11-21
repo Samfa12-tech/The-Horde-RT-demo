@@ -76,6 +76,7 @@ public final class ProbeBridge {
     public static native long[] getChapterDialogueState();
     /** Coherent lookout availability: schema, surface generation, world generation, available. */
     public static native long[] getLookoutObjectiveState(long surfaceGeneration);
+    public static native String getLookoutObjectiveText(long surfaceGeneration, long worldGeneration, int objective);
     /** Speaker and exact catalog text from the same render-owner publication. */
     public static native String getChapterDialogueText(long generation);
     /** Packed Float left/right planar gains from the shared spatial-audio model. */

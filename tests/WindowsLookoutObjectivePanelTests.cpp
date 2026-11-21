@@ -121,6 +121,21 @@ int main() {
         Check(open(h.view),"final explicit opening remains available");Click(parent,Panel::MenuId);
         Check(h.actions.size()==3 && h.actions.back()==Panel::Action::ReturnToMenu && !h.panel.Visible(),
             "only current native Return to menu emits its distinct action");
+        h.view.objective=Panel::Objective::BellwetherRegister;
+        Check(open(h.view) && Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" &&
+            Text(parent,Panel::BodyId)==horde::gameplay::campaign::PauseObjectiveText(h.view.objective) &&
+            !GetDlgItem(parent,Panel::MenuId),"the Bellwether page shows earned directions and offers pause navigation");
+        Click(parent,Panel::BackId);
+        Check(h.actions.size()==4 && h.actions.back()==Panel::Action::BackToPause && !h.panel.Visible(),
+            "Bellwether Back preserves the pause menu");
+        Check(open(h.view),"the directions can reopen without changing progress");
+        const HWND oldDirections=GetDlgItem(parent,Panel::ContinueId);
+        h.view.objective=Panel::Objective::BellwetherExpeditions;
+        SendMessageA(parent,WM_COMMAND,MAKEWPARAM(Panel::ContinueId,BN_CLICKED),reinterpret_cast<LPARAM>(oldDirections));
+        Check(h.actions.size()==4 && !h.panel.Visible(),"new earned directions revoke the previous page's controls");
+        Check(open(h.view) && Text(parent,Panel::BodyId).find("future expeditions")!=std::string::npos,
+            "expedition directions identify leads for future content");
+        Click(parent,Panel::ContinueId);
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }
     foreground.Observe("before-destroy");

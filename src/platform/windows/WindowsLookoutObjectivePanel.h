@@ -8,22 +8,23 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include "gameplay/campaign/LookoutObjective.h"
 
 namespace horde::platform::windows {
 // Native presentation only. The owner supplies the shared gameplay eligibility;
 // this panel never advances, resets, loads or saves a campaign.
 class WindowsLookoutObjectivePanel {
 public:
-    enum class Action { ContinueExploring, ReturnToMenu };
+    using Objective = gameplay::campaign::PauseObjective;
+    enum class Action { ContinueExploring, ReturnToMenu, BackToPause };
     struct View {
         bool available=false,active=false;
         std::uint64_t worldGeneration=0,surfaceGeneration=0;
+        Objective objective=Objective::Lookout;
     };
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
-    static constexpr const char* Body=
-        "Follow the road down to Bellwether. The tavern is across the square.\r\n\r\n"
-        "You can also turn back toward the tomb.";
+    static constexpr const char* Body=gameplay::campaign::kLookoutObjectiveText;
     ~WindowsLookoutObjectivePanel() { Close(); }
     WindowsLookoutObjectivePanel()=default;
     WindowsLookoutObjectivePanel(const WindowsLookoutObjectivePanel&)=delete;
@@ -31,9 +32,13 @@ public:
 
     bool Open(HWND parent,const View& view,HFONT font=nullptr) {
         if(visible_ || !IsWindow(parent) || !Admitted(view))return false;
-        parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;
-        constexpr std::array<const char*,5> labels{Title,Body,"CONTINUE EXPLORING","RETURN TO MENU","BACK"};
+        parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
+        const bool lookout = objective_ == Objective::Lookout;
+        const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
+            gameplay::campaign::PauseObjectiveText(objective_),"CONTINUE EXPLORING",
+            lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
         for(std::size_t i=0;i<controls_.size();++i) {
+            if (!labels[i]) continue;
             const bool button=i>=2;
             controls_[i]=CreateWindowExA(0,button?"BUTTON":"STATIC",labels[i],
                 WS_CHILD|(button?WS_TABSTOP|BS_OWNERDRAW:SS_CENTER|SS_NOPREFIX),0,0,1,1,parent,
@@ -44,7 +49,7 @@ public:
             SendMessageA(controls_[i],WM_SETFONT,reinterpret_cast<WPARAM>(uiFont),FALSE);
         }
         visible_=true;
-        for(auto control:controls_)ShowWindow(control,SW_SHOWNOACTIVATE);
+        for(auto control:controls_)if(control)ShowWindow(control,SW_SHOWNOACTIVATE);
         return true;
     }
     void Close() {
@@ -57,7 +62,8 @@ public:
     bool Visible() const {return visible_;}
     bool Refresh(const View& view) {
         if(!visible_)return false;
-        if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_) {
+        if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_ ||
+            view.objective!=objective_) {
             Close();return false;
         }
         return true;
@@ -67,7 +73,8 @@ public:
         if(!Handles(id) || !Refresh(view))return {};
         const auto index=static_cast<std::size_t>(id-TitleId);
         if(!source || source!=controls_[index] || !IsWindow(source) || !IsWindowEnabled(source))return {};
-        const auto result=id==MenuId?Action::ReturnToMenu:Action::ContinueExploring;
+        const auto result=id==MenuId?Action::ReturnToMenu:
+            id==BackId && objective_!=Objective::Lookout?Action::BackToPause:Action::ContinueExploring;
         Close();return result;
     }
     std::array<HWND,3> ActionControls() const {return {controls_[2],controls_[3],controls_[4]};}
@@ -78,21 +85,25 @@ public:
         const int availableHeight=std::max(1L,bounds.bottom-bounds.top);
         const int width=std::min(px(540),availableWidth);
         const int titleHeight=px(42),bodyHeight=px(140),gap=px(10);
-        const int buttonHeight=std::min(px(44),std::max(px(24),(availableHeight-titleHeight-bodyHeight-5*gap)/3));
-        const int total=titleHeight+bodyHeight+3*buttonHeight+5*gap;
+        const int buttons = objective_==Objective::Lookout ? 3 : 2;
+        const int gaps = buttons + 2;
+        const int buttonHeight=std::min(px(44),std::max(px(24),(availableHeight-titleHeight-bodyHeight-gaps*gap)/buttons));
+        const int total=titleHeight+bodyHeight+buttons*buttonHeight+gaps*gap;
         const int x=bounds.left+(availableWidth-width)/2;
         int y=bounds.top+std::max(0,(availableHeight-total)/2);
         MoveWindow(controls_[0],x,y,width,titleHeight,TRUE);y+=titleHeight+gap;
         MoveWindow(controls_[1],x,y,width,bodyHeight,TRUE);y+=bodyHeight+2*gap;
-        for(auto control:ActionControls()) {MoveWindow(control,x,y,width,buttonHeight,TRUE);y+=buttonHeight+gap;}
+        for(auto control:ActionControls()) if(control) {MoveWindow(control,x,y,width,buttonHeight,TRUE);y+=buttonHeight+gap;}
     }
 private:
     static bool Admitted(const View& view) {
-        return view.available && view.active && view.worldGeneration && view.surfaceGeneration;
+        return view.available && view.active && view.worldGeneration && view.surfaceGeneration &&
+            view.objective!=Objective::None;
     }
     HWND parent_=nullptr;
     std::array<HWND,5> controls_{};
     bool visible_=false;
     std::uint64_t world_=0,surface_=0;
+    Objective objective_=Objective::None;
 };
 } // namespace horde::platform::windows

@@ -1213,10 +1213,10 @@ void PublishSimulationUiState()
         gChapterDialogueUiSnapshot = simulation.chapterDialogue;
         gChapterDialogueUiAudioDomain = horde::gameplay::ResolveSpatialAudioDomain(
             simulation.developmentRescueJourney, simulation.worldRoute.current);
-        gLookoutObjectiveUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
+        gLookoutObjectiveUiState={2,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
             static_cast<jlong>(simulation.worldRoute.generation),
-            horde::gameplay::campaign::LookoutObjectiveAvailable(simulation,
-                gGameSimulation.LatestCampaignBoundary())?1:0};
+            static_cast<jlong>(horde::gameplay::campaign::CurrentPauseObjective(simulation,
+                gGameSimulation.LatestCampaignBoundary()))};
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -7329,6 +7329,20 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveState(JNIEnv* env
     const auto result=env->NewLongArray(static_cast<jsize>(state.size()));
     if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());
     return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
+    JNIEnv* env, jclass, jlong surface, jlong world, jint objective)
+{
+    std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+    if (surface<=0 || world<=0 || objective<=0 ||
+        gSurfaceSessions.State(static_cast<std::uint64_t>(surface))!=1 ||
+        gLookoutObjectiveUiState[1]!=surface || gLookoutObjectiveUiState[2]!=world ||
+        gLookoutObjectiveUiState[3]!=objective)
+        return env->NewStringUTF("");
+    using namespace horde::gameplay::campaign;
+    return env->NewStringUTF(PauseObjectiveText(static_cast<PauseObjective>(objective)));
 }
 
 extern "C" JNIEXPORT jlong JNICALL

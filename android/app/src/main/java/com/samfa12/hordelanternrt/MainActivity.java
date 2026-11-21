@@ -1497,7 +1497,7 @@ public class MainActivity extends Activity {
         final LookoutObjectiveState lookout=readLookoutObjective();
         if(lookout!=null && lookout.available) {
             final long menuEpoch=lookoutObjectiveEpoch;
-            addMenuButton(panel,"Lookout objective",() -> {
+            addMenuButton(panel,lookout.isLookout()?"Lookout objective":"Bellwether directions",() -> {
                 if(menuEpoch==lookoutObjectiveEpoch)showLookoutObjective(lookout);
             });
         }
@@ -1543,23 +1543,39 @@ public class MainActivity extends Activity {
 
     private void showLookoutObjective(LookoutObjectiveState expected) {
         if(!menuVisible || !controllerWindowFocused || expected==null || !expected.matches(readLookoutObjective()))return;
+        final String text;
+        try {
+            text = ProbeBridge.getLookoutObjectiveText(expected.surfaceGeneration, expected.worldGeneration, expected.objective);
+        } catch (RuntimeException | LinkageError unavailable) {return;}
+        if (text==null || text.isEmpty())return;
         // Opening is an explicit pause-menu action. No arrival poll invokes this page.
         clearTouchState();setGameplayPaused(true);
         invalidateLookoutObjective();lookoutObjectiveVisible=true;lookoutObjectiveState=expected;
         final long epoch=lookoutObjectiveEpoch;
         menuScrim.removeAllViews();
-        final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
+        final boolean lookout = expected.isLookout();
+        final LinearLayout panel=lookout ? createPanel("The road ahead","FOREST LOOKOUT") :
+                createPanel("Directions","BELLWETHER");
         lookoutObjectivePanel=panel;
-        addBody(panel,"Follow the road down to Bellwether. The tavern is across the square. You can also turn back toward the tomb.");
-        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
+        addBody(panel,text);
+        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,this::hideMenu));
         panel.addView(exploring,menuButtonLayoutParams());
-        addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));
+        if (lookout)
+            addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,this::returnGameplayToMainMenu));
+        else
+            addMenuButton(panel,"Back to pause menu",() -> finishLookoutObjective(epoch,expected,() -> showMainMenu(false)));
         attachPanel(panel);
         if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
         else exploring.requestFocus();
     }
 
-    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,boolean returnToMenu) {
+    private void cancelLookoutObjective() {
+        final LookoutObjectiveState shown = lookoutObjectiveState;
+        if(shown!=null)
+            finishLookoutObjective(lookoutObjectiveEpoch,shown,shown.isLookout()?this::hideMenu:() -> showMainMenu(false));
+    }
+
+    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,Runnable action) {
         if(!lookoutObjectiveVisible || epoch!=lookoutObjectiveEpoch || !resumed || !controllerWindowFocused)return;
         ViewParent owner=lookoutObjectivePanel==null?null:lookoutObjectivePanel.getParent();
         while(owner instanceof View && owner!=menuScrim)owner=owner.getParent();
@@ -1568,8 +1584,7 @@ public class MainActivity extends Activity {
             showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
         }
         invalidateLookoutObjective();clearTouchState();
-        if(returnToMenu) returnGameplayToMainMenu();
-        else hideMenu();
+        action.run();
     }
 
     private void returnGameplayToMainMenu() {
@@ -8446,7 +8461,7 @@ public class MainActivity extends Activity {
         if(lookoutObjectiveVisible && event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
                 event.getKeyCode()==KeyEvent.KEYCODE_ESCAPE) {
             if(event.getAction()==KeyEvent.ACTION_UP)
-                finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);
+                cancelLookoutObjective();
             return true;
         }
         if (!AndroidControllerInput.isControllerKey(event)) {
@@ -9171,7 +9186,7 @@ public class MainActivity extends Activity {
         }
         if(campaignMenuVisible) { backFromCampaignMenu(); return; }
         if(lookoutObjectiveVisible) {
-            finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);return;
+            cancelLookoutObjective();return;
         }
         if (backExitDialog != null && backExitDialog.isShowing()) {
             backExitDialog.cancel();

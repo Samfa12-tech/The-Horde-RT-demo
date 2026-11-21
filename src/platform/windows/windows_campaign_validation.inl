@@ -1353,7 +1353,35 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 using namespace horde::gameplay::traversal;
                 using namespace horde::gameplay::bellwether;
                 using horde::gameplay::interactions::HeldLightPose;
+                using campaign::PauseObjective;
                 const auto junction = kBellwetherTavernRoute.begin() + kBellwetherChurchJunction;
+                const auto readDirections = [&](PauseObjective objective) {
+                    const auto operation = ctx.campaign->State().operationRevision;
+                    const auto dialogueGeneration = state.chapterDialogue.generation;
+                    const float x = state.playerX, z = state.playerZ;
+                    ShowPauseMenu(ctx,true);
+                    if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
+                        !ctx.lookoutObjective->Visible() || !ctx.simulationPaused) {
+                        std::cerr << "Bellwether directions did not open for objective " << static_cast<int>(objective) << '\n';
+                        return false;
+                    }
+                    std::array<char,512> text{};
+                    GetWindowTextA(GetDlgItem(ctx.windowHandle,LookoutPanel::BodyId),text.data(),static_cast<int>(text.size()));
+                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective);
+                    const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
+                        ctx.pauseMenuVisible && ctx.simulationPaused;
+                    const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
+                    // Fixed-step commands stay on the diagnostic input publisher.
+                    input.paused = false;
+                    const bool unchanged = operation==ctx.campaign->State().operationRevision &&
+                        dialogueGeneration==state.chapterDialogue.generation && x==state.playerX && z==state.playerZ;
+                    if (!correct || !resumed || !unchanged)
+                        std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
+                                  << " textCorrect=" << correct << " resumed=" << resumed
+                                  << " progressUnchanged=" << unchanged << '\n';
+                    // Rebuild the interaction prompts after the read-only UI closes.
+                    return correct && resumed && unchanged && step();
+                };
                 const auto walk = [&](auto first, auto last) { return std::all_of(first, last, walkTo); };
                 const auto face = [&](float yaw, float pitch) {
                     input.yawRadians = yaw;
@@ -1376,11 +1404,20 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     return walkTo(kBellwetherChurchApproach.front()) &&
                         walkTo(kBellwetherRecordKeeperApproach) && face(1.57079632679f, -.12f);
                 };
-                progressed = check(walk(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction)) &&
-                    walk(kBellwetherNorthApproach.begin(), kBellwetherNorthApproach.end()) && approachKeeper() &&
-                    state.recordKeeperAction == RecordKeeperAction::ShowRoadMark && interact() && frame() &&
-                    dialogue(kRecordKeeperLead),
+                progressed = check(readDirections(PauseObjective::BellwetherShrine),
+                    "the restored tavern pause menu recalls the shrine lead without advancing play");
+                const bool reachedKeeper = progressed &&
+                    walk(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction)) &&
+                    walk(kBellwetherNorthApproach.begin(), kBellwetherNorthApproach.end()) && approachKeeper();
+                const auto offered = state.recordKeeperAction;
+                const bool presentedLead = reachedKeeper && offered == RecordKeeperAction::ShowRoadMark &&
+                    interact() && frame();
+                progressed = check(presentedLead && dialogue(kRecordKeeperLead),
                     "the staffed church gives the wayside lead after the player leaves the earned tavern");
+                if (!progressed)
+                    std::cerr << "Bellwether church lead reached=" << reachedKeeper
+                              << " offered=" << static_cast<int>(offered) << " presented=" << presentedLead
+                              << " currentLine=" << static_cast<int>(state.chapterDialogue.line) << '\n';
                 if (progressed) {
                     constexpr std::array help{Line::LanternFirstHelp};
                     constexpr std::array reveal{Line::LanternFirstIdentity, Line::LanternKingName, Line::LanternFirstRequest};
@@ -1388,12 +1425,22 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     progressed = check(walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherNorthApproach.back()) &&
                         walk(kBellwetherWaysideApproach.begin(), kBellwetherWaysideApproach.end()) && face(0.f, -.12f) &&
                         state.waysideArchiveAction == ArchiveAction::Inspect && interact() && dialogue(help) &&
+                        readDirections(PauseObjective::BellwetherLowerStone) &&
                         state.waysideArchiveAction == ArchiveAction::Open && interact() &&
                         waitFor([&] { return state.waysideArchive.stage == ArchiveStage::Open; }, 90) && frame() &&
-                        dialogue(reveal) && state.waysideArchiveAction == ArchiveAction::TakeRegister && interact() &&
+                        dialogue(reveal) && readDirections(PauseObjective::BellwetherArchive) &&
+                        state.waysideArchiveAction == ArchiveAction::TakeRegister && interact() &&
                         state.waysideArchive.registerRecovered && !state.waysideArchive.registerInterpreted && dialogue(pickup),
                         "physical archive opening earns the shrine reveal and recoverable register before interpretation");
+                    if (!progressed)
+                        std::cerr << "Bellwether shrine stage=" << static_cast<int>(state.waysideArchive.stage)
+                                  << " action=" << static_cast<int>(state.waysideArchiveAction)
+                                  << " line=" << static_cast<int>(state.chapterDialogue.line)
+                                  << " recovered=" << state.waysideArchive.registerRecovered << '\n';
                 }
+                if (progressed)
+                    progressed = check(readDirections(PauseObjective::BellwetherRegister),
+                        "away from the tavern the pause directions point the recovered register back to the record keeper");
                 if (progressed) {
                     progressed = check(walk(std::next(kBellwetherWaysideApproach.rbegin()), kBellwetherWaysideApproach.rend()) &&
                         walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
@@ -1403,6 +1450,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         state.chapterDialogue.tavernLanternLinesStarted == 0,
                         "the real register handoff teaches both routes independently of Kit's firsthand knowledge");
                 }
+                if (progressed)
+                    progressed = check(readDirections(PauseObjective::BellwetherExpeditions),
+                        "the church pause directions show both interpreted routes as future expeditions");
                 if (progressed) {
                     progressed = check(walkTo(kBellwetherChurchApproach.front()) &&
                         walk(kBellwetherNorthApproach.rbegin(), kBellwetherNorthApproach.rend()) &&
@@ -1444,12 +1494,15 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
                     if (progressed) {
                         campaign::storage::StoredCheckpoint resumed;
-                        check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
+                        progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                                 campaign::storage::Status::Read && resumed.encoded == expedition.encoded,
                             "native reload preserves both discoveries and does not replay the speech or rewrite the save");
+                        if (progressed)
+                            check(readDirections(PauseObjective::BellwetherExpeditions),
+                                "the reloaded tavern pause menu restores the earned expedition directions");
                     }
                 }
             }

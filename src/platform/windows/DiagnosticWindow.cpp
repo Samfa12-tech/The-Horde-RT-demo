@@ -3712,9 +3712,12 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         !context.settingsVisible && !context.diagnosticsVisible && !context.benchmarkReportVisible &&
         !context.graphicsVisible && !context.rtLabVisible && !context.deathOverlayVisible && !context.endingOverlayVisible &&
         !context.campaignPause && !(context.campaignMenu && context.campaignMenu->Visible()) &&
-        !context.benchmark.IsRunning() && context.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
-        horde::gameplay::campaign::LookoutObjectiveAvailable(snapshot,context.simulation.LatestCampaignBoundary());
-    return {available,context.lookoutAppActive,snapshot.worldRoute.generation,context.campaignSurfaceGeneration};
+        !context.benchmark.IsRunning() && context.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    const auto objective = available ?
+        horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
+        LookoutPanel::Objective::None;
+    return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
@@ -3925,6 +3928,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle,kCampaignLoadButtonId,pauseVisible && !campaignVisible &&
         (!context.entryMenuVisible || context.entryMoreVisible) && !context.endingOverlayVisible);
     const auto lookoutView=CurrentLookoutObjectiveView(context);
+    if (lookoutView.available)
+        horde::platform::windows::SetNativeTextIfChanged(GetDlgItem(context.windowHandle,kLookoutObjectiveButtonId),
+            lookoutView.objective==LookoutPanel::Objective::Lookout?"LOOKOUT OBJECTIVE":"BELLWETHER DIRECTIONS");
     SetControlVisible(context.windowHandle,kLookoutObjectiveButtonId,pauseVisible && lookoutView.available && lookoutView.active);
     if(campaignVisible) {
         EnumChildWindows(context.windowHandle,[](HWND child,LPARAM)->BOOL {
@@ -4206,7 +4212,7 @@ void OpenLookoutObjective(VulkanSurfaceContext& context)
     if(!context.lookoutObjective)context.lookoutObjective=std::make_unique<LookoutPanel>();
     const auto font=reinterpret_cast<HFONT>(SendMessageA(GetDlgItem(context.windowHandle,kResumeButtonId),WM_GETFONT,0,0));
     if(!context.lookoutObjective->Open(context.windowHandle,view,font))return;
-    for(auto control:context.lookoutObjective->ActionControls())InstallControllerFocusOutline(control);
+    for(auto control:context.lookoutObjective->ActionControls())if(control)InstallControllerFocusOutline(control);
     ApplyOverlayState(context);
     RECT client{};GetClientRect(context.windowHandle,&client);
     LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
@@ -4231,6 +4237,11 @@ void FinishLookoutObjective(VulkanSurfaceContext& context,LookoutPanel::Action a
     context.simulationInput.dialogueCompletionLine=0;context.simulationInput.dialogueCompletionGeneration=0;
     context.lookoutMovementNeedsFreshKeyDown=true;context.lastControlSteadyNs=0;
     if(action==LookoutPanel::Action::ContinueExploring) {ShowPauseMenu(context,false);return;}
+    if(action==LookoutPanel::Action::BackToPause) {
+        ShowPauseMenu(context,true);
+        FocusGameControl(GetDlgItem(context.windowHandle,kLookoutObjectiveButtonId));
+        return;
+    }
     // Reuse the branded RT entry profile. Its existing retirement path retains
     // the paused logical simulation and latest boundary; no reset/save/write.
     context.entryMenu.Reset();context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);

@@ -98,6 +98,14 @@ Use `--bellwether-verify-expedition-leads` in place of `--bellwether-earn-tavern
 
 Both standard Windows hardware RT backends passed all 16 checks from the lookout menu load through the final tavern reload. The final save kept the interpreted register and all six lantern exchange lines without replaying speech on load or changing the saved bytes. This is hidden Windows campaign and save evidence. Phone controls, listening and sustained performance still need their own checks.
 
+### Bellwether directions in the pause menu
+
+Completing the first tavern Talk unlocks **Bellwether directions** in the pause menu while exploring outside the tomb. The page follows the player's progress from finding the northern church or shrine, through opening the lower stone and recovering the register, to bringing it to the record keeper. After the reading it shows the downstream Abbey and eastern Foundry as leads for future expeditions. The page reads the existing campaign progress, so reloading restores the corresponding directions without an extra save field.
+
+Windows and Android use the same text. **Back to pause menu** keeps the game paused, and **Continue exploring** resumes through the existing pause controls. An action on an old directions page is revoked when the surface, world or objective changes.
+
+The expanded Windows campaign check passed 20 assertions on each hardware RT backend. It opened the directions at the tavern, shrine and church, then reloaded the earned tavern save and checked the same expedition leads. Ten Android menu tests covered the pause actions and stale UI, and the ARM64 Debug package contains the matching native text endpoint. Physical Android remains pending.
+
 Both Windows hardware RT backends passed all seven assertions on the same Debug executable (SHA-256 `4f352112e829e96b67a08b4a8581bad1629596bd112a652edbe43c56212e9606`). The load presented a fresh world generation and resumed automatically with Kit seated, the keeper at the hearth, Talk complete and Directions available. The resumed autosave matched the bytes written by that run. This starts from a seeded lookout in a hidden window using the keeper stand-in and muted audio. Android device play and sustained performance remain separate open checks.
 
 The editable tavern blockout is derived from the v4 master. It retains the floor height and roofline and fits an 11.5 m stone ramp to the current terrain. The ramp rises roughly 3.26 m from its buried toe to the 2.2 m wide south masonry opening. The ramp, floor, building solids and west-wall hearth share the native render geometry with the movement system. See the [Blender recipe](../../../tools/author-bellwether-tavern.py) and [asset receipt](../../../assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json).

@@ -25,4 +25,52 @@ inline bool LookoutObjectiveAvailable(const simulation::SimulationSnapshot& s,
         s.chapterDialogue.forestVillageConsumed && s.chapterCompanion.grounded &&
         s.chapterCompanion.waypoint==simulation::kWorldRoutePoints.size();
 }
+
+// Values are carried by the Android pause UI publication. This is a view of
+// existing progress, with no saved quest state or gameplay command of its own.
+enum class PauseObjective {
+    None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone
+};
+
+inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
+    const std::optional<Checkpoint>& boundary)
+{
+    if (boundary && boundary->contentRevision == kBellwetherContentRevision &&
+        s.developmentRescueJourney && s.playerAlive && s.rescue.exteriorSide &&
+        s.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size())
+    {
+        if (s.waysideArchive.registerInterpreted) return PauseObjective::BellwetherExpeditions;
+        if (s.waysideArchive.registerRecovered) return PauseObjective::BellwetherRegister;
+        if (s.waysideArchive.lanternRevealStarted) return PauseObjective::BellwetherArchive;
+        if (s.waysideArchive.stage != bellwether::ArchiveStage::Closed) return PauseObjective::BellwetherLowerStone;
+        return PauseObjective::BellwetherShrine;
+    }
+    return LookoutObjectiveAvailable(s, boundary) ? PauseObjective::Lookout : PauseObjective::None;
+}
+
+inline constexpr char kLookoutObjectiveText[] =
+    "Follow the road down to Bellwether. The tavern is across the square.\r\n\r\n"
+    "You can also turn back toward the tomb.";
+
+inline const char* PauseObjectiveText(PauseObjective objective)
+{
+    switch (objective)
+    {
+    case PauseObjective::Lookout: return kLookoutObjectiveText;
+    case PauseObjective::BellwetherShrine:
+        return "Ask the record keeper by the northern church about the wayside shrine. "
+            "The shrine is on a short spur off the northern path.";
+    case PauseObjective::BellwetherArchive:
+        return "Recover the road register from the opened wayside archive.";
+    case PauseObjective::BellwetherLowerStone:
+        return "Open the lower stone at the wayside shrine. Stay close to hear the lantern.";
+    case PauseObjective::BellwetherRegister:
+        return dialogue::Spec(dialogue::Line::TavernRegisterDirections).text;
+    case PauseObjective::BellwetherExpeditions:
+        return "The Abbey lies downstream. The Foundry is east, across the gorge.\r\n\r\n"
+            "Both are leads for future expeditions.";
+    case PauseObjective::None: return "";
+    }
+    return "";
+}
 } // namespace horde::gameplay::campaign
