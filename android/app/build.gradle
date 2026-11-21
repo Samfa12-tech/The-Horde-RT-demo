@@ -661,6 +661,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb'
         include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb'
         include 'models/world/runtime/bellwether-tavern-v1/window.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb'
         include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json'

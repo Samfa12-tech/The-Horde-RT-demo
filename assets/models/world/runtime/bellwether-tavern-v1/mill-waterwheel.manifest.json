@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "asset": "bellwether-waterwheel",
+  "metresPerUnit": 1.0,
+  "coordinateSystem": {
+    "up": "+Y",
+    "forward": "+Z"
+  },
+  "budgets": {
+    "maxVertices": 4800,
+    "maxIndices": 6540,
+    "maxPrimitives": 2,
+    "maxMaterials": 2,
+    "maxTextureLayersPerKind": 2
+  },
+  "lods": [
+    {
+      "name": "lod0",
+      "maxTriangles": 2180
+    }
+  ],
+  "requiredSockets": [],
+  "runtimeTextureProfile": {
+    "android": "astc",
+    "windows": "rgba8",
+    "mipmapped": true,
+    "resolution": 1024
+  },
+  "materialOverrides": [],
+  "distribution": "runtime",
+  "licenceStatus": "Original Horde geometry with admitted ChestWood and BlackIron finishes"
+}

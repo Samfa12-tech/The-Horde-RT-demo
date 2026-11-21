@@ -19,13 +19,14 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
 {
     WindowsEnvironmentSurveyLaunch result;
     bool capture=false, hidden=false, chapter=false, conflict=false;
+    bool testedDrive=false, residentFixture=false;
     for(std::size_t i=0;i<arguments.size();++i)
     {
         const auto a=arguments[i];
         if(a==L"--capture-environment-survey")
         {
-            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"millrace" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
-            {result.error="Environment survey requires exactly one river-bend, millrace, tomb-debris or player-dodge profile.";return result;}
+            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"millrace" && arguments[i+1]!=L"mill-wheel" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
+            {result.error="Environment survey requires exactly one river-bend, millrace, mill-wheel, tomb-debris or player-dodge profile.";return result;}
             result.requested=true;
             // Only the fixed ASCII profile names above reach this conversion.
             for(const wchar_t letter:arguments[++i])result.profile.push_back(static_cast<char>(letter));
@@ -50,7 +51,13 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         else if(a==L"--capture-hidden")hidden=true;
         else if(a==L"--development-rescue-journey")chapter=true;
         else if(a==L"--require-rayquery-compute"){} // Same scene, explicit real RT backend.
-        else conflict=true; // No gameplay seed, camera, tuning or another validation path.
+        else if(a==L"--development-checkpoint" && !testedDrive && i+1<arguments.size() &&
+                arguments[i+1]==L"bellwether-mill-drive-tested")
+        {testedDrive=true;++i;}
+        else if(a==L"--chapter-resident-fixture" && !residentFixture && i+1<arguments.size() &&
+                !arguments[i+1].starts_with(L"--"))
+        {residentFixture=true;++i;}
+        else conflict=true;
     }
     if(result.waterDisabled && (!result.requested || result.profile!="river-bend"))
         result.error="--survey-water-disabled requires an explicit river-bend survey.";
@@ -58,8 +65,11 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         result.error="--survey-debris-disabled requires an explicit tomb-debris survey.";
     if(result.dodgeDisabled && (!result.requested || result.profile!="player-dodge"))
         result.error="--survey-dodge-disabled requires an explicit player-dodge survey.";
+    if(result.requested && (testedDrive || residentFixture) &&
+       (result.profile!="mill-wheel" || !testedDrive || !residentFixture))
+        result.error="Only the mill-wheel survey can pair the tested-drive checkpoint with its resident fixture.";
     if(result.requested && (!debugBuild || !capture || !hidden || !chapter || conflict))
-        result.error="Environment survey requires a hidden Debug chapter showcase capture without gameplay staging or another validation mode.";
+        result.error="Environment survey requires a hidden Debug chapter showcase capture without competing validation or input.";
     return result;
 }
 
@@ -79,6 +89,11 @@ inline EnvironmentSurveyCamera MillraceSurveyCamera()
 {
     // West side of the grading envelope, looking along the up-river cut.
     return {135.8f,99.f,0,.23f,-.26f};
+}
+inline EnvironmentSurveyCamera MillWheelSurveyCamera()
+{
+    // Dry west bank below the mill, looking into the surveyed wheel bay.
+    return {135.12f,114.6f,0,.377f,-.24f};
 }
 inline EnvironmentSurveyCamera TombDebrisSurveyCamera(unsigned frame)
 {

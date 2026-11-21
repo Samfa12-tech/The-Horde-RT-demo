@@ -7974,6 +7974,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if(ctx.environmentSurveyActive && ctx.environmentSurveyProfile!="player-dodge")
         {
             const auto& camera=ctx.environmentSurveyCamera;
+            const auto& snapshot=ctx.simulation.Snapshot();
+            // A staged walk leaves a tiny decaying visual blend after the motor
+            // has settled. Normalize it only in the frozen mill inspection copy.
+            if(ctx.environmentSurveyProfile=="mill-wheel" && !ctx.developmentCheckpoint.empty() &&
+               snapshot.playerGrounded && snapshot.playerTravelledThisTick==0.f &&
+               snapshot.playerMovementSpeedMetresPerSecond==0.f &&
+               frameInputs.walkAmount>=0.f && frameInputs.walkAmount<=0.00001f)
+                frameInputs.walkAmount=0.f;
             if(!horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,
                 {camera.x,camera.z,camera.supportY,camera.yaw,camera.pitch,ctx.environmentSurveyTime},diagnostic)) {
                 ctx.lastRtFrameError=diagnostic;

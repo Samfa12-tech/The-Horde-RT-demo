@@ -520,6 +520,8 @@ try {
         "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb",
         "assets/models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json",
         "assets/models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb",
+        "assets/models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json",
+        "assets/models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb",
         "assets/models/world/runtime/bellwether-tavern-v1/window.manifest.json",
         "assets/models/world/runtime/bellwether-tavern-v1/bellwether-window.glb",
         "assets/models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json",

@@ -2153,6 +2153,72 @@ void TestBellwetherMillRepairAndLeakTrial(
         <<" stage "<<unsigned(state.millPreparation)<<" action "<<unsigned(state.millAction)<<'\n';
     if(!ready)return;
 
+    // The continuous wheel is presentation state derived from fixed-step time,
+    // not campaign progress. Check an unrepaired yard, an operating save reload,
+    // pause, and a pre-wheel save schema against the same production authority.
+    {
+        const auto* yardView=gameplay::FindDevelopmentCheckpoint("bellwether-mill-yard");
+        sim::GameSimulation unrepaired(config);
+        unrepaired.SetDevelopmentRescueJourney(true,true);
+        const auto yardGeneration=unrepaired.Snapshot().worldRoute.generation;
+        const bool yardReady=yardView && unrepaired.PublishChapterTerrain(
+            {yardGeneration,sim::WorldZoneId::TombExterior},terrain) &&
+            gameplay::StageDevelopmentCheckpointSimulation(unrepaired,*yardView);
+        Check(yardReady && unrepaired.Snapshot().millPreparation==MillPreparation::Unexamined &&
+              unrepaired.Snapshot().millWaterwheelAngleRadians==0.f,
+              "the unrepaired mill yard publishes a stopped waterwheel");
+        sim::InputSnapshot running;
+        running.damageEnabled=false;running.tutorialEnabled=false;
+        if(yardReady) {
+            for(unsigned tick=0;tick<120;++tick)unrepaired.StepFixed(running);
+            Check(unrepaired.Snapshot().millWaterwheelAngleRadians==0.f,
+                  "fixed-step time cannot start the wheel before gearing is verified");
+        }
+
+        const auto operating=game.LatestCampaignBoundary();
+        sim::GameSimulation restored(config);
+        const auto restore=[&](const gameplay::campaign::Checkpoint& checkpoint,
+                               sim::GameSimulation& target) {
+            const auto token=target.BeginCampaignRestore(checkpoint);
+            return token && target.CommitCampaignRestore(*token,
+                {token->worldGeneration,checkpoint.zone},terrain,{});
+        };
+        Check(operating && operating->millPreparation==MillPreparation::GearingVerified &&
+              restore(*operating,restored) &&
+              restored.Snapshot().millWaterwheelAngleRadians==0.f,
+              "an operating mill reload starts from a deterministic zero presentation phase");
+        if(operating && restored.Snapshot().millPreparation==MillPreparation::GearingVerified) {
+            for(unsigned tick=0;tick<60;++tick)restored.StepFixed(running);
+            const float afterOneSecond=restored.Snapshot().millWaterwheelAngleRadians;
+            Check(std::abs(afterOneSecond-.5f)<.0001f,
+                  "the wheel advances at 0.5 radians per active simulation second");
+            auto paused=running;paused.paused=true;
+            Check(restored.AdvanceFrame(paused,.5)==0 &&
+                  restored.Snapshot().millWaterwheelAngleRadians==afterOneSecond,
+                  "a paused frame freezes the wheel angle");
+
+            sim::GameSimulation repeated(config);
+            const bool repeatedRestore=restore(*operating,repeated);
+            for(unsigned tick=0;repeatedRestore && tick<60;++tick)repeated.StepFixed(running);
+            Check(repeatedRestore && repeated.Snapshot().millWaterwheelAngleRadians==afterOneSecond,
+                  "reloading and replaying the same fixed ticks reproduces the wheel phase");
+            for(unsigned tick=0;tick<800;++tick)restored.StepFixed(running);
+            Check(restored.Snapshot().millWaterwheelAngleRadians>=0.f &&
+                  restored.Snapshot().millWaterwheelAngleRadians<6.2831855f,
+                  "the long-running wheel phase stays within one revolution");
+
+            auto legacy=*operating;
+            legacy.schema=gameplay::campaign::kTavernConversationSchema;
+            legacy.millPreparation=MillPreparation::Unexamined;
+            sim::GameSimulation olderSave(config);
+            const bool legacyRestored=restore(legacy,olderSave);
+            for(unsigned tick=0;legacyRestored && tick<120;++tick)olderSave.StepFixed(running);
+            Check(legacyRestored && olderSave.Snapshot().millPreparation==MillPreparation::Unexamined &&
+                  olderSave.Snapshot().millWaterwheelAngleRadians==0.f,
+                  "an older save without mill preparation keeps the wheel stopped");
+        }
+    }
+
     sim::InputSnapshot input;
     input.damageEnabled=false;input.tutorialEnabled=false;
     input.commands.interact=state.lastConsumedInteractSequence;
@@ -2247,8 +2313,16 @@ void TestBellwetherMillRepairAndLeakTrial(
           confirmationRevision==trialBoundaryRevision+1 && game.CampaignBoundaryRevision()==confirmationRevision &&
           state.millAction==MillAction::None && state.millLeakTestPhase==MillLeakTestPhase::Idle,
           "dry confirmation earns one durable seal at the existing tavern boundary");
-    Check(tested && reload(*tested) && reloaded.Snapshot().millPreparation==MillPreparation::RigTested,
-          "a confirmed seal survives reloading");
+    const bool testedReloaded=tested && reload(*tested) &&
+        reloaded.Snapshot().millPreparation==MillPreparation::RigTested;
+    const float testedReloadPhase=reloaded.Snapshot().millWaterwheelAngleRadians;
+    sim::InputSnapshot resumed;
+    resumed.damageEnabled=false;resumed.tutorialEnabled=false;
+    if(testedReloaded)reloaded.StepFixed(resumed);
+    float resumedPhaseDelta=reloaded.Snapshot().millWaterwheelAngleRadians-testedReloadPhase;
+    if(resumedPhaseDelta<0.f)resumedPhaseDelta+=6.2831855f;
+    Check(testedReloaded && std::abs(resumedPhaseDelta-(.5f/60.f))<.0001f,
+          "a confirmed seal reloads with the waterwheel still running");
 }
 
 void TestBellwetherRepeatVisitCheckpoint(

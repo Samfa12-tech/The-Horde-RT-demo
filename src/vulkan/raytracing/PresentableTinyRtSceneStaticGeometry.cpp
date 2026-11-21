@@ -633,9 +633,19 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!tavernDoorAsset_.primitives.empty())
         registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
-    if (!millDriveAsset_.primitives.empty())
-        registrations.push_back({kMillDriveMetadataIndex, 0x42303547u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &millDriveAsset_});
+    if (!millDriveAsset_.primitives.empty()) {
+        StaticRtAssetRegistration drive{kMillDriveMetadataIndex, 0x42303547u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+            &millDriveAsset_, &gothicChestBaseAsset_};
+        drive.primitiveCount = kMillDrivePrimitiveCount;
+        registrations.push_back(drive);
+        StaticRtAssetRegistration waterwheel{kMillWaterwheelMetadataIndex, 0x42303557u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+            &millDriveAsset_, &gothicChestBaseAsset_};
+        waterwheel.primitiveOffset = kMillWaterwheelPrimitiveOffset;
+        waterwheel.primitiveCount = kMillWaterwheelPrimitiveCount;
+        registrations.push_back(waterwheel);
+    }
     if (!furniture->primitives.empty()) {
         StaticRtAssetRegistration tiers{kBellwetherFurnitureLane, 0x42303146u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, furnitureOwner};
@@ -651,12 +661,16 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     {
         // Only these immutable opaque chest families opt in. The separately
         // mutable dielectric fixture keeps its own row, as do all other assets.
-        std::array<RtImmutableMaterialAlias, 2> aliases{};
+        std::array<RtImmutableMaterialAlias, 4> aliases{};
         const auto materialRow = [&](const auto& asset, std::uint32_t instance,
+                                     std::uint32_t assetPrimitiveOffset,
                                      const char* name, std::uint32_t& row) {
             const auto& metadata = out.InstanceMetadata()[instance];
-            for (std::size_t i = 0; i < asset.primitives.size(); ++i)
-                if (asset.materials[asset.primitives[i].materialIndex].name == name)
+            if (assetPrimitiveOffset > asset.primitives.size() ||
+                metadata.primitiveCount > asset.primitives.size() - assetPrimitiveOffset)
+                return false;
+            for (std::size_t i = 0; i < metadata.primitiveCount; ++i)
+                if (asset.materials[asset.primitives[assetPrimitiveOffset + i].materialIndex].name == name)
                 {
                     row = out.PrimitiveMetadata()[metadata.primitiveBase + i].materialIndex;
                     return true;
@@ -665,18 +679,27 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         };
         constexpr std::array<const char*, 2> families{{"ChestWood", "BlackIron"}};
         for (std::size_t i = 0; i < families.size(); ++i)
-            if (!materialRow(gothicChestBaseAsset_, 5u, families[i], aliases[i].provider) ||
-                !materialRow(gothicChestLidAsset_, 6u, families[i], aliases[i].consumer))
+            if (!materialRow(gothicChestBaseAsset_, 5u, 0u, families[i], aliases[i].provider) ||
+                !materialRow(gothicChestLidAsset_, 6u, 0u, families[i], aliases[i].consumer))
             {
                 diagnostic = "Chapter immutable chest material roster changed.";
                 return false;
             }
+        for (std::size_t i = 0; i < families.size(); ++i)
+            if (!materialRow(millDriveAsset_, kMillWaterwheelMetadataIndex,
+                    kMillWaterwheelPrimitiveOffset, families[i], aliases[families.size() + i].consumer))
+            {
+                diagnostic = "Bellwether waterwheel immutable material roster changed.";
+                return false;
+            }
+        aliases[2].provider = aliases[0].provider;
+        aliases[3].provider = aliases[1].provider;
         if (!out.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
         if(!furnitureOffset && !furniture->primitives.empty()) {
             RtImmutableMaterialAlias furniture;
             const auto& metadata=out.InstanceMetadata()[kBellwetherFurnitureLane];
             furniture.consumer=out.PrimitiveMetadata()[metadata.primitiveBase].materialIndex;
-            if(!materialRow(collapseStaticAsset_,kCollapseInstanceIndex,
+            if(!materialRow(collapseStaticAsset_,kCollapseInstanceIndex,0u,
                 bellwetherFurnitureAsset_.materials.front().name.c_str(),furniture.provider)) {
                 diagnostic="Bellwether furniture requires the existing world timber finish.";return false;
             }

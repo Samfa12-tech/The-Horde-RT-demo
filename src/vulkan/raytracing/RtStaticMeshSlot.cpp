@@ -631,6 +631,15 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         std::vector<std::size_t> materialIndices;
     };
     std::map<std::pair<std::size_t,std::int32_t>,DeferredGroup> deferredGroups;
+    const auto requiredRoster = [&] {
+        std::size_t primitives=0,materials=0;
+        for(const auto* asset:uniqueAssets) {
+            primitives+=asset->primitives.size();
+            materials+=asset->materials.size();
+        }
+        return " Complete roster requires "+std::to_string(primitives)+" primitives and "+
+            std::to_string(materials)+" materials before aliasing.";
+    };
     for (std::size_t assetIndex = 0u; assetIndex < uniqueAssets.size(); ++assetIndex)
     {
         const auto& asset = *uniqueAssets[assetIndex];
@@ -651,13 +660,13 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         if (primitiveMetadata_.size() + asset.primitives.size() > kRtPrimitiveMetadataCapacity)
         {
             diagnostic = "RtStaticMeshSlot capacity overflow: primitives exceed " +
-                         std::to_string(kRtPrimitiveMetadataCapacity) + ".";
+                         std::to_string(kRtPrimitiveMetadataCapacity) + "." + requiredRoster();
             return false;
         }
         if (materials_.size() + asset.materials.size() > kRtMaterialCapacity)
         {
             diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed " +
-                         std::to_string(kRtMaterialCapacity) + ".";
+                         std::to_string(kRtMaterialCapacity) + "." + requiredRoster();
             return false;
         }
         if (roleVertices->size() + asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() ||

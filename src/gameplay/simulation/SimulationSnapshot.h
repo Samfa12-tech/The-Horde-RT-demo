@@ -89,6 +89,8 @@ struct SimulationSnapshot
     bellwether::MillLeakTestPhase millLeakTestPhase{};
     bool millDriveTesting=false;
     float millDriveAngleRadians=0.f;
+    // Continuous waterwheel presentation, driven by the shared active fixed step.
+    float millWaterwheelAngleRadians=0.f;
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {

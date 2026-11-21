@@ -283,9 +283,9 @@ int main()
                       PresentableTinyRtScene::kBlasCount == 32u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
                       PresentableTinyRtScene::kTlasInstanceCount == 119u &&
-                      kRtInstanceMetadataCapacity == 38u &&
+                      kRtInstanceMetadataCapacity == 39u &&
                       kRtStaticAssetCapacity == 23u &&
-                      kRtPrimitiveMetadataCapacity == 48u && kRtMaterialCapacity == 44u &&
+                      kRtPrimitiveMetadataCapacity == 49u && kRtMaterialCapacity == 46u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&

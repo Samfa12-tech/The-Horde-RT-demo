@@ -1122,6 +1122,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb", "models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json", "models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&

@@ -293,6 +293,19 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    // The incoming headrace approaches from -Z. A positive rotation about
+    // local +X carries the wheel's top toward +Z, downstream. Keep the
+    // operating wheel tied to active 60 Hz simulation time so pause freezes
+    // it and a restored operating mill starts from the same zero phase.
+    constexpr float kMillWaterwheelRadiansPerSecond = 0.5f;
+    constexpr float kMillWaterwheelTwoPi = 6.28318530717958647692f;
+    if (!input.paused && bellwether::MillProgress(millPreparation_) >=
+        bellwether::MillProgress(bellwether::MillPreparation::GearingVerified))
+    {
+        millWaterwheelAngleRadians_ += kMillWaterwheelRadiansPerSecond * dialogueDeltaSeconds;
+        if (millWaterwheelAngleRadians_ >= kMillWaterwheelTwoPi)
+            millWaterwheelAngleRadians_ -= kMillWaterwheelTwoPi;
+    }
     if (input.paused || !playerAlive)
     {
         DiscardFlaskRequests();
@@ -3499,6 +3512,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.millDriveAngleRadians=bellwether::kMillDriveTestRadians *
         (millDriveTurnSeconds_ ? *millDriveTurnSeconds_/bellwether::kMillDriveTestSeconds :
          bellwether::MillProgress(millPreparation_)>=bellwether::MillProgress(bellwether::MillPreparation::GearingVerified) ? 1.f : 0.f);
+    snapshot_.millWaterwheelAngleRadians=millWaterwheelAngleRadians_;
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&

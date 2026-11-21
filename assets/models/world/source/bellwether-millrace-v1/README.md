@@ -2,7 +2,7 @@
 
 The chapter now has a graded channel from the river intake to the wheel bay and the tailrace upstream of the original practice landing. Its cross-section has a submerged bed and raised banks. The deeper wheel bay clears the full wheel rim during a turn, with 15 cm of terrain clearance checked across its width. The narrow, steep section at the wheel follows the surveyed 2.19 m drop. The channel lips fade into the existing river terrain.
 
-The renderer and native water contact both use a ribbon generated from the [surveyed layout](../bellwether-waterwheel-v1/layout.json). The 18 new ray-traced water faces occupy the existing main-river shader bounds. They extend the shared water buffer by 2,016 bytes. The original lake, river and outflow stay in their established positions in that buffer. The bed and its shoulders use the original terrain material images and existing collision intake. The editable wheel, masonry supports, gate and optional dry crossing still need in-world placement.
+The renderer and native water contact both use a ribbon generated from the [surveyed layout](../bellwether-waterwheel-v1/layout.json). The 18 new ray-traced water faces occupy the existing main-river shader bounds. They extend the shared water buffer by 2,016 bytes. The original lake, river and outflow stay in their established positions in that buffer. The bed and its shoulders use the original terrain material images and existing collision intake. The [wheel, stone supports and raised sluice](../bellwether-millworks-v1/README.md) now use this bay. The walk to the wheel and the optional dry crossing remain open.
 
 ## Regenerate
 

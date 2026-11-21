@@ -211,7 +211,7 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 38u,
+    Check(kRtInstanceMetadataCapacity == 39u,
           "chapter residents and the Bellwether props have independent metadata");
     Check(kRtTlasInstanceCapacity == 119u,
           "storage fits the legacy 31-slot prefix, forest reserves, five Bellwether props and two residents");
@@ -220,8 +220,8 @@ void TestGeneratedConstants()
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 23u, "static asset capacity includes the fitted mill drive");
-    Check(kRtPrimitiveMetadataCapacity == 48u, "primitive storage includes the mill drive primitive");
-    Check(kRtMaterialCapacity == 44u, "material storage includes the mill bronze");
+    Check(kRtPrimitiveMetadataCapacity == 49u, "primitive storage includes the wheel and staffed mill roster");
+    Check(kRtMaterialCapacity == 46u, "material storage covers the staffed mill before immutable aliases");
     Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
@@ -425,14 +425,16 @@ void TestNamedCapacityFailures()
     StaticRtAssetRegistration primitiveRequest{3u, 1u, 1u, 0u, &primitiveOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&primitiveRequest, 1u), diagnostic) &&
               diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed " +
-                  std::to_string(kRtPrimitiveMetadataCapacity) + ".",
+                  std::to_string(kRtPrimitiveMetadataCapacity) + ". Complete roster requires " +
+                  std::to_string(kRtPrimitiveMetadataCapacity + 1u) + " primitives and 1 materials before aliasing.",
           "primitive overflow fails initialization by name");
 
     auto materialOverflow = MakeAsset(1u, kRtMaterialCapacity + 1u);
     StaticRtAssetRegistration materialRequest{3u, 1u, 1u, 0u, &materialOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&materialRequest, 1u), diagnostic) &&
               diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed " +
-                  std::to_string(kRtMaterialCapacity) + ".",
+                  std::to_string(kRtMaterialCapacity) + ". Complete roster requires 1 primitives and " +
+                  std::to_string(kRtMaterialCapacity + 1u) + " materials before aliasing.",
           "material overflow fails initialization by name");
 
     auto textureOverflow = MakeAsset(1u, kRtTextureLayerCapacity + 1u);

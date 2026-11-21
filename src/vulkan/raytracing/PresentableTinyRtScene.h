@@ -182,6 +182,7 @@ struct RtSceneFrameInputs
     bool waysideRegisterRecovered=false;
     bool millDriveInstalled=false;
     float millDriveAngleRadians=0.f;
+    float millWaterwheelAngleRadians=0.f;
     std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
@@ -339,6 +340,10 @@ public:
     static constexpr std::uint32_t kWaysideRegisterMetadataIndex = kWaysideCoverMetadataIndex + 1u;
     static constexpr std::uint32_t kTavernDoorMetadataIndex = kWaysideRegisterMetadataIndex + 1u;
     static constexpr std::uint32_t kMillDriveMetadataIndex = kTavernDoorMetadataIndex + 1u;
+    static constexpr std::uint32_t kMillWaterwheelMetadataIndex = kMillDriveMetadataIndex + 1u;
+    static constexpr std::uint32_t kMillDrivePrimitiveCount = 1u;
+    static constexpr std::uint32_t kMillWaterwheelPrimitiveOffset = kMillDrivePrimitiveCount;
+    static constexpr std::uint32_t kMillWaterwheelPrimitiveCount = 2u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -357,6 +362,7 @@ public:
     static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kMillDriveMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kMillWaterwheelMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
@@ -700,6 +706,12 @@ public:
     const std::array<std::uint8_t, kTlasInstanceCount>& LastInstanceMasks() const
     {
         return lastInstanceMasks_;
+    }
+    [[nodiscard]] std::uint8_t MillWaterwheelInstanceMask() const noexcept
+    {
+        return ready_ && millWaterwheelBlas_.address != 0u && tlasInstanceCount_ != 0u &&
+            tlasInstanceCount_ <= kTlasInstanceCount
+            ? lastInstanceMasks_[tlasInstanceCount_ - 1u] : 0u;
     }
     [[nodiscard]] std::uint8_t SubmittedInstanceMask(std::uint32_t metadataIndex) const noexcept;
     bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
@@ -1344,6 +1356,8 @@ private:
     void ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
     static void ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR&,
         const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
+    bool ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR&, float angleRadians,
+        std::string& diagnostic) const;
     // Showcase chapter's unused fixture/legacy arm lane, shared with no other trial.
     static constexpr std::uint32_t kBellwetherFurnitureLane=9u;
     bool UsesBellwetherNearPage() const noexcept {
@@ -1356,6 +1370,7 @@ private:
         return (roadStoneBlas_.address ? 1u : 0u) + (waysideCoverBlas_.address ? 1u : 0u) +
             (waysideRegisterBlas_.address ? 1u : 0u) + (tavernDoorBlas_.address ? 1u : 0u) +
             (millDriveBlas_.address ? 1u : 0u) +
+            (millWaterwheelBlas_.address ? 1u : 0u) +
             (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
@@ -1507,6 +1522,7 @@ private:
     AccelerationStructure waysideRegisterBlas_;
     AccelerationStructure tavernDoorBlas_;
     AccelerationStructure millDriveBlas_;
+    AccelerationStructure millWaterwheelBlas_;
     std::array<AccelerationStructure,horde::scene::kBellwetherFurnitureTriangles.size()> bellwetherFurnitureBlas_{};
     horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
     horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
@@ -1679,6 +1695,7 @@ private:
     horde::scene::assets::StaticMeshAsset waysideRegisterAsset_;
     horde::scene::assets::StaticMeshAsset tavernDoorAsset_;
     horde::scene::assets::StaticMeshAsset millDriveAsset_;
+    horde::scene::assets::StaticMeshAsset millWaterwheelAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

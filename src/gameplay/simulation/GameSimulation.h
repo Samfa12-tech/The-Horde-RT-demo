@@ -403,6 +403,7 @@ private:
     bellwether::MillPreparation millPreparation_{};
     bellwether::MillLeakTestPhase millLeakTestPhase_{};
     float millLeakTestSeconds_{};
+    float millWaterwheelAngleRadians_{};
     std::optional<float> millDriveTurnSeconds_;
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};

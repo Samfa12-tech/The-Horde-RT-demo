@@ -12,6 +12,8 @@
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "vulkan/raytracing/RtStaticTextureSelection.h"
 #include "vulkan/raytracing/RtIndexedActorGeometry.h"
+#include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -789,11 +791,32 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::cerr<<"Real development static admission: "<<diagnostic<<'\n';
             return false;
         }
+        const auto idleWaterwheel=BellwetherWaterwheelWorldFromModel(0.f);
+        const auto quarterTurnWaterwheel=BellwetherWaterwheelWorldFromModel(1.57079632679f);
+        bool ok=Require(idleWaterwheel.has_value() && quarterTurnWaterwheel.has_value() &&
+            !BellwetherWaterwheelWorldFromModel(std::numeric_limits<float>::infinity()).has_value(),
+            "waterwheel pivot transform rejects nonfinite input and builds finite idle/rotated frames");
+        if(idleWaterwheel && quarterTurnWaterwheel) {
+            ok &= Require(std::abs((*idleWaterwheel)[3]-137.2f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[7]+21.10f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[11]-109.35f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[5]-1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[5])<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[6]+1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[9]-1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[10])<1.e-5f,
+                "waterwheel TLAS transform rotates rigidly around the surveyed X-axis centre");
+        }
+        horde::gameplay::simulation::SimulationSnapshot angleSnapshot{};
+        angleSnapshot.millWaterwheelAngleRadians=.625f;
+        const auto adaptedWheelFrame=BuildRtSceneFrameInputs(angleSnapshot,1.f);
+        ok &= Require(std::abs(adaptedWheelFrame.millWaterwheelAngleRadians-.625f)<1.e-6f,
+            "simulation frame adapter carries the authoritative waterwheel angle");
         const auto counts=scene.staticMeshSlot_.TextureArrayCounts();
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
         // The admitted Kit maps append one family after the terrain maps;
         // Kit is the sole mapped emissive owner, replacing the unused fallback.
-        bool ok=layers==std::array<std::uint32_t,4>{{18,15,15,1}};
+        ok &= layers==std::array<std::uint32_t,4>{{18,15,15,1}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
@@ -802,7 +825,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
         ok &= materials.size()==40u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?42u:41u);
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?44u:43u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -814,8 +837,64 @@ struct PresentableTinyRtSceneObservationTestAccess
             (materials[primitives[window.primitiveBase].materialIndex].materialFlags[0] &
                 static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume));
         const auto& drive=instances[PresentableTinyRtScene::kMillDriveMetadataIndex];
-        ok &= drive.primitiveCount==1u && drive.assetIndex!=window.assetIndex &&
-              scene.millDriveAsset_.indices.size()==384u*3u;
+        ok &= Require(drive.primitiveCount==1u && drive.assetIndex!=window.assetIndex &&
+              drive.primitiveBase<primitives.size() &&
+              scene.millDriveAsset_.primitives.size()==3u &&
+              scene.millDriveAsset_.indices.size()==(384u+2180u)*3u,
+              "drive source remains primitive zero in a three-primitive shared owner");
+        const auto& waterwheel=instances[PresentableTinyRtScene::kMillWaterwheelMetadataIndex];
+        ok &= Require(waterwheel.primitiveCount==PresentableTinyRtScene::kMillWaterwheelPrimitiveCount &&
+              waterwheel.primitiveBase==drive.primitiveBase+drive.primitiveCount &&
+              waterwheel.assetIndex==drive.assetIndex && waterwheel.stableObjectId==0x42303557u &&
+              scene.millWaterwheelAsset_.primitives.size()==2u &&
+              scene.millWaterwheelAsset_.indices.size()==2180u*3u &&
+              scene.millWaterwheelAsset_.vertices.size()==4252u,
+              "waterwheel retains two separate packed primitive ranges and its admitted GLB contract");
+        {
+            // Model the complete accepted Bellwether tail without creating GPU
+            // objects. Drive and wheel remain separate BLAS/TLAS identities,
+            // while their packed CPU source shares one static-asset owner.
+            scene.roadStoneBlas_.address=1u;
+            scene.waysideCoverBlas_.address=1u;
+            scene.waysideRegisterBlas_.address=1u;
+            scene.tavernDoorBlas_.address=1u;
+            scene.millDriveBlas_.address=1u;
+            scene.millWaterwheelBlas_.address=1u;
+            scene.dielectricFixtureBlas_.address=1u;
+            const auto chapterTail=scene.ChapterTailInstanceCount();
+            const std::uint32_t currentProfileTlasCount=PresentableTinyRtScene::kOrdinaryTlasInstanceCount+
+                64u+12u+chapterTail;
+            constexpr std::uint32_t fullBellwetherTailCount=6u+1u+
+                static_cast<std::uint32_t>(kAdditionalChapterActorCapacity);
+            constexpr std::uint32_t fullBellwetherTlasCount=
+                PresentableTinyRtScene::kOrdinaryTlasInstanceCount+64u+12u+fullBellwetherTailCount;
+            std::array<bool,kRtStaticAssetCapacity> usedAssets{},usedAssetsWithoutWheel{};
+            for(std::size_t index=0;index<instances.size();++index) {
+                const auto& row=instances[index];
+                if(!row.primitiveCount)continue;
+                if(row.assetIndex>=usedAssets.size()) {ok=false;continue;}
+                usedAssets[row.assetIndex]=true;
+                if(index!=PresentableTinyRtScene::kMillWaterwheelMetadataIndex)
+                    usedAssetsWithoutWheel[row.assetIndex]=true;
+            }
+            const auto uniqueAssetCount=std::count(usedAssets.begin(),usedAssets.end(),true);
+            const auto baselineAssetCount=std::count(usedAssetsWithoutWheel.begin(),usedAssetsWithoutWheel.end(),true);
+            ok &= Require(chapterTail==6u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
+                    scene.chapterResidentSources_.size() &&
+                currentProfileTlasCount<=kRtTlasInstanceCapacity &&
+                fullBellwetherTlasCount==116u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
+                kRtTlasInstanceCapacity-fullBellwetherTlasCount==3u,
+                "full Bellwether tail includes its window and two resident lanes at 116 of 119 TLAS slots");
+            ok &= Require(uniqueAssetCount==baselineAssetCount && uniqueAssetCount<=kRtStaticAssetCapacity,
+                "wheel reuses the packed drive asset owner without expanding the static asset roster");
+            scene.roadStoneBlas_.address=0u;
+            scene.waysideCoverBlas_.address=0u;
+            scene.waysideRegisterBlas_.address=0u;
+            scene.tavernDoorBlas_.address=0u;
+            scene.millDriveBlas_.address=0u;
+            scene.millWaterwheelBlas_.address=0u;
+            scene.dielectricFixtureBlas_.address=0u;
+        }
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
         const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
         const auto& stone=instances[PresentableTinyRtScene::kRoadStoneMetadataIndex];
@@ -830,6 +909,59 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= door.primitiveCount==2u && door.assetIndex!=ledger.assetIndex &&
               door.stableObjectId==0x42303144u &&
               scene.tavernDoorAsset_.indices.size()==horde::gameplay::bellwether::kSouthDoorTriangles*3;
+        {
+            using namespace horde::scene::assets;
+            const auto millDirectory=std::filesystem::path(root)/"models/world/runtime/bellwether-tavern-v1";
+            AssetManifest driveManifest,waterwheelManifest;
+            StaticMeshAsset originalDrive,originalWaterwheel;
+            if(!AssetManifest::Load(millDirectory/"mill-bench-drive.manifest.json",driveManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"mill-bench-drive.glb",driveManifest,originalDrive,diagnostic) ||
+               !AssetManifest::Load(millDirectory/"mill-waterwheel.manifest.json",waterwheelManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"mill-waterwheel.glb",waterwheelManifest,originalWaterwheel,diagnostic)) return false;
+            const auto& combined=scene.millDriveAsset_;
+            ok &= Require(originalDrive.primitives.size()==PresentableTinyRtScene::kMillDrivePrimitiveCount &&
+                originalWaterwheel.primitives.size()==PresentableTinyRtScene::kMillWaterwheelPrimitiveCount &&
+                combined.vertices.size()==originalDrive.vertices.size()+originalWaterwheel.vertices.size() &&
+                combined.indices.size()==originalDrive.indices.size()+originalWaterwheel.indices.size() &&
+                combined.nodeTransforms.size()==originalDrive.nodeTransforms.size()+originalWaterwheel.nodeTransforms.size() &&
+                combined.materials.size()==originalDrive.materials.size()+originalWaterwheel.materials.size(),
+                "runtime wheel and drive sources keep bounded GLB counts after range composition");
+            ok &= Require(std::memcmp(combined.vertices.data(),originalDrive.vertices.data(),
+                    originalDrive.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(combined.indices.data(),originalDrive.indices.data(),
+                    originalDrive.indices.size()*sizeof(std::uint32_t))==0 &&
+                std::memcmp(combined.vertices.data()+originalDrive.vertices.size(),originalWaterwheel.vertices.data(),
+                    originalWaterwheel.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(combined.indices.data()+originalDrive.indices.size(),originalWaterwheel.indices.data(),
+                    originalWaterwheel.indices.size()*sizeof(std::uint32_t))==0,
+                "range composition preserves every source vertex and index byte");
+            const auto& drivePrimitive=combined.primitives.front();
+            const auto& originalDrivePrimitive=originalDrive.primitives.front();
+            ok &= Require(drivePrimitive.vertexOffset==originalDrivePrimitive.vertexOffset &&
+                drivePrimitive.indexOffset==originalDrivePrimitive.indexOffset &&
+                drivePrimitive.indexCount==originalDrivePrimitive.indexCount &&
+                drivePrimitive.materialIndex==originalDrivePrimitive.materialIndex &&
+                drivePrimitive.nodeTransformIndex==originalDrivePrimitive.nodeTransformIndex,
+                "original drive primitive and node range remain unchanged at source index zero");
+            for(std::size_t i=0;i<originalWaterwheel.primitives.size();++i) {
+                const auto& source=originalWaterwheel.primitives[i];
+                const auto& packed=combined.primitives[PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset+i];
+                ok &= Require(packed.vertexOffset==originalDrive.vertices.size()+source.vertexOffset &&
+                    packed.indexOffset==originalDrive.indices.size()+source.indexOffset &&
+                    packed.indexCount==source.indexCount &&
+                    packed.materialIndex==originalDrive.materials.size()+source.materialIndex &&
+                    packed.nodeTransformIndex==originalDrive.nodeTransforms.size()+source.nodeTransformIndex,
+                    "waterwheel primitive offsets remain disjoint from the existing drive BLAS range");
+            }
+            for(std::size_t i=0;i<originalDrive.nodeTransforms.size();++i)
+                ok &= combined.nodeTransforms[i].name==originalDrive.nodeTransforms[i].name &&
+                    combined.nodeTransforms[i].world==originalDrive.nodeTransforms[i].world;
+            for(std::size_t i=0;i<originalWaterwheel.nodeTransforms.size();++i) {
+                const auto& packed=combined.nodeTransforms[originalDrive.nodeTransforms.size()+i];
+                ok &= packed.name==originalWaterwheel.nodeTransforms[i].name &&
+                    packed.world==originalWaterwheel.nodeTransforms[i].world;
+            }
+        }
         ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
               ring.primitiveBase!=flask.primitiveBase &&
               scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&
@@ -852,15 +984,20 @@ struct PresentableTinyRtSceneObservationTestAccess
         }
         ok &= emissiveOwners==1u;
         for(const char* family:{"ChestWood","BlackIron"}) {
-            const auto row=[&](const auto& asset,std::uint32_t owner) {
-                for(std::size_t i=0;i<asset.primitives.size();++i)
-                    if(asset.materials[asset.primitives[i].materialIndex].name==family)
+            const auto row=[&](const auto& asset,std::uint32_t owner,std::size_t primitiveOffset) {
+                const auto& metadata=instances[owner];
+                for(std::size_t i=0;i<metadata.primitiveCount;++i)
+                    if(asset.materials[asset.primitives[primitiveOffset+i].materialIndex].name==family)
                         return primitives[instances[owner].primitiveBase+i].materialIndex;
                 return kRtMaterialCapacity;
             };
-            const auto base=row(scene.gothicChestBaseAsset_,5u);
-            const auto lid=row(scene.gothicChestLidAsset_,6u);
-            ok &= base<materials.size() && base==lid && base!=scene.dielectricFixtureMaterialIndex_;
+            const auto base=row(scene.gothicChestBaseAsset_,5u,0u);
+            const auto lid=row(scene.gothicChestLidAsset_,6u,0u);
+            const auto wheel=row(scene.millDriveAsset_,PresentableTinyRtScene::kMillWaterwheelMetadataIndex,
+                PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset);
+            ok &= Require(base<materials.size() && base==lid && base==wheel &&
+                base!=scene.dielectricFixtureMaterialIndex_,
+                "waterwheel ChestWood and BlackIron reuse the admitted immutable atlas/material rows");
         }
         // These are separately owned rigid props. Grouping their baked node
         // geometry must preserve every vertex/triangle and every grip/latch
@@ -1419,7 +1556,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 41u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 43u &&
                   tomb.staticMeshSlot_.Materials().size() == 40u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
@@ -2042,7 +2179,7 @@ int main(int argc, char** argv)
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWorldMaterialPaletteSemantics(),
                   "shared authored palette must retain byte-identical material values and every surface/normal classification");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckDevelopmentStaticAdmission(),
-                  "real dressed tomb/forest production registration exceeds its unchanged resource contracts");
+                  "real dressed tomb/forest production registration fits the reviewed resource contracts");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
                   "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
@@ -2084,7 +2221,7 @@ int main(int argc, char** argv)
     ok &= CheckBoundedWaterDropletGeometry();
     std::cerr << "Resource integration: actual tomb intake\n";
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckIntegratedTombIntake(),
-                  "actual combined native tomb asset intake retains the frozen primitive/material capacities");
+                  "actual combined native tomb asset intake retains the reviewed primitive/material capacities");
     std::cerr << "Resource integration: water owner lifetime\n";
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWaterDropletOwnerLifetime(),
                   "water droplet CPU/GPU owner must transfer and clear through scene move/destroy");

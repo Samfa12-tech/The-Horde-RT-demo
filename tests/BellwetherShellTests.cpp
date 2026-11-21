@@ -243,6 +243,13 @@ int main(int argc,char** argv) {
               !support->NonWalkableVolumeClear(kMillWorkMark[0],kMillWorkMark[2],kMillWorkMark[0]+1.2f,kMillWorkMark[2],
                   workGround.worldY+.05f,workGround.worldY+1.8f,.24f),
               "the workbench has a clear standing mark but blocks movement through its timber");
+        for(float pierX:{135.82f,138.60f}) {
+            check(!support->NonWalkableVolumeClear(pierX,108.6f,pierX,110.1f,-21.82f,-21.26f,.08f),
+                  "each dressed bearing pier is an admitted physical world solid");
+        }
+        check(!support->NonWalkableVolumeClear(137.33f,106.2f,137.33f,107.2f,-19.85f,-19.12f,.04f) &&
+              support->NonWalkableVolumeClear(137.33f,106.2f,137.33f,107.2f,-20.23f,-20.01f,.04f),
+              "the raised sluice boards have collision and leave the headrace clear below");
         constexpr auto shore=horde::gameplay::traversal::kBellwetherRiverLanding.back();
         const auto shoreGround=support->Query(shore.x,shore.z);
         const auto riverY=ChapterRegionalWaterSurfaceAt(shore.x,shore.z);

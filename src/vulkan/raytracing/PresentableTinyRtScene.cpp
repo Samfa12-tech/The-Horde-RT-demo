@@ -56,6 +56,7 @@
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RegionalWaterRenderData.h"
+#include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
 
 #include <algorithm>
 #include <array>
@@ -96,6 +97,139 @@ namespace
 {
 
 using InitialiseClock = std::chrono::steady_clock;
+
+bool AppendBellwetherWaterwheelGeometry(
+    horde::scene::assets::StaticMeshAsset& millDrive,
+    horde::scene::assets::StaticMeshAsset& waterwheel,
+    std::string& diagnostic)
+{
+    using horde::scene::assets::StaticMeshAsset;
+    if (millDrive.primitives.size() != PresentableTinyRtScene::kMillDrivePrimitiveCount ||
+        millDrive.materials.size() != 1u || millDrive.indices.size() != 384u * 3u ||
+        waterwheel.primitives.size() != PresentableTinyRtScene::kMillWaterwheelPrimitiveCount ||
+        waterwheel.materials.size() != 2u || waterwheel.indices.size() != 2180u * 3u ||
+        !waterwheel.HasValidTriangleProvenance())
+    {
+        diagnostic = "Bellwether waterwheel source changed its two-primitive, two-material, 2180-triangle contract.";
+        return false;
+    }
+
+    std::array<bool, 2u> materialFamilies{};
+    for (auto& material : waterwheel.materials)
+    {
+        const std::size_t family = material.name == "ChestWood" ? 0u :
+            material.name == "BlackIron" ? 1u : materialFamilies.size();
+        if (family >= materialFamilies.size() || materialFamilies[family] ||
+            material.baseColorTexture < 0 || material.normalTexture < 0 || material.ormTexture < 0 ||
+            material.emissiveTexture >= 0 || material.transmissionFactor != 0.0f ||
+            (material.flags & (static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+                static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) != 0u)
+        {
+            diagnostic = "Bellwether waterwheel requires the opaque ChestWood and BlackIron PBR material pair.";
+            return false;
+        }
+        materialFamilies[family] = true;
+        material.textureGroup = static_cast<std::int32_t>(family);
+        material.deferTextureAllocation = false;
+    }
+    if (!std::all_of(materialFamilies.begin(), materialFamilies.end(), [](bool present) { return present; }))
+    {
+        diagnostic = "Bellwether waterwheel is missing a shared ChestWood or BlackIron material.";
+        return false;
+    }
+
+    const auto pivot = std::find_if(waterwheel.nodeTransforms.begin(), waterwheel.nodeTransforms.end(),
+        [](const auto& transform) { return transform.name == "BellwetherWaterwheel"; });
+    if (pivot == waterwheel.nodeTransforms.end())
+    {
+        diagnostic = "Bellwether waterwheel GLB is missing its local BellwetherWaterwheel pivot node.";
+        return false;
+    }
+    const auto pivotIndex = static_cast<std::uint32_t>(pivot - waterwheel.nodeTransforms.begin());
+    for (std::size_t row = 0u; row < 4u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+        {
+            const float expected = row == column ? 1.0f : 0.0f;
+            if (!std::isfinite(pivot->world[row * 4u + column]) ||
+                std::abs(pivot->world[row * 4u + column] - expected) > 1.0e-5f)
+            {
+                diagnostic = "Bellwether waterwheel pivot node must stay at local identity.";
+                return false;
+            }
+        }
+    std::array<bool, 2u> primitiveMaterials{};
+    std::uint32_t primitiveTriangles = 0u;
+    for (const auto& primitive : waterwheel.primitives)
+    {
+        if (primitive.nodeTransformIndex != pivotIndex || primitive.materialIndex >= waterwheel.materials.size() ||
+            !primitive.indexCount || primitive.indexCount % 3u ||
+            primitive.indexOffset > waterwheel.indices.size() ||
+            primitive.indexCount > waterwheel.indices.size() - primitive.indexOffset)
+        {
+            diagnostic = "Bellwether waterwheel primitives must stay in the pivot-local opaque mesh ranges.";
+            return false;
+        }
+        primitiveMaterials[primitive.materialIndex] = true;
+        primitiveTriangles += primitive.indexCount / 3u;
+    }
+    if (primitiveTriangles != 2180u ||
+        !std::all_of(primitiveMaterials.begin(), primitiveMaterials.end(), [](bool used) { return used; }))
+    {
+        diagnostic = "Bellwether waterwheel primitives must retain both material ranges and all 2180 triangles.";
+        return false;
+    }
+
+    const std::uint64_t vertexBase = millDrive.vertices.size();
+    const std::uint64_t indexBase = millDrive.indices.size();
+    const std::uint64_t transformBase = millDrive.nodeTransforms.size();
+    const std::uint64_t materialBase = millDrive.materials.size();
+    const auto fits32 = [](std::uint64_t base, std::size_t count) {
+        return base + count <= std::numeric_limits<std::uint32_t>::max();
+    };
+    if (!fits32(vertexBase, waterwheel.vertices.size()) || !fits32(indexBase, waterwheel.indices.size()) ||
+        !fits32(transformBase, waterwheel.nodeTransforms.size()) ||
+        !fits32(materialBase, waterwheel.materials.size()) ||
+        !fits32(millDrive.primitives.size(), waterwheel.primitives.size()) ||
+        !fits32(transformBase, waterwheel.sockets.size()))
+    {
+        diagnostic = "Bellwether waterwheel exceeds the existing mill-drive packed-asset offsets.";
+        return false;
+    }
+
+    StaticMeshAsset combined = millDrive;
+    combined.triangleRegions.resize(combined.indices.size() / 3u,
+        horde::scene::assets::StaticTriangleRegion::Shared);
+    combined.vertices.insert(combined.vertices.end(), waterwheel.vertices.begin(), waterwheel.vertices.end());
+    combined.indices.insert(combined.indices.end(), waterwheel.indices.begin(), waterwheel.indices.end());
+    combined.nodeTransforms.insert(combined.nodeTransforms.end(),
+        waterwheel.nodeTransforms.begin(), waterwheel.nodeTransforms.end());
+    combined.materials.insert(combined.materials.end(), waterwheel.materials.begin(), waterwheel.materials.end());
+    for (auto primitive : waterwheel.primitives)
+    {
+        primitive.vertexOffset += static_cast<std::uint32_t>(vertexBase);
+        primitive.indexOffset += static_cast<std::uint32_t>(indexBase);
+        primitive.nodeTransformIndex += static_cast<std::uint32_t>(transformBase);
+        primitive.materialIndex += static_cast<std::uint32_t>(materialBase);
+        combined.primitives.push_back(primitive);
+    }
+    for (const auto region : waterwheel.triangleRegions)
+        combined.triangleRegions.push_back(region);
+    combined.triangleRegions.resize(combined.indices.size() / 3u,
+        horde::scene::assets::StaticTriangleRegion::Shared);
+    for (auto socket : waterwheel.sockets)
+    {
+        socket.nodeTransformIndex += static_cast<std::uint32_t>(transformBase);
+        combined.sockets.push_back(std::move(socket));
+    }
+    for (std::size_t axis = 0u; axis < combined.bounds.minimum.size(); ++axis)
+    {
+        combined.bounds.minimum[axis] = std::min(combined.bounds.minimum[axis], waterwheel.bounds.minimum[axis]);
+        combined.bounds.maximum[axis] = std::max(combined.bounds.maximum[axis], waterwheel.bounds.maximum[axis]);
+    }
+    millDrive = std::move(combined);
+    diagnostic.clear();
+    return true;
+}
 
 template <typename Action>
 bool MeasureInitialisationStageWork(
@@ -635,6 +769,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waysideRegisterBlas_ = std::exchange(other.waysideRegisterBlas_, AccelerationStructure{});
     tavernDoorBlas_ = std::exchange(other.tavernDoorBlas_, AccelerationStructure{});
     millDriveBlas_ = std::exchange(other.millDriveBlas_, AccelerationStructure{});
+    millWaterwheelBlas_ = std::exchange(other.millWaterwheelBlas_, AccelerationStructure{});
     bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
     bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
@@ -698,6 +833,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waysideRegisterAsset_ = std::move(other.waysideRegisterAsset_);
     tavernDoorAsset_ = std::move(other.tavernDoorAsset_);
     millDriveAsset_ = std::move(other.millDriveAsset_);
+    millWaterwheelAsset_ = std::move(other.millWaterwheelAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -1203,7 +1339,11 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=15+ChapterTailInstanceCount())
+    const bool millWaterwheelSharesDriveAsset = millDriveBlas_.address && millWaterwheelBlas_.address &&
+        staticMeshSlot_.InstanceMetadata()[kMillDriveMetadataIndex].assetIndex ==
+            staticMeshSlot_.InstanceMetadata()[kMillWaterwheelMetadataIndex].assetIndex;
+    if(std::count(assets.begin(),assets.end(),true)!=
+       15+ChapterTailInstanceCount()-(millWaterwheelSharesDriveAsset?1u:0u))
         return fail("Forest proof did not preserve every unique static asset.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
@@ -1785,6 +1925,7 @@ void PresentableTinyRtScene::Destroy()
         waysideRegisterBlas_ = {};
         tavernDoorBlas_ = {};
         millDriveBlas_ = {};
+        millWaterwheelBlas_ = {};
         bellwetherFurnitureBlas_={};
         bellwetherNearCandidate_={};
         bellwetherNearBuildScratch_={};
@@ -1797,6 +1938,7 @@ void PresentableTinyRtScene::Destroy()
         waysideRegisterAsset_ = {};
         tavernDoorAsset_ = {};
         millDriveAsset_ = {};
+        millWaterwheelAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1851,6 +1993,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waysideRegisterBlas_);
     DestroyAccelerationStructure(tavernDoorBlas_);
     DestroyAccelerationStructure(millDriveBlas_);
+    DestroyAccelerationStructure(millWaterwheelBlas_);
     RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
     DestroyAccelerationStructure(bellwetherNearCandidate_);
     DestroyBuffer(bellwetherNearBuildScratch_);
@@ -1931,6 +2074,7 @@ void PresentableTinyRtScene::Destroy()
     waysideRegisterAsset_ = {};
     tavernDoorAsset_ = {};
     millDriveAsset_ = {};
+    millWaterwheelAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -2047,7 +2191,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for(const auto& owner:bellwetherFurnitureBlas_)
         append(result.bottomLevelAccelerationStructures,owner.handle);
@@ -2116,7 +2260,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -3387,6 +3531,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     waysideRegisterAsset_ = {};
     tavernDoorAsset_ = {};
     millDriveAsset_ = {};
+    millWaterwheelAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -3551,14 +3696,21 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         }
         const auto millDirectory = root / "models/world/runtime/bellwether-tavern-v1";
         horde::scene::assets::AssetManifest millDriveManifest;
+        horde::scene::assets::AssetManifest millWaterwheelManifest;
         if (!horde::scene::assets::AssetManifest::Load(millDirectory / "mill-bench-drive.manifest.json",
                 millDriveManifest, diagnostic) ||
             !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-bench-drive.glb",
-                millDriveManifest, millDriveAsset_, diagnostic)) return false;
+                millDriveManifest, millDriveAsset_, diagnostic) ||
+            !horde::scene::assets::AssetManifest::Load(millDirectory / "mill-waterwheel.manifest.json",
+                millWaterwheelManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-waterwheel.glb",
+                millWaterwheelManifest, millWaterwheelAsset_, diagnostic)) return false;
         if (!jointPropAssetAdmitted(millDriveAsset_) || millDriveAsset_.indices.size() != 384u * 3u) {
             diagnostic = "The mill bench drive requires its bounded, opaque bronze geometry.";
             return false;
         }
+        if (!AppendBellwetherWaterwheelGeometry(millDriveAsset_, millWaterwheelAsset_, diagnostic))
+            return false;
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
                 rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
@@ -5987,7 +6139,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!tavernDoorAsset_.primitives.empty() && !buildRegisteredStaticBlas(kTavernDoorMetadataIndex,
             "Bellwether tavern door", tavernDoorBlas_, true)) ||
         (!millDriveAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillDriveMetadataIndex,
-            "Bellwether mill bench drive", millDriveBlas_, true)))
+            "Bellwether mill bench drive", millDriveBlas_, true)) ||
+        (!millWaterwheelAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillWaterwheelMetadataIndex,
+            "Bellwether waterwheel", millWaterwheelBlas_, true)))
         return false;
     if(bellwetherFurnitureTransitions_) {
         const std::uint32_t firstTier=(UsesBellwetherNearPage() ||
@@ -6523,6 +6677,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
             horde::gameplay::traversal::kMillDriveMount, 0.f), kMillDriveMetadataIndex, millDriveBlas_.address);
         instance.mask = 0u;
+    }
+    if (millWaterwheelBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_];
+        if (!ApplyMillWaterwheelInstance(instance, 0.f, diagnostic)) return false;
+        ++tlasInstanceCount_;
     }
     if(bellwetherFurnitureTransitions_) {
         activeBellwetherFurnitureDetail_=(bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_) ?
@@ -7839,6 +7998,26 @@ void PresentableTinyRtScene::ApplyHingedPropInstance(VkAccelerationStructureInst
     instance.accelerationStructureReference = address;
 }
 
+bool PresentableTinyRtScene::ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR& instance,
+    const float angleRadians, std::string& diagnostic) const
+{
+    const auto transform = BellwetherWaterwheelWorldFromModel(angleRadians);
+    if (!transform || millWaterwheelBlas_.address == 0u)
+    {
+        diagnostic = "Bellwether waterwheel requires a finite angle and a built immutable BLAS.";
+        return false;
+    }
+    for (std::size_t row = 0u; row < 3u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+            instance.transform.matrix[row][column] = (*transform)[row * 4u + column];
+    instance.instanceCustomIndex = kMillWaterwheelMetadataIndex;
+    instance.mask = 0x01u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = millWaterwheelBlas_.address;
+    diagnostic.clear();
+    return true;
+}
+
 void PresentableTinyRtScene::ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR& instance,
                                                         bool visible) const
 {
@@ -9090,12 +9269,26 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     std::array<RtIndexedActorGeometry, kAdditionalChapterActorCapacity> residentGeometries;
     if (!PrepareChapterResidents(frame, residentInstances, residentGeometries, diagnostic, observation))
         return false;
+    auto millPropSlot = chapterPropSlot + residentInstances.size();
     if (millDriveBlas_.address) {
-        auto& instance = instances[chapterPropSlot + residentInstances.size()];
+        if (millPropSlot >= tlasInstanceCount_) {
+            diagnostic = "Bellwether mill-drive TLAS owner exceeds the live chapter tail.";
+            return false;
+        }
+        auto& instance = instances[millPropSlot++];
         ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
             horde::gameplay::traversal::kMillDriveMount, frame.millDriveAngleRadians),
             kMillDriveMetadataIndex, millDriveBlas_.address);
         instance.mask = frame.millDriveInstalled ? 1u : 0u;
+    }
+    if (millWaterwheelBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_ ||
+            !ApplyMillWaterwheelInstance(instances[millPropSlot++],
+                frame.millWaterwheelAngleRadians, diagnostic)) return false;
+    }
+    if (millPropSlot != tlasInstanceCount_) {
+        diagnostic = "Bellwether chapter TLAS tail does not match its submitted dynamic owners.";
+        return false;
     }
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;

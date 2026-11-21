@@ -1,6 +1,6 @@
 # Bellwether waterwheel and millrace
 
-The editable wheel uses a 3 m diameter, sixteen cupped paddles, oak rims and spokes, and round iron journals. The GLB has one rigid node at the centre of the axle with local +X as the rotation axis. The face is 1.76 m wide and has 0.27 m clearance per side in the 2.3 m race. A future game instance can rotate at the axle while its bedding, sluice and piers stay fixed.
+The editable wheel uses a 3 m diameter, sixteen cupped paddles, oak rims and spokes, and round iron journals. The GLB has one rigid node at the centre of the axle with local +X as the rotation axis. The face is 1.76 m wide and has 0.27 m clearance per side in the 2.3 m race. The [native assembly](../bellwether-millworks-v1/README.md) rotates at the axle while the sluice and piers stay fixed.
 
 ## Fit against the chapter river
 

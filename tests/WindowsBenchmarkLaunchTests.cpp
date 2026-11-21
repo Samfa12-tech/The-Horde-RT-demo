@@ -503,6 +503,18 @@ int main()
     check(millraceLaunch.requested && millraceLaunch.profile=="millrace" && millraceLaunch.error.empty() &&
           !ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,false).error.empty(),
           "millrace survey uses the bounded hidden Debug camera path");
+    auto wheelSurvey=std::vector<std::wstring_view>(survey.begin(),survey.end());
+    wheelSurvey.back()=L"mill-wheel";
+    check(ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty(),
+          "mill wheel terrain view admits its fixed station without staging a repair");
+    wheelSurvey.insert(wheelSurvey.end(),{L"--development-checkpoint",L"bellwether-mill-drive-tested",
+                                         L"--chapter-resident-fixture",L"review-fixture"});
+    check(ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,false).error.empty(),
+          "the isolated completed repair may be viewed from the wheel bank in Debug");
+    wheelSurvey[5]=L"millrace";
+    check(!ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty(),
+          "the tested repair may not change another survey's starting state");
     auto tombSurvey=survey;tombSurvey.back()=L"tomb-debris";
     const auto tombLaunch=ParseWindowsEnvironmentSurveyLaunch(tombSurvey,true);
     check(tombLaunch.requested && tombLaunch.profile=="tomb-debris" && !tombLaunch.debrisDisabled &&

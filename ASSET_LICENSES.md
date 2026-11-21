@@ -1031,6 +1031,12 @@ reproducible from the recipe and remains outside game packages.
 
 The millrace terrain and water are also original Horde authoring. The terrain cut derives from the pinned r23 chapter mesh and retains the original embedded material images and texture mapping policy. Its source receipt is in assets/models/world/source/bellwether-millrace-v1/.
 
+The runtime wheel and its original stone and timber support geometry are
+documented under assets/models/world/source/bellwether-millworks-v1/. The wheel
+reuses the existing Horde chest wood and iron texture sources and exact
+platform material rows. The sluice and piers reuse the existing Bellwether
+timber and masonry materials.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

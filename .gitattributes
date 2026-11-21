@@ -531,3 +531,9 @@ assets/models/world/source/bellwether-waterwheel-v1/*.json text eol=lf
 tools/author-bellwether-millrace.py text eol=lf
 src/scene/BellwetherMillrace.generated.h text eol=lf
 assets/models/world/source/bellwether-millrace-v1/*.json text eol=lf
+
+# The mill assembly receipt pins these exact source and runtime text bytes.
+tools/author-bellwether-mill-works.py text eol=lf
+assets/models/world/source/bellwether-millworks-v1/*.json text eol=lf
+assets/models/world/source/bellwether-millworks-v1/*.generated.h text eol=lf
+assets/models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json text eol=lf
