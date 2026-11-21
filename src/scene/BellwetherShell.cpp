@@ -4,7 +4,11 @@
 #include <limits>
 namespace horde::scene {
 bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMeshAsset& world,
+    std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     std::string& diagnostic) {
+    if(!support) {
+        diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
+    }
     if(std::any_of(world.nodeTransforms.begin(),world.nodeTransforms.end(),[](const auto& node){
         return node.name=="Original_Bellwether_closed_distant_shell";})) {
         diagnostic="Distant town is already admitted to this owner.";return false;
@@ -35,6 +39,24 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
             diagnostic="Distant town source requests unadmitted material or light features.";return false;
         }
     }
+    using Surface=gameplay::simulation::TriangleSupportSurface;
+    std::vector<Surface::Triangle> contact;
+    contact.reserve(source.indices.size()/3);
+    for(const auto& primitive:source.primitives) {
+        for(std::size_t k=0;k<primitive.indexCount;k+=3) {
+            Surface::Triangle triangle;
+            triangle.surface=gameplay::simulation::SupportSurface::Stone;
+            for(std::size_t corner=0;corner<3;++corner) {
+                const auto local=source.indices[primitive.indexOffset+k+corner];
+                const auto& position=source.vertices[primitive.vertexOffset+local].position;
+                triangle.points[corner]={position[0],position[1],position[2]};
+            }
+            contact.push_back(triangle);
+        }
+    }
+    auto prepared=Surface::WithAdditionalNonWalkableGeometry(*support,contact,diagnostic);
+    if(!prepared)return false;
+
     auto staged=world;
     const auto vertices=static_cast<std::uint32_t>(staged.vertices.size());
     const auto indices=static_cast<std::uint32_t>(staged.indices.size());
@@ -51,6 +73,9 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         staged.bounds.minimum[axis]=std::min(staged.bounds.minimum[axis],source.bounds.minimum[axis]);
         staged.bounds.maximum[axis]=std::max(staged.bounds.maximum[axis],source.bounds.maximum[axis]);
     }
-    world=std::move(staged);diagnostic.clear();return true;
+    world=std::move(staged);
+    support=std::move(prepared);
+    diagnostic.clear();
+    return true;
 }
 }

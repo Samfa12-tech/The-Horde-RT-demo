@@ -30,6 +30,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -686,7 +687,7 @@ void TestSharedMasterPacking()
     const bool base=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
         AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
         AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic) &&
-        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic) &&
         PrepareForestDressing(kRoot/"assets",prepared,diagnostic,terrain.get());
     Check(base,diagnostic.empty()?"shared master proof prepares the same real chapter and root-fitted snapshot":diagnostic);
     if(!base)return;
@@ -1135,16 +1136,90 @@ void AuditBoundary(const gameplay::simulation::TriangleSupportSurface& terrain,b
     std::cout<<"Containment audit: sentinels="<<std::count(reached.begin(),reached.end(),true)<<" approaches="<<attempted<<" leaks="<<leaks<<" floodCells="<<visited<<" movementSteps="<<moves<<'\n';
 }
 
-void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+gameplay::campaign::Checkpoint LookoutCheckpoint(
+    const gameplay::simulation::TriangleSupportSurface& terrain) {
     namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
     cp::Checkpoint record;record.contentRevision=2;record.id=cp::CheckpointId::ForestEndpoint;
     record.zone=sim::WorldZoneId::Lookout;record.firstAscentCompleted=true;
     record.guards={cp::GuardPose{-4.f,-15.2f,.3f},cp::GuardPose{-6.f,-16.f,-.7f}};
-    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(anchor.x,anchor.z);
+    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain.Query(anchor.x,anchor.z);
     record.position={anchor.x,ground.worldY,anchor.z};record.yaw=2.57f;
     record.dialogue.grateConsumed=record.dialogue.rescueConsumed=record.dialogue.reunionStarted=true;
     record.dialogue.proofAccepted=record.dialogue.forestNightConsumed=record.dialogue.forestWaystoneConsumed=true;
     record.dialogue.forestClueConsumed=record.dialogue.forestVillageConsumed=true;
+    return record;
+}
+
+void TestBellwetherExteriorApproach(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+    const auto record=LookoutCheckpoint(*terrain);
+    const auto token=game.BeginCampaignRestore(record);
+    const bool restored=token && game.CommitCampaignRestore(
+        *token,{token->worldGeneration,record.zone},terrain,{});
+    Check(restored,"the production movement fixture can start from a completed 1.7 lookout save");
+    if(!restored)return;
+    for(const auto& zone:sim::kWorldZones) {
+        const sim::WorldZoneToken ready{token->worldGeneration,zone.id};
+        if(zone.id==sim::WorldZoneId::Dungeon)game.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
+        else game.PublishChapterTerrain(ready,terrain);
+    }
+    sim::InputSnapshot neutral;
+    neutral.yawRadians=record.yaw;
+    neutral.pitchRadians=record.pitch;
+    game.StepFixed(neutral);
+
+    // The atlas road uses East/North. Convert with the admitted terrain/shell
+    // registration. Skirt the proposed well and stop short of the closed wall.
+    constexpr std::array<std::array<float,2>,10> mapRoute{{
+        {-65,90},{-56,76},{-59,58},{-47,44},{-30,34},{-19,18},
+        {-4,4},{-1.1f,2.6f},{4,1},{4,5.4f}
+    }};
+    sim::InputSnapshot input;
+    input.moveForward=1.f;
+    input.runHeld=true;
+    input.damageEnabled=false;
+    bool replayedLookoutLine=false;
+    const auto step=[&] {
+        game.StepFixed(input);
+        replayedLookoutLine|=game.Snapshot().chapterDialogue.line==gameplay::dialogue::Line::ForestVillage;
+    };
+    const auto walkTo=[&](const auto& mapPoint) {
+        const float x=mapPoint[0]+78.3f,z=126.2f-mapPoint[1];
+        for(unsigned tick=0;tick<1200;++tick) {
+            const auto& current=game.Snapshot();
+            const float dx=x-current.playerX,dz=z-current.playerZ;
+            if(std::hypot(dx,dz)<.15f)return true;
+            input.yawRadians=std::atan2(dx,-dz);
+            step();
+            const auto& next=game.Snapshot();
+            if(next.worldRoute.blocked || !next.playerGrounded)break;
+        }
+        std::cerr<<"Bellwether approach stopped at "<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ
+                 <<" en route to "<<x<<','<<z<<'\n';
+        return false;
+    };
+    for(const auto& point:mapRoute) {
+        if(!walkTo(point)) {Check(false,"the normal player motor reaches the mapped south approach");return;}
+    }
+    const auto approach=game.Snapshot();
+    input.yawRadians=0;
+    for(unsigned tick=0;tick<90 && !game.Snapshot().worldRoute.blocked;++tick)step();
+    Check(game.Snapshot().worldRoute.blocked && game.Snapshot().playerZ<approach.playerZ &&
+          game.Snapshot().playerZ>119.2f,"player reaches the closed tavern and stops outside its south foundation");
+    for(auto i=std::next(mapRoute.rbegin());i!=mapRoute.rend();++i) {
+        if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
+    }
+    Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
+          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::ForestEndpoint,
+          "return keeps the earned lookout checkpoint and completed dialogue");
+}
+
+void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+    namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
+    const auto record=LookoutCheckpoint(*terrain);
+    const auto anchor=sim::kWorldRoutePoints.back();
     Check(cp::Validate(record),"canonical old forest save remains valid with new demo endpoint");
     auto outside=record;outside.position.x=40;outside.position.z=60;
     Check(!cp::Validate(outside),"old arbitrary off-trail position cannot be a valid persistent checkpoint");
@@ -1205,7 +1280,7 @@ void TestFullSurroundings()
     const bool ready=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
         AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
         AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
-        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic) &&
         PrepareForestDressing(kRoot/"assets",original,diagnostic,terrain.get()) &&
         AppendPreparedForestDressing(*original,owner,forest,diagnostic) &&
         AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic) &&
@@ -1343,7 +1418,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
                   malformed.triangleRegions.size()==owner.indices.size()/3u+1u,
                   "graveyard append rejects excessive provenance and retains prior geometry/contact");
             return AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic);}() &&
-        AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
+        AppendBellwetherShell(kRoot / "assets", owner, terrain, diagnostic) &&
         [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
                 ForestDressingBuildReport rejected;
                 return AppendPreparedForestDressing(kRoot/"assets",invalid,rejected,diagnostic,terrain.get());
@@ -1474,6 +1549,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
+    if(!auditRestBasins && !f01North)TestBellwetherExteriorApproach(terrain);
     if(auditRestBasins) {
         const auto prior=terrain;auto baseline=owner;
         const auto materials=owner.materials.size(),indices=owner.indices.size();

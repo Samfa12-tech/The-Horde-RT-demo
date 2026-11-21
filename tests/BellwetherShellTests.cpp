@@ -1,4 +1,6 @@
 #include "scene/BellwetherShell.h"
+#include "scene/ChapterTerrainSurface.h"
+#include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include <cstring>
@@ -18,11 +20,31 @@ int main() {
     v.position[2]=1;world.vertices.push_back(v);world.indices={0,1,2};world.primitives.push_back({0,0,3,0,0});
     world.bounds={{{-40,0,0}},{{-39,0,1}}};const auto before=world;
     std::string error;const auto root=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets";
-    const auto result=AppendBellwetherShell(root,world,error);
+    const auto terrainRoot=root/"models/world/runtime/chapter-terrain-v1";
+    assets::AssetManifest terrainManifest;
+    assets::StaticMeshAsset terrainMesh;
+    if(!assets::AssetManifest::Load(terrainRoot/"asset.manifest.json",terrainManifest,error) ||
+       !assets::StaticMeshAsset::Load(terrainRoot/"chapter-terrain-lod0.runtime.glb",terrainManifest,terrainMesh,error)) {
+        std::cerr<<error<<'\n';return 1;
+    }
+    const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
+    auto support=originalTerrain;
+    const auto result=AppendBellwetherShell(root,world,support,error);
     check(result,"real exported closed distant town must enter the native world owner");
     if(result) {
         check(world.indices.size()==before.indices.size()+966*3,"all 966 bounded silhouette/facade triangles are preserved");
         check(world.materials.size()==2,"no texture layer or material row expansion");
+        check(support->NonWalkableTriangleCount()==966 &&
+              support->TriangleCount()==originalTerrain->TriangleCount(),
+            "the same town triangles become solid without replacing any terrain support");
+        constexpr float southDoorX=82.3f,southWallZ=119.2f;
+        const auto bare=originalTerrain->Query(southDoorX,southWallZ);
+        const auto after=support->Query(southDoorX,southWallZ);
+        check(bare.found && after.found && after.triangle==bare.triangle && after.worldY==bare.worldY,
+            "adding the closed facade does not turn its roof into ground at the mapped entry");
+        check(originalTerrain->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,-11.2f,-9.4f,.24f) &&
+             !support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,-11.2f,-9.4f,.24f),
+             "the actual south foundation blocks entry at the mapped door before the interior is open");
         check(std::memcmp(world.vertices.data(),before.vertices.data(),before.vertices.size()*sizeof(v))==0,
             "accepted geometry prefix remains byte-identical");
         check(world.bounds.maximum[0]>120 && world.bounds.maximum[2]>170,
@@ -66,8 +88,10 @@ int main() {
         check(std::abs(closestZ-102.96f)<.001f,
             "actual closed stone facade relief survives native import at metre scale");
         const auto admittedIndices=world.indices;
-        check(!AppendBellwetherShell(root,world,error) && world.indices==admittedIndices,
-            "repeated admission cannot duplicate the distant town or partially mutate its owner");
+        const auto admittedSupport=support;
+        check(!AppendBellwetherShell(root,world,support,error) && world.indices==admittedIndices &&
+              support==admittedSupport,
+            "repeated admission preserves the existing render owner and contact");
         for(std::size_t j=1;j<world.primitives.size();++j) {
             const auto& p=world.primitives[j];double volume=0;
             for(std::size_t k=0;k<p.indexCount;k+=3) {
@@ -84,11 +108,15 @@ int main() {
             "town shares two existing world families after coalescing");
     }
     auto missing=before;missing.materials[1].name="Missing";
-    check(!AppendBellwetherShell(root,missing,error) && missing.indices==before.indices,
-        "missing admitted clay rejects without partial publication");
+    auto fallback=originalTerrain;
+    check(!AppendBellwetherShell(root,missing,fallback,error) && missing.indices==before.indices &&
+          fallback==originalTerrain,"missing admitted clay rejects without partial publication");
     auto absent=before;
-    check(!AppendBellwetherShell(root/"missing",absent,error) && absent.indices==before.indices,
-        "missing native source rejects without partial publication");
+    check(!AppendBellwetherShell(root/"missing",absent,fallback,error) && absent.indices==before.indices &&
+          fallback==originalTerrain,"missing native source rejects without partial publication");
+    fallback.reset();
+    check(!AppendBellwetherShell(root,absent,fallback,error) && absent.indices==before.indices &&
+          !fallback,"unavailable terrain cannot publish render geometry without matching contact");
     std::cout<<"Bellwether native placement/material/rollback "<<(ok?"passed":"failed")<<".\n";
     return ok?0:1;
 }

@@ -84,6 +84,12 @@ The keeper belongs at the tavern; record keeper north by the church; artificer a
 
 Protect the northwest return to the lookout, northern church/shrine routes and southeast regional road. Future branches remain downstream Abbey, eastern gorge/Foundry and northeast ridge/Glass Court. Exact junctions, entries and terrain remain proposals. Their mouths should be legible without falsely advertising unfinished areas as playable. The regional Foundry is distinct from the village smith; the mill bridge is not the Foundry crossing.
 
+### 1.8 exterior integration checkpoint
+
+The Windows host fixture drives the shared player motor from a completed 1.7 lookout checkpoint on the current native terrain. It follows the mapped bends past the square, stops at the closed south tavern foundation, then returns to the same lookout without replaying the reveal. The closed town now uses its imported render triangles for solid contact while ground support still comes from terrain.
+
+This station line is about 126 m to the approach outside the south door. Block the ankle turn on the lower road so Kit has a short protective walk. At the planned south doorway the current terrain is around engine Y −11.30 m and the closed shell floor is around Y −8.71 m. Fit the approach, doorway and finished interior together to resolve that roughly 2.6 m rise while retaining the mapped south entrance and distant roofline. The fixture ends outside the closed shell. Kit’s injury, walk and sit, the open interior, the conversation and target-device performance still require integration evidence.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

@@ -3330,7 +3330,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::GraveyardDressingReport graveyard;
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
-        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, diagnostic)) return false;
+        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic))
+            return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
