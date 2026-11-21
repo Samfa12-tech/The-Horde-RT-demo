@@ -438,6 +438,41 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckChapterResidentPublication()
+    {
+        PresentableTinyRtScene scene;
+        std::string diagnostic;
+        const std::vector<horde::scene::SkinnedClipBinding> clips{{"idle", true, true}};
+        const std::array sources{
+            ChapterResidentActorSource{100, "fixture", "one.glb", clips},
+            ChapterResidentActorSource{200, "fixture", "two.glb", clips}};
+        if (!scene.SetChapterResidentActors(sources, diagnostic)) return false;
+        auto duplicates = sources;
+        duplicates[1].stableId = duplicates[0].stableId;
+        if (scene.SetChapterResidentActors(duplicates, diagnostic) ||
+            scene.chapterResidentSources_[1].stableId != 200) return false;
+        scene.chapterResidents_[0].blas.address = 0x11000;
+        scene.chapterResidents_[1].blas.address = 0x22000;
+        std::array<VkAccelerationStructureInstanceKHR, 2> instances{};
+        RtSceneFrameInputs frame;
+        if (!scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr) ||
+            instances[0].mask || instances[1].mask ||
+            instances[0].instanceCustomIndex != PresentableTinyRtScene::kFirstResidentMetadataIndex ||
+            instances[1].instanceCustomIndex != PresentableTinyRtScene::kFirstResidentMetadataIndex + 1 ||
+            instances[0].accelerationStructureReference != 0x11000 ||
+            instances[1].accelerationStructureReference != 0x22000) return false;
+        frame.chapterResidents[0].stableId = 100;
+        frame.chapterResidents[1].stableId = 100;
+        if (scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr)) return false;
+        frame.chapterResidents[1].stableId = 300;
+        if (scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr)) return false;
+        scene.chapterResidents_[0].needsRefit = true;
+        scene.chapterResidents_[1].needsRefit = true;
+        scene.chapterResidents_[0].refitRecorded = true;
+        scene.NotifyFrameSubmitted();
+        return !scene.chapterResidents_[0].needsRefit && scene.chapterResidents_[1].needsRefit;
+    }
+
     static bool CheckFlaskPhysicalAliases()
     {
         PresentableTinyRtScene scene;scene.healingFlaskBlas_.address=0x129000u;
@@ -1981,6 +2016,8 @@ int main(int argc, char** argv)
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = playerUploadOk;
     ok &= CheckIndexedActorGeometry();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckChapterResidentPublication(),
+        "chapter residents keep separate GPU references and retry an unsubmitted pose");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();

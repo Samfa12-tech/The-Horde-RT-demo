@@ -25,6 +25,8 @@ enum class RtSceneCommandEvent : std::uint8_t
     Count,
 };
 
+inline constexpr std::size_t kRtDynamicBlasWorkCapacity = 9u;
+
 // Fixed, one-way event sink used by the live scene command path. It proves
 // command cardinality/order without wrapping or replacing Vulkan entrypoints.
 class RtSceneCommandObservation final
@@ -97,9 +99,9 @@ private:
         return count;
     }
 
-    // Six batched BLAS producers plus host write, one BLAS dependency, TLAS,
-    // TLAS dependency, trace, and copy are twelve events at maximum.
-    std::array<RtSceneCommandEvent, 12u> events_{};
+    // Host write, all scheduled BLAS updates, one BLAS dependency, TLAS,
+    // TLAS dependency, trace, and copy.
+    std::array<RtSceneCommandEvent, kRtDynamicBlasWorkCapacity + 6u> events_{};
     std::size_t size_ = 0u;
     bool overflowed_ = false;
 };

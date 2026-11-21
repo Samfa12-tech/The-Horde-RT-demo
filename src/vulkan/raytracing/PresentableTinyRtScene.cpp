@@ -638,6 +638,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
     chapterActor_ = std::move(other.chapterActor_);
+    chapterResidentSources_ = std::exchange(other.chapterResidentSources_, {});
+    chapterResidents_ = std::exchange(other.chapterResidents_, {});
 #if defined(_DEBUG)
     chapterInspectionActor_=std::move(other.chapterInspectionActor_);
     chapterInspectionLast_=std::exchange(other.chapterInspectionLast_,std::nullopt);
@@ -1171,7 +1173,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
             return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
     }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
-       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+ChapterWorldPropInstanceCount() ||
+       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+ChapterTailInstanceCount() ||
        staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
@@ -1179,7 +1181,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=15+ChapterWorldPropInstanceCount())
+    if(std::count(assets.begin(),assets.end(),true)!=15+ChapterTailInstanceCount())
         return fail("Forest proof did not preserve every unique static asset.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
@@ -1391,6 +1393,11 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     initialiseMeasurements_ = {};
     InitialiseAttemptTimer totalAttemptTimer(initialiseMeasurements_);
     sceneProfile_ = sceneProfile;
+    if (!chapterResidentSources_.empty() &&
+        (sceneProfile_ != RtSceneProfile::Showcase || !developmentRescueJourney_)) {
+        diagnostic = "Chapter residents require the authored chapter scene.";
+        return false;
+    }
 #if defined(_DEBUG)
     if(diagnosticPreviewPairMaster_ && sceneProfile_!=RtSceneProfile::GraphicsPreview) {
         diagnostic="Diagnostic preview pair cannot initialize a gameplay or entry scene.";return false;
@@ -1781,6 +1788,11 @@ void PresentableTinyRtScene::Destroy()
     regionalWaterFaces_.clear();
     finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
+    for (auto& resident : chapterResidents_) {
+        DestroyAccelerationStructure(resident.blas);
+        DestroyBuffer(resident.scratch);
+        resident = {};
+    }
     chapterActor_ = {};
     chapterActorReady_ = thirdActorIsCompanion_ = thirdActorSubmittedCompanion_ =
         thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
@@ -1986,6 +1998,8 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
              &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
+    for (const auto& resident : chapterResidents_)
+        append(result.bottomLevelAccelerationStructures, resident.blas.handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
         append(result.bottomLevelAccelerationStructures,
@@ -2052,6 +2066,10 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_})
     {
         accumulateBlas(*blas);
+    }
+    for (const auto& resident : chapterResidents_) {
+        accumulateBlas(resident.blas);
+        AccumulateRtGpuBuffer(inventory, resident.scratch);
     }
     if (tlas_.handle != VK_NULL_HANDLE)
     {
@@ -2987,6 +3005,131 @@ bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
            imageProperties.maxExtent.height >= 512u && imageProperties.maxArrayLayers >= 5u;
 }
 
+bool PresentableTinyRtScene::SetChapterResidentActors(
+    const std::span<const ChapterResidentActorSource> sources, std::string& diagnostic)
+{
+    if (device_ != VK_NULL_HANDLE || sources.size() > chapterResidents_.size()) {
+        diagnostic = "Chapter resident sources must be configured before Vulkan scene creation.";
+        return false;
+    }
+    for (std::size_t lane = 0; lane < sources.size(); ++lane) {
+        const auto& source = sources[lane];
+        if (!source.stableId || source.directory.empty() || source.fileName.empty() ||
+            source.clips.empty() ||
+            std::any_of(sources.begin(), sources.begin() + lane, [&](const auto& prior) {
+                return prior.stableId == source.stableId;
+            })) {
+            diagnostic = "Chapter resident sources require unique identities and complete asset inputs.";
+            return false;
+        }
+    }
+    chapterResidentSources_.assign(sources.begin(), sources.end());
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::LoadChapterResidents(std::string& diagnostic)
+{
+    for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        const auto& source = chapterResidentSources_[lane];
+        auto& actor = chapterResidents_[lane].actor;
+        if (!actor.Load(source.directory, source.fileName.c_str(), source.clips, diagnostic))
+            return false;
+        for (const auto& material : actor.Asset().materials) {
+            if (material.baseColorTexture >= 0 || material.normalTexture >= 0 ||
+                material.ormTexture >= 0 || material.emissiveTexture >= 0 ||
+                material.transmissionFactor > 0) {
+                diagnostic = "Chapter resident material needs an admitted texture or transmission route.";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+namespace
+{
+constexpr VkBuildAccelerationStructureFlagsKHR kChapterResidentBuildFlags =
+    VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+    VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+}
+
+bool PresentableTinyRtScene::BuildChapterResidentStructures(std::string& diagnostic)
+{
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        auto& resident = chapterResidents_[lane];
+        RtIndexedActorGeometry geometry;
+        if (!geometry.Resolve(staticMeshSlot_, kFirstResidentMetadataIndex + lane,
+                resident.actor.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic) ||
+            !BuildProfileAccelerationStructure(geometry.Geometries(), geometry.Ranges(),
+                VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, kChapterResidentBuildFlags,
+                resident.blas, &resident.scratch, diagnostic))
+            return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::PrepareChapterResidents(const RtSceneFrameInputs& frame,
+    const std::span<VkAccelerationStructureInstanceKHR> instances,
+    const std::span<RtIndexedActorGeometry> geometries, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
+{
+    std::array<const ChapterResidentActorPose*, kAdditionalChapterActorCapacity> byLane{};
+    for (const auto& pose : frame.chapterResidents) {
+        if (!pose.stableId) continue;
+        const auto source = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+            [&](const auto& item) { return item.stableId == pose.stableId; });
+        const auto lane = static_cast<std::size_t>(source - chapterResidentSources_.begin());
+        if (source == chapterResidentSources_.end() || byLane[lane] ||
+            !std::isfinite(pose.time) || pose.time < 0 || !std::isfinite(pose.yaw) ||
+            !std::all_of(pose.foot.begin(), pose.foot.end(), [](float value) { return std::isfinite(value); })) {
+            diagnostic = "Frame requests an unknown, duplicate or invalid chapter resident pose.";
+            return false;
+        }
+        byLane[lane] = &pose;
+    }
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        auto& resident = chapterResidents_[lane];
+        auto& instance = instances[lane];
+        resident.refitRecorded = false;
+        const auto* pose = byLane[lane];
+        instance = {};
+        instance.instanceCustomIndex = kFirstResidentMetadataIndex + lane;
+        instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instance.accelerationStructureReference = resident.blas.address;
+        instance.transform = {{{1,0,0,0}, {0,1,0,0}, {0,0,1,0}}};
+        if (!pose) continue;
+
+        auto& geometry = geometries[lane];
+        if (!geometry.Resolve(staticMeshSlot_, kFirstResidentMetadataIndex + lane,
+                resident.actor.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+            return false;
+        if (resident.uploadedClip != pose->clip || resident.uploadedTime != pose->time) {
+            RtSceneStageScope skin(observation, horde::telemetry::RtStage::CharacterSkin);
+            horde::scene::SkinWorkMetrics work;
+            if (!resident.actor.Pose(pose->clip, pose->time, diagnostic, {}, nullptr,
+                    WantsSkinWorkMetrics(observation) ? &work : nullptr)) {
+                skin.Cancel();
+                return false;
+            }
+            skin.Complete(1u);
+            ObserveSkinWork(observation, work);
+            if (!gpuResources_.WriteBufferRange(staticVertexBuffer_, geometry.VertexOffset(),
+                    resident.actor.Asset().vertices.data(), geometry.VertexBytes(),
+                    "chapter resident pose", diagnostic, observation))
+                return false;
+            resident.uploadedClip = pose->clip;
+            resident.uploadedTime = pose->time;
+            resident.needsRefit = true;
+        }
+        const float sine = std::sin(pose->yaw), cosine = std::cos(pose->yaw);
+        instance.transform = {{{cosine,0,sine,pose->foot[0]}, {0,1,0,pose->foot[1]},
+            {-sine,0,cosine,pose->foot[2]}}};
+        instance.mask = 1u;
+    }
+    return true;
+}
+
 bool PresentableTinyRtScene::CreateMaterialTextures(const std::string& directory, std::string& diagnostic)
 {
     const auto path = [&directory](const char* name) { return directory + "/" + name; };
@@ -3448,6 +3591,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         }
         chapterActorReady_ = true;
     }
+    if (!LoadChapterResidents(diagnostic)) return false;
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
     // Pin the validated full CPU source once during heavy startup. Candidate
     // reconstruction can then copy in bounded turns without rescanning meshes
@@ -6220,6 +6364,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         ApplyRoadStoneInstance(instances[tlasInstanceCount_++], {});
     if (chapterActorReady_)
         ApplyChapterWindowInstance(instances[tlasInstanceCount_++], false);
+    if (!BuildChapterResidentStructures(diagnostic) ||
+        !PrepareChapterResidents({}, std::span(instances).subspan(tlasInstanceCount_,
+            chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
+    tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -8585,11 +8733,15 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
     if(UsesSharedForestRetention())
         ApplySharedForestRetentionProof(instances,frame);
-    auto chapterPropSlot = tlasInstanceCount_ - ChapterWorldPropInstanceCount();
+    auto chapterPropSlot = tlasInstanceCount_ - ChapterTailInstanceCount();
     if (roadStoneBlas_.address)
         ApplyRoadStoneInstance(instances[chapterPropSlot++], frame.chapterCompanion);
     if (chapterActorReady_)
-        ApplyChapterWindowInstance(instances[chapterPropSlot], chapterWindowVisible);
+        ApplyChapterWindowInstance(instances[chapterPropSlot++], chapterWindowVisible);
+    const auto residentInstances = std::span(instances).subspan(chapterPropSlot, chapterResidentSources_.size());
+    std::array<RtIndexedActorGeometry, kAdditionalChapterActorCapacity> residentGeometries;
+    if (!PrepareChapterResidents(frame, residentInstances, residentGeometries, diagnostic, observation))
+        return false;
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
@@ -8716,9 +8868,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
 
-    const std::array<bool, 7u> requestedBlasWork{{
+    static_assert(kRtDynamicBlasWorkCapacity == 7u + kAdditionalChapterActorCapacity);
+    std::array<bool, kRtDynamicBlasWorkCapacity> requestedBlasWork{{
         updateRescueWorldBlas, updateSkinnedPlayer, updateSkeletonPose0,
         updateSkeletonPose1, updateLich, updateViewmodel, updateWaterDropletBlas}};
+    for (std::size_t lane = 0; lane < residentInstances.size(); ++lane)
+        requestedBlasWork[7u + lane] = residentInstances[lane].mask && chapterResidents_[lane].needsRefit;
     const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
         std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
     RtSceneStageScope blasRefitScope(
@@ -8925,7 +9080,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
             requestedBlasWork[0] || requestedBlasWork[1] || requestedBlasWork[5] ||
-                requestedBlasWork[6],
+                requestedBlasWork[6] || std::any_of(requestedBlasWork.begin() + 7, requestedBlasWork.end(),
+                    [](bool update) { return update; }),
             requestedBlasWork[2], requestedBlasWork[3], requestedBlasWork[4]});
     const auto recordBlasToTlasBarrier = [&]() noexcept
     {
@@ -8955,7 +9111,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             case 4u: recordLichBlas(); break;
             case 5u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
             case 6u: recordWaterDropletBlas(); break;
-            default: break;
+            default: {
+                const auto lane = index - 7u;
+                auto& resident = chapterResidents_[lane];
+                VkAccelerationStructureBuildGeometryInfoKHR info{
+                    VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+                info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+                info.flags = kChapterResidentBuildFlags;
+                info.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+                info.srcAccelerationStructure = resident.blas.handle;
+                info.dstAccelerationStructure = resident.blas.handle;
+                info.scratchData.deviceAddress = resident.scratch.AlignedAddress();
+                residentGeometries[lane].Record(commandBuffer, vkCmdBuildAccelerationStructuresKHR_, info);
+                resident.refitRecorded = true;
+                break;
+            }
             }
         },
         recordBlasToTlasBarrier);
@@ -9351,6 +9521,11 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
     characterSlot_.NotifyFrameSubmitted();
+    for (auto& resident : chapterResidents_)
+        if (resident.refitRecorded) {
+            resident.needsRefit = false;
+            resident.refitRecorded = false;
+        }
     thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     if (!tlasPendingDefinitionsValid_) return;
     thirdActorSubmittedCompanion_ = thirdActorIsCompanion_;

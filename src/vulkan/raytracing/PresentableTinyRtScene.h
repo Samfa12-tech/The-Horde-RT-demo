@@ -139,6 +139,26 @@ struct ChapterActorInspectionPose {
     bool operator==(const ChapterActorInspectionPose&) const=default;
 };
 #endif
+inline constexpr std::size_t kAdditionalChapterActorCapacity = 2;
+class RtIndexedActorGeometry;
+
+struct ChapterResidentActorSource
+{
+    std::uint32_t stableId = 0;
+    std::filesystem::path directory;
+    std::string fileName;
+    std::vector<horde::scene::SkinnedClipBinding> clips;
+};
+
+struct ChapterResidentActorPose
+{
+    std::uint32_t stableId = 0;
+    std::array<float, 3> foot{};
+    float yaw = 0;
+    horde::scene::SkinnedClip clip = horde::scene::SkinnedClip::Idle;
+    float time = 0;
+};
+
 struct RtSceneFrameInputs
 {
     // CPU experiment selection only; ignored when its compile gate is OFF.
@@ -154,6 +174,7 @@ struct RtSceneFrameInputs
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     float playerCrouchDropMetres=0;
@@ -287,7 +308,7 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 24u;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 24u + kAdditionalChapterActorCapacity;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -305,6 +326,7 @@ public:
     static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
     static constexpr std::uint32_t kRoadStoneMetadataIndex = 30u;
     static constexpr std::uint32_t kChapterWindowMetadataIndex = 31u;
+    static constexpr std::uint32_t kFirstResidentMetadataIndex = 32u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -322,13 +344,15 @@ public:
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kFirstResidentMetadataIndex + kAdditionalChapterActorCapacity <= kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 2u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 2u +
+                  kAdditionalChapterActorCapacity);
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -401,6 +425,7 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
@@ -1253,9 +1278,14 @@ private:
     void ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
         const horde::gameplay::dialogue::CompanionSnapshot& companion) const;
     void ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
-    std::uint32_t ChapterWorldPropInstanceCount() const noexcept {
-        return (roadStoneBlas_.address ? 1u : 0u) + (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u);
+    std::uint32_t ChapterTailInstanceCount() const noexcept {
+        return (roadStoneBlas_.address ? 1u : 0u) + (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
+            static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
+    bool LoadChapterResidents(std::string&);
+    bool BuildChapterResidentStructures(std::string&);
+    bool PrepareChapterResidents(const RtSceneFrameInputs&, std::span<VkAccelerationStructureInstanceKHR>,
+        std::span<RtIndexedActorGeometry>, std::string&, RtSceneRecordObservation*);
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
@@ -1487,6 +1517,17 @@ private:
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;
+    struct ChapterResidentActor {
+        horde::scene::assets::SkinnedPbrActor actor;
+        AccelerationStructure blas;
+        Buffer scratch;
+        horde::scene::SkinnedClip uploadedClip = horde::scene::SkinnedClip::Idle;
+        float uploadedTime = -1;
+        bool needsRefit = false;
+        bool refitRecorded = false;
+    };
+    std::vector<ChapterResidentActorSource> chapterResidentSources_;
+    std::array<ChapterResidentActor, kAdditionalChapterActorCapacity> chapterResidents_{};
 #if defined(_DEBUG)
     std::unique_ptr<horde::scene::assets::SkinnedPbrActor> chapterInspectionActor_;
     std::optional<ChapterActorInspectionPose> chapterInspectionLast_;

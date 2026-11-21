@@ -321,7 +321,7 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
     constexpr std::size_t forestBegin=kOrdinaryTlasInstanceCount;
     constexpr std::size_t forestEnd=forestBegin+64u;
     for(std::size_t i=forestBegin;i<forestEnd && i<instances.size();++i)instances[i].mask=1u;
-    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd+ChapterWorldPropInstanceCount() || !ready_ ||
+    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd+ChapterTailInstanceCount() || !ready_ ||
        !ForestRetentionIdentityMatches() || !ordinaryStaticFacesVerified_ ||
        !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticOmissions_ || preparedStaticGeometry_ ||
        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
@@ -575,6 +575,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (chapterActorReady_)
         registrations.push_back({kChapterWindowMetadataIndex, 0x42303157u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
             static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u, &productionDielectricFixtureAsset_});
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+        registrations.push_back({kFirstResidentMetadataIndex + lane, chapterResidentSources_[lane].stableId,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterResidents_[lane].actor.Asset()});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -1093,6 +1096,10 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
     for (std::size_t i=0; i<lastInstanceMasks_.size(); ++i) lastInstanceMasks_[i] = static_cast<std::uint8_t>(tlasBuiltInstances_[i].mask);
     chapterActorPoseGeneration_ = UINT64_MAX; chapterActorPoseSeconds_ = -1.0f;
     chapterActorNeedsRefit_ = thirdActorIsCompanion_;
+    for (auto& resident : chapterResidents_) {
+        resident.uploadedTime = -1;
+        resident.needsRefit = false;
+    }
     waterDropletGeometryVisible_ = true; // Forces one write/refit, also for a now-empty pool.
     if (api.recordCurrentFrame) {
         bool recorded = false;

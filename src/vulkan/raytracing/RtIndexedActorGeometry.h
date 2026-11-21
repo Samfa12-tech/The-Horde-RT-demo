@@ -103,6 +103,11 @@ public:
         return {triangleCounts_.data(), count_};
     }
 
+    std::span<const VkAccelerationStructureBuildRangeInfoKHR> Ranges() const
+    {
+        return {ranges_.data(), count_};
+    }
+
     VkDeviceSize VertexOffset() const { return count_ ? vertexOffset_ : 0; }
     VkDeviceSize VertexBytes() const { return count_ ? vertexBytes_ : 0; }
 

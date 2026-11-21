@@ -449,6 +449,7 @@ constexpr UINT kMaxFramesInFlight = 1u;
 
 struct CaptureLaunchOptions
 {
+    std::filesystem::path chapterResidentFixture;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -679,6 +680,7 @@ struct VulkanSurfaceContext
         horde::platform::windows::PreviewMeshPairCaptureMode::None;
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> previewMeshPairMaster;
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
+    std::filesystem::path chapterResidentFixture;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
@@ -1249,6 +1251,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.portrait = true;
             continue;
         }
+        if (argument == L"--chapter-resident-fixture")
+        {
+#if defined(_DEBUG)
+            if (!options.chapterResidentFixture.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--chapter-resident-fixture requires one local fixture directory.";
+                break;
+            }
+            options.chapterResidentFixture = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--chapter-resident-fixture is Debug only.";
+#endif
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -1298,6 +1314,10 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
            options.validateChapterRoundTrip)
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
     }
+    if (options.error.empty() && !options.chapterResidentFixture.empty() &&
+        (!options.requested || !options.captureHidden || options.developmentCheckpoint != "chapter-kit-reunion" ||
+         options.validateChapterRoundTrip || options.validateStaticZoneCutover))
+        options.error = "Chapter resident fixtures require a hidden chapter-kit-reunion capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -6580,6 +6600,18 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
+    if (!ctx.chapterResidentFixture.empty()) {
+        using horde::vulkan::raytracing::ChapterResidentActorSource;
+        const std::vector<horde::scene::SkinnedClipBinding> clips{
+            {"Warden|idle", true, true}, {"Warden|walk", true, true}};
+        const std::array fixtures{
+            ChapterResidentActorSource{0x52544431, ctx.chapterResidentFixture, "resident.glb", clips},
+            ChapterResidentActorSource{0x52544432, ctx.chapterResidentFixture, "resident.glb", clips}};
+        if (!ctx.rtScene.SetChapterResidentActors(fixtures, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            return false;
+        }
+    }
     if(ctx.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
         const bool normalShared=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::NormalShared64;
@@ -7465,6 +7497,23 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             return false;
         }
 #if defined(_DEBUG)
+        if (!ctx.chapterResidentFixture.empty()) {
+            const auto terrain = ctx.rtScene.ChapterTerrainSurface();
+            const auto request = [&](std::size_t lane, std::uint32_t id, float x, float z, float yaw,
+                                     horde::scene::SkinnedClip clip, float time) {
+                if (!terrain) return false;
+                const auto support = terrain->Query(x, z);
+                if (!support.found || !support.walkable) return false;
+                frameInputs.chapterResidents[lane] = {id, {x, support.worldY, z}, yaw, clip, time};
+                return true;
+            };
+            if (!request(0, 0x52544431, -25.60f, -6.82f, -1.22f, horde::scene::SkinnedClip::Walking, .34f) ||
+                !request(1, 0x52544432, -25.32f, -4.96f, -1.92f, horde::scene::SkinnedClip::Idle, .51f)) {
+                ctx.lastRtFrameError = "Chapter resident diagnostic marks have no authored support.";
+                if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+        }
         if (ctx.inspectionSkeletonBlends) {
             if (!ctx.playerDodgeInspectionSnapshot || !frozenDevelopmentCheckpoint ||
                 !gShowcaseCaptureHidden || IsWindowVisible(ctx.windowHandle) ||
@@ -9603,6 +9652,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
+    context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
 #if HORDE_RT_FRAME_STAGE_PROBE
     context.captureGpuStages=ParseCaptureLaunchOptions().captureGpuStages;
 #endif

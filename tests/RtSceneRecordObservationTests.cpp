@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <iostream>
+#include <span>
 #include <string_view>
 #include <type_traits>
 #include <vector>
@@ -261,11 +262,17 @@ int main()
     RtSceneCommandObservation overflowCommands{};
     RtSceneRecordObservation overflowObservation{};
     overflowObservation.commands = &overflowCommands;
-    for (const auto event : expectedSixCommands)
+    ObserveRtSceneCommand(&overflowObservation, RtSceneCommandEvent::HostWriteBarrier);
+    for (std::size_t update = 0; update < kRtDynamicBlasWorkCapacity; ++update)
+        ObserveRtSceneCommand(&overflowObservation, RtSceneCommandEvent::BlasUpdate);
+    for (const auto event : std::span(expectedSixCommands).last(5))
         ObserveRtSceneCommand(&overflowObservation, event);
+    ok &= Require(overflowObservation.healthy && overflowCommands.ValidCompleted() &&
+                  overflowCommands.BlasUpdateCount() == kRtDynamicBlasWorkCapacity,
+                  "the command observer accepts all scheduled producers including chapter residents");
     ObserveRtSceneCommand(&overflowObservation, RtSceneCommandEvent::BlasUpdate);
     ok &= Require(!overflowObservation.healthy && !overflowCommands.ValidCompleted(),
-                  "a thirteenth observed command overflows the fixed twelve-event capacity");
+                  "the command observer detects one event beyond full scene capacity");
     // Test the geometry and normal transport actually consumed by the world
     // BLAS and its shader metadata, for both vertical and thrown/bent ropes.
     using namespace horde::scene;
