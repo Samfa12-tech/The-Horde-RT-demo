@@ -63,6 +63,12 @@ Both backends reported the same counts in all five matched 960 x 540 views.
 | Window with Glass On | 0 | 1 | 0 | 0 |
 | Hearth | 5,408 | 27,719 | 2,483 | 0 |
 
-In the staffed room, 6,524 shadow pixels and 423 reflection pixels had no primary furniture hit. The window gave a shadow hit even though the furniture lay entirely outside direct visibility in that frame. The matched ordinary captures retained identical green and blue channels. These sampled views establish why a furniture tier must remain available for secondary and shadow rays when its primary hits disappear. Safe resource retirement and phone budgets remain acceptance gates.
+In the staffed room, 6,524 shadow pixels and 423 reflection pixels had no primary furniture hit. The window gave a shadow hit even though the furniture lay entirely outside direct visibility in that frame. The matched ordinary captures retained identical green and blue channels. These sampled views establish why a furniture tier must remain available for secondary and shadow rays when its primary hits disappear.
+
+## Near BLAS residency
+
+Add `--bellwether-furniture-residency` to the moving Windows Debug route to start with mid and far BLAS owners. Those tiers stay available to all ray types. Near preparation starts within 9 m of the room bounds, using the original packed geometry. The graphics queue builds the near BLAS asynchronously. The renderer can select it after its build fence completes, with mid available while it prepares.
+
+The near BLAS can retire beyond 11 m once the submitted TLAS references a coarse tier and the platform has proved prior frame command references retired. This checkpoint releases only the near BLAS backing allocation. Shared vertices, indices, door and glazing stay resident. Both Windows backends measured 67,072 bytes released per retirement, with a 121,088-byte preparation peak for the near BLAS and its scratch. Each route recorded three retirements and four preparations, including one extra prepare-retire cycle along the initial road detour. Near was ready on every sampled frame that required it. The 1,033 frame records and 13 milestone images per backend matched the fully resident control in gameplay state, selected tier and image bytes. Geometry-buffer residency and phone performance remain acceptance gates.
 
 The [Blender recipe](../../../../../tools/author-bellwether-tavern-lods.py) takes the repository root and a new output directory. The existing `horde_rt_bellwether_shell_tests` executable accepts that output directory as an optional argument to run the candidate checks alongside its ordinary town tests.

@@ -636,6 +636,12 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
     bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
+    bellwetherFurnitureResidency_=std::exchange(other.bellwetherFurnitureResidency_,false);
+    bellwetherFurnitureLifetime_=std::exchange(other.bellwetherFurnitureLifetime_,{});
+    bellwetherNearCandidate_=std::exchange(other.bellwetherNearCandidate_,{});
+    bellwetherNearBuildScratch_=std::exchange(other.bellwetherNearBuildScratch_,{});
+    bellwetherNearBuild_=std::exchange(other.bellwetherNearBuild_,{});
+    bellwetherNearRetryTick_=std::exchange(other.bellwetherNearRetryTick_,0u);
     activeBellwetherFurnitureDetail_=std::exchange(other.activeBellwetherFurnitureDetail_,horde::scene::BellwetherFurnitureDetail::Near);
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
@@ -1753,6 +1759,8 @@ void PresentableTinyRtScene::Destroy()
     thirdActorSubmittedCompanion_ = false;
     jointPropPresentationActive_ = false;
     keeperVertexLifetime_ = {};
+    bellwetherFurnitureLifetime_={};
+    bellwetherNearRetryTick_=0;
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
@@ -1771,6 +1779,9 @@ void PresentableTinyRtScene::Destroy()
         waysideRegisterBlas_ = {};
         tavernDoorBlas_ = {};
         bellwetherFurnitureBlas_={};
+        bellwetherNearCandidate_={};
+        bellwetherNearBuildScratch_={};
+        bellwetherNearBuild_={};
         bellwetherFurnitureAsset_={};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
@@ -1831,6 +1842,9 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waysideCoverBlas_);
     DestroyAccelerationStructure(waysideRegisterBlas_);
     DestroyAccelerationStructure(tavernDoorBlas_);
+    RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
+    DestroyAccelerationStructure(bellwetherNearCandidate_);
+    DestroyBuffer(bellwetherNearBuildScratch_);
     for(auto& owner:bellwetherFurnitureBlas_)DestroyAccelerationStructure(owner);
     bellwetherFurnitureAsset_={};
     DestroyAccelerationStructure(skinnedPlayerBlas_);
@@ -2097,6 +2111,8 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
         accumulateBlas(*blas);
     }
     for(const auto& owner:bellwetherFurnitureBlas_)accumulateBlas(owner);
+    accumulateBlas(bellwetherNearCandidate_);
+    AccumulateRtGpuBuffer(inventory,bellwetherNearBuildScratch_);
     for (const auto& resident : chapterResidents_) {
         accumulateBlas(resident.blas);
         AccumulateRtGpuBuffer(inventory, resident.scratch);
@@ -4118,6 +4134,75 @@ bool PresentableTinyRtScene::CreateScratchBuffer(const VkDeviceSize usableSize,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, out, diagnostic);
 }
 
+bool PresentableTinyRtScene::AppendRegisteredStaticGeometries(std::uint32_t instanceCustomIndex,
+    std::vector<VkAccelerationStructureGeometryKHR>& geometries,
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
+    std::vector<std::uint32_t>& primitiveCounts, std::string& diagnostic,
+    std::optional<std::uint32_t> onePrimitive)
+{
+    const RtInstanceMetadata instance =
+        staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
+    if(onePrimitive && *onePrimitive>=instance.primitiveCount) {
+        diagnostic="Static RT BLAS detail range is out of bounds.";return false;
+    }
+    const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+    const auto& materialMetadata = staticMeshSlot_.Materials();
+    const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
+    const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
+    const auto end=onePrimitive ? *onePrimitive+1u : instance.primitiveCount;
+    for (std::uint32_t localIndex = onePrimitive.value_or(0u); localIndex < end; ++localIndex)
+    {
+        const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
+        const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
+        if (vertexCounts[geometryIndex] == 0u || primitive.indexCount == 0u)
+        {
+            diagnostic = "Static RT BLAS primitive has an empty geometry range.";
+            return false;
+        }
+        VkAccelerationStructureGeometryKHR geometry{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        if (primitive.materialIndex >= materialMetadata.size())
+        {
+            diagnostic = "Static RT BLAS primitive has an out-of-range material.";
+            return false;
+        }
+        const bool transmissive =
+            (materialMetadata[primitive.materialIndex].materialFlags[0] &
+             static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
+        // Transparent-shadow accumulation is not idempotent: Vulkan may
+        // otherwise report the same triangle candidate more than once.
+        // Preserve non-opaque dielectric filtering and the opaque fast path.
+        geometry.flags = transmissive
+            ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
+            : VK_GEOMETRY_OPAQUE_BIT_KHR;
+        geometry.geometry.triangles.sType =
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        geometry.geometry.triangles.vertexData.deviceAddress =
+            vertexBuffer.address +
+            static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.vertexStride =
+            sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.maxVertex =
+            vertexCounts[geometryIndex] - 1u;
+        geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        geometry.geometry.triangles.indexData.deviceAddress =
+            staticIndexBuffer_.address +
+            static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+        geometry.geometry.triangles.transformData.deviceAddress =
+            staticGeometryTransformBuffer_.address +
+            static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+        geometries.push_back(geometry);
+        VkAccelerationStructureBuildRangeInfoKHR range{};
+        range.primitiveCount = primitive.indexCount / 3u;
+        ranges.push_back(range);
+        primitiveCounts.push_back(range.primitiveCount);
+    }
+    return true;
+}
+
 bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
     const std::span<const VkAccelerationStructureGeometryKHR> geometries,
     const std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
@@ -5577,73 +5662,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     finaleRoofAddressInfo.accelerationStructure = finaleRoofBlas_.handle;
     finaleRoofBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &finaleRoofAddressInfo);
 
-    const auto appendStaticGeometries = [this, &diagnostic](
-        const std::uint32_t instanceCustomIndex,
-        std::vector<VkAccelerationStructureGeometryKHR>& geometries,
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
-        std::vector<std::uint32_t>& primitiveCounts,
-        std::optional<std::uint32_t> onePrimitive = {}) {
-        const RtInstanceMetadata instance =
-            staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
-        if(onePrimitive && *onePrimitive>=instance.primitiveCount) {
-            diagnostic="Static RT BLAS detail range is out of bounds.";return false;
-        }
-        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
-        const auto& materialMetadata = staticMeshSlot_.Materials();
-        const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
-        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
-        const auto end=onePrimitive ? *onePrimitive+1u : instance.primitiveCount;
-        for (std::uint32_t localIndex = onePrimitive.value_or(0u); localIndex < end; ++localIndex)
-        {
-            const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
-            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
-            if (vertexCounts[geometryIndex] == 0u || primitive.indexCount == 0u)
-            {
-                diagnostic = "Static RT BLAS primitive has an empty geometry range.";
-                return false;
-            }
-            VkAccelerationStructureGeometryKHR geometry{
-                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-            if (primitive.materialIndex >= materialMetadata.size())
-            {
-                diagnostic = "Static RT BLAS primitive has an out-of-range material.";
-                return false;
-            }
-            const bool transmissive =
-                (materialMetadata[primitive.materialIndex].materialFlags[0] &
-                 static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
-            // Transparent-shadow accumulation is not idempotent: Vulkan may
-            // otherwise report the same triangle candidate more than once.
-            // Preserve non-opaque dielectric filtering and the opaque fast path.
-            geometry.flags = transmissive
-                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
-                : VK_GEOMETRY_OPAQUE_BIT_KHR;
-            geometry.geometry.triangles.sType =
-                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-            geometry.geometry.triangles.vertexData.deviceAddress =
-                vertexBuffer.address +
-                static_cast<VkDeviceSize>(primitive.vertexOffset) *
-                    sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.vertexStride =
-                sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.maxVertex =
-                vertexCounts[geometryIndex] - 1u;
-            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-            geometry.geometry.triangles.indexData.deviceAddress =
-                staticIndexBuffer_.address +
-                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
-            geometry.geometry.triangles.transformData.deviceAddress =
-                staticGeometryTransformBuffer_.address +
-                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
-            geometries.push_back(geometry);
-            VkAccelerationStructureBuildRangeInfoKHR range{};
-            range.primitiveCount = primitive.indexCount / 3u;
-            ranges.push_back(range);
-            primitiveCounts.push_back(range.primitiveCount);
-        }
-        return true;
+    const auto appendStaticGeometries = [this, &diagnostic](std::uint32_t id,
+        auto& geometries,auto& ranges,auto& counts,std::optional<std::uint32_t> onePrimitive={}) {
+        return AppendRegisteredStaticGeometries(id,geometries,ranges,counts,diagnostic,onePrimitive);
     };
 
     const auto buildRegisteredStaticBlas = [this, &appendStaticGeometries, &buildBlas, &diagnostic](
@@ -5931,7 +5952,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             "Bellwether tavern door", tavernDoorBlas_, true)))
         return false;
     if(bellwetherFurnitureTransitions_) {
-        for(std::uint32_t tier=0;tier<bellwetherFurnitureBlas_.size();++tier)
+        const std::uint32_t firstTier=bellwetherFurnitureResidency_ ? 1u : 0u;
+        for(std::uint32_t tier=firstTier;tier<bellwetherFurnitureBlas_.size();++tier)
             if(!buildRegisteredStaticBlas(kBellwetherFurnitureLane,"Bellwether furniture",
                 bellwetherFurnitureBlas_[tier],true,nullptr,tier))return false;
     }
@@ -6458,7 +6480,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
     tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
     if(bellwetherFurnitureTransitions_) {
-        activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
+        activeBellwetherFurnitureDetail_=bellwetherFurnitureResidency_ ?
+            horde::scene::BellwetherFurnitureDetail::Far : horde::scene::BellwetherFurnitureDetail::Near;
         ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
     }
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
@@ -7292,6 +7315,76 @@ PresentableTinyRtScene::DebugRecordedBellwetherFurnitureDetail() const noexcept 
     return {};
 }
 #endif
+
+bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFrameInputs& frame,
+    bool (*retireReferences)(void*,std::string&),void* user,std::string& diagnostic)
+{
+    if(!bellwetherFurnitureResidency_)return true;
+    if(!bellwetherFurnitureTransitions_ || !ready_ || !tlasInstanceDefinitionsValid_ ||
+       tlasPendingDefinitionsValid_) {
+        diagnostic="Bellwether residency requires the completed furniture TLAS owner.";return false;
+    }
+    auto& near=bellwetherFurnitureBlas_.front();
+    auto& lifetime=bellwetherFurnitureLifetime_;
+    const RtGpuWorkApi work{device_,queue_,commandPool_};
+    if(bellwetherNearBuild_.submitted) {
+        const bool alreadyUnproved=bellwetherNearBuild_.completionUnproved;
+        switch(PollRtGpuWork(work,bellwetherNearBuild_,diagnostic)) {
+        case RtGpuWorkStatus::Complete:
+            DestroyBuffer(bellwetherNearBuildScratch_);
+            near=std::exchange(bellwetherNearCandidate_,{});
+            ++lifetime.restorations;
+            break;
+        case RtGpuWorkStatus::Unproved:
+            if(!alreadyUnproved)++lifetime.preparationFailures;
+            [[fallthrough]];
+        case RtGpuWorkStatus::Pending:
+            diagnostic.clear();return true;
+        case RtGpuWorkStatus::Empty:
+            diagnostic="Bellwether near-build state lost its queue owner.";return false;
+        }
+    }
+    if(!std::isfinite(frame.cameraX) || !std::isfinite(frame.cameraZ))return true;
+    const float distance=horde::scene::BellwetherFurnitureRoomDistanceSquared(frame.cameraX,frame.cameraZ);
+    constexpr float prepareRadius=9.f,retireRadius=11.f;
+    if(near.address && distance>retireRadius*retireRadius) {
+        const auto stillReferenced=[&](const auto& instance) {
+            return instance.accelerationStructureReference==near.address;
+        };
+        // The newest submitted TLAS must already use the coarse owner. The
+        // platform fence and command resets then retire all older references.
+        if(std::any_of(tlasBuiltInstances_.begin(),tlasBuiltInstances_.end(),stillReferenced))return true;
+        if(!retireReferences || !retireReferences(user,diagnostic)) {
+            if(diagnostic.empty())diagnostic="Bellwether near BLAS retirement lost its command-reference proof.";
+            return false;
+        }
+        lifetime.retiredAllocationBytes=near.backing.allocationSize;
+        DestroyAccelerationStructure(near);
+        ++lifetime.retirements;
+    }
+    if(near.address || distance>prepareRadius*prepareRadius || frame.tickIndex<bellwetherNearRetryTick_)return true;
+    std::vector<VkAccelerationStructureGeometryKHR> geometry;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
+    std::vector<std::uint32_t> counts;
+    if(!AppendRegisteredStaticGeometries(kBellwetherFurnitureLane,geometry,ranges,counts,diagnostic,0u))
+        return false;
+    const bool started=BuildProfileAccelerationStructure(geometry,ranges,VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+        VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,bellwetherNearCandidate_,
+        &bellwetherNearBuildScratch_,diagnostic,nullptr,&bellwetherNearBuild_);
+    lifetime.preparationPeakBytes=std::max(lifetime.preparationPeakBytes,
+        bellwetherNearCandidate_.backing.allocationSize+bellwetherNearBuildScratch_.allocationSize);
+    if(!started) {
+        ++lifetime.preparationFailures;
+        if(!bellwetherNearBuild_.submitted) {
+            DestroyAccelerationStructure(bellwetherNearCandidate_);
+            DestroyBuffer(bellwetherNearBuildScratch_);
+            bellwetherNearRetryTick_=frame.tickIndex+60u;
+        }
+        // Keep the coarse tier active even while an unproved submit stays owned.
+        diagnostic.clear();
+    }
+    return true;
+}
 
 void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR& instance,
     horde::scene::BellwetherFurnitureDetail detail) const noexcept {
@@ -8828,6 +8921,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         activeBellwetherFurnitureDetail_=horde::scene::SelectBellwetherFurnitureDetail(
             frame.cameraX,frame.cameraZ,activeBellwetherFurnitureDetail_);
+        if(activeBellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near &&
+           !bellwetherFurnitureBlas_.front().address) {
+            activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Mid;
+            ++bellwetherFurnitureLifetime_.deferredNearFrames;
+        }
         ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
         auto& furniture=frameInstanceMetadata[kBellwetherFurnitureLane];
         furniture=staticMeshSlot_.InstanceMetadata()[kBellwetherFurnitureLane];

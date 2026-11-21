@@ -139,15 +139,19 @@ bool PrepareFurnitureGeometry(const std::filesystem::path& root,StaticMeshAsset&
 }
 }
 
-BellwetherFurnitureDetail SelectBellwetherFurnitureDetail(
-    float x,float z,BellwetherFurnitureDetail current) noexcept {
-    using Detail=BellwetherFurnitureDetail;
-    if(!std::isfinite(x) || !std::isfinite(z))return Detail::Near;
+float BellwetherFurnitureRoomDistanceSquared(float x,float z) noexcept {
     const auto& low=gameplay::bellwether::kRoomMin;
     const auto& high=gameplay::bellwether::kRoomMax;
     const float dx=x-std::clamp(x,low[0],high[0]);
     const float dz=z-std::clamp(z,low[2],high[2]);
-    const float distanceSquared=dx*dx+dz*dz;
+    return dx*dx+dz*dz;
+}
+
+BellwetherFurnitureDetail SelectBellwetherFurnitureDetail(
+    float x,float z,BellwetherFurnitureDetail current) noexcept {
+    using Detail=BellwetherFurnitureDetail;
+    if(!std::isfinite(x) || !std::isfinite(z))return Detail::Near;
+    const float distanceSquared=BellwetherFurnitureRoomDistanceSquared(x,z);
     // A full near perimeter protects both faces of the window and the entrance.
     const float nearRadius=current==Detail::Near ? 6.f : 4.f;
     const float midRadius=current==Detail::Far ? 16.f : 20.f;

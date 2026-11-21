@@ -499,6 +499,7 @@ struct CaptureLaunchOptions
     horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     bool bellwetherFurnitureTransitions=false;
     bool bellwetherFurnitureRoute=false;
+    bool bellwetherFurnitureResidency=false;
     std::string forestContentCandidate;
     bool validateForestContentCandidate = false;
     bool validateChapterRoundTrip = false;
@@ -718,6 +719,7 @@ struct VulkanSurfaceContext
     bool recordKeeperCapture = false;
     bool combinedBellwetherResidents = false;
     bool bellwetherFurnitureTransitions=false;
+    bool bellwetherFurnitureResidency=false;
     horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
@@ -1214,6 +1216,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--bellwether-furniture-residency") {
+#if defined(_DEBUG)
+            options.bellwetherFurnitureResidency=true;
+#else
+            options.error="Bellwether furniture residency is Debug-only.";
+#endif
+            continue;
+        }
         if(argument==L"--bellwether-furniture-route") {
 #if defined(_DEBUG)
             options.bellwetherFurnitureRoute=true;
@@ -1428,6 +1438,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if(options.error.empty() && options.bellwetherFurnitureRoute &&
        (!options.bellwetherFurnitureTransitions || options.developmentCheckpoint!="bellwether-repeat-visit"))
         options.error="Bellwether furniture route requires automatic selection and the repeat-visit checkpoint.";
+    if(options.error.empty() && options.bellwetherFurnitureResidency && !options.bellwetherFurnitureRoute)
+        options.error="Bellwether furniture residency requires the moving repeat-visit witness.";
 #if defined(HORDE_RT_BELLWETHER_RAY_WITNESS)
     if(options.error.empty() && (!options.bellwetherFurnitureTransitions || options.bellwetherFurnitureRoute))
         options.error="The private Bellwether ray witness requires one hidden automatic-detail checkpoint.";
@@ -6813,7 +6825,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
     if (!ctx.rtScene.SetBellwetherFurnitureDetail(ctx.bellwetherFurnitureDetail) ||
-        !ctx.rtScene.SetBellwetherFurnitureTransitions(ctx.bellwetherFurnitureTransitions)) {
+        !ctx.rtScene.SetBellwetherFurnitureTransitions(ctx.bellwetherFurnitureTransitions) ||
+        !ctx.rtScene.SetBellwetherFurnitureResidency(ctx.bellwetherFurnitureResidency)) {
         ctx.lastRtFrameError="Bellwether furniture detail must be selected before scene creation.";
         return false;
     }
@@ -7904,11 +7917,23 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
             return false;
         }
+#if defined(_DEBUG)
+        if(ctx.bellwetherFurnitureResidency &&
+           !ctx.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
+            ctx.lastRtFrameError=diagnostic;
+            if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
+#endif
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
         DetailFrame detail=DetailFrame::Render;
         if(!ctx.environmentSurveyActive && !ctx.rtScene.AdvanceOrdinaryStaticDetail(ctx.simulation,frameInputs,
             !previewFrame && !frozenDevelopmentCheckpoint && !ctx.nativeMotionValidation && !ctx.outputResizeValidation &&
-            !ctx.graphicsPreviewCapture && !ctx.benchmark.IsRunning(),detail,diagnostic)) {
+            !ctx.graphicsPreviewCapture && !ctx.benchmark.IsRunning()
+#if defined(_DEBUG)
+            && !ctx.bellwetherFurnitureResidency
+#endif
+            ,detail,diagnostic)) {
             ctx.lastRtFrameError=diagnostic;
             if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
             return false;
@@ -9994,6 +10019,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
     context.bellwetherFurnitureDetail=ParseCaptureLaunchOptions().bellwetherFurnitureDetail;
     context.bellwetherFurnitureTransitions=ParseCaptureLaunchOptions().bellwetherFurnitureTransitions;
+    context.bellwetherFurnitureResidency=ParseCaptureLaunchOptions().bellwetherFurnitureResidency;
     std::error_code fixtureError;
     context.combinedBellwetherResidents=developmentCheckpoint &&
         (*developmentCheckpoint=="bellwether-return-to-kit" ||

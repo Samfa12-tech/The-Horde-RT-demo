@@ -444,6 +444,23 @@ public:
         if(ready_ || device_!=VK_NULL_HANDLE)return false;
         bellwetherFurnitureTransitions_=enabled;return true;
     }
+    bool SetBellwetherFurnitureResidency(bool enabled) {
+        if(enabled==bellwetherFurnitureResidency_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureResidency_=enabled;return true;
+    }
+    struct BellwetherFurnitureLifetime {
+        std::uint64_t retirements=0, restorations=0, deferredNearFrames=0, preparationFailures=0;
+        VkDeviceSize retiredAllocationBytes=0, preparationPeakBytes=0;
+    };
+    const BellwetherFurnitureLifetime& BellwetherFurnitureLifetimeEvidence() const noexcept {
+        return bellwetherFurnitureLifetime_;
+    }
+    VkDeviceSize BellwetherNearBlasBytes() const noexcept {
+        return bellwetherFurnitureBlas_.front().backing.allocationSize;
+    }
+    bool PrepareBellwetherFurnitureLifetime(const RtSceneFrameInputs&,
+        bool (*retireReferences)(void*,std::string&), void*, std::string&);
     horde::scene::BellwetherFurnitureDetail ActiveBellwetherFurnitureDetail() const noexcept {
         return activeBellwetherFurnitureDetail_;
     }
@@ -1292,6 +1309,10 @@ private:
                                  std::string& diagnostic);
     bool ResolvePreviewPropTransforms(std::string& diagnostic);
     bool BuildPreviewAccelerationStructures(std::string& diagnostic);
+    bool AppendRegisteredStaticGeometries(std::uint32_t instanceCustomIndex,
+        std::vector<VkAccelerationStructureGeometryKHR>&, std::vector<VkAccelerationStructureBuildRangeInfoKHR>&,
+        std::vector<std::uint32_t>& primitiveCounts, std::string& diagnostic,
+        std::optional<std::uint32_t> onePrimitive = {});
     bool BuildProfileAccelerationStructure(
         std::span<const VkAccelerationStructureGeometryKHR> geometries,
         std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
@@ -1474,6 +1495,12 @@ private:
     horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
     horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
     bool bellwetherFurnitureTransitions_=false;
+    bool bellwetherFurnitureResidency_=false;
+    BellwetherFurnitureLifetime bellwetherFurnitureLifetime_{};
+    AccelerationStructure bellwetherNearCandidate_{};
+    Buffer bellwetherNearBuildScratch_{};
+    RtGpuWorkLease bellwetherNearBuild_{};
+    std::uint64_t bellwetherNearRetryTick_=0;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
