@@ -77,6 +77,7 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
     bool tavernDirectionsAvailable=false;
+    bool tavernLanternFittingAvailable=false;
     bool tavernLanternAvailable=false;
     dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
     campaign::TreasurePurse treasurePurse{};
@@ -85,7 +86,7 @@ struct SimulationSnapshot
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
-        return tavernConversationAvailable || tavernDirectionsAvailable ||
+        return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None;
     }

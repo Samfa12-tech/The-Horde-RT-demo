@@ -60,6 +60,13 @@ static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellweth
         checkpoint.schema=std::max(checkpoint.schema,campaign::kRegisterInterpretationSchema);
 }
 
+static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::TreasurePurse purse) {
+    if(purse==campaign::TreasurePurse{})return;
+    checkpoint.treasurePurse=purse;
+    checkpoint.schema=std::max(checkpoint.schema,purse.lanternFittingPurchased?
+        campaign::kLanternFittingSchema:campaign::kTreasurePurseSchema);
+}
+
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
     return BuildCampaignCheckpoint(id,false);
 }
@@ -193,21 +200,36 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
         RecordWaysideArchive(c,waysideArchive_);
     if(c.dialogue.tavernLanternLinesStarted)c.schema=campaign::kTavernLanternExchangeSchema;
-    if(treasurePurse_!=campaign::TreasurePurse{}) {
-        c.treasurePurse=treasurePurse_;
-        c.schema=campaign::kTreasurePurseSchema;
-    }
+    RecordTreasurePurse(c,treasurePurse_);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
 void GameSimulation::ClaimRegisterReward(const dialogue::Context& context) {
-    if(RecordKeeperAction(context)!=dialogue::RecordKeeperAction::CollectReward ||
-       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return;
+    auto purse=treasurePurse_;
+    if(RecordKeeperAction(context)!=dialogue::RecordKeeperAction::CollectReward || !purse.ClaimRegisterReward())return;
+    const auto updated=PrepareTreasureCheckpoint(purse);
+    if(updated && chapterDialogue_.TryStartRecordKeeper(dialogue::RecordKeeperAction::CollectReward,context))
+        CommitTreasureCheckpoint(*updated);
+}
+bool GameSimulation::CanBuyLanternFitting(const dialogue::Context& context) const {
+    return treasurePurse_.CanBuyLanternFitting() && campaignBoundary_ &&
+        campaignBoundaryRevision_!=UINT64_MAX && chapterDialogue_.CanFitTavernLantern(context);
+}
+void GameSimulation::BuyLanternFitting(const dialogue::Context& context) {
+    auto purse=treasurePurse_;
+    if(!CanBuyLanternFitting(context) || !purse.BuyLanternFitting())return;
+    const auto updated=PrepareTreasureCheckpoint(purse);
+    if(updated && chapterDialogue_.TryStartTavernLanternFitting(context))CommitTreasureCheckpoint(*updated);
+}
+std::optional<campaign::Checkpoint> GameSimulation::PrepareTreasureCheckpoint(campaign::TreasurePurse purse) const {
+    if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return std::nullopt;
     auto updated=*campaignBoundary_;
-    if(!updated.treasurePurse.ClaimRegisterReward())return;
-    updated.schema=campaign::kTreasurePurseSchema;
-    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_) ||
-       !chapterDialogue_.TryStartRecordKeeper(dialogue::RecordKeeperAction::CollectReward,context))return;
+    RecordTreasurePurse(updated,purse);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return std::nullopt;
+    return updated;
+}
+void GameSimulation::CommitTreasureCheckpoint(const campaign::Checkpoint& updated) {
     treasurePurse_=updated.treasurePurse;
     campaignBoundary_=updated;
     ++campaignBoundaryRevision_;

@@ -21,7 +21,7 @@ public:
         bool available=false,active=false;
         std::uint64_t worldGeneration=0,surfaceGeneration=0;
         Objective objective=Objective::Lookout;
-        std::uint32_t coins=0;
+        gameplay::campaign::TreasurePurse purse{};
     };
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
@@ -34,9 +34,9 @@ public:
     bool Open(HWND parent,const View& view,HFONT font=nullptr) {
         if(visible_ || !IsWindow(parent) || !Admitted(view))return false;
         parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
-        coins_=view.coins;
+        purse_=view.purse;
         const bool lookout = objective_ == Objective::Lookout;
-        const auto body=gameplay::campaign::PauseObjectiveText(objective_,coins_);
+        const auto body=gameplay::campaign::PauseObjectiveText(objective_,purse_);
         const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
             body.c_str(),"CONTINUE EXPLORING",
             lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
@@ -66,7 +66,7 @@ public:
     bool Refresh(const View& view) {
         if(!visible_)return false;
         if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_ ||
-            view.objective!=objective_ || view.coins!=coins_) {
+            view.objective!=objective_ || view.purse!=purse_) {
             Close();return false;
         }
         return true;
@@ -107,7 +107,7 @@ private:
     std::array<HWND,5> controls_{};
     bool visible_=false;
     std::uint64_t world_=0,surface_=0;
-    std::uint32_t coins_=0;
+    gameplay::campaign::TreasurePurse purse_{};
     Objective objective_=Objective::None;
 };
 } // namespace horde::platform::windows

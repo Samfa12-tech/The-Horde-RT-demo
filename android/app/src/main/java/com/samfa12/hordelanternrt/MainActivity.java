@@ -8736,11 +8736,11 @@ public class MainActivity extends Activity {
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
     }
 
-    private void updateControllerPrompt(int interactLabel,boolean interactEnabled,boolean raise,boolean lower) {
+    private void updateControllerPrompt(String interactText,boolean interactEnabled,boolean raise,boolean lower) {
         if(controllerPrompt==null || !controllerMode)return;
         // Timed teaching has its own owner. This footer contains nearby actions only.
         String prompt="";
-        if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
+        if(!interactText.isEmpty())prompt+=(interactEnabled?"A: ":"")+interactText;
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
         prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
@@ -8980,6 +8980,7 @@ public class MainActivity extends Activity {
             default: break;
         }
         if ((state & CONTEXTUAL_REGISTER_REWARD) != 0) return R.string.collect_register_reward;
+        if (lanternFittingPrice(state) != 0) return R.string.fit_lantern_hinge;
         switch ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) {
             case 1: return R.string.show_road_mark;
             case 2: return R.string.show_road_register;
@@ -8995,6 +8996,8 @@ public class MainActivity extends Activity {
             default: return 0;
         }
     }
+
+    static int lanternFittingPrice(int state) { return (state >>> 25) & 63; }
 
     private void updateContextualControls(final boolean controlsAllowed) {
         updateHealingFlaskHud(controlsAllowed);
@@ -9051,17 +9054,19 @@ public class MainActivity extends Activity {
         }
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
         final int interactLabel = contextualInteractLabel(contextualState);
+        final String interactText = interactLabel==0 ? "" : interactLabel==R.string.fit_lantern_hinge
+                ? getString(interactLabel,lanternFittingPrice(contextualState)) : getString(interactLabel);
         if (interactLabel == 0) {
             interactButton.setVisibility(View.GONE);
         } else {
-            interactButton.setText(interactLabel);
-            interactButton.setContentDescription(getString(interactLabel));
+            interactButton.setText(interactText);
+            interactButton.setContentDescription(interactText);
             interactButton.setEnabled(interactEnabled);
             interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
         }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
-        updateControllerPrompt(interactLabel, interactEnabled,
+        updateControllerPrompt(interactText, interactEnabled,
                 showRaise && (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0, showLower);
         updateLanternPoseControl(contextualState);
         showRaiseLanternObjective(contextualState);

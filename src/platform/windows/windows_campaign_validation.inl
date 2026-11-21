@@ -1432,7 +1432,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     }
                     std::array<char,512> text{};
                     GetWindowTextA(GetDlgItem(ctx.windowHandle,LookoutPanel::BodyId),text.data(),static_cast<int>(text.size()));
-                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective,state.treasurePurse.coins);
+                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(objective,state.treasurePurse);
                     const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
                         ctx.pauseMenuVisible && ctx.simulationPaused;
                     const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
@@ -1543,6 +1543,32 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         walkTo({kConversation[0], kConversation[2]}) && face(-1.40f, -.22f) && atHearth(),
                         "the player returns through the south door to the same staffed hearth");
                 }
+                const campaign::TreasurePurse fitted{earned.coins-campaign::TreasurePurse::kLanternFittingPrice,true,true};
+                if (progressed) {
+                    constexpr std::array fittingLine{Line::TavernLanternFitting};
+                    std::array<char,256> quote{};
+                    const bool offered = walkTo(kBellwetherLanternFittingApproach) &&
+                        face(std::atan2(kKeeperHearth[0]-state.playerX,state.playerZ-kKeeperHearth[2]),-.12f) &&
+                        state.tavernLanternFittingAvailable && state.treasurePurse == earned && frame() &&
+                        ctx.tavernInteractionPromptPresented &&
+                        GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),static_cast<int>(quote.size()))>0 &&
+                        std::string_view(quote.data()).find(std::to_string(campaign::TreasurePurse::kLanternFittingPrice)+" COINS")!=
+                            std::string_view::npos;
+                    campaign::storage::StoredCheckpoint purchase;
+                    progressed = check(offered && interact() && state.treasurePurse == fitted && frame() &&
+                        dialogue(fittingLine) && interact() && !state.tavernLanternFittingAvailable && state.treasurePurse == fitted &&
+                        until([&] {
+                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",purchase).status ==
+                                campaign::storage::Status::Read && purchase.checkpoint.treasurePurse == fitted &&
+                                ctx.campaign->State().operation == campaign::PlayOperation::Autosave &&
+                                ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                        },false) && readDirections(PauseObjective::BellwetherExpeditions) &&
+                        walkTo({kConversation[0],kConversation[2]}) && face(-1.40f,-.22f),
+                        "the keeper quotes the hinge price and saves the single purchase before the player returns to Kit");
+                    if (!progressed)
+                        std::cerr << "Bellwether fitting offered=" << offered << " prompt=" << quote.data()
+                                  << " available=" << state.tavernLanternFittingAvailable << " coins=" << state.treasurePurse.coins << '\n';
+                }
                 if (progressed) {
                     const auto settle = [&](HeldLightPose pose) {
                         return waitFor([&] { return state.interaction.heldLightPose == pose; }, 125);
@@ -1573,14 +1599,14 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         expedition.checkpoint.position.y == original.position.y &&
                         expedition.checkpoint.position.z == original.position.z &&
                         expedition.checkpoint.vitality == original.vitality &&
-                        expedition.checkpoint.flask == original.flask && expedition.checkpoint.treasurePurse == earned &&
+                        expedition.checkpoint.flask == original.flask && expedition.checkpoint.treasurePurse == fitted &&
                         expedition.checkpoint.dialogue.activeLine == Line::None,
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
                     if (progressed) {
                         campaign::storage::StoredCheckpoint resumed;
                         progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
-                            state.treasurePurse == earned &&
+                            state.treasurePurse == fitted &&
                             (!state.healingFlaskEnabled || state.healingFlask.resources == expedition.checkpoint.flask) &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==

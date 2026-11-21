@@ -266,7 +266,8 @@ void LanternPendulum::Import(const LanternPendulumSnapshot& snapshot)
 const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     const HeldItemTransform& worldFromHinge,
     const float fixedDeltaSeconds,
-    const float presentationYawRadians)
+    const float presentationYawRadians,
+    const LanternHinge hinge)
 {
     if (!FiniteTransform(worldFromHinge) || !std::isfinite(fixedDeltaSeconds) ||
         fixedDeltaSeconds <= 0.0f || fixedDeltaSeconds > 0.05f)
@@ -313,14 +314,15 @@ const LanternPendulumSnapshot& LanternPendulum::StepFixed(
     const float forwardAcceleration = Dot(acceleration, Column(worldFromHinge, 2u));
     const float strafeAcceleration = Dot(acceleration, Column(worldFromHinge, 0u));
     const float centreOfMassLength = snapshot_.centreOfMassLengthMetres;
+    const float damping = hinge == LanternHinge::Fitted ? 6.4f : kAngularDamping;
     float forwardAngularAcceleration =
         -(kGravity / centreOfMassLength) * std::sin(snapshot_.forwardAngleRadians) +
         forwardAcceleration / centreOfMassLength -
-        kAngularDamping * snapshot_.forwardAngularVelocity;
+        damping * snapshot_.forwardAngularVelocity;
     float strafeAngularAcceleration =
         -(kGravity / centreOfMassLength) * std::sin(snapshot_.strafeAngleRadians) -
         strafeAcceleration / centreOfMassLength -
-        kAngularDamping * snapshot_.strafeAngularVelocity;
+        damping * snapshot_.strafeAngularVelocity;
     float torsionAngularAcceleration =
         -kTorsionRestoring * std::sin(snapshot_.torsionAngleRadians) -
         kTorsionDamping * snapshot_.torsionAngularVelocity -

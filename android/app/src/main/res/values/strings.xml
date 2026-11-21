@@ -70,6 +70,7 @@
     <string name="show_road_register">Show the road register</string>
     <string name="recall_expedition_routes">Recall the expedition routes</string>
     <string name="collect_register_reward">Collect register reward</string>
+    <string name="fit_lantern_hinge">Fit lantern hinge (%1$d coins)</string>
     <string name="recall_lantern_words">Recall the lantern\'s words</string>
     <string name="chest_opening">OPENING…</string>
     <string name="take_lantern">TAKE LANTERN</string>

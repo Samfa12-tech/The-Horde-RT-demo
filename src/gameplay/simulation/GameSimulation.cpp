@@ -374,7 +374,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             {
                 lanternPendulum_.StepFixed(
                     RescueLanternHinge(), fixedDeltaSeconds,
-                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians,
+                    treasurePurse_.lanternFittingPurchased ? horde::gameplay::interactions::LanternHinge::Fitted
+                                                         : horde::gameplay::interactions::LanternHinge::Standard);
             }
         }
         else
@@ -3474,6 +3476,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
         chapterDialogue_.CanStartTavernConversation(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
+    snapshot_.tavernLanternFittingAvailable=CanBuyLanternFitting(chapterContext);
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
     snapshot_.waysideArchive=waysideArchive_;
     snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);

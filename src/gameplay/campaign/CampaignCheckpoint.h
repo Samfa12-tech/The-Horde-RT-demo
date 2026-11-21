@@ -20,6 +20,7 @@ inline constexpr std::uint32_t kWaysideRegisterSchema=10;
 inline constexpr std::uint32_t kRegisterInterpretationSchema=11;
 inline constexpr std::uint32_t kTavernLanternExchangeSchema=12;
 inline constexpr std::uint32_t kTreasurePurseSchema=13;
+inline constexpr std::uint32_t kLanternFittingSchema=14;
 enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
@@ -83,8 +84,10 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kTreasurePurseSchema ||
+    if (c.schema < 1 || c.schema > kLanternFittingSchema ||
         (c.schema<kTreasurePurseSchema && c.treasurePurse!=TreasurePurse{}) ||
+        (c.treasurePurse.lanternFittingPurchased &&
+            (c.schema<kLanternFittingSchema || !c.treasurePurse.registerRewardClaimed)) ||
         c.treasurePurse.coins>TreasurePurse::kMaximumCoins ||
         (c.treasurePurse.registerRewardClaimed && !c.waysideRegisterInterpreted) ||
         (c.treasurePurse.coins!=0 && !c.treasurePurse.registerRewardClaimed) ||

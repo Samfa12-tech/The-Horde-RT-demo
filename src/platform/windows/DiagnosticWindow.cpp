@@ -3527,6 +3527,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         text = snapshot.tavernDoorAction==horde::gameplay::bellwether::DoorAction::Open
             ? "LEFT-CLICK / A TO OPEN THE TAVERN DOOR" : "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR";
     }
+    else if(chapterInteract && snapshot.tavernLanternFittingAvailable) {
+        text = "LEFT-CLICK / A TO FIT LANTERN HINGE";
+        context.tavernInteractionPromptPresented=visible;
+    }
     else if(chapterInteract) {
         using horde::gameplay::bellwether::ArchiveAction;
         switch (snapshot.waysideArchiveAction) {
@@ -3556,6 +3560,8 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
              snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     }
     std::string contextualText(text);
+    if(chapterInteract && snapshot.tavernLanternFittingAvailable)
+        contextualText+=" ("+std::to_string(horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice)+" COINS)";
     if (snapshot.tavernLanternAvailable) {
         const bool controller = context.teachingControllerGlyphs;
         const bool high = snapshot.interaction.heldLightPose==horde::gameplay::interactions::HeldLightPose::High;
@@ -3725,7 +3731,7 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
         LookoutPanel::Objective::None;
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
-        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse.coins};
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)

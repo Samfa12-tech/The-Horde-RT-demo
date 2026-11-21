@@ -76,11 +76,14 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     return "";
 }
 
-inline std::string PauseObjectiveText(PauseObjective objective, std::uint32_t coins)
+inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse)
 {
     std::string text=PauseObjectiveText(objective);
-    if (objective==PauseObjective::BellwetherExpeditions)
-        text+="\r\n\r\nPurse: "+std::to_string(coins)+(coins==1?" coin.":" coins.");
+    if (objective==PauseObjective::BellwetherExpeditions) {
+        text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");
+        if (purse.lanternFittingPurchased) text+="\r\nLantern hinge fitted.";
+        else text+="\r\nLantern fitting at the tavern: "+std::to_string(TreasurePurse::kLanternFittingPrice)+" coins.";
+    }
     return text;
 }
 } // namespace horde::gameplay::campaign

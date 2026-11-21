@@ -77,7 +77,7 @@ bool PlaySession::ObserveSafeBoundary() {
         (captured->waysideLanternRevealStarted && !latest_->waysideLanternRevealStarted) ||
         (captured->waysideRegisterRecovered && !latest_->waysideRegisterRecovered) ||
         (captured->waysideRegisterInterpreted && !latest_->waysideRegisterInterpreted) ||
-        (captured->treasurePurse.registerRewardClaimed && !latest_->treasurePurse.registerRewardClaimed));
+        captured->treasurePurse!=latest_->treasurePurse);
     const bool changed=SetLatest(*captured);
     if(!boundary_ || *boundary_!=captured->id || ((restCompleted || bellwetherProgressAdvanced) && changed)) {
         boundary_=captured->id;

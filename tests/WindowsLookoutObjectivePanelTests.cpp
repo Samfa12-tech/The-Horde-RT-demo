@@ -133,10 +133,11 @@ int main() {
         h.view.objective=Panel::Objective::BellwetherExpeditions;
         SendMessageA(parent,WM_COMMAND,MAKEWPARAM(Panel::ContinueId,BN_CLICKED),reinterpret_cast<LPARAM>(oldDirections));
         Check(h.actions.size()==4 && !h.panel.Visible(),"new earned directions revoke the previous page's controls");
-        h.view.coins=3;
+        h.view.purse={3,true,false};
         Check(open(h.view) && Text(parent,Panel::BodyId).find("future expeditions")!=std::string::npos &&
-            Text(parent,Panel::BodyId).find("Purse: 3 coins.")!=std::string::npos,
-            "expedition directions identify both leads and show the current purse");
+            Text(parent,Panel::BodyId).find("Purse: 3 coins.")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("Lantern fitting at the tavern: 2 coins.")!=std::string::npos,
+            "expedition directions identify both leads, the purse and the fitting price");
         Click(parent,Panel::ContinueId);
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }

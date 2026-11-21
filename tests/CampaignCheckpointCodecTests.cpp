@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kTreasurePurseSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197};
+    constexpr std::array<std::size_t,cp::kLanternFittingSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -199,7 +199,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kTreasurePurseSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kLanternFittingSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -320,7 +320,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kTreasurePurseSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kLanternFittingSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -365,7 +365,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kTreasurePurseSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kLanternFittingSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;
@@ -412,6 +412,21 @@ int main() {
         invalidEncode(paid,codec::Error::InvalidCheckpoint);
         paid.schema=cp::kTreasurePurseSchema;
         RoundTrip(paid);
+        Check(codec::Decode(Encode(paid),legacy,error) && legacy.treasurePurse==paid.treasurePurse &&
+            !legacy.treasurePurse.lanternFittingPurchased,"a legacy purse preserves funds and grants no fitting");
+        auto fitted=paid;
+        Check(fitted.treasurePurse.BuyLanternFitting() && !fitted.treasurePurse.BuyLanternFitting() &&
+            fitted.treasurePurse.coins==cp::TreasurePurse::kRegisterRewardCoins-cp::TreasurePurse::kLanternFittingPrice,
+            "the fitting deducts its price only once");
+        invalidEncode(fitted,codec::Error::InvalidCheckpoint);
+        fitted.schema=cp::kLanternFittingSchema;
+        RoundTrip(fitted);
+        auto badFitting=Encode(fitted);badFitting.back()=std::byte{2};Rechecksum(badFitting);
+        Reject(badFitting,codec::Error::Malformed);
+        auto shortFunds=paid.treasurePurse;
+        shortFunds.coins=cp::TreasurePurse::kLanternFittingPrice-1;
+        const auto beforePurchase=shortFunds;
+        Check(!shortFunds.BuyLanternFitting() && shortFunds==beforePurchase,"insufficient funds preserve the purse and equipment");
         auto badReward=Encode(paid);badReward.back()=std::byte{2};Rechecksum(badReward);
         Reject(badReward,codec::Error::Malformed);
         auto tampered=paid;tampered.waysideRegisterInterpreted=false;invalidEncode(tampered,codec::Error::InvalidCheckpoint);

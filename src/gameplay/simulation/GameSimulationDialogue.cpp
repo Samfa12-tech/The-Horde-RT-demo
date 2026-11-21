@@ -12,6 +12,10 @@ void GameSimulation::InteractWithClaimedChapter() {
         return;
     }
     if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
+    if(CanBuyLanternFitting(context)) {
+        BuyLanternFitting(context);
+        return;
+    }
     const auto records=RecordKeeperAction(context);
     if(records==dialogue::RecordKeeperAction::CollectReward) {
         ClaimRegisterReward(context);
@@ -206,6 +210,16 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
        config_.combatFoundation1_7 && !legacyCombatCheckpoint_) {
         c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
         c.keeperAtHearth=keeper->stage==TavernKeeperStage::AtHearth;
+        if(c.keeperAtHearth && !c.tavernInReach && playerSupport_.grounded &&
+           traversal::IsOnBellwetherTavernRoomFloor(playerX_,playerSupport_.worldY,playerZ_)) {
+            const auto& source=*c.tavernKeeperSource;
+            const float dx=source.x-c.player.x,dz=source.z-c.player.z;
+            const float distance=std::hypot(dx,dz),height=std::min(c.listener.y,source.y);
+            c.tavernFittingInReach=distance<=2.f &&
+                (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance &&
+                chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,source.x,source.z,
+                    height-.025f,height+.025f,.025f);
+        }
     }
     if(recordKeeper_ && c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation) {

@@ -338,6 +338,10 @@ private:
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
+    bool CanBuyLanternFitting(const dialogue::Context&) const;
+    void BuyLanternFitting(const dialogue::Context&);
+    std::optional<campaign::Checkpoint> PrepareTreasureCheckpoint(campaign::TreasurePurse) const;
+    void CommitTreasureCheckpoint(const campaign::Checkpoint&);
     void AdvanceWaysideArchive(float seconds);
     bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
     bellwether::DoorAction TavernDoorAction(const dialogue::Context&) const;

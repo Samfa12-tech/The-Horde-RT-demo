@@ -20,14 +20,14 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     RecordKeeperInspect, RecordKeeperErrand, RecordKeeperDirections,
     RecordKeeperRegister, RecordKeeperTwoRoads, RecordKeeperRoadOrder, TavernRegisterDirections, TavernExpeditionDirections,
     TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
-    RecordKeeperReward };
+    RecordKeeperReward, TavernLanternFitting };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,49> kLines{{
+inline constexpr std::array<LineSpec,50> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -76,7 +76,8 @@ inline constexpr std::array<LineSpec,49> kLines{{
     {Line::KitVoiceListen,"kit.first_direct_voice.finish","Kit","Go on, then. I'm listening.","",3.3f,2},
     {Line::KitRoyalClaim,"kit.royal_claim.king","Kit","King Veyr. That's quite a claim to make from inside a lamp.","",5.5f,2},
     {Line::KitRoadHelp,"kit.royal_claim.help","Kit","If you know the roads, help us get there and back. We can start with that.","",6.8f,2},
-    {Line::RecordKeeperReward,"hub.register_reward","Record keeper","Here, for bringing the register back.","",2.6f,1}
+    {Line::RecordKeeperReward,"hub.register_reward","Record keeper","Here, for bringing the register back.","",2.6f,1},
+    {Line::TavernLanternFitting,"hub.lantern_fitting","Tavern keeper","Try that. The hinge should swing less when you walk.","",3.2f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -114,7 +115,7 @@ inline constexpr bool IsTavernLanternVoice(Line line) {
 inline constexpr bool IsBellwetherLine(Line line) {
     return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
         line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
-        IsRecordKeeperLine(line) || IsTavernLanternLine(line);
+        IsRecordKeeperLine(line) || IsTavernLanternLine(line) || line==Line::TavernLanternFitting;
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -151,6 +152,7 @@ struct Context {
     bool companionAtBasin=false,playerNearBasin=false;
     bool tavernInReach=false, kitAtChair=false, kitSeated=false;
     bool keeperAtHearth=false, tavernDoorInReach=false, kitAtSouthDoor=false;
+    bool tavernFittingInReach=false;
     bool roadInReach=false, kitCaughtAnkle=false, kitReadyForProtectiveWalk=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
@@ -195,6 +197,17 @@ public:
         if(!CanShowTavernDirections(c))return;
         constexpr std::array notes{Line::TavernDirections,Line::TavernRegisterDirections,Line::TavernExpeditionDirections};
         Start(notes[static_cast<std::size_t>(guidance)],*c.companionSource,c);
+    }
+    bool CanFitTavernLantern(const Context& c) const {
+        return c.claimed && c.alive && c.exterior && !c.paused && !c.combat && !c.traversing &&
+            c.tavernFittingInReach && c.tavernKeeperSource && Finite(*c.tavernKeeperSource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0;
+    }
+    bool TryStartTavernLanternFitting(const Context& c) {
+        if(!CanFitTavernLantern(c))return false;
+        Start(Line::TavernLanternFitting,*c.tavernKeeperSource,c);
+        return true;
     }
     bool TryStartShrineSpeech(ShrineSpeech speech,const Context& c) {
         if(state_.line!=Line::None || continuationCount_!=0 || shrineRevealIndex_<kShrineReveal.size() ||
@@ -411,6 +424,7 @@ public:
         const bool hearsWelcome=c.tavernDoorInReach && c.exterior && !c.traversing && !c.combat &&
             c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
         if(state_.line==Line::TavernWelcome && !hearsWelcome)Cancel(false);
+        if(state_.line==Line::TavernLanternFitting && (!c.tavernFittingInReach || c.combat))Cancel(false);
         if(IsGuidanceLine(state_.line) && !AtTavernHearth(c))Cancel(false);
         const bool hearsShrine=CanHearShrineLantern(c);
         if(!hearsShrine && (IsShrineLanternLine(state_.line) || shrineRevealIndex_<kShrineReveal.size()))
@@ -548,7 +562,8 @@ private:
     }
     void BindCompanionSpatial(const Context& c) {
         if(state_.line<Line::ReunionQuestion || (state_.line>Line::FlaskTopup && !IsBellwetherLine(state_.line))) return;
-        const bool fromKeeper=state_.line==Line::TavernHordeArmy || state_.line==Line::TavernWelcome;
+        const bool fromKeeper=state_.line==Line::TavernHordeArmy || state_.line==Line::TavernWelcome ||
+            state_.line==Line::TavernLanternFitting;
         const auto& source=IsShrineLanternLine(state_.line)?c.shrineLanternSource:
             IsTavernLanternVoice(state_.line)?c.tavernLanternSource:
             IsRecordKeeperLine(state_.line)?c.recordKeeperSource:(fromKeeper?c.tavernKeeperSource:c.companionSource);

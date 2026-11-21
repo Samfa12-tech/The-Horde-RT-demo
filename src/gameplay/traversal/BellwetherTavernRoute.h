@@ -27,6 +27,7 @@ inline constexpr std::size_t kBellwetherChurchJunction=3;
 inline constexpr std::size_t kBellwetherSouthApproachStation=9;
 inline constexpr std::size_t kBellwetherSouthDoorStation=10;
 inline constexpr std::size_t kBellwetherAnkleStation=5;
+inline constexpr BellwetherStation kBellwetherLanternFittingApproach{86.75f,110.10f};
 
 // The authored room starts at the inner face of the south wall. The ramp
 // and sill remain exterior even where they share the physical floor height.

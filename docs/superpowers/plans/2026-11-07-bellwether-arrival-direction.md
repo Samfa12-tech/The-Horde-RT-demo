@@ -210,7 +210,15 @@ The `bellwether-record-keeper-handoff` debug view loads a local resident fixture
 
 After the record keeper reads the recovered register, **Collect register reward** offers a one-time payment. The three-coin amount is provisional for the private playtest. The player collects it through the same interaction and sees the balance in **Bellwether directions**. After payment the keeper offers **Recall the expedition routes** again.
 
-The payment and its collection record are saved together at the existing earned checkpoint. A schema 11 or 12 save with an interpreted register still offers the reward on the next visit. Repeated interaction or loading a paid checkpoint preserves the balance and the completed routes. The interpretation, the lantern conversation with Kit and both future leads stay independent of collecting the reward. Gear prices, spending and access training remain open.
+The payment and its collection record are saved together at the existing earned checkpoint. A schema 11 or 12 save with an interpreted register still offers the reward on the next visit. Repeated interaction or loading a paid checkpoint preserves the balance and the completed routes. The interpretation, the lantern conversation with Kit and both future leads stay independent of collecting the reward.
+
+#### Lantern hinge fitting
+
+After the register reward, approach the tavern keeper from the aisle side and face her from close range. **Fit lantern hinge (2 coins)** shows the provisional price before Interact. Kit's chair retains its own conversation and directions. **Bellwether directions** lists the fitting price and shows **Lantern hinge fitted** after purchase, alongside the remaining purse.
+
+The Tech fitting increases damping in the shared 60 Hz hinge simulation. The carried body and its light follow the same solved hinge pose. The fitting and debit share one checkpoint transaction. Legacy purses keep their saved balance and can purchase on a later visit. Pricing and handling feel await playtesting, and the wider access training remains open.
+
+The native host check loaded the earned tavern save before and after purchase. Each run walked 1.58 m and then stopped on the same input schedule. Summed swing over that sequence fell by 48% with the fitted hinge. The Windows campaign check also reads the quoted price from the native prompt, purchases once, and verifies the remaining coin and fitting after reload.
 
 The local fixture now uses the prepared 15,322-triangle record keeper. Its four-second idle preserves the standing stance, settles the arms using the supplied rig, and adds a small breathing motion and head glance. The shared simulation advances the idle in earshot and holds it while paused or outside earshot. [The source recipe](../../../tools/author-record-keeper-idle.py) preserves the rigged and walking GLBs and writes an editable Blend and a separate local export.
 

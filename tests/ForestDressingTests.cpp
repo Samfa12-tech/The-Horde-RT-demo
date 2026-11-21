@@ -1781,8 +1781,61 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                   "returning from the wayside branch preserves seated Kit and the completed tavern exchange");
             if(!returned)return;
             const auto tavernEntry=std::next(route.begin(),index);
-            if(!walkStations(tavernEntry+1,route.end()) || !walkTo({kConversation[0],kConversation[2]})) {
-                Check(false,"the register route can reach Kit's table again");return;
+            if(!walkStations(tavernEntry+1,route.end()) || !walkTo(kBellwetherLanternFittingApproach)) {
+                Check(false,"the register route reaches the keeper's side of the tavern");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57f;step();
+            Check(!state.tavernLanternFittingAvailable && state.treasurePurse==earned,
+                  "the lantern fitting is offered only while facing the keeper");
+            input.yawRadians=std::atan2(kKeeperHearth[0]-state.playerX,state.playerZ-kKeeperHearth[2]);step();
+            Check(state.tavernLanternFittingAvailable && state.treasurePurse==earned,
+                  "the funded fitting is available beside the keeper before committing any coins");
+            ++input.commands.interact;step();
+            const cp::TreasurePurse fitted{earned.coins-cp::TreasurePurse::kLanternFittingPrice,true,true};
+            const auto bought=game.LatestCampaignBoundary();
+            Check(state.chapterDialogue.line==Line::TavernLanternFitting && state.treasurePurse==fitted &&
+                  bought && rewarded && bought->schema==cp::kLanternFittingSchema && bought->treasurePurse==fitted &&
+                  bought->position.x==rewarded->position.x && bought->position.z==rewarded->position.z &&
+                  bought->vitality==rewarded->vitality && bought->flask==rewarded->flask,
+                  "one fitting purchase saves its debit and ownership at the earned return point");
+            ++input.commands.dialogueSkip;step();
+            ++input.commands.interact;step();
+            Check(!state.tavernLanternFittingAvailable && state.treasurePurse==fitted,
+                  "a second interaction cannot rebuy the fitted hinge");
+            if(rewarded && bought) {
+                const auto measureWalk=[&](const cp::Checkpoint& checkpoint) {
+                    sim::GameSimulation reopened(config);
+                    sim::InputSnapshot walk;
+                    walk.yawRadians=checkpoint.yaw;walk.pitchRadians=checkpoint.pitch;
+                    const auto token=reopened.BeginCampaignRestore(checkpoint);
+                    const bool restored=token && reopened.CommitCampaignRestore(
+                        *token,{token->worldGeneration,checkpoint.zone},terrain,walk);
+                    Check(restored,"the real tavern save restores for a matched lantern walking check");
+                    std::array<float,2> sums{};
+                    if(!restored)return sums;
+                    reopened.StepFixed(walk);
+                    walk.yawRadians=3.14159265f;
+                    for(unsigned tick=0;tick<20;++tick)reopened.StepFixed(walk);
+                    for(unsigned tick=0;tick<120;++tick) {
+                        walk.moveForward=tick<50?1.f:0.f;
+                        reopened.StepFixed(walk);
+                        const auto& sample=reopened.Snapshot();
+                        sums[0]+=sample.playerTravelledThisTick;
+                        sums[1]+=std::hypot(sample.lanternPendulum.forwardAngleRadians,
+                                            sample.lanternPendulum.strafeAngleRadians);
+                    }
+                    return sums;
+                };
+                const auto standard=measureWalk(*rewarded),damped=measureWalk(*bought);
+                std::cout<<"Matched lantern walk travel="<<standard[0]<<','<<damped[0]
+                         <<" accumulated swing="<<standard[1]<<','<<damped[1]<<'\n';
+                Check(standard[0]>1.f && std::abs(standard[0]-damped[0])<.001f &&
+                      damped[1]>0.f && damped[1]<standard[1]*.9f,
+                      "a fitted save measurably reduces swing on the same walking path");
+            }
+            input.moveForward=1;input.runHeld=true;
+            if(!walkTo({kConversation[0],kConversation[2]})) {
+                Check(false,"the fitting leaves a clear path back to Kit's table");return;
             }
             input.moveForward=0;input.runHeld=false;step();
             using HeldLightPose=gameplay::interactions::HeldLightPose;
@@ -1805,7 +1858,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 ++input.commands.dialogueSkip;step();
             }
             const auto introduced=game.LatestCampaignBoundary();
-            Check(introduced && introduced->schema==cp::kTreasurePurseSchema && introduced->treasurePurse==earned &&
+            Check(introduced && introduced->schema==cp::kLanternFittingSchema && introduced->treasurePurse==fitted &&
                   introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
                   introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
                   "the direct exchange updates the earned save and retains the independently interpreted register");

@@ -959,7 +959,7 @@ horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
     horde::gameplay::SpatialAudioDomain::DungeonRoute; // guarded by gChapterDialogueUiMutex
 std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
-std::uint32_t gLookoutObjectiveCoins=0; // guarded by gChapterDialogueUiMutex
+horde::gameplay::campaign::TreasurePurse gLookoutObjectivePurse{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -1218,7 +1218,7 @@ void PublishSimulationUiState()
             static_cast<jlong>(simulation.worldRoute.generation),
             static_cast<jlong>(horde::gameplay::campaign::CurrentPauseObjective(simulation,
                 gGameSimulation.LatestCampaignBoundary()))};
-        gLookoutObjectiveCoins=simulation.treasurePurse.coins;
+        gLookoutObjectivePurse=simulation.treasurePurse;
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -1291,6 +1291,11 @@ void PublishSimulationUiState()
         contextualControls |= (1 << 14) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
         contextualControls |= (1 << 15) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernLanternFittingAvailable) {
+        constexpr auto price=horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice;
+        static_assert(price>0 && price<64); // Bits 25-30 carry the quoted price.
+        contextualControls |= static_cast<int>(price << 25) | 1;
+    }
     else if ((contextualControls & (1 << 9)) == 0 &&
              simulation.waysideArchiveAction != horde::gameplay::bellwether::ArchiveAction::None)
         contextualControls |= (static_cast<int>(simulation.waysideArchiveAction) << 16) | 1;
@@ -7348,7 +7353,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
         gLookoutObjectiveUiState[3]!=objective)
         return env->NewStringUTF("");
     using namespace horde::gameplay::campaign;
-    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectiveCoins);
+    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse);
     return env->NewStringUTF(text.c_str());
 }
 

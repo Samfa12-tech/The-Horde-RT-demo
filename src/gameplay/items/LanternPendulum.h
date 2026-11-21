@@ -12,6 +12,7 @@ inline constexpr float kLanternPendulumHardLimitRadians = 0.95993108860f;
 inline constexpr float kLanternPendulumTorsionSoftLimitRadians = 0.26179938780f;
 inline constexpr float kLanternPendulumTorsionHardLimitRadians = 0.34906585040f;
 inline constexpr float kLanternPendulumMaximumTorsionVelocity = 6.0f;
+enum class LanternHinge { Standard, Fitted };
 
 horde::gameplay::items::HeldItemTransform ComposeLanternPendulumBodyTransform(
     const horde::gameplay::items::HeldItemTransform& worldFromHinge,
@@ -51,7 +52,8 @@ public:
     const LanternPendulumSnapshot& StepFixed(
         const horde::gameplay::items::HeldItemTransform& worldFromHinge,
         float fixedDeltaSeconds,
-        float presentationYawRadians = 0.0f);
+        float presentationYawRadians = 0.0f,
+        LanternHinge hinge = LanternHinge::Standard);
     const LanternPendulumSnapshot& Snapshot() const { return snapshot_; }
 
 private:

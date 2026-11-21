@@ -47,6 +47,9 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.recall_expedition_routes, MainActivity.contextualInteractLabel((3 << 19) | 1));
         assertEquals(R.string.collect_register_reward, MainActivity.contextualInteractLabel((1 << 24) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 24) | (1 << 9) | 1));
+        assertEquals(R.string.fit_lantern_hinge, MainActivity.contextualInteractLabel((2 << 25) | 1));
+        assertEquals(2, MainActivity.lanternFittingPrice((2 << 25) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((2 << 25) | (1 << 9) | 1));
         assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 15) | (1 << 12) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 15) | (1 << 9) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 14) | (1 << 9) | 1));
