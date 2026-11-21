@@ -289,6 +289,15 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
               Seed(restoredArchive,decoded,terrain) && restoredArchive.Snapshot().waysideArchive.registerInterpreted &&
               restoredArchive.Snapshot().chapterDialogue.line==Line::None,
               "the expedition directions survive reload without replaying the church reading");
+        Check(restoredArchive.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
+              "an older interpreted register restores with Kit still awaiting the lantern");
+        archive.schema=cp::kTavernLanternExchangeSchema;
+        archive.dialogue.tavernLanternLinesStarted=1;
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              Seed(restoredArchive,decoded,terrain) &&
+              restoredArchive.Snapshot().chapterDialogue.tavernLanternLinesStarted==1 &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "Kit keeps the first witnessed line on load without replaying speech");
         archive.schema=cp::kTavernConversationSchema;
         Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
     }

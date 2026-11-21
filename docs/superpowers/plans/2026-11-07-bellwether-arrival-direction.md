@@ -150,19 +150,25 @@ The **road register** rests on the sill behind the stone as a separate opaque le
 
 Matched 960 × 540 Windows captures on the RTX 5050 Laptop GPU show the register on the sill and the empty niche after interaction on both RayTracingPipeline and RayQueryCompute. The second capture requires the simulation to record recovery in the earned tavern checkpoint. The four captures use the same camera and exercise the staged walk from that checkpoint. Android device performance still needs validation.
 
-The local record keeper review package includes a rigged Meshy model, PBR maps, an editable Blender assembly and voice takes. Its original zero-duration pose and stock walk/run are source material. Kit's later evidence-based reaction remains open.
+The local record keeper review package includes a rigged Meshy model, PBR maps, an editable Blender assembly and voice takes. Its original zero-duration pose and stock walk/run are source material.
 
 ### Church register handoff
 
 The record keeper's shared simulation pose uses the existing church service mark. A facing and clear-reach check offers **Show the road mark** before the shrine, based on the forest clue already earned on the lookout route. The three English bank lines direct the player to the shrine. Walking away or losing earshot cancels the captions.
 
-The collected register offers **Show the road register**. That deliberate handoff records the interpretation at the earned tavern save and starts the bank's three reading lines. The Abbey downstream and the Foundry across the eastern gorge can be pursued in either order. The Court's route remains sealed. **Recall the expedition routes** repeats the reading, and the tavern Directions note also reflects the player's progress. These captions use the written English bank. Kit's knowledge still requires a separate encounter.
+The collected register offers **Show the road register**. That deliberate handoff records the interpretation at the earned tavern save and starts the bank's three reading lines. The Abbey downstream and the Foundry across the eastern gorge can be pursued in either order. The Court's route remains sealed. **Recall the expedition routes** repeats the reading, and the tavern Directions note also reflects the player's progress. These captions use the written English bank.
 
 The `bellwether-record-keeper-handoff` debug view loads a local resident fixture. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup.
 
 The local fixture now uses the prepared 15,322-triangle record keeper. Its four-second idle preserves the standing stance, settles the arms using the supplied rig, and adds a small breathing motion and head glance. The shared simulation advances the idle in earshot and holds it while paused or outside earshot. [The source recipe](../../../tools/author-record-keeper-idle.py) preserves the rigged and walking GLBs and writes an editable Blend and a separate local export.
 
 Both Windows hardware RT backends presented the textured actor at 960 × 540 and recorded the same idle time and completed interpretation. The exact-byte texture check verified all 11 mips and the unchanged preceding layers in both Windows RGBA8 and Android ASTC. One resident adds 16,777,212 bytes of Windows texture payload and 2,650,704 bytes of Android texture payload. The Android ARM64 debug package built without the local fixture. Phone performance, model and voice distribution clearance, and normal package integration remain open.
+
+### The lantern speaks to Kit
+
+After hearing the shrine claim, return to Kit's table and raise the lantern on the local prompt. If the lantern is already up, the prompt asks the player to lower it first. Both platforms use the existing raise control and require a newly presented high pose. Each of the two lantern lines then comes from the held lantern, followed by Kit's four replies from his seat. Kit looks toward the lamp from his seated pose. The six captions follow the English bank's `hub.lantern_introduction_to_kit` order. The spoken identity remains the lantern's claim.
+
+The register reading and Kit's firsthand conversation open independently. Each line that starts in earshot updates the existing tavern save, with the saved pose and resources preserved. Leaving or lowering the lantern cancels pending lines, and a fresh raise lets the player continue from the next line. Loading an older save leaves Kit awaiting the introduction. A partial or complete exchange loads quietly. The local audio inventory has a provisional `lantern.town_seals` clip and three Kit review lines. The exact `lantern.town_identity` and `kit.royal_claim.king` takes were absent from the reviewed intake. Voiced playback and phone playtesting remain open.
 
 ## Open decisions deliberately preserved
 

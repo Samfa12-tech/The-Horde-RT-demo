@@ -32,7 +32,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
-        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.waysideArchive,
+        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
         c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted);};
     return facts(a)==facts(b);
 }
@@ -173,6 +173,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.contentRevision<campaign::kBellwetherContentRevision) {
         c.dialogue.hearthLinesResolved=0;
         c.dialogue.tavernConversationLinesResolved=0;
+        c.dialogue.tavernLanternLinesStarted=0;
     }
     c.defeatedGuards=0;
     for(std::size_t i=0;i<c.guards.size();++i) {
@@ -191,6 +192,7 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     }
     if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
         RecordWaysideArchive(c,waysideArchive_);
+    if(c.dialogue.tavernLanternLinesStarted)c.schema=campaign::kTavernLanternExchangeSchema;
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -207,16 +209,23 @@ void GameSimulation::LatchCampaignBoundary() {
         const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
         if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
             const auto& speech=chapterDialogue_.State();
-            const bool roadRegisterProgressAdvanced=atTavernBoundary &&
+            const bool waysideProgressAdvanced=atTavernBoundary &&
                 (WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
                  (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted) ||
                  (waysideArchive_.registerRecovered && !campaignBoundary_->waysideRegisterRecovered) ||
                  (waysideArchive_.registerInterpreted && !campaignBoundary_->waysideRegisterInterpreted));
-            if(roadRegisterProgressAdvanced && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
+            const bool lanternExchangeAdvanced=atTavernBoundary &&
+                speech.tavernLanternLinesStarted>campaignBoundary_->dialogue.tavernLanternLinesStarted;
+            if((waysideProgressAdvanced || lanternExchangeAdvanced) && chapterTerrain_ &&
+               chapterTerrainGeneration_==worldRoute_.generation) {
                 // Record the discovery in the existing tavern save. The distant
                 // interaction does not replace the player's saved pose or resources.
                 auto updated=*campaignBoundary_;
                 RecordWaysideArchive(updated,waysideArchive_);
+                if(lanternExchangeAdvanced) {
+                    updated.dialogue.tavernLanternLinesStarted=speech.tavernLanternLinesStarted;
+                    updated.schema=campaign::kTavernLanternExchangeSchema;
+                }
                 if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_)) {
                     campaignBoundary_=updated;++campaignBoundaryRevision_;
                     return;

@@ -3330,7 +3330,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
     const bool chapterInteract = !rescueJourney && !flaskUpgrade && snapshot.HasChapterInteractPrompt();
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
-    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern)
+    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern || snapshot.tavernLanternAvailable)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
@@ -3383,7 +3383,12 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
              snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     }
     std::string contextualText(text);
-    if (raiseLantern) {
+    if (snapshot.tavernLanternAvailable) {
+        const bool controller = context.teachingControllerGlyphs;
+        const bool high = snapshot.interaction.heldLightPose==horde::gameplay::interactions::HeldLightPose::High;
+        contextualText = high ? (controller ? "Y: LOWER, THEN RAISE LANTERN FOR KIT" : "E: LOWER, THEN RAISE LANTERN FOR KIT")
+                              : (controller ? "Y: RAISE LANTERN FOR KIT" : "E: RAISE LANTERN FOR KIT");
+    } else if (raiseLantern) {
         contextualText=horde::platform::windows::WindowsRaiseLanternPromptText(context.teachingControllerGlyphs,
             rescueJourney && snapshot.rescuePrompt==horde::gameplay::traversal::RescuePrompt::Descend);
     }

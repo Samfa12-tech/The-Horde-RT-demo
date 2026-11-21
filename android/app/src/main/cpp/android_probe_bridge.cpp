@@ -1264,6 +1264,7 @@ void PublishSimulationUiState()
         contextualControls |= (static_cast<int>(simulation.recordKeeperAction) << 19) | 1;
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
+    if (simulation.tavernLanternAvailable && (contextualControls & 4)) contextualControls |= 1 << 21;
     if (simulation.crouchActive) contextualControls |= 1 << 10;
     if (simulation.crouchStandingBlocked) contextualControls |= 1 << 11;
     gContextualControlState.store(contextualControls, std::memory_order_release);

@@ -685,5 +685,52 @@ int main() {
               !records.Complete(before.line,before.generation),
               "leaving earshot cancels the remaining reading and its stale callbacks");
     }
+    {
+        Director tavern;
+        Context room;
+        room.claimed=room.exterior=room.kitSeated=room.tavernInReach=true;
+        room.companionSource=Tuple{2,1,0};
+        Progress arrival;
+        arrival.grateConsumed=arrival.rescueConsumed=arrival.reunionStarted=arrival.proofAccepted=true;
+        arrival.forestNightConsumed=arrival.forestWaystoneConsumed=arrival.forestClueConsumed=arrival.forestVillageConsumed=true;
+        arrival.hearthLinesResolved=kHearthLines.size();
+        Check(tavern.RestoreProgress(arrival,room,1,0),"the seated scene restores without Kit's new evidence");
+        room.lanternHigh=true;room.manualRaiseSequence=room.visibleRaiseSequence=1;
+        tavern.Step(.02f,room);
+        room.tavernLanternSource=Tuple{.25f,1.4f,0};
+        tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::None,"a lantern already held high cannot introduce itself on return");
+        room.lanternHigh=false;room.lanternLow=true;room.manualRaiseSequence=2;
+        tavern.Step(.02f,room);
+        room.lanternHigh=true;room.lanternLow=false;room.manualRaiseSequence=3;
+        tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::None,"the new raise must reach a presented frame");
+        room.visibleRaiseSequence=3;tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::TavernLanternIdentity && tavern.State().source.x==.25f &&
+              RequiresChapterCaption(tavern.State().line),"the claim comes from the raised lantern in hearing range");
+        const auto identity=tavern.State();
+        room.tavernInReach=false;tavern.Step(.02f,room);
+        Check(!tavern.Complete(identity.line,identity.generation) && tavern.State().line==Line::None &&
+              tavern.ExportProgress().tavernLanternLinesStarted==1,
+              "leaving after the claim retains just the witnessed utterance");
+        Director restored;
+        room.tavernInReach=true;
+        Check(restored.RestoreProgress(tavern.ExportProgress(),room,20,3),"the first utterance survives reload");
+        restored.Step(.02f,room);
+        Check(restored.State().line==Line::None,"loading a raised lantern never resumes the exchange");
+        room.lanternHigh=false;room.lanternLow=true;room.manualRaiseSequence=4;
+        restored.Step(.02f,room);
+        room.lanternHigh=true;room.lanternLow=false;room.manualRaiseSequence=room.visibleRaiseSequence=5;
+        restored.Step(.02f,room);
+        for(std::size_t i=1;i<kTavernLanternExchange.size();++i) {
+            const auto line=kTavernLanternExchange[i];
+            Check(restored.State().line==line && restored.State().source.x==(i==1?.25f:2.f) &&
+                  RequiresChapterCaption(line),"the seals and Kit's replies use their own sources in order");
+            restored.Skip();restored.Step(.02f,room);
+        }
+        Check(restored.State().line==Line::None && !restored.CanOfferTavernLantern(room) &&
+              restored.ExportProgress().tavernLanternLinesStarted==kTavernLanternExchange.size(),
+              "the witnessed exchange completes once without automatic repetition");
+    }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

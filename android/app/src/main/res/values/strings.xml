@@ -3,6 +3,7 @@
     <string name="raise_lantern_touch_prompt">Tap the lantern icon to raise your lantern for Kit.</string>
     <string name="raise_lantern_keyboard_prompt">Select the lantern icon to raise your lantern for Kit.</string>
     <string name="raise_lantern_controller_prompt">Y: Raise your lantern for Kit.</string>
+    <string name="reraise_lantern_prompt">Lower the lantern, then raise it for Kit.</string>
     <string name="app_name">Horde Lantern RT Alpha</string>
     <string name="start_demo">ENTER THE RUIN</string>
     <string name="resume_demo">RESUME</string>

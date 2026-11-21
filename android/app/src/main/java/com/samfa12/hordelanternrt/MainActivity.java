@@ -266,6 +266,7 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
     private static final int CONTEXTUAL_RECORD_KEEPER_SHIFT = 19;
     private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
+    private static final int CONTEXTUAL_RERAISE_OBJECTIVE = 1 << 21;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -8665,8 +8666,10 @@ public class MainActivity extends Activity {
     }
 
     private void showRaiseLanternObjective(int contextualState) {
-        if (controllerPrompt == null || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0) return;
-        final int label = controllerMode ? R.string.raise_lantern_controller_prompt :
+        if (controllerPrompt == null ||
+                (contextualState & (CONTEXTUAL_RAISE_OBJECTIVE | CONTEXTUAL_RERAISE_OBJECTIVE)) == 0) return;
+        final int label = (contextualState & CONTEXTUAL_RERAISE_OBJECTIVE) != 0 ? R.string.reraise_lantern_prompt :
+                controllerMode ? R.string.raise_lantern_controller_prompt :
                 latestSubtitleInputMode == SUBTITLE_INPUT_TOUCH ? R.string.raise_lantern_touch_prompt :
                 R.string.raise_lantern_keyboard_prompt;
         String prompt = controllerMode && controllerPrompt.getVisibility() == View.VISIBLE
@@ -8914,7 +8917,7 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
-        if (controllerMode || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0)
+        if (controllerMode || (contextualState & (CONTEXTUAL_RAISE_OBJECTIVE | CONTEXTUAL_RERAISE_OBJECTIVE)) == 0)
             positionContextualPrompt(false);
         logDebugContextualControls(true, contextualState);
         final boolean traversalOwned = (contextualState & CONTEXTUAL_RESCUE_MODE) != 0 &&

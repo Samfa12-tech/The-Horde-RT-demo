@@ -3447,6 +3447,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
         chapterDialogue_.CanStartTavernConversation(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
+    snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
     snapshot_.waysideArchive=waysideArchive_;
     snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&

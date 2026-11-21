@@ -137,6 +137,12 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
         const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
         c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
     }
+    if(c.tavernInReach && c.kitSeated && c.companionSource && waysideArchive_.lanternRevealStarted) {
+        const auto source=HeldRewardLanternSource();
+        if(source && std::hypot(source->x-c.companionSource->x,source->y-c.companionSource->y,
+                               source->z-c.companionSource->z)<=4.f)
+            c.tavernLanternSource=source;
+    }
     const auto& keeper=tavernKeeper_.Pose();
     if(keeper && c.exterior && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation && config_.bellwetherTavernKeeperAdmitted &&
@@ -273,7 +279,8 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     }
     chapterDialogue_.RefreshCompanionSpatial(ChapterInteractionContext(input.paused));
     const auto& speech=chapterDialogue_.State();
-    const auto lanternPosition=speech.line==Line::TavernIntroduce?HeldRewardLanternSource():std::nullopt;
+    const auto lanternPosition=speech.line==Line::TavernIntroduce || IsTavernLanternLine(speech.line)?
+        HeldRewardLanternSource():std::nullopt;
     chapterCompanion_.AdvanceActing(seconds,speech,c.exterior,c.alive,
         !proofWasAccepted && speech.proofAccepted,lanternPosition);
 }

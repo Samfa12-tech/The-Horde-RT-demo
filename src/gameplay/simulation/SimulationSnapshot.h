@@ -74,6 +74,7 @@ struct SimulationSnapshot
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
     bool tavernDirectionsAvailable=false;
+    bool tavernLanternAvailable=false;
     dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
     bellwether::WaysideArchive waysideArchive;
     bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
@@ -228,6 +229,8 @@ struct SimulationSnapshot
     bool NeedsRaiseLanternPrompt() const
     {
         using namespace horde::gameplay::interactions;
+        if(tavernLanternAvailable)
+            return interaction.heldLightKind==HeldLightKind::RewardLantern && interaction.heldLightPose==HeldLightPose::Low;
         return chapterDialogue.waitingForRaise && !chapterDialogue.proofAccepted &&
             developmentRescueJourney && rescue.phase == horde::gameplay::traversal::Phase::UpperSafe &&
             interaction.heldLightKind == HeldLightKind::RewardLantern &&

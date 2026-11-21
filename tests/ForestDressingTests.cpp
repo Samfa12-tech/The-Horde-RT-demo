@@ -1624,9 +1624,43 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const bool returned=walkTo(kBellwetherChurchApproach.front()) &&
                 walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
             Check(returned && game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
-                  game.Snapshot().chapterDialogue.tavernConversationLinesResolved==kTavernConversation.size(),
+                  game.Snapshot().chapterDialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+                  game.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
                   "returning from the wayside branch preserves seated Kit and the completed tavern exchange");
             if(!returned)return;
+            const auto tavernEntry=std::next(route.begin(),index);
+            if(!walkStations(tavernEntry+1,route.end()) || !walkTo({kConversation[0],kConversation[2]})) {
+                Check(false,"the register route can reach Kit's table again");return;
+            }
+            input.moveForward=0;input.runHeld=false;step();
+            using HeldLightPose=gameplay::interactions::HeldLightPose;
+            const auto settleLantern=[&](HeldLightPose wanted) {
+                for(unsigned tick=0;tick<125 && game.Snapshot().interaction.heldLightPose!=wanted;++tick)step();
+                return game.Snapshot().interaction.heldLightPose==wanted;
+            };
+            if(game.Snapshot().interaction.heldLightPose==HeldLightPose::High)++input.commands.toggleHeldLightPose;
+            Check(settleLantern(HeldLightPose::Low) && game.Snapshot().NeedsRaiseLanternPrompt() &&
+                  game.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
+                  "the completed shrine route offers a local raise at Kit's chair without granting knowledge");
+            ++input.commands.toggleHeldLightPose;
+            Check(settleLantern(HeldLightPose::High) && game.Snapshot().chapterDialogue.line==Line::None,
+                  "the new raise waits for presentation before speaking");
+            Check(game.AcknowledgeChapterPresentation(game.Snapshot().tickIndex,game.Snapshot().chapterDialogue.generation),
+                  "the raised lantern can be acknowledged at the physical chair");
+            step();
+            for(const auto line:kTavernLanternExchange) {
+                Check(game.Snapshot().chapterDialogue.line==line,"the direct tavern exchange follows the English bank's order");
+                ++input.commands.dialogueSkip;step();
+            }
+            const auto introduced=game.LatestCampaignBoundary();
+            Check(introduced && introduced->schema==cp::kTavernLanternExchangeSchema &&
+                  introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
+                  introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
+                  "the direct exchange updates the earned save and retains the independently interpreted register");
+            input.moveForward=1;input.runHeld=true;
+            if(!walkStations(route.rbegin(),std::make_reverse_iterator(tavernEntry))) {
+                Check(false,"the direct tavern exchange leaves the outbound route clear");return;
+            }
         }
     }
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&

@@ -39,17 +39,18 @@ public:
         // Grate/rescue calls remain unseen; Keeper speech never animates Kit.
         const bool standingLine=!seated && speech.line>=Line::ReunionQuestion && speech.line<=Line::FlaskTopup;
         const bool seatedLine=seated && (speech.line==Line::TavernLimit || speech.line==Line::TavernWork ||
-            speech.line==Line::TavernIntroduce || speech.line==Line::TavernHoardAnswer);
-        const bool talking=body && (standingLine || seatedLine) &&
-            std::isfinite(speech.elapsed) && std::isfinite(speech.duration) && speech.duration>0;
-        if(talking) {
+            speech.line==Line::TavernIntroduce || speech.line==Line::TavernHoardAnswer ||
+            (IsTavernLanternLine(speech.line) && !IsTavernLanternVoice(speech.line)));
+        const bool listening=seated && IsTavernLanternVoice(speech.line);
+        if(body && (standingLine || seatedLine || listening) &&
+           std::isfinite(speech.elapsed) && std::isfinite(speech.duration) && speech.duration>0) {
             const float t=std::clamp(speech.elapsed,0.0f,speech.duration);
             const float edge=std::clamp(std::min(t,speech.duration-t)/.2f,0.0f,1.0f);
             const float envelope=edge*edge*(3-2*edge)*(walking?.4f:1.0f);
-            headPitch=static_cast<float>(.035*std::sin(double(t)*5)*envelope);
-            headYaw=static_cast<float>(.025*std::sin(double(t)*2.3)*envelope);
+            headPitch=listening?0.f:static_cast<float>(.035*std::sin(double(t)*5)*envelope);
+            headYaw=listening?0.f:static_cast<float>(.025*std::sin(double(t)*2.3)*envelope);
             chestPitch=walking || seated ? 0 : static_cast<float>(.012*std::sin(double(t)*3.1)*envelope);
-            if(speech.line==Line::TavernIntroduce && lanternFromHead &&
+            if((speech.line==Line::TavernIntroduce || IsTavernLanternLine(speech.line)) && lanternFromHead &&
                std::isfinite(lanternFromHead->x) && std::isfinite(lanternFromHead->y) &&
                std::isfinite(lanternFromHead->z) && lanternFromHead->z>.1f) {
                 // During "something worth the climb", look toward the prop.
