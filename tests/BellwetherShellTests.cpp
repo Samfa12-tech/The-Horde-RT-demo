@@ -7,10 +7,96 @@
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
+#include <algorithm>
 #include <cstring>
 #include <cmath>
 #include <iostream>
-int main() {
+#include <map>
+
+namespace {
+bool CheckTavernDetailCandidates(const std::filesystem::path& directory, const horde::scene::assets::StaticMeshAsset& town) {
+    using namespace horde::scene::assets;
+    using namespace horde::gameplay::bellwether;
+    using Surface=horde::gameplay::simulation::TriangleSupportSurface;
+    constexpr std::array identity{1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f};
+    std::string diagnostic;
+    const auto load=[&](const std::string& name,const char* node,std::size_t triangles,StaticMeshAsset& mesh) {
+        AssetManifest manifest;
+        return AssetManifest::Load(directory/(name+".manifest.json"),manifest,diagnostic) &&
+               StaticMeshAsset::Load(directory/(name+".glb"),manifest,mesh,diagnostic) &&
+               mesh.indices.size()==triangles*3 && mesh.nodeTransforms.size()==1 &&
+               mesh.nodeTransforms.front().name==node && mesh.nodeTransforms.front().world==identity;
+    };
+    const auto triangles=[](const StaticMeshAsset& mesh) {
+        std::vector<Surface::Triangle> result;
+        result.reserve(mesh.indices.size()/3);
+        for(const auto& primitive:mesh.primitives) {
+            for(std::size_t i=0;i<primitive.indexCount;i+=3) {
+                Surface::Triangle triangle;
+                for(unsigned j=0;j<3;++j) {
+                    const auto index=mesh.indices[primitive.indexOffset+i+j];
+                    const auto& p=mesh.vertices[primitive.vertexOffset+index].position;
+                    triangle.points[j]={p[0],p[1],p[2]};
+                }
+                result.push_back(triangle);
+            }
+        }
+        return result;
+    };
+    using TriangleKey=std::array<std::array<long long,3>,3>;
+    const auto key=[](const Surface::Triangle& triangle) {
+        const auto corner=[](const Surface::Point& p) {
+            constexpr double unitsPerMetre=10000;
+            return std::array{std::llround(p[0]*unitsPerMetre),std::llround(p[1]*unitsPerMetre),std::llround(p[2]*unitsPerMetre)};
+        };
+        const auto a=corner(triangle.points[0]),b=corner(triangle.points[1]),c=corner(triangle.points[2]);
+        // Rotate the corner order without reversing winding.
+        return std::min({TriangleKey{a,b,c},TriangleKey{b,c,a},TriangleKey{c,a,b}});
+    };
+    StaticMeshAsset shared,near,mid,far;
+    constexpr auto furnitureNode="BellwetherTavernFurniture";
+    if(!load("tavern-architecture","BellwetherTavernArchitecture",494,shared) ||
+       !load("tavern-furniture-lod0",furnitureNode,1012,near) ||
+       !load("tavern-furniture-lod1",furnitureNode,276,mid) ||
+       !load("tavern-furniture-lod2",furnitureNode,144,far)) {
+        std::cerr<<"B01 detail candidate import: "<<diagnostic<<'\n';return false;
+    }
+    const auto sharedTriangles=triangles(shared);
+    const auto nearTriangles=triangles(near);
+    std::map<TriangleKey,std::size_t> townTriangles;
+    for(const auto& triangle:triangles(town))++townTriangles[key(triangle)];
+    for(const auto* selected:{&sharedTriangles,&nearTriangles}) {
+        for(const auto& triangle:*selected) {
+            const auto found=townTriangles.find(key(triangle));
+            if(found==townTriangles.end() || !found->second)return false;
+            --found->second;
+        }
+    }
+    const auto architecture=Surface::Build(sharedTriangles,diagnostic);
+    constexpr float floorY=kSouthDoorHinge[1];
+    if(!architecture ||
+       !architecture->HorizontalVolumeClear(82.3f,120.f,82.3f,118.55f,floorY+.05f,floorY+2.45f,.10f) ||
+       architecture->HorizontalVolumeClear(84.f,120.f,84.f,118.55f,floorY+.05f,floorY+2.45f,.10f) ||
+       !architecture->HorizontalVolumeClear(86.88f,119.3f,86.88f,118.7f,floorY+2.03f,floorY+2.05f,.01f))
+        return false;
+    for(const auto* mesh:{&near,&mid,&far}) {
+        const auto furnitureTriangles=triangles(*mesh);
+        const auto furniture=Surface::Build(furnitureTriangles,diagnostic);
+        if(!furniture || mesh->bounds.minimum!=near.bounds.minimum || mesh->bounds.maximum!=near.bounds.maximum ||
+           mesh->materials.size()!=1 || mesh->materials.front().name!="HordeTavernTimber")return false;
+        for(const auto& mark:{kChairSeat,kTableTop}) {
+            if(furniture->HorizontalVolumeClear(mark[0],mark[2],mark[0],mark[2],mark[1]-.002f,mark[1]+.002f,.025f))
+                return false;
+        }
+    }
+    return true;
+}
+}
+
+int main(int argc,char** argv) {
+    if(argc>2) {
+        std::cerr<<"Pass at most one B01 detail candidate directory.\n";return 2;
+    }
     using namespace horde::scene;
     bool ok=true;
     const auto check=[&](bool v,const char* m){if(!v){ok=false;std::cerr<<"FAIL: "<<m<<'\n';}};
@@ -38,6 +124,8 @@ int main() {
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
+        if(argc==2)check(CheckTavernDetailCandidates(argv[1],world),
+                        "source-review detail candidates match the tavern registration, apertures and furniture levels");
         check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
             "the complete bounded town and tavern geometry is rendered");
         check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");

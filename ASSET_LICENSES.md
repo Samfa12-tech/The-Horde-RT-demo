@@ -128,6 +128,9 @@ from the same Blender source. The untextured window has no third-party inputs.
 The south door leaf, jambs, straps and pulls are original meshes in that
 Blender source. The moving leaf has two untextured finishes in its hinge-local
 export. The fixed frame and pintles use the existing town material rows.
+The B01 detail candidates are original derivatives of that same editable master.
+They reuse the existing finishes and are stored with the source assets under
+`assets/models/world/source/bellwether-tavern-lods-v1/`.
 The table candle, holder and wick are original Horde geometry in that source.
 They reuse the existing TombEarthenware and TombCharredWick material rows.
 The church approach's stone deck and retaining sides are original Horde geometry

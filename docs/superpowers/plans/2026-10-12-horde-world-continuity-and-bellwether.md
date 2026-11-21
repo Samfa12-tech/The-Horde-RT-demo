@@ -55,6 +55,8 @@ The [1.8 hub plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16
 
 Test approach, street/interior thresholds, windows and secondary views, turns/backtracking, detail switches and repeat visits. Keep coarse buildings and relevant shadow/light contributors while detailed interiors prepare or retire. Closed buildings must read honestly as closed. Concrete playable 1.8 implementation still follows accepted 1.7.
 
+The [B01 source review](../../../assets/models/world/source/bellwether-tavern-lods-v1/README.md) has one shared tavern structure and three registered furniture exports. Native import confirmed the original positions, clear south door and window apertures, and matching seat and table heights. This establishes the geometry to use when testing detail changes. Runtime switching, ray relevance and residency validation remain open.
+
 ## NPC capacity: prove reusable three-character capacity first
 
 Sam clarifies that NPCs may load/unload as the player walks; the whole cast is unlikely to occupy one room, and **three may work**. This supersedes the earlier recommendation to increase lanes merely because Bellwether has a four-to-seven named cast. Total cast, currently resident actors, visible actors and simultaneous animation/RT work are different quantities.
