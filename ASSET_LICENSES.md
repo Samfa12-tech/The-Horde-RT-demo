@@ -86,6 +86,12 @@ Revision4 adds bounded solid portal/step/tower/shutter detail to the same
 nine closed footprints; no building interior, new light or texture is admitted. This asset notice
 does not apply the code licence to third-party texture/audio/model sources.
 
+The 1.8 runtime candidate in `assets/models/world/runtime/bellwether-tavern-v1/`
+is original Horde geometry derived from the editable v4 master. The same two
+shared material/texture owners supply the south entrance, ramp, room and
+hearth. The original master and export stay in the source tree. The derivative
+master, recipe and hashes are retained with the tavern authoring records.
+
 ## Generic closed dielectric fixture
 
 - `assets/models/props/runtime/dielectric-fixture/closed-glass-lod0.runtime.glb`

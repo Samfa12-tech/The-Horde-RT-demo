@@ -274,37 +274,32 @@ inline bool StageDevelopmentCheckpointSimulation(
         if(checkpoint.rescueTraversalCapture!=0u)return finalize(false);
         // Capture route stations through real fixed-step movement and native
         // support/collision after ascent, never a teleport through blockers.
-        if(checkpoint.exteriorRouteStation >= simulation::kWorldRoutePoints.size())return finalize(false);
-        for(std::size_t station=3;station<=checkpoint.exteriorRouteStation;++station) {
-            const auto destination=simulation::kWorldRoutePoints[station];
-            bool reached=false;
+        const auto walkTo=[&](float x,float z) {
             for(int tick=0;tick<2600;++tick) {
                 const auto& state=gameSimulation.Snapshot();
-                const float dx=destination.x-state.playerX,dz=destination.z-state.playerZ;
+                const float dx=x-state.playerX,dz=z-state.playerZ;
                 const float distance=std::hypot(dx,dz);
-                if(distance<.008f) {reached=true;break;}
+                if(distance<.008f)return true;
                 routeInput.yawRadians=std::atan2(dx,-dz);
                 routeInput.moveForward=std::min(1.0f,distance/.055f);
                 routeInput.runHeld=distance>.3f;
                 advance();
             }
-            if(!reached)return finalize(false);
+            return false;
+        };
+        if(checkpoint.exteriorRouteStation>=simulation::kWorldRoutePoints.size() ||
+           checkpoint.bellwetherStations>traversal::kBellwetherTavernRoute.size())return finalize(false);
+        for(std::size_t station=3;station<=checkpoint.exteriorRouteStation;++station) {
+            const auto destination=simulation::kWorldRoutePoints[station];
+            if(!walkTo(destination.x,destination.z))return finalize(false);
         }
         // A mapped approach capture continues from F04 using the same motor;
         // the camera target is never used as an authoritative teleport.
-        if(checkpoint.walksBeyondExteriorStation) {
-            bool reached=false;
-            for(int tick=0;tick<2600;++tick) {
-                const auto& state=gameSimulation.Snapshot();
-                const float dx=checkpoint.cameraX-state.playerX,dz=checkpoint.cameraZ-state.playerZ;
-                const float distance=std::hypot(dx,dz);
-                if(distance<.008f) {reached=true;break;}
-                routeInput.yawRadians=std::atan2(dx,-dz);
-                routeInput.moveForward=std::min(1.0f,distance/.055f);
-                routeInput.runHeld=distance>.3f;
-                advance();
-            }
-            if(!reached)return finalize(false);
+        if(checkpoint.walksBeyondExteriorStation && !walkTo(checkpoint.cameraX,checkpoint.cameraZ))
+            return finalize(false);
+        for(std::size_t station=0;station<checkpoint.bellwetherStations;++station) {
+            const auto destination=traversal::kBellwetherTavernRoute[station];
+            if(!walkTo(destination.x,destination.z))return finalize(false);
         }
         routeInput.moveForward=0;routeInput.runHeld=false;
         // The native replay really ascends before freezing. Never seed a

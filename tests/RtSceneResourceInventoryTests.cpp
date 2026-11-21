@@ -6,6 +6,7 @@
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
+#include "scene/BellwetherShell.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "scene/ForestSurroundings.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
@@ -709,7 +710,8 @@ struct PresentableTinyRtSceneObservationTestAccess
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
         ok &= materials.size()==32u && primitives.size()==
             (scene.pipelineBundle_.Request().quality==DielectricQuality::High?34u:33u);
-        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==37846u;
+        ok &= scene.chapterTerrainSurface_ &&
+            scene.chapterTerrainSurface_->TriangleCount()==37846u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
         ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
@@ -1286,14 +1288,16 @@ struct PresentableTinyRtSceneObservationTestAccess
         // in the existing bark primitive, without expanding either row capacity.
         // Eight original F03 kerbs and one marked waystone add 144 triangles
         // in the existing consolidated masonry owner, without a new row.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u + 144u)*3u;
-        // Normal private480 adds the unchanged middle/far trees, low ferns and
-        // the admitted closed boundary, all within existing material families.
-        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1188u)*3u;
+        constexpr auto townTriangles=horde::scene::kBellwetherSolidTriangles+horde::scene::kBellwetherGroundTriangles;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + townTriangles + 6168u + 11904u + 72u + 144u)*3u;
+        // The full woodland retains the same trees/ferns/rocks and opens two
+        // rail spans, keeping the end post of the adjoining retained span.
+        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
         const auto& woodland=tomb.forestSurroundingsPrototype_;
         bool ok = woodland && woodland->report.extraTrees==416u &&
                   woodland->report.addedIndices==woodlandIndices &&
-                  woodland->report.boundaryContained &&
+                  woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&
+                  woodland->report.bellwetherRoadRuns==2u &&
                   oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&

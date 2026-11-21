@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
 
 namespace horde::gameplay
 {
@@ -68,6 +69,7 @@ struct DevelopmentCheckpoint
     // 3 return grip/backoff, 4 second ascent. No authored root teleport.
     std::uint8_t rescueTraversalCapture = 0u;
     bool walksBeyondExteriorStation = false;
+    std::size_t bellwetherStations = 0;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
 };
@@ -77,10 +79,11 @@ struct DevelopmentCheckpoint
 inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     const DevelopmentCheckpoint& checkpoint) noexcept
 {
-    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
+    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-") ||
+        checkpoint.bellwetherStations!=0;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 120u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -201,6 +204,16 @@ inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints
     {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
+    {.id=320,.name="bellwether-south-approach",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].z,
+     .yaw=0,.pitch=-.23f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthApproachStation+1},
+    {.id=321,.name="bellwether-tavern-hearth",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute.back().x,
+     .cameraZ=traversal::kBellwetherTavernRoute.back().z,
+     .yaw=-1.09f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size()},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

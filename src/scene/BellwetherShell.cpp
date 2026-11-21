@@ -10,39 +10,53 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
     if(std::any_of(world.nodeTransforms.begin(),world.nodeTransforms.end(),[](const auto& node){
-        return node.name=="Original_Bellwether_closed_distant_shell";})) {
-        diagnostic="Distant town is already admitted to this owner.";return false;
+        return node.name=="BellwetherSolid";})) {
+        diagnostic="Bellwether is already admitted to this owner.";return false;
     }
     constexpr std::array<const char*,2> families{{"MedievalWall02","TombEarthenware"}};
     std::array<std::uint32_t,2> rows{};
     for(std::size_t i=0;i<families.size();++i) {
         const auto found=std::find_if(world.materials.begin(),world.materials.end(),
             [&](const auto& m){return m.name==families[i];});
-        if(found==world.materials.end()) {diagnostic="Distant town requires the existing admitted stone/clay rows.";return false;}
+        if(found==world.materials.end()) {diagnostic="Bellwether requires the existing admitted stone/clay rows.";return false;}
         rows[i]=static_cast<std::uint32_t>(found-world.materials.begin());
     }
-    const auto dir=root/"models/world/runtime/bellwether-shell-v4";
+    const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
     assets::AssetManifest manifest;assets::StaticMeshAsset source;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
-       !assets::StaticMeshAsset::Load(dir/"bellwether-shell-v4.glb",manifest,source,diagnostic))return false;
-    if(source.primitives.size()!=2 || source.materials.size()!=2 || source.indices.size()!=966*3 ||
-       world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+2>32 || world.vertices.size()>UINT32_MAX-source.vertices.size() ||
+       !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic))return false;
+    if(source.primitives.size()!=3 || source.materials.size()!=2 ||
+       source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
+       world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+source.primitives.size()>32 ||
+       world.vertices.size()>UINT32_MAX-source.vertices.size() ||
        world.indices.size()>UINT32_MAX-source.indices.size()) {
-        diagnostic="Distant town lost its exact bounded native geometry.";return false;
+        diagnostic="Bellwether lost its exact bounded native geometry.";return false;
     }
     constexpr std::array<const char*,2> names{{"HordeTownStone","HordeTownRoofClay"}};
+    std::array<std::uint32_t,2> mappedRows{};
     for(std::size_t i=0;i<names.size();++i) {
         const auto& m=source.materials[i];
-        if(m.name!=names[i] || m.baseColorTexture>=0 || m.normalTexture>=0 || m.ormTexture>=0 ||
+        const auto named=std::find(names.begin(),names.end(),m.name);
+        if(named==names.end() || m.baseColorTexture>=0 || m.normalTexture>=0 || m.ormTexture>=0 ||
            m.emissiveTexture>=0 || m.metallicFactor!=0 || m.transmissionFactor!=0 ||
            m.emissiveFactor!=std::array<float,3>{}) {
-            diagnostic="Distant town source requests unadmitted material or light features.";return false;
+            diagnostic="Bellwether source requests unadmitted material or light features.";return false;
         }
+        mappedRows[i]=rows[static_cast<std::size_t>(named-names.begin())];
+    }
+    if(mappedRows[0]==mappedRows[1]) {
+        diagnostic="Bellwether stone and clay require distinct admitted rows.";return false;
     }
     using Surface=gameplay::simulation::TriangleSupportSurface;
-    std::vector<Surface::Triangle> contact;
-    contact.reserve(source.indices.size()/3);
+    std::vector<Surface::Triangle> contact,ground;
+    contact.reserve(kBellwetherSolidTriangles);
+    ground.reserve(kBellwetherGroundTriangles);
     for(const auto& primitive:source.primitives) {
+        const auto& name=source.nodeTransforms[primitive.nodeTransformIndex].name;
+        if(name!="BellwetherSolid" && name!="BellwetherWalkable") {
+            diagnostic="Bellwether geometry is missing its solid or walkable role.";return false;
+        }
+        auto& triangles=name=="BellwetherWalkable"?ground:contact;
         for(std::size_t k=0;k<primitive.indexCount;k+=3) {
             Surface::Triangle triangle;
             triangle.surface=gameplay::simulation::SupportSurface::Stone;
@@ -51,10 +65,15 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
                 const auto& position=source.vertices[primitive.vertexOffset+local].position;
                 triangle.points[corner]={position[0],position[1],position[2]};
             }
-            contact.push_back(triangle);
+            triangles.push_back(triangle);
         }
     }
-    auto prepared=Surface::WithAdditionalNonWalkableGeometry(*support,contact,diagnostic);
+    if(contact.size()!=kBellwetherSolidTriangles || ground.size()!=kBellwetherGroundTriangles) {
+        diagnostic="Bellwether solid and walkable triangle inventories differ.";return false;
+    }
+    const auto raised=Surface::WithAdditionalGroundGeometry(*support,ground,diagnostic);
+    if(!raised)return false;
+    auto prepared=Surface::WithAdditionalNonWalkableGeometry(*raised,contact,diagnostic);
     if(!prepared)return false;
 
     auto staged=world;
@@ -63,7 +82,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     const auto transforms=static_cast<std::uint32_t>(staged.nodeTransforms.size());
     for(auto primitive:source.primitives) {
         primitive.vertexOffset+=vertices;primitive.indexOffset+=indices;
-        primitive.nodeTransformIndex+=transforms;primitive.materialIndex=rows[primitive.materialIndex];
+        primitive.nodeTransformIndex+=transforms;primitive.materialIndex=mappedRows[primitive.materialIndex];
         staged.primitives.push_back(primitive);
     }
     staged.vertices.insert(staged.vertices.end(),source.vertices.begin(),source.vertices.end());

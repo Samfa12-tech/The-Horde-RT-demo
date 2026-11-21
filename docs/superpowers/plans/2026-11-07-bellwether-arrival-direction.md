@@ -84,11 +84,13 @@ The keeper belongs at the tavern; record keeper north by the church; artificer a
 
 Protect the northwest return to the lookout, northern church/shrine routes and southeast regional road. Future branches remain downstream Abbey, eastern gorge/Foundry and northeast ridge/Glass Court. Exact junctions, entries and terrain remain proposals. Their mouths should be legible without falsely advertising unfinished areas as playable. The regional Foundry is distinct from the village smith; the mill bridge is not the Foundry crossing.
 
-### 1.8 exterior integration checkpoint
+### 1.8 route and tavern checkpoint
 
-The Windows host fixture drives the shared player motor from a completed 1.7 lookout checkpoint on the current native terrain. It follows the mapped bends past the square, stops at the closed south tavern foundation, then returns to the same lookout without replaying the reveal. The closed town now uses its imported render triangles for solid contact while ground support still comes from terrain.
+The Windows host fixture drives the shared player motor from a completed 1.7 lookout checkpoint, through the fully populated forest, down the mapped road, past the square and into the south tavern entrance. It then returns to the lookout without replaying Kit’s reveal. The normal scene opens the two rail spans on the Bellwether road. The rest of the forest boundary retains its rendered collision, and the explicit historical forest proof still uses the closed turnaround.
 
-This station line is about 126 m to the approach outside the south door. Block the ankle turn on the lower road so Kit has a short protective walk. At the planned south doorway the current terrain is around engine Y −11.30 m and the closed shell floor is around Y −8.71 m. Fit the approach, doorway and finished interior together to resolve that roughly 2.6 m rise while retaining the mapped south entrance and distant roofline. The fixture ends outside the closed shell. Kit’s injury, walk and sit, the open interior, the conversation and target-device performance still require integration evidence.
+The editable tavern blockout is derived from the v4 master. It retains the floor height and roofline and fits an 11.5 m stone ramp to the current terrain. The ramp rises roughly 3.26 m from its buried toe to the 2.2 m wide south doorway. The ramp, floor, building solids and west-wall hearth share the native render geometry with the movement system. See the [Blender recipe](../../../tools/author-bellwether-tavern.py) and [asset receipt](../../../assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json).
+
+Block the ankle turn on the lower road so Kit has a short protective walk. The room currently supplies a traversable shell and an unlit hearth. Chair/table placement, injury/walk/sit performance, fire, the keeper, conversation, tavern checkpoint and combined scene timing remain open.
 
 ## Open decisions deliberately preserved
 

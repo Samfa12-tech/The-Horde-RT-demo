@@ -1067,8 +1067,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb", "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb", "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/asset.manifest.json", "models/world/runtime/bellwether-tavern-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-middle.glb", "models/world/runtime/forest-surroundings-v1/alder-middle.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/asset.manifest.json", "models/world/runtime/forest-surroundings-v1/asset.manifest.json") &&
@@ -1506,7 +1506,7 @@ public class MainActivity extends Activity {
         menuScrim.removeAllViews();
         final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
         lookoutObjectivePanel=panel;
-        addBody(panel,"The 1.7 demo ends at the timber road closure ahead. Bellwether opens in a future chapter; this is a temporary endpoint. You can explore the lookout with Kit or return to the tomb.");
+        addBody(panel,"Follow the road down to Bellwether. The tavern is across the square. You can also turn back toward the tomb.");
         final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
         panel.addView(exploring,menuButtonLayoutParams());
         addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));

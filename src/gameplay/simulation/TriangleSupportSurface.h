@@ -38,6 +38,39 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> Build(std::span<const Triangle> input,
                                                               std::string& diagnostic)
     {
+        return BuildSurface(input,diagnostic);
+    }
+
+    // Preserve the exact existing triangle IDs and auxiliary solids. Walkable
+    // additions must use the same triangles as their rendered surfaces.
+    static std::shared_ptr<const TriangleSupportSurface> WithAdditionalGroundGeometry(
+        const TriangleSupportSurface& terrain,std::span<const Triangle> input,std::string& diagnostic)
+    {
+        const auto retained=terrain.TriangleCount()+terrain.NonWalkableTriangleCount()+terrain.StepTriangleCount();
+        if(input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+            diagnostic="Additional ground geometry is empty or exceeds bounded intake.";return {};
+        }
+        std::vector<Triangle> triangles;
+        triangles.reserve(terrain.TriangleCount()+input.size());
+        triangles.insert(triangles.end(),terrain.triangles_.begin(),terrain.triangles_.end());
+        triangles.insert(triangles.end(),input.begin(),input.end());
+        auto merged=BuildSurface(triangles,diagnostic);
+        if(!merged)return {};
+        for(std::size_t i=terrain.TriangleCount();i<merged->normals_.size();++i) {
+            const auto& n=merged->normals_[i];
+            if(n[1]<=1e-7f || std::hypot(n[0],n[2])>kMaximumWalkableSlope*n[1]+1e-7f) {
+                diagnostic="An additional ground triangle faces down or exceeds the walkable slope.";return {};
+            }
+        }
+        merged->nonWalkable_=terrain.nonWalkable_;
+        merged->steps_=terrain.steps_;
+        return merged;
+    }
+
+private:
+    static std::shared_ptr<TriangleSupportSurface> BuildSurface(std::span<const Triangle> input,
+                                                               std::string& diagnostic)
+    {
         if(input.empty() || input.size()>kMaximumTriangles) {
             diagnostic="Terrain support triangle count is outside bounded intake capacity.";return {};
         }
@@ -69,6 +102,8 @@ public:
         result->BuildNode(0,static_cast<std::uint32_t>(input.size()));
         diagnostic.clear();return result;
     }
+
+public:
     Sample Query(float x,float z,float minimumY=-1000000.f,float maximumY=1000000.f) const
     {
         Sample result;

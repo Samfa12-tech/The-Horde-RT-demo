@@ -30,21 +30,24 @@ int main() {
     const auto originalTerrain=PrepareChapterTerrainSurface(terrainMesh,error);
     auto support=originalTerrain;
     const auto result=AppendBellwetherShell(root,world,support,error);
-    check(result,"real exported closed distant town must enter the native world owner");
+    check(result,"real exported town and its tavern interior enter the native world owner");
     if(result) {
-        check(world.indices.size()==before.indices.size()+966*3,"all 966 bounded silhouette/facade triangles are preserved");
+        check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
+            "the complete bounded town and tavern geometry is rendered");
         check(world.materials.size()==2,"no texture layer or material row expansion");
-        check(support->NonWalkableTriangleCount()==966 &&
-              support->TriangleCount()==originalTerrain->TriangleCount(),
-            "the same town triangles become solid without replacing any terrain support");
+        check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles &&
+              support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
+            "rendered masonry stays solid while only the ramp and floor extend ground support");
         constexpr float southDoorX=82.3f,southWallZ=119.2f;
         const auto bare=originalTerrain->Query(southDoorX,southWallZ);
         const auto after=support->Query(southDoorX,southWallZ);
-        check(bare.found && after.found && after.triangle==bare.triangle && after.worldY==bare.worldY,
-            "adding the closed facade does not turn its roof into ground at the mapped entry");
-        check(originalTerrain->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,-11.2f,-9.4f,.24f) &&
-             !support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,-11.2f,-9.4f,.24f),
-             "the actual south foundation blocks entry at the mapped door before the interior is open");
+        check(bare.found && after.found && after.walkable && after.triangle>=originalTerrain->TriangleCount() &&
+              std::abs(after.worldY-(-8.70955f))<.001f && after.worldY-bare.worldY>2.5f,
+            "real ramp and floor meet at the original tavern floor height above current ground");
+        check(support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,after.worldY+.01f,after.worldY+1.8f,.24f) &&
+             !support->NonWalkableVolumeClear(southDoorX+1.5f,121.f,southDoorX+1.5f,118.8f,
+                 after.worldY+.01f,after.worldY+1.8f,.24f),
+             "the mapped south opening admits the capsule while the adjacent wall stays solid");
         check(std::memcmp(world.vertices.data(),before.vertices.data(),before.vertices.size()*sizeof(v))==0,
             "accepted geometry prefix remains byte-identical");
         check(world.bounds.maximum[0]>120 && world.bounds.maximum[2]>170,
@@ -65,9 +68,8 @@ int main() {
             slopingNormal|=std::abs(n[1])>.1f && std::abs(n[1])<.99f;
         }
         check(slopingNormal,"real pitched roof normals survive native import");
-        // Cast through a closed B01 portal post at its actual planned facade.
-        // v2 hits the flat wall at Z103.2; v3 must hit 240mm of solid relief
-        // sooner. A label, UV, dark card or aggregate count cannot satisfy it.
+        // The v4 decorative north doorway was replaced by real wall geometry.
+        // A ray at the old portal post now hits the preserved north wall plane.
         float closestZ=104.2f;
         for(std::size_t j=1;j<world.primitives.size();++j) {
             const auto& p=world.primitives[j];
@@ -85,8 +87,8 @@ int main() {
                 if(z>=102.f)closestZ=std::min(closestZ,z);
             }
         }
-        check(std::abs(closestZ-102.96f)<.001f,
-            "actual closed stone facade relief survives native import at metre scale");
+        check(std::abs(closestZ-103.2f)<.001f,
+            "the north facade is closed at the original footprint");
         const auto admittedIndices=world.indices;
         const auto admittedSupport=support;
         check(!AppendBellwetherShell(root,world,support,error) && world.indices==admittedIndices &&
@@ -102,7 +104,8 @@ int main() {
                     double(a[1])*(double(b[2])*c[0]-double(b[0])*c[2])+
                     double(a[2])*(double(b[0])*c[1]-double(b[1])*c[0]))/6;
             }
-            check(volume>1,"each closed town material family has outward native winding");
+            if(world.nodeTransforms[p.nodeTransformIndex].name=="BellwetherSolid")
+                check(volume>1,"each solid town material family has outward native winding");
         }
         check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==2,
             "town shares two existing world families after coalescing");

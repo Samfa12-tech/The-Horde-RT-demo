@@ -25,8 +25,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-road-clue-v1/asset.manifest.json',
         'models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb',
         'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
-        'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
+        'models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
         'models/world/runtime/forest-surroundings-v1/alder-far.glb',
         'models/world/runtime/forest-surroundings-v1/alder-middle.glb',
         'models/world/runtime/forest-surroundings-v1/asset.manifest.json',
@@ -80,10 +80,11 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/props/runtime/player-sword-scabbard/*' -or
                        $_ -like 'models/world/runtime/chapter-entry-return-v1/*' -or
                        $_ -like 'models/world/runtime/chapter-terrain-v1/*' -or
+                       $_ -like 'models/world/runtime/bellwether-tavern-v1/*' -or
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
+    Require ($required.Count -eq 20) 'Android equipment and chapter staging require the closed twenty-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -266,7 +267,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed eighteen-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed twenty-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks

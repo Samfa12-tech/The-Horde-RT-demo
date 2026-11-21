@@ -1020,6 +1020,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
        <<",\"surroundingsTreeContactTriangles\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.treeContactTriangles:0u)
        <<",\"surroundingsUnderstoryClumps\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.understoryClumps:0u)
        <<",\"surroundingsArrivalPortalRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.arrivalPortalRuns:0u)
+       <<",\"surroundingsBellwetherRoadRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.bellwetherRoadRuns:0u)
        <<",\"surroundingsBoundarySectionsContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundarySectionsContained?"true":"false")
        <<",\"surroundingsBoundaryContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundaryContained?"true":"false")
        <<",\"proofOverride\":"<<(forestRouteProofMode_!=ForestRouteProofMode::Disabled?"true":"false")<<",\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
@@ -3375,9 +3376,15 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             if(!horde::scene::PrepareForestFlaskUpgrade(roadClue,healingFlaskAsset_,*chapterTerrainSurface_,placement,diagnostic))return false;
             healingFlaskUpgradeSite_=static_cast<const horde::gameplay::healing::FlaskUpgradeSite&>(placement);
         }
-        if(SelectForestSurroundingsPrototype() &&
-           !horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
-               chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic))return false;
+        if(SelectForestSurroundingsPrototype()) {
+            auto roadEnd=horde::scene::ForestRoadEnd::Bellwether;
+#if defined(_DEBUG)
+            if(forestRouteProofMode_==ForestRouteProofMode::BakedSurroundings480)
+                roadEnd=horde::scene::ForestRoadEnd::Closed;
+#endif
+            if(!horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
+                chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic,roadEnd))return false;
+        }
         // Only the explicitly selected native flask application adds furniture.
         // Ordinary public/default packages retain their previous geometry.
         if(!playerUtilityCandidateAsset_.empty()) {

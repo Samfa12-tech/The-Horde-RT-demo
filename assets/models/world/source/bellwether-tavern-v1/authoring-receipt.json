@@ -1,0 +1,27 @@
+{
+  "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
+  "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+  "runtimeSha256": "4e0ce808d92c8a977f9452bad1c77d88f0051c4dc299ae78f3277e0ab571ddfa",
+  "solidTriangles": 1024,
+  "walkableTriangles": 4,
+  "southDoor": [
+    82.3,
+    -8.70955078125,
+    119.2
+  ],
+  "clearDoorWidth": 2.2,
+  "clearDoorHeight": 2.65,
+  "rampToe": [
+    82.3,
+    -11.965814514160156,
+    130.7
+  ],
+  "rampWidth": 3,
+  "highestGroundUnderFloor": -8.785720825195312,
+  "hearthMouth": [
+    80.85,
+    -8.70955078125,
+    109.9
+  ]
+}

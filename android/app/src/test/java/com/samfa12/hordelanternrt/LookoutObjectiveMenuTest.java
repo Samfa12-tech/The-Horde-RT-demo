@@ -122,7 +122,7 @@ public final class LookoutObjectiveMenuTest {
         set("parryTouchActive",true);set("crouchControlKeys",1);
         find("Lookout objective").performClick();
         assertTrue(field("lookoutObjectiveVisible").getBoolean(a));assertTrue(Bridge.paused);
-        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("future chapter"));
+        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("The tavern is across the square"));
         assertArrayEquals(new int[]{-1,-1},pointers);assertFalse(field("parryTouchActive").getBoolean(a));
         Bridge.order.clear();find("Continue exploring").performClick();
         assertFalse(Bridge.paused);assertFalse(field("menuVisible").getBoolean(a));

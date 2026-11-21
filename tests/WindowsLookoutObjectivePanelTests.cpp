@@ -81,8 +81,8 @@ int main() {
         }
         Check(open(h.view) && !IsWindowVisible(parent),"explicit open creates native controls without showing owner");
         Check(Text(parent,Panel::TitleId)==Panel::Title && Text(parent,Panel::BodyId)==Panel::Body &&
-            Text(parent,Panel::BodyId).find("future chapter")!=std::string::npos,
-            "native objective labels preserve the truthful continuing chapter scope");
+            Text(parent,Panel::BodyId).find("The tavern is across the square")!=std::string::npos,
+            "native objective directs the player to the open Bellwether road");
         Check(Text(parent,Panel::ContinueId)=="CONTINUE EXPLORING" && Text(parent,Panel::MenuId)=="RETURN TO MENU" &&
             Text(parent,Panel::BackId)=="BACK","all explicit native actions have accessible text");
         auto actions=h.panel.ActionControls();

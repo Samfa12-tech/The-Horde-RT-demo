@@ -69,8 +69,8 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 118u,
-          "development registry retains prior views and adds authoritative ring and accepted-hit views");
+    Check(kDevelopmentCheckpoints.size() == 120u,
+          "development registry retains prior views and adds the two tavern inspections");
     {
         simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
         const auto* hit=FindDevelopmentCheckpoint(238);
@@ -92,6 +92,17 @@ int main()
               std::abs(view->cameraX-simulation::kPrivateChapterDemoEndpoint.x)<.00001f &&
               std::abs(view->cameraZ-simulation::kPrivateChapterDemoEndpoint.z)<.00001f,
               "endpoint views walk from F04 to the mapped turnaround through simulation");
+    }
+    for(const auto name : {"bellwether-south-approach","bellwether-tavern-hearth"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        const auto& route=traversal::kBellwetherTavernRoute;
+        Check(view && view->stagesRescueExterior && view->exteriorRouteStation==7u &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*view) &&
+              view->bellwetherStations>0 && view->bellwetherStations<=route.size() &&
+              view->cameraX==route[view->bellwetherStations-1].x &&
+              view->cameraZ==route[view->bellwetherStations-1].z &&
+              FindShowcaseCheckpoint(name)==nullptr,
+              "tavern inspections use the mapped, authored movement route and remain development views");
     }
     for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
         const auto* view=FindDevelopmentCheckpoint(name);

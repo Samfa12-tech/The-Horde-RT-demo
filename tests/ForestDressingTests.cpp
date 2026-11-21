@@ -1150,7 +1150,7 @@ gameplay::campaign::Checkpoint LookoutCheckpoint(
     return record;
 }
 
-void TestBellwetherExteriorApproach(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
     namespace sim=gameplay::simulation;
     namespace cp=gameplay::campaign;
     sim::GameSimulation game(sim::ProductionGameSimulationConfig());
@@ -1170,12 +1170,7 @@ void TestBellwetherExteriorApproach(std::shared_ptr<const gameplay::simulation::
     neutral.pitchRadians=record.pitch;
     game.StepFixed(neutral);
 
-    // The atlas road uses East/North. Convert with the admitted terrain/shell
-    // registration. Skirt the proposed well and stop short of the closed wall.
-    constexpr std::array<std::array<float,2>,10> mapRoute{{
-        {-65,90},{-56,76},{-59,58},{-47,44},{-30,34},{-19,18},
-        {-4,4},{-1.1f,2.6f},{4,1},{4,5.4f}
-    }};
+    const auto& route=gameplay::traversal::kBellwetherTavernRoute;
     sim::InputSnapshot input;
     input.moveForward=1.f;
     input.runHeld=true;
@@ -1185,8 +1180,8 @@ void TestBellwetherExteriorApproach(std::shared_ptr<const gameplay::simulation::
         game.StepFixed(input);
         replayedLookoutLine|=game.Snapshot().chapterDialogue.line==gameplay::dialogue::Line::ForestVillage;
     };
-    const auto walkTo=[&](const auto& mapPoint) {
-        const float x=mapPoint[0]+78.3f,z=126.2f-mapPoint[1];
+    const auto walkTo=[&](gameplay::traversal::BellwetherStation station) {
+        const auto [x,z]=station;
         for(unsigned tick=0;tick<1200;++tick) {
             const auto& current=game.Snapshot();
             const float dx=x-current.playerX,dz=z-current.playerZ;
@@ -1200,15 +1195,13 @@ void TestBellwetherExteriorApproach(std::shared_ptr<const gameplay::simulation::
                  <<" en route to "<<x<<','<<z<<'\n';
         return false;
     };
-    for(const auto& point:mapRoute) {
-        if(!walkTo(point)) {Check(false,"the normal player motor reaches the mapped south approach");return;}
+    for(const auto& point:route) {
+        if(!walkTo(point)) {Check(false,"the normal player motor enters the tavern by its mapped south entrance");return;}
     }
-    const auto approach=game.Snapshot();
-    input.yawRadians=0;
-    for(unsigned tick=0;tick<90 && !game.Snapshot().worldRoute.blocked;++tick)step();
-    Check(game.Snapshot().worldRoute.blocked && game.Snapshot().playerZ<approach.playerZ &&
-          game.Snapshot().playerZ>119.2f,"player reaches the closed tavern and stops outside its south foundation");
-    for(auto i=std::next(mapRoute.rbegin());i!=mapRoute.rend();++i) {
+    Check(game.Snapshot().playerZ<118.4f &&
+          std::abs(game.Snapshot().playerSupportWorldY-(-8.70955f))<.001f,
+          "the shared motor stands on the actual imported tavern floor behind the portal");
+    for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
         if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
     }
     Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
@@ -1380,6 +1373,22 @@ void TestFullSurroundings()
     Check(!AppendPreparedForestSurroundings(kRoot/"missing-assets",*original,owner,terrain,result,diagnostic) &&
           ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
           "failed candidate preparation preserves all already published geometry/support/receipts");
+    if(!auditContainment) {
+        recreatedOwner=baseline;
+        recreatedTerrain=baselineTerrain;
+        recreated.reset();
+        const bool open=AppendPreparedForestSurroundings(kRoot/"assets",*original,recreatedOwner,
+            recreatedTerrain,recreated,diagnostic,ForestRoadEnd::Bellwether);
+        Check(open,diagnostic);
+        if(open) {
+            const auto& road=recreated->report;
+            Check(road.bellwetherRoadRuns==2 && road.boundarySectionsContained && !road.boundaryContained &&
+                  road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
+                  road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
+                  "the live forest opens only the two road spans and retains the closed sections and full tree roster");
+            TestBellwetherTavernRoute(recreatedTerrain);
+        }
+    }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
              <<" retainedSupportBytes="<<terrain->RetainedBytes()<<" baseline64SupportBytes="<<baselineTerrain->RetainedBytes()<<" rocks="<<r.rockRuns<<" rockTriangles="<<r.rockTriangles<<" totalSupport="<<terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()<<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
              <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
@@ -1549,7 +1558,6 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
         ConsolidateWorldBakedMaterialFamilies(owner, diagnostic);
     Check(prepared, diagnostic.empty() ? "real tomb/terrain/forest preparation succeeds" : diagnostic);
     if (!prepared) return;
-    if(!auditRestBasins && !f01North)TestBellwetherExteriorApproach(terrain);
     if(auditRestBasins) {
         const auto prior=terrain;auto baseline=owner;
         const auto materials=owner.materials.size(),indices=owner.indices.size();
