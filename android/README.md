@@ -75,6 +75,13 @@ Save that output as `bellwether-doorway.csv` in the local run directory. From
 the repository root, verify and summarize it with
 `python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
 
+The five privately approved Kit takes can be enabled by adding
+`-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
+That root contains only the five pinned WAVs under `private_bellwether_voice/`.
+The voice overlay is optional. The shared dialogue clock uses the measured takes
+and an unavailable cue retains its caption. The release guard also covers this
+overlay.
+
 ### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.

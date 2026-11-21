@@ -213,6 +213,8 @@ Four missing takes were identified for this exact arrival, using established voi
 
 The five existing Kit tavern/conversation WAVs were verified present and hash-matched against the 4 November private intake receipt, with owner listening approval. `forest.village.wav` is present in the runtime folder. Tavern `hub.horde_army.wav` and optional `hub.arrival.wav` are present in the October production archive; casting is approved, but do not treat the older archive's technical checks as blanket approval of every production take.
 
+The Windows Debug option `--bellwether-voice-dir <local WAV directory>` and the [private Android voice overlay](../../../android/README.md#bellwether-three-actor-playtest) admit the same five exact WAVs. The three hearth lines and both of Kit's first-conversation lines use durations measured from the approved mono PCM at 24 kHz. The spatial voice path uses each line's existing actor source and the Voice preference. Bellwether captions remain available whenever the voice is missing, muted or fails to start. The keeper and the three approach lines still use captions. Exact-build listening and public distribution clearance remain open.
+
 Keep original MP3s, per-line review WAVs, exact text/voice/cost manifests and a short pickup listening reel in the existing private Horde audio archive. Do not overwrite accepted runtime audio or insert new clips into the game as part of this planning task. Use the pickup receipt for exact production/QC status; this plan does not claim runtime admission, licence clearance for wider distribution, or performance approval.
 
 ## Animation and gameplay acceptance gate

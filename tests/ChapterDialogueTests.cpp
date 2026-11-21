@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "audio/BellwetherVoiceFixture.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsChapterDialogue.h"
 #include "gameplay/SpatialAudio.h"
@@ -61,14 +62,25 @@ int main() {
         if (spec.id == Line::None) continue;
         const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
         if(IsBellwetherLine(spec.id)) {
-            Check(path.empty() && spec.text[0]!='\0',"unadmitted Bellwether takes use timed captions");
+            Check(path.empty() && spec.text[0]!='\0' && RequiresChapterCaption(spec.id),
+                "Bellwether retains timed captions when the local voice is unavailable");
             continue;
         }
+        Check(!RequiresChapterCaption(spec.id), "existing voiced chapter lines respect the subtitle preference");
         Check(!path.empty() && std::filesystem::is_regular_file(path),
             "every admitted Kit and Keeper voice resolves to actual bytes from the Windows assets root");
         Check(path.lexically_relative(assetRoot).generic_string().starts_with("audio/"),
             "dialogue root is joined once rather than duplicating assets/assets");
     }
+    for (const auto& cut : horde::audio::kBellwetherVoiceCuts) {
+        const auto& spec = Spec(cut.line);
+        Check(std::string_view(spec.speaker) == "Kit" &&
+            std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
+            "the shared clock covers the exact five approved Kit waveforms");
+    }
+    Check(!horde::audio::HasBellwetherVoiceCut(Line::TavernHordeArmy) &&
+        !horde::audio::HasBellwetherVoiceCut(Line::RoadAnkle),
+        "nearby unapproved performances are excluded from the local voice fixture");
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
           "invalid catalogue paths cannot escape the supplied asset root");

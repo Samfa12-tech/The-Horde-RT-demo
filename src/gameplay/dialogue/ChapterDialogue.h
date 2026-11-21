@@ -51,9 +51,9 @@ inline constexpr std::array<LineSpec,48> kLines{{
     {Line::RoadStop,"kit.approach_injury.stop","Kit","Ah. Wait a moment.","",1.6f,1},
     {Line::RoadAnkle,"kit.approach_injury.ankle","Kit","Loose ground. Turned my ankle. I can stand, but give me a moment.","",4.25f,1},
     {Line::RoadSlow,"kit.approach_injury.slow","Kit","Stay close a moment. I can manage if we go slowly.","",3.4f,1},
-    {Line::TavernIntroduce,"hub.kit_introduce","Kit","The tomb was there. So was something worth the climb.","",3.6f,1},
+    {Line::TavernIntroduce,"hub.kit_introduce","Kit","The tomb was there. So was something worth the climb.","",4.099333f,1},
     {Line::TavernHordeArmy,"hub.horde_army","Tavern keeper","My grandfather called the Horde an army. You treasure hunters always hear the other word.","",6.2f,1},
-    {Line::TavernHoardAnswer,"hub.hoard_answer","Kit","Armies need paying. I'm hoping we're both right.","",3.4f,1},
+    {Line::TavernHoardAnswer,"hub.hoard_answer","Kit","Armies need paying. I'm hoping we're both right.","",3.939333f,1},
     {Line::TavernWelcome,"hub.arrival_chair","Tavern keeper","Easy. There's a chair just inside.","",2.6f,1},
     {Line::TavernDirections,"hub.record_keeper_lead","","Ask the record keeper by the northern church about the wayside shrine.","",7.0f,1},
     {Line::LanternFirstHelp,"lantern.first_help","Lantern voice","The lower stone. Its hinge is hidden under the roots.","",4.6f,2},
@@ -116,8 +116,7 @@ inline constexpr bool IsBellwetherLine(Line line) {
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
 inline bool RequiresChapterCaption(Line line) {
-    return IsGuidanceLine(line) || ((IsShrineLanternLine(line) || IsRecordKeeperLine(line) ||
-        IsTavernLanternLine(line)) && Spec(line).audio[0]=='\0');
+    return IsBellwetherLine(line) && Spec(line).audio[0]=='\0';
 }
 struct Tuple { float x=0,y=0,z=0; };
 inline constexpr float kCompanionSpeechHeight=1.4f;

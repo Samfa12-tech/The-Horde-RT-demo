@@ -19,7 +19,8 @@ public final class ChapterVoiceAssetsTest {
     };
 
     @Test public void everyAdmittedSpeechLineHasOneUniqueKeyAndExpectedRuntimePath() {
-        assertEquals(STABLE_IDS.length, ChapterVoiceAssets.all().size());
+        assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0),
+                ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
         for (int i = 0; i < STABLE_IDS.length; i++) {
@@ -51,7 +52,18 @@ public final class ChapterVoiceAssetsTest {
         assertNull(ChapterVoiceAssets.soundIdForLine(21, sounds));
     }
 
-    @Test public void privateBellwetherTakesRemainCaptionOnly() {
-        for (int line : new int[]{18, 19, 20, 21, 22, 23, 24, 25, 26, 27}) assertNull(ChapterVoiceAssets.forLine(line));
+    @Test public void privateBellwetherRosterMatchesApprovedKitLines() {
+        final int[] lines = {18, 19, 20, 24, 26};
+        final String[] ids = {"kit.accept_base.sit", "kit.accept_base.limit", "kit.accept_base.work",
+                "hub.kit_introduce", "hub.hoard_answer"};
+        for (int i = 0; i < lines.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
+            if (BuildConfig.BELLWETHER_VOICE_CANDIDATE) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+            } else assertNull(asset);
+        }
+        for (int line : new int[]{21, 22, 23, 25, 27, 34}) assertNull(ChapterVoiceAssets.forLine(line));
     }
 }

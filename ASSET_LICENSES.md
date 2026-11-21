@@ -510,6 +510,16 @@ terrain/collision and save-restore tests; rendered staging, runtime voice
 balance and physical Windows/Android listening remain acceptance gates.
 
 
+### Bellwether Kit dialogue for private playtesting (21 November 2026)
+
+Five owner-listened performances from the private 4 November intake supply
+Kit's hearth and first-conversation lines in the optional local Windows and
+Android Debug overlays. The native cut roster and Android build pin their
+SHA-256 identities. The byte-exact WAVs use mono PCM16 at 24 kHz, with no
+resampling or gain changes. The private intake preserves the masters and
+review receipt. The ordinary packages use captions for these lines. Public
+game and repository distribution clearance for the five takes remains open.
+
 ### Kit visual source intake (11 October 2026)
 
 The owner expressly confirmed that public Horde repository and game-package

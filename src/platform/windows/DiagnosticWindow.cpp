@@ -2,6 +2,7 @@
 #include "platform/windows/WindowsFlaskGauge.h"
 #include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
+#include "audio/BellwetherVoiceFixture.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
@@ -213,6 +214,9 @@ bool gLookoutInspectKitPartials=false;
 bool gLookoutInspectKitPartialsDense=false;
 bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
+#if defined(_DEBUG)
+std::filesystem::path gBellwetherVoiceDirectory;
+#endif
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
 horde::platform::windows::WindowsAcceptanceProfile gAcceptanceProfile;
@@ -451,6 +455,7 @@ constexpr UINT kMaxFramesInFlight = 1u;
 struct CaptureLaunchOptions
 {
     std::filesystem::path chapterResidentFixture;
+    std::filesystem::path bellwetherVoiceDirectory;
     bool staffedTavernCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
@@ -1278,6 +1283,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if (argument == L"--bellwether-voice-dir")
+        {
+#if defined(_DEBUG)
+            if (!options.bellwetherVoiceDirectory.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--bellwether-voice-dir requires one local directory.";
+                break;
+            }
+            options.bellwetherVoiceDirectory = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--bellwether-voice-dir is Debug only.";
+#endif
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -1515,6 +1534,26 @@ bool Sha256File(const std::filesystem::path& path, std::string& hexDigest, std::
     diagnostic.clear();
     return true;
 }
+
+#if defined(_DEBUG)
+bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
+{
+    if (directory.empty()) return true;
+    std::error_code error;
+    const auto root = std::filesystem::canonical(directory, error);
+    if (error || !std::filesystem::is_directory(root, error) || error) return false;
+    for (const auto& cut : horde::audio::kBellwetherVoiceCuts) {
+        const auto path = root / (std::string(horde::gameplay::dialogue::Spec(cut.line).stableId) + ".wav");
+        const auto bytes = std::filesystem::file_size(path, error);
+        std::string digest, diagnostic;
+        if (error || bytes != 78u + cut.frames * 2u || !Sha256File(path, digest, diagnostic) ||
+            digest != cut.sha256) return false;
+    }
+    gBellwetherVoiceDirectory = root;
+    std::cerr << "Bellwether private Kit WAVs verified.\n";
+    return true;
+}
+#endif
 
 bool ValidateCapturedObjGeometry(const std::filesystem::path& path,
                                  horde::platform::windows::CapturedPlayerGeometryEvidence& evidence,
@@ -2354,7 +2393,12 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     const auto line = dialogue.line;
     const auto lineId = static_cast<std::uint32_t>(line);
     const auto& spec = horde::gameplay::dialogue::Spec(line);
-    if (line == Line::None || spec.audio == nullptr || spec.audio[0] == '\0')
+    std::filesystem::path privateVoice;
+#if defined(_DEBUG)
+    if (!gBellwetherVoiceDirectory.empty() && horde::audio::HasBellwetherVoiceCut(line))
+        privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
+#endif
+    if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))
     {
         if (context.playingDialogueLine != 0u)
             SpatialAudioEngine().StopLoop("chapter_dialogue");
@@ -2377,11 +2421,15 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     SpatialAudioEngine().StopLoop("chapter_dialogue");
     context.playingDialogueLine = 0u;
     context.playingDialogueGeneration = 0u;
-    const auto path = horde::platform::windows::WindowsDialogueAudioPath(
-        ResolveAssetRoot(), spec.audio);
+    const auto path = privateVoice.empty() ? horde::platform::windows::WindowsDialogueAudioPath(
+        ResolveAssetRoot(), spec.audio) : privateVoice;
     if (!std::filesystem::exists(path))
     {
-        LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + path.string());
+        if (context.loggedDialogueAttemptGeneration != dialogue.generation) {
+            LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + std::string(spec.stableId));
+            context.loggedDialogueAttemptGeneration = dialogue.generation;
+            context.loggedDialogueAttemptAccepted = false;
+        }
         return;
     }
     if (gains.left <= 0.0f && gains.right <= 0.0f) return;
@@ -2413,7 +2461,10 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
     if (subtitle == nullptr) return;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
-    if ((!context.subtitlesEnabled && !horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line)) ||
+    const bool voicePlaying = context.playingDialogueLine == static_cast<unsigned>(dialogue.line) &&
+        context.playingDialogueGeneration == dialogue.generation && context.voiceVolumePercent > 0;
+    const bool requiresCaption = !voicePlaying && horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line);
+    if ((!context.subtitlesEnabled && !requiresCaption) ||
         dialogue.line == horde::gameplay::dialogue::Line::None ||
         dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
     {
@@ -13768,6 +13819,12 @@ int RunDiagnosticWindow(const int showCommand)
         std::cerr << launchOptions.error << '\n';
         return 2;
     }
+#if defined(_DEBUG)
+    if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
+        std::cerr << "Bellwether voice directory failed the approved WAV identity check.\n";
+        return 2;
+    }
+#endif
     gShowcaseCaptureHidden=launchOptions.captureHidden;
 #if !defined(_DEBUG)
     if (launchOptions.requested && !(HORDE_RT_CHAPTER_MEASUREMENT && launchOptions.measureChapterShippingRoute))

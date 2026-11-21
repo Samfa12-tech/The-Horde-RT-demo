@@ -4334,9 +4334,7 @@ public class MainActivity extends Activity {
             return;
         }
         final long generation = state[1];
-        final boolean requiresCaption = state[5] != 0;
-        chapterAmbienceDialogueActive = !requiresCaption;
-        if (!requiresCaption) stopChapterAmbience(); // Speech keeps priority when Voice or subtitles are muted.
+        final boolean captionFallback = state[5] != 0;
         if (chapterDialogueSkipPendingGeneration != generation)
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
         final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
@@ -4347,6 +4345,11 @@ public class MainActivity extends Activity {
             stopChapterVoice();
             chapterVoiceGeneration = generation;
         } else updateChapterVoice(line, generation, paused);
+        final boolean voicePlaying = chapterVoiceGeneration == generation && chapterVoiceStream != 0;
+        chapterAmbienceDialogueActive = !captionFallback || voicePlaying;
+        if (chapterAmbienceDialogueActive) stopChapterAmbience();
+        final boolean requiresCaption = captionFallback &&
+                (!voicePlaying || preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) <= 0);
         final boolean subtitles = requiresCaption || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
         if (chapterSubtitleGeneration != generation) {

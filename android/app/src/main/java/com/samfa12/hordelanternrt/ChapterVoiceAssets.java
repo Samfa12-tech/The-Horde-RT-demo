@@ -1,6 +1,7 @@
 package com.samfa12.hordelanternrt;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,19 @@ final class ChapterVoiceAssets {
             kit(16, "flask.empty"),
             kit(17, "flask.topup")
     };
-    private static final List<Asset> ALL = Collections.unmodifiableList(Arrays.asList(ASSETS));
+    private static final List<Asset> ALL = admittedAssets();
+
+    private static List<Asset> admittedAssets() {
+        final List<Asset> assets = new ArrayList<>(Arrays.asList(ASSETS));
+        if (BuildConfig.BELLWETHER_VOICE_CANDIDATE) {
+            assets.add(bellwetherKit(18, "kit.accept_base.sit"));
+            assets.add(bellwetherKit(19, "kit.accept_base.limit"));
+            assets.add(bellwetherKit(20, "kit.accept_base.work"));
+            assets.add(bellwetherKit(24, "hub.kit_introduce"));
+            assets.add(bellwetherKit(26, "hub.hoard_answer"));
+        }
+        return Collections.unmodifiableList(assets);
+    }
 
     private ChapterVoiceAssets() {}
 
@@ -48,9 +61,8 @@ final class ChapterVoiceAssets {
 
     /** Returns null for None, out-of-range lines, and every unadmitted ID. */
     static Asset forLine(int line) {
-        if (line < 1 || line > ASSETS.length) return null;
-        final Asset asset = ASSETS[line - 1];
-        return asset.line == line ? asset : null;
+        for (Asset asset : ALL) if (asset.line == line) return asset;
+        return null;
     }
 
     /** A missing or unadmitted cue returns null so callers can keep subtitle fallback. */
@@ -62,6 +74,11 @@ final class ChapterVoiceAssets {
     private static Asset kit(int line, String stableId) {
         final String key = "kit_" + stableId.replace('.', '_');
         return asset(line, stableId, key, "audio/kit/runtime/" + stableId + ".wav");
+    }
+
+    private static Asset bellwetherKit(int line, String stableId) {
+        return asset(line, stableId, "kit_" + stableId.replace('.', '_'),
+                "private_bellwether_voice/" + stableId + ".wav");
     }
 
     private static Asset asset(int line, String stableId, String key, String path) {
