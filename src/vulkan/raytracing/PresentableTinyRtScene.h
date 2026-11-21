@@ -439,6 +439,14 @@ public:
         if(ready_ || device_!=VK_NULL_HANDLE)return false;
         bellwetherFurnitureDetail_=detail;return true;
     }
+    bool SetBellwetherFurnitureTransitions(bool enabled) {
+        if(enabled==bellwetherFurnitureTransitions_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureTransitions_=enabled;return true;
+    }
+    horde::scene::BellwetherFurnitureDetail ActiveBellwetherFurnitureDetail() const noexcept {
+        return activeBellwetherFurnitureDetail_;
+    }
     bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
     // Candidate source binding only, chosen before resource creation. Empty
@@ -1301,6 +1309,10 @@ private:
     void ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
     static void ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR&,
         const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
+    // Showcase chapter's unused fixture/legacy arm lane, shared with no other trial.
+    static constexpr std::uint32_t kBellwetherFurnitureLane=9u;
+    void ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR&,
+        horde::scene::BellwetherFurnitureDetail) const noexcept;
     std::uint32_t ChapterTailInstanceCount() const noexcept {
         return (roadStoneBlas_.address ? 1u : 0u) + (waysideCoverBlas_.address ? 1u : 0u) +
             (waysideRegisterBlas_.address ? 1u : 0u) + (tavernDoorBlas_.address ? 1u : 0u) +
@@ -1454,6 +1466,10 @@ private:
     AccelerationStructure waysideCoverBlas_;
     AccelerationStructure waysideRegisterBlas_;
     AccelerationStructure tavernDoorBlas_;
+    std::array<AccelerationStructure,horde::scene::kBellwetherFurnitureTriangles.size()> bellwetherFurnitureBlas_{};
+    horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
+    horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
+    bool bellwetherFurnitureTransitions_=false;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;

@@ -119,8 +119,39 @@ int main(int argc,char** argv) {
     const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger,&door);
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
+    using Tier=BellwetherFurnitureDetail;
+    const auto select=[](float beyond,Tier current) {
+        return SelectBellwetherFurnitureDetail(82.3f,
+            horde::gameplay::bellwether::kRoomMax[2]+beyond,current);
+    };
+    const std::array approach{std::pair{30.f,Tier::Far},std::pair{17.f,Tier::Far},
+        std::pair{15.f,Tier::Mid},std::pair{5.f,Tier::Mid},std::pair{3.f,Tier::Near},
+        std::pair{0.f,Tier::Near},std::pair{5.f,Tier::Near},std::pair{7.f,Tier::Mid},
+        std::pair{19.f,Tier::Mid},std::pair{21.f,Tier::Far},std::pair{19.f,Tier::Far},
+        std::pair{8.f,Tier::Mid},std::pair{2.f,Tier::Near}};
+    auto tier=Tier::Near;
+    for(const auto& [position,wanted]:approach) {
+        tier=select(position,tier);
+        check(tier==wanted,"room entry, retreat and repeat approach keep the tier through hysteresis bands");
+    }
+    check(SelectBellwetherFurnitureDetail(100.f,108.f,Tier::Far)==Tier::Near,
+          "the full interior perimeter selects original furniture");
     if(result) {
         if(argc==2) {
+            auto base=before;
+            auto baseSupport=originalTerrain;
+            horde::scene::assets::StaticMeshAsset furniture;
+            const bool isolated=AppendBellwetherShell(root,base,baseSupport,error,
+                nullptr,nullptr,nullptr,nullptr,Tier::Near,&furniture);
+            if(!isolated)std::cerr<<error<<'\n';
+            check(isolated && base.indices.size()+kBellwetherFurnitureTriangles.front()*3==world.indices.size() &&
+                  furniture.materials.size()==1 && furniture.primitives.size()==kBellwetherFurnitureTriangles.size() &&
+                  baseSupport->RetainedBytes()==support->RetainedBytes(),
+                  "staging tiers separates the original triangles once and preserves authored collision");
+            if(isolated && furniture.primitives.size()==kBellwetherFurnitureTriangles.size())
+                for(std::size_t lod=0;lod<furniture.primitives.size();++lod)
+                    check(furniture.primitives[lod].indexCount==kBellwetherFurnitureTriangles[lod]*3,
+                          "each isolated tier owns exactly its admitted triangles");
             check(CheckTavernDetailCandidates(argv[1],world),
                   "source-review detail candidates match the tavern registration, apertures and furniture levels");
             for(const auto detail:{BellwetherFurnitureDetail::Mid,BellwetherFurnitureDetail::Far}) {

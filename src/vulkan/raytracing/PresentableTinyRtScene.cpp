@@ -633,6 +633,10 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waysideCoverBlas_ = std::exchange(other.waysideCoverBlas_, AccelerationStructure{});
     waysideRegisterBlas_ = std::exchange(other.waysideRegisterBlas_, AccelerationStructure{});
     tavernDoorBlas_ = std::exchange(other.tavernDoorBlas_, AccelerationStructure{});
+    bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
+    bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
+    bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
+    activeBellwetherFurnitureDetail_=std::exchange(other.activeBellwetherFurnitureDetail_,horde::scene::BellwetherFurnitureDetail::Near);
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
@@ -1766,6 +1770,8 @@ void PresentableTinyRtScene::Destroy()
         waysideCoverBlas_ = {};
         waysideRegisterBlas_ = {};
         tavernDoorBlas_ = {};
+        bellwetherFurnitureBlas_={};
+        bellwetherFurnitureAsset_={};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
         roadStoneAsset_ = {};
@@ -1825,6 +1831,8 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waysideCoverBlas_);
     DestroyAccelerationStructure(waysideRegisterBlas_);
     DestroyAccelerationStructure(tavernDoorBlas_);
+    for(auto& owner:bellwetherFurnitureBlas_)DestroyAccelerationStructure(owner);
+    bellwetherFurnitureAsset_={};
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -2017,6 +2025,8 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
              &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
+    for(const auto& owner:bellwetherFurnitureBlas_)
+        append(result.bottomLevelAccelerationStructures,owner.handle);
     for (const auto& resident : chapterResidents_)
         append(result.bottomLevelAccelerationStructures, resident.blas.handle);
     for (std::size_t bucket = 0u;
@@ -2086,6 +2096,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     {
         accumulateBlas(*blas);
     }
+    for(const auto& owner:bellwetherFurnitureBlas_)accumulateBlas(owner);
     for (const auto& resident : chapterResidents_) {
         accumulateBlas(resident.blas);
         AccumulateRtGpuBuffer(inventory, resident.scratch);
@@ -3515,7 +3526,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             return false;
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
                 &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_, &tavernDoorAsset_,
-                bellwetherFurnitureDetail_))
+                bellwetherFurnitureDetail_,bellwetherFurnitureTransitions_ ? &bellwetherFurnitureAsset_ : nullptr))
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
@@ -3601,6 +3612,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
 #endif
     }
+    if(bellwetherFurnitureTransitions_ &&
+       (bellwetherFurnitureAsset_.primitives.size()!=horde::scene::kBellwetherFurnitureTriangles.size() ||
+        HORDE_RT_REGION_PAGE_PROTOTYPE)) {
+        diagnostic="Bellwether furniture transitions require the isolated authored chapter profile.";return false;
+    }
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
     if (!SelectLanternGeometryForQuality(
@@ -3631,6 +3647,9 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         chapterActorReady_ = true;
     }
     if (!LoadChapterResidents(diagnostic)) return false;
+    if(bellwetherFurnitureTransitions_ && !viewmodelAvailable_) {
+        diagnostic="Bellwether furniture transitions require a modelled chapter player.";return false;
+    }
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
     // Pin the validated full CPU source once during heavy startup. Candidate
     // reconstruction can then copy in bounded turns without rescanning meshes
@@ -5562,14 +5581,19 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const std::uint32_t instanceCustomIndex,
         std::vector<VkAccelerationStructureGeometryKHR>& geometries,
         std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
-        std::vector<std::uint32_t>& primitiveCounts) {
+        std::vector<std::uint32_t>& primitiveCounts,
+        std::optional<std::uint32_t> onePrimitive = {}) {
         const RtInstanceMetadata instance =
             staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
+        if(onePrimitive && *onePrimitive>=instance.primitiveCount) {
+            diagnostic="Static RT BLAS detail range is out of bounds.";return false;
+        }
         const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
         const auto& materialMetadata = staticMeshSlot_.Materials();
         const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
         const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
-        for (std::uint32_t localIndex = 0u; localIndex < instance.primitiveCount; ++localIndex)
+        const auto end=onePrimitive ? *onePrimitive+1u : instance.primitiveCount;
+        for (std::uint32_t localIndex = onePrimitive.value_or(0u); localIndex < end; ++localIndex)
         {
             const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
             const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
@@ -5627,12 +5651,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const char* label,
         AccelerationStructure& accelerationStructure,
         const bool productionProp = false,
-        Buffer* retainedUpdateScratch = nullptr) {
+        Buffer* retainedUpdateScratch = nullptr, std::optional<std::uint32_t> onePrimitive = {}) {
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
         std::vector<std::uint32_t> primitiveCounts;
         if (!appendStaticGeometries(
-                instanceCustomIndex, geometries, ranges, primitiveCounts))
+                instanceCustomIndex, geometries, ranges, primitiveCounts, onePrimitive))
             return false;
         VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
             VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
@@ -5906,6 +5930,11 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!tavernDoorAsset_.primitives.empty() && !buildRegisteredStaticBlas(kTavernDoorMetadataIndex,
             "Bellwether tavern door", tavernDoorBlas_, true)))
         return false;
+    if(bellwetherFurnitureTransitions_) {
+        for(std::uint32_t tier=0;tier<bellwetherFurnitureBlas_.size();++tier)
+            if(!buildRegisteredStaticBlas(kBellwetherFurnitureLane,"Bellwether furniture",
+                bellwetherFurnitureBlas_[tier],true,nullptr,tier))return false;
+    }
     if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
         healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
         diagnostic = "Joint warning/flask BLAS owners are unavailable before TLAS construction.";
@@ -6428,6 +6457,10 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !PrepareChapterResidents({}, std::span(instances).subspan(tlasInstanceCount_,
             chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
     tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
+    if(bellwetherFurnitureTransitions_) {
+        activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
+    }
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -7237,6 +7270,16 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
     diagnostic.clear();
     timing.succeeded = true;
     return true;
+}
+
+void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR& instance,
+    horde::scene::BellwetherFurnitureDetail detail) const noexcept {
+    instance={};
+    instance.transform={{{1,0,0,0},{0,1,0,0},{0,0,1,0}}};
+    instance.instanceCustomIndex=kBellwetherFurnitureLane;
+    instance.mask=0x01u;
+    instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference=bellwetherFurnitureBlas_[static_cast<std::size_t>(detail)].address;
 }
 
 void PresentableTinyRtScene::ApplyGlassFixtureVisibility(
@@ -8754,6 +8797,22 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
     if (!chapterWindowVisible)
         frameInstanceMetadata[kChapterWindowMetadataIndex].flags = 0u;
+    if(bellwetherFurnitureTransitions_) {
+        const auto usesFurnitureLane=[](const auto& instance) {
+            return instance.mask && instance.instanceCustomIndex==kBellwetherFurnitureLane;
+        };
+        if(effectivePlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel || instances[kBellwetherFurnitureLane].mask ||
+           std::any_of(instances.begin(),instances.begin()+tlasInstanceCount_,usesFurnitureLane)) {
+            diagnostic="Bellwether furniture cannot overwrite a live player lane.";return false;
+        }
+        activeBellwetherFurnitureDetail_=horde::scene::SelectBellwetherFurnitureDetail(
+            frame.cameraX,frame.cameraZ,activeBellwetherFurnitureDetail_);
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
+        auto& furniture=frameInstanceMetadata[kBellwetherFurnitureLane];
+        furniture=staticMeshSlot_.InstanceMetadata()[kBellwetherFurnitureLane];
+        furniture.primitiveBase+=static_cast<std::uint32_t>(activeBellwetherFurnitureDetail_);
+        furniture.primitiveCount=1u;
+    }
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable framePageTable;

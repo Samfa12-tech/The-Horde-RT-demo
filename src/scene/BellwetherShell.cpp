@@ -30,19 +30,23 @@ bool LoadFurniture(const std::filesystem::path& directory,std::size_t level,Stat
     return true;
 }
 
-bool SubstituteFurniture(const std::filesystem::path& root,StaticMeshAsset& source,
-                         BellwetherFurnitureDetail detail,std::string& diagnostic) {
+bool PrepareFurnitureGeometry(const std::filesystem::path& root,StaticMeshAsset& source,
+                              BellwetherFurnitureDetail detail,StaticMeshAsset* isolated,
+                              std::string& diagnostic) {
     const auto level=static_cast<std::size_t>(detail);
     const auto directory=root/"models/world/source/bellwether-tavern-lods-v1";
     StaticMeshAsset original,replacement;
     if(level>=kBellwetherFurnitureTriangles.size()) {
         diagnostic="Unknown Bellwether furniture detail level.";return false;
     }
-    if(!LoadFurniture(directory,0,original,diagnostic) || !LoadFurniture(directory,level,replacement,diagnostic))return false;
-    if(replacement.bounds.minimum!=original.bounds.minimum || replacement.bounds.maximum!=original.bounds.maximum ||
-       replacement.vertices.size()>=original.vertices.size()) {
+    if(!LoadFurniture(directory,0,original,diagnostic))return false;
+    const auto loadLower=[&](std::size_t tier, StaticMeshAsset& mesh) {
+        if(!LoadFurniture(directory,tier,mesh,diagnostic))return false;
+        if(mesh.bounds.minimum==original.bounds.minimum && mesh.bounds.maximum==original.bounds.maximum &&
+           mesh.vertices.size()<original.vertices.size())return true;
         diagnostic="Bellwether lower furniture detail must preserve bounds and reduce geometry.";return false;
-    }
+    };
+    if(!isolated && !loadLower(level,replacement))return false;
     const auto isTimber=[&](const auto& primitive){return source.materials[primitive.materialIndex].name==kTavernTimber;};
     const auto timber=std::find_if(source.primitives.begin(),source.primitives.end(),isTimber);
     if(timber==source.primitives.end() || std::find_if(std::next(timber),source.primitives.end(),isTimber)!=source.primitives.end()) {
@@ -51,6 +55,16 @@ bool SubstituteFurniture(const std::filesystem::path& root,StaticMeshAsset& sour
     std::map<assets::WorldTriangleKey,std::size_t> removable;
     for(std::size_t index=0;index<original.indices.size();index+=3)
         ++removable[assets::KeyWorldTriangle(original,original.primitives.front(),index)];
+
+    StaticMeshAsset tiers;
+    if(isolated) {
+        tiers.materials.push_back(source.materials[timber->materialIndex]);
+        tiers.nodeTransforms=original.nodeTransforms;
+        tiers.bounds=original.bounds;
+        auto near=original.primitives.front();
+        near.indexCount=0;
+        tiers.primitives.push_back(near);
+    }
 
     auto primitives=source.primitives;
     std::vector<assets::StaticRtVertex> vertices;
@@ -71,30 +85,52 @@ bool SubstituteFurniture(const std::filesystem::path& root,StaticMeshAsset& sour
             continue;
         }
         std::vector<std::uint32_t> remap(vertexEnd-before.vertexOffset,UINT32_MAX);
+        std::vector<std::uint32_t> nearRemap(isolated ? remap.size() : 0,UINT32_MAX);
+        const auto appendTriangle=[&](std::size_t i,auto& map,auto& destVertices,auto& destIndices,
+                                      std::uint32_t vertexBase) {
+            for(std::size_t corner=0;corner<3;++corner) {
+                const auto oldIndex=source.indices[before.indexOffset+i+corner];
+                auto& newIndex=map[oldIndex];
+                if(newIndex==UINT32_MAX) {
+                    newIndex=static_cast<std::uint32_t>(destVertices.size())-vertexBase;
+                    destVertices.push_back(source.vertices[before.vertexOffset+oldIndex]);
+                }
+                destIndices.push_back(newIndex);
+            }
+        };
         for(std::size_t index=0;index<before.indexCount;index+=3) {
             const auto found=removable.find(assets::KeyWorldTriangle(source,before,index));
             if(found!=removable.end() && found->second) {
                 --found->second;
                 ++removed;
-                continue;
-            }
-            for(std::size_t corner=0;corner<3;++corner) {
-                const auto oldIndex=source.indices[before.indexOffset+index+corner];
-                auto& newIndex=remap[oldIndex];
-                if(newIndex==UINT32_MAX) {
-                    newIndex=static_cast<std::uint32_t>(vertices.size())-after.vertexOffset;
-                    vertices.push_back(source.vertices[before.vertexOffset+oldIndex]);
-                }
-                indices.push_back(newIndex);
+                if(isolated)appendTriangle(index,nearRemap,tiers.vertices,tiers.indices,0u);
+            }else {
+                appendTriangle(index,remap,vertices,indices,after.vertexOffset);
             }
         }
-        const auto replacementBase=static_cast<std::uint32_t>(vertices.size())-after.vertexOffset;
-        vertices.insert(vertices.end(),replacement.vertices.begin(),replacement.vertices.end());
-        for(const auto index:replacement.indices)indices.push_back(replacementBase+index);
+        if(!isolated) {
+            const auto replacementBase=static_cast<std::uint32_t>(vertices.size())-after.vertexOffset;
+            vertices.insert(vertices.end(),replacement.vertices.begin(),replacement.vertices.end());
+            for(const auto index:replacement.indices)indices.push_back(replacementBase+index);
+        }
         after.indexCount=static_cast<std::uint32_t>(indices.size())-after.indexOffset;
     }
     if(removed!=kBellwetherFurnitureTriangles.front()) {
         diagnostic="Bellwether near furniture no longer matches the authored timber range.";return false;
+    }
+    if(isolated) {
+        tiers.primitives.front().indexCount=static_cast<std::uint32_t>(tiers.indices.size());
+        for(std::size_t tier=1;tier<kBellwetherFurnitureTriangles.size();++tier) {
+            StaticMeshAsset lower;
+            if(!loadLower(tier,lower))return false;
+            auto primitive=lower.primitives.front();
+            primitive.vertexOffset=static_cast<std::uint32_t>(tiers.vertices.size());
+            primitive.indexOffset=static_cast<std::uint32_t>(tiers.indices.size());
+            tiers.primitives.push_back(primitive);
+            tiers.vertices.insert(tiers.vertices.end(),lower.vertices.begin(),lower.vertices.end());
+            tiers.indices.insert(tiers.indices.end(),lower.indices.begin(),lower.indices.end());
+        }
+        *isolated=std::move(tiers);
     }
     source.primitives=std::move(primitives);
     source.vertices=std::move(vertices);
@@ -103,11 +139,27 @@ bool SubstituteFurniture(const std::filesystem::path& root,StaticMeshAsset& sour
 }
 }
 
+BellwetherFurnitureDetail SelectBellwetherFurnitureDetail(
+    float x,float z,BellwetherFurnitureDetail current) noexcept {
+    using Detail=BellwetherFurnitureDetail;
+    if(!std::isfinite(x) || !std::isfinite(z))return Detail::Near;
+    const auto& low=gameplay::bellwether::kRoomMin;
+    const auto& high=gameplay::bellwether::kRoomMax;
+    const float dx=x-std::clamp(x,low[0],high[0]);
+    const float dz=z-std::clamp(z,low[2],high[2]);
+    const float distanceSquared=dx*dx+dz*dz;
+    // A full near perimeter protects both faces of the window and the entrance.
+    const float nearRadius=current==Detail::Near ? 6.f : 4.f;
+    const float midRadius=current==Detail::Far ? 16.f : 20.f;
+    if(distanceSquared<=nearRadius*nearRadius)return Detail::Near;
+    return distanceSquared<=midRadius*midRadius ? Detail::Mid : Detail::Far;
+}
+
 bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMeshAsset& world,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     std::string& diagnostic, assets::StaticMeshAsset* glazing, assets::StaticMeshAsset* archiveCover,
     assets::StaticMeshAsset* roadRegister, assets::StaticMeshAsset* southDoor,
-    BellwetherFurnitureDetail furnitureDetail) {
+    BellwetherFurnitureDetail furnitureDetail, StaticMeshAsset* isolatedFurnitureTiers) {
     if(!support) {
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
@@ -231,7 +283,9 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
 
     // Collision comes from the original geometry. The fixed review tier is
     // selected before the static render owner builds its buffers and BLAS.
-    if(furnitureDetail!=BellwetherFurnitureDetail::Near && !SubstituteFurniture(root,source,furnitureDetail,diagnostic))
+    StaticMeshAsset furniture;
+    if((isolatedFurnitureTiers || furnitureDetail!=BellwetherFurnitureDetail::Near) &&
+       !PrepareFurnitureGeometry(root,source,furnitureDetail,isolatedFurnitureTiers ? &furniture : nullptr,diagnostic))
         return false;
 
     auto staged=world;
@@ -252,6 +306,12 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     }
     world=std::move(staged);
     support=std::move(prepared);
+    if(isolatedFurnitureTiers) {
+        const auto timber=std::find_if(source.materials.begin(),source.materials.end(),
+            [](const auto& material){return material.name==kTavernTimber;});
+        furniture.materials.front()=world.materials[mappedRows[timber-source.materials.begin()]];
+        *isolatedFurnitureTiers=std::move(furniture);
+    }
     if(glazing)*glazing=std::move(pane);
     if(archiveCover)*archiveCover=std::move(cover);
     if(roadRegister)*roadRegister=std::move(ledger);

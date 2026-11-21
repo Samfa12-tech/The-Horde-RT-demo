@@ -55,7 +55,7 @@ The [1.8 hub plan](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16
 
 Test approach, street/interior thresholds, windows and secondary views, turns/backtracking, detail switches and repeat visits. Keep coarse buildings and relevant shadow/light contributors while detailed interiors prepare or retire. Closed buildings must read honestly as closed. Concrete playable 1.8 implementation still follows accepted 1.7.
 
-The [B01 source review](../../../assets/models/world/source/bellwether-tavern-lods-v1/README.md) has one shared tavern structure and three registered furniture exports. Native import confirmed the original positions, clear south door and window apertures, and matching seat and table heights. Windows Debug now admits each fixed furniture tier to the existing chapter RT geometry and preserves the authored collision. Runtime switching, ray relevance and residency validation remain open.
+The [B01 source review](../../../assets/models/world/source/bellwether-tavern-lods-v1/README.md) has one shared tavern structure and three registered furniture exports. Native import confirmed the original positions, clear south door and window apertures, and matching seat and table heights. Windows Debug can also select a furniture tier per frame using distance hysteresis. One RT instance uses the selected geometry while all tiers stay resident. The repeated gameplay route, ray relevance and resource retirement remain open.
 
 ## NPC capacity: prove reusable three-character capacity first
 

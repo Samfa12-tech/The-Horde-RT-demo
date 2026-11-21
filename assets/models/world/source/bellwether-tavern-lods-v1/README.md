@@ -25,6 +25,14 @@ The window view uses `bellwether-tavern-window`. The staffed view uses `bellweth
 
 Twelve presented Windows frames at 960 x 540 on an RTX 5050 Laptop GPU used matched cameras, shader bundles and presentation settings within each pair. In the staffed room, 386 pixels changed at lod1 on each backend and 716 to 717 pixels changed at lod2. At the south approach, the far tier changed 132 pixels on each backend, confined to the visible room. The RayTracingPipeline window pair with Glass On was pixel-identical. These are full-frame comparisons. Individual primary, shadow and reflection contributions still need dedicated validation.
 
-Runtime switching still needs visibility and residency rules that preserve interior contributors through the door and glass, including shadows and reflections, and allow a player to turn back before a transition completes. Fixed-tier payload totals do not measure resident memory, transitions or mobile frame rate.
+## Automatic selection
+
+Replace the fixed detail flag with `--bellwether-furniture-transitions` for a hidden Windows Debug capture. The loader separates the exact original furniture from the town mesh after it creates authored collision. Each tier has an immutable BLAS. Every frame publishes one tier through the chapter's spare instance and the original timber material, while the shared architecture, door, window and lights keep their owners.
+
+Selection uses horizontal distance to the full room bounds. Near enters at 4 m and stays active through 6 m. Far enters beyond 20 m and stays active until 16 m. Mid fills the band in between. This protects the immediate doorway and both sides of the window, and gives a turning player a stable tier near each boundary. All three tiers stay resident for this experiment. The south-approach capture reported 58,800 additional vertex and index bytes and 34,816 additional BLAS bytes compared with the original merged geometry.
+
+Eight Windows frames presented on the two RT backends. Both chose far at the church waymarker, mid at the south approach, and near in the staffed room and at the window. Compared with fixed near, both staffed-room images and the matched pipeline window image with Glass On were pixel-identical. The mid tier changed 52 pixels at the approach on each backend, all within the visible room. The native host test exercised both hysteresis bands on entry, retreat and repeat approach.
+
+The repeated gameplay route, per-ray relevance, safe resource retirement and phone budgets remain acceptance gates.
 
 The [Blender recipe](../../../../../tools/author-bellwether-tavern-lods.py) takes the repository root and a new output directory. The existing `horde_rt_bellwether_shell_tests` executable accepts that output directory as an optional argument to run the candidate checks alongside its ordinary town tests.

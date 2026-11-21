@@ -587,6 +587,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!tavernDoorAsset_.primitives.empty())
         registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
+    if(!bellwetherFurnitureAsset_.primitives.empty())
+        registrations.push_back({kBellwetherFurnitureLane,0x42303146u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&bellwetherFurnitureAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -616,6 +619,16 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
                 return false;
             }
         if (!out.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
+        if(!bellwetherFurnitureAsset_.primitives.empty()) {
+            RtImmutableMaterialAlias furniture;
+            const auto& metadata=out.InstanceMetadata()[kBellwetherFurnitureLane];
+            furniture.consumer=out.PrimitiveMetadata()[metadata.primitiveBase].materialIndex;
+            if(!materialRow(collapseStaticAsset_,kCollapseInstanceIndex,
+                bellwetherFurnitureAsset_.materials.front().name.c_str(),furniture.provider)) {
+                diagnostic="Bellwether furniture requires the existing world timber finish.";return false;
+            }
+            if(!out.ShareImmutableMaterialRows(std::span{&furniture,1u},diagnostic))return false;
+        }
     }
     return true;
 }
