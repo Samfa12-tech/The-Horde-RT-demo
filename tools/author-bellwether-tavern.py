@@ -1,10 +1,11 @@
 """Author the first playable B01 interior from the preserved Bellwether master.
 
-blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT
+blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT [OUTPUT_WORLD]
 The editable and runtime output directories must both be new.
 """
 import hashlib
 import json
+import math
 from pathlib import Path
 import sys
 
@@ -14,12 +15,16 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 
-ROOT = Path(sys.argv[sys.argv.index("--") + 1]).resolve()
+args = sys.argv[sys.argv.index("--") + 1:]
+if len(args) not in (1, 2):
+    raise RuntimeError("Expected ROOT and an optional OUTPUT_WORLD.")
+ROOT = Path(args[0]).resolve()
 WORLD = ROOT / "assets/models/world"
 MASTER = WORLD / "source/bellwether-shell-v4/bellwether-shell-v4.blend"
 TERRAIN = WORLD / "runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb"
-OUTPUT = WORLD / "source/bellwether-tavern-v1"
-RUNTIME = WORLD / "runtime/bellwether-tavern-v1"
+DESTINATION = Path(args[1]).resolve() if len(args) == 2 else WORLD
+OUTPUT = DESTINATION / "source/bellwether-tavern-v1"
+RUNTIME = DESTINATION / "runtime/bellwether-tavern-v1"
 if OUTPUT.exists() or RUNTIME.exists():
     raise RuntimeError("Preserve the previous source and runtime outputs.")
 
@@ -65,10 +70,10 @@ def ground(x, z):
     return hit.z
 
 
-def mesh(name, vertices, faces, group):
+def mesh(name, vertices, faces, group, material=stone):
     data = bpy.data.meshes.new(name)
     data.from_pydata([(x, -z, y) for x, y, z in vertices], [], faces)
-    data.materials.append(stone)
+    data.materials.append(material)
     data.update()
     uv = data.uv_layers.new(name="metre_projection")
     for face in data.polygons:
@@ -80,14 +85,15 @@ def mesh(name, vertices, faces, group):
     obj = bpy.data.objects.new(name, data)
     bpy.context.collection.objects.link(obj)
     group.append(obj)
+    return obj
 
 
-def box(name, west, east, north, south, bottom, top):
+def box(name, west, east, north, south, bottom, top, material=stone):
     lower = [(west, bottom, north), (east, bottom, north),
              (east, bottom, south), (west, bottom, south)]
     upper = [(x, top, z) for x, _, z in lower]
-    mesh(name, lower + upper, [(0, 1, 2, 3), (4, 5, 1, 0), (5, 6, 2, 1),
-                               (6, 7, 3, 2), (7, 4, 0, 3), (7, 6, 5, 4)], solids)
+    return mesh(name, lower + upper, [(0, 1, 2, 3), (4, 5, 1, 0), (5, 6, 2, 1),
+                                      (6, 7, 3, 2), (7, 4, 0, 3), (7, 6, 5, 4)], solids, material)
 
 
 west = tavern["engineX"] - tavern["width"] / 2
@@ -157,6 +163,95 @@ box("B01_hearth_lintel", hearth_back, hearth_front + .10,
     hearth_north, hearth_south, floor + 1.35, floor + 1.75)
 
 
+def opaque_finish(name, color, roughness):
+    material = bpy.data.materials.new(name)
+    material.diffuse_color = (*color, 1)
+    material.use_nodes = True
+    principled = material.node_tree.nodes.get("Principled BSDF")
+    principled.inputs["Base Color"].default_value = material.diffuse_color
+    principled.inputs["Metallic"].default_value = 0
+    principled.inputs["Roughness"].default_value = roughness
+    return material
+
+
+# Native admission maps these textureless finishes onto two existing opaque
+# material rows. Edge highlights and plank seams distinguish the timber.
+oak = opaque_finish("HordeTavernTimber", (.25, .115, .065), .84)
+ember = opaque_finish("HordeHearthChar", (.025, .019, .013), .95)
+chair_x, chair_z, chair_top = 82.0, 107.30, .49
+table_x, table_z, table_top = 82.52, 106.13, .75
+chair_depth, chair_board_x = .41, chair_x - .10
+seat_mark = (chair_x, floor + chair_top, chair_z)
+approach_mark = (82.98, floor, chair_z)
+turn_mark = (84.30, floor, chair_z)
+talk_mark = (84.52, floor, 107.68)
+
+
+def joined_timber(name, x, z, w, d, low, high, bevel=.007):
+    obj = box(name, x - w / 2, x + w / 2, z - d / 2, z + d / 2, floor + low, floor + high, oak)
+    bpy.context.view_layer.objects.active = obj
+    modifier = obj.modifiers.new("Hand-rounded edges", "BEVEL")
+    modifier.width = bevel
+    modifier.segments = 1
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+
+
+# The chair faces east. It can remain a fixed environmental prop after Kit
+# settles. The seat has no gap under the contact point, and all four feet
+# touch the same exported room floor used by the gameplay motor.
+for side in (-1, 1):
+    z = chair_z + side * .24
+    joined_timber(f"B01_chair_front_leg_{side}", chair_x + .057, z, .08, .08, 0, .45)
+    joined_timber(f"B01_chair_back_post_{side}", chair_x - .24, z, .088, .09, 0, 1.09)
+    joined_timber(f"B01_chair_side_stretcher_{side}", chair_x - .092, z, .29, .047, .19, .245)
+for plank in (-1, 0, 1):
+    joined_timber(f"B01_chair_seat_{plank}", chair_board_x, chair_z + plank * .198,
+                  chair_depth, .196, .43, chair_top, .004)
+joined_timber("B01_chair_back_lower", chair_x - .245, chair_z, .062, .49, .68, .795)
+joined_timber("B01_chair_back_upper", chair_x - .245, chair_z, .062, .542, .89, 1.045)
+joined_timber("B01_chair_front_apron", chair_x + .049, chair_z, .056, .49, .35, .438)
+
+for side in (-1, 1):
+    x = table_x + side * .375
+    for corner in (-1, 1):
+        z = table_z + corner * .210
+        joined_timber(f"B01_table_leg_{side}_{corner}", x, z, .09, .09, 0, .70)
+    joined_timber(f"B01_table_end_apron_{side}", x, table_z, .06, .44, .59, .704)
+    joined_timber(f"B01_table_long_apron_{side}", table_x, table_z + side * .210, .76, .06, .59, .704)
+for plank in (-1, 0, 1):
+    joined_timber(f"B01_table_top_{plank}", table_x, table_z + plank * .205, 1.02, .203, .695, table_top)
+
+
+def billet(name, x, z, offset_y, heading, length, radius):
+    direction_x, direction_z = math.cos(heading), math.sin(heading)
+    ring = 7
+    vertices = []
+    for end in (-1, 1):
+        for side in range(ring):
+            angle = math.tau * side / ring
+            ridge = radius * (1 if side % 2 == 0 else .9)
+            cross = math.sin(angle) * ridge
+            vertices.append((x + end * direction_x * length / 2 - direction_z * cross,
+                             floor + offset_y + math.cos(angle) * ridge,
+                             z + end * direction_z * length / 2 + direction_x * cross))
+    faces = [tuple(reversed(range(ring))), tuple(range(ring, ring * 2))]
+    for side in range(ring):
+        next_side = (side + 1) % ring
+        faces.append((side, next_side, ring + next_side, ring + side))
+    # Recalculate the closed stave's normals before projection/export.
+    obj = mesh(name, vertices, faces, solids, ember)
+    editable = bmesh.new()
+    editable.from_mesh(obj.data)
+    bmesh.ops.recalc_face_normals(editable, faces=list(editable.faces))
+    editable.to_mesh(obj.data)
+    editable.free()
+
+
+billet("B01_hearth_billet_front", 80.66, 109.74, .056, .18, .53, .057)
+billet("B01_hearth_billet_back", 80.53, 110.04, .055, -.23, .49, .057)
+billet("B01_hearth_billet_cross", 80.54, 109.89, .12, 1.43, .50, .047)
+
+
 def joined_copy(group, name):
     bpy.ops.object.select_all(action="DESELECT")
     copies = []
@@ -201,7 +296,8 @@ solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygon
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
 manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxIndices=(solid_triangles + walkable_triangles) * 3, maxPrimitives=3)
+manifest["budgets"].update(maxVertices=4900, maxIndices=(solid_triangles + walkable_triangles) * 3,
+                           maxPrimitives=5, maxMaterials=4)
 manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
 (RUNTIME / "asset.manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -210,6 +306,19 @@ receipt = dict(sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
                southDoor=[door_x, floor, south], clearDoorWidth=2.2, clearDoorHeight=2.65,
                rampToe=[door_x, toe_y, toe_z], rampWidth=3, highestGroundUnderFloor=highest_inside,
-               hearthMouth=[hearth_front, floor, (hearth_north + hearth_south) / 2])
+               hearthMouth=[hearth_front, floor, (hearth_north + hearth_south) / 2],
+               chairSeat=seat_mark, chairApproach=approach_mark, chairTurn=turn_mark,
+               chairSeatBoundsXZ=[chair_board_x - chair_depth / 2, chair_board_x + chair_depth / 2,
+                                  chair_z - .296, chair_z + .296],
+               tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark)
 (OUTPUT / "authoring-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+stage = ["// Generated by tools/author-bellwether-tavern.py. Engine coordinates in metres.",
+         "#pragma once", "#include <array>", "namespace horde::gameplay::bellwether {", ""]
+for name, mark in (("ChairSeat", seat_mark), ("ChairApproach", approach_mark), ("ChairTurn", turn_mark),
+                   ("TableTop", receipt["tableTop"]), ("Conversation", talk_mark)):
+    position = ", ".join(f"{coordinate:.6f}f" for coordinate in mark)
+    stage.append(f"inline constexpr std::array<float, 3> k{name}{{{{{position}}}}};")
+stage += ["", "inline constexpr float kChairFacingRadians=1.570796327f;", "}", ""]
+(OUTPUT / "staging.generated.h").write_text("\n".join(stage), encoding="utf-8", newline="\n")
 print(json.dumps(receipt))

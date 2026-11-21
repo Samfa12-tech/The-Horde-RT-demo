@@ -7,6 +7,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
 #include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
+#include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
@@ -1217,11 +1218,16 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(room.fireEmitterCount==room.fireEmitters.size() &&
           hearth.stableId==gameplay::effects::kBellwetherHearthEmitterId &&
           hearth.strength>0 && hearth.zone==gameplay::ShowcaseZone::Outside &&
-          floor.found && std::abs(kBellwetherHearthFlame[1]-floor.worldY-.12f)<.002f &&
+          floor.found && std::abs(kBellwetherHearthFlame[1]-floor.worldY-.18f)<.002f &&
           terrain->NonWalkableVolumeClear(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2],
               kBellwetherHearthLight[0],kBellwetherHearthLight[2],kBellwetherHearthFlame[1],
               kBellwetherHearthFlame[1]+hearth.height,hearth.radius),
           "the stationary fire fits inside the rendered hearth, over its imported floor");
+    using namespace gameplay::bellwether;
+    for(const auto& mark:{kChairTurn,kChairApproach,kConversation}) {
+        if(!walkTo({mark[0],mark[2]})) {Check(false,"the normal player motor reaches the staged seat and conversation");return;}
+    }
+    if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
     for(auto i=std::next(route.rbegin());i!=route.rend();++i) {
         if(!walkTo(*i)) {Check(false,"the player can return from the tavern to the same lookout");return;}
     }

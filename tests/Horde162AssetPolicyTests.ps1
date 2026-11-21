@@ -350,10 +350,10 @@ try {
         Require (@($windows | Where-Object {$_ -ceq $rock}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $rock}).Count -eq 1) 'Each exact rock payload is admitted once.'
     }
-    $townFiles=@('models/world/runtime/bellwether-shell-v4/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb')
-    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2 -and
-             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2) 'Both platforms admit only the two final closed town payloads.'
+    $townFiles=@('models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq 2 -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq 2) 'Both platforms admit only the two shared tavern payloads.'
     foreach($town in $townFiles) {
         Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'

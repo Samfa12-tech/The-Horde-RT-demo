@@ -212,7 +212,7 @@ inline constexpr std::array<DevelopmentCheckpoint, 120u> kDevelopmentCheckpoints
     {.id=321,.name="bellwether-tavern-hearth",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherTavernRoute.back().x,
      .cameraZ=traversal::kBellwetherTavernRoute.back().z,
-     .yaw=-1.09f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .yaw=-.79f,.pitch=-.27f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size()},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},

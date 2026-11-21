@@ -3,6 +3,7 @@
 #include "scene/assets/AssetManifest.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
+#include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <cstring>
 #include <cmath>
 #include <iostream>
@@ -11,7 +12,7 @@ int main() {
     bool ok=true;
     const auto check=[&](bool v,const char* m){if(!v){ok=false;std::cerr<<"FAIL: "<<m<<'\n';}};
     assets::StaticMeshAsset world;
-    for(const auto* name:{"MedievalWall02","TombEarthenware"}) {
+    for(const auto* name:{"MedievalWall02","TombEarthenware","TombCharredWick"}) {
         assets::StaticMaterial m;m.name=name;world.materials.push_back(m);
     }
     world.nodeTransforms.push_back({"identity",{{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}}});
@@ -34,7 +35,7 @@ int main() {
     if(result) {
         check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
             "the complete bounded town and tavern geometry is rendered");
-        check(world.materials.size()==2,"no texture layer or material row expansion");
+        check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");
         check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "rendered masonry stays solid while only the ramp and floor extend ground support");
@@ -48,6 +49,22 @@ int main() {
              !support->NonWalkableVolumeClear(southDoorX+1.5f,121.f,southDoorX+1.5f,118.8f,
                  after.worldY+.01f,after.worldY+1.8f,.24f),
              "the mapped south opening admits the capsule while the adjacent wall stays solid");
+        using namespace horde::gameplay::bellwether;
+        const auto exactHorizontalFace=[&](const auto& mark) {
+            constexpr float epsilon=.001f;
+            return !support->NonWalkableVolumeClear(mark[0],mark[2],mark[0],mark[2],
+                mark[1]-epsilon,mark[1]+epsilon,.025f) &&
+                support->NonWalkableVolumeClear(mark[0],mark[2],mark[0],mark[2],
+                mark[1]+epsilon,mark[1]+2*epsilon,.025f);
+        };
+        check(exactHorizontalFace(kChairSeat) && exactHorizontalFace(kTableTop) &&
+              std::abs(support->Query(kChairSeat[0],kChairSeat[2]).worldY-after.worldY)<.001f,
+            "the authored contact marks match the seat and table surfaces above the shared floor");
+        check(support->NonWalkableVolumeClear(kChairTurn[0],kChairTurn[2],kChairApproach[0],kChairApproach[2],
+                  after.worldY+.001f,after.worldY+1.8f,.24f) &&
+              !support->NonWalkableVolumeClear(kChairApproach[0],kChairApproach[2],kChairSeat[0],kChairSeat[2],
+                  after.worldY+.001f,after.worldY+1.8f,.24f),
+            "the real chair leaves a clear approach and blocks the standing player from walking through the seat");
         check(std::memcmp(world.vertices.data(),before.vertices.data(),before.vertices.size()*sizeof(v))==0,
             "accepted geometry prefix remains byte-identical");
         check(world.bounds.maximum[0]>120 && world.bounds.maximum[2]>170,
@@ -105,10 +122,10 @@ int main() {
                     double(a[2])*(double(b[0])*c[1]-double(b[1])*c[0]))/6;
             }
             if(world.nodeTransforms[p.nodeTransformIndex].name=="BellwetherSolid")
-                check(volume>1,"each solid town material family has outward native winding");
+                check(volume>.005,"each solid town material range has outward native winding");
         }
-        check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==2,
-            "town shares two existing world families after coalescing");
+        check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==3,
+            "town and furniture coalesce into the three existing opaque world families");
     }
     auto missing=before;missing.materials[1].name="Missing";
     auto fallback=originalTerrain;

@@ -7,7 +7,7 @@ namespace horde::gameplay::effects
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
-inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.59f,109.90f}};
+inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
 inline constexpr std::array<float,3> kBellwetherHearthLight{{80.77f,-8.17f,109.90f}};
 
 inline FireEmitterState MakeBellwetherHearthFireEmitter()

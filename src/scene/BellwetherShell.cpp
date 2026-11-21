@@ -13,27 +13,22 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         return node.name=="BellwetherSolid";})) {
         diagnostic="Bellwether is already admitted to this owner.";return false;
     }
-    constexpr std::array<const char*,2> families{{"MedievalWall02","TombEarthenware"}};
-    std::array<std::uint32_t,2> rows{};
-    for(std::size_t i=0;i<families.size();++i) {
-        const auto found=std::find_if(world.materials.begin(),world.materials.end(),
-            [&](const auto& m){return m.name==families[i];});
-        if(found==world.materials.end()) {diagnostic="Bellwether requires the existing admitted stone/clay rows.";return false;}
-        rows[i]=static_cast<std::uint32_t>(found-world.materials.begin());
-    }
+    constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
+    constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
     const auto dir=root/"models/world/runtime/bellwether-tavern-v1";
     assets::AssetManifest manifest;assets::StaticMeshAsset source;
     if(!assets::AssetManifest::Load(dir/"asset.manifest.json",manifest,diagnostic) ||
        !assets::StaticMeshAsset::Load(dir/"bellwether-tavern-v1.glb",manifest,source,diagnostic))return false;
-    if(source.primitives.size()!=3 || source.materials.size()!=2 ||
+    if(source.primitives.size()!=5 || source.materials.size()!=names.size() ||
        source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
        world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+source.primitives.size()>32 ||
        world.vertices.size()>UINT32_MAX-source.vertices.size() ||
        world.indices.size()>UINT32_MAX-source.indices.size()) {
         diagnostic="Bellwether lost its exact bounded native geometry.";return false;
     }
-    constexpr std::array<const char*,2> names{{"HordeTownStone","HordeTownRoofClay"}};
-    std::array<std::uint32_t,2> mappedRows{};
+    std::array<std::uint32_t,names.size()> mappedRows{};
+    std::array<bool,names.size()> seen{};
+    std::array<bool,names.size()> wood{};
     for(std::size_t i=0;i<names.size();++i) {
         const auto& m=source.materials[i];
         const auto named=std::find(names.begin(),names.end(),m.name);
@@ -42,10 +37,15 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
            m.emissiveFactor!=std::array<float,3>{}) {
             diagnostic="Bellwether source requests unadmitted material or light features.";return false;
         }
-        mappedRows[i]=rows[static_cast<std::size_t>(named-names.begin())];
-    }
-    if(mappedRows[0]==mappedRows[1]) {
-        diagnostic="Bellwether stone and clay require distinct admitted rows.";return false;
+        const auto index=static_cast<std::size_t>(named-names.begin());
+        const auto found=std::find_if(world.materials.begin(),world.materials.end(),
+            [&](const auto& material){return material.name==families[index];});
+        if(seen[index] || found==world.materials.end()) {
+            diagnostic="Bellwether requires each authored finish and its existing material row.";return false;
+        }
+        seen[index]=true;
+        mappedRows[i]=static_cast<std::uint32_t>(found-world.materials.begin());
+        wood[i]=index>=2;
     }
     using Surface=gameplay::simulation::TriangleSupportSurface;
     std::vector<Surface::Triangle> contact,ground;
@@ -59,7 +59,8 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         auto& triangles=name=="BellwetherWalkable"?ground:contact;
         for(std::size_t k=0;k<primitive.indexCount;k+=3) {
             Surface::Triangle triangle;
-            triangle.surface=gameplay::simulation::SupportSurface::Stone;
+            triangle.surface=wood[primitive.materialIndex] ? gameplay::simulation::SupportSurface::Wood :
+                gameplay::simulation::SupportSurface::Stone;
             for(std::size_t corner=0;corner<3;++corner) {
                 const auto local=source.indices[primitive.indexOffset+k+corner];
                 const auto& position=source.vertices[primitive.vertexOffset+local].position;

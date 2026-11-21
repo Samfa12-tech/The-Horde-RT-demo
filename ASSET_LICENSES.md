@@ -87,9 +87,11 @@ nine closed footprints; no building interior, new light or texture is admitted. 
 does not apply the code licence to third-party texture/audio/model sources.
 
 The 1.8 runtime candidate in `assets/models/world/runtime/bellwether-tavern-v1/`
-is original Horde geometry derived from the editable v4 master. The same two
-shared material/texture owners supply the south entrance, ramp, room and
-hearth. The original master and export stay in the source tree. The derivative
+is original Horde geometry derived from the editable v4 master. The room adds
+an original bevelled timber chair and side table with three charred hearth
+billets. The original untextured furniture colour reuses the existing
+TombEarthenware roughness and colour row. The billets reuse TombCharredWick.
+MedievalWall02 and TombEarthenware still supply the architecture. The editable
 master, recipe and hashes are retained with the tavern authoring records.
 
 ## Generic closed dielectric fixture
@@ -494,6 +496,11 @@ authoring is by Samfa12/Codex using Blender. The source above and its entitlemen
 remain the provenance; no new provider generation or blanket MIT/CC0 claim.
 This editable turn study and its studio previews are unadmitted and excluded from
 runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
+
+The editable `assets/models/characters/source/kit-hearth-sit-study-v1/` take uses
+the same owner-approved source rig and original Horde tavern furniture.
+Blender motion authoring is by Samfa12/Codex. The take is source-only and
+excluded from runtime packages. The receipt pins both original inputs.
 
 ### Kit same-rig turn runtime promotion (24 October 2026)
 
