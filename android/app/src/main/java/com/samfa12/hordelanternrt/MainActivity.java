@@ -7314,6 +7314,7 @@ public class MainActivity extends Activity {
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
+            case "bellwether-church-approach": return 334;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7659,7 +7660,9 @@ public class MainActivity extends Activity {
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
             case 331:
-            case 332: return new float[]{0.0f, -0.12f};
+            case 332:
+            case 333: return new float[]{0.0f, -0.12f};
+            case 334: return new float[]{-1.57f, -0.24f};
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};

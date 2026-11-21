@@ -358,6 +358,55 @@ for index, letter in enumerate("CHURCH"):
 mesh("B02_church_arrow_letters", letter_vertices, letter_faces, solids, oak)
 
 
+# The mapped church path crosses a steep diagonal terrain band around the
+# southwest corner of B02. A stone
+# approach bridges the two faces of the cut, with buried toes at both ends.
+church_sections = [
+    (62.30, 65.20, None), (62.70, 67.20, -3.08), (63.00, 68.70, -2.84),
+    (63.40, 70.70, -2.77), (63.90, 73.20, -3.40), (64.30, 75.20, -3.90),
+    (66.50, 75.20, -3.48), (69.60, 75.20, -2.58), (71.50, 75.20, -2.54),
+    (73.50, 75.20, None),
+]
+church_half_width = 1.1
+church_centres = [Vector((x, z)) for x, z, _ in church_sections]
+church_normals = []
+for a, b in zip(church_centres, church_centres[1:]):
+    dx, dz = (b - a).normalized()
+    church_normals.append(Vector((-dz, dx)))
+church_top = []
+church_base = []
+for index, (centre, (_, _, height)) in enumerate(zip(church_centres, church_sections)):
+    if index == 0:
+        normal = church_normals[0]
+    elif index == len(church_sections) - 1:
+        normal = church_normals[-1]
+    else:
+        incoming, outgoing = church_normals[index - 1:index + 1]
+        normal = (incoming + outgoing) / (1 + incoming.dot(outgoing))
+    offset = normal * church_half_width
+    edges = (centre - offset, centre + offset)
+    heights = [ground(*point) for point in edges]
+    if height is None:
+        height = min(heights + [ground(*centre)]) - .035
+    for (x, z), terrain_y in zip(edges, heights):
+        church_top.append((x, height, z))
+        church_base.append((x, min(height, terrain_y) - .20, z))
+church_deck = []
+church_walls = []
+offset = len(church_top)
+for index in range(len(church_sections) - 1):
+    left, right = 2 * index, 2 * index + 1
+    next_left, next_right = left + 2, right + 2
+    church_deck.append((left, right, next_right, next_left))
+    church_walls.extend(((next_left, left, left + offset, next_left + offset),
+                         (right, next_right, next_right + offset, right + offset)))
+church_walls.extend(((0, 1, 1 + offset, offset),
+                     (offset - 1, offset - 2, 2 * offset - 2, 2 * offset - 1)))
+mesh("B02_church_approach_deck", church_top, church_deck, walkable)
+mesh("B02_church_approach_retaining", church_top + church_base,
+     [tuple(reversed(face)) for face in church_walls], solids)
+
+
 # B09 keeps its mapped footprint and distant silhouette. The old archive
 # compartment sits outside on the reachable south slope below the shell.
 shrine = next(building for building in parent["buildings"] if building["id"] == "B09")
@@ -564,6 +613,7 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
                tableCandleFlame=candle_flame, tableCandleLight=candle_light,
                churchWaymarker=[sign_x,sign_y,sign_z],
+               churchApproach=dict(width=2*church_half_width, sections=church_sections),
                waysideArchive=[shrine_mechanism, shrine_hinge, shrine_view],
                keeperRoute=[keeper_door, keeper_aisle, keeper_hearth],
                keeperDoorYaw=keeper_door_yaw, keeperHearthYaw=keeper_hearth_yaw)

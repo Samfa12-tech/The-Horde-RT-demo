@@ -1436,6 +1436,11 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     Check(firstCaptionAtChair && hearthSpoken==std::vector{Line::TavernSit,Line::TavernLimit,Line::TavernWork} &&
           game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->dialogue.hearthLinesResolved==3,
           "the real route delivers all three hearth captions in order and records the completed sequence");
+    // Kit can finish speaking while the keeper is still crossing the room.
+    // Wait for the same interaction the player sees before sending Talk.
+    if(stayAtIncident) {
+        for(unsigned tick=0;tick<900 && !game.Snapshot().tavernConversationAvailable;++tick)step();
+    }
     const auto& keeper=game.Snapshot().tavernKeeper;
     Check(stayAtIncident ? (keeper && keeperAtDoor && keeperWalkedAfterSeat && keeperTravel>9.7f && keeperTravel<10.f &&
           minimumSpeakerGap>.85f && keeper->stage==TavernKeeperStage::AtHearth &&

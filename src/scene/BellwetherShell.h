@@ -4,10 +4,10 @@
 #include <filesystem>
 
 namespace horde::scene {
-inline constexpr std::size_t kBellwetherSolidTriangles=2836;
+inline constexpr std::size_t kBellwetherSolidTriangles=2876;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
-inline constexpr std::size_t kBellwetherGroundTriangles=4;
+inline constexpr std::size_t kBellwetherGroundTriangles=22;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 // The town and B01 interior use one render and physical geometry source.
 // Architecture, furniture and the fuel bed reuse existing material rows.

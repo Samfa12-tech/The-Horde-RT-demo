@@ -285,7 +285,7 @@ public:
                order_.capacity()*sizeof(std::uint32_t)+nodes_.capacity()*sizeof(Node);
     }
 private:
-    struct Interval { double begin=0,end=1,height=0,deltaHeight=0; };
+    struct Interval { double begin=0,end=1,height=0,deltaHeight=0;bool walkable=false; };
     using Intervals=std::array<Interval,kMaximumSweepIntervals>;
     struct Node { Point minimum{},maximum{};std::uint32_t begin=0,count=0,left=0,right=0; };
     std::vector<Triangle> triangles_;
@@ -458,15 +458,40 @@ private:
                 else interval.end=std::min(interval.end,-bary[0]/bary[1]);
             }
             if(!intersects||interval.begin>interval.end) continue;
-            // Conservative for layered meshes: an intersected steep upward
-            // face is rejected even if another floor might obscure it. This
-            // support sweep is intended for the exported terrain heightfield.
-            if(std::hypot(n[0],n[2])>kMaximumWalkableSlope*n[1]+1e-7f || count==intervals.size()) return false;
+            if(count==intervals.size()) return false;
+            interval.walkable=std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
             interval.height=u*a[1]+v*b[1]+(1-u-v)*c[1];
             interval.deltaHeight=du*a[1]+dv*b[1]+(-du-dv)*c[1];
             intervals[count++]=interval;
         }
         return true;
+    }
+    static bool SteepIntervalBuried(const Interval& steep,std::span<const Interval> spans)
+    {
+        // A bridge or raised walkable deck can mask the terrain only where
+        // there is continuous, strictly higher walkable support. Clip the
+        // two linear height functions to their common interval before merging
+        // coverage so even a thin exposed part of the bank stays impassable.
+        constexpr double heightMargin=.00001;
+        constexpr double joinTolerance=1e-9;
+        double covered=steep.begin;
+        for(;;) {
+            double next=covered;
+            for(const auto& top:spans) {
+                if(!top.walkable || top.begin>covered+joinTolerance || top.end<covered) continue;
+                const double difference=top.height-steep.height-heightMargin;
+                const double slope=top.deltaHeight-steep.deltaHeight;
+                double from=std::max(steep.begin,top.begin),to=std::min(steep.end,top.end);
+                if(slope>0)from=std::max(from,-difference/slope);
+                else if(slope<0)to=std::min(to,-difference/slope);
+                else if(difference<0)continue;
+                if(from>to || from>covered+joinTolerance || to<covered)continue;
+                if(to>=steep.end)return true;
+                next=std::max(next,to);
+            }
+            if(next<=covered)return false;
+            covered=next;
+        }
     }
     bool ContinuousSupport(float x,float z,float toX,float toZ,float maximumStep) const
     {
@@ -477,7 +502,8 @@ private:
         });
         double covered=0;
         for(std::size_t i=0;i<count;++i) {
-            if(intervals[i].begin>covered+1e-9) return false;
+            if(intervals[i].begin>covered+1e-9 ||
+               (!intervals[i].walkable && !SteepIntervalBuried(intervals[i],{intervals.data(),count}))) return false;
             covered=std::max(covered,intervals[i].end);
         }
         if(covered<1-1e-9) return false;

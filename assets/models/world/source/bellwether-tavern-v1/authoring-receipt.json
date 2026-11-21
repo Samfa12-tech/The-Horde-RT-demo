@@ -11,9 +11,9 @@
   "sourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
   "terrainSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
   "layoutSha256": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
-  "runtimeSha256": "adf9a4724430bbdcfe31882dcdbd680e1c42a5220ca507f168adffffdbba4709",
-  "solidTriangles": 2836,
-  "walkableTriangles": 4,
+  "runtimeSha256": "31920bf9f8864719c38584d200adab28872c8dc69b70e7b77224b332d7a1cd08",
+  "solidTriangles": 2876,
+  "walkableTriangles": 22,
   "windowSha256": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
   "windowTriangles": 12,
   "windowBounds": [
@@ -98,6 +98,61 @@
     -5.981605529785156,
     82.1
   ],
+  "churchApproach": {
+    "width": 2.2,
+    "sections": [
+      [
+        62.3,
+        65.2,
+        null
+      ],
+      [
+        62.7,
+        67.2,
+        -3.08
+      ],
+      [
+        63.0,
+        68.7,
+        -2.84
+      ],
+      [
+        63.4,
+        70.7,
+        -2.77
+      ],
+      [
+        63.9,
+        73.2,
+        -3.4
+      ],
+      [
+        64.3,
+        75.2,
+        -3.9
+      ],
+      [
+        66.5,
+        75.2,
+        -3.48
+      ],
+      [
+        69.6,
+        75.2,
+        -2.58
+      ],
+      [
+        71.5,
+        75.2,
+        -2.54
+      ],
+      [
+        73.5,
+        75.2,
+        null
+      ]
+    ]
+  },
   "waysideArchive": [
     [
       103.3,

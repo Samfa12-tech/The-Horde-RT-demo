@@ -141,7 +141,24 @@ int main()
     auto layered=std::vector<Surface::Triangle>(ramp.begin(),ramp.end());
     const auto upper=quad(-2,2,-2,2,4,8);layered.insert(layered.end(),upper.begin(),upper.end());
     const auto layers=Surface::Build(layered,error);
-    check(layers&&!layers->Query(0,0).walkable&&layers->Query(0,0,0,2).walkable,
-          "highest candidate or bounded-height selection is inconsistent");
+    check(layers&&!layers->Query(0,0).walkable&&layers->Query(0,0,0,2).walkable &&
+          !layers->GroundSweep(-.35f,0,.35f,0,1,.24f),
+          "a lower floor cannot hide an exposed upper bank");
+    const auto buried=quad(-.18f,.18f,-2,2,-1,.5f);
+    const auto deck=[&](float leftEnd,float rightStart) {
+        std::vector<Surface::Triangle> triangles(buried.begin(),buried.end());
+        const auto left=quad(-2,leftEnd,-2,2,1,1);
+        const auto right=quad(rightStart,2,-2,2,1,1);
+        triangles.insert(triangles.end(),left.begin(),left.end());
+        triangles.insert(triangles.end(),right.begin(),right.end());
+        return Surface::Build(triangles,error);
+    };
+    const auto continuousDeck=deck(0,0);
+    check(continuousDeck && continuousDeck->GroundSweep(-.35f,0,.35f,0,1,.24f) &&
+          continuousDeck->GroundSweep(.35f,0,-.35f,0,1,.24f),
+          "joined walkable surfaces cover the buried steep plane in both directions");
+    const auto openSeam=deck(.001f,.003f);
+    check(openSeam && !openSeam->GroundSweep(-.35f,0,.35f,0,1,.24f),
+          "an exposed steep sliver between raised surfaces blocks the swept footprint");
     std::cout<<"Triangle support failures="<<failures<<'\n';return failures?1:0;
 }

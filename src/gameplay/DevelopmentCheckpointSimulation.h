@@ -189,7 +189,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
         return progress;
     };
-    if(checkpoint.bellwetherWaysideApproach) {
+    if(checkpoint.bellwetherNorthView!=BellwetherNorthView::None) {
         using namespace simulation;
         using namespace bellwether;
         if(!chapterTerrain || checkpoint.bellwetherStations!=traversal::kBellwetherChurchJunction+1)
@@ -229,13 +229,21 @@ inline bool StageDevelopmentCheckpointSimulation(
             if(!walkStation(route[i-1]))return finalize(false);
         for(const auto& station:traversal::kBellwetherNorthApproach)
             if(!walkStation(station))return finalize(false);
-        for(const auto& station:traversal::kBellwetherWaysideApproach)
-            if(!walkStation(station))return finalize(false);
+        if(checkpoint.bellwetherNorthView==BellwetherNorthView::Church) {
+            for(const auto& station:traversal::kBellwetherChurchApproach)
+                if(!walkStation(station))return finalize(false);
+        } else {
+            for(const auto& station:traversal::kBellwetherWaysideApproach)
+                if(!walkStation(station))return finalize(false);
+        }
         input.moveForward=0;input.runHeld=false;
         input.yawRadians=checkpoint.yaw;input.pitchRadians=checkpoint.pitch;
         for(unsigned tick=0;tick<120;++tick)advance();
+        if(checkpoint.bellwetherNorthView==BellwetherNorthView::Church)
+            return finalize(state.playerGrounded &&
+                state.chapterCompanion.bellwetherArrival==dialogue::BellwetherArrivalStage::Seated);
         if(state.waysideArchiveAction!=ArchiveAction::Inspect)return finalize(false);
-        if(!checkpoint.bellwetherArchiveOpen)return finalize(true);
+        if(checkpoint.bellwetherNorthView==BellwetherNorthView::Archive)return finalize(true);
         // Stage through the same handlers without consuming sequence numbers
         // reserved for the next live interact or skip from a platform publisher.
         gameSimulation.InteractWithClaimedChapter();advance();
@@ -246,7 +254,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         for(unsigned tick=0;tick<70 && state.waysideArchive.stage!=ArchiveStage::Open;++tick)advance();
         if(state.waysideArchive.stage!=ArchiveStage::Open ||
            state.chapterDialogue.line!=dialogue::Line::LanternFirstIdentity)return finalize(false);
-        if(checkpoint.bellwetherRegisterRecovered) {
+        if(checkpoint.bellwetherNorthView==BellwetherNorthView::RegisterRecovered) {
             for(const auto line:{dialogue::Line::LanternKingName,dialogue::Line::LanternFirstRequest,dialogue::Line::None}) {
                 gameSimulation.chapterDialogue_.Skip();advance();
                 if(state.chapterDialogue.line!=line)return finalize(false);

@@ -8,7 +8,7 @@
   },
   "budgets": {
     "maxVertices": 6500,
-    "maxIndices": 8520,
+    "maxIndices": 8694,
     "maxPrimitives": 5,
     "maxMaterials": 4,
     "maxTextureLayersPerKind": 1
@@ -16,7 +16,7 @@
   "lods": [
     {
       "name": "lod0",
-      "maxTriangles": 2840
+      "maxTriangles": 2898
     }
   ],
   "requiredSockets": [],
