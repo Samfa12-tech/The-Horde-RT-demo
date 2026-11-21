@@ -447,6 +447,10 @@ public:
     horde::scene::BellwetherFurnitureDetail ActiveBellwetherFurnitureDetail() const noexcept {
         return activeBellwetherFurnitureDetail_;
     }
+#if defined(_DEBUG)
+    bool DebugHasRecordedInstance(std::uint32_t customIndex) const noexcept;
+    std::optional<horde::scene::BellwetherFurnitureDetail> DebugRecordedBellwetherFurnitureDetail() const noexcept;
+#endif
     bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
     // Candidate source binding only, chosen before resource creation. Empty

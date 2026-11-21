@@ -7272,6 +7272,27 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
     return true;
 }
 
+#if defined(_DEBUG)
+bool PresentableTinyRtScene::DebugHasRecordedInstance(std::uint32_t customIndex) const noexcept {
+    return tlasInstanceDefinitionsValid_ && std::any_of(tlasBuiltInstances_.begin(),
+        tlasBuiltInstances_.begin()+tlasInstanceCount_,[customIndex](const auto& instance) {
+            return instance.mask && instance.accelerationStructureReference && instance.instanceCustomIndex==customIndex;
+        });
+}
+
+std::optional<horde::scene::BellwetherFurnitureDetail>
+PresentableTinyRtScene::DebugRecordedBellwetherFurnitureDetail() const noexcept {
+    if(!bellwetherFurnitureTransitions_ || !tlasInstanceDefinitionsValid_)return {};
+    const auto& instance=tlasBuiltInstances_[kBellwetherFurnitureLane];
+    if(instance.instanceCustomIndex!=kBellwetherFurnitureLane || instance.mask!=0x01u ||
+       !instance.accelerationStructureReference)return {};
+    for(std::size_t tier=0;tier<bellwetherFurnitureBlas_.size();++tier)
+        if(instance.accelerationStructureReference==bellwetherFurnitureBlas_[tier].address)
+            return static_cast<horde::scene::BellwetherFurnitureDetail>(tier);
+    return {};
+}
+#endif
+
 void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR& instance,
     horde::scene::BellwetherFurnitureDetail detail) const noexcept {
     instance={};

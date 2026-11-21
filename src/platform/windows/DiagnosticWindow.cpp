@@ -498,6 +498,7 @@ struct CaptureLaunchOptions
     std::string inspectStaticWorldMaterial;
     horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     bool bellwetherFurnitureTransitions=false;
+    bool bellwetherFurnitureRoute=false;
     std::string forestContentCandidate;
     bool validateForestContentCandidate = false;
     bool validateChapterRoundTrip = false;
@@ -1213,6 +1214,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
+        if(argument==L"--bellwether-furniture-route") {
+#if defined(_DEBUG)
+            options.bellwetherFurnitureRoute=true;
+#else
+            options.error="Bellwether furniture route is Debug-only.";
+#endif
+            continue;
+        }
         if(argument==L"--bellwether-furniture-transitions") {
 #if defined(_DEBUG)
             options.bellwetherFurnitureTransitions=true;
@@ -1416,6 +1425,9 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         !options.nativeMotionScenario.empty() || options.benchmark.requested || options.chapterLandingOnly ||
         !options.inspectStaticWorldMaterial.empty() || (fixedFurnitureDetail && options.bellwetherFurnitureTransitions)))
         options.error="Bellwether furniture comparisons require an isolated hidden authored Bellwether capture.";
+    if(options.error.empty() && options.bellwetherFurnitureRoute &&
+       (!options.bellwetherFurnitureTransitions || options.developmentCheckpoint!="bellwether-repeat-visit"))
+        options.error="Bellwether furniture route requires automatic selection and the repeat-visit checkpoint.";
     const bool returnToKit = residentCheckpoint &&
         residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
@@ -8872,6 +8884,9 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
 #endif
 
 #include "platform/windows/WindowsChapterRoundTripCapture.inl"
+#if defined(_DEBUG)
+#include "platform/windows/WindowsBellwetherFurnitureRouteCapture.inl"
+#endif
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "platform/windows/WindowsChapterShippingMeasurement.inl"
 #endif
@@ -8959,6 +8974,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     }
 
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
+#if defined(_DEBUG)
+    if(ParseCaptureLaunchOptions().bellwetherFurnitureRoute) {
+        std::string error;
+        if(!RunBellwetherFurnitureRouteCapture(context,outputDirectory,clearColor,error))return fail(error);
+        return 0;
+    }
+#endif
     for (const horde::gameplay::ShowcaseCheckpoint* checkpointPointer : checkpoints)
     {
 #if defined(_DEBUG)

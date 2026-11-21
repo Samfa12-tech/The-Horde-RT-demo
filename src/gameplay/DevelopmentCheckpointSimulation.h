@@ -63,6 +63,9 @@ struct DevelopmentCheckpointStepFixedObservation
     void* user = nullptr;
     void (*beginStepFixed)(void*) noexcept = nullptr;
     void (*completeStepFixed)(void*) noexcept = nullptr;
+    // The repeat-visit harness can present the ordinary snapshot after each
+    // tick. Normal presentation acknowledgement is allowed. False stops staging.
+    bool (*presentBellwetherVisitStep)(void*) = nullptr;
 };
 
 // Stages a debug-only visual checkpoint by advancing the same fixed-step
@@ -150,8 +153,10 @@ inline bool StageDevelopmentCheckpointSimulation(
                 ++evidence->enemyHitEvents;
         }
     };
-    const auto finalize = [&](const bool staged)
+    bool routePresentationFailed=false;
+    const auto finalize = [&](bool staged)
     {
+        staged=staged && !routePresentationFailed;
         if (evidence != nullptr)
         {
             evidence->failure = staged ? DevelopmentCheckpointStageFailure::None
@@ -170,7 +175,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         return staged;
     };
     const auto walkTo=[&](simulation::InputSnapshot& input,const auto& advance,float x,float z) {
-        for(int tick=0;tick<2600;++tick) {
+        for(int tick=0;tick<2600 && !routePresentationFailed;++tick) {
             const auto& state=gameSimulation.Snapshot();
             const float dx=x-state.playerX,dz=z-state.playerZ;
             const float distance=std::hypot(dx,dz);
@@ -440,6 +445,8 @@ inline bool StageDevelopmentCheckpointSimulation(
                     ++visit.exchangeCaptions;
                 replayedCaption|=returningQuietly && IsBellwetherLine(line);
                 reportVisit();
+                if(stepObservation && stepObservation->presentBellwetherVisitStep)
+                    routePresentationFailed=!stepObservation->presentBellwetherVisitStep(stepObservation->user);
             }
         };
         advance(); // Release the restored input barrier with an exact neutral publication.
@@ -449,8 +456,8 @@ inline bool StageDevelopmentCheckpointSimulation(
         };
         const auto waitFor=[&](const auto& ready,unsigned maxTicks) {
             input.moveForward=0;input.runHeld=false;
-            for(unsigned tick=0;tick<maxTicks && !ready();++tick)advance();
-            return ready();
+            for(unsigned tick=0;tick<maxTicks && !routePresentationFailed && !ready();++tick)advance();
+            return !routePresentationFailed && ready();
         };
         for(std::size_t index=0;index<stations;++index) {
             if(!walkStation(index))return finalize(false);

@@ -33,6 +33,10 @@ Selection uses horizontal distance to the full room bounds. Near enters at 4 m a
 
 Eight Windows frames presented on the two RT backends. Both chose far at the church waymarker, mid at the south approach, and near in the staffed room and at the window. Compared with fixed near, both staffed-room images and the matched pipeline window image with Glass On were pixel-identical. The mid tier changed 52 pixels at the approach on each backend, all within the visible room. The native host test exercised both hysteresis bands on entry, retreat and repeat approach.
 
-The repeated gameplay route, per-ray relevance, safe resource retirement and phone budgets remain acceptance gates.
+For a moving check, add `--bellwether-furniture-route` and use `bellwether-repeat-visit` with its local tavern keeper fixture. The shared simulation owns the road, open doorway, exchange checkpoint and two quiet returns. The Windows runner presents one frame every 12 simulation ticks and on each tier or room-boundary change. It checks the recorded TLAS furniture address and the active door and pane, then joins milestone readbacks to the exact completed presentation. `furniture-route.csv` records the accepted frame sequence and `furniture-route.json` is written only when the full route passes on a single TLAS.
+
+Both Windows RT backends presented 1,033 sampled frames across three entries and two quiet returns. The sampled route logs matched byte for byte, with one TLAS per run and 13 completed image readbacks per backend. The tier sequence was far, mid, near, mid, near, mid, near. The authored door and pane stayed active throughout. The route used the local tavern keeper fixture and hidden 960 x 540 presentation.
+
+Per-ray relevance, safe resource retirement and phone budgets remain acceptance gates.
 
 The [Blender recipe](../../../../../tools/author-bellwether-tavern-lods.py) takes the repository root and a new output directory. The existing `horde_rt_bellwether_shell_tests` executable accepts that output directory as an optional argument to run the candidate checks alongside its ordinary town tests.
