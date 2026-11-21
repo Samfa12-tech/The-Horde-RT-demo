@@ -456,8 +456,10 @@ public:
     const BellwetherFurnitureLifetime& BellwetherFurnitureLifetimeEvidence() const noexcept {
         return bellwetherFurnitureLifetime_;
     }
-    VkDeviceSize BellwetherNearBlasBytes() const noexcept {
-        return bellwetherFurnitureBlas_.front().backing.allocationSize;
+    VkDeviceSize BellwetherNearBlasBytes() const noexcept;
+    VkDeviceSize BellwetherNearGeometryBytes() const noexcept;
+    VkDeviceSize BellwetherNearOwnerBytes() const noexcept {
+        return BellwetherNearBlasBytes()+BellwetherNearGeometryBytes();
     }
     bool PrepareBellwetherFurnitureLifetime(const RtSceneFrameInputs&,
         bool (*retireReferences)(void*,std::string&), void*, std::string&);
@@ -1146,7 +1148,10 @@ private:
     bool regionPageVisible_=true,regionRetirementAwaitingFrame_=false;
     RtRegionPreparationRecovery regionPreparationRecovery_;
     std::uint64_t regionPreparationPeakBytes_=0;
-    bool PrepareRegionPageSource(std::string&);
+    bool SplitBellwetherNearPage(horde::world::streaming::GeometryPayload&,std::string&);
+    bool PrepareRegionPageSource(std::unique_ptr<horde::world::streaming::GeometryPayload>,std::string&);
+    bool AdvanceBellwetherNearPage(bool prepare,bool retire,std::uint64_t tick,
+        bool (*retireReferences)(void*,std::string&),void*,std::string&);
     bool CreateInitialRegionPage(std::string&);
     bool ApplyRegionPage(std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>&,
         std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity>&,
@@ -1336,6 +1341,10 @@ private:
         const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
     // Showcase chapter's unused fixture/legacy arm lane, shared with no other trial.
     static constexpr std::uint32_t kBellwetherFurnitureLane=9u;
+    bool UsesBellwetherNearPage() const noexcept {
+        return HORDE_RT_REGION_PAGE_PROTOTYPE && bellwetherFurnitureResidency_;
+    }
+    VkDeviceAddress BellwetherFurnitureBlasAddress(std::size_t tier) const noexcept;
     void ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR&,
         horde::scene::BellwetherFurnitureDetail) const noexcept;
     std::uint32_t ChapterTailInstanceCount() const noexcept {

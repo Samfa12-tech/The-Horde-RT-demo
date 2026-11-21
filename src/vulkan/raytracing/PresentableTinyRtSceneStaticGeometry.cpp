@@ -395,6 +395,7 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     const bool restore=ordinaryStaticReduced_ && (!allowEviction || !safe ||
         frame.cameraX< -22.5f || frame.cameraX> -21.5f || snapshot.staticDetailLease.restoreRequested);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage()){diagnostic.clear();return true;}
     if(regionPageSource_)return AdvanceRegionPage(simulation,frame,safe,inner,allowEviction,decision,diagnostic);
 #endif
     if(!ordinaryStaticCandidate_ && preparedStaticGeometry_) {

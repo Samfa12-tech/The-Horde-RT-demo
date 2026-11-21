@@ -14,7 +14,7 @@ bool RunBellwetherFurnitureRouteCapture(VulkanSurfaceContext& context, const std
     }
     std::ofstream frames(output/"furniture-route.csv");
     if(!frames) {error="Could not open the Bellwether route receipt.";return false;}
-    frames<<"tick,submission,epoch,static_generation,x,y,z,yaw,door_opening,in_room,stage,tier,pane,near_blas_bytes,near_retirements,near_restorations\n";
+    frames<<"tick,submission,epoch,static_generation,x,y,z,yaw,door_opening,in_room,stage,tier,pane,near_blas_bytes,near_geometry_bytes,near_retirements,near_restorations\n";
     const auto start=std::chrono::steady_clock::now();
     context.chapterRoundTripCaptureActive=true;
     context.simulationPaused=false;
@@ -67,13 +67,14 @@ bool RunBellwetherFurnitureRouteCapture(VulkanSurfaceContext& context, const std
         }
         if(crossed)room ? ++entries : ++exits;
         const auto& lifetime=context.rtScene.BellwetherFurnitureLifetimeEvidence();
-        const auto nearBytes=context.rtScene.BellwetherNearBlasBytes();
-        sawReleasedNear |= lifetime.retirements>0 && nearBytes==0;
+        const auto nearBlas=context.rtScene.BellwetherNearBlasBytes();
+        const auto nearGeometry=context.rtScene.BellwetherNearGeometryBytes();
+        sawReleasedNear |= lifetime.retirements>0 && nearBlas+nearGeometry==0;
         ++frameCount;
         frames<<tick<<','<<identity.submissionSerial<<','<<sceneEpoch<<','<<staticGeneration<<','
             <<state.playerX<<','<<state.playerSupportWorldY<<','<<state.playerZ<<','<<state.playerYawRadians<<','
             <<state.tavernDoor.opening<<','<<room<<','<<entries+exits<<','<<static_cast<unsigned>(next)<<','<<window<<','
-            <<nearBytes<<','<<lifetime.retirements<<','<<lifetime.restorations<<'\n';
+            <<nearBlas<<','<<nearGeometry<<','<<lifetime.retirements<<','<<lifetime.restorations<<'\n';
         if(changedTier || crossed || finish) {
             if(!CompleteRtEvidenceAfterDeviceIdle(context,vkDeviceWaitIdle(context.device))) {
                 error="Bellwether milestone did not complete its submitted GPU work.";return false;
@@ -111,7 +112,7 @@ bool RunBellwetherFurnitureRouteCapture(VulkanSurfaceContext& context, const std
     const auto& lifetime=context.rtScene.BellwetherFurnitureLifetimeEvidence();
     if(context.bellwetherFurnitureResidency && (!sawReleasedNear || lifetime.retirements<2 ||
        lifetime.restorations<3 || lifetime.retiredAllocationBytes==0 || lifetime.preparationFailures ||
-       lifetime.deferredNearFrames || context.rtScene.BellwetherNearBlasBytes()!=lifetime.retiredAllocationBytes)) {
+       lifetime.deferredNearFrames || context.rtScene.BellwetherNearOwnerBytes()!=lifetime.retiredAllocationBytes)) {
         error="Bellwether run did not retire and rebuild the near BLAS before both returns.";
         return false;
     }
@@ -123,7 +124,10 @@ bool RunBellwetherFurnitureRouteCapture(VulkanSurfaceContext& context, const std
         <<",\"quietReturns\":"<<evidence.bellwetherVisit->quietReturns
         <<",\"sameTlas\":true,\"glassEnabled\":true";
     if(context.bellwetherFurnitureResidency)
-        receipt<<",\"nearBlasRetirements\":"<<lifetime.retirements<<",\"nearBlasRestorations\":"<<lifetime.restorations
+        receipt<<",\"retainedVertexBytes\":"<<context.rtScene.StaticMeshMeasurements().vertexBytes
+            <<",\"retainedIndexBytes\":"<<context.rtScene.StaticMeshMeasurements().indexBytes
+            <<",\"nearGeometryBytes\":"<<context.rtScene.BellwetherNearGeometryBytes()
+            <<",\"nearBlasRetirements\":"<<lifetime.retirements<<",\"nearBlasRestorations\":"<<lifetime.restorations
             <<",\"retiredAllocationBytes\":"<<lifetime.retiredAllocationBytes
             <<",\"preparationPeakBytes\":"<<lifetime.preparationPeakBytes
             <<",\"nearFramesDeferred\":"<<lifetime.deferredNearFrames;

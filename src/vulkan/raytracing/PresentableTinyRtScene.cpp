@@ -3630,7 +3630,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
     if(bellwetherFurnitureTransitions_ &&
        (bellwetherFurnitureAsset_.primitives.size()!=horde::scene::kBellwetherFurnitureTriangles.size() ||
-        HORDE_RT_REGION_PAGE_PROTOTYPE)) {
+        (HORDE_RT_REGION_PAGE_PROTOTYPE && !UsesBellwetherNearPage()))) {
         diagnostic="Bellwether furniture transitions require the isolated authored chapter profile.";return false;
     }
     // The selected immutable quality bundle owns the geometry profile too.
@@ -3666,6 +3666,13 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     if(bellwetherFurnitureTransitions_ && !viewmodelAvailable_) {
         diagnostic="Bellwether furniture transitions require a modelled chapter player.";return false;
     }
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    std::unique_ptr<horde::world::streaming::GeometryPayload> nearPage;
+    if(UsesBellwetherNearPage()) {
+        nearPage=std::make_unique<horde::world::streaming::GeometryPayload>();
+        if(!SplitBellwetherNearPage(*nearPage,diagnostic))return false;
+    }
+#endif
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
     // Pin the validated full CPU source once during heavy startup. Candidate
     // reconstruction can then copy in bounded turns without rescanning meshes
@@ -3673,7 +3680,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     if (developmentRescueJourney_)
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
-    if(!PrepareRegionPageSource(diagnostic))return false;
+    if(!PrepareRegionPageSource(std::move(nearPage),diagnostic))return false;
 #endif
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -5955,7 +5962,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const std::uint32_t firstTier=bellwetherFurnitureResidency_ ? 1u : 0u;
         for(std::uint32_t tier=firstTier;tier<bellwetherFurnitureBlas_.size();++tier)
             if(!buildRegisteredStaticBlas(kBellwetherFurnitureLane,"Bellwether furniture",
-                bellwetherFurnitureBlas_[tier],true,nullptr,tier))return false;
+                bellwetherFurnitureBlas_[tier],true,nullptr,tier-(UsesBellwetherNearPage()?1u:0u)))return false;
     }
     if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
         healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
@@ -7310,7 +7317,7 @@ PresentableTinyRtScene::DebugRecordedBellwetherFurnitureDetail() const noexcept 
     if(instance.instanceCustomIndex!=kBellwetherFurnitureLane || instance.mask!=0x01u ||
        !instance.accelerationStructureReference)return {};
     for(std::size_t tier=0;tier<bellwetherFurnitureBlas_.size();++tier)
-        if(instance.accelerationStructureReference==bellwetherFurnitureBlas_[tier].address)
+        if(instance.accelerationStructureReference==BellwetherFurnitureBlasAddress(tier))
             return static_cast<horde::scene::BellwetherFurnitureDetail>(tier);
     return {};
 }
@@ -7324,6 +7331,15 @@ bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFra
        tlasPendingDefinitionsValid_) {
         diagnostic="Bellwether residency requires the completed furniture TLAS owner.";return false;
     }
+    const bool validPosition=std::isfinite(frame.cameraX) && std::isfinite(frame.cameraZ);
+    const float distance=horde::scene::BellwetherFurnitureRoomDistanceSquared(frame.cameraX,frame.cameraZ);
+    constexpr float prepareRadius=9.f,retireRadius=11.f;
+    const bool prepare=validPosition && distance<=prepareRadius*prepareRadius;
+    const bool retire=validPosition && distance>retireRadius*retireRadius;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage())
+        return AdvanceBellwetherNearPage(prepare,retire,frame.tickIndex,retireReferences,user,diagnostic);
+#endif
     auto& near=bellwetherFurnitureBlas_.front();
     auto& lifetime=bellwetherFurnitureLifetime_;
     const RtGpuWorkApi work{device_,queue_,commandPool_};
@@ -7344,10 +7360,7 @@ bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFra
             diagnostic="Bellwether near-build state lost its queue owner.";return false;
         }
     }
-    if(!std::isfinite(frame.cameraX) || !std::isfinite(frame.cameraZ))return true;
-    const float distance=horde::scene::BellwetherFurnitureRoomDistanceSquared(frame.cameraX,frame.cameraZ);
-    constexpr float prepareRadius=9.f,retireRadius=11.f;
-    if(near.address && distance>retireRadius*retireRadius) {
+    if(near.address && retire) {
         const auto stillReferenced=[&](const auto& instance) {
             return instance.accelerationStructureReference==near.address;
         };
@@ -7362,7 +7375,7 @@ bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFra
         DestroyAccelerationStructure(near);
         ++lifetime.retirements;
     }
-    if(near.address || distance>prepareRadius*prepareRadius || frame.tickIndex<bellwetherNearRetryTick_)return true;
+    if(near.address || !prepare || frame.tickIndex<bellwetherNearRetryTick_)return true;
     std::vector<VkAccelerationStructureGeometryKHR> geometry;
     std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
     std::vector<std::uint32_t> counts;
@@ -7386,6 +7399,31 @@ bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFra
     return true;
 }
 
+VkDeviceAddress PresentableTinyRtScene::BellwetherFurnitureBlasAddress(std::size_t tier) const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage() && tier==0)return regionPageOwner_.blas.address;
+#endif
+    return bellwetherFurnitureBlas_[tier].address;
+}
+
+VkDeviceSize PresentableTinyRtScene::BellwetherNearBlasBytes() const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage())return regionPageOwner_.blas.backing.allocationSize;
+#endif
+    return bellwetherFurnitureBlas_.front().backing.allocationSize;
+}
+
+VkDeviceSize PresentableTinyRtScene::BellwetherNearGeometryBytes() const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage()) {
+        VkDeviceSize bytes=0;
+        for(const auto& buffer:regionPageOwner_.buffers)bytes+=buffer.allocationSize;
+        return bytes;
+    }
+#endif
+    return 0;
+}
+
 void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR& instance,
     horde::scene::BellwetherFurnitureDetail detail) const noexcept {
     instance={};
@@ -7393,7 +7431,7 @@ void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStru
     instance.instanceCustomIndex=kBellwetherFurnitureLane;
     instance.mask=0x01u;
     instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    instance.accelerationStructureReference=bellwetherFurnitureBlas_[static_cast<std::size_t>(detail)].address;
+    instance.accelerationStructureReference=BellwetherFurnitureBlasAddress(static_cast<std::size_t>(detail));
 }
 
 void PresentableTinyRtScene::ApplyGlassFixtureVisibility(
@@ -8922,14 +8960,16 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         activeBellwetherFurnitureDetail_=horde::scene::SelectBellwetherFurnitureDetail(
             frame.cameraX,frame.cameraZ,activeBellwetherFurnitureDetail_);
         if(activeBellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near &&
-           !bellwetherFurnitureBlas_.front().address) {
+           !BellwetherFurnitureBlasAddress(0)) {
             activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Mid;
             ++bellwetherFurnitureLifetime_.deferredNearFrames;
         }
         ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
         auto& furniture=frameInstanceMetadata[kBellwetherFurnitureLane];
         furniture=staticMeshSlot_.InstanceMetadata()[kBellwetherFurnitureLane];
-        furniture.primitiveBase+=static_cast<std::uint32_t>(activeBellwetherFurnitureDetail_);
+        const auto tier=static_cast<std::uint32_t>(activeBellwetherFurnitureDetail_);
+        if(!UsesBellwetherNearPage() || tier>0)
+            furniture.primitiveBase+=tier-(UsesBellwetherNearPage()?1u:0u);
         furniture.primitiveCount=1u;
     }
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;

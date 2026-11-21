@@ -6,7 +6,51 @@
 #include <algorithm>
 
 namespace horde::vulkan::raytracing {
-bool PresentableTinyRtScene::PrepareRegionPageSource(std::string& error) {
+bool PresentableTinyRtScene::SplitBellwetherNearPage(
+    horde::world::streaming::GeometryPayload& near,std::string& error) {
+    auto& asset=bellwetherFurnitureAsset_;
+    if(asset.primitives.size()!=horde::scene::kBellwetherFurnitureTriangles.size()) {
+        error="Bellwether near page requires the registered three-tier asset.";return false;
+    }
+    const auto& first=asset.primitives.front();
+    const auto vertexCount=asset.primitives[1].vertexOffset;
+    const auto indexCount=asset.primitives[1].indexOffset;
+    if(first.vertexOffset || first.indexOffset || first.indexCount!=indexCount ||
+       indexCount!=horde::scene::kBellwetherFurnitureTriangles.front()*3u ||
+       !vertexCount || vertexCount>=asset.vertices.size() || indexCount>=asset.indices.size() ||
+       !asset.triangleRegions.empty()) {
+        error="Bellwether near page requires an exclusive authored furniture range.";return false;
+    }
+    near.vertices.assign(asset.vertices.begin(),asset.vertices.begin()+vertexCount);
+    near.indices.assign(asset.indices.begin(),asset.indices.begin()+indexCount);
+    near.vertexCounts.push_back(vertexCount);
+    near.primitives.push_back({0u,0u,indexCount,0u});
+    near.bounds={asset.bounds.minimum,asset.bounds.maximum};
+    asset.vertices.erase(asset.vertices.begin(),asset.vertices.begin()+vertexCount);
+    asset.indices.erase(asset.indices.begin(),asset.indices.begin()+indexCount);
+    asset.primitives.erase(asset.primitives.begin());
+    for(auto& primitive:asset.primitives) {
+        primitive.vertexOffset-=vertexCount;
+        primitive.indexOffset-=indexCount;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::PrepareRegionPageSource(
+    std::unique_ptr<horde::world::streaming::GeometryPayload> near,std::string& error) {
+    if(UsesBellwetherNearPage()) {
+        const auto& furniture=staticMeshSlot_.InstanceMetadata()[kBellwetherFurnitureLane];
+        const auto& rows=staticMeshSlot_.PrimitiveMetadata();
+        if(!near || !chapterActorReady_ || furniture.primitiveCount!=2u ||
+           furniture.primitiveBase>=rows.size() || rows.size()-furniture.primitiveBase<2u ||
+           rows[furniture.primitiveBase].materialIndex!=rows[furniture.primitiveBase+1u].materialIndex) {
+            error="Bellwether near page could not bind the retained timber material.";return false;
+        }
+        near->primitives.front().materialIndex=rows[furniture.primitiveBase].materialIndex;
+        regionPageSource_=std::move(near);
+        activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Far;
+        return true;
+    }
     // Android boots the ordinary root scene before adopting a chapter request.
     // The same address shader supports this fully resident root, without taking
     // a detail lane or inventing a preparation request.
@@ -36,6 +80,7 @@ bool PresentableTinyRtScene::CreateInitialRegionPage(std::string& error) {
         as.minAccelerationStructureScratchOffsetAlignment,as.maxPrimitiveCount,as.maxGeometryCount,
         executionPolicy_.shaderPipelineStage};
     regionPagePreparation_=std::make_unique<RtRegionGeometryPreparation>(gpuResources_,context);
+    if(UsesBellwetherNearPage())return true;
     const horde::world::streaming::Token token{staticGeometryGeneration_,1,1};
     if(!regionPagePreparation_->Begin(token,regionPageSource_,staticMeshSlot_.Materials(),error))return false;
     // Heavy startup only. Normal return uses bounded application-turn advances.
@@ -61,6 +106,28 @@ bool PresentableTinyRtScene::ApplyRegionPage(
         {staticIndexBuffer_.address,staticIndexBuffer_.size},
         {primitiveMetadataBuffer_.address,primitiveMetadataBuffer_.size},
         static_cast<std::uint32_t>(staticMeshSlot_.PrimitiveMetadata().size())};
+    if(UsesBellwetherNearPage()) {
+        if(activeBellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near) {
+            const auto& instance=instances[kBellwetherFurnitureLane];
+            if(regionPageOwner_.Empty() || !regionPageOwner_.payload ||
+               regionPageOwner_.token.worldGeneration!=staticGeometryGeneration_ ||
+               instance.accelerationStructureReference!=regionPageOwner_.blas.address ||
+               instance.instanceCustomIndex!=kBellwetherFurnitureLane || instance.mask!=0x01u) {
+                error="Bellwether near metadata lacks the same complete GPU owner.";return false;
+            }
+            auto& row=metadata[kBellwetherFurnitureLane];
+            row.primitiveBase=0;row.primitiveCount=1u;
+            row.flags|=1u<<kGeometryPageShift;
+            const auto& buffers=regionPageOwner_.buffers;
+            pages[1]={{buffers[0].address,buffers[0].size},{buffers[1].address,buffers[1].size},
+                {buffers[2].address,buffers[2].size},1u};
+        }
+        if(!BuildGeometryPageTable(metadata,pages,table,staticMeshSlot_.InstanceMetadata(),
+                                   worldSurfaceBuffer_.size/sizeof(std::uint32_t))) {
+            error="Bellwether furniture page address admission failed.";return false;
+        }
+        return true;
+    }
     if(!regionPageSource_) {
         if(!regionPageOwner_.Empty() || !BuildGeometryPageTable(metadata,pages,table,
             staticMeshSlot_.InstanceMetadata(),worldSurfaceBuffer_.size/sizeof(std::uint32_t))) {
@@ -109,6 +176,54 @@ void PresentableTinyRtScene::DestroyRegionPage() noexcept {
     regionStreaming_={};regionCutover_=RegionCutover::None;regionCutoverToken_={};
     regionPageVisible_=true;regionRetirementAwaitingFrame_=false;regionPreparationRecovery_={};regionPreparationPeakBytes_=0;
 }
+bool PresentableTinyRtScene::AdvanceBellwetherNearPage(bool prepare,bool retire,std::uint64_t tick,
+    bool (*retireReferences)(void*,std::string&),void* user,std::string& error) {
+    using Phase=RtRegionGeometryPreparation::Phase;
+    auto& lifetime=bellwetherFurnitureLifetime_;
+    auto& staged=*regionPagePreparation_;
+    if(staged.Status()==Phase::Quarantined)return true;
+    if(staged.Status()!=Phase::Idle) {
+        if(!staged.Advance(regionCutoverToken_,256u*1024u,error)) {
+            ++lifetime.preparationFailures;
+            if(staged.Status()!=Phase::Quarantined) {
+                if(!staged.ResetFailed(regionCutoverToken_))return false;
+                bellwetherNearRetryTick_=tick+60u;
+            }
+            error.clear();return true;
+        }
+        horde::telemetry::RtResourceInventory preparing;
+        staged.AccumulateResourceInventory(preparing);
+        lifetime.preparationPeakBytes=std::max(lifetime.preparationPeakBytes,preparing.deviceLocalBytes);
+        if(staged.Status()!=Phase::Ready)return true;
+        if(!staged.Take(regionCutoverToken_,regionPageOwner_,error))return false;
+        ++lifetime.restorations;
+    }
+    if(!regionPageOwner_.Empty() && retire) {
+        const auto address=regionPageOwner_.blas.address;
+        const auto stillReferenced=[address](const auto& instance) {
+            return instance.accelerationStructureReference==address;
+        };
+        if(std::any_of(tlasBuiltInstances_.begin(),tlasBuiltInstances_.end(),stillReferenced))return true;
+        if(!retireReferences || !retireReferences(user,error)) {
+            if(error.empty())error="Bellwether near page lost its completed retirement proof.";
+            return false;
+        }
+        lifetime.retiredAllocationBytes=BellwetherNearOwnerBytes();
+        gpuResources_.DestroyAccelerationStructure(regionPageOwner_.blas);
+        for(auto& buffer:regionPageOwner_.buffers)gpuResources_.DestroyBuffer(buffer);
+        if(!regionPageOwner_.ResetEmpty()) {error="Bellwether near page still owns GPU resources.";return false;}
+        ++lifetime.retirements;
+    }
+    if(!regionPageOwner_.Empty() || !prepare || tick<bellwetherNearRetryTick_)return true;
+    regionCutoverToken_={staticGeometryGeneration_,regionCutoverToken_.requestGeneration+1u,1u};
+    if(!staged.Begin(regionCutoverToken_,regionPageSource_,staticMeshSlot_.Materials(),error)) {
+        ++lifetime.preparationFailures;
+        bellwetherNearRetryTick_=tick+60u;
+        error.clear();
+    }
+    return true;
+}
+
 bool PresentableTinyRtScene::AdvanceRegionPage(horde::gameplay::simulation::GameSimulation& simulation,
     const RtSceneFrameInputs& frame,bool safe,bool inner,bool allowEviction,StaticDetailFrame& decision,std::string& error) {
     using namespace horde::world::streaming;

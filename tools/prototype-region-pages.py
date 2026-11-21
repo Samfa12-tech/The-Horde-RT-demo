@@ -33,10 +33,12 @@ def main():
     shutil.copytree(root / "shaders", private / "shaders")
     (private / "tools").mkdir()
     for name in ("compile-raygen.ps1", "raygen-variants.json", "raygen-variant-budgets.json",
-                 "GenerateRtPipelineVariantCatalog.ps1"):
+                 "GenerateRtPipelineVariantCatalog.ps1", "GenerateRayQueryComputeVariants.ps1"):
         shutil.copy2(root / "tools" / name, private / "tools" / name)
     abi = private / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
-    replace(abi, "    RtInstanceMetadata values[];", "    RtInstanceMetadata values[26];\n    RtGeometryPage pages[4];")
+    runtime_abi = json.loads((root / "src/vulkan/raytracing/RtSceneAbi.def").read_text(encoding="utf-8"))
+    capacity = runtime_abi["capacities"]["instanceMetadata"]
+    replace(abi, "    RtInstanceMetadata values[];", f"    RtInstanceMetadata values[{capacity}];\n    RtGeometryPage pages[4];")
     replace(abi, "layout(std430, set = 0, binding = 11)", """// Experimental private page table; legacy metadata prefix is unchanged.
 struct RtGeometryPage { uvec4 vertexAndIndexAddress; uvec4 primitiveAddressAndCounts; };
 layout(buffer_reference, std430, buffer_reference_align=16) readonly buffer PageVertices { StaticRtVertex values[]; };
