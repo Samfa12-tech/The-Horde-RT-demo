@@ -3022,8 +3022,10 @@ bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
 bool PresentableTinyRtScene::SetChapterResidentActors(
     const std::span<const ChapterResidentActorSource> sources, std::string& diagnostic)
 {
-    if (device_ != VK_NULL_HANDLE || sources.size() > chapterResidents_.size()) {
-        diagnostic = "Chapter resident sources must be configured before Vulkan scene creation.";
+    // Destroy retires the scene bundle and its resources but retains the
+    // borrowed device. Each subsequent profile may select its own roster.
+    if (ready_ || pipelineBundle_.HasSelection() || sources.size() > chapterResidents_.size()) {
+        diagnostic = "Chapter resident sources must be configured before Vulkan scene creation or after retirement.";
         return false;
     }
     for (std::size_t lane = 0; lane < sources.size(); ++lane) {

@@ -47,9 +47,9 @@ The existing Debug checkpoint intent accepts `bellwether-repeat-visit` for
 the staffed tavern threshold and `bellwether-record-keeper-handoff` for the
 church and return to Kit. With capture disabled, both enter normal live
 control after staging. The variant uses the same hardware RT backend selection
-and authored chapter simulation as the other builds. The output is a local
-phone-validation artifact. Build and package verification are distinct from
-on-device presentation and sustained performance.
+and authored chapter simulation as the other builds. The explicit ARM64 build
+is marked test-only. Install that APK with `adb install -r -t` when the phone
+is available for testing.
 
 From a fresh launch of the Bellwether package, the live church start uses:
 
