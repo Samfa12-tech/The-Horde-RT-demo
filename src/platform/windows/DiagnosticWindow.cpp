@@ -219,6 +219,7 @@ bool gShowcaseCaptureHidden=false;
 std::filesystem::path gBellwetherVoiceDirectory;
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherEarnTavernValidation = false;
+bool gBellwetherExpeditionValidation = false;
 #endif
 
 horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
