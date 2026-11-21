@@ -1012,6 +1012,13 @@ The paid Meshy account charged 20 credits. Exact redistribution rights remain
 pending. The public repository records the preparation tools and provenance.
 The private archive retains the model, textures and review images.
 
+## Bellwether mill workbench drive - 22 November 2026
+
+The untextured bronze gear is original Horde geometry authored in Blender by
+Samfa12/Codex. The editable source and authoring script are retained alongside
+the checked-in runtime GLB. The model uses one opaque material and no external
+textures or third-party asset inputs.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

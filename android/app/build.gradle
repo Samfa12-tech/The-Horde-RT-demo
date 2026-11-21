@@ -64,8 +64,16 @@ def verifyBellwetherOverlay = { File root, Map pinned, String label ->
 }
 def texturedTavernKeeper = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/tavern-keeper/base-color.android.ktx2').isFile()
+def bellwetherArtificer = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/artificer').isDirectory()
 if (bellwetherResidentDirectory) {
-    def pinned = [
+    def pinned = bellwetherArtificer ? [
+        'private_bellwether/artificer/asset.manifest.json': '890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864',
+        'private_bellwether/artificer/resident.glb': '58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f',
+        'private_bellwether/artificer/base-color.android.ktx2': '68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8',
+        'private_bellwether/artificer/normal.android.ktx2': '9f930fbdf2eeea390ae84a74123902f7d12e1a62fb1bccf784ac17b4606ff543',
+        'private_bellwether/artificer/orm.android.ktx2': '9985942d945dcde16a2d5e83d40778e09f5999c8425c12ac7e1815b679e7baa0'
+    ] : [
         'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
         'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
         'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
@@ -651,6 +659,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb'
         include 'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb'
         include 'models/world/runtime/bellwether-tavern-v1/window.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb'
         include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json'
@@ -795,6 +805,7 @@ android {
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
         buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', 'false'
@@ -840,12 +851,15 @@ android {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', bellwetherArtificer ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
-                applicationIdSuffix flaskCandidateDirectory ? '.debug.bellwether.flask' : '.debug.bellwether'
-                resValue 'string', 'app_name', flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug'
+                def rosterSuffix = bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'
+                applicationIdSuffix rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
+                resValue 'string', 'app_name', bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
+                    (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')
             } else {
                 applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             }
@@ -861,6 +875,7 @@ android {
                 cmake {
                     arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),

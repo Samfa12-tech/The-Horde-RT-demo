@@ -21,17 +21,30 @@ public final class ChapterDebugCheckpointTest {
                 MainActivity.checkpointId("bellwether-repeat-visit"));
         assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 337 : -1,
                 MainActivity.checkpointId("bellwether-doorway-measurement"));
-        assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1,
-                MainActivity.checkpointId("bellwether-record-keeper-handoff"));
+        final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE;
+        final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !mill;
+        assertEquals(church ? 335 : -1, MainActivity.checkpointId("bellwether-record-keeper-handoff"));
+        assertEquals(mill ? 344 : -1, MainActivity.checkpointId("bellwether-mill-artificer"));
+        assertEquals(mill ? 345 : -1, MainActivity.checkpointId("bellwether-mill-drive-tested"));
         if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
             assertArrayEquals(new float[]{-.14f, -.11f}, MainActivity.developmentCheckpointViewPose(329), .000001f);
             assertArrayEquals(MainActivity.developmentCheckpointViewPose(329),
                     MainActivity.developmentCheckpointViewPose(337), .000001f);
-            assertArrayEquals(new float[]{1.57079632679f, -.07f}, MainActivity.developmentCheckpointViewPose(335), .000001f);
         } else {
             assertNull(MainActivity.developmentCheckpointViewPose(329));
             assertNull(MainActivity.developmentCheckpointViewPose(337));
+        }
+        if (church)
+            assertArrayEquals(new float[]{1.57079632679f, -.07f}, MainActivity.developmentCheckpointViewPose(335), .000001f);
+        else
             assertNull(MainActivity.developmentCheckpointViewPose(335));
+        if (mill) {
+            assertArrayEquals(new float[]{1.64f, -.32f}, MainActivity.developmentCheckpointViewPose(344), .000001f);
+            assertArrayEquals(MainActivity.developmentCheckpointViewPose(344),
+                    MainActivity.developmentCheckpointViewPose(345), .000001f);
+        } else {
+            assertNull(MainActivity.developmentCheckpointViewPose(344));
+            assertNull(MainActivity.developmentCheckpointViewPose(345));
         }
     }
 

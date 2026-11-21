@@ -974,11 +974,12 @@ public class MainActivity extends Activity {
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
+                final String specialist = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/";
                 for (String asset : new String[] {
                         "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
-                        "record-keeper/asset.manifest.json", "record-keeper/resident.glb",
-                        "record-keeper/base-color.android.ktx2", "record-keeper/normal.android.ktx2",
-                        "record-keeper/orm.android.ktx2"
+                        specialist + "asset.manifest.json", specialist + "resident.glb",
+                        specialist + "base-color.android.ktx2", specialist + "normal.android.ktx2",
+                        specialist + "orm.android.ktx2"
                 }) {
                     final String path = "private_bellwether/" + asset;
                     if (!stageAsset(path, path))
@@ -1119,6 +1120,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/south-door.manifest.json", "models/world/runtime/bellwether-tavern-v1/south-door.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
@@ -7406,7 +7409,10 @@ public class MainActivity extends Activity {
             case "bellwether-mill-yard": return 341;
             case "bellwether-river-landing": return 342;
             case "bellwether-rig-leak-trial": return 343;
-            case "bellwether-record-keeper-handoff": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 335 : -1;
+            case "bellwether-record-keeper-handoff":
+                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 335 : -1;
+            case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 344 : -1;
+            case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 345 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7760,7 +7766,11 @@ public class MainActivity extends Activity {
             case 341: return new float[]{1.76f, -0.21f};
             case 342:
             case 343: return new float[]{1.68f, -0.28f};
-            case 335: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{1.57079632679f, -0.07f} : null;
+            case 335:
+                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ?
+                        new float[]{1.57079632679f, -0.07f} : null;
+            case 344:
+            case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? new float[]{1.64f, -0.32f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};
@@ -9001,6 +9011,10 @@ public class MainActivity extends Activity {
                     case 5: return R.string.confirm_rig_seal;
                     case 6: return R.string.rig_leak_test_in_progress;
                     case 7: return R.string.rig_leak_test_return_to_dry;
+                    case 8: return R.string.seat_mill_bearing;
+                    case 9: return R.string.turn_mill_drive;
+                    case 10: return R.string.take_breathing_rig;
+                    case 11: return R.string.mill_drive_turning;
                     default: return 0;
                 }
             default: break;

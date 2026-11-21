@@ -14,7 +14,9 @@ std::filesystem::path WindowsCampaignDirectory()
     if(SUCCEEDED(result) && raw) {
         root=std::filesystem::path(raw)/"HordeLanternRT";
 #if defined(_DEBUG)
-        if(!gBellwetherCampaignActors.empty())root/="bellwether-debug";
+        if(!gBellwetherCampaignActors.empty())
+            root/=gBellwetherCampaignSpecialist==horde::gameplay::bellwether::Specialist::Artificer ?
+                "bellwether-mill-debug" : "bellwether-debug";
 #endif
         root/="campaign-v1";
     }
@@ -74,7 +76,8 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     std::string diagnostic;
 #if defined(_DEBUG)
     if(!gBellwetherCampaignActors.empty() &&
-       !horde::vulkan::raytracing::SetBellwetherResidentSources(scene,gBellwetherCampaignActors,diagnostic))
+       !horde::vulkan::raytracing::SetBellwetherResidentSources(
+            scene,gBellwetherCampaignActors,diagnostic,gBellwetherCampaignSpecialist))
         return CampaignPreparationFailure(ctx,"bellwether-residents",diagnostic);
 #endif
     auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();

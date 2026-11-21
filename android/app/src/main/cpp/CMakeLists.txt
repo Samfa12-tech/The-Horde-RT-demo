@@ -7,6 +7,10 @@ option(HORDE_RT_PRIVATE_REVIVAL "Private pinned owner revival candidate" OFF)
 option(HORDE_RT_SHIPPING17_CONTENT "Ordinary 1.7 pinned flask and revival content" OFF)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
 option(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE "Private Bellwether resident fixtures for the Debug app" OFF)
+option(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE "Use the mill specialist in the private resident roster" OFF)
+if(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE AND NOT HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE)
+    message(FATAL_ERROR "The mill specialist requires the private Debug resident roster.")
+endif()
 option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel candidate for live Debug play" OFF)
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
     message(FATAL_ERROR "The viewmodel candidate is restricted to Debug checkpoint-enabled builds.")
@@ -61,6 +65,7 @@ target_compile_definitions(horde_rt_probe_android PRIVATE
     HORDE_RT_FLASK_CANDIDATE=$<BOOL:${HORDE_RT_FLASK_CANDIDATE}>
     HORDE_RT_PRIVATE_REVIVAL=$<BOOL:${HORDE_RT_PRIVATE_REVIVAL}>
     HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=$<BOOL:${HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE}>
+    HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=$<BOOL:${HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE}>
     HORDE_RT_SHIPPING17_CONTENT=$<BOOL:${HORDE_RT_SHIPPING17_CONTENT}>
     HORDE_RT_MIN_RENDER_SCALE_PERCENT=${HORDE_RT_MIN_RENDER_SCALE_PERCENT}
     HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE=$<BOOL:${HORDE_RT_ANDROID_OUTDOOR_SCALE_PROBE}>

@@ -29,6 +29,8 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
         'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
         'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
         'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json',
@@ -101,7 +103,7 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 36) 'Android equipment and chapter staging require the closed 36-file package roster.'
+    Require ($required.Count -eq 38) 'Android equipment and chapter staging require the closed 38-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -265,6 +267,8 @@ try {
                        'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb',
                        'models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb',
                        'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+                       'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
                        'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
                        'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
@@ -287,7 +291,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 36-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 38-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -339,9 +343,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 74 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 75) 'Both base runtime rosters include the Bellwether world assets.'
-    Require ($windows.Count -eq 134 -and $android.Count -eq 135) 'Both platforms have the expected full runtime asset roster.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 76 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 77) 'Both base runtime rosters include the Bellwether world assets.'
+    Require ($windows.Count -eq 136 -and $android.Count -eq 137) 'Both platforms have the expected full runtime asset roster.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name
@@ -374,6 +378,8 @@ try {
         'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
         'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
         'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
         'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
         'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json',

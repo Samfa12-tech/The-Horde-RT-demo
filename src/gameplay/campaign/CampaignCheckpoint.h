@@ -90,7 +90,7 @@ inline bool Validate(const Checkpoint& c) {
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
     if (c.schema < 1 || c.schema > kMillPreparationSchema ||
-        c.millPreparation>bellwether::MillPreparation::RigTested ||
+        c.millPreparation>bellwether::MillPreparation::GearingVerified ||
         (c.millPreparation!=bellwether::MillPreparation::Unexamined &&
             (c.schema<kMillPreparationSchema || c.contentRevision<kBellwetherContentRevision ||
              c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||

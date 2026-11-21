@@ -337,8 +337,12 @@ private:
     void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
     bellwether::MillAction CurrentMillAction(const dialogue::Context&) const;
+    bool CanWorkAtMill(const dialogue::Context&) const;
+    bool MillTargetInReach(const dialogue::Context&,const std::array<float,3>& mark,float reach) const;
+    void AdvanceMillDriveTest(float seconds);
     void AdvanceMillLeakTest(float seconds);
     void InteractWithMill(bellwether::MillAction);
+    bool CommitMillPreparation(bellwether::MillPreparation);
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
     bool CanBuyLanternFitting(const dialogue::Context&) const;
@@ -399,6 +403,7 @@ private:
     bellwether::MillPreparation millPreparation_{};
     bellwether::MillLeakTestPhase millLeakTestPhase_{};
     float millLeakTestSeconds_{};
+    std::optional<float> millDriveTurnSeconds_;
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};

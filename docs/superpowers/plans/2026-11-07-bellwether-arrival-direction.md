@@ -323,7 +323,7 @@ The `bellwether-mill-yard` development checkpoint restores a completed tavern vi
 
 #### Mill bearing preparation
 
-After the hearth conversation, the player can **Inspect mill gearing** at the workbench. Bellwether Directions points to an open spare-parts bin south of the mill path. **Take a spare bearing** records the selected part, and **Check bearing fit** compares it with the retained reference at the bench. Each step updates the earned return record while preserving its position and resources. Earlier saves still start with the gearing unexamined. The fit check is optional and independent of the shrine ward and lantern fitting. It leaves the bearing ready for the artificer's repair. Running the mill and receiving the breathing rig remain later steps. The salvager encounter, millrace crossing and phone performance remain open.
+After the hearth conversation, the player can **Inspect mill gearing** at the workbench. Bellwether Directions points to an open spare-parts bin south of the mill path. **Take a spare bearing** records the selected part, and **Check bearing fit** compares it with the retained reference at the bench. Each step updates the earned return record while preserving its position and resources. Earlier saves still start with the gearing unexamined. The fit check is optional and independent of the shrine ward and lantern fitting. It leaves the bearing ready for the artificer's workbench repair. The waterwheel, salvager encounter, millrace crossing and phone performance remain open.
 
 The two fixtures add 180 triangles to the shared town mesh and reuse its existing materials. Both Windows hardware RT backends presented the bench reference, and the ARM64 debug package contains the same export. Save tests cover earlier records and all three updates to the existing autosave slot.
 
@@ -339,7 +339,7 @@ The native walkthrough enters and leaves the shallows, verifies wet-footstep pos
 
 The private Debug checkpoint bellwether-rig-leak-trial starts on the dry causeway with the rig ready to test. Enter the shallows at the rail and choose **Start leak test**. Stay on the wet platform for two active seconds. Leaving early resets the test and the player can try again. On a successful hold, the prompt directs the player back to dry stone. **Confirm seal** updates the existing tavern return record. Pausing freezes the test and reloading an unconfirmed result requires a fresh attempt.
 
-The checkpoint supplies the rig for testing. Normal campaign play ends this branch at the bearing fit check until the artificer's repair and hand-off are ready. The seal trial uses the existing shallow contact at the river rail. The salvager lesson, underwater traversal and Abbey crossing remain separate milestones.
+This isolated river checkpoint supplies the rig for testing. The separate private mill campaign earns the rig from the artificer after the workbench test. The seal trial uses the existing shallow contact at the river rail. The salvager lesson, underwater traversal and Abbey crossing remain separate milestones.
 
 The native walkthrough checks early retreat, pause, retry, the full wet hold and the dry confirmation. It checks that an unfinished trial restarts after loading and the confirmed seal survives loading. Both Windows hardware RT backends presented the Debug starting position at 960 x 540. The ARM64 Debug package passed the Android checkpoint and prompt tests. Phone performance remains open.
 
@@ -353,7 +353,15 @@ The Windows Debug checkpoint `bellwether-mill-artificer` restores the completed 
 
 For a local capture, use the checkpoint with `--capture-hidden` and `--chapter-resident-fixture` pointing to a directory containing `tavern-keeper` and `artificer` runtime packages. The capture records the artificer's foot position and requires all three submitted instance masks. Both Windows hardware RT backends presented the scene at 960 × 540. The native walkthrough verified grounded feet and a clear approach and rejected the checkpoint with the church roster. The separate return-to-Kit replay now uses the full first register reading, including the air ward offer, and presented the return with the original roster. The mill still uses the existing dim night lighting. The ARM64 Debug package and Android tests cover the existing church roster.
 
-The mill repair and rig fitting still need their gameplay interactions. Moving between the church and mill rosters during play, phone performance and exact distribution clearance remain open.
+#### Workbench repair and rig hand-off
+
+With the artificer present, **Seat the bearing** installs the replacement drive in the existing cradle. **Turn the drive** runs the bronze gear for one active second. Looking away or leaving reach resets that attempt, and pausing freezes it. The part remains seated after interruption or reload. Once the drive passes, face the artificer and choose **Take breathing rig** to unlock the river seal trial. The fitted, tested, handed-off and sealed states update the same tavern return record. The test checks the drive by hand at the workbench. The waterwheel and millrace remain open.
+
+The original Blender assembly uses one untextured bronze material and 384 triangles. The native renderer reuses the rigid-prop transform path. The drive adds one BLAS and one TLAS instance to the chapter and uses no extra texture layers. The `bellwether-mill-drive-tested` checkpoint walks to the bin and the workbench and reaches the tested stage through the normal action handlers.
+
+On Windows Debug, pass the two-role mill folder to the existing `--bellwether-campaign-dir` option. On Android, build Debug with the pinned `artificer` and `tavern-keeper` directories under the existing resident overlay. The mill profiles use separate save storage, and the existing church profiles continue to use the record keeper.
+
+The native walkthrough installs and tests the drive, takes the rig through the ordinary interaction, walks to the river and confirms the seal after checking pause, retreat, retry and reload. Matched empty and tested Windows captures passed at 960 × 540 on both hardware RT backends. The regular Windows Debug mill profile reached the tavern through the native campaign menus and restored its earned save. The separate ARM64 Debug package passed the checkpoint and interaction tests, and the APK inspection verified the exact gear, resident and voice entries. Moving between those rosters during play, phone performance and exact distribution clearance remain open.
 
 ## Open decisions deliberately preserved
 

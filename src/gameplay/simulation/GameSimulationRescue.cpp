@@ -29,6 +29,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     tavernKeeper_={};
     recordKeeper_.reset();
     artificer_.reset();
+    millDriveTurnSeconds_.reset();
     waysideArchive_={};
     treasurePurse_={};
     tavernDoor_={};

@@ -87,6 +87,8 @@ struct SimulationSnapshot
     bellwether::MillPreparation millPreparation{};
     bellwether::MillAction millAction{};
     bellwether::MillLeakTestPhase millLeakTestPhase{};
+    bool millDriveTesting=false;
+    float millDriveAngleRadians=0.f;
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {

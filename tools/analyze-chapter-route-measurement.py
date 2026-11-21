@@ -181,8 +181,10 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True):
     door_witness = run['schema'] == 5
     if door_witness:
         hashes = receipt['tavernAssetHashes']
-        assert set(hashes) == {'asset.manifest.json', 'bellwether-tavern-v1.glb',
-                               'south-door.manifest.json', 'bellwether-south-door.glb'}
+        original_assets = {'asset.manifest.json', 'bellwether-tavern-v1.glb',
+                           'south-door.manifest.json', 'bellwether-south-door.glb'}
+        drive_assets = {'mill-bench-drive.manifest.json', 'mill-bench-drive.glb'}
+        assert set(hashes) in (original_assets, original_assets | drive_assets)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in hashes.values())
     assert 60 <= run['durationSeconds'] <= 150 and run['simulationHz'] == 60
     assert not run['unoccludedClientChecks'] and not run['foregroundRequested']

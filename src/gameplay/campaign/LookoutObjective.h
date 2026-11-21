@@ -112,7 +112,13 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
             text+="\r\n\r\nTake the spare bearing to the mill workbench and check its fit.";
             break;
         case MillPreparation::FitChecked:
-            text+="\r\n\r\nMill bearing matched and ready for repair.";
+            text+="\r\n\r\nMill bearing matched. Seat it in the workbench drive when the artificer is present.";
+            break;
+        case MillPreparation::BearingSeated:
+            text+="\r\n\r\nThe bearing is seated. Turn the drive at the workbench to check it moves freely.";
+            break;
+        case MillPreparation::GearingVerified:
+            text+="\r\n\r\nThe drive turned freely. Collect the breathing rig from the artificer beside the bench.";
             break;
         case MillPreparation::RigTrialReady:
             text+="\r\n\r\nFollow the stone causeway south of the mill to the river rail. Start the leak test "

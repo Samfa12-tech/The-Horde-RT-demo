@@ -211,17 +211,17 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 37u,
+    Check(kRtInstanceMetadataCapacity == 38u,
           "chapter residents and the Bellwether props have independent metadata");
-    Check(kRtTlasInstanceCapacity == 118u,
+    Check(kRtTlasInstanceCapacity == 119u,
           "storage fits the legacy 31-slot prefix, forest reserves, five Bellwether props and two residents");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 22u, "static asset capacity includes the hinged tavern door");
-    Check(kRtPrimitiveMetadataCapacity == 47u, "primitive storage includes two door primitives");
-    Check(kRtMaterialCapacity == 43u, "material storage includes the two door finishes");
+    Check(kRtStaticAssetCapacity == 23u, "static asset capacity includes the fitted mill drive");
+    Check(kRtPrimitiveMetadataCapacity == 48u, "primitive storage includes the mill drive primitive");
+    Check(kRtMaterialCapacity == 44u, "material storage includes the mill bronze");
     Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&

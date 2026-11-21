@@ -20,6 +20,12 @@ inline constexpr auto kBellwetherMillYardView = BellwetherMapStation(35.45f, 13.
 inline constexpr BellwetherStation kBellwetherMillArtificerMark{117.45f,117.15f};
 inline constexpr BellwetherStation kBellwetherMillArtificerView{115.16f,117.00f};
 inline constexpr BellwetherStation kBellwetherMillWorkMark{bellwether::kMillWorkMark[0], bellwether::kMillWorkMark[2]};
+// The existing cradle sits .43 m east and .56 m north of the old bearing.
+inline constexpr std::array<float,3> kMillDriveMount{
+    bellwether::kMillComparison[0]+.43f, bellwether::kMillComparison[1]-.16f,
+    bellwether::kMillComparison[2]-.56f};
+inline constexpr std::array<float,3> kMillDriveWork{
+    kMillDriveMount[0], kMillDriveMount[1]+.18f, kMillDriveMount[2]};
 inline constexpr BellwetherStation kBellwetherBearingBinApproach{
     bellwether::kMillBearingBin[0]-1.f, bellwether::kMillBearingBin[2]};
 

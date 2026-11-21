@@ -76,7 +76,10 @@ if($doorway) {
  }
  $tavernAssetHashes=@{}
  $tavernRoot=Join-Path $assetRoot 'models/world/runtime/bellwether-tavern-v1'
- foreach($name in @('asset.manifest.json','bellwether-tavern-v1.glb','south-door.manifest.json','bellwether-south-door.glb')) {
+ $names=@('asset.manifest.json','bellwether-tavern-v1.glb','south-door.manifest.json','bellwether-south-door.glb')
+ $drive=@('mill-bench-drive.manifest.json','mill-bench-drive.glb')
+ if($drive | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$drive }
+ foreach($name in $names) {
   $tavernAssetHashes[$name]=(Get-FileHash -LiteralPath (Join-Path $tavernRoot $name) -Algorithm SHA256).Hash.ToLowerInvariant()
  }
 }

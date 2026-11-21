@@ -24,6 +24,7 @@
 #include "scene/atmosphere/ForestFireflies.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
@@ -633,6 +634,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waysideCoverBlas_ = std::exchange(other.waysideCoverBlas_, AccelerationStructure{});
     waysideRegisterBlas_ = std::exchange(other.waysideRegisterBlas_, AccelerationStructure{});
     tavernDoorBlas_ = std::exchange(other.tavernDoorBlas_, AccelerationStructure{});
+    millDriveBlas_ = std::exchange(other.millDriveBlas_, AccelerationStructure{});
     bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
     bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
@@ -695,6 +697,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waysideCoverAsset_ = std::move(other.waysideCoverAsset_);
     waysideRegisterAsset_ = std::move(other.waysideRegisterAsset_);
     tavernDoorAsset_ = std::move(other.tavernDoorAsset_);
+    millDriveAsset_ = std::move(other.millDriveAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -1781,6 +1784,7 @@ void PresentableTinyRtScene::Destroy()
         waysideCoverBlas_ = {};
         waysideRegisterBlas_ = {};
         tavernDoorBlas_ = {};
+        millDriveBlas_ = {};
         bellwetherFurnitureBlas_={};
         bellwetherNearCandidate_={};
         bellwetherNearBuildScratch_={};
@@ -1792,6 +1796,7 @@ void PresentableTinyRtScene::Destroy()
         waysideCoverAsset_ = {};
         waysideRegisterAsset_ = {};
         tavernDoorAsset_ = {};
+        millDriveAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1845,6 +1850,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waysideCoverBlas_);
     DestroyAccelerationStructure(waysideRegisterBlas_);
     DestroyAccelerationStructure(tavernDoorBlas_);
+    DestroyAccelerationStructure(millDriveBlas_);
     RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
     DestroyAccelerationStructure(bellwetherNearCandidate_);
     DestroyBuffer(bellwetherNearBuildScratch_);
@@ -1924,6 +1930,7 @@ void PresentableTinyRtScene::Destroy()
     waysideCoverAsset_ = {};
     waysideRegisterAsset_ = {};
     tavernDoorAsset_ = {};
+    millDriveAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -2040,7 +2047,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for(const auto& owner:bellwetherFurnitureBlas_)
         append(result.bottomLevelAccelerationStructures,owner.handle);
@@ -2109,7 +2116,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -3379,6 +3386,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     waysideCoverAsset_ = {};
     waysideRegisterAsset_ = {};
     tavernDoorAsset_ = {};
+    millDriveAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -3539,6 +3547,16 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
                 roadStoneManifest, roadStoneAsset_, diagnostic)) return false;
         if (!jointPropAssetAdmitted(roadStoneAsset_)) {
             diagnostic = "The Bellwether road stone requires one opaque untextured primitive and material.";
+            return false;
+        }
+        const auto millDirectory = root / "models/world/runtime/bellwether-tavern-v1";
+        horde::scene::assets::AssetManifest millDriveManifest;
+        if (!horde::scene::assets::AssetManifest::Load(millDirectory / "mill-bench-drive.manifest.json",
+                millDriveManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-bench-drive.glb",
+                millDriveManifest, millDriveAsset_, diagnostic)) return false;
+        if (!jointPropAssetAdmitted(millDriveAsset_) || millDriveAsset_.indices.size() != 384u * 3u) {
+            diagnostic = "The mill bench drive requires its bounded, opaque bronze geometry.";
             return false;
         }
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
@@ -5967,7 +5985,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!waysideRegisterAsset_.primitives.empty() && !buildRegisteredStaticBlas(kWaysideRegisterMetadataIndex,
             "Bellwether road register", waysideRegisterBlas_, true)) ||
         (!tavernDoorAsset_.primitives.empty() && !buildRegisteredStaticBlas(kTavernDoorMetadataIndex,
-            "Bellwether tavern door", tavernDoorBlas_, true)))
+            "Bellwether tavern door", tavernDoorBlas_, true)) ||
+        (!millDriveAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillDriveMetadataIndex,
+            "Bellwether mill bench drive", millDriveBlas_, true)))
         return false;
     if(bellwetherFurnitureTransitions_) {
         const std::uint32_t firstTier=(UsesBellwetherNearPage() ||
@@ -6498,6 +6518,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !PrepareChapterResidents({}, std::span(instances).subspan(tlasInstanceCount_,
             chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
     tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
+    if (millDriveBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_++];
+        ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
+            horde::gameplay::traversal::kMillDriveMount, 0.f), kMillDriveMetadataIndex, millDriveBlas_.address);
+        instance.mask = 0u;
+    }
     if(bellwetherFurnitureTransitions_) {
         activeBellwetherFurnitureDetail_=(bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_) ?
             horde::scene::BellwetherFurnitureDetail::Far : horde::scene::BellwetherFurnitureDetail::Near;
@@ -9064,6 +9090,13 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     std::array<RtIndexedActorGeometry, kAdditionalChapterActorCapacity> residentGeometries;
     if (!PrepareChapterResidents(frame, residentInstances, residentGeometries, diagnostic, observation))
         return false;
+    if (millDriveBlas_.address) {
+        auto& instance = instances[chapterPropSlot + residentInstances.size()];
+        ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
+            horde::gameplay::traversal::kMillDriveMount, frame.millDriveAngleRadians),
+            kMillDriveMetadataIndex, millDriveBlas_.address);
+        instance.mask = frame.millDriveInstalled ? 1u : 0u;
+    }
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||

@@ -77,7 +77,11 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.confirm_rig_seal, MainActivity.contextualInteractLabel(mill | (5 << 25) | 1));
         assertEquals(R.string.rig_leak_test_in_progress, MainActivity.contextualInteractLabel(mill | (6 << 25)));
         assertEquals(R.string.rig_leak_test_return_to_dry, MainActivity.contextualInteractLabel(mill | (7 << 25)));
-        assertEquals(0, MainActivity.lanternFittingPrice(mill | (7 << 25)));
+        assertEquals(R.string.seat_mill_bearing, MainActivity.contextualInteractLabel(mill | (8 << 25) | 1));
+        assertEquals(R.string.turn_mill_drive, MainActivity.contextualInteractLabel(mill | (9 << 25) | 1));
+        assertEquals(R.string.take_breathing_rig, MainActivity.contextualInteractLabel(mill | (10 << 25) | 1));
+        assertEquals(R.string.mill_drive_turning, MainActivity.contextualInteractLabel(mill | (11 << 25)));
+        assertEquals(0, MainActivity.lanternFittingPrice(mill | (11 << 25)));
     }
 
     private static Rect bounds(final View view) {

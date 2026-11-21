@@ -334,16 +334,24 @@ void GameSimulation::InteractWithMill(bellwether::MillAction action) {
         millLeakTestSeconds_=0.f;
         return;
     case MillAction::ConfirmSeal: preparation=MillPreparation::RigTested;break;
+    case MillAction::SeatBearing: preparation=MillPreparation::BearingSeated;break;
+    case MillAction::TurnDrive: millDriveTurnSeconds_=0.f;return;
+    case MillAction::TakeRig: preparation=MillPreparation::RigTrialReady;break;
     default: return;
     }
+    CommitMillPreparation(preparation);
+}
+
+bool GameSimulation::CommitMillPreparation(bellwether::MillPreparation preparation) {
     auto updated=*campaignBoundary_;
     RecordMillPreparation(updated,preparation);
-    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return;
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return false;
     millPreparation_=preparation;
-    millLeakTestPhase_=MillLeakTestPhase::Idle;
+    millLeakTestPhase_=bellwether::MillLeakTestPhase::Idle;
     millLeakTestSeconds_=0.f;
     campaignBoundary_=updated;
     ++campaignBoundaryRevision_;
+    return true;
 }
 
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {

@@ -79,16 +79,39 @@ void GameSimulation::InteractWithClaimedChapter() {
     }
 }
 
+bool GameSimulation::CanWorkAtMill(const dialogue::Context& c) const {
+    return c.claimed && c.exterior && c.alive && !c.paused && !c.traversing && !c.combat &&
+        c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+        chapterTerrainGeneration_==worldRoute_.generation && campaignBoundary_ &&
+        campaignBoundaryRevision_!=UINT64_MAX &&
+        campaignBoundary_->dialogue.tavernConversationLinesResolved==dialogue::kTavernConversation.size() &&
+        chapterDialogue_.State().line==dialogue::Line::None;
+}
+
+bool GameSimulation::MillTargetInReach(const dialogue::Context& c,const std::array<float,3>& mark,
+    float reach) const {
+    const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
+    const float distance=std::hypot(dx,dz);
+    return distance<=reach && std::abs(c.listener.y-mark[1])<=1.1f &&
+        std::sin(c.yaw)*dx-std::cos(c.yaw)*dz>=.75f*distance &&
+        chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
+            mark[1]-.02f,mark[1]+.02f,.025f);
+}
+
 bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context& c) const {
     using namespace bellwether;
-    if(millPreparation_==MillPreparation::FitChecked || millPreparation_==MillPreparation::RigTested ||
-       !c.claimed || !c.exterior ||
-       !c.alive || c.paused || c.traversing || c.combat || !c.kitSeated || !playerSupport_.grounded ||
-       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
-       !campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
-       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size() ||
-       chapterDialogue_.State().line!=dialogue::Line::None)
+    if(!CanWorkAtMill(c) || millPreparation_==MillPreparation::RigTested || millDriveTurnSeconds_)
         return MillAction::None;
+    if(millPreparation_==MillPreparation::GearingVerified) {
+        if(!artificer_)return MillAction::None;
+        auto speaker=artificer_->foot;
+        speaker[1]+=1.37f;
+        return MillTargetInReach(c,speaker,2.5f)?MillAction::TakeRig:MillAction::None;
+    }
+    if(millPreparation_==MillPreparation::FitChecked || millPreparation_==MillPreparation::BearingSeated) {
+        if(!artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f))return MillAction::None;
+        return millPreparation_==MillPreparation::FitChecked?MillAction::SeatBearing:MillAction::TurnDrive;
+    }
     if(millPreparation_==MillPreparation::RigTrialReady) {
         const bool wet=waterContact_.Snapshot().wetGround;
         constexpr auto dry=traversal::kBellwetherRiverDryMark;
@@ -101,14 +124,23 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
     }
     const bool atBin=millPreparation_==MillPreparation::BearingNeeded;
     const auto& mark=atBin?kMillBearingBin:kMillComparison;
-    const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
-    const float distance=std::hypot(dx,dz);
-    if(distance>1.75f || std::abs(c.listener.y-mark[1])>1.1f ||
-       std::sin(c.yaw)*dx-std::cos(c.yaw)*dz<.75f*distance ||
-       !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
-           mark[1]-.02f,mark[1]+.02f,.025f))return MillAction::None;
+    if(!MillTargetInReach(c,mark,1.75f))return MillAction::None;
     if(atBin)return MillAction::RecoverBearing;
     return millPreparation_==MillPreparation::Unexamined?MillAction::InspectGearing:MillAction::CheckFit;
+}
+
+void GameSimulation::AdvanceMillDriveTest(float seconds) {
+    if(!millDriveTurnSeconds_)return;
+    const auto c=ChapterInteractionContext(false);
+    if(!CanWorkAtMill(c) || !artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f)) {
+        millDriveTurnSeconds_.reset();
+        return;
+    }
+    *millDriveTurnSeconds_+=seconds;
+    if(*millDriveTurnSeconds_+1.e-5f>=bellwether::kMillDriveTestSeconds) {
+        CommitMillPreparation(bellwether::MillPreparation::GearingVerified);
+        millDriveTurnSeconds_.reset();
+    }
 }
 
 void GameSimulation::AdvanceMillLeakTest(float seconds) {

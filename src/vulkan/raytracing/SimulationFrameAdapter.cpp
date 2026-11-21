@@ -298,6 +298,8 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.waysideArchivePose = simulation.waysideArchive.pose;
     frame.tavernDoorOpening = simulation.tavernDoor.opening;
     frame.waysideRegisterRecovered = simulation.waysideArchive.registerRecovered;
+    frame.millDriveInstalled = horde::gameplay::bellwether::HasMillDrive(simulation.millPreparation);
+    frame.millDriveAngleRadians = simulation.millDriveAngleRadians;
     if (simulation.tavernKeeper) {
         using namespace horde::gameplay::dialogue;
         const auto& keeper = *simulation.tavernKeeper;

@@ -32,7 +32,7 @@ enum class DevelopmentRewardPose : std::uint8_t
 };
 
 enum class BellwetherBranchView : std::uint8_t {
-    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction, MillYard, RiverLanding, RigLeakTrial, MillArtificer
+    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction, MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested
 };
 
 struct DevelopmentCheckpoint
@@ -95,7 +95,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 142u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 143u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -297,6 +297,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 142u> kDevelopmentCheckpoints
      .yaw=1.64f,.pitch=-.32f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
      .bellwetherBranchView=BellwetherBranchView::MillArtificer},
+    {.id=345,.name="bellwether-mill-drive-tested",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherMillArtificerView.x,.cameraZ=traversal::kBellwetherMillArtificerView.z,
+     .yaw=1.64f,.pitch=-.32f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::MillDriveTested},
     {.id=342,.name="bellwether-river-landing",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRiverLandingView.x,.cameraZ=traversal::kBellwetherRiverLandingView.z,
      .yaw=1.68f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,

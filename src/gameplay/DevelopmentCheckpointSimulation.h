@@ -197,7 +197,8 @@ inline bool StageDevelopmentCheckpointSimulation(
     if(checkpoint.bellwetherBranchView!=BellwetherBranchView::None) {
         using namespace simulation;
         using namespace bellwether;
-        const bool artificer=checkpoint.bellwetherBranchView==BellwetherBranchView::MillArtificer;
+        const bool driveTested=checkpoint.bellwetherBranchView==BellwetherBranchView::MillDriveTested;
+        const bool artificer=driveTested || checkpoint.bellwetherBranchView==BellwetherBranchView::MillArtificer;
         const bool millYard=artificer || checkpoint.bellwetherBranchView==BellwetherBranchView::MillYard;
         const bool rigTrial=checkpoint.bellwetherBranchView==BellwetherBranchView::RigLeakTrial;
         const bool riverLanding=rigTrial || checkpoint.bellwetherBranchView==BellwetherBranchView::RiverLanding;
@@ -217,7 +218,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         record.contentRevision=campaign::kBellwetherContentRevision;
         record.schema=campaign::kTavernConversationSchema;
         if(rigTrial) {
-            // Stand in for the artificer's future hand-off in this Debug entry point.
+            // Isolated river checkpoint for testing the seal without replaying the mill.
             record.schema=campaign::kMillPreparationSchema;
             record.millPreparation=MillPreparation::RigTrialReady;
         }
@@ -258,10 +259,36 @@ inline bool StageDevelopmentCheckpointSimulation(
                state.waterContact.wetGround)return finalize(false);
         } else if(millYard) {
             const auto& mill=traversal::kBellwetherMillApproach;
-            for(auto station=mill.begin()+1;station!=mill.end();++station)
-                if(!walkStation(*station))return finalize(false);
-            if(!walkStation(traversal::kBellwetherMillWorkMark) || !walkStation(mill.back()))
-                return finalize(false);
+            const auto reachWorkbench=[&] {
+                for(auto station=mill.begin()+1;station!=mill.end();++station)
+                    if(!walkStation(*station))return false;
+                return walkStation(traversal::kBellwetherMillWorkMark);
+            };
+            if(!reachWorkbench())return finalize(false);
+            if(driveTested) {
+                const auto use=[&](MillAction action,const std::array<float,3>& target) {
+                    input.moveForward=0;input.runHeld=false;
+                    input.yawRadians=std::atan2(target[0]-state.playerX,state.playerZ-target[2]);
+                    advance();
+                    if(state.millAction!=action)return false;
+                    // Use the ordinary action handler without consuming a live platform edge.
+                    gameSimulation.InteractWithClaimedChapter();
+                    advance();
+                    return true;
+                };
+                if(!use(MillAction::InspectGearing,kMillComparison) || !walkStation(mill.back()))
+                    return finalize(false);
+                for(auto station=mill.rbegin()+1;station!=mill.rend()-1;++station)
+                    if(!walkStation(*station))return finalize(false);
+                if(!walkStation(traversal::kBellwetherBearingBinApproach) ||
+                   !use(MillAction::RecoverBearing,kMillBearingBin) ||
+                   !reachWorkbench() || !use(MillAction::CheckFit,kMillComparison) ||
+                   !use(MillAction::SeatBearing,traversal::kMillDriveWork) ||
+                   !use(MillAction::TurnDrive,traversal::kMillDriveWork))return finalize(false);
+                for(unsigned tick=0;tick<70 && state.millDriveTesting;++tick)advance();
+                if(state.millPreparation!=MillPreparation::GearingVerified)return finalize(false);
+            }
+            if(!walkStation(mill.back()))return finalize(false);
             const auto view=artificer?traversal::kBellwetherMillArtificerView:traversal::kBellwetherMillYardView;
             if(!walkStation(view))return finalize(false);
         } else {

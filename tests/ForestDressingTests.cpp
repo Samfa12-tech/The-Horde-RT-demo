@@ -2127,7 +2127,7 @@ void TestBellwetherResidentRosters(
     }
 }
 
-void TestBellwetherRigLeakTrial(
+void TestBellwetherMillRepairAndLeakTrial(
     const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
     namespace sim=gameplay::simulation;
     namespace cp=gameplay::campaign;
@@ -2135,42 +2135,64 @@ void TestBellwetherRigLeakTrial(
     using gameplay::bellwether::MillAction;
     using gameplay::bellwether::MillLeakTestPhase;
     using gameplay::bellwether::MillPreparation;
-    const auto config=sim::ProductionGameSimulationConfig();
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=gameplay::bellwether::Specialist::Artificer;
+    config.bellwetherTavernKeeperAdmitted=true;
     sim::GameSimulation game(config);
     game.SetDevelopmentRescueJourney(true,true);
-    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-rig-leak-trial");
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-mill-drive-tested");
     const auto generation=game.Snapshot().worldRoute.generation;
     const bool ready=view && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
         gameplay::StageDevelopmentCheckpointSimulation(game,*view);
     const auto& state=game.Snapshot();
-    Check(ready && !state.waterContact.wetGround && state.millAction==MillAction::None &&
-          state.millPreparation==MillPreparation::RigTrialReady,
-          "the private rig checkpoint stages on dry stone before the test");
+    Check(ready && state.millAction==MillAction::TakeRig &&
+          state.millPreparation==MillPreparation::GearingVerified && !state.millDriveTesting &&
+          std::abs(state.millDriveAngleRadians-gameplay::bellwether::kMillDriveTestRadians)<.001f,
+          "the real workbench route fits and turns the drive before the artificer offers the rig");
+    if(!ready)std::cerr<<"Mill repair stopped at "<<state.playerX<<','<<state.playerZ
+        <<" stage "<<unsigned(state.millPreparation)<<" action "<<unsigned(state.millAction)<<'\n';
     if(!ready)return;
 
     sim::InputSnapshot input;
     input.damageEnabled=false;input.tutorialEnabled=false;
     input.commands.interact=state.lastConsumedInteractSequence;
+    input.yawRadians=state.playerYawRadians;input.pitchRadians=state.playerPitchRadians;
     const auto step=[&] {
         game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
         game.ClearEvents();
     };
     const auto walkTo=[&](BellwetherStation point) {
-        for(unsigned tick=0;tick<180;++tick) {
+        for(unsigned tick=0;tick<1800;++tick) {
             const float dx=point.x-state.playerX,dz=point.z-state.playerZ;
             const float distance=std::hypot(dx,dz);
             if(distance<.008f) {
-                input.moveForward=0;
+                input.moveForward=0;input.runHeld=false;
                 step();
                 return true;
             }
             input.yawRadians=std::atan2(dx,-dz);
             input.moveForward=std::min(1.f,distance/.055f);
+            input.runHeld=distance>.3f;
             step();
         }
         return false;
     };
     const auto interact=[&] {++input.commands.interact;step();};
+    const auto repairRevision=game.CampaignBoundaryRevision();
+    interact();
+    interact();
+    Check(state.millPreparation==MillPreparation::RigTrialReady && state.millAction==MillAction::None &&
+          game.CampaignBoundaryRevision()==repairRevision+1,
+          "only taking the rig from the artificer earns the seal trial and the hand-off saves once");
+    const auto& mill=kBellwetherMillApproach;
+    if(!walkTo(mill.back())) {Check(false,"can leave the mill bench with the rig");return;}
+    for(auto station=mill.rbegin()+1;station!=mill.rend()-1;++station)
+        if(!walkTo(*station)) {Check(false,"can retrace the mill approach with the rig");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"can reach the river path with the rig");return;}
+    const auto& landing=kBellwetherRiverLanding;
+    for(auto station=landing.begin();station!=landing.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"can follow the dry causeway with the rig");return;}
+    if(!walkTo(kBellwetherRiverLandingView)) {Check(false,"can reach the dry test starting point");return;}
     constexpr auto shallows=kBellwetherRiverLanding.back();
     const auto trialBoundaryRevision=game.CampaignBoundaryRevision();
     interact();
@@ -2476,7 +2498,7 @@ void TestFullSurroundings()
             TestBellwetherTavernRoute(recreatedTerrain,true);
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
-            TestBellwetherRigLeakTrial(recreatedTerrain);
+            TestBellwetherMillRepairAndLeakTrial(recreatedTerrain);
             TestBellwetherResidentRosters(recreatedTerrain);
         }
     }

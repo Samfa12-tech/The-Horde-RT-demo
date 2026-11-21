@@ -633,6 +633,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!tavernDoorAsset_.primitives.empty())
         registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
+    if (!millDriveAsset_.primitives.empty())
+        registrations.push_back({kMillDriveMetadataIndex, 0x42303547u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &millDriveAsset_});
     if (!furniture->primitives.empty()) {
         StaticRtAssetRegistration tiers{kBellwetherFurnitureLane, 0x42303146u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, furnitureOwner};

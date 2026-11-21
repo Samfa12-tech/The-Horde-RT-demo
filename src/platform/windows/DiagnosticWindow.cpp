@@ -219,6 +219,7 @@ bool gShowcaseCaptureHidden=false;
 std::filesystem::path gBellwetherVoiceDirectory;
 bool gBellwetherArrivalAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
+horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherExpeditionValidation = false;
 bool gBellwetherHearthRestValidation = false;
@@ -229,8 +230,7 @@ horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationCo
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
 #if defined(_DEBUG)
     config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
-    if (!gBellwetherCampaignActors.empty())
-        config.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;
+    config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
 #endif
     return config;
 }
@@ -546,6 +546,9 @@ struct ShowcaseCaptureRecord
     std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
     std::optional<horde::gameplay::bellwether::ArtificerPose> artificer;
     std::array<std::uint8_t,3> millResidentMasks{};
+    horde::gameplay::bellwether::MillPreparation millPreparation{};
+    float millDriveAngleRadians=0.f;
+    std::uint8_t millDriveMask=0u;
     bool registerInterpreted = false;
     std::uint64_t tavernLanternPresentedRaiseTick = 0;
     unsigned tavernLanternLinesStarted = 0;
@@ -1433,7 +1436,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     const bool returnToKit = residentCheckpoint &&
         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::KitIntroduction;
     options.artificerCapture = residentCheckpoint &&
-        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillArtificer;
+        (residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillArtificer ||
+         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillDriveTested);
     options.staffedTavernCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None ||
          returnToKit || options.artificerCapture);
@@ -1679,6 +1683,13 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
         {"record-keeper/normal.windows.ktx2", "ac7b1b04940c66b88176b2209a4d934467c67ece2e85497aae3c387c73f091a0"},
         {"record-keeper/orm.windows.ktx2", "98163b1d3313ed5aa6fbab5cc00b37f25bbba9546c73f370ad1fcd3ae2bdded6"}
     };
+    constexpr std::pair<std::string_view, std::string_view> artificer[]{
+        {"artificer/asset.manifest.json", "890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864"},
+        {"artificer/resident.glb", "58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f"},
+        {"artificer/base-color.windows.ktx2", "8dc88a5c8b417e044611e423c7ac512e85d751fb1d9baee1f849e731edce5492"},
+        {"artificer/normal.windows.ktx2", "7185fe6d08e19f029cb2dcb3d37f8d04f94fcb9190836733e4dcbb9cc1d2493a"},
+        {"artificer/orm.windows.ktx2", "f99cb2a329f67eba4270b86abfd355831326ab289bf518a3a57c386447353d1a"}
+    };
     std::error_code error;
     const auto root = std::filesystem::canonical(directory, error);
     if (error) return false;
@@ -1691,8 +1702,14 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
         }
         return true;
     };
-    if (!matches(recordKeeper) || (!matches(standIn) && !matches(texturedKeeper))) return false;
+    if (!matches(standIn) && !matches(texturedKeeper)) return false;
+    const bool mill = std::filesystem::exists(root / "artificer", error);
+    if (error) return false;
+    const bool church = std::filesystem::exists(root / "record-keeper", error);
+    if (error || mill == church || !(mill ? matches(artificer) : matches(recordKeeper))) return false;
     gBellwetherCampaignActors = root;
+    using horde::gameplay::bellwether::Specialist;
+    gBellwetherCampaignSpecialist = mill ? Specialist::Artificer : Specialist::RecordKeeper;
     return true;
 }
 #endif
@@ -3542,7 +3559,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const auto leakTest=snapshot.millLeakTestPhase;
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
     const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern ||
-                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle)
+                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle || snapshot.millDriveTesting)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
@@ -3583,6 +3600,9 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case MillAction::CheckFit: text = "LEFT-CLICK / A TO CHECK BEARING FIT"; break;
         case MillAction::StartLeakTest: text = "LEFT-CLICK / A TO START LEAK TEST"; break;
         case MillAction::ConfirmSeal: text = "LEFT-CLICK / A TO CONFIRM SEAL"; break;
+        case MillAction::SeatBearing: text = "LEFT-CLICK / A TO SEAT THE BEARING"; break;
+        case MillAction::TurnDrive: text = "LEFT-CLICK / A TO TURN THE DRIVE"; break;
+        case MillAction::TakeRig: text = "LEFT-CLICK / A TO TAKE THE BREATHING RIG"; break;
         default: break;
         }
         context.tavernInteractionPromptPresented=visible;
@@ -3609,6 +3629,9 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             break;
         }
         context.tavernInteractionPromptPresented=visible;
+    }
+    else if(snapshot.millDriveTesting) {
+        text = "TESTING THE DRIVE";
     }
     else if(leakTest!=MillLeakTestPhase::Idle) {
         text = leakTest==MillLeakTestPhase::Testing ? "LEAK TEST | STAY IN THE SHALLOWS" : "RETURN TO DRY STONE";
@@ -6906,7 +6929,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         const bool authoredShowcase = rescueJourney &&
             ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
         if (!horde::vulkan::raytracing::SetBellwetherResidentSources(ctx.rtScene,
-                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic)) {
+                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic,
+                gBellwetherCampaignSpecialist)) {
             ctx.lastRtFrameError = diagnostic;
             return false;
         }
@@ -8714,7 +8738,11 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      << "], \"yaw\": " << smith.yaw << ", \"submittedMasks\": {\"kit\": "
                      << unsigned(capture.millResidentMasks[0]) << ", \"tavernKeeper\": "
                      << unsigned(capture.millResidentMasks[1]) << ", \"artificer\": "
-                     << unsigned(capture.millResidentMasks[2]) << "}}";
+                     << unsigned(capture.millResidentMasks[2]) << "}}"
+                     << ", \"millDrive\": {\"progress\": "
+                     << horde::gameplay::bellwether::MillProgress(capture.millPreparation)
+                     << ", \"angleRadians\": " << capture.millDriveAngleRadians
+                     << ", \"submittedMask\": " << unsigned(capture.millDriveMask) << "}";
         }
         if (capture.tavernLanternPresentedRaiseTick) {
             manifest << ", \"tavernLanternIntroduction\": {\"presentedRaiseTick\": "
@@ -9378,6 +9406,11 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.artificer = simulation.artificer;
         if (record.artificer) {
             using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.millPreparation = simulation.millPreparation;
+            record.millDriveAngleRadians = simulation.millDriveAngleRadians;
+            record.millDriveMask = context.rtScene.SubmittedInstanceMask(Scene::kMillDriveMetadataIndex);
+            if ((record.millDriveMask != 0u) != horde::gameplay::bellwether::HasMillDrive(record.millPreparation))
+                return fail("The mill drive submission disagrees with the earned repair stage.");
             record.millResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
                 context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
                 context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};

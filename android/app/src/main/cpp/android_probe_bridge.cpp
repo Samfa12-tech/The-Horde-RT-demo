@@ -661,12 +661,17 @@ void InvalidateBenchmarkSummaryLocked()
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
 
+constexpr auto AndroidBellwetherSpecialist() {
+    using horde::gameplay::bellwether::Specialist;
+    return HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE ? Specialist::Artificer : Specialist::RecordKeeper;
+}
+
 horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationConfig()
 {
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = true;
-    config.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;
+    config.bellwetherSpecialist = AndroidBellwetherSpecialist();
 #endif
     return config;
 }
@@ -1303,14 +1308,16 @@ void PublishSimulationUiState()
         contextualControls |= static_cast<int>(price << 25) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
-             (simulation.millAction != MillAction::None || simulation.millLeakTestPhase != MillLeakTestPhase::Idle)) {
-        // Tag 7 shares the archive/fitting lanes. Details 6 and 7 are read-only leak test cues.
+             (simulation.millAction != MillAction::None || simulation.millLeakTestPhase != MillLeakTestPhase::Idle ||
+              simulation.millDriveTesting)) {
+        // Tag 7 shares the archive/fitting lanes. Details 6, 7 and 11 are read-only cues.
         constexpr int millTag=7, detailShift=25;
         static_assert(static_cast<int>(horde::gameplay::bellwether::ArchiveAction::RestoreBinding)<millTag);
-        static_assert(static_cast<int>(MillAction::ConfirmSeal)==5);
+        static_assert(static_cast<int>(MillAction::ConfirmSeal)==5 && static_cast<int>(MillAction::SeatBearing)==8 &&
+                      static_cast<int>(MillAction::TakeRig)==10);
         const bool actionable=simulation.millAction!=MillAction::None;
         const int detail=actionable ? static_cast<int>(simulation.millAction) :
-            simulation.millLeakTestPhase==MillLeakTestPhase::Testing ? 6 : 7;
+            simulation.millDriveTesting ? 11 : simulation.millLeakTestPhase==MillLeakTestPhase::Testing ? 6 : 7;
         contextualControls |= (millTag << 16) | (detail << detailShift) | (actionable ? 1 : 0);
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
@@ -3702,7 +3709,8 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         return false;
     }
     if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
-            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{}, diagnostic)) {
+            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
+            diagnostic, AndroidBellwetherSpecialist())) {
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
         return false;
     }

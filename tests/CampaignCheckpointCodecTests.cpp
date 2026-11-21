@@ -118,14 +118,15 @@ int main() {
         Check(codec::Decode(Encode(mill),decoded,error) && decoded.millPreparation==MillPreparation::Unexamined,
             "a completed tavern save from before the mill can start mill preparation");
         for(auto progress:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked,
-                           MillPreparation::RigTrialReady,MillPreparation::RigTested}) {
+                           MillPreparation::RigTrialReady,MillPreparation::RigTested,
+                           MillPreparation::BearingSeated,MillPreparation::GearingVerified}) {
             mill.millPreparation=progress;
             mill.schema=cp::kTavernConversationSchema;
             Check(!cp::Validate(mill),"an older schema never silently discards mill preparation");
             mill.schema=cp::kMillPreparationSchema;
             RoundTrip(mill);
         }
-        auto corrupt=Encode(mill);corrupt.back()=std::byte{6};Rechecksum(corrupt);
+        auto corrupt=Encode(mill);corrupt.back()=std::byte{8};Rechecksum(corrupt);
         Reject(corrupt,codec::Error::InvalidCheckpoint);
         --mill.dialogue.tavernConversationLinesResolved;
         Check(!cp::Validate(mill),"mill preparation requires the earned tavern conversation");

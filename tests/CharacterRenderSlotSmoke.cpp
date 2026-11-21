@@ -279,13 +279,13 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 29u &&
-                      PresentableTinyRtScene::kBlasCount == 31u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 30u &&
+                      PresentableTinyRtScene::kBlasCount == 32u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 118u &&
-                      kRtInstanceMetadataCapacity == 37u &&
-                      kRtStaticAssetCapacity == 22u &&
-                      kRtPrimitiveMetadataCapacity == 47u && kRtMaterialCapacity == 43u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 119u &&
+                      kRtInstanceMetadataCapacity == 38u &&
+                      kRtStaticAssetCapacity == 23u &&
+                      kRtPrimitiveMetadataCapacity == 48u && kRtMaterialCapacity == 44u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
@@ -1111,8 +1111,8 @@ int main()
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
         ok &= Require(sceneSource.find(
                           "geometry.flags = transmissive\n"
-                          "                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
-                          "                : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
+                          "            ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
+                          "            : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
                       "transmissive BLAS geometry must suppress duplicate candidates without making glass opaque");
         ok &= Require(hitDecodeSource.find("#if HORDE_GENERIC_TRANSMISSION_VARIANT\n") != std::string::npos &&
                       hitDecodeSource.find("if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)") != std::string::npos &&
