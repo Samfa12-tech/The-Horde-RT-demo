@@ -471,6 +471,7 @@ struct CaptureLaunchOptions
     std::filesystem::path bellwetherVoiceDirectory;
     std::filesystem::path bellwetherCampaignDirectory;
     bool staffedTavernCapture = false;
+    bool recordKeeperCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -711,6 +712,7 @@ struct VulkanSurfaceContext
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
     std::filesystem::path chapterResidentFixture;
     bool staffedTavernCapture = false;
+    bool recordKeeperCapture = false;
     bool combinedBellwetherResidents = false;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
@@ -1379,11 +1381,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
         residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::KitIntroduction;
     options.staffedTavernCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None || returnToKit);
-    const bool recordKeeperCapture = returnToKit || (residentCheckpoint &&
+    options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
         residentCheckpoint->bellwetherNorthView == horde::gameplay::BellwetherNorthView::RegisterHandoff);
-    if (options.error.empty() && (options.staffedTavernCapture || recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
+    if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
         (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
-         (!options.staffedTavernCapture && !recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
+         (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
         options.error = "Chapter resident fixtures require a hidden reunion, staffed tavern or record keeper capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
@@ -6773,7 +6775,7 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
                 ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "tavern-keeper" : ctx.chapterResidentFixture,
                 "resident.glb", clips});
         }
-        if (ctx.combinedBellwetherResidents || ctx.developmentCheckpoint == "bellwether-record-keeper-handoff") {
+        if (ctx.combinedBellwetherResidents || ctx.recordKeeperCapture) {
             fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
                 ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "record-keeper" : ctx.chapterResidentFixture,
                 "resident.glb", {clips.front()}});
@@ -9907,6 +9909,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
     context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
     context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
+    context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
     std::error_code fixtureError;
     context.combinedBellwetherResidents=developmentCheckpoint &&
         (*developmentCheckpoint=="bellwether-return-to-kit" ||
@@ -9943,8 +9946,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
         simulationConfig.bellwetherTavernKeeperAdmitted |= context.staffedTavernCapture;
         simulationConfig.bellwetherRecordKeeperAdmitted |= !context.chapterResidentFixture.empty() &&
-            (context.combinedBellwetherResidents ||
-             (developmentCheckpoint && *developmentCheckpoint=="bellwether-record-keeper-handoff"));
+            (context.combinedBellwetherResidents || context.recordKeeperCapture);
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }
