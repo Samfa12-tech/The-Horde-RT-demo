@@ -175,6 +175,69 @@ inline bool StageDevelopmentCheckpointSimulation(
         return false;
     };
 
+    const auto completedForestProgress = [] {
+        dialogue::Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        return progress;
+    };
+    if (checkpoint.bellwetherStaffedView != BellwetherStaffedView::None) {
+        using namespace simulation;
+        if (!chapterTerrain || !gameSimulation.config_.bellwetherTavernKeeperAdmitted)
+            return finalize(false);
+        // Seed an already-earned tavern save, then use the ordinary restore
+        // transaction and input edges. The full approach is tested separately.
+        campaign::Checkpoint record;
+        record.schema = campaign::kTavernConversationSchema;
+        record.contentRevision = campaign::kBellwetherContentRevision;
+        record.id = campaign::CheckpointId::BellwetherTavern;
+        record.zone = campaign::Destination(record.id);
+        record.firstAscentCompleted = true;
+        record.position = campaign::kBellwetherCheckpointPosition;
+        record.yaw = checkpoint.yaw;
+        record.pitch = checkpoint.pitch;
+        record.swordStowed = true;
+        record.dialogue = completedForestProgress();
+        record.dialogue.hearthLinesResolved = static_cast<std::uint8_t>(dialogue::kHearthLines.size());
+        InputSnapshot input;
+        input.damageEnabled = false;
+        input.tutorialEnabled = false;
+        input.yawRadians = record.yaw;
+        input.pitchRadians = record.pitch;
+        const auto token = gameSimulation.BeginCampaignRestore(record);
+        if (!token || !gameSimulation.CommitCampaignRestore(*token, {token->worldGeneration, record.zone},
+                chapterTerrain, input, gameSimulation.Snapshot().inputPublicationSequence))
+            return finalize(false);
+        const auto advance = [&] {
+            stepFixed(input, 1.f/60.f, gameSimulation.Snapshot().inputPublicationSequence+1);
+            accumulateEvents();
+            gameSimulation.ClearEvents();
+        };
+        advance();
+        if (!gameSimulation.Snapshot().tavernConversationAvailable) return finalize(false);
+        input.commands.interact = gameSimulation.Snapshot().lastConsumedInteractSequence + 1;
+        advance();
+        if (gameSimulation.Snapshot().chapterDialogue.line != dialogue::Line::TavernIntroduce)
+            return finalize(false);
+        ++input.commands.dialogueSkip;
+        advance();
+        const auto& reply = gameSimulation.Snapshot();
+        if (!reply.tavernKeeper || reply.tavernKeeper->stage != dialogue::TavernKeeperStage::AtHearth ||
+            reply.chapterDialogue.line != dialogue::Line::TavernHordeArmy ||
+            reply.chapterDialogue.source.x != reply.tavernKeeper->foot[0] ||
+            reply.chapterCompanion.bellwetherArrival != dialogue::BellwetherArrivalStage::Seated)
+            return finalize(false);
+        if (checkpoint.bellwetherStaffedView == BellwetherStaffedView::KeeperReply) return finalize(true);
+        if (!walkTo(input, advance, checkpoint.cameraX, checkpoint.cameraZ)) return finalize(false);
+        input.moveForward = 0;
+        input.runHeld = false;
+        input.yawRadians = checkpoint.yaw;
+        input.pitchRadians = checkpoint.pitch;
+        advance();
+        return finalize(gameSimulation.Snapshot().chapterDialogue.line == dialogue::Line::None &&
+            gameSimulation.Snapshot().tavernKeeper.has_value());
+    }
+
     if(checkpoint.bellwetherSitTicks!=0 || checkpoint.bellwetherAnkleTicks!=0) {
         using namespace simulation;
         const bool ankle=checkpoint.bellwetherAnkleTicks!=0;
@@ -191,9 +254,7 @@ inline bool StageDevelopmentCheckpointSimulation(
         const auto support=traversal::ChapterExteriorSupport(chapterTerrain.get(),lookout.x,lookout.z);
         if(!support.grounded)return finalize(false);
         record.position={lookout.x,support.worldY,lookout.z};record.yaw=2.51f;record.pitch=-.15f;
-        auto& progress=record.dialogue;
-        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
-        progress.forestNightConsumed=progress.forestWaystoneConsumed=progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        record.dialogue=completedForestProgress();
         InputSnapshot input;
         input.damageEnabled=false;input.tutorialEnabled=false;
         input.yawRadians=record.yaw;input.pitchRadians=record.pitch;

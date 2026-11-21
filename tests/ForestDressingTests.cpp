@@ -1421,6 +1421,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     const auto& keeper=game.Snapshot().tavernKeeper;
     Check(stayAtIncident ? (keeper && keeperAtDoor && keeperWalkedAfterSeat && keeperTravel>9.7f && keeperTravel<10.f &&
           minimumSpeakerGap>.85f && keeper->stage==TavernKeeperStage::AtHearth &&
+          keeper->travelled==0.f && std::abs(keeper->walkSeconds*1.08f-keeperTravel)<.001f &&
           std::abs(keeper->foot[1]-kKeeperHearth[1])<.001f && game.Snapshot().tavernConversationAvailable)
           : (!keeper && !game.Snapshot().tavernConversationAvailable),
           "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");

@@ -5,17 +5,20 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <optional>
 
 namespace horde::gameplay::dialogue {
 
 enum class TavernKeeperStage { AtDoor, Walking, AtHearth };
+inline constexpr std::uint32_t kTavernKeeperActorId = 0x4230314bu;
 
 struct TavernKeeperPose {
     TavernKeeperStage stage;
     std::array<float,3> foot;
     float yaw;
     float travelled = 0.f;
+    float walkSeconds = 0.f;
 };
 
 // Logical blocking is shared with the motor and can be consumed by a resident
@@ -59,12 +62,14 @@ public:
             return;
         }
         if(std::abs(turn)>.3f)return;
-        const float travel=std::min(distance,1.08f*dt);
+        constexpr float walkMetresPerSecond = 1.08f;
+        const float travel=std::min(distance,walkMetresPerSecond*dt);
         const float x=travel==distance?target[0]:pose.foot[0]+dx/distance*travel;
         const float z=travel==distance?target[2]:pose.foot[2]+dz/distance*travel;
         const auto moved=traversal::ResolveChapterStepMovement(terrain,pose.foot[0],pose.foot[2],x,z,
             pose.foot[1],kBodyRadius,kBodyHeight);
-        if(moved.accepted)pose={TavernKeeperStage::Walking,{x,moved.support.worldY,z},pose.yaw,travel};
+        if(moved.accepted)pose={TavernKeeperStage::Walking,{x,moved.support.worldY,z},pose.yaw,
+            travel,pose.walkSeconds+travel/walkMetresPerSecond};
     }
 
 private:

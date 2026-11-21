@@ -2,6 +2,7 @@
 #include "gameplay/campaign/CampaignPlaySession.h"
 #include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/BellwetherShell.h"
 #include "scene/assets/AssetManifest.h"
@@ -166,6 +167,23 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
           "the real tavern remains quiet on Interact until a keeper is admitted");
     auto staffedConfig=sim::ProductionGameSimulationConfig();
     staffedConfig.bellwetherTavernKeeperAdmitted=true;
+    for (const auto name : {"bellwether-keeper-reply", "bellwether-staffed-room"}) {
+        sim::GameSimulation capture(staffedConfig);
+        capture.SetDevelopmentRescueJourney(true, true);
+        const auto generation = capture.Snapshot().worldRoute.generation;
+        const bool ready = capture.PublishChapterTerrain({generation, sim::WorldZoneId::TombExterior}, terrain);
+        const auto* view = horde::gameplay::FindDevelopmentCheckpoint(name);
+        const bool staged = ready && view && horde::gameplay::StageDevelopmentCheckpointSimulation(capture, *view);
+        Check(staged, "the staffed diagnostic uses the authored terrain, restore and fixed-step Talk interaction");
+        if (staged) {
+            const auto& frame = capture.Snapshot();
+            const auto expected = view->bellwetherStaffedView == horde::gameplay::BellwetherStaffedView::KeeperReply
+                ? Line::TavernHordeArmy : Line::None;
+            Check(frame.tavernKeeper && frame.chapterDialogue.line == expected &&
+                  std::hypot(frame.playerX - view->cameraX, frame.playerZ - view->cameraZ) < .01f,
+                "reply holds the keeper line and the room view walks outside interaction reach");
+        }
+    }
     sim::GameSimulation staffed(staffedConfig);
     Check(Seed(staffed,complete,terrain),"staffed tavern uses the same real room and campaign transaction");
     cp::PlaySession staffedPlay(staffed,directory.path);

@@ -657,6 +657,22 @@ int main()
     auto chapterInterior = rescueExteriorSnapshot;
     chapterInterior.rescue.exteriorSide = false;
     const auto chapterInteriorFrame = BuildRtSceneFrameInputs(chapterInterior, .75f);
+    {
+        using namespace horde::gameplay::dialogue;
+        auto staffed = rescueExteriorSnapshot;
+        staffed.tavernKeeper = TavernKeeperPose{TavernKeeperStage::Walking, {85.65f,-8.70955f,111.f},
+            .6f, .018f, .8f};
+        const auto moving = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        staffed.tavernKeeper->travelled = 0.f;
+        const auto stopped = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        staffed.tavernKeeper.reset();
+        const auto vacant = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        ok &= Require(moving.stableId == kTavernKeeperActorId && moving.foot == std::array{85.65f,-8.70955f,111.f} &&
+                Near(moving.yaw, 3.14159265359f-.6f) && moving.clip == horde::scene::SkinnedClip::Walking &&
+                Near(moving.time, .8f) && stopped.stableId == moving.stableId &&
+                stopped.clip == horde::scene::SkinnedClip::Idle && stopped.time == 0.f && !vacant.stableId,
+            "keeper presentation uses the immutable foot, facing and admitted walk clock");
+    }
     ok &= Require(Near(chapterInteriorFrame.tuning.fogDensityScale, 0.f) &&
                   chapterInteriorFrame.lich.roomMistDensityScale == chapterInterior.lich.roomMistDensityScale,
                   "chapter tomb removes global distance fog without changing authoritative Keeper mist clearing");

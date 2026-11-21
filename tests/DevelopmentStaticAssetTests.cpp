@@ -69,8 +69,10 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 124u,
-          "development registry retains prior views and adds the tavern window inspection");
+    Check(kDevelopmentCheckpoints.size() == 126u &&
+          FindShowcaseCheckpoint("bellwether-keeper-reply") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-staffed-room") == nullptr,
+          "staffed tavern views are restricted to the development registry");
     {
         simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
         const auto* hit=FindDevelopmentCheckpoint(238);

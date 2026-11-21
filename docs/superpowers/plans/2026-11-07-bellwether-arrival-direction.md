@@ -114,6 +114,10 @@ The shared interaction and save path now supports the three-line exchange betwee
 
 In the staffed fixture, the keeper's chair greeting plays as a caption when Kit approaches the south door and the player is within earshot. Solid walls block the cue, and moving on ends it without a repeat on backtracking. Kit keeps walking through it. The cue uses the same admitted-keeper gate as Talk and stays out of saved playback state.
 
+The keeper's resident render pose now comes from the shared simulation. Each admitted walking step advances the clip clock by its travelled distance at the staged walking speed. The door and hearth use the resident's idle pose. The Windows hidden views `bellwether-keeper-reply` and `bellwether-staffed-room` use `--chapter-resident-fixture <directory>` with a local textureless Kit stand-in. Both restore an already-earned tavern record through the normal save transaction. They take the Talk and Skip input edges and verify that the reply originates at the keeper's authored hearth mark. The reply view freezes there. The room view walks back through the real interior and verifies that the caption stops outside Talk range.
+
+At 960 × 540 on the RTX 5050 Laptop GPU, both hardware RT backends presented the room view with seated Kit, the stand-in, active glazing, and the hearth and reward lantern in the uploaded light roster. The scene used 34 TLAS definitions and 25 BLAS owners. The RayTracingPipeline reply view also preserved the `hub.horde_army` state in its capture manifest. Kit reads mostly as a silhouette from the doorway. The original keeper asset, voiced playback, final scene lighting and phone performance need their own checks. The live approach, welcome and movement remain covered by the separate authored route test.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

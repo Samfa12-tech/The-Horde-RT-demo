@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "scene/CompanionPose.h"
 
 #include <algorithm>
 #include <cmath>
@@ -294,6 +295,15 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.developmentRescueJourney = simulation.developmentRescueJourney;
     frame.rescue = simulation.rescue;
     frame.chapterCompanion = simulation.chapterCompanion;
+    if (simulation.tavernKeeper) {
+        using namespace horde::gameplay::dialogue;
+        const auto& keeper = *simulation.tavernKeeper;
+        const bool moving = keeper.stage == TavernKeeperStage::Walking && keeper.travelled > 0;
+        frame.chapterResidents[0] = {kTavernKeeperActorId, keeper.foot,
+            horde::scene::CompanionModelYaw(keeper.yaw),
+            moving ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle,
+            moving ? keeper.walkSeconds : 0.f};
+    }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;

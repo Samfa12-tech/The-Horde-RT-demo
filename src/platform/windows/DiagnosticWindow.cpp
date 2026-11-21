@@ -450,6 +450,7 @@ constexpr UINT kMaxFramesInFlight = 1u;
 struct CaptureLaunchOptions
 {
     std::filesystem::path chapterResidentFixture;
+    bool staffedTavernCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -532,6 +533,8 @@ struct ShowcaseCaptureRecord
     horde::gameplay::items::HeldItemTransform publishedLanternHinge{};
     horde::gameplay::items::HeldItemTransform publishedLanternBody{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
+    horde::gameplay::dialogue::Line chapterLine = horde::gameplay::dialogue::Line::None;
     float keeperDissolve = 0.0f;
     float playerHeightDelta = 0.0f;
     std::uint8_t playerSupportId = 0u;
@@ -681,6 +684,7 @@ struct VulkanSurfaceContext
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> previewMeshPairMaster;
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
     std::filesystem::path chapterResidentFixture;
+    bool staffedTavernCapture = false;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
@@ -1314,10 +1318,14 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
            options.validateChapterRoundTrip)
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
     }
-    if (options.error.empty() && !options.chapterResidentFixture.empty() &&
-        (!options.requested || !options.captureHidden || options.developmentCheckpoint != "chapter-kit-reunion" ||
+    const auto* residentCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+    options.staffedTavernCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None;
+    if (options.error.empty() && (options.staffedTavernCapture || !options.chapterResidentFixture.empty()) &&
+        (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
+         (!options.staffedTavernCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
-        options.error = "Chapter resident fixtures require a hidden chapter-kit-reunion capture.";
+        options.error = "Chapter resident fixtures require a hidden reunion or staffed tavern capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -6604,9 +6612,14 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         using horde::vulkan::raytracing::ChapterResidentActorSource;
         const std::vector<horde::scene::SkinnedClipBinding> clips{
             {"Warden|idle", true, true}, {"Warden|walk", true, true}};
-        const std::array fixtures{
-            ChapterResidentActorSource{0x52544431, ctx.chapterResidentFixture, "resident.glb", clips},
-            ChapterResidentActorSource{0x52544432, ctx.chapterResidentFixture, "resident.glb", clips}};
+        std::vector<ChapterResidentActorSource> fixtures;
+        if (ctx.staffedTavernCapture) {
+            fixtures.push_back({horde::gameplay::dialogue::kTavernKeeperActorId,
+                ctx.chapterResidentFixture, "resident.glb", clips});
+        } else {
+            fixtures.push_back({0x52544431, ctx.chapterResidentFixture, "resident.glb", clips});
+            fixtures.push_back({0x52544432, ctx.chapterResidentFixture, "resident.glb", clips});
+        }
         if (!ctx.rtScene.SetChapterResidentActors(fixtures, diagnostic)) {
             ctx.lastRtFrameError = diagnostic;
             return false;
@@ -7497,7 +7510,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             return false;
         }
 #if defined(_DEBUG)
-        if (!ctx.chapterResidentFixture.empty()) {
+        if (!ctx.chapterResidentFixture.empty() && !ctx.staffedTavernCapture) {
             const auto terrain = ctx.rtScene.ChapterTerrainSurface();
             const auto request = [&](std::size_t lane, std::uint32_t id, float x, float z, float yaw,
                                      horde::scene::SkinnedClip clip, float time) {
@@ -8345,8 +8358,15 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"ankleSeconds\": " << capture.chapterCompanion.motion.anklePlaybackSeconds
                  << ", \"bellwetherArrival\": " << static_cast<unsigned>(capture.chapterCompanion.bellwetherArrival)
                  << ", \"bellwetherStation\": " << capture.chapterCompanion.bellwetherStation
-                 << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}"
-                 << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
+                 << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}";
+        if (capture.tavernKeeper) {
+            const auto& keeper = *capture.tavernKeeper;
+            manifest << ", \"tavernKeeper\": {\"stage\": " << static_cast<unsigned>(keeper.stage)
+                     << ", \"foot\": [" << keeper.foot[0] << ", " << keeper.foot[1] << ", " << keeper.foot[2]
+                     << "], \"yaw\": " << keeper.yaw << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId << "\"}";
+        }
+        manifest << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
             manifest << (mask == 0u ? "" : ", ")
@@ -8945,6 +8965,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.publishedLanternHinge = simulation.rewardLanternWorldFromHinge;
         record.publishedLanternBody = simulation.lanternPendulum.worldFromBody;
         record.chapterCompanion = simulation.chapterCompanion;
+        record.tavernKeeper = simulation.tavernKeeper;
+        record.chapterLine = simulation.chapterDialogue.line;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
         record.playerHeightDelta = simulation.playerHeightDelta;
         record.playerSupportId = static_cast<std::uint8_t>(simulation.playerSupportId);
@@ -9653,6 +9675,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
     context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
+    context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
 #if HORDE_RT_FRAME_STAGE_PROBE
     context.captureGpuStages=ParseCaptureLaunchOptions().captureGpuStages;
 #endif
@@ -9682,6 +9705,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         // Only the strictly isolated existing route validator may opt in.
         // Normal application configuration, settings and save schema stay OFF.
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
+        simulationConfig.bellwetherTavernKeeperAdmitted=context.staffedTavernCapture;
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }

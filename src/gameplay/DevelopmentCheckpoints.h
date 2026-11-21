@@ -11,6 +11,8 @@
 namespace horde::gameplay
 {
 
+enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply };
+
 enum class DevelopmentCombatPose : std::uint8_t
 {
     Rest,
@@ -73,6 +75,7 @@ struct DevelopmentCheckpoint
     std::size_t bellwetherStations = 0;
     std::uint32_t bellwetherSitTicks = 0;
     std::uint32_t bellwetherAnkleTicks = 0;
+    BellwetherStaffedView bellwetherStaffedView = BellwetherStaffedView::None;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
 };
@@ -83,10 +86,10 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     const DevelopmentCheckpoint& checkpoint) noexcept
 {
     return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-") ||
-        checkpoint.bellwetherStations!=0;
+        checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 124u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 126u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -234,6 +237,13 @@ inline constexpr std::array<DevelopmentCheckpoint, 124u> kDevelopmentCheckpoints
      .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,
      .yaw=2.43f,.pitch=.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthDoorStation+2},
+    {.id=326,.name="bellwether-staffed-room",.baseShowcaseCheckpointId=11,
+     .cameraX=83.97f,.cameraZ=114.04f,.yaw=-.14f,.pitch=-.11f,.stagesRescueExterior=true,
+     .bellwetherStaffedView=BellwetherStaffedView::Room},
+    {.id=327,.name="bellwether-keeper-reply",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=2.47f,.pitch=-.08f,.stagesRescueExterior=true,
+     .bellwetherStaffedView=BellwetherStaffedView::KeeperReply},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,
