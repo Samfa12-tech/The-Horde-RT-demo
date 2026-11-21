@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.GradientDrawable;
 import android.hardware.input.InputManager;
 import android.os.SystemClock;
 import android.view.InputDevice;
@@ -13,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -442,6 +444,38 @@ public class AndroidControllerIntegrationTest {
         a.onBackPressed();assertTrue(field("menuVisible").getBoolean(a));assertTrue(Bridge.paused);
         a.onBackPressed();assertFalse(field("menuVisible").getBoolean(a));assertFalse(Bridge.paused);
         assertFalse(a.isFinishing());assertNull(ShadowAlertDialog.getLatestAlertDialog());
+    }
+
+    @Test public void subtitleSettingsApplyAndPersistAcrossReopening() throws Exception {
+        set("appRoot", a.findViewById(R.id.root));
+        call("createChapterDialogueOverlay", new Class<?>[]{});
+        call("showSettings", new Class<?>[]{});
+        final View menu = (View) field("menuScrim").get(a);
+        final TextView caption = (TextView) field("chapterSubtitleText").get(a);
+        final View panel = (View) field("chapterSubtitlePanel").get(a);
+        final String yellowLabel = a.getString(R.string.subtitle_yellow);
+        final String backingLabel = "Add contrast backing behind subtitles";
+        final String opacityTag = "graphics-slider-" + a.getString(R.string.subtitle_backing_opacity);
+        assertEquals(0xFFF2E9D8, caption.getCurrentTextColor());
+        assertNull(panel.getBackground());
+
+        findButton(menu, yellowLabel).performClick();
+        findButton(menu, backingLabel).performClick();
+        ((SeekBar) menu.findViewWithTag(opacityTag)).setProgress(30); // 40%, including the 10% floor.
+        assertEquals(0xFFFFDF69, caption.getCurrentTextColor());
+        assertEquals(0x66000000, ((GradientDrawable) panel.getBackground()).getColor().getDefaultColor());
+        call("showSettings", new Class<?>[]{});
+        assertTrue(((CheckBox) findButton(menu, yellowLabel)).isChecked());
+        assertTrue(((CheckBox) findButton(menu, backingLabel)).isChecked());
+        assertEquals(30, ((SeekBar) menu.findViewWithTag(opacityTag)).getProgress());
+
+        findButton(menu, backingLabel).performClick();
+        assertNull(panel.getBackground());
+        findButton(menu, backingLabel).performClick();
+        assertEquals(0x66000000, ((GradientDrawable) panel.getBackground()).getColor().getDefaultColor());
+        findButton(menu, a.getString(R.string.reset_non_graphics)).performClick();
+        assertEquals(0xFFF2E9D8, caption.getCurrentTextColor());
+        assertNull(panel.getBackground());
     }
 
     @Test public void pauseRevokesExitConfirmationAndDelayedPositiveTapCannotExit()throws Exception {

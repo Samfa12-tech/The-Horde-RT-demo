@@ -44,6 +44,15 @@ build. Both residents are prepared with the authored chapter scene before a
 save is resumed. The same campaign can continue on foot from the lookout to
 the tavern, where the game can earn and restore the tavern checkpoint.
 
+In **Settings → Chapter subtitles**, **Yellow subtitles** switches the
+existing white text to yellow. Both colours use the same black outline on the
+speaker and line. Enable the optional dark backing and set its opacity from
+10% to 100%. Existing enabled backings retain their previous 79% opacity
+until changed. These settings also apply to text-only directions and required
+dialogue captions. The Bellwether phone check should review both colours
+against the outdoor route, firelight and dark tavern at normal and enlarged
+text sizes.
+
 ```powershell
 .\gradlew.bat :app:assembleDebug "-PhordeBellwetherResidentDir=<local-root>" '-Pandroid.injected.build.abi=arm64-v8a'
 ```

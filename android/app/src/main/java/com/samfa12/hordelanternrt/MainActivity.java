@@ -110,6 +110,10 @@ public class MainActivity extends Activity {
     private static final String PREF_CHAPTER_SUBTITLE_SIZE = "chapter_subtitle_size_percent";
     private static final String PREF_CHAPTER_SUBTITLE_POSITION = "chapter_subtitle_position";
     private static final String PREF_CHAPTER_SUBTITLE_BACKING = "chapter_subtitle_backing";
+    private static final String PREF_CHAPTER_SUBTITLE_YELLOW = "chapter_subtitle_yellow";
+    private static final String PREF_CHAPTER_SUBTITLE_BACKING_OPACITY = "chapter_subtitle_backing_opacity";
+    private static final int DEFAULT_SUBTITLE_BACKING_OPACITY = 79;
+    private static final int MIN_SUBTITLE_BACKING_OPACITY = 10;
     private static final String PREF_CHAPTER_VOICE_VOLUME = "chapter_voice_volume";
     static final int SUBTITLE_POSITION_AUTO = 0;
     static final int SUBTITLE_POSITION_TOP = 1;
@@ -4173,12 +4177,10 @@ public class MainActivity extends Activity {
         chapterSubtitleScroll.setFillViewport(true);
         chapterSubtitleScroll.setVerticalScrollBarEnabled(true);
         chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
-        chapterSubtitleText = new TextView(this);
-        chapterSubtitleText.setTextColor(0xFFF2E9D8);
+        chapterSubtitleText = new OutlinedSubtitleView(this);
         chapterSubtitleText.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         chapterSubtitleText.setGravity(Gravity.CENTER);
         chapterSubtitleText.setIncludeFontPadding(true);
-        chapterSubtitleText.setShadowLayer(dp(2), 0, dp(1), 0xE6000000);
         chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         final LinearLayout content = new LinearLayout(this);
@@ -4194,21 +4196,28 @@ public class MainActivity extends Activity {
         chapterSubtitlePanel.setVisibility(View.GONE);
         appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        applyChapterSubtitleBacking();
+        applyChapterSubtitleStyle();
     }
 
-    private void applyChapterSubtitleBacking() {
+    private int chapterSubtitleBackingOpacity() {
+        return Math.max(MIN_SUBTITLE_BACKING_OPACITY, Math.min(100, GraphicsPreferences.integer(
+                preferences, PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, DEFAULT_SUBTITLE_BACKING_OPACITY)));
+    }
+
+    private void applyChapterSubtitleStyle() {
         if (chapterSubtitlePanel == null) return;
-        if (preferences != null && preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)) {
+        final boolean yellow = preferences != null &&
+                InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_YELLOW, false);
+        chapterSubtitleText.setTextColor(yellow ? 0xFFFFDF69 : 0xFFF2E9D8);
+        if (hasChapterSubtitleBacking()) {
             final GradientDrawable backing = new GradientDrawable();
-            backing.setColor(0xC9000000);
+            backing.setColor(Color.argb(Math.round(chapterSubtitleBackingOpacity() * 255f / 100f), 0, 0, 0));
             backing.setCornerRadius(dp(3));
             chapterSubtitlePanel.setBackground(backing);
-            chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
         } else {
             chapterSubtitlePanel.setBackground(null);
-            applyChapterSubtitleBasePadding();
         }
+        applyChapterSubtitleBasePadding();
         reflowChapterDialoguePlacement();
     }
 
@@ -4518,10 +4527,13 @@ public class MainActivity extends Activity {
         chapterSubtitlePanel.setLayoutParams(params);
     }
 
+    private boolean hasChapterSubtitleBacking() {
+        return preferences != null && InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_BACKING, false);
+    }
+
     private void applyChapterSubtitleBasePadding() {
-        final boolean backing = preferences != null &&
-                preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false);
-        final int horizontal = backing ? dp(8) : 0;
+        final boolean backing = hasChapterSubtitleBacking();
+        final int horizontal = backing ? dp(8) : dp(2);
         final int vertical = backing ? dp(4) : dp(2);
         chapterSubtitlePanel.setPadding(horizontal, vertical, horizontal, vertical);
     }
@@ -4610,19 +4622,36 @@ public class MainActivity extends Activity {
         subtitlesEnabled.setOnCheckedChangeListener((buttonView, checked) ->
                 preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLES, checked).apply());
         panel.addView(subtitlesEnabled, matchWrap());
+        final CheckBox subtitleYellow = new CheckBox(this);
+        subtitleYellow.setText(R.string.subtitle_yellow);
+        subtitleYellow.setTextColor(0xFFFFE5BA);
+        subtitleYellow.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitleYellow.setTextSize(16);
+        subtitleYellow.setMinHeight(dp(48));
+        subtitleYellow.setChecked(InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_YELLOW, false));
+        subtitleYellow.setOnCheckedChangeListener((buttonView, checked) -> {
+            preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_YELLOW, checked).apply();
+            applyChapterSubtitleStyle();
+        });
+        panel.addView(subtitleYellow, matchWrap());
         final CheckBox subtitleBacking = new CheckBox(this);
         subtitleBacking.setText("Add contrast backing behind subtitles");
         subtitleBacking.setContentDescription("Add a subtle background behind subtitles for extra contrast");
         subtitleBacking.setTextColor(0xFFFFE5BA);
         subtitleBacking.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
         subtitleBacking.setTextSize(16);
-        subtitleBacking.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false));
+        subtitleBacking.setChecked(hasChapterSubtitleBacking());
         subtitleBacking.setMinHeight(dp(48));
         subtitleBacking.setOnCheckedChangeListener((buttonView, checked) -> {
             preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, checked).apply();
-            applyChapterSubtitleBacking();
+            applyChapterSubtitleStyle();
         });
         panel.addView(subtitleBacking, matchWrap());
+        addSlider(panel, getString(R.string.subtitle_backing_opacity), chapterSubtitleBackingOpacity(),
+                MIN_SUBTITLE_BACKING_OPACITY, 100, value -> {
+                    preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, value).apply();
+                    applyChapterSubtitleStyle();
+                });
         addSlider(panel, "Subtitle size", clampChapterSubtitleSize(
                         preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)), 80, 160,
                 value -> {
@@ -4743,6 +4772,9 @@ public class MainActivity extends Activity {
                             .putBoolean(PREF_CHAPTER_SUBTITLES, true)
                             .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
                             .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
+                            .putBoolean(PREF_CHAPTER_SUBTITLE_YELLOW, false)
+                            .putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)
+                            .putInt(PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, DEFAULT_SUBTITLE_BACKING_OPACITY)
                             .putInt(PREF_CHAPTER_VOICE_VOLUME, 100)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
@@ -4752,6 +4784,7 @@ public class MainActivity extends Activity {
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
                     applyInterfacePresentation();
+                    applyChapterSubtitleStyle();
                     showSettings();
                 },
                 getString(R.string.back), () -> showMainMenu(false));

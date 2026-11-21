@@ -6,7 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.KeyEvent;
@@ -25,6 +29,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.GraphicsMode;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = 34)
@@ -161,14 +166,55 @@ public final class ChapterSubtitlePolicyTest {
         assertEquals(null, panel.getBackground());
         activity.getSharedPreferences("subtitle-policy", Context.MODE_PRIVATE).edit()
                 .putBoolean("chapter_subtitle_backing", true).apply();
-        call("applyChapterSubtitleBacking", new Class<?>[]{});
-        assertNotNull("the optional accessibility backing is available", panel.getBackground());
+        call("applyChapterSubtitleStyle", new Class<?>[]{});
+        assertEquals("the previous enabled backing keeps its opacity", 0xC9000000,
+                ((GradientDrawable) panel.getBackground()).getColor().getDefaultColor());
         assertNotNull(subtitle.getTypeface());
         assertEquals(View.IMPORTANT_FOR_ACCESSIBILITY_YES, subtitle.getImportantForAccessibility());
         assertEquals(View.ACCESSIBILITY_LIVE_REGION_POLITE, subtitle.getAccessibilityLiveRegion());
         subtitle.setText("An entire line remains available to screen readers.");
         subtitle.setContentDescription(subtitle.getText());
         assertEquals(subtitle.getText().toString(), subtitle.getContentDescription().toString());
+    }
+
+    @Test
+    @GraphicsMode(GraphicsMode.Mode.NATIVE)
+    public void bothCaptionColoursRenderTheSameBlackOutlineOnABrightBackground() throws Exception {
+        final TextView subtitle = (TextView) get("chapterSubtitleText");
+        subtitle.setText("Kit\nThe road leads to Bellwether.");
+        subtitle.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, 24);
+        subtitle.measure(View.MeasureSpec.makeMeasureSpec(420, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(120, View.MeasureSpec.EXACTLY));
+        subtitle.layout(0, 0, 420, 120);
+        final int dialogueTop = subtitle.getTotalPaddingTop() + subtitle.getLayout().getLineTop(1);
+        int whiteOutlinePixels = 0;
+        for (boolean yellow : new boolean[]{false, true}) {
+            activity.getSharedPreferences("subtitle-policy", Context.MODE_PRIVATE).edit()
+                    .putBoolean("chapter_subtitle_yellow", yellow).apply();
+            call("applyChapterSubtitleStyle", new Class<?>[]{});
+            final int fillColor = yellow ? 0xFFFFDF69 : 0xFFF2E9D8;
+            final Bitmap frame = Bitmap.createBitmap(420, 120, Bitmap.Config.ARGB_8888);
+            frame.eraseColor(Color.WHITE);
+            subtitle.draw(new Canvas(frame));
+            final int[] pixels = new int[420 * 120];
+            frame.getPixels(pixels, 0, 420, 0, 0, 420, 120);
+            int fillPixels = 0;
+            int speakerOutlinePixels = 0;
+            int dialogueOutlinePixels = 0;
+            for (int i = 0; i < pixels.length; ++i) {
+                if (pixels[i] == fillColor) ++fillPixels;
+                if (pixels[i] == Color.BLACK) {
+                    if (i / 420 < dialogueTop) ++speakerOutlinePixels;
+                    else ++dialogueOutlinePixels;
+                }
+            }
+            assertTrue("the selected fill is drawn", fillPixels > 100);
+            assertTrue("the speaker name is outlined", speakerOutlinePixels > 10);
+            assertTrue("the spoken line is outlined", dialogueOutlinePixels > 100);
+            final int outlinePixels = speakerOutlinePixels + dialogueOutlinePixels;
+            if (yellow) assertEquals("colour selection preserves the outline", whiteOutlinePixels, outlinePixels);
+            else whiteOutlinePixels = outlinePixels;
+        }
     }
 
     @Test public void landscapeCaptionUsesTheMeasuredOpenLaneAtLargeSystemFont() throws Exception {
