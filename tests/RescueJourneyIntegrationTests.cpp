@@ -100,12 +100,13 @@ int main(int argc,char** argv) {
  if(authored) {
   unsigned chapterSelections=0;
   for(const auto& checkpoint:kDevelopmentCheckpoints) {
-   const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-");
+   const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-") ||
+       checkpoint.name=="bellwether-south-approach" || checkpoint.name=="bellwether-tavern-hearth";
    check(DevelopmentCheckpointRequiresAuthoredChapter(checkpoint)==expected,
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==41,"live journey and all40 chapter views, including F03/F04 directions, both demo-endpoint views and retention views, retain authored-scene admission");
+  check(chapterSelections==43,"the live journey, 40 chapter views and two Bellwether views require authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right",
                        "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {
