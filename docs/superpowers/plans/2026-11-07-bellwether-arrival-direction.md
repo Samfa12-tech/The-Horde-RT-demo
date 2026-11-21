@@ -90,6 +90,8 @@ The Windows host fixture drives the shared player motor from a completed 1.7 loo
 
 The editable tavern blockout is derived from the v4 master. It retains the floor height and roofline and fits an 11.5 m stone ramp to the current terrain. The ramp rises roughly 3.26 m from its buried toe to the 2.2 m wide south doorway. The ramp, floor, building solids and west-wall hearth share the native render geometry with the movement system. See the [Blender recipe](../../../tools/author-bellwether-tavern.py) and [asset receipt](../../../assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json).
 
+The Windows Diagnostic capture reached the hearth through ordinary fixed-step movement with the full forest admitted and presented a 960 × 540 hardware RayTracingPipeline frame. The exterior ramp capture reached the requested point and wrote an image, but failed the first-person arm-pixel check with zero primary arm pixels. Keep that failure open for the next first-person pass. The scoped host, renderer-resource and Android staging/menu checks passed. These checks leave device performance and owner playtesting open.
+
 Block the ankle turn on the lower road so Kit has a short protective walk. The room currently supplies a traversable shell and an unlit hearth. Chair/table placement, injury/walk/sit performance, fire, the keeper, conversation, tavern checkpoint and combined scene timing remain open.
 
 ## Open decisions deliberately preserved
