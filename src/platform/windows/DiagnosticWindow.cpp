@@ -3648,6 +3648,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
           !visibility.captureMode
         : horde::platform::windows::ShouldShowWindowsChestPrompt(snapshot.chestPrompt, visibility);
     std::string_view text;
+    bool showingShorePracticeCue = false;
     if (rescueJourney)
     {
         using horde::gameplay::traversal::RescuePrompt;
@@ -3728,11 +3729,13 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         text = leakTest==MillLeakTestPhase::Testing ? "LEAK TEST | STAY IN THE SHALLOWS" : "RETURN TO DRY STONE";
     }
     else if(shorePractice!=ShorePracticeStage::Idle) {
+        showingShorePracticeCue = true;
         switch(shorePractice) {
         case ShorePracticeStage::FindDryMark: text="FOLLOW THE CAUSEWAY TO THE RIVER RAIL"; break;
         case ShorePracticeStage::EnterShallows: text="WADE TO THE RAIL"; break;
         case ShorePracticeStage::Retreat: text="RETURN TO DRY STONE"; break;
         case ShorePracticeStage::ReportBack: text="RETURN TO THE SALVAGER AT THE FORK"; break;
+        case ShorePracticeStage::RecoverBreath: text="RECOVER BREATH ON DRY STONE"; break;
         case ShorePracticeStage::Idle: break;
         }
     }
@@ -3744,6 +3747,11 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
              snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     }
     std::string contextualText(text);
+    if (showingShorePracticeCue && snapshot.shorePracticeBreathTicksRemaining > 0) {
+        contextualText += " | BREATH " + std::to_string(
+            horde::gameplay::bellwether::ShorePracticeSecondsRemaining(
+                snapshot.shorePracticeBreathTicksRemaining)) + "s";
+    }
     if(chapterInteract && snapshot.tavernLanternFittingAvailable)
         contextualText+=" ("+std::to_string(horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice)+" COINS)";
     if (snapshot.tavernLanternAvailable) {

@@ -1352,13 +1352,27 @@ void PublishSimulationUiState()
     else if ((contextualControls & (1 << 9)) == 0 &&
              (simulation.salvagerAction != SalvagerAction::None ||
               simulation.shorePracticeStage != ShorePracticeStage::Idle)) {
-        // Shared river context uses details 12–14 for actions and 15–18 for cues.
+        // Shared river context uses details 12–14 for actions, 15–18 for
+        // untimed cues, 19 for dry recovery, 20–35 for an EnterShallows
+        // breath countdown, and 36–51 for a Retreat countdown. The complete
+        // snapshot remains in this one release-published atomic; Java never
+        // invents a timer or submits an input action for it.
         constexpr int riverTag=7;
         static_assert(static_cast<int>(SalvagerAction::RecallPractice)==3 &&
-                      static_cast<int>(ShorePracticeStage::ReportBack)==4);
+                      static_cast<int>(ShorePracticeStage::ReportBack)==4 &&
+                      static_cast<int>(ShorePracticeStage::RecoverBreath)==5 &&
+                      horde::gameplay::bellwether::kShorePracticeBreathSeconds<=16);
         const bool actionable=simulation.salvagerAction!=SalvagerAction::None;
-        const int detail=actionable ? 11+static_cast<int>(simulation.salvagerAction)
+        int detail=actionable ? 11+static_cast<int>(simulation.salvagerAction)
             : 14+static_cast<int>(simulation.shorePracticeStage);
+        if (!actionable) {
+            const auto seconds = horde::gameplay::bellwether::ShorePracticeSecondsRemaining(
+                simulation.shorePracticeBreathTicksRemaining);
+            if (seconds > 0u && simulation.shorePracticeStage == ShorePracticeStage::EnterShallows)
+                detail = 19 + static_cast<int>(seconds);
+            else if (seconds > 0u && simulation.shorePracticeStage == ShorePracticeStage::Retreat)
+                detail = 35 + static_cast<int>(seconds);
+        }
         contextualControls |= (riverTag << 16) | (detail << 25) | (actionable ? 1 : 0);
     }
     // Keep the grounded reunion action available beside the return-rope prompt.

@@ -94,6 +94,7 @@ struct SimulationSnapshot
     float millWaterwheelAngleRadians=0.f;
     bellwether::ShorePracticeStage shorePracticeStage{};
     bellwether::SalvagerAction salvagerAction{};
+    std::uint16_t shorePracticeBreathTicksRemaining=0;
     bool salvagerShorePracticeCompleted=false;
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;

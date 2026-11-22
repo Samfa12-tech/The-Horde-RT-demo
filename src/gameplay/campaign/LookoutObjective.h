@@ -37,12 +37,13 @@ enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
 
 inline const char* BellwetherShorePracticeLine(bellwether::ShorePracticeStage stage,bool completed) {
     using bellwether::ShorePracticeStage;
-    if(completed)return "Complete. Visit the salvager at the river fork to recall the lesson.";
+    if(completed)return "Complete. Breath control learned. Visit the salvager at the river fork to recall the lesson.";
     switch(stage) {
     case ShorePracticeStage::FindDryMark:return "Follow the causeway to the dry mark by the river rail.";
-    case ShorePracticeStage::EnterShallows:return "From the dry mark, wade to the river rail.";
-    case ShorePracticeStage::Retreat:return "Return from the shallows to the dry mark.";
+    case ShorePracticeStage::EnterShallows:return "From the dry mark, wade to the river rail. Breath practice starts in the shallows.";
+    case ShorePracticeStage::Retreat:return "Return from the shallows to the dry mark before your breath runs out.";
     case ShorePracticeStage::ReportBack:return "Return to the salvager at the river fork to report back.";
+    case ShorePracticeStage::RecoverBreath:return "Catch your breath on the dry mark, then try again.";
     case ShorePracticeStage::Idle:break;
     }
     return "Meet the salvager at the river fork.";

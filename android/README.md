@@ -150,9 +150,11 @@ For the shore lesson, stage the salvager's pinned GLB, manifest and three
 ASTC KTX2 files in `private_bellwether/salvager/` alongside the textured
 tavern keeper. The package is `com.samfa12.hordelanternrt.debug.bellwether.shore`.
 The live Debug checkpoint `bellwether-salvager-shore` stages the river fork
-with the opening tavern conversation already complete. Talk to the salvager,
-walk to the last dry stone, touch the shallows at the rail and retreat before
-reporting back. Load the tavern autosave to check that practice was saved.
+with the opening tavern conversation already complete. Talk to the salvager
+and walk to the last dry stone. Enter the shallows to start the eight-second
+breath cue, reach the rail, and return to the dry mark before it expires.
+Recover on dry stone to retry, then go back to the salvager to report a
+successful return. Load the tavern autosave to check that practice was saved.
 The optional eight-file voice overlay contains the five Kit takes and
 `access.body_task.wav`, `access.body_progress.wav` and
 `hub.passing.learned_retreat.wav`.

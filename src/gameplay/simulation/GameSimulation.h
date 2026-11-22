@@ -421,6 +421,7 @@ private:
     float millWaterwheelAngleRadians_{};
     std::optional<float> millDriveTurnSeconds_;
     bellwether::ShorePracticeStage shorePracticeStage_{};
+    std::uint16_t shorePracticeBreathTicksRemaining_=0;
     bool salvagerShorePracticeCompleted_=false;
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};

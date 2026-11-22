@@ -883,6 +883,7 @@ void GameSimulation::ResetRoute()
     millDriveTurnSeconds_.reset();
     salvager_.reset();
     shorePracticeStage_={};
+    shorePracticeBreathTicksRemaining_=0;
     salvagerShorePracticeCompleted_=false;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
@@ -3540,6 +3541,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
     snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
     snapshot_.shorePracticeStage=shorePracticeStage_;
+    snapshot_.shorePracticeBreathTicksRemaining=shorePracticeBreathTicksRemaining_;
     snapshot_.salvagerShorePracticeCompleted=salvagerShorePracticeCompleted_;
     snapshot_.recordKeeperAction=RecordKeeperAction(chapterContext);
     snapshot_.treasurePurse=treasurePurse_;

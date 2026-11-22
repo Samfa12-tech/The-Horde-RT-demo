@@ -31,6 +31,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     artificer_.reset();
     salvager_.reset();
     shorePracticeStage_={};
+    shorePracticeBreathTicksRemaining_=0;
     millDriveTurnSeconds_.reset();
     waysideArchive_={};
     treasurePurse_={};

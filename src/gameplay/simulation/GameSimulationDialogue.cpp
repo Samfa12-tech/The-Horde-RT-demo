@@ -19,6 +19,12 @@ bool AtRiverLeakTest(const dialogue::Context& c) {
     constexpr auto station=traversal::kBellwetherRiverLanding.back();
     return std::hypot(c.player.x-station.x,c.player.z-station.z)<=.5f;
 }
+
+bool OnRiverPracticeLanding(float x,float z) {
+    constexpr auto wet=traversal::kBellwetherRiverLanding.back();
+    constexpr auto dry=traversal::kBellwetherRiverDryMark;
+    return x>=dry.x-.75f && x<=wet.x+.5f && std::abs(z-dry.z)<=.6f;
+}
 } // namespace
 
 void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) {
@@ -138,26 +144,47 @@ void GameSimulation::AdvanceShorePractice() {
     if(!salvager_ || !UsesRescueExterior() || rescueTraversal_.IsActive() ||
        chapterTerrainGeneration_!=worldRoute_.generation || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive) {
         shorePracticeStage_=ShorePracticeStage::Idle;
+        shorePracticeBreathTicksRemaining_=0;
         return;
     }
-    if(!playerSupport_.grounded)return;
     constexpr auto dry=traversal::kBellwetherRiverDryMark;
     constexpr auto wet=traversal::kBellwetherRiverLanding.back();
-    const bool wetGround=waterContact_.Snapshot().wetGround;
-    const bool atDry=!wetGround && std::hypot(playerX_-dry.x,playerZ_-dry.z)<=.48f;
+    const bool wetGround=playerSupport_.grounded && waterContact_.Snapshot().wetGround;
+    const bool atDry=playerSupport_.grounded && !wetGround && std::hypot(playerX_-dry.x,playerZ_-dry.z)<=.48f;
     const bool atWet=wetGround && std::hypot(playerX_-wet.x,playerZ_-wet.z)<=.40f;
     switch(shorePracticeStage_) {
     case ShorePracticeStage::FindDryMark:
+    case ShorePracticeStage::RecoverBreath:
         if(atDry)shorePracticeStage_=ShorePracticeStage::EnterShallows;
-        break;
+        return;
     case ShorePracticeStage::EnterShallows:
+        if(atDry) {
+            // Turning back before reaching the rail is a safe restart.
+            shorePracticeBreathTicksRemaining_=0;
+            return;
+        }
+        if(millLeakTestPhase_!=bellwether::MillLeakTestPhase::Idle)return;
         if(atWet)shorePracticeStage_=ShorePracticeStage::Retreat;
+        if(!shorePracticeBreathTicksRemaining_) {
+            if(wetGround && OnRiverPracticeLanding(playerX_,playerZ_))
+                shorePracticeBreathTicksRemaining_=bellwether::kShorePracticeBreathTicks;
+            return;
+        }
         break;
     case ShorePracticeStage::Retreat:
-        if(atDry)shorePracticeStage_=ShorePracticeStage::ReportBack;
+        if(atDry) {
+            shorePracticeStage_=ShorePracticeStage::ReportBack;
+            shorePracticeBreathTicksRemaining_=0;
+            return;
+        }
         break;
-    default: break;
+    default: return;
     }
+    // The active rehearsal owns a fixed number of simulation ticks, even if
+    // movement stalls or the player steps off the course. Reaching safe dry
+    // footing on the last available tick succeeds before the next breath tick.
+    if(--shorePracticeBreathTicksRemaining_==0)
+        shorePracticeStage_=ShorePracticeStage::RecoverBreath;
 }
 
 bool GameSimulation::CanWorkAtMill(const dialogue::Context& c) const {
@@ -197,7 +224,11 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
     if(millPreparation_==MillPreparation::RigTrialReady) {
         const bool wet=waterContact_.Snapshot().wetGround;
         constexpr auto dry=traversal::kBellwetherRiverDryMark;
-        if(millLeakTestPhase_==MillLeakTestPhase::Idle && wet && AtRiverLeakTest(c))
+        // An active breath attempt owns the shared cue. Once it expires the
+        // player can still choose the rig at the rail instead of retrying.
+        const bool practisingBreath=shorePracticeStage_==ShorePracticeStage::EnterShallows ||
+            shorePracticeStage_==ShorePracticeStage::Retreat;
+        if(millLeakTestPhase_==MillLeakTestPhase::Idle && wet && AtRiverLeakTest(c) && !practisingBreath)
             return MillAction::StartLeakTest;
         if(millLeakTestPhase_==MillLeakTestPhase::ReturnToDry && !wet &&
            std::hypot(c.player.x-dry.x,c.player.z-dry.z)<=.55f)
@@ -230,10 +261,7 @@ void GameSimulation::AdvanceMillLeakTest(float seconds) {
     using bellwether::MillLeakTestPhase;
     if(millLeakTestPhase_==MillLeakTestPhase::Idle)return;
     const auto c=ChapterInteractionContext(false);
-    constexpr auto wet=traversal::kBellwetherRiverLanding.back();
-    constexpr auto dry=traversal::kBellwetherRiverDryMark;
-    const bool onLanding=c.player.x>=dry.x-.75f && c.player.x<=wet.x+.5f &&
-        std::abs(c.player.z-dry.z)<=.6f;
+    const bool onLanding=OnRiverPracticeLanding(c.player.x,c.player.z);
     const bool testing=millLeakTestPhase_==MillLeakTestPhase::Testing;
     if(!c.alive || !c.exterior || c.traversing || c.combat || !playerSupport_.grounded || !onLanding ||
        (testing && (!waterContact_.Snapshot().wetGround || !AtRiverLeakTest(c)))) {

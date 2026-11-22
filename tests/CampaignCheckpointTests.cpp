@@ -236,7 +236,8 @@ int main(int argc,char** argv) {
             std::pair{bellwether::ShorePracticeStage::FindDryMark,"Follow the causeway to the dry mark"},
             std::pair{bellwether::ShorePracticeStage::EnterShallows,"From the dry mark, wade to the river rail"},
             std::pair{bellwether::ShorePracticeStage::Retreat,"Return from the shallows to the dry mark"},
-            std::pair{bellwether::ShorePracticeStage::ReportBack,"Return to the salvager at the river fork"}}) {
+            std::pair{bellwether::ShorePracticeStage::ReportBack,"Return to the salvager at the river fork"},
+            std::pair{bellwether::ShorePracticeStage::RecoverBreath,"Catch your breath on the dry mark"}}) {
         const auto text=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
             cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,stage,false);
         Check(text.find(expected)!=std::string::npos,"directions follow the current shore-practice stage");
@@ -244,7 +245,7 @@ int main(int argc,char** argv) {
     const auto completedShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
         cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,
         bellwether::ShorePracticeStage::Idle,true);
-    Check(completedShore.find("Shore practice: Complete.")!=std::string::npos,
+    Check(completedShore.find("Shore practice: Complete. Breath control learned.")!=std::string::npos,
           "directions report saved shore-practice completion");
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;

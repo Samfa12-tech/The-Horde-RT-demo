@@ -1383,6 +1383,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             const auto readDirections = [&](campaign::PauseObjective objective, std::string_view requiredText = {}) {
                 const auto operation = ctx.campaign->State().operationRevision;
                 const auto dialogueGeneration = state.chapterDialogue.generation;
+                const auto breathTicks = state.shorePracticeBreathTicksRemaining;
                 const float x = state.playerX, z = state.playerZ;
                 ShowPauseMenu(ctx, true);
                 if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
@@ -1405,7 +1406,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
                 input.paused = false;
                 const bool unchanged = operation == ctx.campaign->State().operationRevision &&
-                    dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ;
+                    dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ &&
+                    state.shorePracticeBreathTicksRemaining == breathTicks;
                 if (!correct || !resumed || !unchanged)
                     std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
                               << " textCorrect=" << correct << " resumed=" << resumed
@@ -1537,16 +1539,34 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "the salvager starts shore practice with both eastern actors in the same presented scene");
                 }
                 if (progressed && gBellwetherPreparationsValidation) {
-                    progressed = check(approachShallows() && state.shorePracticeStage == ShorePracticeStage::Retreat &&
+                    const bool reachedWetRail = approachShallows();
+                    const auto breathTicks = state.shorePracticeBreathTicksRemaining;
+                    std::array<char, 96> breathCue{};
+                    const std::string expectedCue = "RETURN TO DRY STONE | BREATH " +
+                        std::to_string(ShorePracticeSecondsRemaining(breathTicks)) + "s";
+                    const bool presentedWetRail = reachedWetRail && breathTicks > 0 &&
+                        breathTicks <= kShorePracticeBreathTicks && frame() &&
+                        GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),
+                            breathCue.data(),static_cast<int>(breathCue.size())) > 0 &&
+                        std::string_view(breathCue.data()) == expectedCue &&
+                        capture("windows-combined-shore-breath.png");
+                    progressed = check(presentedWetRail && state.shorePracticeStage == ShorePracticeStage::Retreat &&
                         readDirections(campaign::PauseObjective::BellwetherShrine, "Return from the shallows") &&
+                        state.shorePracticeBreathTicksRemaining + 1 == breathTicks &&
                         !state.salvagerShorePracticeCompleted && walkTo(kBellwetherRiverDryMark) &&
-                        state.shorePracticeStage == ShorePracticeStage::ReportBack && backFromShore() &&
+                        state.shorePracticeStage == ShorePracticeStage::ReportBack &&
+                        state.shorePracticeBreathTicksRemaining == 0 && backFromShore() &&
                         face(kBellwetherSalvagerStand.x, kBellwetherSalvagerStand.z) &&
                         state.salvagerAction == SalvagerAction::ReportPractice && interact() && frame() &&
                         state.salvagerShorePracticeCompleted && !state.waysideArchive.airWardLearned &&
                         state.millPreparation == MillPreparation::Unexamined &&
                         state.chapterDialogue.line == Line::SalvagerShoreReturn,
-                        "the player earns shore practice through dry and wet footing and reports it without a ward or rig");
+                        "the player observes the timed breath cue, pauses it, returns to dry stone and reports the lesson");
+                    if (!progressed)
+                        std::cerr << "Combined shore breath beginning=" << breathTicks
+                                  << " cue=" << breathCue.data() << " wetFrame=" << presentedWetRail
+                                  << " stage=" << static_cast<int>(state.shorePracticeStage)
+                                  << " remaining=" << state.shorePracticeBreathTicksRemaining << '\n';
                 }
                 if (progressed) {
                     progressed = check(reachWorkbench() && face(kMillComparison[0], kMillComparison[2]) && east() &&

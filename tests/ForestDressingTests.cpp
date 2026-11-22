@@ -2306,17 +2306,43 @@ void TestBellwetherSalvagerPractice(
         if(!walkTo(*station)) {Check(false,"shore practice follows the authored causeway");return;}
     if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the dry mark is reachable");return;}
     Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && !snap.waterContact.wetGround &&
+          snap.shorePracticeBreathTicksRemaining==0 &&
           !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
-          "reaching dry footing prepares the approach and cannot award completion");
+          "the dry mark prepares the drill without starting the breath timer or awarding completion");
     if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
         Check(false,"the practice waterline is reachable through the ordinary movement motor");return;
     }
     Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.waterContact.wetGround &&
+          snap.shorePracticeBreathTicksRemaining>0 &&
+          snap.shorePracticeBreathTicksRemaining<=kShorePracticeBreathTicks &&
           !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
-          "reaching actual water contact asks for retreat without changing the save");
+          "wet contact starts finite breath and reaching the rail asks for a timed return");
+    const auto breathAtRail=snap.shorePracticeBreathTicksRemaining;
+    const auto revisionAtRail=game.CampaignBoundaryRevision();
+    const auto vitalityAtRail=snap.playerVitals;
+    input.paused=true;
+    for(unsigned tick=0;tick<kShorePracticeBreathTicks;++tick)advance();
+    Check(snap.shorePracticeBreathTicksRemaining==breathAtRail && snap.shorePracticeStage==ShorePracticeStage::Retreat,
+          "pause freezes the remaining breath even across the whole active budget");
+    input.paused=false;
+    for(unsigned tick=0;tick<breathAtRail;++tick)advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::RecoverBreath && snap.shorePracticeBreathTicksRemaining==0 &&
+          snap.waterContact.wetGround && snap.playerVitals.vitality==vitalityAtRail.vitality &&
+          snap.playerVitals.halfHeart==vitalityAtRail.halfHeart &&
+          game.CampaignBoundaryRevision()==revisionAtRail && !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "expiration requests a safe dry recovery without damage or saving an incomplete drill");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"dry recovery remains reachable after expiration");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && snap.shorePracticeBreathTicksRemaining==0,
+          "recovering on the dry mark makes the same exercise available for retry");
+    if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"a fresh breath attempt reaches the rail");return;
+    }
+    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.shorePracticeBreathTicksRemaining==breathAtRail,
+          "retry starts a fresh full budget on the same route");
     if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the wet mark can be left safely");return;}
-    Check(snap.shorePracticeStage==ShorePracticeStage::ReportBack && !snap.waterContact.wetGround,
-          "regaining the dry shore advances the report without any rig or ward requirement");
+    Check(snap.shorePracticeStage==ShorePracticeStage::ReportBack && !snap.waterContact.wetGround &&
+          snap.shorePracticeBreathTicksRemaining==0,
+          "timely dry footing clears the timer and advances the report without requiring a rig or ward");
     for(auto station=shore.rbegin()+2;station!=shore.rend();++station)
         if(!walkTo(*station)) {Check(false,"the reporting route can be retraced");return;}
     if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"the salvager can be revisited");return;}
@@ -2337,7 +2363,39 @@ void TestBellwetherSalvagerPractice(
     const auto restore=game.BeginCampaignRestore(*completed);
     Check(restore && game.CommitCampaignRestore(*restore,{restore->worldGeneration,completed->zone},terrain,input) &&
           snap.salvagerShorePracticeCompleted && snap.shorePracticeStage==ShorePracticeStage::Idle &&
+          snap.shorePracticeBreathTicksRemaining==0 &&
           snap.chapterDialogue.line==Line::None,"the saved outcome restores without a live exercise or caption");
+
+    const auto* rigTrial=gameplay::FindDevelopmentCheckpoint("bellwether-rig-leak-trial");
+    if(!rigTrial || !gameplay::StageDevelopmentCheckpointSimulation(game,*rigTrial)) {
+        Check(false,"the accepted rig-trial fixture also admits the salvager");return;
+    }
+    for(auto station=shore.rbegin()+2;station!=shore.rend();++station)
+        if(!walkTo(*station)) {Check(false,"a rig carrier can retrace the river path to the salvager");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"a rig carrier reaches the fork");return;}
+    input.yawRadians=checkpoint->yaw;
+    input.commands.interact=snap.lastConsumedInteractSequence;
+    advance();
+    Check(snap.salvagerAction==SalvagerAction::StartPractice,"carrying the rig does not remove the breath lesson");
+    ++input.commands.interact;advance();
+    for(auto station=shore.begin();station!=shore.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"the rig carrier can return to the practice landing");return;}
+    if(!walkTo(kBellwetherRiverDryMark) || !walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"a rig carrier can choose to practise at the rail");return;
+    }
+    Check(snap.shorePracticeBreathTicksRemaining>0 && snap.millAction==MillAction::None,
+          "the active breath cue has the landing while both preparations are available");
+    for(unsigned tick=0;tick<kShorePracticeBreathTicks;++tick)advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::RecoverBreath && snap.millAction==MillAction::StartLeakTest,
+          "an expired breath drill leaves the rig option available at the same rail");
+    ++input.commands.interact;advance();
+    for(unsigned tick=0;tick<125;++tick)advance();
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the rig carrier can return to dry stone");return;}
+    Check(snap.millAction==MillAction::ConfirmSeal && !snap.salvagerShorePracticeCompleted,
+          "the leak test can be finished after changing approaches");
+    ++input.commands.interact;advance();
+    Check(snap.millPreparation==MillPreparation::RigTested && snap.shorePracticeBreathTicksRemaining==0 &&
+          !snap.salvagerShorePracticeCompleted,"the rig seal and breath lesson retain independent completion");
 }
 
 void TestBellwetherMillRepairAndLeakTrial(

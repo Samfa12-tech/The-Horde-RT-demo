@@ -88,6 +88,64 @@ public final class ContextualControlsLayoutTest {
         assertEquals(0, MainActivity.lanternFittingPrice(mill | (11 << 25)));
     }
 
+    @Test
+    public void shoreBreathDetailsKeepUntimedApproachAndExposeCeilingCountdowns() {
+        final int mill = 7 << 16;
+        assertEquals(R.string.salvager_enter_shallows,
+                MainActivity.contextualInteractLabel(mill | (16 << 25)));
+        assertEquals(R.string.salvager_recover_breath,
+                MainActivity.contextualInteractLabel(mill | (19 << 25)));
+        assertEquals(R.string.salvager_enter_shallows_timed,
+                MainActivity.contextualInteractLabel(mill | (20 << 25)));
+        assertEquals(1, MainActivity.contextualRiverSeconds(mill | (20 << 25)));
+        assertEquals(R.string.salvager_enter_shallows_timed,
+                MainActivity.contextualInteractLabel(mill | (27 << 25)));
+        assertEquals(8, MainActivity.contextualRiverSeconds(mill | (27 << 25)));
+        assertEquals(R.string.salvager_retreat_timed,
+                MainActivity.contextualInteractLabel(mill | (36 << 25)));
+        assertEquals(16, MainActivity.contextualRiverSeconds(mill | (51 << 25)));
+        assertEquals(0, MainActivity.contextualRiverSeconds(mill | (19 << 25)));
+        assertEquals(0, MainActivity.contextualRiverSeconds(20 << 25));
+        assertEquals("Wade to rail · 8 s",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (27 << 25)));
+        assertEquals("Return to dry · 4 s",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (39 << 25)));
+        assertEquals("Back to dry stone",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (19 << 25)));
+    }
+
+    @Test
+    public void timedShoreLabelsFitTheCompactTouchSlotAtMaximumFontScale() {
+        final Configuration maximumFont = new Configuration(
+                RuntimeEnvironment.getApplication().getResources().getConfiguration());
+        maximumFont.fontScale = 2.0f;
+        maximumFont.densityDpi = DisplayMetrics.DENSITY_MEDIUM;
+        final Context context = RuntimeEnvironment.getApplication().createConfigurationContext(maximumFont);
+        final FrameLayout root = (FrameLayout) LayoutInflater.from(context)
+                .inflate(R.layout.activity_main, null, false);
+        root.findViewById(R.id.menu_scrim).setVisibility(View.GONE);
+        root.findViewById(R.id.diagnostics_panel).setVisibility(View.GONE);
+        final Button interact = root.findViewById(R.id.interact_button);
+        interact.setVisibility(View.VISIBLE);
+        final int width = 320;
+        final int height = 568;
+        root.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+        root.layout(0, 0, width, height);
+        final int mill = 7 << 16;
+        for (final int detail : new int[] {19, 20, 27, 36, 43}) {
+            interact.setText(MainActivity.contextualInteractText(context, mill | (detail << 25)));
+            interact.measure(View.MeasureSpec.makeMeasureSpec(interact.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(interact.getHeight(), View.MeasureSpec.EXACTLY));
+            assertNotNull("timed action must produce a text layout", interact.getLayout());
+            assertTrue("timed action must remain at most two compact lines",
+                    interact.getLayout().getLineCount() <= 2);
+            for (int line = 0; line < interact.getLayout().getLineCount(); ++line)
+                assertEquals("timed action must not be ellipsized", 0,
+                        interact.getLayout().getEllipsisCount(line));
+        }
+    }
+
     private static Rect bounds(final View view) {
         return new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }

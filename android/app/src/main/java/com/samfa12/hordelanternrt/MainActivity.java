@@ -9033,7 +9033,8 @@ public class MainActivity extends Activity {
             case 5: return R.string.take_road_register;
             case 6: return R.string.restore_shrine_binding;
             case CONTEXTUAL_MILL_TAG:
-                switch ((state >>> 25) & 63) {
+                final int detail = (state >>> 25) & 63;
+                switch (detail) {
                     case 1: return R.string.inspect_mill_gearing;
                     case 2: return R.string.take_spare_bearing;
                     case 3: return R.string.check_mill_bearing_fit;
@@ -9052,7 +9053,11 @@ public class MainActivity extends Activity {
                     case 16: return R.string.salvager_enter_shallows;
                     case 17: return R.string.rig_leak_test_return_to_dry;
                     case 18: return R.string.salvager_report_back;
-                    default: return 0;
+                    case 19: return R.string.salvager_recover_breath;
+                    default:
+                        if (detail >= 20 && detail <= 35) return R.string.salvager_enter_shallows_timed;
+                        if (detail >= 36 && detail <= 51) return R.string.salvager_retreat_timed;
+                        return 0;
                 }
             default: break;
         }
@@ -9075,6 +9080,25 @@ public class MainActivity extends Activity {
             case CHEST_PROMPT_UNLOCKING: return R.string.chest_unlocking;
             default: return 0;
         }
+    }
+
+    static int contextualRiverSeconds(final int state) {
+        if (((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) != CONTEXTUAL_MILL_TAG) return 0;
+        final int detail = (state >>> 25) & 63;
+        if (detail >= 20 && detail <= 35) return detail - 19;
+        if (detail >= 36 && detail <= 51) return detail - 35;
+        return 0;
+    }
+
+    static String contextualInteractText(final Context context, final int state) {
+        final int label = contextualInteractLabel(state);
+        if (label == 0) return "";
+        if (label == R.string.fit_lantern_hinge)
+            return context.getString(label, lanternFittingPrice(state));
+        if (label == R.string.salvager_enter_shallows_timed ||
+                label == R.string.salvager_retreat_timed)
+            return context.getString(label, contextualRiverSeconds(state));
+        return context.getString(label);
     }
 
     static int lanternFittingPrice(int state) {
@@ -9136,10 +9160,8 @@ public class MainActivity extends Activity {
             return;
         }
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
-        final int interactLabel = contextualInteractLabel(contextualState);
-        final String interactText = interactLabel==0 ? "" : interactLabel==R.string.fit_lantern_hinge
-                ? getString(interactLabel,lanternFittingPrice(contextualState)) : getString(interactLabel);
-        if (interactLabel == 0) {
+        final String interactText = contextualInteractText(this, contextualState);
+        if (interactText.isEmpty()) {
             interactButton.setVisibility(View.GONE);
         } else {
             interactButton.setText(interactText);
