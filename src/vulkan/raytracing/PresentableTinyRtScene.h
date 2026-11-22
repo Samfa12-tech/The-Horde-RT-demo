@@ -499,8 +499,8 @@ public:
         void* user, std::string& diagnostic);
     bool ReplaceChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
         bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
-    // Import exclusively owned CPU data off the frame thread. Active actor
-    // geometry, texture layers and ray visibility stay untouched until publication.
+    // Import the model and prepare atlas payloads off the frame thread. The job
+    // owns only CPU data. The live lane changes after publication proves completion.
     [[nodiscard]] std::uint32_t PrefetchedChapterResidentId(std::size_t lane) const noexcept;
     bool PrefetchChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
         std::string& diagnostic);
@@ -1402,8 +1402,27 @@ private:
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
     bool LoadChapterResidents(std::string&);
+    struct ResidentTextureLayout {
+        VkFormat format;
+        std::uint32_t width, height, mipLevels;
+        bool operator==(const ResidentTextureLayout&) const = default;
+    };
+    using ResidentTextureLayouts = std::array<ResidentTextureLayout, 3>;
+    struct ResidentTexturePayload {
+        ResidentTextureLayouts layouts{};
+        std::vector<std::uint8_t> pixels;
+        std::array<std::array<VkDeviceSize, 16>, 3> mipOffsets{};
+    };
+    [[nodiscard]] ResidentTextureLayouts ChapterResidentTextureLayouts() const noexcept;
+    static bool PrepareChapterResidentTexturePayload(const ResidentTextureLayouts&,
+        const std::filesystem::path& activeDirectory, const std::filesystem::path& incomingDirectory,
+        ResidentTexturePayload&, std::string& diagnostic);
+    bool PublishChapterResidentTexturePayload(std::uint32_t activeId, const std::filesystem::path& directory,
+        const ResidentTexturePayload* prepared, bool (*retireReferences)(void*, std::string&),
+        void* user, std::string& diagnostic);
+    struct ChapterResidentImport;
     bool CommitChapterResidentReplacement(std::uint32_t activeId, ChapterResidentActorSource replacement,
-        horde::scene::assets::SkinnedPbrActor* imported,
+        ChapterResidentImport* imported,
         bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     bool RetireReplacedChapterResidents(bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     bool BuildChapterResidentStructures(std::string&);
@@ -1660,6 +1679,7 @@ private:
     horde::scene::assets::SkinnedPbrActor chapterActor_;
     struct ChapterResidentImport {
         horde::scene::assets::SkinnedPbrActor actor;
+        ResidentTexturePayload textures;
         std::string diagnostic;
         bool ready = false;
     };

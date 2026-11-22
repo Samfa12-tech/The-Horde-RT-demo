@@ -3278,6 +3278,71 @@ bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
     std::uint32_t stableId, const std::filesystem::path& directory,
     bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
 {
+    return PublishChapterResidentTexturePayload(stableId, directory, nullptr,
+        retireReferences, user, diagnostic);
+}
+
+PresentableTinyRtScene::ResidentTextureLayouts PresentableTinyRtScene::ChapterResidentTextureLayouts() const noexcept
+{
+    return {{
+        {staticBaseColor_.format, staticBaseColor_.extent.width, staticBaseColor_.extent.height, staticBaseColor_.mipLevels},
+        {staticNormal_.format, staticNormal_.extent.width, staticNormal_.extent.height, staticNormal_.mipLevels},
+        {staticOrm_.format, staticOrm_.extent.width, staticOrm_.extent.height, staticOrm_.mipLevels}
+    }};
+}
+
+bool PresentableTinyRtScene::PrepareChapterResidentTexturePayload(const ResidentTextureLayouts& layouts,
+    const std::filesystem::path& activeDirectory, const std::filesystem::path& incomingDirectory,
+    ResidentTexturePayload& payload, std::string& diagnostic)
+{
+#if defined(__ANDROID__)
+    constexpr std::array names{"base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"};
+#else
+    constexpr std::array names{"base-color.windows.ktx2", "normal.windows.ktx2", "orm.windows.ktx2"};
+#endif
+    const auto readBytes = [](const std::filesystem::path& path, std::vector<std::uint8_t>& bytes) {
+        std::ifstream file(path, std::ios::binary | std::ios::ate);
+        if (!file || file.tellg() < 80) return false;
+        bytes.resize(static_cast<std::size_t>(file.tellg()));
+        file.seekg(0, std::ios::beg);
+        return bool(file.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size())));
+    };
+    ResidentTexturePayload prepared;
+    prepared.layouts = layouts;
+    for (std::size_t map = 0; map < layouts.size(); ++map)
+    {
+        std::vector<std::uint8_t> baseline, replacement;
+        const auto path = incomingDirectory / names[map];
+        if (!readBytes(activeDirectory / names[map], baseline) || !readBytes(path, replacement))
+        {
+            diagnostic = "Resident texture replacement could not read a complete map: " + path.string();
+            return false;
+        }
+        const auto& layout = layouts[map];
+        RtKtxArrayAppendView mips;
+        // The original sidecar and the incoming map each have one layer.
+        if (!PrepareRtKtxArrayAppend(baseline, replacement, static_cast<std::uint32_t>(layout.format),
+                layout.width, layout.height, 1u, 2u, mips, diagnostic) ||
+            mips.mipLevels != layout.mipLevels || mips.mipLevels > prepared.mipOffsets[map].size())
+        {
+            diagnostic = "Resident texture replacement does not match its atlas mip layout or colour metadata: " + path.string();
+            return false;
+        }
+        for (std::uint32_t mip = 0; mip < mips.mipLevels; ++mip)
+        {
+            prepared.mipOffsets[map][mip] = prepared.pixels.size();
+            prepared.pixels.insert(prepared.pixels.end(), mips.mips[mip].begin(), mips.mips[mip].end());
+        }
+    }
+    payload = std::move(prepared);
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::PublishChapterResidentTexturePayload(std::uint32_t stableId,
+    const std::filesystem::path& directory, const ResidentTexturePayload* prepared,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
     auto& recovery = textureUploadRecovery_;
     if (!ready_ || staticGeometryCompletionUnproved_ || directory.empty() || !retireReferences ||
         recovery.staging.buffer || recovery.work.command || recovery.work.fence)
@@ -3314,27 +3379,27 @@ bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
         return false;
     }
     const auto rows = std::span(primitives).subspan(instance.primitiveBase, instance.primitiveCount);
-#if defined(__ANDROID__)
-    constexpr std::array names{"base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"};
-#else
-    constexpr std::array names{"base-color.windows.ktx2", "normal.windows.ktx2", "orm.windows.ktx2"};
-#endif
+    const auto layouts = ChapterResidentTextureLayouts();
+    ResidentTexturePayload direct;
+    if (!prepared)
+    {
+        if (!PrepareChapterResidentTexturePayload(layouts, source->directory, directory, direct, diagnostic))
+            return false;
+        prepared = &direct;
+    }
+    if (prepared->layouts != layouts || prepared->pixels.empty())
+    {
+        diagnostic = "Prepared resident maps do not match the current atlas.";
+        return false;
+    }
     const std::array arrays{&staticBaseColor_, &staticNormal_, &staticOrm_};
     struct LayerUpload
     {
         VkImage image = VK_NULL_HANDLE;
         VkImageSubresourceRange range{};
-        std::vector<VkBufferImageCopy> copies;
+        std::array<VkBufferImageCopy, 16> copies{};
     };
     std::array<LayerUpload, arrays.size()> uploads{};
-    std::vector<std::uint8_t> pixels;
-    const auto readBytes = [](const std::filesystem::path& path, std::vector<std::uint8_t>& bytes) {
-        std::ifstream file(path, std::ios::binary | std::ios::ate);
-        if (!file || file.tellg() < 80) return false;
-        bytes.resize(static_cast<std::size_t>(file.tellg()));
-        file.seekg(0, std::ios::beg);
-        return bool(file.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size())));
-    };
     for (std::size_t map = 0; map < arrays.size(); ++map)
     {
         const auto& texture = *arrays[map];
@@ -3353,39 +3418,21 @@ bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
             diagnostic = "Resident texture replacement disagrees with the packed layer ownership.";
             return false;
         }
-        std::vector<std::uint8_t> baseline, replacement;
-        const auto path = directory / names[map];
-        if (!readBytes(source->directory / names[map], baseline) || !readBytes(path, replacement))
-        {
-            diagnostic = "Resident texture replacement could not read a complete map: " + path.string();
-            return false;
-        }
-        RtKtxArrayAppendView mips;
-        // Reuse the strict, byte-exact KTX compatibility check used at admission.
-        // Both the original resident sidecar and the incoming map have one layer.
-        if (!PrepareRtKtxArrayAppend(baseline, replacement, static_cast<std::uint32_t>(texture.format),
-                texture.extent.width, texture.extent.height, 1u, 2u, mips, diagnostic) ||
-            mips.mipLevels != texture.mipLevels)
-        {
-            diagnostic = "Resident texture replacement does not match its atlas mip layout or colour metadata: " + path.string();
-            return false;
-        }
         auto& upload = uploads[map];
         upload.image = texture.image;
-        upload.range = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, mips.mipLevels, layer, 1u};
-        for (std::uint32_t mip = 0; mip < mips.mipLevels; ++mip)
+        upload.range = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, texture.mipLevels, layer, 1u};
+        for (std::uint32_t mip = 0; mip < texture.mipLevels; ++mip)
         {
-            VkBufferImageCopy copy{};
-            copy.bufferOffset = pixels.size();
+            auto& copy = upload.copies[mip];
+            copy.bufferOffset = prepared->mipOffsets[map][mip];
             copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, mip, layer, 1u};
             copy.imageExtent = {std::max(1u, texture.extent.width >> mip),
                 std::max(1u, texture.extent.height >> mip), 1u};
-            upload.copies.push_back(copy);
-            pixels.insert(pixels.end(), mips.mips[mip].begin(), mips.mips[mip].end());
         }
     }
 
     Buffer staging;
+    const auto& pixels = prepared->pixels;
     if (!CreateBuffer(pixels.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             false, staging, diagnostic))
@@ -3421,7 +3468,7 @@ bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
             0, nullptr, 0, nullptr, static_cast<std::uint32_t>(barriers.size()), barriers.data());
         for (const auto& layer : data.layers)
             vkCmdCopyBufferToImage(command, data.staging, layer.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                static_cast<std::uint32_t>(layer.copies.size()), layer.copies.data());
+                layer.range.levelCount, layer.copies.data());
         for (auto& barrier : barriers)
         {
             std::swap(barrier.oldLayout, barrier.newLayout);
@@ -3513,10 +3560,13 @@ bool PresentableTinyRtScene::PrefetchChapterResidentActor(std::uint32_t activeId
     }
     try
     {
-        auto import = std::async(std::launch::async, [replacement] {
+        auto import = std::async(std::launch::async, [replacement,
+            activeDirectory = current->directory, layouts = ChapterResidentTextureLayouts()] {
             ChapterResidentImport result;
             result.ready = result.actor.Load(replacement.directory, replacement.fileName.c_str(),
-                replacement.clips, result.diagnostic);
+                replacement.clips, result.diagnostic) &&
+                PrepareChapterResidentTexturePayload(layouts, activeDirectory, replacement.directory,
+                    result.textures, result.diagnostic);
             return result;
         });
         prefetch.source = std::move(replacement);
@@ -3562,7 +3612,7 @@ PresentableTinyRtScene::ResidentPublication PresentableTinyRtScene::PublishPrefe
             diagnostic = std::move(imported.diagnostic);
             return ResidentPublication::Failed;
         }
-        return CommitChapterResidentReplacement(activeId, std::move(source), &imported.actor,
+        return CommitChapterResidentReplacement(activeId, std::move(source), &imported,
             retireReferences, user, diagnostic) ? ResidentPublication::Published : ResidentPublication::Failed;
     }
     catch (const std::exception& exception)
@@ -3573,7 +3623,7 @@ PresentableTinyRtScene::ResidentPublication PresentableTinyRtScene::PublishPrefe
 }
 
 bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t activeId,
-    ChapterResidentActorSource replacement, horde::scene::assets::SkinnedPbrActor* importedActor,
+    ChapterResidentActorSource replacement, ChapterResidentImport* prepared,
     bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
 {
     if (!ready_ || staticGeometryCompletionUnproved_ || !retireReferences ||
@@ -3601,7 +3651,7 @@ bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t acti
 #if defined(_DEBUG)
     const auto swapStart = std::chrono::steady_clock::now();
 #endif
-    if (importedActor) candidate = std::move(*importedActor);
+    if (prepared) candidate = std::move(prepared->actor);
     else if (!candidate.Load(replacement.directory, replacement.fileName.c_str(), replacement.clips, diagnostic))
         return false;
 #if defined(_DEBUG)
@@ -3677,7 +3727,8 @@ bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t acti
 #if defined(_DEBUG)
     const auto built = std::chrono::steady_clock::now();
 #endif
-    if (!ReplaceChapterResidentTextureLayers(activeId, replacement.directory, retireReferences, user, diagnostic))
+    if (!PublishChapterResidentTexturePayload(activeId, replacement.directory,
+            prepared ? &prepared->textures : nullptr, retireReferences, user, diagnostic))
     {
         releaseCandidate();
         return false;
@@ -3702,7 +3753,7 @@ bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t acti
         return std::chrono::duration<double, std::milli>(end - start).count();
     };
     std::clog << "HORDE_RESIDENT_SWAP from=" << activeId << " to=" << current->stableId
-              << " prefetched=" << (importedActor != nullptr)
+              << " prefetched=" << (prepared != nullptr)
               << " import_ms=" << elapsed(imported, swapStart) << " build_ms=" << elapsed(built, imported)
               << " publish_ms=" << elapsed(now, built) << " total_ms=" << elapsed(now, swapStart) << '\n';
 #endif
