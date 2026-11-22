@@ -14,7 +14,7 @@ The original connected-map profile passed farther west. At its mapped upstream b
 | Headwater to tailwater | Y -20.16 to -22.35 m, a 2.19 m fall |
 | Return to main river | X 139.50, Y -23.045, Z 119.00 m |
 
-Both race profiles descend. The surveyed lips sit 24–51 mm below the existing river across the stations. The axle height gives 0.25 m of nominal paddle immersion in the tailwater. The largest sampled cut to a 0.4 m-deep bed is 3.75 m. The headrace also needs up to 0.69 m of sampled fill to the bed. These are station samples from the pinned runtime GLB. The designed bed will need local cut and masonry retention, including a contained gate and drop at the wheel. The bridge still needs dry approaches and abutments on both banks. Author the bed and its water faces together so they share their edges. Preserve the practice landing and keep the crossing optional.
+Both race profiles descend. The surveyed lips sit 24–51 mm below the existing river across the stations. The axle height gives 0.25 m of nominal paddle immersion in the tailwater. The largest sampled cut to a 0.4 m-deep bed is 3.75 m. The headrace also needs up to 0.69 m of sampled fill to the bed. These are station samples from the pinned runtime GLB. The [native mill bed](../bellwether-millrace-v1/README.md) applies the local cut, and the [optional dry crossing](../bellwether-mill-crossing-v1/README.md) now has a landward approach and river-side turnout at Z 94 m.
 
 ## Rebuild and validation
 

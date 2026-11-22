@@ -3,14 +3,17 @@
 #include "scene/assets/StaticMeshAsset.h"
 #include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "../../assets/models/world/source/bellwether-millworks-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-mill-crossing-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
 inline constexpr std::size_t kBellwetherSolidTriangles=
-    gameplay::bellwether::kSolidTriangles+kBellwetherMillWorksSolidTriangles;
+    gameplay::bellwether::kSolidTriangles+kBellwetherMillWorksSolidTriangles+
+    gameplay::bellwether::kMillCrossingSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
-inline constexpr std::size_t kBellwetherGroundTriangles=gameplay::bellwether::kGroundTriangles;
+inline constexpr std::size_t kBellwetherGroundTriangles=
+    gameplay::bellwether::kGroundTriangles+gameplay::bellwether::kMillCrossingGroundTriangles;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 enum class BellwetherFurnitureDetail { Near, Mid, Far };
 inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};

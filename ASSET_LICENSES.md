@@ -1037,6 +1037,10 @@ reuses the existing Horde chest wood and iron texture sources and exact
 platform material rows. The sluice and piers reuse the existing Bellwether
 timber and masonry materials.
 
+The footway, crossing, rails and turnout are original Horde geometry using
+those same Bellwether timber and masonry materials. The editable source and
+receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

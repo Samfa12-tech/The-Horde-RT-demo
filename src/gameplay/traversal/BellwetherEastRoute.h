@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../../assets/models/world/source/bellwether-mill-crossing-v1/geometry.generated.h"
 
 namespace horde::gameplay::traversal {
 
@@ -39,5 +40,12 @@ inline constexpr BellwetherStation kBellwetherRiverDryMark{
     bellwether::kRiverLandingDryMark[0],bellwether::kRiverLandingDryMark[1]};
 inline constexpr BellwetherStation kBellwetherRiverLandingView{
     bellwether::kRiverLandingView[0],bellwether::kRiverLandingView[1]};
+
+inline constexpr auto kBellwetherMillCrossing=[] {
+    constexpr auto& centres=bellwether::kMillCrossingStations;
+    std::array<BellwetherStation,centres.size()> route{};
+    for(std::size_t i=0;i<route.size();++i)route[i]={centres[i][0],centres[i][1]};
+    return route;
+}();
 
 } // namespace horde::gameplay::traversal

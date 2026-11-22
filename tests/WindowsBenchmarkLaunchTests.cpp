@@ -503,6 +503,12 @@ int main()
     check(millraceLaunch.requested && millraceLaunch.profile=="millrace" && millraceLaunch.error.empty() &&
           !ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,false).error.empty(),
           "millrace survey uses the bounded hidden Debug camera path");
+    auto crossingSurvey=survey;crossingSurvey.back()=L"mill-crossing";
+    const auto crossingLaunch=ParseWindowsEnvironmentSurveyLaunch(crossingSurvey,true);
+    check(crossingLaunch.requested && crossingLaunch.profile=="mill-crossing" &&
+          crossingLaunch.error.empty() && !ParseWindowsEnvironmentSurveyLaunch(crossingSurvey,false).error.empty() &&
+          MillCrossingSurveyCamera(0).z>MillCrossingSurveyCamera(60).z,
+          "mill crossing survey admits the two fixed hidden terrain views only in Debug");
     auto wheelSurvey=std::vector<std::wstring_view>(survey.begin(),survey.end());
     wheelSurvey.back()=L"mill-wheel";
     check(ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty(),

@@ -1,6 +1,6 @@
 # Bellwether waterwheel and sluice
 
-The 3 m wheel from the preserved Blender source now sits in the surveyed east millrace. Its timber face turns between stone bearing piers with recessed oak journal blocks. A raised sluice spans the headrace upstream of the wheel and leaves 24 cm of clearance above the water. The sluice frame and piers are solid terrain contact geometry. The optional dry crossing and walk to the wheel bay remain open.
+The 3 m wheel from the preserved Blender source now sits in the surveyed east millrace. Its timber face turns between stone bearing piers with recessed oak journal blocks. A raised sluice spans the headrace upstream of the wheel and leaves 24 cm of clearance above the water. The sluice frame and piers are solid terrain contact geometry. The [mill footway and optional dry crossing](../bellwether-mill-crossing-v1/README.md) reach the wheel from the existing river causeway.
 
 The wheel uses 2,180 triangles and rotates about its axle at world XYZ (137.2, -21.10, 109.35). The shared simulation starts it when the bearing repair passes the existing workbench test. It turns at 0.5 radians per active second and holds during pause. An operating saved game resumes the wheel from the same starting phase without adding a campaign save field. The handoff, rig seal trial and ordinary river landing keep their existing progression.
 

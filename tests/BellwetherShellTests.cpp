@@ -263,7 +263,7 @@ int main(int argc,char** argv) {
             auto point=kBellwetherMillApproach[1];
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
             float foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
-            const auto follow=[&](BellwetherStation target) {
+            const auto follow=[&](BellwetherStation target, bool dry=false) {
                 const auto start=point;
                 const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/.05f)));
                 for(int i=1;i<=steps;++i) {
@@ -271,7 +271,14 @@ int main(int argc,char** argv) {
                     const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
                     const auto result=ResolveChapterStepMovement(*support,point.x,point.z,next.x,next.z,foot,radius);
                     if(!result.accepted) {
-                        std::cerr<<"River sweep blocked at "<<next.x<<','<<next.z<<'\n';
+                        std::cerr<<"Mill or river sweep blocked at "<<next.x<<','<<next.z
+                                 <<" from "<<point.x<<','<<point.z<<" foot "<<foot
+                                 <<" next foot "<<result.support.worldY<<'\n';
+                        return false;
+                    }
+                    const auto water=ChapterRegionalWaterSurfaceAt(next.x,next.z);
+                    if(dry && water && result.support.worldY<=*water+.05f) {
+                        std::cerr<<"Dry mill path meets water at "<<next.x<<','<<next.z<<'\n';
                         return false;
                     }
                     point=next;
@@ -283,6 +290,16 @@ int main(int argc,char** argv) {
             check(follow(kBellwetherSalvagerMark) && std::all_of(route.begin(),route.end(),follow) &&
                   std::all_of(route.rbegin(),route.rend(),follow) && follow(kBellwetherSalvagerMark),
                   "ground and body sweeps stay continuous on the way into the river and back");
+            const auto dry=[&](BellwetherStation target) { return follow(target,true); };
+            check(std::all_of(route.begin(),route.end()-2,dry) &&
+                  std::all_of(kBellwetherMillCrossing.begin(),kBellwetherMillCrossing.end(),dry) &&
+                  std::all_of(kBellwetherMillCrossing.rbegin(),kBellwetherMillCrossing.rend(),dry),
+                  "the ordinary standing capsule walks dry from the old causeway to the wheel and across the millrace in both directions");
+            const auto turnout=kBellwetherMillCrossing.back();
+            const auto turnoutGround=support->Query(turnout.x,turnout.z);
+            check(!support->NonWalkableVolumeClear(turnout.x,turnout.z,turnout.x+1.f,turnout.z,
+                      turnoutGround.worldY+.1f,turnoutGround.worldY+1.8f,radius),
+                  "the turnout fence blocks a walk off the elevated east end");
         }
         constexpr auto wayside=horde::gameplay::traversal::kBellwetherWaysideApproach.back();
         auto waysideGround=support->Query(wayside.x,wayside.z);

@@ -1634,8 +1634,23 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             };
             const auto interact=[&] {++input.commands.interact;step();};
             const auto& landing=kBellwetherRiverLanding;
-            const bool reachedShallows=walkTo(mill[1]) && walkTo(kBellwetherSalvagerMark) &&
-                walkStations(landing.begin(),landing.end());
+            const auto& crossing=kBellwetherMillCrossing;
+            const auto beforeCrossing=game.Snapshot().waterContact.stepCount;
+            const auto walkDry=[&](auto begin,auto end) {
+                for(;begin!=end;++begin)
+                    if(!walkTo(*begin) || !game.Snapshot().playerGrounded ||
+                       game.Snapshot().waterContact.wetGround ||
+                       game.Snapshot().waterContact.stepCount!=beforeCrossing)
+                        return false;
+                return true;
+            };
+            const bool crossed=walkTo(mill[1]) && walkTo(kBellwetherSalvagerMark) &&
+                walkDry(landing.begin(),landing.end()-2) &&
+                walkDry(crossing.begin(),crossing.end()) &&
+                walkDry(crossing.rbegin(),crossing.rend());
+            Check(crossed,"the shared player motor reaches the millrace turnout and returns dry with no water steps");
+            if(!crossed)return;
+            const bool reachedShallows=walkStations(landing.end()-3,landing.end());
             Check(reachedShallows && game.Snapshot().playerGrounded && game.Snapshot().waterContact.wetGround,
                   "the normal motor can descend from the salvager's shore path into the river shallows");
             if(!reachedShallows)return;

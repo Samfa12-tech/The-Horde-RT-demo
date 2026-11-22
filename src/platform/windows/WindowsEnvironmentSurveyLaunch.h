@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+#include <array>
 #include <cmath>
 #include <span>
 #include <string>
@@ -25,8 +27,11 @@ inline WindowsEnvironmentSurveyLaunch ParseWindowsEnvironmentSurveyLaunch(
         const auto a=arguments[i];
         if(a==L"--capture-environment-survey")
         {
-            if(result.requested || i+1==arguments.size() || (arguments[i+1]!=L"river-bend" && arguments[i+1]!=L"millrace" && arguments[i+1]!=L"mill-wheel" && arguments[i+1]!=L"tomb-debris" && arguments[i+1]!=L"player-dodge"))
-            {result.error="Environment survey requires exactly one river-bend, millrace, mill-wheel, tomb-debris or player-dodge profile.";return result;}
+            constexpr std::array<std::wstring_view,6> profiles{
+                L"river-bend",L"millrace",L"mill-wheel",L"mill-crossing",L"tomb-debris",L"player-dodge"};
+            if(result.requested || i+1==arguments.size() ||
+               std::find(profiles.begin(),profiles.end(),arguments[i+1])==profiles.end())
+            {result.error="Environment survey requires one known profile.";return result;}
             result.requested=true;
             // Only the fixed ASCII profile names above reach this conversion.
             for(const wchar_t letter:arguments[++i])result.profile.push_back(static_cast<char>(letter));
@@ -94,6 +99,12 @@ inline EnvironmentSurveyCamera MillWheelSurveyCamera()
 {
     // Dry west bank below the mill, looking into the surveyed wheel bay.
     return {135.12f,114.6f,0,.377f,-.24f};
+}
+inline EnvironmentSurveyCamera MillCrossingSurveyCamera(unsigned frame)
+{
+    // Walkable footway viewpoint followed by the west entry of the span.
+    return frame<60 ? EnvironmentSurveyCamera{135.30f,114.f,0,.57f,-.29f}
+                    : EnvironmentSurveyCamera{135.30f,94.f,0,1.57079633f,-.31f};
 }
 inline EnvironmentSurveyCamera TombDebrisSurveyCamera(unsigned frame)
 {
