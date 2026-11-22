@@ -344,7 +344,8 @@ private:
     void InteractWithClaimedChapter();
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
-    dialogue::Context ChapterInteractionContext(bool paused) const;
+    dialogue::Context ChapterInteractionContext(bool paused,
+        std::optional<float> facingYaw = std::nullopt) const;
     std::optional<dialogue::Tuple> HeldRewardLanternSource() const;
     void TryStartShrineReveal(const dialogue::Context&);
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;

@@ -241,9 +241,14 @@ inline bool StageDevelopmentCheckpointSimulation(
         input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
         input.commands.interact=gameSimulation.latestInteractSequence_;
         input.commands.dialogueSkip=gameSimulation.chapterSkipFloor_;
+        const auto stagedResidents=gameSimulation.bellwetherResidentMask_;
         const auto token=gameSimulation.BeginCampaignRestore(record);
         if(!token || !gameSimulation.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},chapterTerrain,
                 input,gameSimulation.Snapshot().inputPublicationSequence))return finalize(false);
+        // The diagnostic checkpoint retains the two resident assets already
+        // staged by its caller when it initializes the authored starting save.
+        if(gameSimulation.config_.bellwetherCombinedResidents &&
+           !gameSimulation.PublishBellwetherResidents(stagedResidents))return finalize(false);
         for(std::size_t zone=1;zone<kWorldZones.size();++zone)
             if(!gameSimulation.PublishChapterTerrain({token->worldGeneration,static_cast<WorldZoneId>(zone)},chapterTerrain))
                 return finalize(false);

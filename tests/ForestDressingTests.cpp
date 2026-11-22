@@ -1,6 +1,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/campaign/CampaignCheckpointCodec.h"
 #include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/items/HeldItemKinematics.h"
@@ -1277,11 +1278,14 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
         *token,{token->worldGeneration,record.zone},terrain,{});
     Check(restored,"the production movement fixture can start from a completed 1.7 lookout save");
     if(!restored)return;
-    for(const auto& zone:sim::kWorldZones) {
-        const sim::WorldZoneToken ready{token->worldGeneration,zone.id};
-        if(zone.id==sim::WorldZoneId::Dungeon)game.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
-        else game.PublishChapterTerrain(ready,terrain);
-    }
+    const auto publishWorld=[&](std::uint64_t generation) {
+        for(const auto& zone:sim::kWorldZones) {
+            const sim::WorldZoneToken ready{generation,zone.id};
+            if(zone.id==sim::WorldZoneId::Dungeon)game.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
+            else game.PublishChapterTerrain(ready,terrain);
+        }
+    };
+    publishWorld(token->worldGeneration);
     sim::InputSnapshot neutral;
     neutral.yawRadians=record.yaw;
     neutral.pitchRadians=record.pitch;
@@ -1513,7 +1517,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           forkLampFloor.found && std::abs(kRiverForkLampPostFoot[1]-forkLampFloor.worldY)<.002f &&
           std::abs(kRiverForkLampFlame[1]-kRiverForkLampPostFoot[1]-1.39f)<.002f &&
           std::abs(kRiverForkLampLight[1]-kRiverForkLampPostFoot[1]-1.52f)<.002f &&
-          std::abs(salvagerFaceDistance-2.2f)<.1f,
+          std::abs(salvagerFaceDistance-2.04f)<.1f,
           "the fourth exterior emitter uses the authored fork-lamp anchors at plausible salvager-face distance");
     CompanionRouteFixture kit(true);
     Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
@@ -2060,6 +2064,72 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           hearthSpoken.size()==3 && roadSpoken==expectedRoad && welcomes==(stayAtIncident?1u:0u) &&
           std::abs(stoneTravel()-.284f)<.001f,
           "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
+    if(!stayAtIncident)return;
+
+    const auto townSave=game.LatestCampaignBoundary();
+    if(!townSave || !townSave->airWardLearned || !townSave->treasurePurse.lanternFittingPurchased) {
+        Check(false,"the return to the tomb starts with earned Bellwether preparations");return;
+    }
+    const auto keepsTownProgress=[&](const cp::Checkpoint& checkpoint) {
+        return checkpoint.contentRevision==townSave->contentRevision &&
+            checkpoint.treasurePurse==townSave->treasurePurse &&
+            checkpoint.millPreparation==townSave->millPreparation &&
+            checkpoint.airWardLearned && checkpoint.waysideArchive==townSave->waysideArchive &&
+            checkpoint.waysideRegisterInterpreted &&
+            checkpoint.dialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+            checkpoint.dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size();
+    };
+    for(std::size_t index=sim::kWorldRoutePoints.size()-1;index>3;) {
+        const auto& point=sim::kWorldRoutePoints[--index];
+        if(!walkTo({point.x,point.z})) {
+            Check(false,"the player can follow the forest path back toward the rescue rope");return;
+        }
+    }
+    if(!walkTo({kExteriorLanding.x,kExteriorLanding.z})) {
+        Check(false,"the player can approach the original rescue rope from Bellwether");return;
+    }
+    input.moveForward=0;
+    input.runHeld=false;
+    step();
+    if(game.Snapshot().rescuePrompt!=RescuePrompt::Descend) {
+        Check(false,"the earned rope still offers descent after leaving Bellwether");return;
+    }
+    ++input.commands.interact;
+    step();
+    for(unsigned tick=0; tick<1800 && game.Snapshot().rescue.equipmentStowed; ++tick)step();
+    const auto lower=game.LatestCampaignBoundary();
+    if(!lower || lower->id!=cp::CheckpointId::LowerClaimed || !keepsTownProgress(*lower) ||
+       game.Snapshot().rescue.exteriorSide || !game.Snapshot().rescue.sawLanding) {
+        Check(false,"the completed descent earns a lower save that retains Bellwether progress");return;
+    }
+
+    std::vector<std::byte> saveBytes;
+    cp::codec::Error codecError;
+    cp::Checkpoint savedLower;
+    if(!cp::codec::Encode(*lower,saveBytes,codecError) ||
+       !cp::codec::Decode(saveBytes,savedLower,codecError) || !keepsTownProgress(savedLower)) {
+        Check(false,"the lower save encodes and decodes the earned Bellwether progress");return;
+    }
+    const auto reload=game.BeginCampaignRestore(savedLower);
+    if(!reload || !game.CommitCampaignRestore(*reload,{reload->worldGeneration,savedLower.zone},terrain,input)) {
+        Check(false,"the earned lower save restores after a visit to Bellwether");return;
+    }
+    publishWorld(reload->worldGeneration);
+    input.yawRadians=savedLower.yaw;
+    input.pitchRadians=savedLower.pitch;
+    step();
+    if(game.Snapshot().rescuePrompt!=RescuePrompt::Climb) {
+        Check(false,"a lower save with Bellwether progress retains its original climb action");return;
+    }
+    ++input.commands.interact;
+    step();
+    for(unsigned tick=0; tick<1800 && game.Snapshot().rescue.equipmentStowed; ++tick)step();
+    const auto exterior=game.LatestCampaignBoundary();
+    Check(game.Snapshot().rescue.exteriorSide && !game.Snapshot().rescue.equipmentStowed &&
+          game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+          game.Snapshot().chapterDialogue.line==Line::None && injuryEntries==1 && ankleCues.size()==2 &&
+          exterior && exterior->id==cp::CheckpointId::SafeExit && keepsTownProgress(*exterior),
+          "reascending from the lower save keeps Kit in Bellwether and retains every earned preparation");
 }
 
 void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
@@ -2332,7 +2402,11 @@ void TestBellwetherSalvagerPractice(
     input.yawRadians=snap.playerYawRadians;
     input.pitchRadians=snap.playerPitchRadians;
     input.commands.interact=snap.lastConsumedInteractSequence;
-    const auto advance=[&] {game.StepFixed(input,1.f/60.f,snap.inputPublicationSequence+1);};
+    std::uint16_t peakBreath=0;
+    const auto advance=[&] {
+        game.StepFixed(input,1.f/60.f,snap.inputPublicationSequence+1);
+        peakBreath=std::max(peakBreath,snap.shorePracticeBreathTicksRemaining);
+    };
     const auto walkTo=[&](BellwetherStation mark) {
         for(unsigned tick=0;tick<1600;++tick) {
             const float dx=mark.x-snap.playerX,dz=mark.z-snap.playerZ;
@@ -2378,6 +2452,7 @@ void TestBellwetherSalvagerPractice(
         Check(false,"the practice waterline is reachable through the ordinary movement motor");return;
     }
     Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.waterContact.wetGround &&
+          peakBreath==kShorePracticeBreathTicks &&
           snap.shorePracticeBreathTicksRemaining>0 &&
           snap.shorePracticeBreathTicksRemaining<=kShorePracticeBreathTicks &&
           !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
@@ -2399,11 +2474,13 @@ void TestBellwetherSalvagerPractice(
     if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"dry recovery remains reachable after expiration");return;}
     Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && snap.shorePracticeBreathTicksRemaining==0,
           "recovering on the dry mark makes the same exercise available for retry");
+    peakBreath=0;
     if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
         Check(false,"a fresh breath attempt reaches the rail");return;
     }
-    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.shorePracticeBreathTicksRemaining==breathAtRail,
-          "retry starts a fresh full budget on the same route");
+    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && peakBreath==kShorePracticeBreathTicks &&
+          snap.shorePracticeBreathTicksRemaining>0 && snap.shorePracticeBreathTicksRemaining<=peakBreath,
+          "retry starts a fresh full budget on first wet contact and carries it to the rail");
     if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the wet mark can be left safely");return;}
     Check(snap.shorePracticeStage==ShorePracticeStage::ReportBack && !snap.waterContact.wetGround &&
           snap.shorePracticeBreathTicksRemaining==0,
@@ -2524,6 +2601,7 @@ void TestBellwetherMillRepairAndLeakTrial(
               restored.Snapshot().millWaterwheelAngleRadians==0.f,
               "an operating mill reload starts from a deterministic zero presentation phase");
         if(operating && restored.Snapshot().millPreparation==MillPreparation::GearingVerified) {
+            running.yawRadians=operating->yaw;running.pitchRadians=operating->pitch;
             for(unsigned tick=0;tick<60;++tick)restored.StepFixed(running);
             const float afterOneSecond=restored.Snapshot().millWaterwheelAngleRadians;
             Check(std::abs(afterOneSecond-.5f)<.0001f,
@@ -2654,7 +2732,10 @@ void TestBellwetherMillRepairAndLeakTrial(
     const float testedReloadPhase=reloaded.Snapshot().millWaterwheelAngleRadians;
     sim::InputSnapshot resumed;
     resumed.damageEnabled=false;resumed.tutorialEnabled=false;
-    if(testedReloaded)reloaded.StepFixed(resumed);
+    if(testedReloaded) {
+        resumed.yawRadians=tested->yaw;resumed.pitchRadians=tested->pitch;
+        reloaded.StepFixed(resumed);
+    }
     float resumedPhaseDelta=reloaded.Snapshot().millWaterwheelAngleRadians-testedReloadPhase;
     if(resumedPhaseDelta<0.f)resumedPhaseDelta+=6.2831855f;
     Check(testedReloaded && std::abs(resumedPhaseDelta-(.5f/60.f))<.0001f,

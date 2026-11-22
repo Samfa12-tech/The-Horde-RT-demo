@@ -60,7 +60,9 @@ void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) 
 
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
-    const auto context=ChapterInteractionContext(false);
+    // Interact runs before movement. Use the same camera input as this edge
+    // so turning away cannot activate the prompt from the previous tick.
+    const auto context=ChapterInteractionContext(false,lastInput_.yawRadians);
     if(const auto rag=CurrentPrivyRagAction(context);rag!=bellwether::PrivyRagAction::None) {
         InteractWithPrivyRag(rag,context);
         return;
@@ -250,12 +252,14 @@ void GameSimulation::AdvanceShorePractice() {
             return;
         }
         if(millLeakTestPhase_!=bellwether::MillLeakTestPhase::Idle)return;
-        if(atWet)shorePracticeStage_=ShorePracticeStage::Retreat;
         if(!shorePracticeBreathTicksRemaining_) {
-            if(wetGround && OnRiverPracticeLanding(playerX_,playerZ_))
+            if(wetGround && OnRiverPracticeLanding(playerX_,playerZ_)) {
                 shorePracticeBreathTicksRemaining_=bellwether::kShorePracticeBreathTicks;
+                if(atWet)shorePracticeStage_=ShorePracticeStage::Retreat;
+            }
             return;
         }
+        if(atWet)shorePracticeStage_=ShorePracticeStage::Retreat;
         break;
     case ShorePracticeStage::Retreat:
         if(atDry) {
@@ -494,12 +498,12 @@ std::optional<dialogue::Tuple> GameSimulation::HeldRewardLanternSource() const {
                            body[14]-body[6]*lightBelowHinge};
 }
 
-dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
+dialogue::Context GameSimulation::ChapterInteractionContext(bool paused,std::optional<float> facingYaw) const {
     using namespace horde::gameplay::dialogue;
     Context c;
     c.player={playerX_,playerSupport_.worldY,playerZ_};
     c.listener={playerX_,kShowcaseEyeWorldY+PlayerHeightDelta(playerSupport_.worldY)-posture_.drop,playerZ_};
-    c.yaw=playerYawRadians_;c.paused=paused;
+    c.yaw=facingYaw && std::isfinite(*facingYaw)?*facingYaw:playerYawRadians_;c.paused=paused;
     c.alive=playerVitals_.Snapshot().phase==PlayerLifePhase::Alive;
     c.combat=combatSnapshot_.attackerIndex>=0 || lichEncounter_.Snapshot().phase==LichPhase::Charging;
     c.claimed=chestRewardSequence_.Snapshot().phase==interactions::ChestRewardPhase::LanternClaimed;

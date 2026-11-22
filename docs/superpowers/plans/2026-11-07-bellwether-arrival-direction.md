@@ -150,6 +150,12 @@ The hidden Windows case `--bellwether-verify-ankle-restore` uses the same fresh 
 
 Once Kit is seated and the player reaches the safe area by the hearth, the ordinary campaign save system earns a **Bellwether tavern** checkpoint. The player restores at the fixed standing mark and Kit restores in his settled pose against the current authored chair. Later safe-side saves retain the seated milestone. Older lookout saves retain their original layout and still begin before the journey. The Windows RTX route diagnostic earned this checkpoint on foot and presented the restored seated scene. A separate disk round-trip checked a fresh session, including rejection when the chair was missing.
 
+The native forest replay walks back from an earned Bellwether visit to
+the original rope. It descends, encodes and decodes the lower checkpoint,
+reloads it and climbs back outside. The check requires Kit to remain seated
+in Bellwether and the register reading, air ward, fitted hinge, purse, mill
+bearing and lantern exchange to survive both safe checkpoints.
+
 Kit's three hearth lines now run as named captions. The first accompanies the lowering, then Kit explains his limits and pauses before offering help. A player who arrives after the sit sees the two seated lines. The tavern autosave tracks resolved lines, so a reload resumes at the first unresolved beat. Audio/haptic manual revalidation required: YES, for the hearth timing, captions and in-room mix. The reviewed recordings remain in private staging.
 
 The shared interaction and save path supports the three-line exchange between seated Kit and the tavern keeper. Talk appears only after the hearth lines resolve and both speakers reach their marks. Leaving the hearth or reloading stops the exchange. Choosing Talk again resumes at the first unresolved line. The [editable tavern](../../../assets/models/world/source/bellwether-tavern-v1/bellwether-tavern-v1.blend) marks the keeper beside the south doorway and across from Kit at the hearth, with an aisle route between them. The shared motor walks that path after Kit sits and restores the keeper at the hearth from an earned tavern save. The private campaign enables Talk with the stand-in. The final keeper model and the keeper's voiced lines remain open.
@@ -346,6 +352,11 @@ After the opening tavern conversation, the salvager stands by the river fork on 
 Reporting back records breath control in the existing safe tavern autosave. Earlier earned lessons remain complete. A load returns to that safe anchor, where unfinished drills can be restarted. At the same rail, a player with the rig can choose the seal test after a breath attempt expires. The three authored lines retain their named captions and optional private audition with positional audio.
 
 The standalone shore Debug roster pairs the salvager with the tavern keeper and Kit. The combined campaign uses the same salvager and opens Bellwether Directions after the tavern conversation, with a shore entry before the church handoff. The entry follows the current stage on the causeway and shows completion after the lesson is saved. The eight-second window is provisional for the shallow Bellwether rehearsal. The submerged route and its exposure limits belong to the Abbey chapter.
+
+Bellwether interactions choose a target using the camera input from the same
+tick as Interact. The salvager and dealer checks cover turning away and
+interacting together. Shore practice starts its breath clock at eligible wet
+contact before it can advance to the retreat, including on a retry.
 
 The host exercised expiration, dry recovery, retry, and switching to the rig at the same rail. The full Windows campaign passed 36 checks on each hardware RT backend, with the native countdown at the wet rail, a paused timer and the three preparations retained after the final reload. The private ARM64 build passed 14 Android checks, including the compact countdown and recovery cues at maximum font scale. Phone playtesting remains open.
 
