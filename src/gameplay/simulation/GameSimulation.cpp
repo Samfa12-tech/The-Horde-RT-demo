@@ -92,7 +92,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     }
     bellwetherFireEmitters_={effects::MakeBellwetherHearthFireEmitter(),
                            effects::MakeBellwetherCandleFireEmitter(),
-                           effects::MakeBellwetherRiverForkLampFireEmitter()};
+                           effects::MakeBellwetherRiverForkLampFireEmitter(),
+                           effects::MakeBellwetherRelicStallLampFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2141,6 +2142,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             effects::BellwetherCandleFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[2],
             effects::BellwetherRiverForkLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[3],
+            effects::BellwetherRelicStallLampFireInput(),fixedDeltaSeconds);
     }
 }
 
@@ -3752,9 +3755,14 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     // Bellwether and the tomb torches occupy different zones. Keep the shared
     // renderer's fixed upload capacity and publish only the current roster.
     if (bellwetherFireReady_) {
+        constexpr float relicStallLampRangeMetres=15.0f;
+        const float lampDx=playerX_-bellwether::kRelicStallLampLight[0];
+        const float lampDz=playerZ_-bellwether::kRelicStallLampLight[2];
+        const bool nearRelicStallLamp=lampDx*lampDx+lampDz*lampDz<=
+            relicStallLampRangeMetres*relicStallLampRangeMetres;
         snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1],
-                                  bellwetherFireEmitters_[2]};
-        snapshot_.fireEmitterCount = 1 + bellwetherFireEmitters_.size();
+                                  bellwetherFireEmitters_[nearRelicStallLamp ? 3u : 2u]};
+        snapshot_.fireEmitterCount = snapshot_.fireEmitters.size();
     }
     snapshot_.flaskUpgrade={};
     if(UsesFlaskUtility() && flaskUpgradeReady_ && flaskUpgradeSite_ && flaskUpgradeWorldGeneration_==worldRoute_.generation &&

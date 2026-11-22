@@ -2264,6 +2264,15 @@ void TestBellwetherRelicDealerVisit(
         std::cerr<<"Relic dealer route stopped at "<<state.playerX<<','<<state.playerZ<<'\n';
         Check(false,"the ordinary player motor can walk from the tavern to the dealer's mark");return;
     }
+    const auto& stallLamp=state.fireEmitters[3];
+    bool stallLampAnchored=true;
+    for(std::size_t axis=0;axis<3;++axis)
+        stallLampAnchored &= stallLamp.worldFromFlame[12+axis]==gameplay::bellwether::kRelicStallLampFlame[axis] &&
+            stallLamp.worldFromLight[12+axis]==gameplay::bellwether::kRelicStallLampLight[axis];
+    Check(state.fireEmitterCount==4 &&
+          stallLamp.stableId==gameplay::effects::kBellwetherRelicStallLampEmitterId &&
+          stallLamp.strength>0 && stallLamp.zone==gameplay::ShowcaseZone::Outside && stallLampAnchored,
+          "the admitted dealer approach selects the serviced relic-stall lamp in fixed light slot three");
     const auto support=ChapterExteriorStepSupport(*terrain,kBellwetherRelicDealerStand.x,
         kBellwetherRelicDealerStand.z,.28f,1.78f);
     Check(support.grounded && state.relicDealer && state.tavernKeeper && state.chapterCompanion.grounded &&

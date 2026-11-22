@@ -1054,6 +1054,12 @@ use the exact archived and validated GLB.
 The candidate remains private pending distribution clearance. Its trade line
 is caption-only. The existing dealer recordings remain in the audio archive.
 
+The S6 stall, weighing sign, counter, stock props and wick stand are original
+Horde geometry authored in Blender by Samfa12/Codex. They reuse the admitted
+town stone, clay, wood and char materials. The stall adds zero textures or
+material rows. The source and receipt are under
+`assets/models/world/source/bellwether-relic-stall-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

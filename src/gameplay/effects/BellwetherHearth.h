@@ -2,12 +2,14 @@
 
 #include "gameplay/effects/FireEmitterState.h"
 #include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
+#include "../../../assets/models/world/source/bellwether-relic-stall-v1/geometry.generated.h"
 
 namespace horde::gameplay::effects
 {
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
 inline constexpr std::uint32_t kBellwetherCandleEmitterId=0x42303143u;
 inline constexpr std::uint32_t kBellwetherRiverForkLampEmitterId=0x4230314cu;
+inline constexpr std::uint32_t kBellwetherRelicStallLampEmitterId=0x42303153u;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -54,6 +56,20 @@ inline FireEmitterState MakeBellwetherRiverForkLampFireEmitter()
     return emitter;
 }
 
+inline FireEmitterState MakeBellwetherRelicStallLampFireEmitter()
+{
+    auto emitter=MakeWorldTorchFireEmitter(kBellwetherRelicStallLampEmitterId,0x5354414cu);
+    emitter.colourTemperatureKelvin=2050.f;
+    emitter.radius=.055f;
+    emitter.height=.23f;
+    emitter.coreRadius=.027f;
+    emitter.absorption=5.0f;
+    emitter.smokeDensity=.025f;
+    emitter.emberRate=0.f;
+    emitter.turbulence=.24f;
+    return emitter;
+}
+
 inline FireEmitterFixedStepInput BellwetherFireInput(
     const std::array<float,3>& flame, const std::array<float,3>& light, float strength)
 {
@@ -80,5 +96,10 @@ inline FireEmitterFixedStepInput BellwetherCandleFireInput()
 inline FireEmitterFixedStepInput BellwetherRiverForkLampFireInput()
 {
     return BellwetherFireInput(bellwether::kRiverForkLampFlame,bellwether::kRiverForkLampLight,.60f);
+}
+
+inline FireEmitterFixedStepInput BellwetherRelicStallLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kRelicStallLampFlame,bellwether::kRelicStallLampLight,.60f);
 }
 }

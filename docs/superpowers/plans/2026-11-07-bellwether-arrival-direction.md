@@ -397,9 +397,13 @@ The Windows Debug `bellwether-relic-dealer` capture uses `--chapter-resident-fix
 
 Android Debug uses the corresponding `hordeBellwetherResidentDir` overlay and the isolated `.debug.bellwether.dealer` package. The `horde.debug.checkpoint` and `horde.debug.autostart` intent extras reach the standalone live player view. The ARM64 package contains the two pinned residents, and the Java tests exercised the checkpoint binding and trade prompt.
 
-The combined campaign can admit the dealer as a fifth source. It prefetches him along the tavern's south ramp and publishes him before the west turn. He shares a resident slot with the record keeper and salvager. The tavern keeper remains active on the south and west approaches, and the eastern approach continues to load the artificer and salvager. Readiness is published after the renderer completes the swap. The ramp hides the dealer through the handoff on the authored route. The open square exposes both east and west sightlines when the player turns freely, so storefront staging and arbitrary-heading transition review remain open. Physical phone validation is pending.
+The combined campaign can admit the dealer as a fifth source. It prefetches him along the tavern's south ramp and publishes him before the west turn. He shares a resident slot with the record keeper and salvager. The tavern keeper remains active on the south and west approaches, and the eastern approach continues to load the artificer and salvager. Readiness is published after the renderer completes the swap.
 
 Both Windows hardware RT backends passed the ordinary campaign replay from the lookout save through the staffed tavern, a reversal on the west approach, the trade caption, both eastern stations and the final return. Each run recorded ten prefetched swaps and presented the active pair in the same RT scene. The combined Android ARM64 Debug package contained all 25 pinned resident files and passed 15 focused host-side Android tests.
+
+The [S6 stall](../../../assets/models/world/source/bellwether-relic-stall-v1/README.md) adds a roof, counter, stock and a weighing sign. Follow the southern edge of the display and turn in to reach the same talk mark. Its stock screen closes the direct views from the sampled square and east road points while retaining the clear conversation aisle. The counter wick uses the existing ray-traced fire system and shares the exterior slot with the distant river lamp. The maximum scene upload remains four emitters. Physical phone validation is pending.
+
+The updated combined route passed on both Windows hardware RT backends. The replay captured the approach and trade view, verified the wick in the active RT upload, and retained the east activities on return. The private Android ARM64 Debug build contains the exact new town GLB and manifest.
 
 ## Open decisions deliberately preserved
 

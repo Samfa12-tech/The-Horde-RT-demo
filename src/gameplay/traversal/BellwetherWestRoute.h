@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../../assets/models/world/source/bellwether-relic-stall-v1/geometry.generated.h"
 
 #include <cstdint>
 
@@ -11,7 +12,9 @@ inline constexpr BellwetherStation kBellwetherRelicDealerStand=BellwetherMapStat
 inline constexpr BellwetherStation kBellwetherRelicDealerApproach{62.1f,129.2f};
 inline constexpr float kBellwetherRelicDealerApproachYaw=-1.57079632679f;
 inline constexpr std::array kBellwetherWestApproach{
-    BellwetherStation{73.f,131.7f},kBellwetherRelicDealerApproach};
+    BellwetherStation{73.f,131.7f},
+    BellwetherStation{bellwether::kRelicStallApproachTurn[0],bellwether::kRelicStallApproachTurn[1]},
+    kBellwetherRelicDealerApproach};
 
 } // namespace horde::gameplay::traversal
 

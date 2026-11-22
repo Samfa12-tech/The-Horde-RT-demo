@@ -4,12 +4,13 @@
 #include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "../../assets/models/world/source/bellwether-millworks-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-mill-crossing-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-relic-stall-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
 inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kSolidTriangles+kBellwetherMillWorksSolidTriangles+
-    gameplay::bellwether::kMillCrossingSolidTriangles;
+    gameplay::bellwether::kMillCrossingSolidTriangles+gameplay::bellwether::kRelicStallSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=

@@ -4,6 +4,7 @@
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/assets/AssetManifest.h"
@@ -229,6 +230,23 @@ int main(int argc,char** argv) {
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "render contact preserves the authored distinction between solids and walkable surfaces");
         using namespace horde::gameplay::bellwether;
+        {
+            using namespace horde::gameplay::traversal;
+            const auto stand=kBellwetherRelicDealerStand;
+            const auto approach=kBellwetherRelicDealerApproach;
+            const auto ground=support->Query(stand.x,stand.z);
+            const float sight=ground.worldY+1.55f;
+            check(ground.found && ground.walkable &&
+                  support->NonWalkableVolumeClear(approach.x,approach.z,stand.x,stand.z,sight-.02f,sight+.02f,.02f) &&
+                  !support->NonWalkableVolumeClear(82.3f,131.7f,stand.x,stand.z,sight-.02f,sight+.02f,.02f) &&
+                  !support->NonWalkableVolumeClear(96.f,127.5f,stand.x,stand.z,sight-.02f,sight+.02f,.02f),
+                  "the authored stock wing screens the dealer from the square and east road and keeps the talk aisle open");
+            check(!support->NonWalkableVolumeClear(66.f,129.2f,approach.x,approach.z,
+                      ground.worldY+.06f,ground.worldY+1.72f,horde::gameplay::kPlayerCollisionRadius) &&
+                  support->NonWalkableVolumeClear(kRelicStallApproachTurn[0],kRelicStallApproachTurn[1],approach.x,
+                      approach.z,ground.worldY+.06f,ground.worldY+1.72f,horde::gameplay::kPlayerCollisionRadius),
+                  "the player must go round the solid display and reaches the dealer along the clear return aisle");
+        }
         constexpr auto mill=horde::gameplay::traversal::kBellwetherMillApproach.back();
         const auto landing=support->Query(mill.x,mill.z);
         check(landing.found && landing.walkable && landing.triangle>=originalTerrain->TriangleCount() &&

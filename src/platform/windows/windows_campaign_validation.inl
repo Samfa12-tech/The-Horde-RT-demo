@@ -1534,17 +1534,28 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     };
                     const auto boundary = ctx.simulation.CampaignBoundaryRevision();
                     const auto purse = state.treasurePurse;
+                    const auto stallWickSelected = [&] {
+                        const auto& ids = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                        return ctx.rtScene.HasUploadedFireEmitters() &&
+                            std::find(ids.begin(), ids.end(), horde::gameplay::effects::kBellwetherRelicStallLampEmitterId)
+                                != ids.end();
+                    };
                     progressed = check(town() && leaveTavern() &&
                         fork() && walkTo(westBranch) && fork() && walkTo(*square) &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && atHearth() && town() &&
                         leaveTavern() && fork() &&
-                        walkTo(westBranch) && fork() && walkTo(kBellwetherRelicDealerApproach) &&
+                        walkTo(westBranch) && fork() && face(kBellwetherRelicDealerStand.x, kBellwetherRelicDealerStand.z) &&
+                        capture("windows-combined-west-stall-entry.png") &&
+                        std::all_of(std::next(kBellwetherWestApproach.begin()), kBellwetherWestApproach.end(), walkTo) &&
                         face(kBellwetherRelicDealerStand.x, kBellwetherRelicDealerStand.z) &&
                         state.relicDealerTradeAvailable && interact() &&
                         state.chapterDialogue.line == Line::RelicDealerOrdinarySale && frame() && fork() &&
+                        stallWickSelected() &&
                         ctx.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) == 1u &&
-                        capture("windows-combined-west-trade.png") && walkTo(westBranch) && walkTo(*square) && fork() &&
+                        capture("windows-combined-west-trade.png") &&
+                        std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
+                        walkTo(*square) && fork() &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && atHearth() && town() &&
                         !state.relicDealerTradeAvailable && state.chapterDialogue.line != Line::RelicDealerOrdinarySale &&
