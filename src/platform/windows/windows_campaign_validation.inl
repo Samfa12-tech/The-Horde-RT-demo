@@ -987,9 +987,12 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
 int FinishHiddenLookoutValidation(HWND owner,int result)
 {
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
-    const int timeLimit = gBellwetherPreparationsValidation ? 360 : gBellwetherExpeditionValidation ? 230 :
+    const int baseTimeLimit = gBellwetherPreparationsValidation ? 360 : gBellwetherExpeditionValidation ? 230 :
         gBellwetherCombinedCampaignActors && gBellwetherEarnTavernValidation ? 180 :
         gBellwetherHearthRestValidation ? 110 : 90;
+    const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
+        !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
+    const int timeLimit = baseTimeLimit + (verifiesSilver ? 90 : 0);
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1198,10 +1201,14 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         ObserveCampaignPresentation(ctx, presented);
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
     };
-    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(
+    const int baseTimeLimit =
         gBellwetherPreparationsValidation ? 325 : gBellwetherExpeditionValidation ? 205 :
         gBellwetherCombinedRelicDealer ? 205 : gBellwetherCombinedCampaignActors ? 150 :
-        gBellwetherHearthRestValidation ? 85 : 65);
+        gBellwetherHearthRestValidation ? 85 : 65;
+    const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
+        !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
+    const auto deadline = std::chrono::steady_clock::now() +
+        std::chrono::seconds(baseTimeLimit + (verifiesSilver ? 65 : 0));
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1424,8 +1431,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 using namespace horde::gameplay::bellwether;
                 using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
                 const auto junction = kBellwetherTavernRoute.begin() + kBellwetherMillJunction;
-                const auto sceneEpoch = ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
-                const auto geometryGeneration = ctx.rtScene.StaticGeometryGeneration();
+                auto sceneEpoch = ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+                auto geometryGeneration = ctx.rtScene.StaticGeometryGeneration();
                 const auto checkRoster = [&](bool posesReady, const std::array<std::uint32_t, 2>& expected) {
                     const auto active = ctx.rtScene.ChapterResidentSourceIds();
                     if (posesReady && active == expected) return true;
@@ -1561,6 +1568,72 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         !state.relicDealerTradeAvailable && state.chapterDialogue.line != Line::RelicDealerOrdinarySale &&
                         ctx.simulation.CampaignBoundaryRevision() == boundary && state.treasurePurse == purse,
                         "the west lane survives reversal, presents dealer trade and restores the same tavern visit");
+                    using campaign::OrdinarySilverAction;
+                    using campaign::OrdinarySilverProgress;
+                    const auto savedSilver = [&](OrdinarySilverProgress progress, std::uint32_t coins, bool fitting) {
+                        return until([&] {
+                            campaign::storage::StoredCheckpoint updated;
+                            return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", updated).status ==
+                                campaign::storage::Status::Read && updated.checkpoint.schema == campaign::kOrdinarySilverSchema &&
+                                updated.checkpoint.position.x == target.x && updated.checkpoint.position.z == target.z &&
+                                updated.checkpoint.treasurePurse.ordinarySilver == progress &&
+                                updated.checkpoint.treasurePurse.coins == coins &&
+                                updated.checkpoint.treasurePurse.lanternFittingPurchased == fitting &&
+                                !updated.checkpoint.treasurePurse.registerRewardClaimed;
+                        }, false);
+                    };
+                    const auto reloadWithTownResidents = [&] {
+                        if (!reloadTavern() || !atHearth()) return false;
+                        const auto readyBy=std::chrono::steady_clock::now()+std::chrono::milliseconds(750);
+                        while (!state.recordKeeper && std::chrono::steady_clock::now() < readyBy)
+                            if (!frame()) return false;
+                        if (!town()) return false;
+                        // A successful native Load begins a new presentation
+                        // epoch. Subsequent walks must retain that new scene.
+                        sceneEpoch=ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+                        geometryGeneration=ctx.rtScene.StaticGeometryGeneration();
+                        return true;
+                    };
+                    if (progressed && verifiesSilver) {
+                        const auto church = kBellwetherTavernRoute.begin() + kBellwetherChurchJunction;
+                        progressed = check(
+                            std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(church), walkTo) &&
+                            walkTo({kRoadSilverCacheApproach[0], kRoadSilverCacheApproach[1]}) &&
+                            face(kRoadSilverCacheReach[0], kRoadSilverCacheReach[2]) &&
+                            state.ordinarySilverAction == OrdinarySilverAction::Take &&
+                            capture("windows-combined-road-silver.png") && interact() &&
+                            state.treasurePurse.ordinarySilver == OrdinarySilverProgress::Carried &&
+                            state.ordinarySilverAction == OrdinarySilverAction::None &&
+                            savedSilver(OrdinarySilverProgress::Carried, 0, false) &&
+                            reloadWithTownResidents() &&
+                            state.treasurePurse.ordinarySilver == OrdinarySilverProgress::Carried,
+                            "the ordinary road silver is collected once and reloads at the earned tavern boundary");
+                    }
+                    if (progressed && verifiesSilver) {
+                        constexpr auto price = campaign::TreasurePurse::kOrdinarySilverSaleCoins;
+                        const std::string sellText="SELL ORDINARY SILVER (+"+std::to_string(price)+" COINS) | LEFT-CLICK / A";
+                        std::array<char, 96> quote{};
+                        progressed = check(leaveTavern() && fork() &&
+                            std::all_of(kBellwetherWestApproach.begin(), kBellwetherWestApproach.end(), walkTo) &&
+                            face(kBellwetherRelicDealerStand.x, kBellwetherRelicDealerStand.z) &&
+                            state.ordinarySilverAction == OrdinarySilverAction::Sell && state.treasurePurse.coins == 0 &&
+                            GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),
+                                static_cast<int>(quote.size())) > 0 && std::string_view(quote.data()) == sellText &&
+                            interact() && state.ordinarySilverAction == OrdinarySilverAction::Sold &&
+                            !state.HasChapterInteractPrompt() && frame() && !ctx.tavernInteractionPromptPresented &&
+                            interact() && state.treasurePurse.coins == price &&
+                            savedSilver(OrdinarySilverProgress::Sold, price, false) &&
+                            reloadWithTownResidents() && state.treasurePurse.coins == price,
+                            "the quoted sale credits the purse exactly once and survives the native checkpoint reload");
+                    }
+                    if (progressed && verifiesSilver) {
+                        progressed = check(walkTo(kBellwetherLanternFittingApproach) && state.tavernKeeper &&
+                            face(state.tavernKeeper->foot[0], state.tavernKeeper->foot[2]) &&
+                            state.tavernLanternFittingAvailable && interact() && state.treasurePurse.lanternFittingPurchased &&
+                            state.treasurePurse.coins == 0 && savedSilver(OrdinarySilverProgress::Sold, 0, true) &&
+                            reloadWithTownResidents() && state.treasurePurse.lanternFittingPurchased,
+                            "the silver proceeds pay for the existing hinge fitting without taking the register reward");
+                    }
                 }
                 if (progressed) progressed = check(town() &&
                     std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction), walkTo) &&

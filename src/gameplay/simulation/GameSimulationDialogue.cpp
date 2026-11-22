@@ -2,6 +2,7 @@
 #include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "audio/KitAnkleAudio.h"
+#include "../../../assets/models/world/source/bellwether-road-cache-v1/geometry.generated.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
@@ -76,6 +77,10 @@ void GameSimulation::InteractWithClaimedChapter() {
         InteractWithSalvager(salvager,context);
         return;
     }
+    if(const auto silver=CurrentOrdinarySilverAction(context);silver!=campaign::OrdinarySilverAction::None) {
+        InteractWithOrdinarySilver(silver);
+        return;
+    }
     if(chapterDialogue_.TryStartRelicDealer(context))return;
     const auto records=RecordKeeperAction(context);
     if(records==dialogue::RecordKeeperAction::CollectReward) {
@@ -116,6 +121,32 @@ void GameSimulation::InteractWithClaimedChapter() {
             waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
         chapterDialogue_.ShowTavernDirections(context,guidance);
     }
+}
+
+campaign::OrdinarySilverAction GameSimulation::CurrentOrdinarySilverAction(const dialogue::Context& c) const {
+    using campaign::OrdinarySilverAction;
+    using campaign::OrdinarySilverProgress;
+    if(!config_.bellwetherOrdinaryTrade || !campaignBoundary_ ||
+       campaignBoundaryRevision_==UINT64_MAX || !c.exterior || !c.claimed || !c.alive ||
+       c.combat || c.paused || c.traversing || !c.kitSeated || !playerSupport_.grounded ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       chapterDialogue_.State().tavernConversationLinesResolved!=dialogue::kTavernConversation.size())
+        return OrdinarySilverAction::None;
+    if(chapterDialogue_.CanStartRelicDealer(c)) {
+        if(treasurePurse_.CanSellOrdinarySilver())return OrdinarySilverAction::Sell;
+        if(treasurePurse_.ordinarySilver==OrdinarySilverProgress::Sold)return OrdinarySilverAction::Sold;
+    }
+    if(!treasurePurse_.CanCollectOrdinarySilver())return OrdinarySilverAction::None;
+    const auto& mark=bellwether::kRoadSilverCacheReach;
+    const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
+    const float distanceSquared=dx*dx+dz*dz;
+    const float facing=std::sin(c.yaw)*dx-std::cos(c.yaw)*dz;
+    if(distanceSquared>4.f || std::abs(c.listener.y-mark[1])>1.35f || facing<0.f ||
+       facing*facing<.65f*.65f*distanceSquared ||
+       !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
+           mark[1]-.025f,mark[1]+.025f,.025f))
+        return OrdinarySilverAction::None;
+    return OrdinarySilverAction::Take;
 }
 
 bellwether::SalvagerAction GameSimulation::CurrentSalvagerAction(const dialogue::Context& c) const {

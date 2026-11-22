@@ -232,6 +232,38 @@ int main(int argc,char** argv) {
         using namespace horde::gameplay::bellwether;
         {
             using namespace horde::gameplay::traversal;
+            const auto& cache=kRoadSilverCacheReach;
+            const auto& approach=kRoadSilverCacheApproach;
+            const auto fork=kBellwetherTavernRoute[kBellwetherChurchJunction];
+            const auto nextRoad=kBellwetherTavernRoute[kBellwetherChurchJunction+1];
+            const auto church=kBellwetherNorthApproach[1];
+            const float floor=cache[1]-.64f;
+            constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
+            check(support->NonWalkableVolumeClear(approach[0],approach[1],cache[0],cache[2],
+                      cache[1]-.025f,cache[1]+.025f,.025f),
+                "the road cache has a clear reach mark above the lid");
+            check(!support->NonWalkableVolumeClear(approach[0],approach[1],cache[0],cache[2],
+                      floor+.21f,floor+.47f,radius),
+                "the box blocks movement through its solid side");
+            const auto clearFork = [&](BellwetherStation end) {
+                auto last=fork;
+                auto contact=ChapterExteriorStepSupport(*support,last.x,last.z,radius,1.78f);
+                const float routeLength=std::hypot(end.x-fork.x,end.z-fork.z);
+                for(int i=1;i<=120 && contact.grounded;++i) {
+                    const float t=(i*.05f)/routeLength;
+                    const BellwetherStation next{std::lerp(fork.x,end.x,t),std::lerp(fork.z,end.z,t)};
+                    const auto move=ResolveChapterStepMovement(*support,last.x,last.z,next.x,next.z,contact.worldY,radius);
+                    if(!move.accepted)return false;
+                    contact=move.support;
+                    last=next;
+                }
+                return contact.grounded;
+            };
+            check(clearFork(nextRoad),"the grounded player capsule clears the nearby tavern path");
+            check(clearFork(church),"the grounded player capsule clears the nearby church path");
+        }
+        {
+            using namespace horde::gameplay::traversal;
             const auto stand=kBellwetherRelicDealerStand;
             const auto approach=kBellwetherRelicDealerApproach;
             const auto ground=support->Query(stand.x,stand.z);

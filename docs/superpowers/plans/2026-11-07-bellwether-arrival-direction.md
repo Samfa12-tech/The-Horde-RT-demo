@@ -236,7 +236,7 @@ The payment and its collection record are saved together at the existing earned 
 
 #### Lantern hinge fitting
 
-After the register reward, approach the tavern keeper from the aisle side and face her from close range. **Fit lantern hinge (2 coins)** shows the provisional price before Interact. Kit's chair retains its own conversation and directions. **Bellwether directions** lists the fitting price and shows **Lantern hinge fitted** after purchase, alongside the remaining purse.
+With enough coins from the register reward or ordinary silver sale, approach the tavern keeper from the aisle side and face her from close range. **Fit lantern hinge (2 coins)** shows the provisional price before Interact. Kit's chair retains its own conversation and directions. **Bellwether directions** lists the fitting price and shows **Lantern hinge fitted** after purchase, alongside the remaining purse.
 
 The Tech fitting increases damping in the shared 60 Hz hinge simulation. The carried body and its light follow the same solved hinge pose. The fitting and debit share one checkpoint transaction. Legacy purses keep their saved balance and can purchase on a later visit. Pricing and handling feel await playtesting, and the wider access training remains open.
 
@@ -391,7 +391,7 @@ The native walkthrough installs and tests the drive, takes the rig through the o
 
 The [west route](../../../src/gameplay/traversal/BellwetherWestRoute.h) branches from the square to the original S6 dealer mark. It uses the existing terrain and village collision. After the tavern conversation, face the dealer within reach and choose **Ask about trade**. The authored `hub.ordinary_sale` caption introduces ordinary silver. The conversation leaves the purse and checkpoint record intact.
 
-The private profile uses the existing two resident slots with the tavern keeper and dealer, alongside Kit. The dealer uses the November 7 rig and its standing pose with one layer of 1K material maps on each platform. The native character loader passed the idle and walk. The existing dealer voice bank is available for audition. Trading, a named relic, its living claimant and the route for recovering it after a sale still need design approval.
+The private profile uses the existing two resident slots with the tavern keeper and dealer, alongside Kit. The dealer uses the November 7 rig and its standing pose with one layer of 1K material maps on each platform. The native character loader passed the idle and walk. The existing dealer voice bank is available for audition. The named relic, its living claimant and the route for recovering it after a sale still need design approval.
 
 The Windows Debug `bellwether-relic-dealer` capture uses `--chapter-resident-fixture` with the pinned `tavern-keeper` and `relic-dealer` folders. Use `--bellwether-campaign-dir` with the same folders to start the private campaign and its separate save slot. Both hardware RT backends presented the 960 × 540 west approach with all three actor instance masks active and the trade caption selected. The player lantern lights the dealer at the approach. The ordinary Windows menu validation also reached the staffed hearth from the lookout, earned the tavern save and loaded it again.
 
@@ -404,6 +404,14 @@ Both Windows hardware RT backends passed the ordinary campaign replay from the l
 The [S6 stall](../../../assets/models/world/source/bellwether-relic-stall-v1/README.md) adds a roof, counter, stock and a weighing sign. Follow the southern edge of the display and turn in to reach the same talk mark. Its stock screen closes the direct views from the sampled square and east road points while retaining the clear conversation aisle. The counter wick uses the existing ray-traced fire system and shares the exterior slot with the distant river lamp. The maximum scene upload remains four emitters. Physical phone validation is pending.
 
 The updated combined route passed on both Windows hardware RT backends. The replay captured the approach and trade view, verified the wick in the active RT upload, and retained the east activities on return. The private Android ARM64 Debug build contains the exact new town GLB and manifest.
+
+### Ordinary silver sale
+
+In the dealer-enabled private campaign, finish the tavern conversation, then follow the CHURCH arrow at the north-west fork. The [split-lid cache](../../../assets/models/world/source/bellwether-road-cache-v1/README.md) beside the post offers **Take ordinary silver**. At the dealer's west stall, **Sell ordinary silver (+2 coins)** shows the provisional price before Interact. **Ordinary silver sold** confirms the sale. The proceeds go into the existing purse and can pay for the lantern hinge before the register reward. The named relic remains a separate decision.
+
+Collection and sale update the earned tavern checkpoint. The sale writes the sold state and its proceeds together. Save schema 18 adds one byte for the silver state. Previous saves retain their balances and the cache starts uncollected.
+
+Both Windows hardware RT backends passed the replay from the lookout save through collection, the quoted sale, repeat Interact, the hinge purchase, and the subsequent eastern visits. The replay reloaded the saved purse after each change. The combined Android ARM64 Debug package includes the pinned cache geometry and passed 16 focused host-side Android tests. Physical phone performance remains pending.
 
 ## Open decisions deliberately preserved
 

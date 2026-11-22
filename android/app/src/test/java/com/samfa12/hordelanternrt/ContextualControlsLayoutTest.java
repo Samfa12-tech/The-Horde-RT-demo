@@ -97,6 +97,25 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void ordinarySilverUsesReadOnlySoldAndNativePriceDetails() {
+        final int tag = 7 << 16;
+        assertEquals(R.string.take_ordinary_silver,
+                MainActivity.contextualInteractLabel(tag | (53 << 25) | 1));
+        assertEquals("Take ordinary silver",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (53 << 25) | 1));
+        assertEquals(R.string.ordinary_silver_sold,
+                MainActivity.contextualInteractLabel(tag | (54 << 25)));
+        assertEquals("Ordinary silver sold",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (54 << 25)));
+        assertEquals(R.string.sell_ordinary_silver,
+                MainActivity.contextualInteractLabel(tag | (56 << 25) | 1));
+        assertEquals(2, MainActivity.contextualOrdinarySilverPrice(tag | (56 << 25) | 1));
+        assertEquals("Sell ordinary silver (+2 coins)",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (56 << 25) | 1));
+        assertEquals(0, MainActivity.contextualOrdinarySilverPrice(tag | (54 << 25)));
+    }
+
+    @Test
     public void shoreBreathDetailsKeepUntimedApproachAndExposeCeilingCountdowns() {
         final int mill = 7 << 16;
         assertEquals(R.string.salvager_enter_shallows,

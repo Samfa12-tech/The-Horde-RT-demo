@@ -104,10 +104,17 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
     bool shorePracticeCompleted=false)
 {
     std::string text=PauseObjectiveText(objective);
-    if (objective==PauseObjective::BellwetherExpeditions) {
+    if(objective==PauseObjective::BellwetherExpeditions ||
+       (objective==PauseObjective::BellwetherShrine && purse.ordinarySilver!=OrdinarySilverProgress::Unfound)) {
         text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");
         if (purse.lanternFittingPurchased) text+="\r\nLantern hinge fitted.";
         else text+="\r\nLantern fitting at the tavern: "+std::to_string(TreasurePurse::kLanternFittingPrice)+" coins.";
+        if(purse.ordinarySilver==OrdinarySilverProgress::Carried)
+            text+="\r\nOrdinary silver: sell it at the stall west of the square.";
+        if(purse.ordinarySilver==OrdinarySilverProgress::Sold)
+            text+="\r\nOrdinary silver sold.";
+    }
+    if (objective==PauseObjective::BellwetherExpeditions) {
         switch(ward) {
         case AirWardDirections::RestoreBinding:text+="\r\n\r\nFor an air ward, return to the wayside shrine and restore its binding.";break;
         case AirWardDirections::LearnWard:text+="\r\n\r\nBinding restored. Ask the record keeper to teach you the air ward.";break;

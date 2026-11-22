@@ -1060,6 +1060,11 @@ town stone, clay, wood and char materials. The stall adds zero textures or
 material rows. The source and receipt are under
 `assets/models/world/source/bellwether-relic-stall-v1/`.
 
+The CHURCH waymarker's split-lid road cache is original Horde geometry by
+Samfa12/Codex. It uses the same admitted timber and char material rows.
+The editable source and receipt are in
+`assets/models/world/source/bellwether-road-cache-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

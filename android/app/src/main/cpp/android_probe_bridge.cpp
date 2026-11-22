@@ -679,6 +679,9 @@ horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationCo
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = true;
     config.bellwetherSpecialist = AndroidBellwetherSpecialist();
+#if HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE
+    config.bellwetherOrdinaryTrade = true;
+#endif
 #if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
     config.bellwetherCombinedResidents = true;
 #endif
@@ -1353,7 +1356,8 @@ void PublishSimulationUiState()
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
              (simulation.salvagerAction != SalvagerAction::None ||
-              simulation.shorePracticeStage != ShorePracticeStage::Idle)) {
+              (simulation.shorePracticeStage != ShorePracticeStage::Idle &&
+               simulation.ordinarySilverAction == horde::gameplay::campaign::OrdinarySilverAction::None))) {
         // Shared river context uses details 12–14 for actions, 15–18 for
         // untimed cues, 19 for dry recovery, 20–35 for an EnterShallows
         // breath countdown, and 36–51 for a Retreat countdown. The complete
@@ -1376,6 +1380,29 @@ void PublishSimulationUiState()
                 detail = 35 + static_cast<int>(seconds);
         }
         contextualControls |= (riverTag << 16) | (detail << 25) | (actionable ? 1 : 0);
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.ordinarySilverAction != horde::gameplay::campaign::OrdinarySilverAction::None) {
+        using horde::gameplay::campaign::OrdinarySilverAction;
+        constexpr int residentTag=7;
+        const auto action=simulation.ordinarySilverAction;
+        int detail=54;
+        bool actionable=false;
+        if (action==OrdinarySilverAction::Take) {
+            detail=53;
+            actionable=true;
+        } else if (action==OrdinarySilverAction::Sell) {
+            constexpr auto price=horde::gameplay::campaign::TreasurePurse::kOrdinarySilverSaleCoins;
+            static_assert(price>=1 && price<=8);
+            detail=54+static_cast<int>(price);
+            actionable=true;
+        } else if (action==OrdinarySilverAction::Sold) {
+            detail=54;
+        } else {
+            detail=52;
+            actionable=true;
+        }
+        contextualControls |= (residentTag << 16) | (detail << 25) | (actionable ? 1 : 0);
     }
     else if ((contextualControls & (1 << 9)) == 0 && simulation.relicDealerTradeAvailable) {
         constexpr int residentTag = 7, tradeDetail = 52;

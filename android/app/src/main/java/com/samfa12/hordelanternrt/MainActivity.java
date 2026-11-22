@@ -9065,6 +9065,9 @@ public class MainActivity extends Activity {
                     case 19: return R.string.salvager_recover_breath;
                     case 52: return R.string.ask_relic_dealer_trade;
                     default:
+                        if (detail == 53) return R.string.take_ordinary_silver;
+                        if (detail == 54) return R.string.ordinary_silver_sold;
+                        if (detail >= 55 && detail <= 62) return R.string.sell_ordinary_silver;
                         if (detail >= 20 && detail <= 35) return R.string.salvager_enter_shallows_timed;
                         if (detail >= 36 && detail <= 51) return R.string.salvager_retreat_timed;
                         return 0;
@@ -9100,6 +9103,11 @@ public class MainActivity extends Activity {
         return 0;
     }
 
+    static int contextualOrdinarySilverPrice(final int state) {
+        final int detail = (state >>> 25) & 63;
+        return detail >= 55 && detail <= 62 ? detail - 54 : 0;
+    }
+
     static String contextualInteractText(final Context context, final int state) {
         final int label = contextualInteractLabel(state);
         if (label == 0) return "";
@@ -9108,6 +9116,8 @@ public class MainActivity extends Activity {
         if (label == R.string.salvager_enter_shallows_timed ||
                 label == R.string.salvager_retreat_timed)
             return context.getString(label, contextualRiverSeconds(state));
+        if (label == R.string.sell_ordinary_silver)
+            return context.getString(label, contextualOrdinarySilverPrice(state));
         return context.getString(label);
     }
 

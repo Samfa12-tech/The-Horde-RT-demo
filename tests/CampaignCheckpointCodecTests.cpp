@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kSalvagerShorePracticeSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201};
+    constexpr std::array<std::size_t,cp::kOrdinarySilverSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -73,6 +73,35 @@ void RoundTrip(const cp::Checkpoint& c) {
 }
 }
 int main() {
+    {
+        cp::TreasurePurse purse;
+        Check(!purse.HasEarnedCoins() && purse.CanCollectOrdinarySilver() && purse.CollectOrdinarySilver() &&
+            !purse.CanCollectOrdinarySilver() && purse.ordinarySilver==cp::OrdinarySilverProgress::Carried,
+            "ordinary silver can be collected once and remains carried until sold");
+        Check(!purse.HasEarnedCoins() && purse.CanSellOrdinarySilver(),
+            "carried silver can be sold but does not count as earned coins");
+        Check(purse.SellOrdinarySilver() && purse.coins==cp::TreasurePurse::kOrdinarySilverSaleCoins && purse.HasEarnedCoins() &&
+            !purse.CanSellOrdinarySilver() && !purse.CanCollectOrdinarySilver(),
+            "selling ordinary silver grants its fixed coins once");
+        Check(purse.CanBuyLanternFitting() && purse.BuyLanternFitting() && purse.coins==0 &&
+            purse.lanternFittingPurchased && !purse.BuyLanternFitting(),
+            "sold silver can buy the shared fitting and spend the exact balance");
+        auto boundary=cp::TreasurePurse{};
+        boundary.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+        boundary.coins=cp::TreasurePurse::kMaximumCoins-cp::TreasurePurse::kOrdinarySilverSaleCoins;
+        Check(boundary.CanSellOrdinarySilver() && boundary.SellOrdinarySilver() &&
+            boundary.coins==cp::TreasurePurse::kMaximumCoins,
+            "silver sale arithmetic permits the exact wallet maximum");
+        boundary.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+        --boundary.coins;
+        const auto before=boundary;
+        Check(!boundary.CanSellOrdinarySilver() && !boundary.SellOrdinarySilver() && boundary==before,
+            "silver sale arithmetic rejects overflow without changing state");
+        cp::TreasurePurse registerReward;
+        Check(registerReward.ClaimRegisterReward() && registerReward.HasEarnedCoins() &&
+            registerReward.CanBuyLanternFitting(),
+            "the existing register reward remains eligible for the same fitting");
+    }
     auto tavern=Endpoint();
     tavern.contentRevision=cp::kBellwetherContentRevision;tavern.id=cp::CheckpointId::BellwetherTavern;
     tavern.zone=cp::Destination(tavern.id);
@@ -252,7 +281,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kSalvagerShorePracticeSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kOrdinarySilverSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -373,7 +402,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kSalvagerShorePracticeSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kOrdinarySilverSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -418,7 +447,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kSalvagerShorePracticeSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kOrdinarySilverSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;
@@ -524,6 +553,52 @@ int main() {
         archive.dialogue.tavernLanternLinesStarted=1;
         archive.waysideArchive=cp::WaysideArchiveProgress::Inspected;
         invalidEncode(archive,codec::Error::InvalidCheckpoint);
+
+        auto silver=archive;
+        silver.schema=cp::kOrdinarySilverSchema;
+        silver.waysideArchive=cp::WaysideArchiveProgress::Open;
+        silver.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        Check(cp::Validate(silver) && silver.treasurePurse.CollectOrdinarySilver() &&
+            silver.treasurePurse.ordinarySilver==cp::OrdinarySilverProgress::Carried,
+            "schema18 admits collected silver only after the complete Bellwether exchange");
+        RoundTrip(silver);
+        auto incompleteSilver=silver;
+        incompleteSilver.dialogue.tavernConversationLinesResolved--;
+        invalidEncode(incompleteSilver,codec::Error::InvalidCheckpoint);
+        incompleteSilver=silver;incompleteSilver.contentRevision=cp::kForestContentRevision;
+        invalidEncode(incompleteSilver,codec::Error::InvalidCheckpoint);
+
+        auto soldSilver=silver;
+        Check(soldSilver.treasurePurse.SellOrdinarySilver() &&
+            soldSilver.treasurePurse.coins==cp::TreasurePurse::kOrdinarySilverSaleCoins &&
+            soldSilver.treasurePurse.HasEarnedCoins(),
+            "sold silver is an independent persistent source of earned coins");
+        RoundTrip(soldSilver);
+        auto overpaidSilver=soldSilver;
+        ++overpaidSilver.treasurePurse.coins;
+        invalidEncode(overpaidSilver,codec::Error::InvalidCheckpoint);
+        auto soldAndFitted=soldSilver;
+        Check(soldAndFitted.treasurePurse.BuyLanternFitting() && soldAndFitted.treasurePurse.coins==0,
+            "silver-only funds can purchase the existing fitting and leave a zero balance");
+        RoundTrip(soldAndFitted);
+
+        auto downgrade=soldSilver;
+        downgrade.schema=cp::kSalvagerShorePracticeSchema;
+        invalidEncode(downgrade,codec::Error::InvalidCheckpoint);
+        auto invalidProgress=soldSilver;
+        invalidProgress.treasurePurse.ordinarySilver=static_cast<cp::OrdinarySilverProgress>(3);
+        invalidEncode(invalidProgress,codec::Error::InvalidCheckpoint);
+        auto invalidBytes=Encode(soldSilver);invalidBytes.back()=std::byte{3};Rechecksum(invalidBytes);
+        Reject(invalidBytes,codec::Error::InvalidCheckpoint);
+
+        auto oldSeventeen=silver;oldSeventeen.schema=cp::kSalvagerShorePracticeSchema;
+        oldSeventeen.treasurePurse.ordinarySilver=cp::OrdinarySilverProgress::Unfound;
+        const auto legacyBytes=Encode(oldSeventeen);
+        cp::Checkpoint migratedLegacy;
+        Check(codec::Decode(legacyBytes,migratedLegacy,error) &&
+            migratedLegacy.treasurePurse.ordinarySilver==cp::OrdinarySilverProgress::Unfound &&
+            Encode(migratedLegacy)==legacyBytes,
+            "schema17 bytes remain unchanged and migrate with ordinary silver unfound");
     }
     invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

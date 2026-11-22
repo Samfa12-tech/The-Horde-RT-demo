@@ -98,13 +98,16 @@ struct SimulationSnapshot
     std::uint16_t shorePracticeBreathTicksRemaining=0;
     bool salvagerShorePracticeCompleted=false;
     bool relicDealerTradeAvailable=false;
+    campaign::OrdinarySilverAction ordinarySilverAction{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
-            salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable;
+            salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||
+            ordinarySilverAction==campaign::OrdinarySilverAction::Take ||
+            ordinarySilverAction==campaign::OrdinarySilverAction::Sell;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;

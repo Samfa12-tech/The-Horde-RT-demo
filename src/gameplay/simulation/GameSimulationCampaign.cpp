@@ -71,6 +71,8 @@ static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::Treas
     checkpoint.treasurePurse=purse;
     checkpoint.schema=std::max(checkpoint.schema,purse.lanternFittingPurchased?
         campaign::kLanternFittingSchema:campaign::kTreasurePurseSchema);
+    if(purse.ordinarySilver!=campaign::OrdinarySilverProgress::Unfound)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kOrdinarySilverSchema);
 }
 
 static void RecordMillPreparation(campaign::Checkpoint& checkpoint,bellwether::MillPreparation preparation) {
@@ -237,6 +239,15 @@ void GameSimulation::BuyLanternFitting(const dialogue::Context& context) {
     if(!CanBuyLanternFitting(context) || !purse.BuyLanternFitting())return;
     const auto updated=PrepareTreasureCheckpoint(purse);
     if(updated && chapterDialogue_.TryStartTavernLanternFitting(context))CommitTreasureCheckpoint(*updated);
+}
+void GameSimulation::InteractWithOrdinarySilver(campaign::OrdinarySilverAction action) {
+    using campaign::OrdinarySilverAction;
+    auto purse=treasurePurse_;
+    const bool changed=action==OrdinarySilverAction::Take ? purse.CollectOrdinarySilver() :
+        action==OrdinarySilverAction::Sell && purse.SellOrdinarySilver();
+    if(changed) {
+        if(const auto updated=PrepareTreasureCheckpoint(purse))CommitTreasureCheckpoint(*updated);
+    }
 }
 std::optional<campaign::Checkpoint> GameSimulation::PrepareTreasureCheckpoint(campaign::TreasurePurse purse) const {
     if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||

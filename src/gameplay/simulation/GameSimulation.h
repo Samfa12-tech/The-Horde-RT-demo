@@ -93,6 +93,7 @@ struct GameSimulationConfig
     bellwether::Specialist bellwetherSpecialist = bellwether::Specialist::None;
     // Private combined campaign: the owner publishes current GPU-ready residents.
     bool bellwetherCombinedResidents = false;
+    bool bellwetherOrdinaryTrade = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -360,6 +361,8 @@ private:
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
     bool CanBuyLanternFitting(const dialogue::Context&) const;
+    campaign::OrdinarySilverAction CurrentOrdinarySilverAction(const dialogue::Context&) const;
+    void InteractWithOrdinarySilver(campaign::OrdinarySilverAction);
     void BuyLanternFitting(const dialogue::Context&);
     std::optional<campaign::Checkpoint> PrepareTreasureCheckpoint(campaign::TreasurePurse) const;
     void CommitTreasureCheckpoint(const campaign::Checkpoint&);

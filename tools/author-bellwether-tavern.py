@@ -952,12 +952,13 @@ if not live_town.is_file():
 live_town_sha256 = hashlib.sha256(live_town.read_bytes()).hexdigest()
 layered_town_path = RUNTIME / ".fork-lamp-layered.glb"
 mill_works_tools = runpy.run_path(str(ROOT / "tools/author-bellwether-mill-works.py"))
-stall_receipt_path = WORLD / "source/bellwether-relic-stall-v1/authoring-receipt.json"
 installed_town_hashes = {FORK_LAMP_LAYERED_TOWN_SHA256}
-if stall_receipt_path.is_file():
-    stall_receipt = json.loads(stall_receipt_path.read_text(encoding="utf-8"))
-    if stall_receipt["originalTownSha256"] == FORK_LAMP_LAYERED_TOWN_SHA256:
-        installed_town_hashes.add(stall_receipt["runtimeTownSha256"])
+for layer in ("bellwether-relic-stall-v1", "bellwether-road-cache-v1"):
+    receipt_path = WORLD / "source" / layer / "authoring-receipt.json"
+    if receipt_path.is_file():
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+        if receipt["originalTownSha256"] in installed_town_hashes:
+            installed_town_hashes.add(receipt["runtimeTownSha256"])
 if live_town_sha256 == FORK_LAMP_SOURCE_TOWN_SHA256:
     layered_source_town_sha256 = live_town_sha256
     live_doc, _ = mill_works_tools["read_glb"](live_town)

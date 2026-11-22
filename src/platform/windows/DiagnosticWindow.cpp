@@ -247,6 +247,8 @@ horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationCo
     config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
     config.bellwetherCombinedResidents = gBellwetherCombinedCampaignActors;
     config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
+    config.bellwetherOrdinaryTrade = gBellwetherCombinedRelicDealer ||
+        gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::RelicDealer;
 #endif
     return config;
 }
@@ -3657,10 +3659,12 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     using horde::gameplay::bellwether::MillLeakTestPhase;
     using horde::gameplay::bellwether::SalvagerAction;
     using horde::gameplay::bellwether::ShorePracticeStage;
+    using horde::gameplay::campaign::OrdinarySilverAction;
+    const bool saleReceipt = !rescueJourney && !flaskUpgrade && snapshot.ordinarySilverAction==OrdinarySilverAction::Sold;
     const auto leakTest=snapshot.millLeakTestPhase;
     const auto shorePractice=snapshot.shorePracticeStage;
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
-    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern ||
+    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || saleReceipt || raiseLantern ||
                           snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle ||
                           snapshot.millDriveTesting || shorePractice!=ShorePracticeStage::Idle)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
@@ -3669,6 +3673,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
           !visibility.captureMode
         : horde::platform::windows::ShouldShowWindowsChestPrompt(snapshot.chestPrompt, visibility);
     std::string_view text;
+    std::string tradeText;
     bool showingShorePracticeCue = false;
     if (rescueJourney)
     {
@@ -3719,6 +3724,20 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case SalvagerAction::None: break;
         }
         context.tavernInteractionPromptPresented=visible;
+    }
+    else if((chapterInteract || saleReceipt) && snapshot.ordinarySilverAction!=OrdinarySilverAction::None) {
+        switch(snapshot.ordinarySilverAction) {
+        case OrdinarySilverAction::Take: text="LEFT-CLICK / A TO TAKE ORDINARY SILVER"; break;
+        case OrdinarySilverAction::Sell:
+            tradeText="SELL ORDINARY SILVER (+"+
+                std::to_string(horde::gameplay::campaign::TreasurePurse::kOrdinarySilverSaleCoins)+
+                " COINS) | LEFT-CLICK / A";
+            text=tradeText;
+            break;
+        case OrdinarySilverAction::Sold: text="ORDINARY SILVER SOLD"; break;
+        case OrdinarySilverAction::None: break;
+        }
+        context.tavernInteractionPromptPresented=visible && snapshot.ordinarySilverAction!=OrdinarySilverAction::Sold;
     }
     else if(chapterInteract && snapshot.relicDealerTradeAvailable) {
         text = "LEFT-CLICK / A TO ASK ABOUT TRADE";

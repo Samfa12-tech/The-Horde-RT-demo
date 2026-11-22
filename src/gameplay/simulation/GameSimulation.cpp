@@ -3546,7 +3546,9 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.artificer=currentExterior && IsBellwetherResidentReady(traversal::kArtificerResident) ? artificer_ : std::nullopt;
     snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
     snapshot_.relicDealer=currentExterior && IsBellwetherResidentReady(traversal::kRelicDealerResident) ? relicDealer_ : std::nullopt;
-    snapshot_.relicDealerTradeAvailable=chapterDialogue_.CanStartRelicDealer(chapterContext);
+    snapshot_.ordinarySilverAction=CurrentOrdinarySilverAction(chapterContext);
+    snapshot_.relicDealerTradeAvailable=snapshot_.ordinarySilverAction==campaign::OrdinarySilverAction::None &&
+        chapterDialogue_.CanStartRelicDealer(chapterContext);
     snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
     snapshot_.shorePracticeStage=shorePracticeStage_;
     snapshot_.shorePracticeBreathTicksRemaining=shorePracticeBreathTicksRemaining_;
