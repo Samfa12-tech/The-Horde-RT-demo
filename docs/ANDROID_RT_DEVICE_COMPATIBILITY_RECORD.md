@@ -4269,3 +4269,62 @@ lantern’s words** displayed the treasury request and exposed its text with the
 **Lantern voice** speaker label in the Android accessibility hierarchy.
 The debug process was stopped after collection. Raw evidence is retained locally
 under `build/phone-shrine-20261121-184741`.
+
+### 23 November 2026 — Bellwether Directions and moving tavern doorway
+
+**Evidence class — actual-device scripted UI, completed RT submissions and
+sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37,
+Adreno 840 driver raw 2150932499, build `089d643e2a`) ran the private combined
+ARM64 Debug candidate with the Directions change recorded in `fc7a40c8`.
+The APK was built before that commit. Its embedded identity records Debug
+and a dirty worktree at `a7104cef2c87f7b88a1893f50f1fa1401dc8f53b` with input
+digest `1c2d94387b3010b7e689ced31880506d9e0be679ef4b50fb9cea470dfe0bcd00`.
+The installed APK hash matched the local artifact
+`f68d6a8de62bbe1b8c9fbbf0f1e7a411b983f8cd04c0ac0b619b9a9dd5af61b3`.
+The test package contained all five resident models and used Bellwether captions.
+
+The `bellwether-doorway-measurement` fixture completed both room-to-square
+returns in 87.25 s with 5,229 simulation ticks and 1,510 frames that joined GPU
+completion to successful native RT present calls. The door stayed fully open
+and its rendered instance remained present. RayTracingPipeline used the default
+33% render scale (475 × 980 internal, 1440 × 2971 output), the Diagnostic
+Mobile opaque-fast shader, and glass off. Battery temperature rose from 29.1 °C
+to 33.8 °C on USB power. Android thermal status was 0 at both readings.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 52.97 / 55.22 | 62.56 / 67.02 |
+| Doorway outbound | 38.43 / 48.04 | 48.63 / 59.05 |
+| Square | 39.21 / 42.54 | 72.38 / 79.36 |
+| Doorway inbound | 44.11 / 49.29 | 55.72 / 61.68 |
+
+The route analyzer excludes the first five seconds. From 33 to 87 s into the
+same run, the game SurfaceView's SurfaceFlinger history yielded 856 distinct,
+adjacent display intervals covering 50.0 s. The median was 58.33 ms and the
+p95 was 75.00 ms. The layer history supplies display pacing for the sampled
+intervals, independently of the native submission IDs. The warm sustained
+route, shipping shader profile, second RT backend and cause of the square's
+longer intervals remain open.
+
+From the staged completed tavern visit, Android Back opened the pause menu
+and **Bellwether directions** showed the northern shrine, the mill breathing
+rig and shore practice. All three leads and both buttons fit on the tested
+display. **Back to pause menu** returned to the menu and **Continue exploring**
+closed Directions and brought the live controls back. The full set of earned
+preparation states still has Windows evidence only. Raw measurements and
+captures are retained locally under `build/bellwether-phone-20261123-080927`.
+
+#### Android Back after benchmark results
+
+The same APK also passed the completed Standard benchmark path for the 1.8
+Back fix in `3caefd67`. From a cold launch into the ordinary entry menu,
+system Back opened **Exit The Horde?**, and **Stay** preserved the menu.
+**More → Standard benchmark (fixed settings)** completed the two-pass course
+and opened its report after the entry surface returned to 1440 × 2971. System
+Back from the report returned to the front menu. The next system Back produced
+the same confirmation. **Stay** preserved the front menu, and reopening the
+confirmation and tapping **Quit Demo** returned focus to Android. The local
+native report recorded `Integrity: COMPLETE`. The test exercised completion
+and dismissal through system Back. Cancellation, sharing review, repeated
+runs and background/resume remain separate device cases. The production app
+and its saves were untouched. [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
