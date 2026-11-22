@@ -30,7 +30,8 @@ inline bool LookoutObjectiveAvailable(const simulation::SimulationSnapshot& s,
 // Values are carried by the Android pause UI publication. This is a view of
 // existing progress, with no saved quest state or gameplay command of its own.
 enum class PauseObjective {
-    None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone
+    None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone,
+    BellwetherArrival, BellwetherHearth, BellwetherLantern
 };
 
 enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
@@ -80,16 +81,22 @@ inline BellwetherDirections CurrentBellwetherDirections(const simulation::Simula
 inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
     const std::optional<Checkpoint>& boundary)
 {
-    if (boundary && boundary->contentRevision == kBellwetherContentRevision &&
-        s.developmentRescueJourney && s.playerAlive && s.rescue.exteriorSide &&
-        (s.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() ||
-            s.waysideArchive.registerInterpreted))
-    {
-        if (s.waysideArchive.registerInterpreted) return PauseObjective::BellwetherExpeditions;
-        if (s.waysideArchive.registerRecovered) return PauseObjective::BellwetherRegister;
-        if (s.waysideArchive.lanternRevealStarted) return PauseObjective::BellwetherArchive;
-        if (s.waysideArchive.stage != bellwether::ArchiveStage::Closed) return PauseObjective::BellwetherLowerStone;
-        return PauseObjective::BellwetherShrine;
+    if (boundary && boundary->contentRevision >= kForestContentRevision &&
+        s.developmentRescueJourney && s.playerAlive && s.rescue.exteriorSide && !s.rescue.equipmentStowed) {
+        if (boundary->contentRevision == kBellwetherContentRevision &&
+            (s.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() ||
+                s.waysideArchive.registerInterpreted)) {
+            if (s.waysideArchive.registerInterpreted) return PauseObjective::BellwetherExpeditions;
+            if (s.waysideArchive.registerRecovered) return PauseObjective::BellwetherRegister;
+            if (s.waysideArchive.lanternRevealStarted) return PauseObjective::BellwetherArchive;
+            if (s.waysideArchive.stage == bellwether::ArchiveStage::Open) return PauseObjective::BellwetherLantern;
+            if (s.waysideArchive.stage != bellwether::ArchiveStage::Closed) return PauseObjective::BellwetherLowerStone;
+            return PauseObjective::BellwetherShrine;
+        }
+        using dialogue::BellwetherArrivalStage;
+        const auto arrival = s.chapterCompanion.bellwetherArrival;
+        if (arrival == BellwetherArrivalStage::Seated && s.tavernKeeper) return PauseObjective::BellwetherHearth;
+        if (arrival != BellwetherArrivalStage::AtLookout) return PauseObjective::BellwetherArrival;
     }
     return LookoutObjectiveAvailable(s, boundary) ? PauseObjective::Lookout : PauseObjective::None;
 }
@@ -103,6 +110,10 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     switch (objective)
     {
     case PauseObjective::Lookout: return kLookoutObjectiveText;
+    case PauseObjective::BellwetherArrival:
+        return "Follow the road down to Bellwether. Cross the square and enter the tavern through its south door.";
+    case PauseObjective::BellwetherHearth:
+        return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
     case PauseObjective::BellwetherShrine:
         return "Ask the record keeper by the northern church about the wayside shrine. "
             "The shrine is on a short spur off the northern path.";
@@ -110,6 +121,8 @@ inline const char* PauseObjectiveText(PauseObjective objective)
         return "Recover the road register from the opened wayside archive.";
     case PauseObjective::BellwetherLowerStone:
         return "Open the lower stone at the wayside shrine. Stay close to hear the lantern.";
+    case PauseObjective::BellwetherLantern:
+        return "The wayside archive is open. Stand near the opening and choose Listen to the lantern.";
     case PauseObjective::BellwetherRegister:
         return dialogue::Spec(dialogue::Line::TavernRegisterDirections).text;
     case PauseObjective::BellwetherExpeditions:
@@ -123,7 +136,8 @@ inline const char* PauseObjectiveText(PauseObjective objective)
 inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherDirections& directions)
 {
     std::string text=PauseObjectiveText(objective);
-    if(objective==PauseObjective::None || objective==PauseObjective::Lookout)return text;
+    if(objective==PauseObjective::None || objective==PauseObjective::Lookout ||
+       objective==PauseObjective::BellwetherArrival || objective==PauseObjective::BellwetherHearth)return text;
     const auto& purse=directions.purse;
     if(objective==PauseObjective::BellwetherExpeditions || purse.ordinarySilver!=OrdinarySilverProgress::Unfound) {
         text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");

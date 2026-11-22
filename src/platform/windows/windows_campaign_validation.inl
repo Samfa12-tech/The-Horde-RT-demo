@@ -1332,6 +1332,36 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     ctx.campaign->State().activeSlot == 0 && !ctx.campaignMenu->Visible() &&
                     !ctx.campaignPause && !ctx.simulationPaused;
             };
+            const auto readDirections = [&](campaign::PauseObjective objective, std::string_view requiredText = {}) {
+                const auto operation = ctx.campaign->State().operationRevision;
+                const auto dialogueGeneration = state.chapterDialogue.generation;
+                const auto breathTicks = state.shorePracticeBreathTicksRemaining;
+                const float x = state.playerX, z = state.playerZ;
+                ShowPauseMenu(ctx, true);
+                if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
+                    !ctx.lookoutObjective->Visible() || !ctx.simulationPaused) {
+                    std::cerr << "Bellwether directions did not open for objective " << static_cast<int>(objective) << '\n';
+                    return false;
+                }
+                const auto body = GetDlgItem(ctx.windowHandle, LookoutPanel::BodyId);
+                std::string text(static_cast<std::size_t>(GetWindowTextLengthA(body)) + 1, '\0');
+                const int copied = GetWindowTextA(body, text.data(), static_cast<int>(text.size()));
+                text.resize(static_cast<std::size_t>(copied));
+                const bool correct = text == campaign::PauseObjectiveText(objective, campaign::CurrentBellwetherDirections(state)) &&
+                    text.find(requiredText) != std::string::npos;
+                const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
+                    ctx.pauseMenuVisible && ctx.simulationPaused;
+                const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
+                input.paused = false;
+                const bool unchanged = operation == ctx.campaign->State().operationRevision &&
+                    dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ &&
+                    state.shorePracticeBreathTicksRemaining == breathTicks;
+                if (!correct || !resumed || !unchanged)
+                    std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
+                              << " textCorrect=" << correct << " resumed=" << resumed
+                              << " progressUnchanged=" << unchanged << '\n';
+                return correct && resumed && unchanged && step();
+            };
             const auto target = campaign::kBellwetherCheckpointPosition;
             // The scripted player runs ahead. Let Kit complete his independent
             // walk, sit and hearth lines on the same fixed-step clock.
@@ -1371,8 +1401,14 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     kit.bellwetherStation == station + 1 && state.chapterDialogue.line == Line::None && frame(),
                     "native Load presents Kit after the injury and retains the player's safe lookout spawn");
             }
+            const auto afterRoadDirections = kBellwetherTavernRoute.begin() + 3;
+            if (progressed) {
+                progressed = check(std::all_of(kBellwetherTavernRoute.begin(), afterRoadDirections, walkTo) &&
+                    readDirections(campaign::PauseObjective::BellwetherArrival, "south door"),
+                    "the ordinary pause menu points to Bellwether's south tavern door on the road");
+            }
             progressed = progressed &&
-                std::all_of(kBellwetherTavernRoute.begin(), kBellwetherTavernRoute.end(), walkTo) &&
+                std::all_of(afterRoadDirections, kBellwetherTavernRoute.end(), walkTo) &&
                 walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, hearthWaitTicks);
             if (gBellwetherAnkleRestoreValidation)
                 progressed = check(progressed && ankleReloaded && !ankleReplayed,
@@ -1399,6 +1435,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                               << " restorations=" << lifetime.restorations << " deferred=" << lifetime.deferredNearFrames
                               << " failures=" << lifetime.preparationFailures
                               << " tier=" << (tier ? static_cast<int>(*tier) : -1) << '\n';
+            }
+            if (progressed) {
+                progressed = check(readDirections(campaign::PauseObjective::BellwetherHearth, "Choose Talk"),
+                    "the ordinary pause menu points to Talk before the first hearth exchange");
             }
             if (progressed) {
                 input.commands.interact = state.lastConsumedInteractSequence + 1;
@@ -1447,36 +1487,6 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "resuming the tavern preserves the earned autosave bytes");
                 }
             }
-            const auto readDirections = [&](campaign::PauseObjective objective, std::string_view requiredText = {}) {
-                const auto operation = ctx.campaign->State().operationRevision;
-                const auto dialogueGeneration = state.chapterDialogue.generation;
-                const auto breathTicks = state.shorePracticeBreathTicksRemaining;
-                const float x = state.playerX, z = state.playerZ;
-                ShowPauseMenu(ctx, true);
-                if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
-                    !ctx.lookoutObjective->Visible() || !ctx.simulationPaused) {
-                    std::cerr << "Bellwether directions did not open for objective " << static_cast<int>(objective) << '\n';
-                    return false;
-                }
-                const auto body = GetDlgItem(ctx.windowHandle, LookoutPanel::BodyId);
-                std::string text(static_cast<std::size_t>(GetWindowTextLengthA(body)) + 1, '\0');
-                const int copied = GetWindowTextA(body, text.data(), static_cast<int>(text.size()));
-                text.resize(static_cast<std::size_t>(copied));
-                const bool correct = text == campaign::PauseObjectiveText(objective, campaign::CurrentBellwetherDirections(state)) &&
-                    text.find(requiredText) != std::string::npos;
-                const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
-                    ctx.pauseMenuVisible && ctx.simulationPaused;
-                const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
-                input.paused = false;
-                const bool unchanged = operation == ctx.campaign->State().operationRevision &&
-                    dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ &&
-                    state.shorePracticeBreathTicksRemaining == breathTicks;
-                if (!correct || !resumed || !unchanged)
-                    std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
-                              << " textCorrect=" << correct << " resumed=" << resumed
-                              << " progressUnchanged=" << unchanged << '\n';
-                return correct && resumed && unchanged && step();
-            };
             if (progressed && gBellwetherPreparationsValidation) {
                 progressed = check(state.shorePracticeServiceAvailable && state.millServiceAvailable &&
                     readDirections(campaign::PauseObjective::BellwetherShrine, "For a breathing rig, follow the MILL signs east"),

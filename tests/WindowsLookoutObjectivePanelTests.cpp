@@ -185,6 +185,17 @@ int main() {
             "combined directions fit the complete shore, rig and ward text in a narrow window");
         h.panel.Close();
         DeleteObject(font);
+        h.view.directions={};
+        for(const auto objective:{Panel::Objective::BellwetherArrival,Panel::Objective::BellwetherHearth,
+                                  Panel::Objective::BellwetherLantern}) {
+            h.view.objective=objective;
+            Check(open(h.view) && Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" &&
+                  Text(parent,Panel::BodyId)==horde::gameplay::campaign::PauseObjectiveText(objective) &&
+                  !GetDlgItem(parent,Panel::MenuId),"the new Bellwether stages use the native directions panel");
+            Click(parent,Panel::BackId);
+            Check(!h.panel.Visible() && h.actions.back()==Panel::Action::BackToPause,
+                  "leaving a new directions stage keeps the parent paused");
+        }
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }
     foreground.Observe("before-destroy");

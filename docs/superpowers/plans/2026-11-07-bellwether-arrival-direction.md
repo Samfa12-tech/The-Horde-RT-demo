@@ -100,7 +100,14 @@ Both standard Windows hardware RT backends passed all 16 checks from the lookout
 
 ### Bellwether directions in the pause menu
 
-Completing the first tavern Talk unlocks **Bellwether directions** in the pause menu while exploring outside the tomb. The page follows the player's progress from finding the northern church or shrine, through opening the lower stone and recovering the register, to bringing it to the record keeper. After the reading it shows the downstream Abbey and eastern Foundry as leads for future expeditions. The page reads the existing campaign progress, so reloading restores the corresponding directions without an extra save field.
+**Bellwether directions** is available in the pause menu once Kit takes the road.
+It points to the south tavern door, then to the hearth and **Talk** when Kit is
+seated and the keeper is available. Completing Talk opens the church and the
+preparation leads. At the shrine the page follows the lower stone, lantern and
+road register. An already-open shrine whose claim is still unheard points to
+**Listen to the lantern**. After the reading the page shows the downstream
+Abbey and eastern Foundry as leads for future expeditions. Reloading uses the
+current campaign progress without an extra save field.
 
 Directions lists the mill workbench and shore practice when the artificer and salvager are part of the playable roster. Either visit can start before the church route. The directions keep the west stall sale location visible whenever the player is carrying ordinary silver, including during the shrine and register steps.
 

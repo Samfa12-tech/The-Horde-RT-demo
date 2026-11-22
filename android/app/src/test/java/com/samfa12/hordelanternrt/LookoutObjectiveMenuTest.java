@@ -50,6 +50,9 @@ public final class LookoutObjectiveMenuTest {
                         + "Purse: 0 coins.\r\nOrdinary silver: sell it at the stall west of the square.";
                 case 4: return "Show the road register to the record keeper by the northern church.";
                 case 5: return "The Abbey lies downstream. The Foundry is east, across the gorge. Both are leads for future expeditions.";
+                case 7: return "Follow the road down to Bellwether. Cross the square and enter the tavern through its south door.";
+                case 8: return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
+                case 9: return "The wayside archive is open. Stand near the opening and choose Listen to the lantern.";
                 default: return "";
             }
         }
@@ -122,7 +125,7 @@ public final class LookoutObjectiveMenuTest {
     }
     @Test public void malformedStaleAndUnavailablePublicationsCannotOfferThePage()throws Exception {
         for(long[] value:new long[][]{null,new long[4],new long[]{1,31,81,1},new long[]{2,30,81,1},
-                new long[]{2,31,0,1},new long[]{2,31,81,7},new long[]{2,31,81,0}}) {
+                new long[]{2,31,0,1},new long[]{2,31,81,10},new long[]{2,31,81,0}}) {
             Bridge.objective=value;pause();assertNull(find("Lookout objective"));
             assertNull(find("Bellwether directions"));
             assertFalse(field("lookoutObjectiveVisible").getBoolean(a));
@@ -184,6 +187,20 @@ public final class LookoutObjectiveMenuTest {
         String archive=text(a.findViewById(R.id.menu_scrim));
         assertTrue(archive.contains("Recover the road register"));
         assertTrue(archive.contains("sell it at the stall west of the square"));
+        assertEquals(0,Bridge.campaignRequests);
+        assertEquals(0,actionCount());
+    }
+    @Test public void bellwetherDirectionsOpenForTheRoadHearthAndUnheardLantern()throws Exception {
+        String[] expected={"south door","Choose Talk","Listen to the lantern"};
+        for(int i=0;i<expected.length;i++) {
+            Bridge.objective[3]=7+i;
+            pause();
+            assertNull(find("Lookout objective"));
+            find("Bellwether directions").performClick();
+            assertTrue(text(a.findViewById(R.id.menu_scrim)).contains(expected[i]));
+            find("Back to pause menu").performClick();
+            assertTrue(Bridge.paused);
+        }
         assertEquals(0,Bridge.campaignRequests);
         assertEquals(0,actionCount());
     }

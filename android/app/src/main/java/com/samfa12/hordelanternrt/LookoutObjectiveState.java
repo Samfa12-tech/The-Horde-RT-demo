@@ -11,7 +11,7 @@ final class LookoutObjectiveState {
     }
     static LookoutObjectiveState decode(long[] values,long currentSurface) {
         if(values==null || values.length!=4 || values[0]!=2 || currentSurface<=0 ||
-                values[1]!=currentSurface || values[2]<=0 || values[3]<0 || values[3]>6)return null;
+                values[1]!=currentSurface || values[2]<=0 || values[3]<0 || values[3]>9)return null;
         return new LookoutObjectiveState(values);
     }
     boolean isLookout() { return objective==1; }

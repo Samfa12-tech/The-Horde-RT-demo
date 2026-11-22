@@ -225,6 +225,45 @@ void RevivalRestoreProfile(const std::shared_ptr<const TriangleSupportSurface>& 
 }
 int main(int argc,char** argv) {
     using cp::PauseObjective;
+    {
+        using dlg::BellwetherArrivalStage;
+        using bellwether::ArchiveStage;
+        auto boundary=Record(true);
+        boundary.contentRevision=cp::kForestContentRevision;
+        SimulationSnapshot state{};
+        state.developmentRescueJourney=true;
+        state.playerAlive=true;
+        state.rescue.exteriorSide=true;
+        state.chapterCompanion.bellwetherArrival=BellwetherArrivalStage::OnRoad;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArrival &&
+              cp::CurrentPauseObjective(state,std::nullopt)==PauseObjective::None,
+              "the road directions follow Kit's departure from an earned lookout, not an unearned world");
+        state.rescue.equipmentStowed=true;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::None,
+              "the Bellwether path stays hidden while rope traversal owns the player");
+        state.rescue.equipmentStowed=false;
+        state.chapterCompanion.bellwetherArrival=BellwetherArrivalStage::Seated;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArrival,
+              "directions do not promise Talk when the keeper is unavailable");
+        state.tavernKeeper.emplace();
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherHearth,
+              "the first tavern visit points to the hearth before the conversation is earned");
+        boundary.contentRevision=cp::kBellwetherContentRevision;
+        state.chapterDialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherShrine,
+              "finishing Talk advances the page to the shrine");
+        state.waysideArchive.stage=ArchiveStage::Inspected;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherLowerStone,
+              "the inspected shrine still calls for opening the lower stone");
+        state.waysideArchive.stage=ArchiveStage::Open;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherLantern &&
+              std::string_view(cp::PauseObjectiveText(PauseObjective::BellwetherLantern)).find(
+                  "Listen to the lantern")!=std::string_view::npos,
+              "an open shrine with an unheard claim points to the existing Listen action");
+        state.waysideArchive.lanternRevealStarted=true;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArchive,
+              "hearing the lantern advances the page to recovering the register");
+    }
     const auto noServices=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,cp::BellwetherDirections{});
     auto directions=[] {
         SimulationSnapshot snapshot{};
@@ -233,6 +272,10 @@ int main(int argc,char** argv) {
         return cp::CurrentBellwetherDirections(snapshot);
     }();
     const auto opening=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+    for(const auto objective:{PauseObjective::BellwetherArrival,PauseObjective::BellwetherHearth}) {
+        Check(cp::PauseObjectiveText(objective,directions)==cp::PauseObjectiveText(objective),
+              "arrival guidance keeps services hidden until after Talk");
+    }
     Check(noServices.find("Shore practice:")==std::string::npos &&
           noServices.find("MILL signs")==std::string::npos &&
           opening.find("Shore practice: Meet the salvager at the river fork.")!=std::string::npos &&
@@ -260,7 +303,7 @@ int main(int argc,char** argv) {
     Check(completedShore.find("Shore practice: Complete. Breath control learned.")!=std::string::npos,
           "directions report saved shore-practice completion");
     directions.purse.ordinarySilver=cp::OrdinarySilverProgress::Carried;
-    for(const auto objective:{PauseObjective::BellwetherLowerStone,PauseObjective::BellwetherArchive,
+    for(const auto objective:{PauseObjective::BellwetherLowerStone,PauseObjective::BellwetherLantern,PauseObjective::BellwetherArchive,
                               PauseObjective::BellwetherRegister}) {
         Check(cp::PauseObjectiveText(objective,directions).find("sell it at the stall west of the square")!=std::string::npos,
               "carried silver keeps its sale directions through the church objectives");
