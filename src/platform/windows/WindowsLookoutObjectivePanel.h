@@ -8,6 +8,7 @@
 #include <array>
 #include <cstdint>
 #include <optional>
+#include <string>
 #include "gameplay/campaign/LookoutObjective.h"
 
 namespace horde::platform::windows {
@@ -24,6 +25,9 @@ public:
         gameplay::campaign::TreasurePurse purse{};
         gameplay::campaign::AirWardDirections ward=gameplay::campaign::AirWardDirections::RestoreBinding;
         gameplay::bellwether::MillPreparation mill{};
+        bool shorePracticeAvailable=false;
+        gameplay::bellwether::ShorePracticeStage shorePracticeStage=gameplay::bellwether::ShorePracticeStage::Idle;
+        bool shorePracticeCompleted=false;
     };
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
@@ -39,10 +43,14 @@ public:
         purse_=view.purse;
         ward_=view.ward;
         mill_=view.mill;
+        shorePracticeAvailable_=view.shorePracticeAvailable;
+        shorePracticeStage_=view.shorePracticeStage;
+        shorePracticeCompleted_=view.shorePracticeCompleted;
         const bool lookout = objective_ == Objective::Lookout;
-        const auto body=gameplay::campaign::PauseObjectiveText(objective_,purse_,ward_,mill_);
+        bodyText_=gameplay::campaign::PauseObjectiveText(objective_,purse_,ward_,mill_,
+            shorePracticeAvailable_,shorePracticeStage_,shorePracticeCompleted_);
         const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
-            body.c_str(),"CONTINUE EXPLORING",
+            bodyText_.c_str(),"CONTINUE EXPLORING",
             lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
         for(std::size_t i=0;i<controls_.size();++i) {
             if (!labels[i]) continue;
@@ -64,13 +72,16 @@ public:
         // Each opening owns distinct native controls. A queued notification from
         // a retired opening cannot choose an action on a later opening.
         for(auto& control:controls_) {if(control && IsWindow(control))DestroyWindow(control);control=nullptr;}
+        bodyText_.clear();
         parent_=nullptr;
     }
     bool Visible() const {return visible_;}
     bool Refresh(const View& view) {
         if(!visible_)return false;
         if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_ ||
-            view.objective!=objective_ || view.purse!=purse_ || view.ward!=ward_ || view.mill!=mill_) {
+            view.objective!=objective_ || view.purse!=purse_ || view.ward!=ward_ || view.mill!=mill_ ||
+            view.shorePracticeAvailable!=shorePracticeAvailable_ || view.shorePracticeStage!=shorePracticeStage_ ||
+            view.shorePracticeCompleted!=shorePracticeCompleted_) {
             Close();return false;
         }
         return true;
@@ -91,7 +102,21 @@ public:
         const int availableWidth=std::max(1L,bounds.right-bounds.left);
         const int availableHeight=std::max(1L,bounds.bottom-bounds.top);
         const int width=std::min(px(540),availableWidth);
-        const int titleHeight=px(42),bodyHeight=px(objective_==Objective::BellwetherExpeditions?228:140),gap=px(10);
+        const int titleHeight=px(42),gap=px(10);
+        int bodyHeight=px(objective_==Objective::BellwetherExpeditions?228:140);
+        if(objective_!=Objective::Lookout) {
+            const auto body=controls_[1];
+            if(const HDC dc=GetDC(body)) {
+                const auto font=reinterpret_cast<HFONT>(SendMessageA(body,WM_GETFONT,0,0));
+                const auto previousFont=font?SelectObject(dc,font):nullptr;
+                RECT measured{0,0,width,0};
+                const int height=DrawTextA(dc,bodyText_.c_str(),static_cast<int>(bodyText_.size()),
+                    &measured,DT_CALCRECT|DT_WORDBREAK|DT_CENTER|DT_NOPREFIX);
+                if(previousFont)SelectObject(dc,previousFont);
+                ReleaseDC(body,dc);
+                bodyHeight=std::max(bodyHeight,height+px(8));
+            }
+        }
         const int buttons = objective_==Objective::Lookout ? 3 : 2;
         const int gaps = buttons + 2;
         const int buttonHeight=std::min(px(44),std::max(px(24),(availableHeight-titleHeight-bodyHeight-gaps*gap)/buttons));
@@ -109,11 +134,15 @@ private:
     }
     HWND parent_=nullptr;
     std::array<HWND,5> controls_{};
+    std::string bodyText_;
     bool visible_=false;
     std::uint64_t world_=0,surface_=0;
     gameplay::campaign::TreasurePurse purse_{};
     gameplay::campaign::AirWardDirections ward_=gameplay::campaign::AirWardDirections::RestoreBinding;
     gameplay::bellwether::MillPreparation mill_{};
+    bool shorePracticeAvailable_=false;
+    gameplay::bellwether::ShorePracticeStage shorePracticeStage_=gameplay::bellwether::ShorePracticeStage::Idle;
+    bool shorePracticeCompleted_=false;
     Objective objective_=Objective::None;
 };
 } // namespace horde::platform::windows

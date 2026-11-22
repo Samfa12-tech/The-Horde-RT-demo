@@ -987,7 +987,7 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
 int FinishHiddenLookoutValidation(HWND owner,int result)
 {
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
-    const int timeLimit = gBellwetherExpeditionValidation ? 230 :
+    const int timeLimit = gBellwetherPreparationsValidation ? 360 : gBellwetherExpeditionValidation ? 230 :
         gBellwetherCombinedCampaignActors && gBellwetherEarnTavernValidation ? 180 :
         gBellwetherHearthRestValidation ? 110 : 90;
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
@@ -1199,7 +1199,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
     };
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(
-        gBellwetherExpeditionValidation ? 205 : gBellwetherCombinedCampaignActors ? 150 :
+        gBellwetherPreparationsValidation ? 325 : gBellwetherExpeditionValidation ? 205 :
+        gBellwetherCombinedCampaignActors ? 150 :
         gBellwetherHearthRestValidation ? 85 : 65);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
@@ -1379,8 +1380,44 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "resuming the tavern preserves the earned autosave bytes");
                 }
             }
+            const auto readDirections = [&](campaign::PauseObjective objective, std::string_view requiredText = {}) {
+                const auto operation = ctx.campaign->State().operationRevision;
+                const auto dialogueGeneration = state.chapterDialogue.generation;
+                const float x = state.playerX, z = state.playerZ;
+                ShowPauseMenu(ctx, true);
+                if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
+                    !ctx.lookoutObjective->Visible() || !ctx.simulationPaused) {
+                    std::cerr << "Bellwether directions did not open for objective " << static_cast<int>(objective) << '\n';
+                    return false;
+                }
+                const auto body = GetDlgItem(ctx.windowHandle, LookoutPanel::BodyId);
+                std::string text(static_cast<std::size_t>(GetWindowTextLengthA(body)) + 1, '\0');
+                const int copied = GetWindowTextA(body, text.data(), static_cast<int>(text.size()));
+                text.resize(static_cast<std::size_t>(copied));
+                const bool shoreAvailable = gBellwetherCombinedCampaignActors ||
+                    gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::Salvager;
+                const bool correct = text == campaign::PauseObjectiveText(objective, state.treasurePurse,
+                    campaign::CurrentAirWardDirections(state.waysideArchive), state.millPreparation,
+                    shoreAvailable, state.shorePracticeStage, state.salvagerShorePracticeCompleted) &&
+                    text.find(requiredText) != std::string::npos;
+                const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
+                    ctx.pauseMenuVisible && ctx.simulationPaused;
+                const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
+                input.paused = false;
+                const bool unchanged = operation == ctx.campaign->State().operationRevision &&
+                    dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ;
+                if (!correct || !resumed || !unchanged)
+                    std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
+                              << " textCorrect=" << correct << " resumed=" << resumed
+                              << " progressUnchanged=" << unchanged << '\n';
+                return correct && resumed && unchanged && step();
+            };
+            if (progressed && gBellwetherPreparationsValidation) {
+                progressed = check(readDirections(campaign::PauseObjective::BellwetherShrine, "Meet the salvager"),
+                    "Bellwether Directions offers shore practice at the tavern before learning the church lead");
+            }
             if (progressed && gBellwetherCombinedCampaignActors && !gBellwetherHearthRestValidation &&
-                !gBellwetherExpeditionValidation) {
+                (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation)) {
                 using namespace horde::gameplay::traversal;
                 using namespace horde::gameplay::bellwether;
                 using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
@@ -1442,6 +1479,28 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
                 };
+                const auto& landing = kBellwetherRiverLanding;
+                const auto& mill = kBellwetherMillApproach;
+                const auto approachShallows = [&] {
+                    return std::all_of(landing.begin(), landing.end() - 2, walkTo) &&
+                        walkTo(kBellwetherRiverDryMark) && !state.waterContact.wetGround &&
+                        walkTo(landing[landing.size() - 2]) && walkTo(landing.back()) &&
+                        state.waterContact.wetGround;
+                };
+                const auto backFromShore = [&] {
+                    return std::all_of(landing.rbegin() + 2, landing.rend(), walkTo) &&
+                        walkTo(kBellwetherSalvagerMark);
+                };
+                const auto reachWorkbench = [&] {
+                    return walkTo(mill[1]) && std::all_of(mill.begin() + 2, mill.end(), walkTo) &&
+                        walkTo(kBellwetherMillWorkMark);
+                };
+                const auto leaveWorkbench = [&] {
+                    return walkTo(mill.back()) && std::all_of(mill.rbegin() + 1, mill.rend() - 1, walkTo);
+                };
+                const auto useMill = [&](MillAction action, const std::array<float, 3>& mark) {
+                    return face(mark[0], mark[2]) && state.millAction == action && interact();
+                };
                 progressed = check(town() &&
                     std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction), walkTo) &&
                     fork() && walkTo(kBellwetherMillApproach[1]) && east() &&
@@ -1461,22 +1520,87 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     progressed = check(started && frame() && capture("windows-combined-shore.png"),
                         "the salvager starts shore practice with both eastern actors in the same presented scene");
                 }
+                if (progressed && gBellwetherPreparationsValidation) {
+                    progressed = check(approachShallows() && state.shorePracticeStage == ShorePracticeStage::Retreat &&
+                        readDirections(campaign::PauseObjective::BellwetherShrine, "Return from the shallows") &&
+                        !state.salvagerShorePracticeCompleted && walkTo(kBellwetherRiverDryMark) &&
+                        state.shorePracticeStage == ShorePracticeStage::ReportBack && backFromShore() &&
+                        face(kBellwetherSalvagerStand.x, kBellwetherSalvagerStand.z) &&
+                        state.salvagerAction == SalvagerAction::ReportPractice && interact() && frame() &&
+                        state.salvagerShorePracticeCompleted && !state.waysideArchive.airWardLearned &&
+                        state.millPreparation == MillPreparation::Unexamined &&
+                        state.chapterDialogue.line == Line::SalvagerShoreReturn,
+                        "the player earns shore practice through dry and wet footing and reports it without a ward or rig");
+                }
                 if (progressed) {
-                    progressed = check(walkTo(kBellwetherMillApproach[1]) &&
-                        std::all_of(kBellwetherMillApproach.begin() + 2, kBellwetherMillApproach.end(), walkTo) &&
-                        walkTo(kBellwetherMillWorkMark) && face(kMillComparison[0], kMillComparison[2]) && east() &&
+                    progressed = check(reachWorkbench() && face(kMillComparison[0], kMillComparison[2]) && east() &&
                         state.millAction == MillAction::InspectGearing && capture("windows-combined-mill.png") &&
                         interact() && state.millPreparation == MillPreparation::BearingNeeded,
                         "the mill workbench advances preparation with both eastern actors in the same presented scene");
                 }
+                if (progressed && gBellwetherPreparationsValidation) {
+                    progressed = check(leaveWorkbench() && walkTo(kBellwetherBearingBinApproach) &&
+                        useMill(MillAction::RecoverBearing, kMillBearingBin) &&
+                        state.millPreparation == MillPreparation::BearingRecovered && reachWorkbench() &&
+                        useMill(MillAction::CheckFit, kMillComparison) && state.millPreparation == MillPreparation::FitChecked &&
+                        useMill(MillAction::SeatBearing, kMillDriveWork) && state.millPreparation == MillPreparation::BearingSeated &&
+                        useMill(MillAction::TurnDrive, kMillDriveWork) &&
+                        waitFor([&] { return state.millPreparation == MillPreparation::GearingVerified; }, 75) &&
+                        walkTo(mill.back()) && walkTo(kBellwetherMillArtificerView) &&
+                        face(kBellwetherMillArtificerMark.x, kBellwetherMillArtificerMark.z) &&
+                        state.millAction == MillAction::TakeRig && interact() && frame() &&
+                        state.millPreparation == MillPreparation::RigTrialReady && !state.waysideArchive.airWardLearned &&
+                        capture("windows-combined-mill-handoff.png"),
+                        "recovering and testing the bearing starts the mill and earns the rig without an air ward");
+                }
+                if (progressed && gBellwetherPreparationsValidation) {
+                    progressed = check(leaveWorkbench() && walkTo(kBellwetherSalvagerMark) &&
+                        approachShallows() && state.millAction == MillAction::StartLeakTest && interact() &&
+                        state.millLeakTestPhase == MillLeakTestPhase::Testing &&
+                        waitFor([&] { return state.millLeakTestPhase == MillLeakTestPhase::ReturnToDry; }, 130) &&
+                        state.waterContact.wetGround && state.millAction == MillAction::None &&
+                        face(kBellwetherRiverDryMark.x, kBellwetherRiverDryMark.z) &&
+                        capture("windows-combined-rig-trial.png") &&
+                        walkTo(kBellwetherRiverDryMark) && state.millAction == MillAction::ConfirmSeal && interact() &&
+                        state.millPreparation == MillPreparation::RigTested && state.salvagerShorePracticeCompleted &&
+                        backFromShore() && walkTo(mill[1]),
+                        "the earned rig only seals after a full wet hold and deliberate confirmation on dry stone");
+                }
                 if (progressed) {
+                    const bool complete = gBellwetherPreparationsValidation;
+                    const bool backAtJunction = complete ? walkTo(*junction) :
+                        std::all_of(mill.rbegin(), mill.rend(), walkTo);
                     progressed = check(
-                        std::all_of(kBellwetherMillApproach.rbegin(), kBellwetherMillApproach.rend(), walkTo) && fork() &&
+                        backAtJunction && fork() &&
                         std::all_of(std::next(junction), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && step() && atHearth() && town() && frame() &&
-                        state.millPreparation == MillPreparation::BearingNeeded &&
-                        state.shorePracticeStage == ShorePracticeStage::FindDryMark && capture("windows-combined-return.png"),
+                        state.millPreparation == (complete ? MillPreparation::RigTested : MillPreparation::BearingNeeded) &&
+                        state.shorePracticeStage == (complete ? ShorePracticeStage::Idle : ShorePracticeStage::FindDryMark) &&
+                        capture("windows-combined-return.png"),
                         "returning to the same tavern restores both town residents and retains the two eastern activities");
+                }
+                if (progressed && gBellwetherPreparationsValidation) {
+                    campaign::storage::StoredCheckpoint eastern;
+                    progressed = check(until([&] {
+                        return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", eastern).status ==
+                            campaign::storage::Status::Read && eastern.checkpoint.salvagerShorePracticeCompleted &&
+                            eastern.checkpoint.millPreparation == MillPreparation::RigTested &&
+                            ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                    }, false) && eastern.checkpoint.id == stored.checkpoint.id &&
+                        eastern.checkpoint.position.x == stored.checkpoint.position.x &&
+                        eastern.checkpoint.position.y == stored.checkpoint.position.y &&
+                        eastern.checkpoint.position.z == stored.checkpoint.position.z &&
+                        eastern.checkpoint.vitality == stored.checkpoint.vitality &&
+                        eastern.checkpoint.treasurePurse == stored.checkpoint.treasurePurse &&
+                        !eastern.checkpoint.airWardLearned && reloadTavern() && step() && atHearth() &&
+                        state.salvagerShorePracticeCompleted && state.millPreparation == MillPreparation::RigTested &&
+                        state.millLeakTestPhase == MillLeakTestPhase::Idle && frame(),
+                        "the native tavern reload preserves both eastern preparations and the earned return position");
+                    if (progressed) {
+                        stored = std::move(eastern);
+                        progressed = check(readDirections(campaign::PauseObjective::BellwetherShrine, "Shore practice: Complete."),
+                            "Bellwether Directions shows the saved shore result after the tavern reload");
+                    }
                 }
             }
             if (progressed && gBellwetherHearthRestValidation) {
@@ -1523,34 +1647,6 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 using horde::gameplay::interactions::HeldLightPose;
                 using campaign::PauseObjective;
                 const auto junction = kBellwetherTavernRoute.begin() + kBellwetherChurchJunction;
-                const auto readDirections = [&](PauseObjective objective) {
-                    const auto operation = ctx.campaign->State().operationRevision;
-                    const auto dialogueGeneration = state.chapterDialogue.generation;
-                    const float x = state.playerX, z = state.playerZ;
-                    ShowPauseMenu(ctx,true);
-                    if (!click(kLookoutObjectiveButtonId) || !ctx.lookoutObjective ||
-                        !ctx.lookoutObjective->Visible() || !ctx.simulationPaused) {
-                        std::cerr << "Bellwether directions did not open for objective " << static_cast<int>(objective) << '\n';
-                        return false;
-                    }
-                    std::array<char,512> text{};
-                    GetWindowTextA(GetDlgItem(ctx.windowHandle,LookoutPanel::BodyId),text.data(),static_cast<int>(text.size()));
-                    const bool correct = std::string_view(text.data())==campaign::PauseObjectiveText(
-                        objective,state.treasurePurse,campaign::CurrentAirWardDirections(state.waysideArchive));
-                    const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
-                        ctx.pauseMenuVisible && ctx.simulationPaused;
-                    const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
-                    // Fixed-step commands stay on the diagnostic input publisher.
-                    input.paused = false;
-                    const bool unchanged = operation==ctx.campaign->State().operationRevision &&
-                        dialogueGeneration==state.chapterDialogue.generation && x==state.playerX && z==state.playerZ;
-                    if (!correct || !resumed || !unchanged)
-                        std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
-                                  << " textCorrect=" << correct << " resumed=" << resumed
-                                  << " progressUnchanged=" << unchanged << '\n';
-                    // Rebuild the interaction prompts after the read-only UI closes.
-                    return correct && resumed && unchanged && step();
-                };
                 const auto walk = [&](auto first, auto last) { return std::all_of(first, last, walkTo); };
                 const auto face = [&](float yaw, float pitch) {
                     input.yawRadians = yaw;
@@ -1754,6 +1850,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     }
                 }
             }
+            if (progressed && gBellwetherPreparationsValidation) {
+                const auto& combined = ctx.simulation.LatestCampaignBoundary();
+                check(combined && campaign::Validate(*combined) && combined->airWardLearned &&
+                    combined->salvagerShorePracticeCompleted &&
+                    combined->millPreparation == horde::gameplay::bellwether::MillPreparation::RigTested &&
+                    combined->treasurePurse.lanternFittingPurchased && state.waysideArchive.airWardLearned &&
+                    state.salvagerShorePracticeCompleted &&
+                    state.millPreparation == horde::gameplay::bellwether::MillPreparation::RigTested &&
+                    state.shorePracticeStage == horde::gameplay::bellwether::ShorePracticeStage::Idle &&
+                    state.millLeakTestPhase == horde::gameplay::bellwether::MillLeakTestPhase::Idle,
+                    "the same tavern save retains Magic, Tech and Constitution preparation after the final native reload");
+            }
         } else if (atLookout) {
             SendMessageA(ctx.windowHandle, WM_COMMAND, MAKEWPARAM(kMenuPauseId,0), 0);
             std::vector<double> timings;
@@ -1789,7 +1897,7 @@ bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
     bool requested=false,lookoutRequested=false,earnTavernRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
-    bool expeditionRequested = false, hearthRestRequested = false;
+    bool expeditionRequested = false, preparationsRequested = false, hearthRestRequested = false;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -1799,6 +1907,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--bellwether-earn-tavern")earnTavernRequested=true;
         if(arg==L"--bellwether-verify-expedition-leads"){earnTavernRequested=true;expeditionRequested=true;}
+        if(arg==L"--bellwether-verify-preparations"){earnTavernRequested=true;expeditionRequested=true;preparationsRequested=true;}
         if(arg==L"--bellwether-verify-hearth-rest"){earnTavernRequested=true;hearthRestRequested=true;}
         if(arg==L"--route-validate-hidden")routeRequested=true;
         if(arg==L"--route-kit-turn-start")routeTurnStartRequested=true;
@@ -1816,6 +1925,10 @@ bool ConfigureHiddenCampaignValidation()
     LocalFree(args);
     if (hearthRestRequested && !HORDE_RT_FLASK_ADMITTED) {
         std::cerr << "Hidden hearth Rest requires the flask-enabled campaign validation build.\n";
+        return false;
+    }
+    if (preparationsRequested && hearthRestRequested) {
+        std::cerr << "Select the preparation route or the separate hearth Rest check.\n";
         return false;
     }
     if (earnTavernRequested && (!lookoutRequested || inspectKit)) {
@@ -1864,6 +1977,7 @@ bool ConfigureHiddenCampaignValidation()
     }
     gBellwetherEarnTavernValidation = earnTavernRequested;
     gBellwetherExpeditionValidation = expeditionRequested;
+    gBellwetherPreparationsValidation = preparationsRequested;
     gBellwetherHearthRestValidation = hearthRestRequested;
     if (earnTavernRequested) gHiddenCampaignFaults.lookoutReadOnly = false;
     gRouteReturnRecovery=returnRequested;

@@ -224,6 +224,28 @@ void RevivalRestoreProfile(const std::shared_ptr<const TriangleSupportSurface>& 
 }
 }
 int main(int argc,char** argv) {
+    const auto noShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
+        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined);
+    const auto idleShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
+        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,
+        bellwether::ShorePracticeStage::Idle,false);
+    Check(noShore.find("Shore practice:")==std::string::npos &&
+          idleShore.find("Shore practice: Meet the salvager at the river fork.")!=std::string::npos,
+          "only a shore-capable profile adds a discoverable idle practice direction");
+    for(const auto& [stage,expected]:std::array{
+            std::pair{bellwether::ShorePracticeStage::FindDryMark,"Follow the causeway to the dry mark"},
+            std::pair{bellwether::ShorePracticeStage::EnterShallows,"From the dry mark, wade to the river rail"},
+            std::pair{bellwether::ShorePracticeStage::Retreat,"Return from the shallows to the dry mark"},
+            std::pair{bellwether::ShorePracticeStage::ReportBack,"Return to the salvager at the river fork"}}) {
+        const auto text=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
+            cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,stage,false);
+        Check(text.find(expected)!=std::string::npos,"directions follow the current shore-practice stage");
+    }
+    const auto completedShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
+        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,
+        bellwether::ShorePracticeStage::Idle,true);
+    Check(completedShore.find("Shore practice: Complete.")!=std::string::npos,
+          "directions report saved shore-practice completion");
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error) ||

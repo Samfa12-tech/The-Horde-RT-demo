@@ -35,6 +35,19 @@ enum class PauseObjective {
 
 enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
 
+inline const char* BellwetherShorePracticeLine(bellwether::ShorePracticeStage stage,bool completed) {
+    using bellwether::ShorePracticeStage;
+    if(completed)return "Complete. Visit the salvager at the river fork to recall the lesson.";
+    switch(stage) {
+    case ShorePracticeStage::FindDryMark:return "Follow the causeway to the dry mark by the river rail.";
+    case ShorePracticeStage::EnterShallows:return "From the dry mark, wade to the river rail.";
+    case ShorePracticeStage::Retreat:return "Return from the shallows to the dry mark.";
+    case ShorePracticeStage::ReportBack:return "Return to the salvager at the river fork to report back.";
+    case ShorePracticeStage::Idle:break;
+    }
+    return "Meet the salvager at the river fork.";
+}
+
 inline AirWardDirections CurrentAirWardDirections(const bellwether::WaysideArchive& archive) {
     if(archive.airWardLearned)return AirWardDirections::Learned;
     return archive.stage==bellwether::ArchiveStage::Restored ?
@@ -85,7 +98,9 @@ inline const char* PauseObjectiveText(PauseObjective objective)
 }
 
 inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse, AirWardDirections ward,
-    bellwether::MillPreparation mill={})
+    bellwether::MillPreparation mill={},bool shorePracticeAvailable=false,
+    bellwether::ShorePracticeStage shorePracticeStage=bellwether::ShorePracticeStage::Idle,
+    bool shorePracticeCompleted=false)
 {
     std::string text=PauseObjectiveText(objective);
     if (objective==PauseObjective::BellwetherExpeditions) {
@@ -129,6 +144,8 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
             break;
         }
     }
+    if(objective!=PauseObjective::None && objective!=PauseObjective::Lookout && shorePracticeAvailable)
+        text+="\r\n\r\nShore practice: "+std::string(BellwetherShorePracticeLine(shorePracticeStage,shorePracticeCompleted));
     return text;
 }
 } // namespace horde::gameplay::campaign

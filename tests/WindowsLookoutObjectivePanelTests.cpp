@@ -47,7 +47,9 @@ void Click(HWND parent,int id) {
 void CheckBounds(HWND parent,RECT bounds) {
     int bottom=bounds.top;
     for(int id=Panel::TitleId;id<=Panel::BackId;++id) {
-        RECT r{};GetWindowRect(GetDlgItem(parent,id),&r);MapWindowPoints(HWND_DESKTOP,parent,reinterpret_cast<POINT*>(&r),2);
+        const auto control=GetDlgItem(parent,id);
+        if(!control)continue;
+        RECT r{};GetWindowRect(control,&r);MapWindowPoints(HWND_DESKTOP,parent,reinterpret_cast<POINT*>(&r),2);
         Check(r.left>=bounds.left && r.right<=bounds.right && r.top>=bottom && r.bottom<=bounds.bottom && r.right>r.left && r.bottom>r.top,
             "real panel controls fit their bounded client area without overlap");bottom=r.bottom;
     }
@@ -144,6 +146,32 @@ int main() {
               Text(parent,Panel::BodyId).find("Air ward learned")!=std::string::npos,
             "the reopened directions reflect the earned ward lesson");
         Click(parent,Panel::ContinueId);
+        h.view.ward=horde::gameplay::campaign::AirWardDirections::RestoreBinding;
+        h.view.mill=horde::gameplay::bellwether::MillPreparation::RigTrialReady;
+        h.view.shorePracticeAvailable=true;
+        h.view.shorePracticeCompleted=true;
+        const auto font=CreateFontA(18,0,0,0,FW_SEMIBOLD,FALSE,FALSE,FALSE,
+            ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,
+            DEFAULT_PITCH|FF_DONTCARE,"Segoe UI");
+        Check(font && h.panel.Open(parent,h.view,font),"combined directions open with the native menu font");
+        RECT narrow{16,16,480,504};
+        h.panel.Layout(narrow,96);
+        CheckBounds(parent,narrow);
+        const auto body=GetDlgItem(parent,Panel::BodyId);
+        RECT bodyBounds{};
+        GetClientRect(body,&bodyBounds);
+        const auto dc=GetDC(body);
+        const auto previous=SelectObject(dc,font);
+        auto measured=bodyBounds;
+        const auto text=Text(parent,Panel::BodyId);
+        const auto required=DrawTextA(dc,text.c_str(),static_cast<int>(text.size()),&measured,
+            DT_CALCRECT|DT_WORDBREAK|DT_CENTER|DT_NOPREFIX);
+        SelectObject(dc,previous);
+        ReleaseDC(body,dc);
+        Check(required>0 && bodyBounds.bottom>=required && text.find("Shore practice: Complete.")!=std::string::npos,
+            "combined directions fit the complete shore, rig and ward text in a narrow window");
+        h.panel.Close();
+        DeleteObject(font);
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }
     foreground.Observe("before-destroy");

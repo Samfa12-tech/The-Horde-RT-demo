@@ -337,7 +337,7 @@ Shallow contact queries the existing, finite Vulkan water faces and compares the
 
 After the opening tavern conversation, the salvager stands by the river fork on the east route. Talk starts a walk to the last dry stone, into the shallows at the rail, and back to dry footing. The shared player motor and water contact confirm the steps. Reporting back records the completed practice in the existing safe tavern autosave. A load returns to that safe anchor and unfinished drills can be restarted. The three authored lines have named captions and an optional private audition with positional audio.
 
-The private Debug roster pairs the salvager with the tavern keeper and Kit using the existing three-character capacity. This is the first Constitution preparation. Finite breath training and the submerged route toward the Abbey still need playable implementation.
+The standalone shore Debug roster pairs the salvager with the tavern keeper and Kit. The combined campaign uses the same salvager and opens Bellwether Directions after the tavern conversation, with a shore entry before the church handoff. The entry follows the current stage on the causeway and shows completion after the lesson is saved. This is the first Constitution preparation. Finite breath training and the submerged route toward the Abbey still need playable implementation.
 
 Both Windows hardware RT backends presented the fork at 960 × 540 with all three resident instance masks active. The ARM64 Debug APK packages the same salvager mesh and the three private WAVs, with single-layer mipmapped ASTC textures. The night capture leaves the salvager's face dark at rest. Live readability, voice balance and sustained phone performance still need checking.
 
@@ -350,6 +350,10 @@ The private Debug checkpoint bellwether-rig-leak-trial starts on the dry causewa
 This isolated river checkpoint supplies the rig for testing. The separate private mill campaign earns the rig from the artificer after the workbench test. The seal trial and the independently playable salvager shore practice use the existing shallow contact at the river rail. Underwater traversal and the Abbey crossing remain open.
 
 The native walkthrough checks early retreat, pause, retry, the full wet hold and the dry confirmation. It checks that an unfinished trial restarts after loading and the confirmed seal survives loading. Both Windows hardware RT backends presented the Debug starting position at 960 x 540. The ARM64 Debug package passed the Android checkpoint and prompt tests. Phone performance remains open.
+
+The combined Windows Debug route uses `--lookout-validate-hidden --bellwether-verify-preparations` with an exported lookout fixture and the four pinned resident directories. It earns shore practice before any ward or rig, repairs the mill and confirms the shallow seal before learning the air ward. It then follows the church and shrine route, buys the lantern fitting and reloads the same tavern save with the three preparations intact. The Directions check reads and closes the actual pause panel along the way. The Windows panel measures wrapped text with the active font so the shore, rig and ward entries fit at the supported narrow size.
+
+The route passed all 35 checks on RayTracingPipeline and RayQueryCompute. The final text-sizing build repeated the full pipeline check and passed the native narrow-window panel test. The combined ARM64 Debug package contains the new Directions copy and passed 12 Android checkpoint, asset-staging and control-layout checks. Device playtesting remains open.
 
 #### Artificer source candidate
 

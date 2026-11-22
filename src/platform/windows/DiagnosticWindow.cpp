@@ -225,6 +225,7 @@ bool gBellwetherCombinedCampaignActors = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherExpeditionValidation = false;
+bool gBellwetherPreparationsValidation = false;
 bool gBellwetherHearthRestValidation = false;
 
 bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::PresentableTinyRtScene& scene,
@@ -3909,9 +3910,16 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
     const auto objective = available ?
         horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
         LookoutPanel::Objective::None;
+    bool shorePracticeAvailable=false;
+#if defined(_DEBUG)
+    shorePracticeAvailable=!gBellwetherCampaignActors.empty() &&
+        (gBellwetherCombinedCampaignActors ||
+            gBellwetherCampaignSpecialist==horde::gameplay::bellwether::Specialist::Salvager);
+#endif
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
         snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse,
-        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive),snapshot.millPreparation};
+        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive),snapshot.millPreparation,
+        shorePracticeAvailable,snapshot.shorePracticeStage,snapshot.salvagerShorePracticeCompleted};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
@@ -14460,6 +14468,10 @@ int RunDiagnosticWindow(const int showCommand)
     }
     if (gBellwetherEarnTavernValidation && gBellwetherCampaignActors.empty()) {
         std::cerr << "The hidden tavern save check requires private Bellwether campaign residents.\n";
+        return 2;
+    }
+    if (gBellwetherPreparationsValidation && !gBellwetherCombinedCampaignActors) {
+        std::cerr << "The hidden preparations check requires the combined Bellwether roster.\n";
         return 2;
     }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
