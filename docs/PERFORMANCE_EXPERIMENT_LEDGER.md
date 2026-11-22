@@ -13,6 +13,12 @@
 
 ## Closed or retained rendering experiments
 
+**23 November Bellwether held-item clearance — KEEP for 1.8.** One carry reach search reuses the camera support check and sampled heights at the 64 authored tree roots. Each candidate reach still checks the same solids, trunk bounds, terrain slope and current tavern door pose. The cache ends with the search.
+
+On the RTX 5050 Laptop GPU, the hidden Windows Debug RayTracingPipeline replay at 960 × 540 ran control → candidate → control with the same shaders, resident assets and 60 Hz route. The square's median / p95 simulation time per advanced tick was 54.48 / 56.27 ms, 10.80 / 11.42 ms, and 53.35 / 57.03 ms in run order. Each replay advanced 5,232 ticks and completed two returns. Elapsed time was 101.03, 87.25 and 99.32 seconds. Peak pending simulation ticks fell from 1,436 and 1,341 in the controls to 10 in the candidate. All three final room images were byte-identical.
+
+The control and candidate executable hashes are `0c2b87bcda29a646cb380ee44446f1e95377fc0ce762b9649fb8ae9c26cbe5d4` and `a83bb18bc2e9a0f71a20747de31ced891f8f89fd0fbf1b0834870c92ac94aab2`. The five affected Windows checks passed, including a clear carry sweep between two obstructed trunk probes using the same query. Local measurements are under `reports/horde-bellwether-carry-query-20261123-093301`. Android and optimized-build gains remain to be measured.
+
 **23 November Bellwether player vertex upload — KEEP for 1.8.** The shared skinning loop writes the player body and first-person pose directly into their initialized static-PBR streams. The pose cadence, socket checks and static vertex data are preserved. The upload regression check compared all vertex bytes for both meshes across twelve walking, reverse and crouching poses.
 
 The hidden Windows Debug doorway replay ran control → candidate → control on the RTX 5050 Laptop GPU. All three runs used RayTracingPipeline, 960 × 540 dispatch and output, the same shaders and resident assets, and the same 60 Hz simulation. The first five seconds were excluded. Across the four route phases, all 4,355 measured frames skinned both streams. The candidate lowered the median combined player skin and pose-copy cost by 18.6–21.8% versus each control. In the staffed tavern, the combined median / p95 was 28.00 / 29.82 ms, 22.02 / 23.75 ms, and 27.11 / 28.61 ms in run order. The corresponding whole-cycle medians were 30.80, 24.84 and 29.90 ms. The room GPU medians stayed within 5.11–5.16 ms.

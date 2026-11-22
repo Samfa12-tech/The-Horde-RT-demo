@@ -168,6 +168,16 @@ int main(int argc,char** argv) {
     const auto base=tr::ChapterExteriorSupport(ground.get(),x,z);
     Check(base.grounded && tr::ChapterExteriorMovementClear(*ground,x-.5f,z,x+.5f,z,base.worldY,radius),
           "production fixture starts on admitted clear forest terrain away from shaft/trunks");
+    tr::ChapterExteriorObstacleQuery obstacleQuery(*ground);
+    const auto& tree=sim::kForestTreePlacementContract.front();
+    const auto treeGround=ground->Query(tree.x,tree.z);
+    const auto trunkClear=[&] {
+        return obstacleQuery.Clear(tree.x,tree.z,tree.x,tree.z,
+                                   treeGround.worldY+.25f,treeGround.worldY+2.30f,radius);
+    };
+    Check(treeGround.found && !trunkClear() &&
+          obstacleQuery.CarryClear(x-.5f,z,x+.5f,z,base.worldY,radius) && !trunkClear(),
+          "shared obstacle queries retain trunk contact after early rejection and a clear carry sweep");
     const auto root=Box(x,z,base.worldY,.12f);
     const auto terrain=Surface::WithStepGeometry(*ground,root,error);
     Check(bool(terrain),"disposable root attaches to actual imported terrain");if(!terrain)return 1;

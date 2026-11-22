@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 
 namespace horde::gameplay::items
 {
@@ -363,12 +364,22 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const simulation::TriangleSupportSurface* chapterTerrain,
                                            const traversal::HingedYawPose* tavernDoorPose)
 {
+    if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
+        !std::isfinite(forwardX) || !std::isfinite(forwardZ))
+        return 0.0f;
+    const float forwardLength = std::hypot(forwardX, forwardZ);
+    if (forwardLength <= 0.000001f) return 0.0f;
+
+    std::optional<traversal::ChapterExteriorObstacleQuery> chapterObstacles;
+    if (rescueExterior && chapterTerrain) {
+        if (!traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded) return 0.0f;
+        chapterObstacles.emplace(*chapterTerrain);
+    }
     const auto* doorContact=chapterTerrain && tavernDoorPose ? chapterTerrain->HingedContact(
         simulation::TriangleSupportSurface::HingedPart::TavernDoor) : nullptr;
     const auto walkable=[&](float x,float z) {
-        if (rescueExterior && chapterTerrain)
-            return traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded &&
-                traversal::ChapterExteriorCarryClear(*chapterTerrain,
+        if (chapterObstacles)
+            return chapterObstacles->CarryClear(
                     cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius) &&
                 (!doorContact || tavernDoorPose->VolumeClear(*doorContact,cameraX,cameraZ,x,z,
                     supportWorldY+.25f,supportWorldY+2.30f,kPlayerCollisionRadius));
@@ -379,12 +390,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
         return developmentWorldRoute ?
         horde::gameplay::simulation::ProjectWorldRoute(x,z).distance <=
             horde::gameplay::simulation::kWorldRouteHalfWidth-horde::gameplay::kPlayerCollisionRadius : IsShowcaseHeldPropPositionWalkable(x,z); };
-    if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
-        !std::isfinite(forwardX) || !std::isfinite(forwardZ))
-        return 0.0f;
-    const float forwardLength = std::hypot(forwardX, forwardZ);
-    if (forwardLength <= 0.000001f ||
-        !walkable(cameraX, cameraZ))
+    if (!walkable(cameraX, cameraZ))
         return 0.0f;
     const float unitForwardX = forwardX / forwardLength;
     const float unitForwardZ = forwardZ / forwardLength;
@@ -394,7 +400,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
     // unobstructed full reach needs one sweep, not 108. Empty holes underneath
     // the carried item are not walls. The
     // historical point predicate must retain its incremental search.
-    if (rescueExterior && chapterTerrain && walkable(
+    if (chapterObstacles && walkable(
             cameraX + unitForwardX*kMaximumClearance,
             cameraZ + unitForwardZ*kMaximumClearance)) return kMaximumClearance;
     float lastWalkable = 0.0f;
