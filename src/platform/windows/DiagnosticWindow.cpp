@@ -452,6 +452,7 @@ struct CaptureLaunchOptions
 {
     std::filesystem::path chapterResidentFixture;
     std::filesystem::path chapterResidentTextureRoundTrip;
+    std::filesystem::path chapterResidentModelRoundTrip;
     std::filesystem::path bellwetherVoiceDirectory;
     std::filesystem::path bellwetherCampaignDirectory;
     bool staffedTavernCapture = false;
@@ -849,6 +850,7 @@ struct VulkanSurfaceContext
     std::string environmentSurveyProfile;
 #if defined(_DEBUG)
     std::optional<horde::gameplay::simulation::SimulationSnapshot> playerDodgeInspectionSnapshot;
+    std::optional<std::uint32_t> residentModelProofActor;
     std::optional<horde::vulkan::raytracing::SkeletonPoseBlendRequests> inspectionSkeletonBlends;
     bool playerDodgeInspectionDisabled=false;
 #endif
@@ -1340,17 +1342,20 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
 #endif
             continue;
         }
-        if (argument == L"--chapter-resident-texture-round-trip")
+        if (argument == L"--chapter-resident-texture-round-trip" || argument == L"--chapter-resident-model-round-trip")
         {
 #if defined(_DEBUG)
-            if (!options.chapterResidentTextureRoundTrip.empty() || index + 1 >= argumentCount ||
+            if (!options.chapterResidentTextureRoundTrip.empty() || !options.chapterResidentModelRoundTrip.empty() ||
+                index + 1 >= argumentCount ||
                 arguments[index + 1][0] == L'-') {
-                options.error = "--chapter-resident-texture-round-trip requires one alternate map directory.";
+                options.error = "Select one resident round trip and supply one alternate asset directory.";
                 break;
             }
-            options.chapterResidentTextureRoundTrip = std::filesystem::path(arguments[++index]);
+            auto& destination = argument == L"--chapter-resident-model-round-trip"
+                ? options.chapterResidentModelRoundTrip : options.chapterResidentTextureRoundTrip;
+            destination = std::filesystem::path(arguments[++index]);
 #else
-            options.error = "--chapter-resident-texture-round-trip is Debug only.";
+            options.error = "Chapter resident round trips are Debug only.";
 #endif
             continue;
         }
@@ -1473,11 +1478,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     if (options.error.empty() && (options.artificerCapture || options.salvagerCapture) &&
         !options.bellwetherCampaignDirectory.empty())
         options.error = "Pass the specialist and tavern keeper together in --chapter-resident-fixture.";
-    if (options.error.empty() && !options.chapterResidentTextureRoundTrip.empty() &&
+    if (options.error.empty() && (!options.chapterResidentTextureRoundTrip.empty() || !options.chapterResidentModelRoundTrip.empty()) &&
         ((!options.salvagerCapture && !options.artificerCapture) || !options.captureHidden ||
          !options.requested || options.chapterResidentFixture.empty() ||
          options.bellwetherFurnitureRoute || options.forestRouteProof != horde::platform::windows::ForestRouteCaptureMode::Disabled))
-        options.error = "Resident texture round trip requires one hidden mill or shore resident capture.";
+        options.error = "Resident round trip requires one hidden mill or shore resident capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -6991,11 +6996,26 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     }
     if (ctx.artificerCapture || ctx.salvagerCapture) {
         using horde::gameplay::bellwether::Specialist;
-        if (!horde::vulkan::raytracing::SetBellwetherResidentSources(ctx.rtScene,
-                ctx.chapterResidentFixture, diagnostic, ctx.artificerCapture?Specialist::Artificer:Specialist::Salvager)) {
+        auto sources = horde::vulkan::raytracing::BellwetherResidentSources(
+            ctx.chapterResidentFixture, ctx.artificerCapture ? Specialist::Artificer : Specialist::Salvager);
+        const auto& alternate = ParseCaptureLaunchOptions().chapterResidentModelRoundTrip;
+        if (!alternate.empty()) {
+            using horde::scene::assets::AssetManifest;
+            AssetManifest original, replacement;
+            if (!AssetManifest::Load(sources.back().directory / "asset.manifest.json", original, diagnostic) ||
+                !AssetManifest::Load(alternate / "asset.manifest.json", replacement, diagnostic)) {
+                ctx.lastRtFrameError = diagnostic;
+                return false;
+            }
+            sources.back().replacementCapacity = {
+                std::max(original.budgets.maxVertices, replacement.budgets.maxVertices),
+                std::max(original.budgets.maxIndices, replacement.budgets.maxIndices)};
+        }
+        if (!ctx.rtScene.SetChapterResidentActors(sources, diagnostic)) {
             ctx.lastRtFrameError = diagnostic;
             return false;
         }
+        ctx.rtScene.RequestPackagedBellwetherFurniture(true);
     } else if (!gBellwetherCampaignActors.empty()) {
         const bool authoredShowcase = rescueJourney &&
             ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
@@ -7914,6 +7934,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             return false;
         }
 #if defined(_DEBUG)
+        if (ctx.residentModelProofActor) {
+            if (!frozenDevelopmentCheckpoint || !gShowcaseCaptureHidden ||
+                !frameInputs.chapterResidents.back().stableId) {
+                ctx.lastRtFrameError = "Resident model proof requires a hidden frozen specialist pose.";
+                if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+            frameInputs.chapterResidents.back().stableId = *ctx.residentModelProofActor;
+        }
         if (!ctx.chapterResidentFixture.empty() && ctx.developmentCheckpoint == "chapter-kit-reunion") {
             const auto terrain = ctx.rtScene.ChapterTerrainSurface();
             const auto request = [&](std::size_t lane, std::uint32_t id, float x, float z, float yaw,
@@ -9107,24 +9136,27 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
 #if defined(_DEBUG)
 #include "platform/windows/WindowsBellwetherFurnitureRouteCapture.inl"
 
-// Present a texture-only replacement in the same scene, then restore the
-// exact authored maps. The frozen simulation and actor geometry stay owned
-// by the ordinary capture path throughout.
-bool RunChapterResidentTextureRoundTrip(VulkanSurfaceContext& context, const CaptureLaunchOptions& options,
+// Change one live resident lane and then restore the original input. The
+// simulation stays frozen while the normal render path presents each state.
+bool RunChapterResidentRoundTrip(VulkanSurfaceContext& context, const CaptureLaunchOptions& options,
     const std::filesystem::path& output, const VkClearColorValue& clear, std::string& error)
 {
     using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
     using horde::telemetry::RtPresentationOutcome;
     using namespace horde::gameplay::bellwether;
-    const auto& alternate = options.chapterResidentTextureRoundTrip;
+    const bool replaceModel = !options.chapterResidentModelRoundTrip.empty();
+    const auto& alternate = replaceModel ? options.chapterResidentModelRoundTrip : options.chapterResidentTextureRoundTrip;
     const auto actor = options.salvagerCapture ? kSalvagerActorId : kArtificerActorId;
+    const auto alternateActor = options.salvagerCapture ? kArtificerActorId : kSalvagerActorId;
     const auto original = options.chapterResidentFixture / (options.salvagerCapture ? "salvager" : "artificer");
-    const auto handles = context.rtScene.CaptureResourceHandles();
+    auto handles = context.rtScene.CaptureResourceHandles();
+    auto lastBlases = std::exchange(handles.bottomLevelAccelerationStructures, {});
     const auto epoch = context.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
     const auto generation = context.rtScene.StaticGeometryGeneration();
     const auto tick = context.simulation.Snapshot().tickIndex;
     std::uint64_t lastSerial = 0;
-    const auto capture = [&](const char* name, Scene::StorageImageCapture& image) {
+    const std::string prefix = replaceModel ? "resident-model-" : "resident-maps-";
+    const auto capture = [&](const char* name, Scene::StorageImageCapture& image, bool changedModel = false) {
         bool presented = false;
         if (!RenderFrame(context, clear, presented) || !presented ||
             context.lastFramePresentation != RtPresentationOutcome::Presented ||
@@ -9136,21 +9168,37 @@ bool RunChapterResidentTextureRoundTrip(VulkanSurfaceContext& context, const Cap
         const auto publication = context.rtFrameEvidence.PublishedStateByValue();
         const auto& completed = publication.completedEvidence;
         const auto& identity = completed.identity.submitted;
+        auto currentHandles = context.rtScene.CaptureResourceHandles();
+        auto currentBlases = std::exchange(currentHandles.bottomLevelAccelerationStructures, {});
+        std::size_t changedBlases = 0;
+        if (currentBlases.size() != lastBlases.size())
+        {
+            error = "Resident proof changed the live BLAS count.";
+            return false;
+        }
+        for (std::size_t index = 0; index < currentBlases.size(); ++index)
+            changedBlases += currentBlases[index] != lastBlases[index];
+        lastBlases = std::move(currentBlases);
         if (!publication.hasCompletedEvidence || identity.frame.sceneEpoch != epoch ||
             identity.frame.simulationTick != tick || identity.submissionSerial <= lastSerial ||
             completed.presentation.outcome != RtPresentationOutcome::Presented ||
             completed.presentation.lastSuccessfulPresentSubmissionSerial != identity.submissionSerial ||
             context.rtScene.StaticGeometryGeneration() != generation ||
-            context.rtScene.CaptureResourceHandles() != handles ||
+            changedBlases != (changedModel ? 1u : 0u) ||
             context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) != 1u ||
             context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex) != 1u ||
             context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u) != 1u)
         {
-            error = "Resident map proof lost scene identity, presentation order or active actors.";
+            error = "Resident replacement lost scene identity, presentation order or active actors.";
+            return false;
+        }
+        if (currentHandles != handles)
+        {
+            error = "Resident replacement changed shared scene resources.";
             return false;
         }
         lastSerial = identity.submissionSerial;
-        return context.rtScene.CaptureStorageImage(image, error) && WriteRgbaPng(output / name, image, error);
+        return context.rtScene.CaptureStorageImage(image, error) && WriteRgbaPng(output / (prefix + name), image, error);
     };
     const auto retire = [](void* data, std::string& diagnostic) {
         const auto& target = *static_cast<VulkanSurfaceContext*>(data);
@@ -9160,8 +9208,16 @@ bool RunChapterResidentTextureRoundTrip(VulkanSurfaceContext& context, const Cap
         diagnostic = "Resident map proof could not retire the sole graphics owner.";
         return false;
     };
+    const auto apply = [&](std::uint32_t active, std::uint32_t incoming, const std::filesystem::path& directory,
+                           bool (*prove)(void*, std::string&), void* user, std::string& diagnostic) {
+        if (!replaceModel)
+            return context.rtScene.ReplaceChapterResidentTextureLayers(active, directory, prove, user, diagnostic);
+        return context.rtScene.ReplaceChapterResidentActor(active,
+            {incoming, directory, "resident.glb", {{"Warden|idle", true, true}}}, prove, user, diagnostic);
+    };
     Scene::StorageImageCapture before, afterRejection, replaced, restored;
-    if (!capture("resident-maps-00-before.png", before)) return false;
+    if (!capture("00-before.png", before)) return false;
+    const auto startingBlasCount = context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount;
 
     // Validate the entire set before transferring even the first map.
     const auto incomplete = output / "incomplete-resident-maps";
@@ -9171,13 +9227,12 @@ bool RunChapterResidentTextureRoundTrip(VulkanSurfaceContext& context, const Cap
         error = "Resident map proof requires a fresh capture directory.";
         return false;
     }
-    for (const auto* name : {"base-color.windows.ktx2", "normal.windows.ktx2"})
+    const auto copy = [&](const char* name) { return std::filesystem::copy_file(alternate / name, incomplete / name, fsError) && !fsError; };
+    if (!copy("base-color.windows.ktx2") || !copy("normal.windows.ktx2") ||
+        (replaceModel && (!copy("asset.manifest.json") || !copy("resident.glb"))))
     {
-        if (!std::filesystem::copy_file(alternate / name, incomplete / name, fsError) || fsError)
-        {
-            error = "Could not stage the incomplete resident map set.";
-            return false;
-        }
+        error = "Could not stage the incomplete resident asset.";
+        return false;
     }
     bool retiredIncomplete = false;
     std::string rejected;
@@ -9185,28 +9240,50 @@ bool RunChapterResidentTextureRoundTrip(VulkanSurfaceContext& context, const Cap
         *static_cast<bool*>(data) = true;
         return false;
     };
-    if (context.rtScene.ReplaceChapterResidentTextureLayers(actor, incomplete, observeRetirement, &retiredIncomplete, rejected) ||
+    if (apply(actor, alternateActor, incomplete,
+            replaceModel ? +retire : +observeRetirement, replaceModel ? static_cast<void*>(&context) : &retiredIncomplete, rejected) ||
         retiredIncomplete || rejected.find("orm.windows.ktx2") == std::string::npos)
     {
         error = "An incomplete map set passed texture admission.";
         return false;
     }
-    if (!capture("resident-maps-01-after-rejection.png", afterRejection) ||
-        !context.rtScene.ReplaceChapterResidentTextureLayers(actor, alternate, retire, &context, error) ||
-        !capture("resident-maps-02-replaced.png", replaced) ||
-        !context.rtScene.ReplaceChapterResidentTextureLayers(actor, original, retire, &context, error) ||
-        !capture("resident-maps-03-restored.png", restored)) return false;
+    if (!capture("01-after-rejection.png", afterRejection) ||
+        !apply(actor, alternateActor, alternate, retire, &context, error)) return false;
+    if (replaceModel) context.residentModelProofActor = alternateActor;
+    if (!capture("02-replaced.png", replaced, replaceModel)) return false;
+    if (replaceModel && context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount != startingBlasCount + 1u)
+    {
+        error = "Resident replacement did not retain exactly one retiring BLAS through submission.";
+        return false;
+    }
+    if (!apply(replaceModel ? alternateActor : actor, actor, original, retire, &context, error)) return false;
+    context.residentModelProofActor.reset();
+    if (!capture("03-restored.png", restored, replaceModel)) return false;
+    if (replaceModel)
+    {
+        Scene::StorageImageCapture retired;
+        if (!capture("04-retired.png", retired)) return false;
+        if (context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount != startingBlasCount ||
+            retired.rgba != restored.rgba)
+        {
+            error = "Resident geometry retirement changed the restored view or left a live BLAS.";
+            return false;
+        }
+    }
     if (before.rgba != afterRejection.rgba || before.rgba == replaced.rgba || before.rgba != restored.rgba)
     {
         error = "Resident map proof did not preserve rejection, replacement and restoration pixels.";
         return false;
     }
-    std::ofstream receipt(output / "resident-maps-round-trip.json");
+    std::ofstream receipt(output / (prefix + "round-trip.json"));
     receipt << "{\"complete\":true,\"actorId\":" << actor << ",\"sceneEpoch\":" << epoch
             << ",\"staticGeometryGeneration\":" << generation << ",\"simulationTick\":" << tick
             << ",\"lastCompletedSerial\":" << lastSerial
-            << ",\"unchangedResources\":true,\"incompleteRejectedBeforeRetirement\":true,"
-               "\"replacementChangedPixels\":true,\"restoredExactly\":true}\n";
+            << ",\"unchangedResources\":" << (replaceModel ? "false" : "true")
+            << ",\"unchangedSharedResources\":true,\"residentBlasReplaced\":" << (replaceModel ? "true" : "false")
+            << ",\"retiringBlasReleased\":" << (replaceModel ? "true" : "false")
+            << ",\"incompleteRejectedBeforeRetirement\":" << (replaceModel ? "false" : "true")
+            << ",\"incompletePreservedFrame\":true,\"replacementChangedPixels\":true,\"restoredExactly\":true}\n";
     if (!receipt) { error = "Could not write the resident map proof receipt."; return false; }
     return true;
 }
@@ -9494,10 +9571,10 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
 
 #if defined(_DEBUG)
         const auto& captureOptions = ParseCaptureLaunchOptions();
-        if (!captureOptions.chapterResidentTextureRoundTrip.empty()) {
+        if (!captureOptions.chapterResidentTextureRoundTrip.empty() || !captureOptions.chapterResidentModelRoundTrip.empty()) {
             std::string textureError;
-            if (!RunChapterResidentTextureRoundTrip(context, captureOptions, outputDirectory, clearColor, textureError))
-                return fail("Chapter resident texture round trip: " + textureError);
+            if (!RunChapterResidentRoundTrip(context, captureOptions, outputDirectory, clearColor, textureError))
+                return fail("Chapter resident round trip: " + textureError);
         }
         if (!ParseCaptureLaunchOptions().inspectStaticWorldMaterial.empty()) {
             std::string inspectionError;

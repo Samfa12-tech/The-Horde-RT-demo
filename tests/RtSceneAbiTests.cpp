@@ -528,6 +528,101 @@ void TestFrameMaterialAppearance()
           "a second metadata owner of the same primitive cannot silently share a mutable appearance");
 }
 
+void TestResidentGeometryReplacement()
+{
+    using namespace horde::vulkan::raytracing;
+    auto fallback=MakeAsset(1u,1u); fallback.materials[0].baseColorTexture=2;
+    StaticRtAssetRegistration registration{8u,108u,static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&fallback};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(std::span(&registration,1),diagnostic),"resident fallback lane initializes");
+    const auto primitiveRows=slot.PrimitiveMetadata().size(), materialRows=slot.Materials().size();
+    std::array<RtResidentPayloadRange,2u> ranges{};
+    Check(slot.ReserveResidentPayloads(8u,{6u,9u},ranges,diagnostic),"resident lane reserves two payload ranges");
+    Check(ranges[0].vertexOffset==3u && ranges[0].indexOffset==3u && ranges[1].vertexOffset==9u && ranges[1].indexOffset==12u &&
+          slot.Vertices().size()==15u && slot.Indices().size()==21u && slot.TriangleRegions().size()==7u &&
+          slot.Measurements().vertexBytes==15u*sizeof(StaticRtVertex) && slot.Measurements().indexBytes==21u*sizeof(std::uint32_t),
+          "reservation appends padded payload and triangle storage without moving existing geometry");
+    auto aliasA=MakeAsset(1u,1u),aliasB=MakeAsset(1u,1u);
+    std::array<StaticRtAssetRegistration,2u> aliasRegs{{
+        {1u,301u,1u,0u,&aliasA},{2u,302u,1u,0u,&aliasB}}};
+    RtStaticMeshSlot aliased;std::array<RtResidentPayloadRange,2u> aliasRanges{};
+    Check(aliased.Initialize(aliasRegs,diagnostic),"resident material alias fixture initializes");
+    const std::array<RtImmutableMaterialAlias,1u> alias{{{1u,0u}}};
+    Check(aliased.ShareImmutableMaterialRows(alias,diagnostic),"fixture shares an immutable material row before reservation");
+    Check(!aliased.ReserveResidentPayloads(2u,{6u,9u},aliasRanges,diagnostic) &&
+          aliased.InstanceMetadata()[2].stableObjectId==302u,
+          "resident lane rejects a successful material alias and retains the existing owner");
+    auto candidate=MakeAsset(1u,1u);candidate.materials[0].baseColorTexture=9;
+    candidate.vertices[0].position[0]=42.f;candidate.indices[1]=2u;
+    RtResidentReplacement prepared{};
+    Check(slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic),
+          "same-presence textured opaque candidate prepares for existing rows");
+    Check(prepared.primitiveRow==0u && prepared.instance.primitiveBase==0u && prepared.instance.stableObjectId==208u &&
+          prepared.primitive.vertexOffset==ranges[0].vertexOffset && prepared.primitive.indexOffset==ranges[0].indexOffset &&
+          prepared.primitive.indexCount==3u && prepared.primitive.materialIndex==0u &&
+          prepared.material.textureLayers==slot.Materials()[0].textureLayers,
+          "prepared replacement maps candidate to existing ABI rows and current texture layers");
+    auto bad=candidate;bad.materials[0].transmissionFactor=0.2f;
+    Check(!slot.PrepareResidentReplacement(8u,209u,bad,ranges[0],prepared,diagnostic) &&
+          slot.InstanceMetadata()[8].stableObjectId==108u && slot.PrimitiveMetadata()[0].vertexOffset==0u,
+          "rejected transmissive candidate leaves the fallback metadata and geometry active");
+    Check(!slot.PrepareResidentReplacement(8u,208u,candidate,
+          {ranges[0].vertexOffset+1u,ranges[0].indexOffset,ranges[0].capacity},prepared,diagnostic),
+          "forged payload offsets fail reservation ownership check");
+    auto tooLarge=candidate;tooLarge.vertices.resize(7u);
+    Check(!slot.PrepareResidentReplacement(8u,210u,tooLarge,ranges[0],prepared,diagnostic),
+          "candidate exceeding reserved vertices is rejected");
+    Check(slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic),"valid resident candidate remains preparable after rejects");
+    slot.PublishResidentReplacement(prepared,candidate);
+    Check(slot.InstanceMetadata()[8].stableObjectId==208u && slot.PrimitiveMetadata()[0].vertexOffset==ranges[0].vertexOffset &&
+          slot.PrimitiveMetadata()[0].indexOffset==ranges[0].indexOffset && slot.Vertices()[ranges[0].vertexOffset].position[0]==42.f &&
+          slot.Indices()[ranges[0].indexOffset+1u]==2u && slot.PrimitiveMetadata().size()==primitiveRows && slot.Materials().size()==materialRows,
+          "publish copies candidate payload and updates only its retained instance, primitive and material rows");
+    Check(slot.Initialize(std::span(&registration,1),diagnostic) &&
+          !slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic) &&
+          slot.ReserveResidentPayloads(8u,{6u,9u},ranges,diagnostic),
+          "reinitializing the static slot discards reservations from its old geometry");
+
+    auto overlapping=MakeAsset(2u,2u);overlapping.materials[1].baseColorTexture=5;
+    std::array<StaticRtAssetRegistration,2u> overlappingOwners{{
+        {6u,206u,1u,0u,&overlapping},{7u,207u,1u,0u,&overlapping}}};
+    overlappingOwners[1].primitiveOffset=1u;
+    overlappingOwners[1].primitiveCount=1u;
+    RtStaticMeshSlot overlappingSlot;
+    std::array<RtResidentPayloadRange,2u> overlappingRanges{};
+    Check(overlappingSlot.Initialize(overlappingOwners,diagnostic) &&
+          !overlappingSlot.ReserveResidentPayloads(7u,{6u,9u},overlappingRanges,diagnostic),
+          "an owner spanning several rows prevents reservation of its shared interior row");
+
+    auto prefixA=MakeAsset(1u,1u),prefixB=MakeAsset(1u,1u),resident=MakeAsset(1u,1u);
+    resident.materials[0].baseColorTexture=4;
+    std::array<StaticRtAssetRegistration,3u> rows{{
+        {1u,401u,1u,0u,&prefixA},{2u,402u,1u,0u,&prefixB},{3u,403u,1u,0u,&resident}}};
+    RtStaticMeshSlot rowSlot;std::array<RtResidentPayloadRange,2u> rowRanges{};
+    Check(rowSlot.Initialize(rows,diagnostic),"resident row-index fixture initializes");
+    const std::array<RtImmutableMaterialAlias,1u> rowAlias{{{1u,0u}}};
+    Check(rowSlot.ShareImmutableMaterialRows(rowAlias,diagnostic),"unrelated prior materials alias without involving resident lane");
+    Check(rowSlot.PrimitiveMetadata()[2].materialIndex==1u &&
+          rowSlot.ReserveResidentPayloads(3u,{3u,3u},rowRanges,diagnostic),
+          "resident primitive row remains distinct from its compacted material row");
+    auto fullCandidate=MakeAsset(1u,1u);fullCandidate.materials[0].baseColorTexture=8;
+    RtResidentReplacement rowPlan{};
+    Check(rowSlot.PrepareResidentReplacement(3u,503u,fullCandidate,rowRanges[0],rowPlan,diagnostic) &&
+          rowPlan.primitiveRow==2u && rowPlan.primitive.materialIndex==1u,
+          "replacement plan keeps primitive and material row indices distinct");
+    auto subrange=fullCandidate;subrange.vertices.insert(subrange.vertices.begin(),StaticRtVertex{});
+    subrange.primitives[0].vertexOffset=1u;
+    Check(!rowSlot.PrepareResidentReplacement(3u,504u,subrange,rowRanges[0],rowPlan,diagnostic),
+          "resident candidate with a nonzero source vertex offset is rejected");
+    Check(rowSlot.PrepareResidentReplacement(3u,503u,fullCandidate,rowRanges[0],rowPlan,diagnostic),
+          "full contiguous source candidate remains preparable after subrange rejection");
+    rowSlot.PublishResidentReplacement(rowPlan,fullCandidate);
+    Check(rowSlot.PrimitiveMetadata()[2].vertexOffset==rowRanges[0].vertexOffset &&
+          rowSlot.PrimitiveMetadata()[2].materialIndex==1u &&
+          rowSlot.Materials()[1].baseColorFactor==fullCandidate.materials[0].baseColorFactor,
+          "publish writes the primitive row and its distinct material row correctly");
+}
+
 void TestMaterialAuthoringValidation()
 {
     using namespace horde::vulkan::raytracing;
@@ -753,6 +848,7 @@ int main()
     TestNamedCapacityFailures();
     TestJointPresentationCapacity();
     TestFrameMaterialAppearance();
+    TestResidentGeometryReplacement();
     TestMaterialAuthoringValidation();
     TestTextureArrayCapacities();
     TestPrimaryShadowPolicy();

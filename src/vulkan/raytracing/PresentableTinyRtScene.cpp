@@ -1969,6 +1969,10 @@ void PresentableTinyRtScene::Destroy()
     finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
     for (auto& resident : chapterResidents_) {
+        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, resident.replacementWork);
+        DestroyAccelerationStructure(resident.replacementBlas);
+        DestroyBuffer(resident.replacementScratch);
+        DestroyAccelerationStructure(resident.retiredBlas);
         DestroyAccelerationStructure(resident.blas);
         DestroyBuffer(resident.scratch);
         resident = {};
@@ -2269,7 +2273,10 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
     AccumulateRtGpuBuffer(inventory,bellwetherNearBuildScratch_);
     for (const auto& resident : chapterResidents_) {
         accumulateBlas(resident.blas);
+        accumulateBlas(resident.retiredBlas);
+        accumulateBlas(resident.replacementBlas);
         AccumulateRtGpuBuffer(inventory, resident.scratch);
+        AccumulateRtGpuBuffer(inventory, resident.replacementScratch);
     }
     if (tlas_.handle != VK_NULL_HANDLE)
     {
@@ -3450,6 +3457,146 @@ constexpr VkBuildAccelerationStructureFlagsKHR kChapterResidentBuildFlags =
     VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
 }
 
+bool PresentableTinyRtScene::RetireReplacedChapterResidents(
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    if (!tlasInstanceDefinitionsValid_) return true;
+    const auto definitions = std::span(tlasBuiltInstances_).first(tlasInstanceCount_);
+    bool retiredReferences = false;
+    for (auto& resident : chapterResidents_)
+    {
+        if (!resident.retiredBlas.handle ||
+            std::any_of(definitions.begin(), definitions.end(), [&](const auto& instance) {
+                return instance.accelerationStructureReference == resident.retiredBlas.address;
+            })) continue;
+        if (!retiredReferences)
+        {
+            if (!retireReferences || !retireReferences(user, diagnostic)) return false;
+            retiredReferences = true;
+        }
+        DestroyAccelerationStructure(resident.retiredBlas);
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, bool (*retireReferences)(void*, std::string&),
+    void* user, std::string& diagnostic)
+{
+    if (!ready_ || staticGeometryCompletionUnproved_ || !retireReferences ||
+        preparedStaticGeometry_ || ordinaryStaticReduced_ || fullStaticGeometrySource_)
+    {
+        diagnostic = "Resident model replacement needs a complete mutable scene and a graphics retirement proof.";
+        return false;
+    }
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (current == chapterResidentSources_.end() || !replacement.stableId ||
+        replacement.directory.empty() || replacement.fileName.empty() || replacement.clips.empty())
+    {
+        diagnostic = "Resident model replacement requires a known lane and complete replacement source.";
+        return false;
+    }
+    const auto lane = static_cast<std::uint32_t>(current - chapterResidentSources_.begin());
+    auto& resident = chapterResidents_[lane];
+    if (!current->replacementCapacity.vertices || !resident.hasPbrMaps || resident.replacementWork.submitted)
+    {
+        diagnostic = "Resident model replacement needs a reserved textured lane and an empty build owner.";
+        return false;
+    }
+    horde::scene::assets::SkinnedPbrActor candidate;
+    if (!candidate.Load(replacement.directory, replacement.fileName.c_str(), replacement.clips, diagnostic))
+        return false;
+    const auto& asset = candidate.Asset();
+    RtResidentReplacement plan{};
+    if (!staticMeshSlot_.PrepareResidentReplacement(kFirstResidentMetadataIndex + lane,
+            replacement.stableId, asset, resident.replacementRanges[resident.nextReplacementRange], plan, diagnostic))
+        return false;
+    if (!RetireReplacedChapterResidents(retireReferences, user, diagnostic)) return false;
+    if (resident.retiredBlas.handle)
+    {
+        diagnostic = "Publish and retire the preceding resident frame before reusing its geometry.";
+        return false;
+    }
+    const VkDeviceSize primitiveOffset = VkDeviceSize(plan.primitiveRow) * sizeof(RtPrimitiveMetadata);
+    if (plan.primitive.materialIndex >= sceneMaterials_.size() ||
+        primitiveOffset > primitiveMetadataBuffer_.size ||
+        sizeof(RtPrimitiveMetadata) > primitiveMetadataBuffer_.size - primitiveOffset)
+    {
+        diagnostic = "Resident model replacement would exceed the live metadata buffers.";
+        return false;
+    }
+    if (!retireReferences(user, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(primitiveMetadataBuffer_, diagnostic))
+        return false;
+
+    const VkDeviceSize vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
+    const VkDeviceSize vertexOffset = VkDeviceSize(plan.primitive.vertexOffset) * vertexStride;
+    const VkDeviceSize indexOffset = VkDeviceSize(plan.primitive.indexOffset) * sizeof(std::uint32_t);
+    if (!gpuResources_.WriteBufferRange(staticVertexBuffer_, vertexOffset, asset.vertices.data(),
+            asset.vertices.size() * vertexStride, "replacement resident vertices", diagnostic) ||
+        !gpuResources_.WriteBufferRange(staticIndexBuffer_, indexOffset, asset.indices.data(),
+            asset.indices.size() * sizeof(std::uint32_t), "replacement resident indices", diagnostic))
+        return false;
+
+    VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+    geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+    geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    auto& triangles = geometry.geometry.triangles;
+    triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+    triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+    triangles.vertexData.deviceAddress = staticVertexBuffer_.address + vertexOffset;
+    triangles.vertexStride = vertexStride;
+    triangles.maxVertex = plan.primitiveVertexCount - 1u;
+    triangles.indexType = VK_INDEX_TYPE_UINT32;
+    triangles.indexData.deviceAddress = staticIndexBuffer_.address + indexOffset;
+    const VkAccelerationStructureBuildRangeInfoKHR range{plan.primitive.indexCount / 3u, 0u, 0u, 0u};
+    const RtGpuWorkApi api{device_, queue_, commandPool_};
+    const auto releaseCandidate = [&] {
+        DestroyAccelerationStructure(resident.replacementBlas);
+        DestroyBuffer(resident.replacementScratch);
+    };
+    const bool submitted = BuildProfileAccelerationStructure(std::span(&geometry, 1), std::span(&range, 1),
+        VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, kChapterResidentBuildFlags,
+        resident.replacementBlas, &resident.replacementScratch, diagnostic, nullptr, &resident.replacementWork);
+    if (!submitted || vkWaitForFences(device_, 1u, &resident.replacementWork.fence, VK_TRUE, 2'000'000'000ull) != VK_SUCCESS ||
+        PollRtGpuWork(api, resident.replacementWork, diagnostic) != RtGpuWorkStatus::Complete)
+    {
+        if (resident.replacementWork.submitted)
+        {
+            resident.replacementWork.completionUnproved = true;
+            staticGeometryCompletionUnproved_ = true;
+            ready_ = false;
+            diagnostic = "Replacement resident BLAS has unproved completion. Retain it until device idle.";
+        }
+        else releaseCandidate();
+        return false;
+    }
+    // The old lanes, metadata and textures remain published through build
+    // completion. Texture work is the last fallible step before publication.
+    if (!ReplaceChapterResidentTextureLayers(activeId, replacement.directory, retireReferences, user, diagnostic))
+    {
+        releaseCandidate();
+        return false;
+    }
+    std::memcpy(static_cast<std::uint8_t*>(primitiveMetadataBuffer_.mappedWriteData) + primitiveOffset,
+        &plan.primitive, sizeof(plan.primitive));
+    staticMeshSlot_.PublishResidentReplacement(plan, asset);
+    sceneMaterials_[plan.primitive.materialIndex] = plan.material;
+    replacement.replacementCapacity = current->replacementCapacity;
+    *current = std::move(replacement);
+    resident.actor = std::move(candidate);
+    resident.retiredBlas = std::exchange(resident.blas, std::exchange(resident.replacementBlas, {}));
+    DestroyBuffer(resident.scratch);
+    resident.scratch = std::exchange(resident.replacementScratch, {});
+    resident.nextReplacementRange = 1u - resident.nextReplacementRange;
+    resident.uploadedClip = horde::scene::SkinnedClip::Idle;
+    resident.uploadedTime = 0.f;
+    resident.needsRefit = resident.refitRecorded = false;
+    diagnostic.clear();
+    return true;
+}
+
 bool PresentableTinyRtScene::BuildChapterResidentStructures(std::string& diagnostic)
 {
     for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
@@ -4038,10 +4185,21 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     }
 #endif
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
+    for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+    {
+        const auto capacity = chapterResidentSources_[lane].replacementCapacity;
+        if (!capacity.vertices && !capacity.indices) continue;
+        if (!staticMeshSlot_.ReserveResidentPayloads(
+                kFirstResidentMetadataIndex + static_cast<std::uint32_t>(lane), capacity,
+                chapterResidents_[lane].replacementRanges, diagnostic))
+            return false;
+    }
     // Pin the validated full CPU source once during heavy startup. Candidate
     // reconstruction can then copy in bounded turns without rescanning meshes
     // on the normal application thread. This adds CPU payload, not GPU rows.
-    if (developmentRescueJourney_)
+    // A resident replacement scene must never restore a stale immutable copy.
+    if (developmentRescueJourney_ && std::none_of(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+            [](const auto& source) { return source.replacementCapacity.vertices != 0; }))
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!PrepareRegionPageSource(std::move(nearPage),diagnostic))return false;
@@ -10209,6 +10367,7 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
     const RtSceneFrameInputs& frame, bool (*retireReferences)(void*, std::string&),
     void* user, std::string& diagnostic, RtSceneRecordObservation* observation)
 {
+    if (!RetireReplacedChapterResidents(retireReferences, user, diagnostic)) return false;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!RetireCompletedRegionPage(retireReferences,user,diagnostic))return false;
 #endif

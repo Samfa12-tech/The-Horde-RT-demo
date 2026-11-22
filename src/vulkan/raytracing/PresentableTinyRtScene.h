@@ -151,6 +151,8 @@ struct ChapterResidentActorSource
     std::filesystem::path directory;
     std::string fileName;
     std::vector<horde::scene::SkinnedClipBinding> clips;
+    // Optional reservation derived from the authored replacement roster.
+    RtResidentPayloadCapacity replacementCapacity{};
 };
 
 struct ChapterResidentActorPose
@@ -488,6 +490,8 @@ public:
     bool ReplaceChapterResidentTextureLayers(std::uint32_t stableId,
         const std::filesystem::path& directory, bool (*retireReferences)(void*, std::string&),
         void* user, std::string& diagnostic);
+    bool ReplaceChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
@@ -1383,6 +1387,7 @@ private:
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
     bool LoadChapterResidents(std::string&);
+    bool RetireReplacedChapterResidents(bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     bool BuildChapterResidentStructures(std::string&);
     bool PrepareChapterResidents(const RtSceneFrameInputs&, std::span<VkAccelerationStructureInstanceKHR>,
         std::span<RtIndexedActorGeometry>, std::string&, RtSceneRecordObservation*);
@@ -1639,6 +1644,12 @@ private:
         horde::scene::assets::SkinnedPbrActor actor;
         AccelerationStructure blas;
         Buffer scratch;
+        AccelerationStructure retiredBlas;
+        AccelerationStructure replacementBlas;
+        Buffer replacementScratch;
+        RtGpuWorkLease replacementWork;
+        std::array<RtResidentPayloadRange, 2> replacementRanges{};
+        std::size_t nextReplacementRange = 0;
         horde::scene::SkinnedClip uploadedClip = horde::scene::SkinnedClip::Idle;
         float uploadedTime = -1;
         bool hasPbrMaps = false;

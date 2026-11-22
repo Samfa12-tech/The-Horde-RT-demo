@@ -62,6 +62,27 @@ struct RtStaticMeshMeasurements
     std::uint32_t descriptorCount = 0u;
 };
 
+struct RtResidentPayloadCapacity
+{
+    std::uint32_t vertices = 0u, indices = 0u;
+    friend bool operator==(const RtResidentPayloadCapacity&, const RtResidentPayloadCapacity&) = default;
+};
+struct RtResidentPayloadRange
+{
+    std::uint32_t vertexOffset = 0u, indexOffset = 0u;
+    RtResidentPayloadCapacity capacity{};
+    friend bool operator==(const RtResidentPayloadRange&, const RtResidentPayloadRange&) = default;
+};
+struct RtResidentReplacement
+{
+    std::uint32_t metadataIndex = 0u, primitiveRow = 0u;
+    RtInstanceMetadata instance{};
+    RtPrimitiveMetadata primitive{};
+    RtMaterialGpu material{};
+    std::uint32_t primitiveVertexCount = 0u;
+    RtResidentPayloadRange payload{};
+};
+
 class RtStaticMeshSlot
 {
 public:
@@ -75,6 +96,17 @@ public:
     // Failure leaves the previously admitted slot intact.
     bool InitializeSelectedGeometry(std::span<const StaticRtAssetRegistration> registrations,
                                     std::string& diagnostic);
+
+    // Reserve two mutable CPU payload ranges after admission and before upload.
+    // The existing exclusive one-primitive owner supplies the ABI rows.
+    bool ReserveResidentPayloads(std::uint32_t metadataIndex, RtResidentPayloadCapacity capacity,
+                                 std::array<RtResidentPayloadRange, 2u>& ranges,
+                                 std::string& diagnostic);
+    bool PrepareResidentReplacement(std::uint32_t metadataIndex, std::uint32_t newStableId,
+        const horde::scene::assets::StaticMeshAsset& candidate, RtResidentPayloadRange payload,
+        RtResidentReplacement& replacement, std::string& diagnostic) const;
+    void PublishResidentReplacement(const RtResidentReplacement& replacement,
+        const horde::scene::assets::StaticMeshAsset& candidate) noexcept;
 
     // CPU admission only, before GPU upload. Caller explicitly warrants these
     // rows are immutable; mutable fixture materials must never be nominated.
@@ -149,6 +181,12 @@ private:
     std::vector<std::array<float, 12u>> geometryTransforms_;
     RtTextureArrayCounts textureArrayCounts_{};
     RtStaticMeshMeasurements measurements_{};
+    struct ResidentReservation
+    {
+        std::uint32_t metadataIndex = 0u;
+        std::array<RtResidentPayloadRange, 2u> ranges{};
+    };
+    std::vector<ResidentReservation> residentReservations_;
 };
 
 // Immutable CPU selection bound to one admitted source and one exclusive BLAS

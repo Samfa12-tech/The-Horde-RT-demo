@@ -472,6 +472,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
     indices_.clear();
     triangleRegions_.clear();
     geometryTransforms_.clear();
+    residentReservations_.clear();
     textureArrayCounts_ = {};
     measurements_ = {};
 
@@ -966,6 +967,177 @@ bool RtStaticMeshSlot::ApplyFrameMaterialAppearance(std::span<RtMaterialGpu> fra
     diagnostic.clear();return true;
 }
 
+bool RtStaticMeshSlot::ReserveResidentPayloads(const std::uint32_t metadataIndex,
+    const RtResidentPayloadCapacity capacity, std::array<RtResidentPayloadRange, 2u>& ranges,
+    std::string& diagnostic)
+{
+    const auto reject=[&](const char* message){diagnostic=message;return false;};
+    if(!admitted_ || vertexSource_ || metadataIndex>=instanceMetadata_.size() ||
+       !capacity.vertices || !capacity.indices || capacity.indices%3u || indices_.size()%3u)
+        return reject("Resident payload reservation requires an admitted mutable slot and nonzero triangle capacity.");
+    if(std::any_of(residentReservations_.begin(),residentReservations_.end(),[&](const auto& r){return r.metadataIndex==metadataIndex;}))
+        return reject("Resident payload owner already has a reservation.");
+    const auto& owner=instanceMetadata_[metadataIndex];
+    if(owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) ||
+       owner.primitiveCount!=1u || !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+       owner.primitiveBase>=primitiveMetadata_.size() || owner.primitiveBase>=primitiveVertexCounts_.size())
+        return reject("Resident payload reservation requires one static-PBR primitive owner.");
+    const auto primitiveIndex=owner.primitiveBase;
+    const auto& primitive=primitiveMetadata_[primitiveIndex];
+    if(!primitive.indexCount || primitive.indexOffset>indices_.size() ||
+       primitive.indexCount>indices_.size()-primitive.indexOffset || primitive.indexCount%3u ||
+       primitive.vertexOffset>vertices_.size() || primitiveVertexCounts_[primitiveIndex]>vertices_.size()-primitive.vertexOffset ||
+       primitive.materialIndex>=materials_.size())
+        return reject("Resident payload owner has invalid packed geometry or material.");
+    for(std::size_t i=0;i<instanceMetadata_.size();++i) if(i!=metadataIndex) {
+        const auto& other=instanceMetadata_[i];
+        if(primitiveIndex>=other.primitiveBase && primitiveIndex-other.primitiveBase<other.primitiveCount)
+            return reject("Resident payload owner shares its primitive row.");
+    }
+    for(std::size_t i=0;i<primitiveMetadata_.size();++i) if(i!=primitiveIndex &&
+       primitiveMetadata_[i].materialIndex==primitive.materialIndex)
+        return reject("Resident payload owner shares its material row.");
+    const auto flags=materials_[primitive.materialIndex].materialFlags[0];
+    if(flags&(static_cast<std::uint32_t>(RtMaterialFlag::Alpha)|static_cast<std::uint32_t>(RtMaterialFlag::Transmission)))
+        return reject("Resident payload owner requires an opaque material.");
+    if(!(flags&(static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture)|
+                 static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture)|
+                 static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture)|
+                 static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture))))
+        return reject("Resident payload owner requires a textured material.");
+    const std::uint64_t vertexEnd=static_cast<std::uint64_t>(vertices_.size())+2ull*capacity.vertices;
+    const std::uint64_t indexEnd=static_cast<std::uint64_t>(indices_.size())+2ull*capacity.indices;
+    if(vertexEnd>UINT32_MAX || indexEnd>UINT32_MAX)
+        return reject("Resident payload reservation exceeds 32-bit packed offsets.");
+    ResidentReservation reservation; reservation.metadataIndex=metadataIndex;
+    for(std::size_t i=0;i<2u;++i) {
+        reservation.ranges[i]={static_cast<std::uint32_t>(vertices_.size()+i*capacity.vertices),
+            static_cast<std::uint32_t>(indices_.size()+i*capacity.indices),capacity};
+    }
+    try {
+        auto newVertices=vertices_; auto newIndices=indices_; auto newRegions=triangleRegions_;
+        newVertices.resize(static_cast<std::size_t>(vertexEnd));
+        newIndices.resize(static_cast<std::size_t>(indexEnd));
+        newRegions.resize(static_cast<std::size_t>(indexEnd/3u),horde::scene::assets::StaticTriangleRegion::Shared);
+        residentReservations_.push_back(reservation);
+        vertices_.swap(newVertices); indices_.swap(newIndices); triangleRegions_.swap(newRegions);
+    } catch(...) { return reject("Resident payload reservation could not allocate packed CPU storage."); }
+    ranges=reservation.ranges;
+    measurements_.vertexBytes=(vertices_.size()+worldBodyVertices_.size()+viewmodelVertices_.size())*sizeof(horde::scene::assets::StaticRtVertex);
+    measurements_.indexBytes=indices_.size()*sizeof(std::uint32_t);
+    diagnostic.clear();return true;
+}
+
+bool RtStaticMeshSlot::PrepareResidentReplacement(const std::uint32_t metadataIndex,
+    const std::uint32_t newStableId, const horde::scene::assets::StaticMeshAsset& candidate,
+    const RtResidentPayloadRange payload, RtResidentReplacement& replacement, std::string& diagnostic) const
+{
+    const auto reject=[&](const char* message){diagnostic=message;return false;};
+    if(!admitted_ || vertexSource_ || metadataIndex>=instanceMetadata_.size())
+        return reject("Resident replacement requires an admitted mutable slot and existing owner.");
+    const auto reservation=std::find_if(residentReservations_.begin(),residentReservations_.end(),[&](const auto& r){return r.metadataIndex==metadataIndex;});
+    if(reservation==residentReservations_.end() || std::find(reservation->ranges.begin(),reservation->ranges.end(),payload)==reservation->ranges.end())
+        return reject("Resident replacement payload range is not owned by this metadata lane.");
+    const auto& owner=instanceMetadata_[metadataIndex];
+    if(owner.geometryRole!=static_cast<std::uint32_t>(RtGeometryRole::Static) || owner.primitiveCount!=1u ||
+       !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) || owner.primitiveBase>=primitiveMetadata_.size())
+        return reject("Resident replacement requires one static-PBR primitive owner.");
+    for(std::size_t i=0;i<instanceMetadata_.size();++i) if(i!=metadataIndex && instanceMetadata_[i].stableObjectId==newStableId)
+        return reject("Resident replacement stable object ID is already in use.");
+    if(candidate.primitives.size()!=1u || candidate.materials.size()!=1u || candidate.primitives[0].materialIndex!=0u ||
+       candidate.primitives[0].vertexOffset!=0u || candidate.primitives[0].indexOffset!=0u ||
+       candidate.primitives[0].indexCount!=candidate.indices.size() ||
+       candidate.nodeTransforms.empty() || !candidate.HasValidTriangleProvenance())
+        return reject("Resident replacement requires one valid primitive and one material.");
+    const auto& sourcePrimitive=candidate.primitives[0]; const auto& sourceMaterial=candidate.materials[0];
+    if(candidate.vertices.size()>UINT32_MAX || candidate.indices.size()>UINT32_MAX)
+        return reject("Resident replacement candidate exceeds 32-bit addressable geometry.");
+    const std::uint32_t vertexEnd=static_cast<std::uint32_t>(candidate.vertices.size());
+    if(sourcePrimitive.vertexOffset>=vertexEnd || !sourcePrimitive.indexCount || sourcePrimitive.indexCount%3u ||
+       sourcePrimitive.indexOffset%3u || sourcePrimitive.indexOffset>candidate.indices.size() ||
+       sourcePrimitive.indexCount>candidate.indices.size()-sourcePrimitive.indexOffset ||
+       sourcePrimitive.nodeTransformIndex>=candidate.nodeTransforms.size())
+        return reject("Resident replacement candidate has invalid geometry bounds.");
+    const std::uint32_t vertexCount=vertexEnd-sourcePrimitive.vertexOffset;
+    if(sourcePrimitive.indexCount>payload.capacity.indices || vertexCount>payload.capacity.vertices)
+        return reject("Resident replacement candidate exceeds its reserved payload capacity.");
+    for(std::size_t i=0;i<sourcePrimitive.indexCount;++i) if(candidate.indices[sourcePrimitive.indexOffset+i]>=vertexCount)
+        return reject("Resident replacement candidate has a local index outside its vertex span.");
+    if((sourceMaterial.flags&(static_cast<std::uint32_t>(RtMaterialFlag::Alpha)|static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) ||
+       sourceMaterial.transmissionFactor!=0.f || sourceMaterial.baseColorFactor[3]<1.f)
+        return reject("Resident replacement candidate material must be opaque.");
+    const auto row=primitiveMetadata_[owner.primitiveBase].materialIndex;
+    if(row>=materials_.size()) return reject("Resident replacement lane material row is invalid.");
+    for(std::size_t i=0;i<instanceMetadata_.size();++i) if(i!=metadataIndex) {
+        const auto& other=instanceMetadata_[i];
+        if(owner.primitiveBase>=other.primitiveBase && owner.primitiveBase-other.primitiveBase<other.primitiveCount)
+            return reject("Resident replacement lane no longer exclusively owns its primitive row.");
+    }
+    for(std::size_t i=0;i<primitiveMetadata_.size();++i) if(i!=owner.primitiveBase && primitiveMetadata_[i].materialIndex==row)
+        return reject("Resident replacement lane no longer exclusively owns its material row.");
+    const auto& old=materials_[row];
+    const std::array<bool,4u> candidateTextures{{sourceMaterial.baseColorTexture>=0,sourceMaterial.normalTexture>=0,
+        sourceMaterial.ormTexture>=0,sourceMaterial.emissiveTexture>=0}};
+    const std::array<std::uint32_t,4u> textureFlags{{static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture),
+        static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture),static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture),
+        static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture)}};
+    if(std::none_of(candidateTextures.begin(),candidateTextures.end(),[](bool present){return present;}))
+        return reject("Resident replacement candidate requires a textured material.");
+    for(std::size_t i=0;i<4u;++i) if(candidateTextures[i]!=((old.materialFlags[0]&textureFlags[i])!=0u))
+        return reject("Resident replacement candidate texture presence differs from its reserved material lane.");
+    RtResidentReplacement prepared; prepared.metadataIndex=metadataIndex; prepared.primitiveRow=owner.primitiveBase;
+    prepared.instance=owner; prepared.instance.stableObjectId=newStableId;
+    prepared.primitive={payload.vertexOffset,payload.indexOffset,sourcePrimitive.indexCount,row};
+    prepared.material=ConvertMaterial(sourceMaterial,old.textureLayers);
+    prepared.primitiveVertexCount=vertexCount; prepared.payload=payload;
+    replacement=prepared;diagnostic.clear();return true;
+}
+
+void RtStaticMeshSlot::PublishResidentReplacement(const RtResidentReplacement& replacement,
+    const horde::scene::assets::StaticMeshAsset& candidate) noexcept
+{
+    if(replacement.metadataIndex>=instanceMetadata_.size() || replacement.primitiveRow>=primitiveMetadata_.size() ||
+       replacement.primitiveRow>=primitiveVertexCounts_.size() || replacement.primitive.materialIndex>=materials_.size() ||
+       replacement.instance.primitiveBase>=primitiveMetadata_.size() ||
+       replacement.primitiveVertexCount>replacement.payload.capacity.vertices ||
+       replacement.primitive.indexCount>replacement.payload.capacity.indices ||
+       replacement.payload.vertexOffset>vertices_.size() || replacement.payload.capacity.vertices>vertices_.size()-replacement.payload.vertexOffset ||
+       replacement.payload.indexOffset>indices_.size() || replacement.payload.capacity.indices>indices_.size()-replacement.payload.indexOffset ||
+       candidate.primitives.size()!=1u || candidate.primitives[0].materialIndex!=0u ||
+       candidate.primitives[0].vertexOffset!=0u || candidate.primitives[0].indexOffset!=0u ||
+       candidate.primitives[0].indexCount!=candidate.indices.size() ||
+       candidate.primitives[0].vertexOffset>candidate.vertices.size() ||
+       replacement.primitiveVertexCount>candidate.vertices.size()-candidate.primitives[0].vertexOffset ||
+       candidate.primitives[0].indexOffset>candidate.indices.size() ||
+       replacement.primitive.indexCount>candidate.indices.size()-candidate.primitives[0].indexOffset) return;
+    const auto reservation=std::find_if(residentReservations_.begin(),residentReservations_.end(),[&](const auto& r){return r.metadataIndex==replacement.metadataIndex;});
+    if(reservation==residentReservations_.end() || std::find(reservation->ranges.begin(),reservation->ranges.end(),replacement.payload)==reservation->ranges.end()) return;
+    if(replacement.primitiveRow!=instanceMetadata_[replacement.metadataIndex].primitiveBase ||
+       replacement.instance.primitiveBase!=replacement.primitiveRow ||
+       replacement.primitive.materialIndex>=materials_.size() ||
+       replacement.primitive.vertexOffset!=replacement.payload.vertexOffset ||
+       replacement.primitive.indexOffset!=replacement.payload.indexOffset) return;
+    std::copy_n(candidate.vertices.begin()+candidate.primitives[0].vertexOffset,replacement.primitiveVertexCount,
+        vertices_.begin()+replacement.payload.vertexOffset);
+    std::copy_n(candidate.indices.begin()+candidate.primitives[0].indexOffset,replacement.primitive.indexCount,
+        indices_.begin()+replacement.payload.indexOffset);
+    const auto regionOffset=replacement.payload.indexOffset/3u;
+    const auto reservedTriangleCount=replacement.payload.capacity.indices/3u;
+    std::fill_n(triangleRegions_.begin()+regionOffset,reservedTriangleCount,
+        horde::scene::assets::StaticTriangleRegion::Shared);
+    const auto sourceTriangleOffset=candidate.primitives[0].indexOffset/3u;
+    const auto activeTriangleCount=replacement.primitive.indexCount/3u;
+    for(std::size_t i=0;i<activeTriangleCount;++i)
+        if(sourceTriangleOffset+i<candidate.triangleRegions.size())
+            triangleRegions_[regionOffset+i]=candidate.triangleRegions[sourceTriangleOffset+i];
+    instanceMetadata_[replacement.metadataIndex]=replacement.instance;
+    primitiveMetadata_[replacement.primitiveRow]=replacement.primitive;
+    primitiveVertexCounts_[replacement.primitiveRow]=replacement.primitiveVertexCount;
+    materials_[replacement.primitive.materialIndex]=replacement.material;
+    measurements_.vertexBytes=(vertices_.size()+worldBodyVertices_.size()+viewmodelVertices_.size())*sizeof(horde::scene::assets::StaticRtVertex);
+    measurements_.indexBytes=indices_.size()*sizeof(std::uint32_t);
+}
+
 bool RtStaticMeshSlot::ShareImmutableMaterialRows(
     std::span<const RtImmutableMaterialAlias> aliases, std::string& diagnostic)
 {
@@ -979,6 +1151,15 @@ bool RtStaticMeshSlot::ShareImmutableMaterialRows(
         {
             diagnostic = "Immutable material aliases require unique consumers and earlier valid providers.";
             return false;
+        }
+        for(const auto& reservation:residentReservations_) {
+            const auto primitive=instanceMetadata_[reservation.metadataIndex].primitiveBase;
+            if(primitive<primitiveMetadata_.size() &&
+               (alias.consumer==primitiveMetadata_[primitive].materialIndex ||
+                alias.provider==primitiveMetadata_[primitive].materialIndex)) {
+                diagnostic="Immutable material aliases cannot include a reserved resident material row.";
+                return false;
+            }
         }
         if (std::memcmp(&materials_[alias.consumer], &materials_[alias.provider],
                         sizeof(RtMaterialGpu)) != 0)
