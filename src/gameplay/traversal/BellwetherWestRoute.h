@@ -19,6 +19,9 @@ inline constexpr std::array kBellwetherGardenApproach{
     BellwetherStation{48.f,134.4f}, BellwetherStation{43.f,134.9f}, BellwetherStation{39.5f,136.23f}};
 inline constexpr BellwetherStation kBellwetherGardenView{38.65f,138.48f};
 inline constexpr BellwetherStation kBellwetherGardenAisle{34.f,136.23f};
+inline constexpr std::array kBellwetherServiceYardApproach{
+    BellwetherStation{74.f,124.f}, BellwetherStation{75.5f,116.f}, BellwetherStation{74.8f,112.f}};
+inline constexpr BellwetherStation kBellwetherServiceYardView{74.15f,112.65f};
 
 } // namespace horde::gameplay::traversal
 

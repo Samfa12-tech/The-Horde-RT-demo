@@ -953,7 +953,8 @@ live_town_sha256 = hashlib.sha256(live_town.read_bytes()).hexdigest()
 layered_town_path = RUNTIME / ".fork-lamp-layered.glb"
 mill_works_tools = runpy.run_path(str(ROOT / "tools/author-bellwether-mill-works.py"))
 installed_town_hashes = {FORK_LAMP_LAYERED_TOWN_SHA256}
-for layer in ("bellwether-relic-stall-v1", "bellwether-road-cache-v1", "bellwether-well-v1", "bellwether-garden-v1"):
+for layer in ("bellwether-relic-stall-v1", "bellwether-road-cache-v1", "bellwether-well-v1",
+              "bellwether-garden-v1", "bellwether-privy-v1"):
     receipt_path = WORLD / "source" / layer / "authoring-receipt.json"
     if receipt_path.is_file():
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))

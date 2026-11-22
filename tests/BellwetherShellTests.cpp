@@ -274,6 +274,19 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(gardenCentre[0],gardenCentre[1],gardenCentre[0],gardenCentre[1]-1.f,
                       gardenGround.worldY+.04f,gardenGround.worldY+1.8f,radius),
                   "both timber bed edges remain solid on either side of the garden aisle");
+            const auto& yard=kBellwetherServiceYardApproach;
+            const auto branch=kBellwetherWestApproach.front();
+            check(follow(branch,yard[0]) && follow(yard[0],yard[1]) && follow(yard[1],yard.back()) &&
+                  follow(yard.back(),kBellwetherServiceYardView) && follow(kBellwetherServiceYardView,yard[1]) &&
+                  follow(yard[1],yard[0]) && follow(yard[0],branch),
+                  "the service yard is accessible from the west lane and stays off the tavern ramp");
+            const auto& listen=kBellwetherPrivyListenPoint;
+            const auto& mouth=kBellwetherPrivyMouth;
+            check(support->NonWalkableVolumeClear(yard.back().x,yard.back().z,listen[0],listen[2],
+                      listen[1]-.025f,listen[1]+.025f,.025f) &&
+                  !support->NonWalkableVolumeClear(listen[0],listen[2],mouth[0],mouth[2],
+                      mouth[1]-.025f,mouth[1]+.025f,.025f),
+                  "the listener can approach the door while the solid leaf conceals the occupant");
         }
         {
             using namespace horde::gameplay::traversal;

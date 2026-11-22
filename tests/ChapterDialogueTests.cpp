@@ -72,6 +72,14 @@ int main() {
         Check(path.lexically_relative(assetRoot).generic_string().starts_with("audio/"),
             "dialogue root is joined once rather than duplicating assets/assets");
     }
+    const auto& privySpec=Spec(Line::PrivyRagRequest);
+    Check(static_cast<std::uint32_t>(Line::PrivyRagRequest)==static_cast<std::uint32_t>(Line::RelicDealerOrdinarySale)+1u &&
+          std::string_view(privySpec.stableId)=="hub.privy_request" &&
+          std::string_view(privySpec.speaker)=="Privy occupant" &&
+          std::string_view(privySpec.text)=="Can someone PLEASE get me some rag?!" &&
+          privySpec.audio[0]=='\0' && std::abs(privySpec.duration-3.6f)<.000001f &&
+          RequiresChapterCaption(Line::PrivyRagRequest) && IsBellwetherLine(Line::PrivyRagRequest),
+          "the appended privy request is an exact timed local caption with a stable project identity");
     for (const auto& cut : horde::audio::kBellwetherVoiceCuts) {
         const auto& spec = Spec(cut.line);
         Check(std::string_view(spec.speaker) == "Kit" &&
@@ -747,6 +755,96 @@ int main() {
         Check(restored.State().line==Line::None && !restored.CanOfferTavernLantern(room) &&
               restored.ExportProgress().tavernLanternLinesStarted==kTavernLanternExchange.size(),
               "the witnessed exchange completes once without automatic repetition");
+    }
+    {
+        Progress arrived;
+        arrived.grateConsumed=arrived.rescueConsumed=arrived.reunionStarted=arrived.proofAccepted=true;
+        arrived.forestNightConsumed=arrived.forestWaystoneConsumed=arrived.forestClueConsumed=arrived.forestVillageConsumed=true;
+        arrived.hearthLinesResolved=kHearthLines.size();
+        arrived.tavernConversationLinesResolved=kTavernConversation.size();
+        Context local;
+        local.claimed=local.exterior=local.kitSeated=local.tavernInReach=local.privyInReach=true;
+        local.companionSource=Tuple{2.f,1.f,0.f};
+        local.privySource=Tuple{76.65f,-9.37f,112.f};
+        local.listener=Tuple{75.5f,-8.f,112.f};
+
+        Director beforeExchange;
+        Progress unfinished=arrived;unfinished.tavernConversationLinesResolved=0;
+        Check(beforeExchange.RestoreProgress(unfinished,local,1,0) &&
+              !beforeExchange.CanStartPrivyRagRequest(local),
+              "the local request is ineligible until the first regular tavern conversation resolves");
+        for(const auto disqualifier:{0,1,2,3,4,5}) {
+            Director gated;Check(gated.RestoreProgress(arrived,local,1,0),"privy gate fixture restores");
+            auto context=local;
+            switch(disqualifier) {
+            case 0: context.claimed=false;break;
+            case 1: context.alive=false;break;
+            case 2: context.exterior=false;break;
+            case 3: context.kitSeated=false;break;
+            case 4: context.combat=true;break;
+            default: context.traversing=true;break;
+            }
+            Check(!gated.CanStartPrivyRagRequest(context),
+                  "the local request requires the live claimed seated exterior and traversal-safe session");
+        }
+
+        Director queued;
+        Progress ordered=arrived;
+        ordered.activeLine=Line::ReunionProof;
+        ordered.continuations[0]=Line::ReunionFirstPiece;
+        ordered.continuations[1]=Line::ReunionDepart;
+        ordered.continuationCount=2;
+        Check(queued.RestoreProgress(ordered,local,1,0) && !queued.CanStartPrivyRagRequest(local),
+              "an active proof and its ordered response queue keep the optional local call silent");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::ReunionFirstPiece,"proof retains its first required response");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::ReunionDepart,"proof retains its departure response");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::PrivyRagRequest && queued.State().source.x==local.privySource->x,
+              "the fixed privy source starts only after all current and queued speech has ended");
+        const auto request=queued.State();
+        Check(queued.ExportProgress().activeLine==Line::None && queued.ExportProgress().continuationCount==0,
+              "the optional caption is excluded from campaign dialogue progress");
+        local.paused=true;queued.Step(.05f,local);
+        Check(queued.State().line==request.line && queued.State().generation==request.generation,
+              "pause freezes the local request without consuming or rearming it");
+        local.paused=false;
+        auto lookingAway=local;lookingAway.privyInReach=false;
+        queued.Step(.05f,lookingAway);
+        Check(queued.State().line==request.line && queued.State().elapsed>.04f,
+              "looking away within the same clear front pocket does not cancel the active local caption");
+        local.traversing=true;queued.Step(.01f,local);
+        Check(queued.State().line==Line::None && !queued.Complete(request.line,request.generation),
+              "traversal cancels the local request and rejects its stale completion");
+        local.traversing=false;queued.Step(.01f,local);
+        Check(queued.State().line==Line::None,"returning to range does not repeat the request within one session");
+        queued.Reset(true);queued.Step(.01f,local);
+        Check(queued.State().line==Line::None,"ordinary preserving refresh does not rearm the local request");
+
+        const auto saved=queued.ExportProgress();
+        Director newSession;
+        Check(newSession.RestoreProgress(saved,local,100,0),"fresh loaded session restores ordinary story progress");
+        newSession.Step(.01f,local);
+        Check(newSession.State().line==Line::PrivyRagRequest,
+              "the optional local call is session-scoped and does not add a campaign save field");
+        for(int tick=0;tick<80;++tick)newSession.Step(.05f,local);
+        Check(newSession.State().line==Line::None,"the local request finishes on its measured caption clock");
+        newSession.Step(.01f,local);newSession.Reset(true);newSession.Step(.01f,local);
+        Check(newSession.State().line==Line::None,
+              "completion and a preserving refresh keep the request consumed for the loaded session");
+
+        for(int interruption=0;interruption<2;++interruption) {
+            Director canceled;Check(canceled.RestoreProgress(arrived,local,1,0),"privy interruption fixture restores");
+            canceled.Step(.01f,local);const auto active=canceled.State();
+            auto away=local;
+            if(interruption==0)away.combat=true;else away.alive=false;
+            canceled.Step(.01f,away);
+            Check(canceled.State().line==Line::None && !canceled.Complete(active.line,active.generation),
+                  "combat or death cancels the local request and invalidates its callback");
+            canceled.Step(.01f,local);
+            Check(canceled.State().line==Line::None,"an interrupted local request does not repeat this session");
+        }
     }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

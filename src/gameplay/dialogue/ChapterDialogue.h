@@ -21,14 +21,15 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     RecordKeeperRegister, RecordKeeperTwoRoads, RecordKeeperRoadOrder, TavernRegisterDirections, TavernExpeditionDirections,
     TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
     RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson,
-    SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn, RelicDealerOrdinarySale };
+    SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn, RelicDealerOrdinarySale,
+    PrivyRagRequest };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,56> kLines{{
+inline constexpr std::array<LineSpec,57> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -84,7 +85,8 @@ inline constexpr std::array<LineSpec,56> kLines{{
     {Line::SalvagerShoreTask,"access.body_task","Salvager","We practise near a way out. Getting across is only half the lesson.","",126704.f/24000.f,1},
     {Line::SalvagerShoreReminder,"access.body_progress","Salvager","Find your way back before you leave the edge. Show me.","",113264.f/24000.f,1},
     {Line::SalvagerShoreReturn,"hub.passing.learned_retreat","Salvager","Coming back was part of the lesson. Good to see you remembered.","",111344.f/24000.f,1},
-    {Line::RelicDealerOrdinarySale,"hub.ordinary_sale","Relic dealer","Common coin, ordinary silver. I can give you a price for those.","",4.8f,1}
+    {Line::RelicDealerOrdinarySale,"hub.ordinary_sale","Relic dealer","Common coin, ordinary silver. I can give you a price for those.","",4.8f,1},
+    {Line::PrivyRagRequest,"hub.privy_request","Privy occupant","Can someone PLEASE get me some rag?!","",3.6f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -130,7 +132,8 @@ inline constexpr bool IsBellwetherLine(Line line) {
     return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
         line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
         IsRecordKeeperLine(line) || IsTavernLanternLine(line) || IsSalvagerLine(line) ||
-        line==Line::TavernLanternFitting || line==Line::RelicDealerOrdinarySale;
+        line==Line::TavernLanternFitting || line==Line::RelicDealerOrdinarySale ||
+        line==Line::PrivyRagRequest;
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -162,7 +165,8 @@ struct Context {
     std::optional<Tuple> salvagerSource;
     std::optional<Tuple> relicDealerSource;
     std::optional<Tuple> tavernLanternSource;
-    bool recordKeeperInReach=false;
+    std::optional<Tuple> privySource;
+    bool recordKeeperInReach=false,privyInReach=false;
     bool salvagerInReach=false;
     bool relicDealerInReach=false;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
@@ -272,6 +276,17 @@ public:
     bool TryStartRelicDealer(const Context& c) {
         if(!CanStartRelicDealer(c))return false;
         Start(Line::RelicDealerOrdinarySale,*c.relicDealerSource,c);
+        return true;
+    }
+    bool CanStartPrivyRagRequest(const Context& c) const {
+        return !privyRagRequestShown_ && c.privyInReach && CanHearResident(c,c.privySource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0 && !tavernConversationActive_;
+    }
+    bool TryStartPrivyRagRequest(const Context& c) {
+        if(!CanStartPrivyRagRequest(c))return false;
+        privyRagRequestShown_=true;
+        Start(Line::PrivyRagRequest,*c.privySource,c);
         return true;
     }
     bool HoldingAnkleAssessment() const {
@@ -397,6 +412,7 @@ public:
         state_.tavernConversationLinesResolved=p.tavernConversationLinesResolved;
         state_.tavernLanternLinesStarted=p.tavernLanternLinesStarted;
         tavernLanternActive_=false;
+        privyRagRequestShown_=false;
         tavernLanternRaiseFloor_=c.manualRaiseSequence;
         tavernConversationActive_=tavernWelcomeStarted_=false;
         shrineRevealIndex_=kShrineReveal.size();
@@ -417,6 +433,7 @@ public:
     void Reset(bool preserveOnce=false) {
         const auto old=state_;const auto oldRaiseFloor=raiseFloor_;
         const auto oldContinuations=continuations_;const auto oldContinuationCount=continuationCount_;
+        const auto oldPrivyRagRequestShown=privyRagRequestShown_;
         state_={}; state_.generation=Next(old.generation);
         if(preserveOnce) { state_.grateConsumed=old.grateConsumed;state_.rescueConsumed=old.rescueConsumed;
             state_.proofAccepted=old.proofAccepted;state_.reminderConsumed=old.reminderConsumed;
@@ -428,6 +445,7 @@ public:
             state_.hearthLinesResolved=old.hearthLinesResolved;
             state_.tavernConversationLinesResolved=old.tavernConversationLinesResolved;
             state_.tavernLanternLinesStarted=old.tavernLanternLinesStarted; }
+        privyRagRequestShown_=preserveOnce&&oldPrivyRagRequestShown;
         tavernLanternActive_=false;
         tavernLanternRaiseFloor_=0;
         tavernConversationActive_=false;
@@ -468,6 +486,7 @@ public:
         const bool hearsWelcome=c.tavernDoorInReach && c.exterior && !c.traversing && !c.combat &&
             c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
         if(state_.line==Line::TavernWelcome && !hearsWelcome)Cancel(false);
+        if(state_.line==Line::PrivyRagRequest && !CanHearResident(c,c.privySource))Cancel(false);
         if(state_.line==Line::TavernLanternFitting && (!c.tavernFittingInReach || c.combat))Cancel(false);
         if(IsGuidanceLine(state_.line) && !AtTavernHearth(c))Cancel(false);
         const bool hearsShrine=CanHearShrineLantern(c);
@@ -556,6 +575,7 @@ public:
         if(hearsRecordKeeper && state_.line==Line::None && continuationCount_==0 && !recordKeeperPending_.empty())
             StartNextRecordKeeperLine(c);
         StepTavernLantern(c);
+        TryStartPrivyRagRequest(c);
         RefreshCompanionSpatial(c);
     }
 private:
@@ -616,6 +636,7 @@ private:
             state_.line==Line::TavernLanternFitting;
         const auto& source=IsShrineLanternLine(state_.line)?c.shrineLanternSource:
             IsTavernLanternVoice(state_.line)?c.tavernLanternSource:
+            state_.line==Line::PrivyRagRequest?c.privySource:
             IsSalvagerLine(state_.line)?c.salvagerSource:
             state_.line==Line::RelicDealerOrdinarySale?c.relicDealerSource:
             IsRecordKeeperLine(state_.line)?c.recordKeeperSource:(fromKeeper?c.tavernKeeperSource:c.companionSource);
@@ -733,6 +754,7 @@ private:
     bool tavernConversationActive_=false;
     bool tavernWelcomeStarted_=false;
     bool tavernLanternActive_=false;
+    bool privyRagRequestShown_=false;
     std::uint64_t tavernLanternRaiseFloor_=0;
     std::uint64_t raiseFloor_=0;float waitingSeconds_=0,hearthPauseSeconds_=0;
 };

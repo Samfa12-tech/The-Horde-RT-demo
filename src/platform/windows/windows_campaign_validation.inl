@@ -1530,6 +1530,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     const auto westBranch = kBellwetherWestApproach.front();
                     const auto rampToe = kBellwetherTavernRoute.begin() + kBellwetherSouthDoorStation;
                     const BellwetherStation coveredHandoff{rampToe->x, rampToe->z + 1.5f};
+                    using horde::gameplay::interactions::HeldLightPose;
+                    const auto setInspectionLight = [&](HeldLightPose pose) {
+                        if (state.interaction.heldLightPose == pose) return true;
+                        input.commands.toggleHeldLightPose = state.lastConsumedToggleHeldLightPoseSequence + 1;
+                        return step() && waitFor([&] { return state.interaction.heldLightPose == pose; }, 125);
+                    };
                     const auto presentWell = [&] {
                         const BellwetherStation view{horde::gameplay::bellwether::kBellwetherWellView[0],
                             horde::gameplay::bellwether::kBellwetherWellView[1]};
@@ -1544,25 +1550,44 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         return presented && walkTo(*square);
                     };
                     const auto presentGarden = [&] {
-                        using horde::gameplay::interactions::HeldLightPose;
                         const auto& approach = kBellwetherGardenApproach;
                         if (!walkTo(kBellwetherWestApproach[1]) || !std::all_of(approach.begin(), approach.end(), walkTo) ||
                             !walkTo(kBellwetherGardenAisle) || !walkTo(approach.back()) || !walkTo(kBellwetherGardenView))
                             return false;
-                        const auto setLight = [&](HeldLightPose pose) {
-                            if (state.interaction.heldLightPose == pose) return true;
-                            input.commands.toggleHeldLightPose = state.lastConsumedToggleHeldLightPoseSequence + 1;
-                            return step() && waitFor([&] { return state.interaction.heldLightPose == pose; }, 125);
-                        };
                         const auto previousPose = state.interaction.heldLightPose;
                         const float previousPitch = input.pitchRadians;
                         input.pitchRadians = -.34f;
                         const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
-                            setLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
+                            setInspectionLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
                         input.pitchRadians = previousPitch;
-                        const bool restored = setLight(previousPose);
+                        const bool restored = setInspectionLight(previousPose);
                         return presented && restored && walkTo(approach.back()) &&
                             std::all_of(std::next(approach.rbegin()), approach.rend(), walkTo) && walkTo(kBellwetherWestApproach[1]);
+                    };
+                    const auto presentPrivy = [&] {
+                        const auto& path = kBellwetherServiceYardApproach;
+                        const auto& mouth = kBellwetherPrivyMouth;
+                        using Line = horde::gameplay::dialogue::Line;
+                        if (!walkTo(westBranch) || !std::all_of(path.begin(), std::prev(path.end()), walkTo) ||
+                            state.chapterDialogue.line == Line::PrivyRagRequest || !walkTo(path.back()) ||
+                            !walkTo(kBellwetherServiceYardView)) return false;
+                        const auto previousPose = state.interaction.heldLightPose;
+                        const float previousPitch = input.pitchRadians;
+                        input.pitchRadians = -.10f;
+                        std::array<char, 96> caption{};
+                        const bool presented = face(mouth[0], mouth[2] + .18f) &&
+                            setInspectionLight(HeldLightPose::High) && frame() &&
+                            state.chapterDialogue.line == Line::PrivyRagRequest &&
+                            std::abs(state.chapterDialogue.source.x - mouth[0]) < .01f &&
+                            GetWindowTextA(GetDlgItem(ctx.windowHandle,kChapterSubtitleId),caption.data(),
+                                static_cast<int>(caption.size())) > 0 &&
+                            std::string_view(caption.data()) == "Privy occupant: Can someone PLEASE get me some rag?!" &&
+                            capture("windows-combined-service-yard.png", false);
+                        input.pitchRadians = previousPitch;
+                        const bool restored = setInspectionLight(previousPose);
+                        return presented && restored &&
+                            std::all_of(std::next(path.rbegin()), path.rend(), walkTo) &&
+                            state.chapterDialogue.line != Line::PrivyRagRequest && walkTo(westBranch) && walkTo(*square);
                     };
                     const auto leaveTavern = [&] {
                         if (!std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(rampToe), walkTo) ||
@@ -1597,6 +1622,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
+                        check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && atHearth() && town() &&
                         !state.relicDealerTradeAvailable && state.chapterDialogue.line != Line::RelicDealerOrdinarySale &&

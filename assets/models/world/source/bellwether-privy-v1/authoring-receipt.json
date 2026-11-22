@@ -1,0 +1,33 @@
+{
+  "feature": "B01 service yard",
+  "centre": [
+    77.0,
+    112.0
+  ],
+  "yawRadians": -1.5707963267948966,
+  "mouth": [
+    76.65,
+    -9.373689270019531,
+    112.0
+  ],
+  "listenPoint": [
+    76.17,
+    -9.373689270019531,
+    112.0
+  ],
+  "originalTownSha256": "d744239755677d24ee51af756a0ac0dd1639cdf4555c7ad277281eb4299a921f",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "0cf8cf09bb73164b7ecb254fda5c4bc0c9bbbc6ecc72e74a2f9629b21561d1a8",
+  "addedSolidTriangles": 900,
+  "townVertices": 20890,
+  "townTriangles": 9772,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "220f8df349dfb86c668fc9ecf54a15cf8fb2567838db6c0f42acd940bdb9b91b",
+  "files": {
+    "bellwether-privy.blend": "9befb01d6dc76b2f6c2006f138da80385d7d5d2034c37f1c3ad27a132bbfea5e",
+    "privy.glb": "f9e4c0c6bc956513f48e1fa7bc40ac4644e4a5809eec813110002f6ceb8f7419",
+    "bellwether-tavern-v1.glb": "0cf8cf09bb73164b7ecb254fda5c4bc0c9bbbc6ecc72e74a2f9629b21561d1a8",
+    "asset.manifest.json": "4567036bb0462acc38acb0ce5b7dab487b21cfaeed95a487dd4262f4158a562b",
+    "geometry.generated.h": "a44f7c8196691acfe149987adbebfc0d21878663eb3de7e93a816d62caae95ba"
+  }
+}

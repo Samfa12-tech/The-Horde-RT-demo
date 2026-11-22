@@ -1080,6 +1080,13 @@ The crop foliage uses the existing original alder material and packed platform
 layers. The editable source and receipt are in
 `assets/models/world/source/bellwether-garden-v1/`.
 
+## Bellwether west service yard - 23 November 2026
+
+The closed privy, latch, washstand, basin and jug are original Horde geometry
+authored in Blender by Samfa12/Codex. They reuse the existing town materials.
+The editable source and receipt are in
+`assets/models/world/source/bellwether-privy-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

@@ -425,6 +425,14 @@ The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/READ
 
 The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
 
+### West service yard
+
+The [closed privy](../../../assets/models/world/source/bellwether-privy-v1/README.md) sits west of the tavern with a latched door, washstand, covered jug and sheltered shelf. Its dry approach leaves the well, ramp and main routes clear. Drainage and waste handling still need review.
+
+After the first tavern conversation, the occupant's approved request appears once per loaded session as a caption on a quiet approach. The cue comes from behind the door, leaves story progress and saved state intact, and stops when the player leaves the pocket. The recording and rag interaction are separate production steps.
+
+Both Windows hardware RT backends walked the detour, showed the exact native caption and returned to the square. The private ARM64 Debug package contains the same pinned town mesh. Physical phone performance remains open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
