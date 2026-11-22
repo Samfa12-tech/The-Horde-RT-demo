@@ -140,6 +140,8 @@ spare parts bin and two mill arrows are original Horde geometry in the same
 Blender master. They reuse the existing town material rows.
 The stone river landing and its timber rail are original meshes in that master
 and use the same stone and timber material rows.
+The hooded river-fork lamp and its post are original Horde meshes in the same
+Blender master. They use the admitted town material rows.
 The church approach's stone deck and retaining sides are original Horde geometry
 from the same editable town master. They reuse MedievalWall02.
 The church arrow, post and chisel-stroke lettering are original Horde meshes.

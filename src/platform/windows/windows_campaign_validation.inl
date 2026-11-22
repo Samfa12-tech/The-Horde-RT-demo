@@ -1506,6 +1506,22 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     fork() && walkTo(kBellwetherMillApproach[1]) && east() &&
                     state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated,
                     "the authored south route loads both eastern residents while Kit stays at the hearth");
+                if (progressed && gBellwetherPreparationsValidation) {
+                    constexpr BellwetherStation approach{
+                        std::lerp(kBellwetherMillApproach[1].x, kBellwetherSalvagerMark.x, .60f),
+                        std::lerp(kBellwetherMillApproach[1].z, kBellwetherSalvagerMark.z, .60f)};
+                    const auto lampSelected = [&] {
+                        const auto& ids = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                        return ctx.rtScene.HasUploadedFireEmitters() &&
+                            std::find(ids.begin(), ids.end(), horde::gameplay::effects::kBellwetherRiverForkLampEmitterId)
+                                != ids.end();
+                    };
+                    progressed = check(walkTo(approach) &&
+                        face((kRiverForkLampFlame[0] + kBellwetherSalvagerStand.x) * .5f,
+                            (kRiverForkLampFlame[2] + kBellwetherSalvagerStand.z) * .5f) &&
+                        east() && lampSelected() && capture("windows-combined-fork-lamp.png"),
+                        "the fork lamp reaches the normal exterior RT fire budget and presents beside the salvager");
+                }
                 if (progressed) {
                     const bool reached = walkTo(kBellwetherSalvagerMark) && east() &&
                         face(kBellwetherSalvagerStand.x, kBellwetherSalvagerStand.z);

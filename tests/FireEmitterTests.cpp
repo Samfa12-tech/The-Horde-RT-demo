@@ -215,17 +215,26 @@ bool TestAllFourEligibleEmittersRemainActive()
                    "four-source budget must never silently discard an otherwise eligible light");
 }
 
-bool TestBellwetherHearthUsesTheOrdinaryFireBudget()
+bool TestBellwetherFiresUseTheOrdinaryFireBudget()
 {
     using namespace horde::gameplay::effects;
-    std::array worldFires{MakeBellwetherHearthFireEmitter(),MakeBellwetherCandleFireEmitter()};
-    auto& [hearth,candle]=worldFires;
+    const horde::gameplay::simulation::GameSimulation underground;
+    const auto& undergroundSnapshot=underground.Snapshot();
+    bool undergroundHasForkLamp=false;
+    for(std::size_t i=0;i<undergroundSnapshot.fireEmitterCount;++i)
+        undergroundHasForkLamp |= undergroundSnapshot.fireEmitters[i].stableId==kBellwetherRiverForkLampEmitterId;
+    bool ok=Require(undergroundSnapshot.fireEmitterCount==3u && !undergroundHasForkLamp,
+        "adding the exterior fork lamp preserves the original underground fire roster");
+    std::array worldFires{MakeBellwetherHearthFireEmitter(),MakeBellwetherCandleFireEmitter(),
+        MakeBellwetherRiverForkLampFireEmitter()};
+    auto& [hearth,candle,lamp]=worldFires;
     StepFireEmitterFixed(hearth,BellwetherHearthFireInput(),kFixedDelta);
     StepFireEmitterFixed(candle,BellwetherCandleFireInput(),kFixedDelta);
+    StepFireEmitterFixed(lamp,BellwetherRiverForkLampFireInput(),kFixedDelta);
     FireEmitterUpload upload;
     std::string diagnostic;
     const std::array<float,3> camera{{84.3f,-7.f,111.7f}};
-    bool ok=Require(BuildFireEmitterUpload(worldFires,
+    ok &= Require(BuildFireEmitterUpload(worldFires,
         {camera,ShowcaseZone::Outside,24.f},{},FireEmitterQuality::Mobile,upload,diagnostic) &&
         upload.activeCount==2 && upload.selectedStableIds[0]==kBellwetherCandleEmitterId &&
         upload.selectedStableIds[1]==kBellwetherHearthEmitterId &&
@@ -243,6 +252,22 @@ bool TestBellwetherHearthUsesTheOrdinaryFireBudget()
     ok &= Require(BuildFireEmitterUpload(worldFires,{{13.3f,0.f,36.2f},ShowcaseZone::Outside,24.f},
         {},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==0,
         "the room fires are outside the lookout's fire workload");
+    const auto& lampFlame=horde::gameplay::bellwether::kRiverForkLampFlame;
+    const auto& lampLight=horde::gameplay::bellwether::kRiverForkLampLight;
+    bool exactAnchor=true;
+    for(std::size_t axis=0;axis<3;++axis)
+        exactAnchor &= Approx(lamp.worldFromFlame[12+axis],lampFlame[axis]) &&
+            Approx(lamp.worldFromLight[12+axis],lampLight[axis]);
+    FireEmitterUpload forkUpload;
+    ok &= Require(exactAnchor && lamp.stableId==kBellwetherRiverForkLampEmitterId &&
+        lamp.parentObject==FireEmitterParentObject::WorldObject && lamp.zone==ShowcaseZone::Outside &&
+        Approx(lamp.colourTemperatureKelvin,2050.f) && Approx(lamp.radius,.06f) &&
+        Approx(lamp.height,.22f) && Approx(lamp.coreRadius,.028f) &&
+        BuildFireEmitterUpload(worldFires,{lampLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,forkUpload,diagnostic) && forkUpload.activeCount==1 &&
+        forkUpload.selectedStableIds[0]==kBellwetherRiverForkLampEmitterId &&
+        forkUpload.emitters[0].lightPositionStrength[3]>0.f,
+        "fork lamp uses the authored anchors and a steady small warm outside flame within ordinary selection");
     return ok;
 }
 
@@ -491,7 +516,7 @@ int main()
     ok &= TestDistanceTieBreaksByStableEmitterId();
     ok &= TestDistanceBoundaryIsExactBeforeStablePublication();
     ok &= TestAllFourEligibleEmittersRemainActive();
-    ok &= TestBellwetherHearthUsesTheOrdinaryFireBudget();
+    ok &= TestBellwetherFiresUseTheOrdinaryFireBudget();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
     ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();

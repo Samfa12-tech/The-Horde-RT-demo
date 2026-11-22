@@ -14,6 +14,9 @@ inline constexpr std::array<float, 3> kRoomMax{{100.880000f, -8.709551f, 118.780
 inline constexpr std::array<float, 3> kSouthDoorHinge{{81.288000f, -8.709551f, 118.695000f}};
 inline constexpr std::array<float, 3> kTavernCandleFlame{{83.150000f, -7.440551f, 106.660000f}};
 inline constexpr std::array<float, 3> kTavernCandleLight{{83.150000f, -7.383551f, 106.660000f}};
+inline constexpr std::array<float, 3> kRiverForkLampPostFoot{{113.300000f, -12.220695f, 126.950000f}};
+inline constexpr std::array<float, 3> kRiverForkLampFlame{{113.349244f, -10.830695f, 126.840569f}};
+inline constexpr std::array<float, 3> kRiverForkLampLight{{113.361555f, -10.700695f, 126.813212f}};
 inline constexpr std::array<float, 3> kChurchWaymarker{{34.650000f, -5.981606f, 82.100000f}};
 inline constexpr std::array<float, 3> kMillWestDoor{{118.300000f, -13.764971f, 113.200000f}};
 inline constexpr std::array<float, 3> kMillWorkMark{{116.100000f, -13.559898f, 115.740000f}};
@@ -42,7 +45,7 @@ inline constexpr std::array<std::array<float, 2>, 11> kRiverLandingStations{{
 inline constexpr std::array<float, 2> kRiverLandingDryMark{136.550000f, 122.550000f};
 inline constexpr std::array<float, 2> kRiverLandingView{135.800000f, 122.550000f};
 
-inline constexpr unsigned kSolidTriangles=3816;
+inline constexpr unsigned kSolidTriangles=4048;
 inline constexpr unsigned kGroundTriangles=40;
 inline constexpr unsigned kSouthDoorTriangles=264;
 inline constexpr float kSouthDoorOpenRadians=1.640609497f;

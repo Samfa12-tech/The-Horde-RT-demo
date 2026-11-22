@@ -7,6 +7,7 @@ namespace horde::gameplay::effects
 {
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
 inline constexpr std::uint32_t kBellwetherCandleEmitterId=0x42303143u;
+inline constexpr std::uint32_t kBellwetherRiverForkLampEmitterId=0x4230314cu;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -39,6 +40,20 @@ inline FireEmitterState MakeBellwetherCandleFireEmitter()
     return emitter;
 }
 
+inline FireEmitterState MakeBellwetherRiverForkLampFireEmitter()
+{
+    auto emitter=MakeWorldTorchFireEmitter(kBellwetherRiverForkLampEmitterId,0x4c414d50u);
+    emitter.colourTemperatureKelvin=2050.f;
+    emitter.radius=.06f;
+    emitter.height=.22f;
+    emitter.coreRadius=.028f;
+    emitter.absorption=5.0f;
+    emitter.smokeDensity=.025f;
+    emitter.emberRate=0.f;
+    emitter.turbulence=.24f;
+    return emitter;
+}
+
 inline FireEmitterFixedStepInput BellwetherFireInput(
     const std::array<float,3>& flame, const std::array<float,3>& light, float strength)
 {
@@ -60,5 +75,10 @@ inline FireEmitterFixedStepInput BellwetherHearthFireInput()
 inline FireEmitterFixedStepInput BellwetherCandleFireInput()
 {
     return BellwetherFireInput(bellwether::kTavernCandleFlame,bellwether::kTavernCandleLight,.58f);
+}
+
+inline FireEmitterFixedStepInput BellwetherRiverForkLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kRiverForkLampFlame,bellwether::kRiverForkLampLight,.60f);
 }
 }

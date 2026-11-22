@@ -1480,7 +1480,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     using gameplay::effects::kBellwetherHearthLight;
     const auto floor=terrain->Query(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2]);
     const auto& hearth=room.fireEmitters[1];
-    Check(room.fireEmitterCount==3 &&
+    Check(room.fireEmitterCount==4 &&
           hearth.stableId==gameplay::effects::kBellwetherHearthEmitterId &&
           hearth.strength>0 && hearth.zone==gameplay::ShowcaseZone::Outside &&
           floor.found && std::abs(kBellwetherHearthFlame[1]-floor.worldY-.18f)<.002f &&
@@ -1500,6 +1500,21 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
               kTavernCandleLight[0],kTavernCandleLight[2],kTavernCandleFlame[1]+.004f,
               kTavernCandleFlame[1]+candle.height,candle.radius),
           "the candlestick publishes a flame and direct light above its authored wick");
+    const auto& forkLamp=room.fireEmitters[3];
+    bool forkLampAnchored=true;
+    for(std::size_t axis=0;axis<3;++axis)
+        forkLampAnchored &= forkLamp.worldFromFlame[12+axis]==kRiverForkLampFlame[axis] &&
+            forkLamp.worldFromLight[12+axis]==kRiverForkLampLight[axis];
+    const auto forkLampFloor=terrain->Query(kRiverForkLampPostFoot[0],kRiverForkLampPostFoot[2]);
+    const float salvagerFaceDistance=std::hypot(kRiverForkLampLight[0]-gameplay::traversal::kBellwetherSalvagerStand.x,
+        kRiverForkLampLight[2]-gameplay::traversal::kBellwetherSalvagerStand.z);
+    Check(forkLamp.stableId==gameplay::effects::kBellwetherRiverForkLampEmitterId &&
+          forkLamp.strength>0 && forkLamp.zone==gameplay::ShowcaseZone::Outside && forkLampAnchored &&
+          forkLampFloor.found && std::abs(kRiverForkLampPostFoot[1]-forkLampFloor.worldY)<.002f &&
+          std::abs(kRiverForkLampFlame[1]-kRiverForkLampPostFoot[1]-1.39f)<.002f &&
+          std::abs(kRiverForkLampLight[1]-kRiverForkLampPostFoot[1]-1.52f)<.002f &&
+          std::abs(salvagerFaceDistance-2.2f)<.1f,
+          "the fourth exterior emitter uses the authored fork-lamp anchors at plausible salvager-face distance");
     CompanionRouteFixture kit(true);
     Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
           "Kit requires the real supported seat handoff before sitting");

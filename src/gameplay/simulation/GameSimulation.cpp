@@ -91,7 +91,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
     bellwetherFireEmitters_={effects::MakeBellwetherHearthFireEmitter(),
-                           effects::MakeBellwetherCandleFireEmitter()};
+                           effects::MakeBellwetherCandleFireEmitter(),
+                           effects::MakeBellwetherRiverForkLampFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2134,6 +2135,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             effects::BellwetherHearthFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[1],
             effects::BellwetherCandleFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[2],
+            effects::BellwetherRiverForkLampFireInput(),fixedDeltaSeconds);
     }
 }
 
@@ -3742,7 +3745,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     // Bellwether and the tomb torches occupy different zones. Keep the shared
     // renderer's fixed upload capacity and publish only the current roster.
     if (bellwetherFireReady_) {
-        snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1]};
+        snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1],
+                                  bellwetherFireEmitters_[2]};
         snapshot_.fireEmitterCount = 1 + bellwetherFireEmitters_.size();
     }
     snapshot_.flaskUpgrade={};

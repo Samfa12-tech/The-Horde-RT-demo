@@ -5,6 +5,7 @@
 #include "audio/BellwetherVoiceFixture.h"
 #include "vulkan/raytracing/BellwetherResidents.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE

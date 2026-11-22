@@ -1,12 +1,14 @@
 """Author the B01 interior, B05 mill yard and B09 archive from the preserved master.
 
-blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT [OUTPUT_WORLD]
+blender --background --python-exit-code 1 --python tools/author-bellwether-tavern.py -- ROOT [OUTPUT_WORLD [INPUT_TOWN_GLB]]
 The editable and runtime output directories must both be new.
 """
 import hashlib
 import json
 import math
 from pathlib import Path
+import runpy
+import shutil
 import sys
 
 import bmesh
@@ -16,15 +18,21 @@ from mathutils.bvhtree import BVHTree
 
 
 args = sys.argv[sys.argv.index("--") + 1:]
-if len(args) not in (1, 2):
-    raise RuntimeError("Expected ROOT and an optional OUTPUT_WORLD.")
+if len(args) not in (1, 2, 3):
+    raise RuntimeError("Expected ROOT and optional OUTPUT_WORLD and INPUT_TOWN_GLB.")
 ROOT = Path(args[0]).resolve()
 WORLD = ROOT / "assets/models/world"
 MASTER = WORLD / "source/bellwether-shell-v4/bellwether-shell-v4.blend"
 TERRAIN = WORLD / "runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb"
-DESTINATION = Path(args[1]).resolve() if len(args) == 2 else WORLD
+DESTINATION = Path(args[1]).resolve() if len(args) >= 2 else WORLD
 OUTPUT = DESTINATION / "source/bellwether-tavern-v1"
 RUNTIME = DESTINATION / "runtime/bellwether-tavern-v1"
+INPUT_TOWN = (Path(args[2]).resolve() if len(args) == 3 else
+              WORLD / "runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb")
+FORK_LAMP_SOURCE_TOWN_SHA256 = "1133a71dbe7ac47b3c306bc687489b10d9036f7b4d6727bfd6115557d1b667b2"
+# Filled with the first authorized layered output hash so a later exact rerun
+# recognizes an already-installed lamp and cannot append its triangles twice.
+FORK_LAMP_LAYERED_TOWN_SHA256 = "4a970dc48d0d7028310ddc0cf4dd26c00c1325a77136ce52470f9287e784a4d6"
 if OUTPUT.exists() or RUNTIME.exists():
     raise RuntimeError("Preserve the previous source and runtime outputs.")
 
@@ -531,6 +539,179 @@ for y in (bin_top - .23, bin_top - .055):
 mill_bearing_bin = (bin_x, bin_top + .09, bin_z)
 
 
+# A small shared-town wick lamp sits just off the fork's shore-path edge. The
+# open face points back toward the Salvager; its footprint is admitted against
+# both the NPC approach spoke and the full river landing route using the same
+# .28 m player capsule radius as Chapter movement.
+fork_lamp_x, fork_lamp_z = 113.30, 126.95
+fork_lamp_y = ground(fork_lamp_x, fork_lamp_z)
+fork_lamp_target = (114.20, 124.95)
+fork_lamp_heading = Vector((fork_lamp_target[0] - fork_lamp_x,
+                            fork_lamp_target[1] - fork_lamp_z)).normalized()
+fork_lamp_forward = (fork_lamp_heading.x, fork_lamp_heading.y)
+fork_lamp_side = (fork_lamp_heading.y, -fork_lamp_heading.x)
+fork_lamp_width, fork_lamp_depth = .66, .54
+fork_lamp_motor_radius = .28
+
+
+def route_clearance(segments):
+    dx, dz = fork_lamp_forward
+    sx, sz = fork_lamp_side
+    best = None
+    for (x0, z0), (x1, z1) in zip(segments, segments[1:]):
+        vx, vz = x1 - x0, z1 - z0
+        length_squared = vx * vx + vz * vz
+        t = max(0.0, min(1.0, ((fork_lamp_x - x0) * vx + (fork_lamp_z - z0) * vz) /
+                                length_squared))
+        px, pz = x0 + t * vx, z0 + t * vz
+        distance = math.hypot(fork_lamp_x - px, fork_lamp_z - pz)
+        length = math.hypot(vx, vz)
+        nx, nz = -vz / length, vx / length
+        half_extent = (abs(nx * sx + nz * sz) * fork_lamp_width / 2 +
+                       abs(nx * dx + nz * dz) * fork_lamp_depth / 2)
+        margin = distance - half_extent - fork_lamp_motor_radius
+        if best is None or margin < best[0]:
+            best = (margin, distance)
+    return best
+
+
+fork_lamp_npc_spoke = route_clearance(((103.30, 125.20), (114.30, 126.20)))
+fork_lamp_slope = math.hypot(ground(fork_lamp_x + .05, fork_lamp_z) -
+                             ground(fork_lamp_x - .05, fork_lamp_z),
+                             ground(fork_lamp_x, fork_lamp_z + .05) -
+                             ground(fork_lamp_x, fork_lamp_z - .05)) / .1
+if (fork_lamp_npc_spoke[0] < .15 or
+        fork_lamp_slope > .65 or math.hypot(fork_lamp_target[0] - fork_lamp_x,
+                                            fork_lamp_target[1] - fork_lamp_z) > 2.2):
+    raise RuntimeError("B05 fork lamp fails support, resident-reach or capsule-route clearance admission.")
+
+
+def fork_lamp_point(u, forward, height):
+    return (fork_lamp_x + fork_lamp_side[0] * u + fork_lamp_forward[0] * forward,
+            fork_lamp_y + height,
+            fork_lamp_z + fork_lamp_side[1] * u + fork_lamp_forward[1] * forward)
+
+
+def fork_lamp_box(name, u0, u1, f0, f1, y0, y1):
+    local_corners = [(u0, f0), (u1, f0), (u1, f1), (u0, f1)]
+    lower = [fork_lamp_point(u, f, y0) for u, f in local_corners]
+    upper = [fork_lamp_point(u, f, y1) for u, f in local_corners]
+    return mesh(name, lower + upper,
+                [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1),
+                 (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)],
+                fork_lamp_solids, ember)
+
+
+def fork_lamp_post(name, profile, sides=8, center=(0.0, 0.0)):
+    post_x, _, post_z = fork_lamp_point(center[0], center[1], 0.0)
+    vertices = [(post_x + radius * math.cos(math.tau * i / sides),
+                 fork_lamp_y + height,
+                 post_z + radius * math.sin(math.tau * i / sides))
+                for height, radius in profile for i in range(sides)]
+    faces = [tuple(reversed(range(sides))),
+             tuple(range((len(profile) - 1) * sides, len(profile) * sides))]
+    for ring in range(len(profile) - 1):
+        for i in range(sides):
+            a, b = ring * sides + i, ring * sides + (i + 1) % sides
+            faces.append((a, b, b + sides, a + sides))
+    obj = mesh(name, vertices, faces, fork_lamp_solids, ember)
+    editable = bmesh.new()
+    editable.from_mesh(obj.data)
+    bmesh.ops.recalc_face_normals(editable, faces=list(editable.faces))
+    editable.to_mesh(obj.data)
+    editable.free()
+    return obj
+
+
+fork_lamp_solids = []
+# Ground plate is partly buried; the tapered post is a real collidable solid.
+fork_lamp_box("B05_fork_lamp_foot", -.12, .12, -.12, .12, -.045, .055)
+fork_lamp_post("B05_fork_lamp_post", ((.025, .095), (.14, .072), (1.11, .045)))
+fork_lamp_post("B05_fork_lamp_post_collar", ((1.015, .067), (1.11, .048)))
+# Wick pan and a rear rain shield; both sides stay open toward the actor-facing mouth.
+fork_lamp_box("B05_fork_lamp_pan", -.245, .245, -.205, .205, 1.10, 1.15)
+fork_lamp_box("B05_fork_lamp_back_shield", -.245, .245, -.205, -.171, 1.15, 1.85)
+fork_lamp_box("B05_fork_lamp_left_cheek", -.258, -.225, -.205, .155, 1.15, 1.51)
+fork_lamp_box("B05_fork_lamp_right_cheek", .225, .258, -.205, .155, 1.15, 1.51)
+# Narrow open-face rails frame the wick without glass, an emitter mesh, or a front plate.
+for side in (-1, 1):
+    fork_lamp_box(f"B05_fork_lamp_front_rail_{side}", side * .225 - .018,
+                  side * .225 + .018, .138, .174, 1.15, 1.51)
+fork_lamp_box("B05_fork_lamp_front_sill", -.23, .23, .145, .177, 1.15, 1.19)
+# One sloping, thick weather hood covers the wick and projects beyond the open front.
+hood_local = [(-.30, -.225, 1.88), (.30, -.225, 1.88),
+              (.32, .245, 1.75), (-.32, .245, 1.75)]
+hood_top = [fork_lamp_point(u, f, y) for u, f, y in hood_local]
+hood_bottom = [fork_lamp_point(u, f, y - .035) for u, f, y in hood_local]
+hood_mesh = mesh("B05_fork_lamp_weather_hood", hood_bottom + hood_top,
+     [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1),
+      (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)], fork_lamp_solids, ember)
+hood_editable = bmesh.new()
+hood_editable.from_mesh(hood_mesh.data)
+bmesh.ops.recalc_face_normals(hood_editable, faces=list(hood_editable.faces))
+hood_editable.to_mesh(hood_mesh.data)
+hood_editable.free()
+fork_lamp_box("B05_fork_lamp_drip_edge", -.33, .33, .227, .267, 1.72, 1.76)
+# The wick cup is a dark holder only; the generated Flame and Light are fixed anchors.
+fork_lamp_post("B05_fork_lamp_wick_cup", ((1.18, .044), (1.265, .020)),
+               sides=6, center=(0, .12))
+fork_lamp_post("B05_fork_lamp_wick", ((1.245, .010), (1.37, .010)), sides=6,
+               center=(0, .12))
+fork_lamp_flame = fork_lamp_point(0, .12, 1.39)
+fork_lamp_light = fork_lamp_point(0, .15, 1.52)
+fork_lamp_post_foot = (fork_lamp_x, fork_lamp_y, fork_lamp_z)
+fork_lamp_triangles = sum(len(face.vertices) - 2 for obj in fork_lamp_solids
+                          for face in obj.data.polygons)
+if fork_lamp_triangles >= 240:
+    raise RuntimeError(f"Fork lamp has {fork_lamp_triangles} solid triangles; budget is below 240.")
+fork_lamp_hood_under_at_flame = 1.88 + (1.75 - 1.88) * ((.12 + .225) / (.245 + .225)) - .035
+fork_lamp_flame_top = 1.39 + .22 + .06
+if fork_lamp_hood_under_at_flame - fork_lamp_flame_top < .05:
+    raise RuntimeError("Fork lamp hood does not clear the preset flame height/radius.")
+solids.extend(fork_lamp_solids)
+
+
+def bvh_from_objects(objects):
+    points, faces = [], []
+    for obj in objects:
+        if obj.type != "MESH":
+            continue
+        offset = len(points)
+        obj.data.calc_loop_triangles()
+        points.extend(obj.matrix_world @ vertex.co for vertex in obj.data.vertices)
+        faces.extend([offset + index for index in tri.vertices] for tri in obj.data.loop_triangles)
+    return BVHTree.FromPolygons(points, faces, all_triangles=True)
+
+
+def direct_ray_clear(tree, source, target):
+    origin = Vector((source[0], -source[2], source[1]))
+    endpoint = Vector((target[0], -target[2], target[1]))
+    delta = endpoint - origin
+    return delta.length > .01 and tree.ray_cast(origin, delta.normalized(), delta.length - .005)[0] is None
+
+
+fork_lamp_source = list(fork_lamp_light)
+fork_lamp_face_samples = [
+    (fork_lamp_target[0] - .10, -10.18, fork_lamp_target[1]),
+    (fork_lamp_target[0], -10.18, fork_lamp_target[1]),
+    (fork_lamp_target[0] + .10, -10.18, fork_lamp_target[1]),
+    (fork_lamp_target[0], -10.02, fork_lamp_target[1]),
+    (fork_lamp_target[0], -10.30, fork_lamp_target[1]),
+]
+fork_lamp_hood_tree = bvh_from_objects(fork_lamp_solids)
+fork_lamp_town_tree = bvh_from_objects([obj for obj in solids if obj not in fork_lamp_solids])
+fork_lamp_shadow_witness = [
+    {"target": target,
+     "hoodClear": direct_ray_clear(fork_lamp_hood_tree, fork_lamp_source, target),
+     "townAndTerrainClear": direct_ray_clear(fork_lamp_town_tree, fork_lamp_source, target) and
+                            direct_ray_clear(terrain, fork_lamp_source, target)}
+    for target in fork_lamp_face_samples
+]
+if not all(witness["hoodClear"] and witness["townAndTerrainClear"]
+           for witness in fork_lamp_shadow_witness):
+    raise RuntimeError(f"Fork lamp source has a direct shadow blocker: {fork_lamp_shadow_witness}")
+
+
 # The mapped church path crosses a steep diagonal terrain band around the
 # southwest corner of B02. A stone
 # approach bridges the two faces of the cut, with buried toes at both ends.
@@ -596,6 +777,9 @@ river_sections = [
 stone_approach("B05_river_landing", river_sections, river_half_width)
 river_stations = [(113.68, 127.86), (114.94, 128.44)]
 river_stations += [(x, z) for x, z, _ in river_sections[:-1]] + [(138.11, 122.55)]
+fork_lamp_shore_path = route_clearance(river_stations)
+if fork_lamp_shore_path[0] < .15:
+    raise RuntimeError("B05 fork lamp intrudes into the river landing's motor capsule corridor.")
 river_dry_mark = (136.55, 122.55)
 river_view = (135.80, 122.55)
 for z in (121.68, 123.42):
@@ -731,6 +915,16 @@ for name, mark in (("Hinge rotation origin", shrine_hinge), ("Player inspection 
     marker.empty_display_size = .25
     marker.location = (mark[0], -mark[2], mark[1])
     archive_blocking.objects.link(marker)
+fork_lamp_blocking = bpy.data.collections.new("B05 - River fork lamp anchors")
+bpy.context.scene.collection.children.link(fork_lamp_blocking)
+for name, mark in (("River fork lamp post foot", fork_lamp_post_foot),
+                   ("River fork lamp Flame", fork_lamp_flame),
+                   ("River fork lamp Light", fork_lamp_light)):
+    marker = bpy.data.objects.new(name, None)
+    marker.empty_display_type = "PLAIN_AXES"
+    marker.empty_display_size = .12
+    marker.location = (mark[0], -mark[2], mark[1])
+    fork_lamp_blocking.objects.link(marker)
 bpy.data.orphans_purge(do_recursive=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(OUTPUT / "bellwether-tavern-v1.blend"), compress=True)
 shell_mesh = joined_copy(solids, "BellwetherSolid")
@@ -740,6 +934,50 @@ path = RUNTIME / "bellwether-tavern-v1.glb"
 bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
                           export_apply=True, export_texcoords=True, export_normals=True,
                           export_tangents=True, export_animations=False)
+base_runtime_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+# The live runtime owner already contains the separately authored millworks
+# and crossing. Append only the new lamp mesh to its matching Hearth-char
+# primitive; do not replace its old accessors or regenerate downstream work.
+lamp_source_path = RUNTIME / ".fork-lamp-support.glb"
+lamp_source_mesh = joined_copy(fork_lamp_solids, "ForkLampSupport")
+bpy.ops.object.select_all(action="DESELECT")
+lamp_source_mesh.select_set(True)
+bpy.context.view_layer.objects.active = lamp_source_mesh
+bpy.ops.export_scene.gltf(filepath=str(lamp_source_path), export_format="GLB", use_selection=True,
+                          export_apply=True, export_texcoords=True, export_normals=True,
+                          export_tangents=True, export_animations=False)
+live_town = INPUT_TOWN
+if not live_town.is_file():
+    raise RuntimeError(f"Missing exact pre-lamp runtime town input: {live_town}")
+live_town_sha256 = hashlib.sha256(live_town.read_bytes()).hexdigest()
+layered_town_path = RUNTIME / ".fork-lamp-layered.glb"
+mill_works_tools = runpy.run_path(str(ROOT / "tools/author-bellwether-mill-works.py"))
+if live_town_sha256 == FORK_LAMP_SOURCE_TOWN_SHA256:
+    layered_source_town_sha256 = live_town_sha256
+    live_doc, _ = mill_works_tools["read_glb"](live_town)
+    input_runtime_triangles = sum(live_doc["accessors"][p["indices"]]["count"] // 3
+                                  for mesh_record in live_doc["meshes"]
+                                  for p in mesh_record["primitives"])
+    layered_extra_triangles, layered_vertex_count, _ = mill_works_tools["join_town"](
+        live_town, lamp_source_path, layered_town_path)
+    if layered_extra_triangles != fork_lamp_triangles:
+        raise RuntimeError("Live town append did not retain the exact lamp triangle payload.")
+    layered_runtime_triangles = input_runtime_triangles + layered_extra_triangles
+    path.unlink()
+    shutil.move(str(layered_town_path), str(path))
+elif FORK_LAMP_LAYERED_TOWN_SHA256 and live_town_sha256 == FORK_LAMP_LAYERED_TOWN_SHA256:
+    layered_source_town_sha256 = FORK_LAMP_SOURCE_TOWN_SHA256
+    layered_doc, _ = mill_works_tools["read_glb"](live_town)
+    layered_runtime_triangles = sum(layered_doc["accessors"][p["indices"]]["count"] // 3
+                                    for mesh_record in layered_doc["meshes"]
+                                    for p in mesh_record["primitives"])
+    layered_vertex_count = sum(layered_doc["accessors"][p["attributes"]["POSITION"]]["count"]
+                               for mesh_record in layered_doc["meshes"]
+                               for p in mesh_record["primitives"])
+    shutil.copyfile(live_town, path)
+else:
+    raise RuntimeError(f"Fork lamp needs an exact admitted town owner; got {live_town_sha256}.")
+lamp_source_path.unlink()
 pane_mesh = joined_copy(glazing, "BellwetherGlazing")
 pane_path = RUNTIME / "bellwether-window.glb"
 bpy.ops.export_scene.gltf(filepath=str(pane_path), export_format="GLB", use_selection=True,
@@ -771,11 +1009,17 @@ def digest(path):
 
 solid_triangles = sum(len(face.vertices) - 2 for face in shell_mesh.data.polygons)
 walkable_triangles = sum(len(face.vertices) - 2 for face in floor_mesh.data.polygons)
-manifest = json.loads((WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
+current_manifest = WORLD / "runtime/bellwether-tavern-v1/asset.manifest.json"
+manifest = json.loads((current_manifest if current_manifest.is_file() else
+                       WORLD / "runtime/bellwether-shell-v4/asset.manifest.json").read_text())
 manifest["asset"] = "bellwether-tavern-v1"
-manifest["budgets"].update(maxVertices=9000, maxIndices=(solid_triangles + walkable_triangles) * 3,
+manifest["budgets"].update(maxVertices=max(manifest["budgets"].get("maxVertices", 9000),
+                                           layered_vertex_count),
+                           maxIndices=max(manifest["budgets"].get("maxIndices", 0),
+                                          layered_runtime_triangles * 3),
                            maxPrimitives=5, maxMaterials=4)
-manifest["lods"][0]["maxTriangles"] = solid_triangles + walkable_triangles
+manifest["lods"][0]["maxTriangles"] = max(manifest["lods"][0].get("maxTriangles", 0),
+                                           layered_runtime_triangles)
 manifest["licenceStatus"] = "Original Horde-owned derivative of Bellwether v4. Shared texture terms are recorded in ASSET_LICENSES.md."
 (RUNTIME / "asset.manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
 pane_triangles = len(pane_mesh.data.polygons)
@@ -813,6 +1057,11 @@ door_manifest["lods"] = [{"name": "lod0", "maxTriangles": door_triangles}]
 receipt = dict(registerSha256=digest(register_path), registerTriangles=register_triangles, registerMark=register_mark,
                coverSha256=digest(cover_path), coverTriangles=cover_triangles, sourceMasterSha256=digest(MASTER), terrainSha256=digest(TERRAIN),
                layoutSha256=parent["planSha256"], runtimeSha256=digest(path),
+               baseRuntimeSha256=base_runtime_sha256,
+               layeredRuntime=dict(inputTownSha256=layered_source_town_sha256,
+                                   appendedLampTriangles=fork_lamp_triangles,
+                                   runtimeTriangles=layered_runtime_triangles,
+                                   runtimeVertices=layered_vertex_count),
                solidTriangles=solid_triangles, walkableTriangles=walkable_triangles,
                windowSha256=digest(pane_path), windowTriangles=pane_triangles,
                windowBounds=[pane_min, pane_max],
@@ -827,6 +1076,16 @@ receipt = dict(registerSha256=digest(register_path), registerTriangles=register_
                                   chair_z - .296, chair_z + .296],
                tableTop=[table_x, floor + table_top, table_z], conversation=talk_mark,
                tavernCandleFlame=candle_flame, tavernCandleLight=candle_light,
+               riverForkLamp=dict(postFoot=fork_lamp_post_foot, flame=fork_lamp_flame,
+                                  light=fork_lamp_light, supportSlope=fork_lamp_slope,
+                                  width=fork_lamp_width, depth=fork_lamp_depth,
+                                  solidTriangles=fork_lamp_triangles,
+                                  npcSpokeCenterDistance=fork_lamp_npc_spoke[1],
+                                  npcSpokeMotorMargin=fork_lamp_npc_spoke[0],
+                                  shoreCenterDistance=fork_lamp_shore_path[1],
+                                  shoreMotorMargin=fork_lamp_shore_path[0],
+                                  headroomAbovePresetFlame=fork_lamp_hood_under_at_flame - fork_lamp_flame_top,
+                                  shadowWitness=fork_lamp_shadow_witness),
                churchWaymarker=church_waymarker,
                churchApproach=dict(width=2*church_half_width, sections=church_sections),
                millWaymarkers=mill_waymarkers, millWestDoor=mill_door, millWorkMark=mill_work_mark,
@@ -849,6 +1108,8 @@ for name, mark in (("ChairSeat", seat_mark), ("ChairSitRoot", sit_root),
                    ("RoomMax", (east - wall_depth, floor, south - wall_depth)),
                    ("SouthDoorHinge", door_hinge),
                    ("TavernCandleFlame", candle_flame), ("TavernCandleLight", candle_light),
+                   ("RiverForkLampPostFoot", fork_lamp_post_foot),
+                   ("RiverForkLampFlame", fork_lamp_flame), ("RiverForkLampLight", fork_lamp_light),
                    ("ChurchWaymarker", church_waymarker),
                    ("MillWestDoor", mill_door), ("MillWorkMark", mill_work_mark),
                    ("MillComparison", mill_comparison), ("MillBearingBin", mill_bearing_bin),
