@@ -154,10 +154,16 @@ The five privately approved Kit takes can be enabled by adding
 `-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
 Use the same property with the ten-file overlay to audition the three
 roadside pickups, the doorway welcome and the keeper's hearth reply. All
-files go under `private_bellwether_voice/`. Gradle checks the exact five- or
-ten-file roster. The shared dialogue clock uses the measured durations, and
-an unavailable or muted cue retains its caption. The audition awaits owner
-listening approval. Both overlays are restricted to the resident Debug app.
+files go under `private_bellwether_voice/`. Gradle checks the exact rosters.
+The arrival and salvager groups can be combined with the five Kit takes in
+the same thirteen-file overlay. Keep receipts and review files outside the
+overlay root. Both audition groups are restricted to the resident Debug app
+and await owner listening approval.
+
+Stored WAVs load into SoundPool directly from the APK. Compressed assets
+and rejected direct loads use the existing cache fallback. The shared
+dialogue clock uses the measured durations. It preserves the required
+caption if a cue is unavailable or muted.
 
 For the shore lesson, stage the salvager's pinned GLB, manifest and three
 ASTC KTX2 files in `private_bellwether/salvager/` alongside the textured

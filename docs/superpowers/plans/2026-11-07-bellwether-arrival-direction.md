@@ -477,6 +477,8 @@ The Windows Debug option `--bellwether-voice-dir <local WAV directory>` and the 
 
 The five audition WAV hashes match their production manifests. Each uses 24 kHz mono PCM16, and its manifest text matches the runtime caption. The doorway take lasts 3.699333 s and the reply lasts 5.579333 s. The local review reel includes the three roadside lines, the welcome and the reply in scene order. Exact-build listening, the foley and voice balance, and public distribution clearance remain open.
 
+The combined private audition can include all thirteen pinned WAVs alongside the five-resident town. The two optional groups keep their original captions, sample lengths and listening status. Android opens stored WAVs directly from the APK and keeps cache staging for assets that need it.
+
 The private Horde audio archive retains the original MP3s, per-line review WAVs and exact text, voice and cost manifests. The Debug audition uses byte-for-byte copies, and its review receipt pins the local reel and the five source WAVs.
 
 ## Animation and gameplay acceptance gate

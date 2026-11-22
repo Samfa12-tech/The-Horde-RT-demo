@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
@@ -70,6 +71,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -8110,6 +8112,17 @@ public class MainActivity extends Activity {
     private void stopPrivateLichRevivalAudio(){if(privateLichRevivalAudio!=null)privateLichRevivalAudio.stop();}
 
     private void loadSound(final String key, final String assetPath) {
+        int directSoundId = 0;
+        try (AssetFileDescriptor descriptor = getAssets().openFd(assetPath)) {
+            directSoundId = soundPool.load(descriptor, 1);
+        } catch (IOException | RuntimeException unavailable) {
+            // Compressed assets have no file descriptor. Keep the stream-copy
+            // fallback for these and other direct-load failures.
+        }
+        if (directSoundId != 0) {
+            sounds.put(key, directSoundId);
+            return;
+        }
         final File audioDirectory = new File(getCacheDir(), "alpha_sfx");
         final File stagedSound = new File(audioDirectory, key + ".wav");
         if (!audioDirectory.exists() && !audioDirectory.mkdirs()) {
