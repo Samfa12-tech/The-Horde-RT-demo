@@ -457,9 +457,11 @@ ANDROID_CPU_STAGE_COLUMNS = (
     'blas_refit_record_ns', 'tlas_update_record_ns', 'trace_copy_record_ns',
     'frame_fence_wait_ns', 'image_acquire_ns', 'queue_submit_ns', 'present_call_ns',
 )
+ANDROID_GPU_STAGE_COLUMNS = ('gpu_as_ns', 'gpu_dispatch_ns', 'gpu_transfer_ns')
 
 
-def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False, relic_dealer=False):
+def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False, relic_dealer=False,
+                              require_gpu_stages=False):
     directory = pathlib.Path(name)
     filename = 'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv'
     with (directory / filename).open(newline='') as source:
@@ -476,7 +478,13 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
     stage_fields = fields.intersection(ANDROID_CPU_STAGE_COLUMNS)
     require(not stage_fields or stage_fields == set(ANDROID_CPU_STAGE_COLUMNS),
             'Incomplete CPU stage columns in Bellwether route report')
+    gpu_stage_columns = {'gpu_stage_serial', *ANDROID_GPU_STAGE_COLUMNS}
+    gpu_stage_fields = fields.intersection(gpu_stage_columns)
+    require(not gpu_stage_fields or gpu_stage_fields == gpu_stage_columns,
+            'Incomplete GPU stage columns in Bellwether route report')
+    require(not require_gpu_stages or gpu_stage_fields, 'GPU stage columns are required')
     cpu_samples = []
+    gpu_stage_samples = {}
     destination = 'east-fork' if resident_roundtrip else 'square'
     phases = ('room', 'doorway-outbound', destination, 'doorway-inbound')
     if resident_roundtrip:
@@ -522,6 +530,19 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
             require(all(re.fullmatch(r'[0-9]+', row[key] or '') for key in ANDROID_CPU_STAGE_COLUMNS),
                     f'Frame {serial} has a missing or invalid CPU stage interval')
             cpu_samples.append({key: int(row[key]) for key in ANDROID_CPU_STAGE_COLUMNS})
+        if gpu_stage_fields:
+            values = [row[key] for key in ANDROID_GPU_STAGE_COLUMNS]
+            if row['gpu_stage_serial'] == '0':
+                require(all(value == '' for value in values),
+                        f'Frame {serial} has GPU stage timings without a submission owner')
+                require(not require_gpu_stages, f'Frame {serial} lacks joined GPU stage timings')
+            else:
+                require(row['gpu_stage_serial'] == str(serial) and
+                        all(re.fullmatch(r'[0-9]+', value or '') for value in values),
+                        f'Frame {serial} has a missing, invalid or mismatched GPU stage interval')
+                durations = tuple(map(int, values))
+                require(durations[1] > 0, f'Frame {serial} has no positive dispatch interval')
+                gpu_stage_samples[index] = durations
         require(not resident_roundtrip or row['shader_sha256'] == shader_hash,
                 f'Frame {serial} changed the active shader')
         if resident_roundtrip:
@@ -553,6 +574,22 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
                        residentSlotSequencesByPhase={phase: [list(pair) for pair in pairs]
                                                      for phase, pairs in roster['phasePairSequences'].items()},
                        transitionCounts=roster['transitionCounts'], transitions=roster['transitions'])
+
+    def gpu_stage_summary(indices):
+        samples = [gpu_stage_samples[i] for i in indices if i in gpu_stage_samples]
+        return {column.removeprefix('gpu_').removesuffix('_ns'):
+                stats([sample[k] / 1e6 for sample in samples])
+                for k, column in enumerate(ANDROID_GPU_STAGE_COLUMNS)}
+
+    if gpu_stage_fields:
+        summary['gpuStageJoinedFrames'] = len(gpu_stage_samples)
+        summary['roomVisits'] = []
+        for visit in range(3):
+            indices = [i for i, row in enumerate(rows)
+                       if row['phase'] == 'room' and int(row['returns']) == visit and elapsed[i] >= 5e9]
+            summary['roomVisits'].append(dict(completedReturns=visit,
+                                              gpuMilliseconds=stats([int(rows[i]['gpu_ns']) / 1e6 for i in indices]),
+                                              gpuStageMilliseconds=gpu_stage_summary(indices)))
     for phase in phases:
         indices = [i for i, row in enumerate(rows) if row['phase'] == phase and elapsed[i] >= 5e9]
         require(bool(indices), f'No post-warmup frames for {phase}')
@@ -572,6 +609,8 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
                 key.removesuffix('_ns'): stats([cpu_samples[i][key] / 1e6 for i in indices])
                 for key in ANDROID_CPU_STAGE_COLUMNS
             }
+        if gpu_stage_fields:
+            phase_summary['gpuStageMilliseconds'] = gpu_stage_summary(indices)
         if resident_roundtrip:
             phase_summary['worstPresentReturnIntervalMilliseconds'] = max(phase_intervals, default=None)
         summary['phases'][phase] = phase_summary
@@ -597,9 +636,13 @@ if __name__=='__main__':
     mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
     parser.add_argument('--expect-relic-dealer', action='store_true',
                         help='Require the five-resident Android fixture, including the relic dealer')
+    parser.add_argument('--require-gpu-stages', action='store_true',
+                        help='Require joined AS, dispatch and transfer timings for every Android round-trip frame')
     args=parser.parse_args()
     if args.expect_relic_dealer and not args.android_bellwether_resident_roundtrip:
         parser.error('--expect-relic-dealer requires --android-bellwether-resident-roundtrip')
+    if args.require_gpu_stages and not args.android_bellwether_resident_roundtrip:
+        parser.error('--require-gpu-stages requires --android-bellwether-resident-roundtrip')
     if args.compare_bellwether_keeper:
         if len(args.directories) != 2:
             parser.error('--compare-bellwether-keeper expects a baseline and a candidate directory')
@@ -609,7 +652,8 @@ if __name__=='__main__':
         if args.android_bellwether_doorway or args.android_bellwether_resident_roundtrip:
             analyze_android_bellwether(name, args.analysis_name,
                                       resident_roundtrip=args.android_bellwether_resident_roundtrip,
-                                      relic_dealer=args.expect_relic_dealer)
+                                      relic_dealer=args.expect_relic_dealer,
+                                      require_gpu_stages=args.require_gpu_stages)
         elif args.bellwether_doorway or args.bellwether_resident_roundtrip:
             analyze_bellwether(name, args.analysis_name, resident_roundtrip=args.bellwether_resident_roundtrip)
         else:

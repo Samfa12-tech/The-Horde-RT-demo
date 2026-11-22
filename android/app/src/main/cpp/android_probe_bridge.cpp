@@ -425,6 +425,17 @@ struct SwapchainContext
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
 #if HORDE_RT_FRAME_STAGE_PROBE
     std::array<horde::vulkan::GpuFrameTimer,3> frameStageTimers;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    std::array<horde::telemetry::RtSubmittedFrameIdentity, kMaxFramesInFlight> bellwetherGpuStageOwners{};
+#endif
+
+    void ResetFrameStageTimingAfterIdle()
+    {
+        for (auto& timer : frameStageTimers) timer.ResetAfterDeviceIdle();
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        bellwetherGpuStageOwners = {};
+#endif
+    }
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
@@ -3491,7 +3502,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
             CurrentInitialGpuEvidenceStatus(context));
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -4061,7 +4072,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
     CancelActiveInAppBenchmark(context);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -4471,8 +4482,27 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+#if HORDE_RT_FRAME_STAGE_PROBE
+        horde::vulkan::raytracing::RtSceneGpuStageCompletedObservation bellwetherGpuStages;
+        auto& stageOwner = context.bellwetherGpuStageOwners[context.currentFrame];
+        // Each submitted stage query must be collected even if the route was
+        // canceled after submission and before its presentation was bound.
+        if (stageOwner.submissionSerial && completion.ownedGraphicsSubmission) {
+            bellwetherGpuStages.submitted = stageOwner;
+            stageOwner = {};
+            for (std::size_t i = 0; i < context.frameStageTimers.size(); ++i) {
+                auto& timer = context.frameStageTimers[i];
+                if (timer.Supported())
+                    bellwetherGpuStages.collections[i] = timer.CollectCompleted(context.currentFrame);
+            }
+        }
+#endif
         if (context.bellwetherDoorway && context.bellwetherDoorway->AwaitingFrame()) {
-            if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot)) {
+            if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot
+#if HORDE_RT_FRAME_STAGE_PROBE
+                    , bellwetherGpuStages
+#endif
+                    )) {
                 CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
             } else if (context.bellwetherDoorway->probe.Complete()) {
                 const bool residentRoundtrip = context.bellwetherDoorway->CombinedEast();
@@ -4584,6 +4614,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
 #if HORDE_RT_FRAME_STAGE_PROBE
     horde::vulkan::raytracing::RtSceneGpuStageProbe frameStageProbe(
         {{&context.frameStageTimers[0],&context.frameStageTimers[1],&context.frameStageTimers[2]}},context.currentFrame);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    bool recordingBellwetherGpuStages = false;
+#endif
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(context.stagedPassTimer, context.currentFrame);
@@ -5238,6 +5271,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         context.rtScene.SetMistEnabled(context.graphicsSettings.mistEnabled);
         context.rtScene.SetDustQuality(context.graphicsSettings.dustQuality);
+#if HORDE_RT_FRAME_STAGE_PROBE
+        const bool recordingMotionGpuStages =
+            gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished;
+        auto* activeGpuStageProbe = recordingMotionGpuStages ? &frameStageProbe : nullptr;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        recordingBellwetherGpuStages = gpuTimingRecording && !recordingMotionGpuStages &&
+            context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast();
+        if (recordingBellwetherGpuStages) activeGpuStageProbe = &frameStageProbe;
+#endif
+#endif
         const bool recorded=detail==DetailFrame::Cutover
             ? context.rtScene.RecordTraceAndCopyWithStaticReplacement(context.rtScene.StaticGeometryGeneration(),
                 retireResourceReferences,&actorOwner,context.commandBuffers[imageIndex],context.swapchainImages[imageIndex],
@@ -5247,7 +5290,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 ,gpuTimingRecording?&context.stagedPassTimer:nullptr,context.currentFrame
 #endif
 #if HORDE_RT_FRAME_STAGE_PROBE
-                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
+                , activeGpuStageProbe
 #endif
               )
             : context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
@@ -5261,7 +5304,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                                                 , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
 #endif
 #if HORDE_RT_FRAME_STAGE_PROBE
-                                                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
+                                                , activeGpuStageProbe
 #endif
                                                 );
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
@@ -5409,6 +5452,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                 context.gpuFrameTimer));
+#if HORDE_RT_FRAME_STAGE_PROBE && HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        if (recordingBellwetherGpuStages) {
+            horde::telemetry::RtSubmittedFrameIdentity owner{};
+            if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner)) {
+                context.bellwetherGpuStageOwners[context.currentFrame] = owner;
+                for (std::size_t i = 0; i < context.frameStageTimers.size(); ++i) {
+                    if (frameStageProbe.recorded[i])
+                        (void)context.frameStageTimers[i].MarkSubmitted(context.currentFrame, owner.submissionSerial);
+                }
+            }
+        }
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         if (context.motion && context.motion->armed && !context.motion->finished)
         {
@@ -5786,7 +5841,7 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
     PublishGraphicsApplied(context, true, false);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -5868,7 +5923,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
     if (vkResetCommandPool(context.device, context.commandPool, 0) != VK_SUCCESS) return false;
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -6129,7 +6184,7 @@ void SwapchainRenderLoop()
                     }
                     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+                    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                     context.stagedPassTimer.ResetAfterDeviceIdle();

@@ -2,6 +2,7 @@
 
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -43,6 +44,9 @@ public:
                    "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
         if (combinedEast_) frames_ << ",resident_slot0_id,resident_slot1_id";
         for (const auto& column : kCpuStages) frames_ << ',' << column.name;
+#if HORDE_RT_FRAME_STAGE_PROBE
+        if (combinedEast_) frames_ << ",gpu_stage_serial,gpu_as_ns,gpu_dispatch_ns,gpu_transfer_ns";
+#endif
         frames_ << "\n";
         return static_cast<bool>(frames_);
     }
@@ -77,7 +81,11 @@ public:
     bool AwaitingFrame() const { return pending_.has_value(); }
     bool CombinedEast() const { return combinedEast_; }
 
-    bool CompleteFence(const telemetry::RtPerformanceEvidenceSnapshot& sample) {
+    bool CompleteFence(const telemetry::RtPerformanceEvidenceSnapshot& sample
+#if HORDE_RT_FRAME_STAGE_PROBE
+                       , const vulkan::raytracing::RtSceneGpuStageCompletedObservation& gpuStages
+#endif
+                       ) {
         using namespace telemetry;
         const auto& tag = *pending_;
         const auto& frame = sample.identity.submitted;
@@ -118,6 +126,17 @@ public:
         if (combinedEast_) frames_ << ',' << tag.residentSourceIds[0] << ',' << tag.residentSourceIds[1];
         for (const auto& column : kCpuStages)
             frames_ << ',' << stages[RtStageIndex(column.stage)].durationNanoseconds;
+#if HORDE_RT_FRAME_STAGE_PROBE
+        if (combinedEast_) {
+            if (vulkan::raytracing::RtSceneGpuStagesMatchCompletedFrame(gpuStages, frame)) {
+                frames_ << ',' << gpuStages.submitted.submissionSerial;
+                for (const auto& collection : gpuStages.collections)
+                    frames_ << ',' << std::llround(collection.sample.milliseconds * 1e6);
+            } else {
+                frames_ << ",0,,,";
+            }
+        }
+#endif
         frames_ << '\n';
         lastSerial_ = serial;
         pending_.reset();

@@ -155,6 +155,15 @@ Use `--expect-relic-dealer` for the five-resident package. The four-resident
 fixture uses the same command without that flag. The verifier checks the
 exact sequence for the installed roster on both returns.
 
+To attribute tavern GPU time, add `-PhordeFrameStageProbe=true` to the same
+Shipping/Mobile Debug build and `--require-gpu-stages` to the verifier command.
+Launch the same checkpoint with the same settings. The verifier requires
+acceleration-structure, RT dispatch and image-transfer timestamps from each
+completed submission that passed the RT present check. It reports the three
+GPU spans by route phase and for each staffed tavern visit. These spans can
+overlap. Keep the device temperature and shader, room workload and camera
+state with the recording when comparing runs.
+
 The report measures native present-return intervals. Display timing requires
 separate display evidence. The shorter doorway check remains available under
 its existing checkpoint and report name.
