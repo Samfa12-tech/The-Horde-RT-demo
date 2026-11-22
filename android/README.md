@@ -178,10 +178,11 @@ The optional eight-file voice overlay contains the five Kit takes and
 `access.body_task.wav`, `access.body_progress.wav` and
 `hub.passing.learned_retreat.wav`.
 
-The post-benchmark Back fix from `3caefd67` is in this build. On the host,
-the opening benchmark, Android controller and campaign menu suites passed all
-115 tests. Physical confirmation of the return from benchmark results to the
-main menu and Stay/Quit dialog remains open. [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+The post-benchmark Back fix from `3caefd67` is in this build. The opening
+benchmark, Android controller and campaign menu suites passed all 115 host
+tests. The Galaxy S26 Ultra also passed results → system Back → main menu →
+Stay/Quit after completing the Standard benchmark. Cancellation, sharing and
+background/resume remain separate checks. [Device record](../docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#android-back-after-benchmark-results) · [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
 
 ### Debug diagnostics
 

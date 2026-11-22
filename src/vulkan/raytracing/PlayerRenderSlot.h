@@ -232,12 +232,14 @@ public:
                      PlayerCpuSkinCadence cadence,
                      bool& poseUpdated,
                      std::string& diagnostic,
-                     RtSceneRecordObservation* observation = nullptr);
+                     RtSceneRecordObservation* observation = nullptr,
+                     std::vector<StaticRtVertex>* upload = nullptr);
     bool PrepareUtilityCandidatePose(
         const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
         PlayerUtilitySample sample, std::uint64_t tickIndex,
         PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
-        RtSceneRecordObservation* observation = nullptr);
+        RtSceneRecordObservation* observation = nullptr,
+        std::vector<StaticRtVertex>* upload = nullptr);
     bool ShoulderCenter(const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
                         std::array<float, 3u>& center,
                         std::string& diagnostic) const;
@@ -300,7 +302,7 @@ private:
         const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
         std::optional<PlayerUtilitySample> utility, std::uint64_t tickIndex,
         PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
-        RtSceneRecordObservation* observation);
+        RtSceneRecordObservation* observation, std::vector<StaticRtVertex>* upload);
     bool DeriveAssetGripSockets(std::string& diagnostic);
     bool BuildBootGroundingProfiles(std::string& diagnostic);
 
@@ -310,6 +312,7 @@ private:
     std::vector<horde::scene::SkinnedPbrTangent> uniqueTangents_;
     horde::scene::SkinnedPlayerSockets sockets_{};
     std::uint64_t lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+    const StaticRtVertex* lastUploadData_ = nullptr;
     horde::gameplay::animation::PlayerAnimationSnapshot lastPreparedAnimation_{};
     bool hasLastPreparedAnimation_ = false;
     bool utilityCandidateReady_ = false;

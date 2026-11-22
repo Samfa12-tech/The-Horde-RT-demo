@@ -11,6 +11,8 @@
 #include <string_view>
 #include <vector>
 
+namespace horde::vulkan::raytracing { struct StaticRtVertex; }
+
 namespace horde::scene
 {
 
@@ -282,8 +284,17 @@ public:
                                       std::vector<TexturedSkinnedRtVertex>& output,
                                       std::vector<SkinnedPbrTangent>& outputTangents,
                                       std::string& diagnostic) const;
+    // The destination is the matching mesh's initialized static-PBR stream.
+    // Only position, normal and tangent change. Discard writes on failure.
+    bool SkinPlayerPoseStaticPbr(const SkinnedPlayerPose& pose,
+                                 std::span<horde::vulkan::raytracing::StaticRtVertex> output,
+                                 std::string& diagnostic) const;
 
 private:
+    bool ValidatePlayerSkinPose(const SkinnedPlayerPose& pose, std::string& diagnostic) const;
+    template<class WriteVertex>
+    bool SkinBoundPlayerVertices(const SkinnedPlayerPose& pose, WriteVertex write,
+                                 std::string& diagnostic) const;
     bool SkinUniqueGeometry(SkinnedClip clip, float timeSeconds,
                             std::string& diagnostic,
                             std::span<const SkinnedNodeRotation> additiveNodeRotations,

@@ -598,6 +598,7 @@ bool PlayerRenderSlot::LoadBoundAsset(const std::string& runtimeGlbPath,
     solvedPose_ = {};
     sockets_ = {};
     lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+    lastUploadData_ = nullptr;
     lastPreparedAnimation_ = {};
     hasLastPreparedAnimation_ = false;
     utilityCandidateReady_ = false;
@@ -808,10 +809,10 @@ bool PlayerRenderSlot::PreparePose(
     const PlayerCpuSkinCadence cadence,
     bool& poseUpdated,
     std::string& diagnostic,
-    RtSceneRecordObservation* observation)
+    RtSceneRecordObservation* observation, std::vector<StaticRtVertex>* upload)
 {
     return PrepareBoundPose(animation, std::nullopt, tickIndex, cadence,
-                            poseUpdated, diagnostic, observation);
+                            poseUpdated, diagnostic, observation, upload);
 }
 
 bool ResolvePlayerUtilitySample(
@@ -857,17 +858,17 @@ bool PlayerRenderSlot::PrepareUtilityCandidatePose(
     const horde::gameplay::animation::PlayerAnimationSnapshot& animation,
     const PlayerUtilitySample sample, const std::uint64_t tickIndex,
     const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
-    RtSceneRecordObservation* observation)
+    RtSceneRecordObservation* observation, std::vector<StaticRtVertex>* upload)
 {
     return PrepareBoundPose(animation, sample, tickIndex, cadence,
-                            poseUpdated, diagnostic, observation);
+                            poseUpdated, diagnostic, observation, upload);
 }
 
 bool PlayerRenderSlot::PrepareBoundPose(
     const horde::gameplay::animation::PlayerAnimationSnapshot& requestedAnimation,
     const std::optional<PlayerUtilitySample> utility, const std::uint64_t tickIndex,
     const PlayerCpuSkinCadence cadence, bool& poseUpdated, std::string& diagnostic,
-    RtSceneRecordObservation* observation)
+    RtSceneRecordObservation* observation, std::vector<StaticRtVertex>* upload)
 {
     // Preserve the ordinary no-copy input path. Only the explicit utility
     // candidate needs a local right-arm target override.
@@ -968,8 +969,14 @@ bool PlayerRenderSlot::PrepareBoundPose(
     const bool importedPoseAtSameTick = hasLastPreparedAnimation_ &&
         tickIndex == lastSkinnedTick_ && animation != lastPreparedAnimation_;
     const bool utilityChanged = utility != lastUtilitySample_;
+    if (upload && upload->size() != asset_.UniqueVertexCount())
+    {
+        diagnostic = "Skinned player pose does not match its static-PBR upload stream.";
+        return false;
+    }
+    const auto* uploadData = upload ? upload->data() : nullptr;
     if (!PlayerPoseNeedsRefresh(tickIndex, lastSkinnedTick_, cadence) &&
-        !importedPoseAtSameTick && !utilityChanged)
+        !importedPoseAtSameTick && !utilityChanged && uploadData == lastUploadData_)
     {
         diagnostic.clear();
         return true;
@@ -979,6 +986,10 @@ bool PlayerRenderSlot::PrepareBoundPose(
         diagnostic = "Measured player CPU skinning requires an explicitly reviewed backend.";
         return false;
     }
+
+    // A failed refresh must never let cadence reuse partially written vertices.
+    lastSkinnedTick_ = std::numeric_limits<std::uint64_t>::max();
+    hasLastPreparedAnimation_ = false;
 
     // The renderer adapter supplies gameplay-owned grip targets transformed
     // into the player's +Z-forward model space. The rig solves to those exact
@@ -1044,10 +1055,15 @@ bool PlayerRenderSlot::PrepareBoundPose(
     }
     poseScope.Complete(1u);
     RtSceneStageScope vertexScope(observation, horde::telemetry::RtStage::PlayerVertices);
-    if(!asset_.SkinPlayerPoseUniqueTextured(solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic)) {
-        vertexScope.Cancel();skinScope.Cancel();return false;
+    const bool skinned = upload ? asset_.SkinPlayerPoseStaticPbr(solvedPose_, *upload, diagnostic)
+                                : asset_.SkinPlayerPoseUniqueTextured(solvedPose_, uniqueVertices_, uniqueTangents_, diagnostic);
+    if (!skinned)
+    {
+        vertexScope.Cancel();
+        skinScope.Cancel();
+        return false;
     }
-    vertexScope.Complete(1u,0u,uniqueVertices_.size());
+    vertexScope.Complete(1u, 0u, upload ? upload->size() : uniqueVertices_.size());
     sockets_ = solvedPose_.Sockets();
     skinScope.Complete(1u);
     const auto socketError = [](const horde::scene::SkinnedNodeTransform& socket,
@@ -1095,6 +1111,7 @@ bool PlayerRenderSlot::PrepareBoundPose(
         return false;
     }
     lastSkinnedTick_ = tickIndex;
+    lastUploadData_ = uploadData;
     lastPreparedAnimation_ = animation;
     lastUtilitySample_ = utility;
     hasLastPreparedAnimation_ = true;

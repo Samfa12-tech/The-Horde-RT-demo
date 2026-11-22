@@ -900,8 +900,6 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     viewmodelAsset_ = std::move(other.viewmodelAsset_);
     viewmodelSkin_ = std::move(other.viewmodelSkin_);
-    viewmodelPoseVertices_ = std::move(other.viewmodelPoseVertices_);
-    viewmodelPoseTangents_ = std::move(other.viewmodelPoseTangents_);
     viewmodelUpload_ = std::move(other.viewmodelUpload_);
     viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
     playerBodyRemainderAvailable_ = std::exchange(other.playerBodyRemainderAvailable_, false);
@@ -2149,8 +2147,6 @@ void PresentableTinyRtScene::Destroy()
     skinnedPlayerUpload_.clear();
     viewmodelAsset_ = {};
     viewmodelSkin_ = {};
-    viewmodelPoseVertices_.clear();
-    viewmodelPoseTangents_.clear();
     viewmodelUpload_.clear();
     viewmodelAvailable_ = false;
     playerBodyRemainderAvailable_ = false;
@@ -8498,32 +8494,6 @@ void PresentableTinyRtScene::ApplyKeeperTorchBodyInstances(
     }
 }
 
-bool PresentableTinyRtScene::PackPlayerWorldBodyPoseUpload(
-    std::string& diagnostic, RtSceneRecordObservation* observation)
-{
-    const auto& skinned = playerRenderSlot_.UniqueVertices();
-    const auto& skinnedTangents = playerRenderSlot_.UniqueTangents();
-    if (skinned.size() != productionPlayerAsset_.vertices.size() ||
-        skinnedTangents.size() != skinned.size() ||
-        skinnedPlayerUpload_.size() != skinned.size())
-    {
-        diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
-        return false;
-    }
-    RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
-    // LoadStaticHeldItemAssets installs the immutable uv0/template fields once.
-    // Each solved pose replaces all four components of every dynamic field.
-    for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
-    {
-        std::copy_n(skinned[vertex].position, 4u, skinnedPlayerUpload_[vertex].position.begin());
-        std::copy_n(skinned[vertex].normal, 4u, skinnedPlayerUpload_[vertex].normal.begin());
-        std::copy_n(skinnedTangents[vertex].tangent, 4u, skinnedPlayerUpload_[vertex].tangent.begin());
-    }
-    poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
-        sizeof(horde::scene::assets::StaticRtVertex), 1u);
-    return true;
-}
-
 bool PresentableTinyRtScene::ApplyHealingFlaskInstances(
     std::span<VkAccelerationStructureInstanceKHR> instances,const RtSceneFrameInputs& frame,
     const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,std::string& diagnostic) const
@@ -9091,10 +9061,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             diagnostic="Rescue rope rig mapping rejected nonfinite authority.";return false;
         }
         if (!(utilitySample ? playerRenderSlot_.PrepareUtilityCandidatePose(rigAnimation,*utilitySample,frame.tickIndex,
-                                           playerCpuSkinCadence_,updateSkinnedPlayer,diagnostic,observation) :
+                                           playerCpuSkinCadence_,updateSkinnedPlayer,diagnostic,observation,
+                                           &skinnedPlayerUpload_) :
               playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
-                                           diagnostic, observation)))
+                                           diagnostic, observation, &skinnedPlayerUpload_)))
             return false;
         if (updateSkinnedPlayer)
         {
@@ -9109,8 +9080,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         if (updateSkinnedPlayer)
         {
-            if (!PackPlayerWorldBodyPoseUpload(diagnostic, observation))
-                return false;
             const VkDeviceSize playerOffset =
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
                 sizeof(horde::scene::assets::StaticRtVertex);
@@ -9126,37 +9095,22 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         updateViewmodel = usesViewmodel && (updateSkinnedPlayer || !viewmodelPoseCurrent_);
         if (updateViewmodel)
         {
+            viewmodelPoseCurrent_ = false;
+            if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
             const auto viewSkinBegin = std::chrono::steady_clock::now();
             RtSceneStageScope viewSkinScope(observation, horde::telemetry::RtStage::PlayerSkin);
             RtSceneStageScope viewVerticesScope(observation, horde::telemetry::RtStage::ViewmodelVertices);
-            if (!viewmodelSkin_.SkinPlayerPoseUniqueTextured(playerRenderSlot_.SolvedPose(),
-                    viewmodelPoseVertices_, viewmodelPoseTangents_, diagnostic))
+            if (!viewmodelSkin_.SkinPlayerPoseStaticPbr(playerRenderSlot_.SolvedPose(), viewmodelUpload_, diagnostic))
             {
                 viewSkinScope.Cancel();
                 viewVerticesScope.Cancel();
                 return false;
             }
-            viewVerticesScope.Complete(1u,0u,viewmodelPoseVertices_.size());
+            viewVerticesScope.Complete(1u, 0u, viewmodelUpload_.size());
             viewSkinScope.Complete(1u);
             playerSkinTotalMilliseconds_ += std::chrono::duration<double, std::milli>(
                 std::chrono::steady_clock::now() - viewSkinBegin).count();
             if (!updateSkinnedPlayer) ++playerSkinUpdateCount_;
-            if (viewmodelPoseVertices_.size() != viewmodelAsset_.vertices.size() ||
-                viewmodelPoseTangents_.size() != viewmodelPoseVertices_.size())
-            {
-                diagnostic = "Viewmodel skin output disagrees with its independent static-PBR stream.";
-                return false;
-            }
-            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
-            if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
-            for (std::size_t vertex = 0u; vertex < viewmodelUpload_.size(); ++vertex)
-            {
-                std::copy_n(viewmodelPoseVertices_[vertex].position, 4u, viewmodelUpload_[vertex].position.begin());
-                std::copy_n(viewmodelPoseVertices_[vertex].normal, 4u, viewmodelUpload_[vertex].normal.begin());
-                std::copy_n(viewmodelPoseTangents_[vertex].tangent, 4u, viewmodelUpload_[vertex].tangent.begin());
-            }
-            poseCopyScope.Complete(1u, viewmodelUpload_.size() *
-                sizeof(horde::scene::assets::StaticRtVertex), 1u);
             if (!gpuResources_.WriteBuffer(viewmodelVertexBuffer_, viewmodelUpload_.data(),
                     viewmodelUpload_.size() * sizeof(viewmodelUpload_.front()),
                     "modelled player viewmodel vertices", diagnostic, observation)) return false;

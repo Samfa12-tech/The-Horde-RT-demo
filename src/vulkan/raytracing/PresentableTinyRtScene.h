@@ -1479,8 +1479,6 @@ private:
                                  Buffer& out,
                                  std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
                                  std::string& diagnostic);
-    bool PackPlayerWorldBodyPoseUpload(std::string& diagnostic,
-                                      RtSceneRecordObservation* observation = nullptr);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
@@ -1749,8 +1747,6 @@ private:
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;
     horde::scene::SkinnedMeshAsset viewmodelSkin_;
-    std::vector<horde::scene::TexturedSkinnedRtVertex> viewmodelPoseVertices_;
-    std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
     std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
     bool viewmodelAvailable_ = false;
     bool playerBodyRemainderAvailable_ = false;

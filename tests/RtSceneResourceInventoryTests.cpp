@@ -638,7 +638,24 @@ struct PresentableTinyRtSceneObservationTestAccess
         horde::scene::SkinnedMeshAsset reference;
         if (!reference.LoadClips((root / "models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
                                  horde::scene::PlayerLocomotionClipSet(), diagnostic)) return false;
-        std::vector<StaticRtVertex> legacy;
+        if (!scene.viewmodelAvailable_) return false;
+        std::vector<horde::scene::TexturedSkinnedRtVertex> vertices;
+        std::vector<horde::scene::SkinnedPbrTangent> tangents;
+        const auto repack = [](std::vector<StaticRtVertex>& upload, const auto& source, const auto& sourceTangents) {
+            for (std::size_t vertex = 0; vertex < upload.size(); ++vertex)
+            {
+                std::copy_n(source[vertex].position, 4, upload[vertex].position.begin());
+                std::copy_n(source[vertex].normal, 4, upload[vertex].normal.begin());
+                std::copy_n(sourceTangents[vertex].tangent, 4, upload[vertex].tangent.begin());
+            }
+        };
+        const auto matchesBytes = [](const std::vector<StaticRtVertex>& left, const std::vector<StaticRtVertex>& right) {
+            return left.size() == right.size() &&
+                std::memcmp(left.data(), right.data(), left.size() * sizeof(StaticRtVertex)) == 0;
+        };
+        auto legacy = scene.productionPlayerAsset_.vertices;
+        auto viewmodel = scene.viewmodelAsset_.vertices;
+        auto legacyViewmodel = viewmodel;
         for (std::uint64_t tick = 1; tick <= 12; ++tick)
         {
             PlayerAnimationSnapshot animation;
@@ -664,31 +681,50 @@ struct PresentableTinyRtSceneObservationTestAccess
             animation.rightIk.target = {{-.16f,1.10f,.35f}}; animation.rightIk.pole = {{-1,0,1}};
             bool updated = false;
             if (!scene.playerRenderSlot_.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
-                                                    updated, diagnostic) || !updated) return false;
-            legacy = scene.productionPlayerAsset_.vertices;
-            const auto& vertices = scene.playerRenderSlot_.UniqueVertices();
-            const auto& tangents = scene.playerRenderSlot_.UniqueTangents();
-            for (std::size_t v = 0; v < vertices.size(); ++v) {
-                std::copy_n(vertices[v].position, 4, legacy[v].position.begin());
-                std::copy_n(vertices[v].normal, 4, legacy[v].normal.begin());
-                std::copy_n(tangents[v].tangent, 4, legacy[v].tangent.begin());
-            }
-            if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic) ||
-                std::memcmp(legacy.data(), scene.skinnedPlayerUpload_.data(), legacy.size()*sizeof(StaticRtVertex)))
+                                                    updated, diagnostic, nullptr, &scene.skinnedPlayerUpload_) ||
+                !updated) return false;
+            const auto& pose = scene.playerRenderSlot_.SolvedPose();
+            if (!reference.SkinPlayerPoseUniqueTextured(pose, vertices, tangents, diagnostic) ||
+                vertices.size() != legacy.size() || tangents.size() != legacy.size()) return false;
+            repack(legacy, vertices, tangents);
+            if (!matchesBytes(legacy, scene.skinnedPlayerUpload_))
             { std::cerr << "Player upload byte parity failed at pose " << tick << '\n'; return false; }
+
+            if (!scene.viewmodelSkin_.SkinPlayerPoseStaticPbr(pose, viewmodel, diagnostic) ||
+                !scene.viewmodelSkin_.SkinPlayerPoseUniqueTextured(pose, vertices, tangents, diagnostic) ||
+                vertices.size() != legacyViewmodel.size() || tangents.size() != legacyViewmodel.size()) return false;
+            repack(legacyViewmodel, vertices, tangents);
+            if (!matchesBytes(legacyViewmodel, viewmodel))
+            { std::cerr << "Viewmodel upload byte parity failed at pose " << tick << '\n'; return false; }
+
+            if (tick == 12)
+            {
+                const auto prepare = [&](std::vector<StaticRtVertex>& upload) {
+                    return scene.playerRenderSlot_.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
+                                                               updated, diagnostic, nullptr, &upload);
+                };
+                auto separateUpload = scene.productionPlayerAsset_.vertices;
+                if (!prepare(scene.skinnedPlayerUpload_) || updated ||
+                    !prepare(separateUpload) || !updated || !matchesBytes(legacy, separateUpload)) return false;
+                separateUpload.pop_back();
+                if (prepare(separateUpload) || updated ||
+                    scene.viewmodelSkin_.SkinPlayerPoseStaticPbr(pose, {}, diagnostic)) return false;
+            }
         }
         if (benchmark)
         {
-            // Actual production packing seam, already solved pose. No skinning,
-            // Vulkan upload or GPU work is timed. Both builds use this same caller.
+            // Keep the previous repack measurement available as a reference.
+            if (!reference.SkinPlayerPoseUniqueTextured(scene.playerRenderSlot_.SolvedPose(),
+                    vertices, tangents, diagnostic) || vertices.size() != legacy.size() ||
+                tangents.size() != legacy.size()) return false;
             constexpr unsigned inner = 16, samples = 301;
             for (unsigned i = 0; i < 64; ++i)
-                if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+                repack(legacy, vertices, tangents);
             std::cout << "player_upload_copy_us=[";
             for (unsigned i = 0; i < samples; ++i) {
                 const auto begin = std::chrono::steady_clock::now();
                 for (unsigned j = 0; j < inner; ++j)
-                    if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+                    repack(legacy, vertices, tangents);
                 const double us = std::chrono::duration<double,std::micro>(
                     std::chrono::steady_clock::now()-begin).count() / inner;
                 std::cout << (i ? "," : "") << us;
@@ -696,8 +732,6 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::cout << "]\nvertices=" << legacy.size() << " bytes=" << legacy.size()*sizeof(StaticRtVertex)
                       << " calls_per_sample=" << inner << '\n';
         }
-        scene.skinnedPlayerUpload_.pop_back();
-        if (scene.PackPlayerWorldBodyPoseUpload(diagnostic)) { std::cerr << "Short upload accepted\n"; return false; }
         // Same-count reload must replace all static fields, not trust size/empty.
         scene.skinnedPlayerUpload_ = legacy;
         for (auto& v : scene.skinnedPlayerUpload_) v.uv0 = {{91,92,93,94}};
