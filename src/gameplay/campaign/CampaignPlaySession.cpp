@@ -70,6 +70,7 @@ bool PlaySession::ObserveSafeBoundary() {
         return changed;
     }
     const bool bellwetherProgressAdvanced=latest_ && (
+        (captured->bellwetherAnkleAssessed && !latest_->bellwetherAnkleAssessed) ||
         captured->dialogue.hearthLinesResolved>latest_->dialogue.hearthLinesResolved ||
         captured->dialogue.tavernConversationLinesResolved>latest_->dialogue.tavernConversationLinesResolved ||
         captured->dialogue.tavernLanternLinesStarted>latest_->dialogue.tavernLanternLinesStarted ||

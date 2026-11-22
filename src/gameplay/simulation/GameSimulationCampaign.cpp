@@ -34,7 +34,8 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
         c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,
-        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted,c.privyRagDelivered);};
+        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted,c.privyRagDelivered,
+        c.bellwetherAnkleAssessed);};
     return facts(a)==facts(b);
 }
 }
@@ -79,6 +80,17 @@ static void RecordMillPreparation(campaign::Checkpoint& checkpoint,bellwether::M
     if(preparation==bellwether::MillPreparation::Unexamined)return;
     checkpoint.millPreparation=preparation;
     checkpoint.schema=std::max(checkpoint.schema,campaign::kMillPreparationSchema);
+}
+
+static bool BellwetherAssessmentFinished(const dialogue::CompanionSnapshot& kit,const dialogue::Snapshot& speech) {
+    return kit.bellwetherArrival>=dialogue::BellwetherArrivalStage::ProtectiveApproach &&
+        !dialogue::IsRoadLine(speech.line);
+}
+
+static void RecordBellwetherAssessment(campaign::Checkpoint& checkpoint) {
+    checkpoint.flaskRecorded=campaign::HasFlaskResources(checkpoint);
+    checkpoint.schema=campaign::kBellwetherAnkleSchema;
+    checkpoint.bellwetherAnkleAssessed=true;
 }
 
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
@@ -224,6 +236,8 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         c.privyRagDelivered=true;
         c.schema=std::max(c.schema,campaign::kPrivyRagSchema);
     }
+    if(c.contentRevision==campaign::kForestContentRevision &&
+       BellwetherAssessmentFinished(kit,chapterDialogue_.State()))RecordBellwetherAssessment(c);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -337,6 +351,21 @@ void GameSimulation::LatchCampaignBoundary() {
             if(atTavernBoundary)return;
         }
         if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint) {
+            if(campaignBoundary_->contentRevision==campaign::kForestContentRevision &&
+               !campaignBoundary_->bellwetherAnkleAssessed && chapterTerrain_ &&
+               chapterTerrainGeneration_==worldRoute_.generation &&
+               BellwetherAssessmentFinished(chapterCompanion_.State(),chapterDialogue_.State())) {
+                // Keep the earned safe anchor and its resources while recording
+                // the completed story beat before the tavern save is available.
+                auto updated=*campaignBoundary_;
+                RecordBellwetherAssessment(updated);
+                dialogue::CompanionRouteFixture restoredKit;
+                if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_) &&
+                   restoredKit.RestoreCampaignBellwetherApproach(*chapterTerrain_,0)) {
+                    campaignBoundary_=updated;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
             // Preserve endpoint ownership away from it, but an eligible Rest or
             // resource change at that earned anchor must refresh logical state.
             if(config_.healingFlask1_7) {
@@ -521,6 +550,9 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     if(c.contentRevision==campaign::kBellwetherContentRevision) {
         if(!next.chapterCompanion_.RestoreCampaignTavernSeat(*next.chapterTerrain_,chapterCompanion_.State().generation))return false;
         if(next.IsBellwetherTavernKeeperReady())next.tavernKeeper_.RestoreAtHearth(*next.chapterTerrain_);
+    } else if(c.bellwetherAnkleAssessed) {
+        if(!next.chapterCompanion_.RestoreCampaignBellwetherApproach(*next.chapterTerrain_,
+                chapterCompanion_.State().generation))return false;
     } else if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     else if(upper && config_.healingFlask1_7 &&

@@ -73,6 +73,28 @@ public:
         state_.y=support.worldY;state_.wait=state_.grounded?CompanionWait::Lookout:CompanionWait::Obstacle;
         state_.yaw=std::atan2(playerX-state_.x,state_.z-playerZ);
     }
+    bool RestoreCampaignBellwetherApproach(const simulation::TriangleSupportSurface& terrain,
+                                           std::uint64_t generationFloor) {
+        using namespace traversal;
+        if(generationFloor==UINT64_MAX || !BellwetherRoadAdmitted(terrain))return false;
+        const auto mark=kBellwetherTavernRoute[kBellwetherAnkleStation];
+        const auto next=kBellwetherTavernRoute[kBellwetherAnkleStation+1];
+        constexpr float radius=.24f;
+        const auto support=ChapterExteriorStepSupport(terrain,mark.x,mark.z,radius);
+        if(!support.grounded || !ResolveChapterStepMovement(terrain,mark.x,mark.z,mark.x,mark.z,
+                support.worldY,radius).accepted)return false;
+        Reset();
+        state_.generation=generationFloor+1;
+        state_.x=mark.x;state_.y=support.worldY;state_.z=mark.z;
+        state_.yaw=std::atan2(next.x-mark.x,mark.z-next.z);
+        state_.grounded=true;
+        state_.waypoint=simulation::kWorldRoutePoints.size();
+        state_.bellwetherArrival=BellwetherArrivalStage::ProtectiveApproach;
+        state_.bellwetherStation=kBellwetherAnkleStation+1;
+        state_.motion.anklePlaybackSeconds=kAnkleAssessmentDurationSeconds;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
     void RestoreCampaignBasin(float playerX,float playerZ,
         const simulation::TriangleSupportSurface* terrain,std::uint64_t generationFloor) {
         state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=generationFloor+1;
@@ -181,19 +203,23 @@ public:
         if(along<.16f || along>1.12f || std::hypot(playerX-(lookout.x+dx*along),
             playerZ-(lookout.z+dz*along))>2.0f)return false;
 
-        // Admitted ground and solids are the authority for the road opening.
-        // A historical scene with the old turnaround rails cannot start it.
-        const auto road=kBellwetherTavernRoute[2];
-        const auto roadX=[&](float z){return std::lerp(turnaround.x,road.x,(z-turnaround.z)/(road.z-turnaround.z));};
-        constexpr float beforeRails=52.8f,afterRails=55.6f;
-        const auto support=ChapterExteriorSupport(&terrain,roadX(beforeRails),beforeRails);
-        if(!support.grounded || !ChapterExteriorMovementClear(terrain,roadX(beforeRails),beforeRails,
-                roadX(afterRails),afterRails,support.worldY,.24f))return false;
+        if(!BellwetherRoadAdmitted(terrain))return false;
         state_.bellwetherArrival=BellwetherArrivalStage::OnRoad;
         state_.wait=CompanionWait::Tavern;
         return true;
     }
 private:
+    static bool BellwetherRoadAdmitted(const simulation::TriangleSupportSurface& terrain) {
+        using namespace traversal;
+        // Historical scenes retain the turnaround rails across the road.
+        const auto turnaround=kBellwetherTavernRoute[1];
+        const auto road=kBellwetherTavernRoute[2];
+        const auto roadX=[&](float z){return std::lerp(turnaround.x,road.x,(z-turnaround.z)/(road.z-turnaround.z));};
+        constexpr float beforeRails=52.8f,afterRails=55.6f;
+        const auto support=ChapterExteriorSupport(&terrain,roadX(beforeRails),beforeRails);
+        return support.grounded && ChapterExteriorMovementClear(terrain,roadX(beforeRails),beforeRails,
+                roadX(afterRails),afterRails,support.worldY,.24f);
+    }
     bool BindTavernChair(const simulation::TriangleSupportSurface& terrain) {
         using namespace bellwether;
         const auto [x,y,z]=kChairSitRoot;

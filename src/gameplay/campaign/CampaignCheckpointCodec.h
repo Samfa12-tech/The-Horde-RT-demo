@@ -26,6 +26,7 @@ enum class Error {
 // the wayside archive. Schema9 appends a canonical reveal-started bool.
 // Schema10 appends a canonical register-recovered bool.
 // Schema11 appends a canonical register-interpreted bool.
+// Schema20 appends a canonical completed roadside assessment bool.
 // Older records receive default values for absent fields.
 // Schema and payload length must agree. The payload encodes logical values;
 // integers are LE32, floats IEEE754 binary32, bools a single 0/1 byte.

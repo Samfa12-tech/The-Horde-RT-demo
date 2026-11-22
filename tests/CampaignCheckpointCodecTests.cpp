@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kPrivyRagSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203};
+    constexpr std::array<std::size_t,cp::kBellwetherAnkleSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203,204};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -127,6 +127,23 @@ int main() {
     Check(!cp::Validate(unearnedPrivy),"schema18 cannot carry a delivered privy fact");
     unearnedPrivy=deliveredPrivy;unearnedPrivy.contentRevision=cp::kForestContentRevision;
     Check(!cp::Validate(unearnedPrivy),"the delivered fact requires Bellwether content revision");
+    auto assessed=Endpoint();
+    assessed.schema=cp::kBellwetherAnkleSchema;
+    assessed.bellwetherAnkleAssessed=true;
+    RoundTrip(assessed);
+    auto badAnkle=Encode(assessed);
+    Check(badAnkle.size()==204 && badAnkle.back()==std::byte{1},"schema20 appends the roadside fact");
+    badAnkle.back()=std::byte{2};Rechecksum(badAnkle);
+    Reject(badAnkle,codec::Error::Malformed);
+    auto unearnedAnkle=assessed;unearnedAnkle.dialogue.forestVillageConsumed=false;
+    Check(!cp::Validate(unearnedAnkle),"the roadside fact requires the completed lookout story");
+    unearnedAnkle=assessed;unearnedAnkle.schema=cp::kPrivyRagSchema;
+    Check(!cp::Validate(unearnedAnkle),"schema19 cannot silently drop the roadside fact");
+    auto oldLookout=Endpoint();oldLookout.schema=cp::kPrivyRagSchema;
+    const auto oldBytes=Encode(oldLookout);
+    codec::Error oldError{};
+    Check(codec::Decode(oldBytes,assessed,oldError) && !assessed.bellwetherAnkleAssessed &&
+          Encode(assessed)==oldBytes,"earlier lookout saves still begin before the assessment");
     for(unsigned line=1;line<=3;++line) {
         auto spoken=tavern;spoken.dialogue.hearthLinesResolved=line;
         Check(!cp::Validate(spoken),"old schema cannot silently drop hearth progress");
@@ -301,7 +318,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kPrivyRagSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kBellwetherAnkleSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -422,7 +439,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kPrivyRagSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kBellwetherAnkleSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -467,7 +484,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kPrivyRagSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kBellwetherAnkleSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;

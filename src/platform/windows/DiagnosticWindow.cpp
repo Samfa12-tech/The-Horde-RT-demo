@@ -226,6 +226,7 @@ bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
+bool gBellwetherAnkleRestoreValidation = false;
 bool gBellwetherExpeditionValidation = false;
 bool gBellwetherPreparationsValidation = false;
 bool gBellwetherHearthRestValidation = false;

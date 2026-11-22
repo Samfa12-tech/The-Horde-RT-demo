@@ -989,7 +989,7 @@ int FinishHiddenLookoutValidation(HWND owner,int result)
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
     const int baseTimeLimit = gBellwetherPreparationsValidation ? 360 : gBellwetherExpeditionValidation ? 230 :
         gBellwetherCombinedCampaignActors && gBellwetherEarnTavernValidation ? 180 :
-        gBellwetherHearthRestValidation ? 110 : 90;
+        gBellwetherAnkleRestoreValidation ? 180 : gBellwetherHearthRestValidation ? 110 : 90;
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
         (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation);
     const int westernAllowance = verifiesSilver ? (gBellwetherPreparationsValidation ? 225 : 135) : 0;
@@ -1205,7 +1205,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
     const int baseTimeLimit =
         gBellwetherPreparationsValidation ? 325 : gBellwetherExpeditionValidation ? 205 :
         gBellwetherCombinedRelicDealer ? 205 : gBellwetherCombinedCampaignActors ? 150 :
-        gBellwetherHearthRestValidation ? 85 : 65;
+        gBellwetherAnkleRestoreValidation ? 150 : gBellwetherHearthRestValidation ? 85 : 65;
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
         (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation);
     // The mixed campaign walks and reloads both western and preparation routes.
@@ -1259,6 +1259,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             input.moveForward = input.moveStrafe = 0;
             input.pitchRadians = -.15f;
             unsigned ticks = 0, exchangeLines = 0, presentationInterval = 60;
+            bool assessmentObserved = false, ankleReloaded = false, ankleReplayed = false;
+            std::optional<campaign::Checkpoint> lookoutBeforeAssessment;
             const auto step = [&] {
                 if (std::chrono::steady_clock::now() >= deadline) {
                     std::cerr << "Bellwether campaign validation deadline at tick " << state.tickIndex << '\n';
@@ -1270,6 +1272,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 ctx.simulationInput = input;
                 ctx.inputPublicationSequence = std::max(ctx.inputPublicationSequence, state.inputPublicationSequence) + 1;
                 ctx.simulation.StepFixed(input, 1.f / 60.f, ctx.inputPublicationSequence);
+                if (gBellwetherAnkleRestoreValidation) {
+                    const bool assessing = state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::AnkleAssessment;
+                    assessmentObserved |= assessing;
+                    if (assessing && !ankleReloaded)
+                        lookoutBeforeAssessment = ctx.simulation.LatestCampaignBoundary();
+                    if (ankleReloaded) {
+                        const auto events = ctx.simulation.Events().Events();
+                        ankleReplayed |= assessing || IsRoadLine(state.chapterDialogue.line) ||
+                            std::any_of(events.begin(), events.end(), [](const auto& event) {
+                                return event.type == horde::gameplay::simulation::GameplayEventType::KitAnkleFoley;
+                            });
+                    }
+                }
                 if (exchangeLines < kTavernConversation.size() &&
                     state.chapterDialogue.line == kTavernConversation[exchangeLines])
                     ++exchangeLines;
@@ -1299,7 +1314,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     if (!step()) return false;
                 return ready();
             };
-            const auto reloadTavern = [&] {
+            const auto reloadCheckpoint = [&] {
                 const auto generation = state.worldRoute.generation;
                 const auto operation = ctx.campaign->State().operationRevision;
                 ShowPauseMenu(ctx, true);
@@ -1321,9 +1336,47 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             // The scripted player runs ahead. Let Kit complete his independent
             // walk, sit and hearth lines on the same fixed-step clock.
             constexpr unsigned hearthWaitTicks = 120 * 60;
-            bool progressed = atLookout && step() &&
+            bool progressed = atLookout && step();
+            if (progressed && gBellwetherAnkleRestoreValidation) {
+                constexpr auto station = horde::gameplay::traversal::kBellwetherAnkleStation;
+                const auto assessmentSaved = [&] {
+                    const auto& boundary = ctx.simulation.LatestCampaignBoundary();
+                    return boundary && boundary->bellwetherAnkleAssessed &&
+                        boundary->id == campaign::CheckpointId::ForestEndpoint;
+                };
+                campaign::storage::StoredCheckpoint assessed;
+                const bool autosaved = std::all_of(kBellwetherTavernRoute.begin(),
+                    kBellwetherTavernRoute.begin() + station + 1, walkTo) &&
+                    waitFor(assessmentSaved, hearthWaitTicks) && until([&] {
+                        return campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", assessed).status ==
+                            campaign::storage::Status::Read && assessed.checkpoint.bellwetherAnkleAssessed &&
+                            ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                    }, false);
+                auto expected = lookoutBeforeAssessment.value_or(gHiddenLookout.source.checkpoint);
+                expected.flaskRecorded = campaign::HasFlaskResources(expected);
+                expected.schema = campaign::kBellwetherAnkleSchema;
+                expected.bellwetherAnkleAssessed = true;
+                expected.savedAtUnixSeconds = assessed.checkpoint.savedAtUnixSeconds;
+                std::vector<std::byte> expectedBytes;
+                campaign::codec::Error codecError{};
+                progressed = check(autosaved && assessmentObserved && lookoutBeforeAssessment &&
+                    campaign::codec::Encode(expected, expectedBytes, codecError) && assessed.encoded == expectedBytes,
+                    "the completed ankle assessment updates the existing lookout autosave and preserves its safe state");
+                ankleReloaded = progressed && reloadCheckpoint();
+                const auto& kit = state.chapterCompanion;
+                const auto& mark = kBellwetherTavernRoute[station];
+                progressed = check(ankleReloaded && state.playerX == expected.position.x &&
+                    state.playerZ == expected.position.z && kit.grounded && kit.x == mark.x && kit.z == mark.z &&
+                    kit.bellwetherArrival == BellwetherArrivalStage::ProtectiveApproach &&
+                    kit.bellwetherStation == station + 1 && state.chapterDialogue.line == Line::None && frame(),
+                    "native Load presents Kit after the injury and retains the player's safe lookout spawn");
+            }
+            progressed = progressed &&
                 std::all_of(kBellwetherTavernRoute.begin(), kBellwetherTavernRoute.end(), walkTo) &&
                 walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, hearthWaitTicks);
+            if (gBellwetherAnkleRestoreValidation)
+                progressed = check(progressed && ankleReloaded && !ankleReplayed,
+                    "the resumed walk reaches the hearth without replaying the injury, captions or foley");
             progressed = check(progressed && atHearth() && frame(),
                 "fixed-step movement from the loaded lookout reaches the staffed hearth through the south door");
             if (!progressed)
@@ -1375,7 +1428,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             }
             if (progressed) {
                 const auto deferredBeforeReload = ctx.rtScene.BellwetherFurnitureLifetimeEvidence().deferredNearFrames;
-                const bool reloaded = reloadTavern();
+                const bool reloaded = reloadCheckpoint();
                 const bool nearPresentedOnLoad = reloaded &&
                     ctx.rtScene.DebugRecordedBellwetherFurnitureDetail()==horde::scene::BellwetherFurnitureDetail::Near &&
                     ctx.rtScene.BellwetherFurnitureLifetimeEvidence().deferredNearFrames==deferredBeforeReload;
@@ -1677,7 +1730,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         }, false);
                     };
                     const auto reloadWithTownResidents = [&] {
-                        if (!reloadTavern() || !atHearth()) return false;
+                        if (!reloadCheckpoint() || !atHearth()) return false;
                         const auto readyBy=std::chrono::steady_clock::now()+std::chrono::milliseconds(750);
                         while (!state.recordKeeper && std::chrono::steady_clock::now() < readyBy)
                             if (!frame()) return false;
@@ -1952,7 +2005,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         eastern.checkpoint.vitality == stored.checkpoint.vitality &&
                         eastern.checkpoint.treasurePurse == stored.checkpoint.treasurePurse &&
                         eastern.checkpoint.privyRagDelivered == stored.checkpoint.privyRagDelivered &&
-                        !eastern.checkpoint.airWardLearned && reloadTavern() && step() && atHearth() &&
+                        !eastern.checkpoint.airWardLearned && reloadCheckpoint() && step() && atHearth() &&
                         state.salvagerShorePracticeCompleted && state.millPreparation == MillPreparation::RigTested &&
                         state.millLeakTestPhase == MillLeakTestPhase::Idle &&
                         state.treasurePurse == stored.checkpoint.treasurePurse &&
@@ -1995,7 +2048,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "native autosave persists the refilled flask at the same earned tavern boundary");
                     if (progressed) {
                         const auto restGeneration = state.completedRestGeneration;
-                        progressed = check(reloadTavern() && step() && atHearth() && frame() &&
+                        progressed = check(reloadCheckpoint() && step() && atHearth() && frame() &&
                             state.healingFlask.resources == rested.checkpoint.flask &&
                             state.healingFlask.action == FlaskAction::Idle && state.completedRestGeneration == restGeneration,
                             "native Load presents the rested save without replaying Rest");
@@ -2220,7 +2273,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
                     if (progressed) {
                         campaign::storage::StoredCheckpoint resumed;
-                        progressed = check(reloadTavern() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
+                        progressed = check(reloadCheckpoint() && step() && atHearth() && state.waysideArchive.registerInterpreted &&
                             state.chapterDialogue.tavernLanternLinesStarted == kTavernLanternExchange.size() &&
                             state.treasurePurse == fitted && state.waysideArchive.airWardLearned &&
                             state.waysideArchive.stage == ArchiveStage::Restored &&
@@ -2288,7 +2341,7 @@ bool ConfigureHiddenCampaignValidation()
 {
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
     bool requested=false,lookoutRequested=false,earnTavernRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
-    bool expeditionRequested = false, preparationsRequested = false, hearthRestRequested = false;
+    bool expeditionRequested = false, preparationsRequested = false, hearthRestRequested = false, ankleRestoreRequested = false;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -2297,6 +2350,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--benchmark-menu-detached-close")detachedCloseRequested=true;
         if(arg==L"--lookout-validate-hidden")lookoutRequested=true;
         if(arg==L"--bellwether-earn-tavern")earnTavernRequested=true;
+        if(arg==L"--bellwether-verify-ankle-restore"){earnTavernRequested=true;ankleRestoreRequested=true;}
         if(arg==L"--bellwether-verify-expedition-leads"){earnTavernRequested=true;expeditionRequested=true;}
         if(arg==L"--bellwether-verify-preparations"){earnTavernRequested=true;expeditionRequested=true;preparationsRequested=true;}
         if(arg==L"--bellwether-verify-hearth-rest"){earnTavernRequested=true;hearthRestRequested=true;}
@@ -2367,6 +2421,7 @@ bool ConfigureHiddenCampaignValidation()
         std::cerr<<"Hidden lookout validation requires the unchanged caller-exported single ForestEndpoint autosave and canonical manifest only.\n";return false;
     }
     gBellwetherEarnTavernValidation = earnTavernRequested;
+    gBellwetherAnkleRestoreValidation = ankleRestoreRequested;
     gBellwetherExpeditionValidation = expeditionRequested;
     gBellwetherPreparationsValidation = preparationsRequested;
     gBellwetherHearthRestValidation = hearthRestRequested;
