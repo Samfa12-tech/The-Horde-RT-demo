@@ -39,6 +39,7 @@
 #include <optional>
 #include <memory>
 #include <string>
+#include <future>
 #include <string_view>
 #include <vector>
 #include <span>
@@ -497,6 +498,14 @@ public:
         const std::filesystem::path& directory, bool (*retireReferences)(void*, std::string&),
         void* user, std::string& diagnostic);
     bool ReplaceChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    // Import exclusively owned CPU data off the frame thread. Active actor
+    // geometry, texture layers and ray visibility stay untouched until publication.
+    [[nodiscard]] std::uint32_t PrefetchedChapterResidentId(std::size_t lane) const noexcept;
+    bool PrefetchChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        std::string& diagnostic);
+    enum class ResidentPublication { Pending, Published, Failed };
+    ResidentPublication PublishPrefetchedChapterResidentActor(std::uint32_t activeId, std::uint32_t incomingId,
         bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
@@ -1393,6 +1402,9 @@ private:
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
     bool LoadChapterResidents(std::string&);
+    bool CommitChapterResidentReplacement(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        horde::scene::assets::SkinnedPbrActor* imported,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     bool RetireReplacedChapterResidents(bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     bool BuildChapterResidentStructures(std::string&);
     bool PrepareChapterResidents(const RtSceneFrameInputs&, std::span<VkAccelerationStructureInstanceKHR>,
@@ -1646,8 +1658,18 @@ private:
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;
+    struct ChapterResidentImport {
+        horde::scene::assets::SkinnedPbrActor actor;
+        std::string diagnostic;
+        bool ready = false;
+    };
+    struct ChapterResidentPrefetch {
+        ChapterResidentActorSource source;
+        std::future<ChapterResidentImport> import;
+    };
     struct ChapterResidentActor {
         horde::scene::assets::SkinnedPbrActor actor;
+        ChapterResidentPrefetch prefetch;
         AccelerationStructure blas;
         Buffer scratch;
         AccelerationStructure retiredBlas;

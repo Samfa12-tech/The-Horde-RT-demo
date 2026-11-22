@@ -122,21 +122,35 @@ inline bool AdvanceBellwetherCombinedResidents(PresentableTinyRtScene& scene,
     const bool south = atTown && snapshot.playerX >= 74.f &&
         snapshot.playerZ >= (active[1] == roster[3].actor ? 118.5f : 120.f);
     const std::array desired{east ? roster[2] : roster[0], (east || south) ? roster[3] : roster[1]};
+    const bool approachingHandoff = atTown && snapshot.playerX >= 68.f && snapshot.playerZ >= 100.f;
+    using Publication = PresentableTinyRtScene::ResidentPublication;
+    bool failed = false;
     for (std::size_t lane = 0; lane < desired.size(); ++lane) {
-        if (active[lane] == desired[lane].actor) continue;
-        if (!scene.ReplaceChapterResidentActor(active[lane], detail::ResidentSource(root, desired[lane]),
-                retireReferences, user, diagnostic)) {
-            // The other lane may have succeeded. Never send a pose for a model
-            // that the renderer did not publish.
-            (void)simulation.PublishBellwetherResidents(detail::ResidentMaskFor(scene.ChapterResidentSourceIds()));
-            return false;
+        const bool switching = active[lane] != desired[lane].actor;
+        if (!approachingHandoff && !switching) continue;
+        // Each lane owns one alternate model and keeps it through a reversal.
+        const auto& alternate = roster[active[lane] == roster[lane].actor ? lane + desired.size() : lane];
+        if (scene.PrefetchedChapterResidentId(lane) != alternate.actor &&
+            !scene.PrefetchChapterResidentActor(active[lane], detail::ResidentSource(root, alternate), diagnostic)) {
+            failed = true;
+            break;
         }
-        active[lane] = desired[lane].actor;
+        if (!switching) continue;
+        const auto status = scene.PublishPrefetchedChapterResidentActor(active[lane], desired[lane].actor,
+            retireReferences, user, diagnostic);
+        if (status == Publication::Failed) {
+            failed = true;
+            break;
+        }
+        if (status == Publication::Published) active[lane] = desired[lane].actor;
     }
+    // A pending or failed lane keeps its old resources. An independently
+    // completed swap must still reach the simulation on this same frame.
     if (!simulation.PublishBellwetherResidents(detail::ResidentMaskFor(active))) {
         diagnostic = "Combined Bellwether could not publish its resident roster to the shared simulation.";
         return false;
     }
+    if (failed) return false;
     diagnostic.clear();
     return true;
 }

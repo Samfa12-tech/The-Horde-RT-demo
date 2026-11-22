@@ -31,6 +31,7 @@
 #include "graphics/GraphicsPreviewSession.h"
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include <locale>
 #include "vulkan/raytracing/ChestGuidanceLight.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
@@ -3483,6 +3484,98 @@ bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
     ChapterResidentActorSource replacement, bool (*retireReferences)(void*, std::string&),
     void* user, std::string& diagnostic)
 {
+    return CommitChapterResidentReplacement(activeId, std::move(replacement), nullptr,
+        retireReferences, user, diagnostic);
+}
+
+std::uint32_t PresentableTinyRtScene::PrefetchedChapterResidentId(std::size_t lane) const noexcept
+{
+    return lane < chapterResidentSources_.size() ? chapterResidents_[lane].prefetch.source.stableId : 0u;
+}
+
+bool PresentableTinyRtScene::PrefetchChapterResidentActor(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, std::string& diagnostic)
+{
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (!ready_ || current == chapterResidentSources_.end() || !current->replacementCapacity.vertices ||
+        !replacement.stableId || activeId == replacement.stableId || replacement.directory.empty() ||
+        replacement.fileName.empty() || replacement.clips.empty())
+    {
+        diagnostic = "Resident prefetch requires a reserved live lane and a complete alternate source.";
+        return false;
+    }
+    auto& prefetch = chapterResidents_[current - chapterResidentSources_.begin()].prefetch;
+    if (prefetch.import.valid())
+    {
+        diagnostic = "Resident prefetch already owns this lane.";
+        return false;
+    }
+    try
+    {
+        auto import = std::async(std::launch::async, [replacement] {
+            ChapterResidentImport result;
+            result.ready = result.actor.Load(replacement.directory, replacement.fileName.c_str(),
+                replacement.clips, result.diagnostic);
+            return result;
+        });
+        prefetch.source = std::move(replacement);
+        prefetch.import = std::move(import);
+    }
+    catch (const std::exception& exception)
+    {
+        diagnostic = std::string("Resident prefetch could not start: ") + exception.what();
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+PresentableTinyRtScene::ResidentPublication PresentableTinyRtScene::PublishPrefetchedChapterResidentActor(
+    std::uint32_t activeId, std::uint32_t incomingId,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (current == chapterResidentSources_.end())
+    {
+        diagnostic = "Resident publication requested an unknown active actor.";
+        return ResidentPublication::Failed;
+    }
+    auto& prefetch = chapterResidents_[current - chapterResidentSources_.begin()].prefetch;
+    if (!prefetch.import.valid() || prefetch.source.stableId != incomingId)
+    {
+        diagnostic = "Resident publication does not match the prefetched source.";
+        return ResidentPublication::Failed;
+    }
+    if (prefetch.import.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+    {
+        diagnostic.clear();
+        return ResidentPublication::Pending;
+    }
+    auto source = std::exchange(prefetch.source, {});
+    try
+    {
+        auto imported = prefetch.import.get();
+        if (!imported.ready)
+        {
+            diagnostic = std::move(imported.diagnostic);
+            return ResidentPublication::Failed;
+        }
+        return CommitChapterResidentReplacement(activeId, std::move(source), &imported.actor,
+            retireReferences, user, diagnostic) ? ResidentPublication::Published : ResidentPublication::Failed;
+    }
+    catch (const std::exception& exception)
+    {
+        diagnostic = std::string("Resident prefetch failed: ") + exception.what();
+        return ResidentPublication::Failed;
+    }
+}
+
+bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, horde::scene::assets::SkinnedPbrActor* importedActor,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
     if (!ready_ || staticGeometryCompletionUnproved_ || !retireReferences ||
         preparedStaticGeometry_ || ordinaryStaticReduced_ || fullStaticGeometrySource_)
     {
@@ -3505,8 +3598,15 @@ bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
         return false;
     }
     horde::scene::assets::SkinnedPbrActor candidate;
-    if (!candidate.Load(replacement.directory, replacement.fileName.c_str(), replacement.clips, diagnostic))
+#if defined(_DEBUG)
+    const auto swapStart = std::chrono::steady_clock::now();
+#endif
+    if (importedActor) candidate = std::move(*importedActor);
+    else if (!candidate.Load(replacement.directory, replacement.fileName.c_str(), replacement.clips, diagnostic))
         return false;
+#if defined(_DEBUG)
+    const auto imported = std::chrono::steady_clock::now();
+#endif
     const auto& asset = candidate.Asset();
     RtResidentReplacement plan{};
     if (!staticMeshSlot_.PrepareResidentReplacement(kFirstResidentMetadataIndex + lane,
@@ -3574,6 +3674,9 @@ bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
     }
     // The old lanes, metadata and textures remain published through build
     // completion. Texture work is the last fallible step before publication.
+#if defined(_DEBUG)
+    const auto built = std::chrono::steady_clock::now();
+#endif
     if (!ReplaceChapterResidentTextureLayers(activeId, replacement.directory, retireReferences, user, diagnostic))
     {
         releaseCandidate();
@@ -3593,6 +3696,16 @@ bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
     resident.uploadedClip = horde::scene::SkinnedClip::Idle;
     resident.uploadedTime = 0.f;
     resident.needsRefit = resident.refitRecorded = false;
+#if defined(_DEBUG)
+    const auto now = std::chrono::steady_clock::now();
+    const auto elapsed = [](auto end, auto start) {
+        return std::chrono::duration<double, std::milli>(end - start).count();
+    };
+    std::clog << "HORDE_RESIDENT_SWAP from=" << activeId << " to=" << current->stableId
+              << " prefetched=" << (importedActor != nullptr)
+              << " import_ms=" << elapsed(imported, swapStart) << " build_ms=" << elapsed(built, imported)
+              << " publish_ms=" << elapsed(now, built) << " total_ms=" << elapsed(now, swapStart) << '\n';
+#endif
     diagnostic.clear();
     return true;
 }
