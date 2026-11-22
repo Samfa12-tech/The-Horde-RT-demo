@@ -89,6 +89,14 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void relicDealerShowsTheTradeConversationAction() {
+        final int tradePrompt = (7 << 16) | (52 << 25) | 1;
+        assertEquals(R.string.ask_relic_dealer_trade, MainActivity.contextualInteractLabel(tradePrompt));
+        assertEquals("Ask about trade", MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tradePrompt));
+        assertEquals(0, MainActivity.contextualRiverSeconds(tradePrompt));
+    }
+
+    @Test
     public void shoreBreathDetailsKeepUntimedApproachAndExposeCeilingCountdowns() {
         final int mill = 7 << 16;
         assertEquals(R.string.salvager_enter_shallows,

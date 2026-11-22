@@ -49,6 +49,11 @@ void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) 
         if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherSalvagerStand))
             salvager_=bellwether::SalvagerPose{*foot};
     }
+    if(!relicDealer_ && !config_.bellwetherCombinedResidents && IsBellwetherTavernKeeperReady() &&
+       config_.bellwetherSpecialist==bellwether::Specialist::RelicDealer) {
+        if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherRelicDealerStand))
+            relicDealer_=bellwether::RelicDealerPose{*foot};
+    }
 }
 
 void GameSimulation::InteractWithClaimedChapter() {
@@ -72,6 +77,7 @@ void GameSimulation::InteractWithClaimedChapter() {
         InteractWithSalvager(salvager,context);
         return;
     }
+    if(chapterDialogue_.TryStartRelicDealer(context))return;
     const auto records=RecordKeeperAction(context);
     if(records==dialogue::RecordKeeperAction::CollectReward) {
         ClaimRegisterReward(context);
@@ -467,21 +473,26 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
                 (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance;
         }
     }
-    if(salvager_ && IsBellwetherResidentReady(traversal::kSalvagerResident) &&
-       c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
-       chapterTerrainGeneration_==worldRoute_.generation) {
-        auto mouth=salvager_->foot;
+    const auto observeShoreOrTradeResident=[&](const std::array<float,3>& foot,
+            std::optional<Tuple>& source,bool& inReach) {
+        if(!c.exterior || !c.kitSeated || !playerSupport_.grounded || !chapterTerrain_ ||
+           chapterTerrainGeneration_!=worldRoute_.generation)return;
+        auto mouth=foot;
         mouth[1]+=kCompanionSpeechHeight;
         const float distance=std::hypot(mouth[0]-c.player.x,mouth[2]-c.player.z);
         const float height=std::min(mouth[1],c.listener.y);
         if(distance<=4.f && std::abs(mouth[1]-c.listener.y)<=1.2f &&
            chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mouth[0],mouth[2],
                height-.025f,height+.025f,.025f)) {
-            c.salvagerSource=Tuple{mouth[0],mouth[1],mouth[2]};
-            c.salvagerInReach=distance<=2.1f &&
+            source=Tuple{mouth[0],mouth[1],mouth[2]};
+            inReach=distance<=2.1f &&
                 std::sin(c.yaw)*(mouth[0]-c.player.x)-std::cos(c.yaw)*(mouth[2]-c.player.z)>=.65f*distance;
         }
-    }
+    };
+    if(salvager_ && IsBellwetherResidentReady(traversal::kSalvagerResident))
+        observeShoreOrTradeResident(salvager_->foot,c.salvagerSource,c.salvagerInReach);
+    if(relicDealer_)
+        observeShoreOrTradeResident(relicDealer_->foot,c.relicDealerSource,c.relicDealerInReach);
     const auto& mark=bellwether::kWaysideMechanism;
     if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && c.alive && c.claimed && c.exterior &&
        !c.combat && !c.traversing && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&

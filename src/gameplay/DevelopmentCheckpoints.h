@@ -7,6 +7,7 @@
 #include "gameplay/ShowcaseRoute.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 #include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
 namespace horde::gameplay
@@ -33,7 +34,7 @@ enum class DevelopmentRewardPose : std::uint8_t
 
 enum class BellwetherBranchView : std::uint8_t {
     None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction,
-    MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested, SalvagerShore
+    MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested, SalvagerShore, RelicDealerVisit
 };
 
 struct DevelopmentCheckpoint
@@ -97,7 +98,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 144u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 145u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -311,6 +312,13 @@ inline constexpr std::array<DevelopmentCheckpoint, 144u> kDevelopmentCheckpoints
      .stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
      .bellwetherBranchView=BellwetherBranchView::SalvagerShore},
+    {.id=348,.name="bellwether-relic-dealer",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRelicDealerApproach.x,.cameraZ=traversal::kBellwetherRelicDealerApproach.z,
+     .yaw=traversal::kBellwetherRelicDealerApproachYaw,.pitch=-.14f,
+     .primaryArmsMayBeOutsideFrame=true,.primaryHeldItemsMayBeOutsideFrame=true,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherWestJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RelicDealerVisit},
     {.id=342,.name="bellwether-river-landing",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRiverLandingView.x,.cameraZ=traversal::kBellwetherRiverLandingView.z,
      .yaw=1.68f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,

@@ -26,12 +26,18 @@ public final class ChapterDebugCheckpointTest {
                 MainActivity.checkpointId("bellwether-resident-roundtrip-measurement"));
         final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !combined;
         final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !combined;
+        final boolean dealer = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE;
         final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
-                (combined || (!mill && !shore));
+                (combined || (!mill && !shore && !dealer));
         assertEquals(church ? 335 : -1, MainActivity.checkpointId("bellwether-record-keeper-handoff"));
         assertEquals(mill ? 344 : -1, MainActivity.checkpointId("bellwether-mill-artificer"));
         assertEquals(mill ? 345 : -1, MainActivity.checkpointId("bellwether-mill-drive-tested"));
         assertEquals(shore ? 346 : -1, MainActivity.checkpointId("bellwether-salvager-shore"));
+        assertEquals(dealer ? 348 : -1, MainActivity.checkpointId("bellwether-relic-dealer"));
+        if (dealer)
+            assertArrayEquals(new float[]{-1.57079632679f, -.14f}, MainActivity.developmentCheckpointViewPose(348), .000001f);
+        else
+            assertNull(MainActivity.developmentCheckpointViewPose(348));
         if (shore)
             assertArrayEquals(new float[]{-.08f, -.17f}, MainActivity.developmentCheckpointViewPose(346), .000001f);
         else

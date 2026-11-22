@@ -68,11 +68,19 @@ def bellwetherArtificer = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/artificer').isDirectory()
 def bellwetherSalvager = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/salvager').isDirectory()
+def bellwetherRelicDealer = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/relic-dealer').isDirectory()
 def bellwetherCombinedResidents = bellwetherResidentDirectory && texturedTavernKeeper &&
     new File(bellwetherResidentDirectory, 'private_bellwether/record-keeper').isDirectory() &&
     bellwetherArtificer && bellwetherSalvager
 if (bellwetherResidentDirectory) {
-    def pinned = bellwetherCombinedResidents ? [
+    def pinned = bellwetherRelicDealer ? [
+        'private_bellwether/relic-dealer/asset.manifest.json': '840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae',
+        'private_bellwether/relic-dealer/resident.glb': '588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe',
+        'private_bellwether/relic-dealer/base-color.android.ktx2': '09fdcf0bdf7f9b3b9108473574ddeec75acb4e62aad39ff3fab6337f9b31d7a2',
+        'private_bellwether/relic-dealer/normal.android.ktx2': 'b39f37aa2cf241c6e93168f32f7bebbcea444ed620af0d01d505ac74e2de9656',
+        'private_bellwether/relic-dealer/orm.android.ktx2': '9317c716ec88693e0bac4765e806511102c5ac3c8b4796be1de2323122144cf3'
+    ] : bellwetherCombinedResidents ? [
         'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
         'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
         'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
@@ -845,6 +853,7 @@ android {
         buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_RELIC_DEALER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
         buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', 'false'
         buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
@@ -894,17 +903,20 @@ android {
             buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', bellwetherArtificer ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', bellwetherSalvager ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_RELIC_DEALER_CANDIDATE', bellwetherRelicDealer ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', bellwetherCombinedResidents ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
-                def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
+                def rosterSuffix = bellwetherRelicDealer ? '.debug.bellwether.dealer' :
+                    bellwetherCombinedResidents ? '.debug.bellwether.combined' :
                     (bellwetherSalvager ? '.debug.bellwether.shore' :
                     (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'))
                 applicationIdSuffix rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
-                def rosterLabel = bellwetherCombinedResidents ? 'Horde RT Bellwether Combined Debug' :
+                def rosterLabel = bellwetherRelicDealer ? 'Horde RT Bellwether Dealer Debug' :
+                    bellwetherCombinedResidents ? 'Horde RT Bellwether Combined Debug' :
                     (bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' :
                     (bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
                     (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')))
@@ -926,6 +938,7 @@ android {
                         "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_SALVAGER_CANDIDATE=${bellwetherSalvager ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE=${bellwetherRelicDealer ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_COMBINED_RESIDENTS=${bellwetherCombinedResidents ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",

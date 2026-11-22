@@ -987,7 +987,8 @@ public class MainActivity extends Activity {
                         }
                     }
                 } else {
-                    final String specialist = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
+                    final String specialist = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? "relic-dealer/" :
+                            BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
                             (BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/");
                     for (String asset : new String[] {
                             "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
@@ -7344,7 +7345,8 @@ public class MainActivity extends Activity {
     private static boolean hasBellwetherRecordKeeper() {
         return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
                 (BuildConfig.BELLWETHER_COMBINED_RESIDENTS ||
-                (!BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE));
+                (!BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE &&
+                        !BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE));
     }
 
     static int checkpointId(final String name) {
@@ -7440,6 +7442,7 @@ public class MainActivity extends Activity {
             case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 344 : -1;
             case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 345 : -1;
             case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 346 : -1;
+            case "bellwether-relic-dealer": return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? 348 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7801,6 +7804,7 @@ public class MainActivity extends Activity {
             case 344:
             case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{1.64f, -0.32f} : null;
             case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-0.08f, -0.17f} : null;
+            case 348: return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? new float[]{-1.57079632679f, -0.14f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};
@@ -9054,6 +9058,7 @@ public class MainActivity extends Activity {
                     case 17: return R.string.rig_leak_test_return_to_dry;
                     case 18: return R.string.salvager_report_back;
                     case 19: return R.string.salvager_recover_breath;
+                    case 52: return R.string.ask_relic_dealer_trade;
                     default:
                         if (detail >= 20 && detail <= 35) return R.string.salvager_enter_shallows_timed;
                         if (detail >= 36 && detail <= 51) return R.string.salvager_retreat_timed;

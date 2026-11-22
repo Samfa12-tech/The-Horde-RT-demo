@@ -29,6 +29,9 @@ inline auto BellwetherResidentSources(const std::filesystem::path& root,
     } else if(specialist==Specialist::Salvager) {
         actorId=gameplay::bellwether::kSalvagerActorId;
         role="salvager";
+    } else if(specialist==Specialist::RelicDealer) {
+        actorId=gameplay::bellwether::kRelicDealerActorId;
+        role="relic-dealer";
     }
     ChapterResidentActorSource service{actorId,root/role,"resident.glb",{{"Warden|idle",true,true}}};
     return std::array<ChapterResidentActorSource, kBellwetherResidentCount>{

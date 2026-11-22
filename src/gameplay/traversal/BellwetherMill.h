@@ -37,7 +37,7 @@ inline constexpr float kMillDriveTestRadians=1.82f;
 
 // The current chapter profile has room for the tavern keeper and one
 // specialist alongside Kit.
-enum class Specialist { None, RecordKeeper, Artificer, Salvager };
+enum class Specialist { None, RecordKeeper, Artificer, Salvager, RelicDealer };
 inline constexpr std::uint32_t kArtificerActorId=0x42303541u;
 inline constexpr float kArtificerRestYaw=-1.69f;
 

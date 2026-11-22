@@ -30,6 +30,7 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     recordKeeper_.reset();
     artificer_.reset();
     salvager_.reset();
+    relicDealer_.reset();
     shorePracticeStage_={};
     shorePracticeBreathTicksRemaining_=0;
     millDriveTurnSeconds_.reset();

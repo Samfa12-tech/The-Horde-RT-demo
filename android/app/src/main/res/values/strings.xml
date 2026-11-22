@@ -85,6 +85,7 @@
     <string name="salvager_retreat_timed">Return to dry · %1$d s</string>
     <string name="salvager_recover_breath">Back to dry stone</string>
     <string name="salvager_report_back">Return to the salvager at the fork</string>
+    <string name="ask_relic_dealer_trade">Ask about trade</string>
     <string name="open_tavern_door">Open tavern door</string>
     <string name="close_tavern_door">Close tavern door</string>
     <string name="show_road_mark">Show the road mark</string>

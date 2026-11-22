@@ -2237,6 +2237,55 @@ void TestBellwetherResidentRosters(
           "the combined input schedule walks to the east fork and back into the staffed tavern twice within the measurement deadline");
 }
 
+void TestBellwetherRelicDealerVisit(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    using namespace gameplay::traversal;
+    using gameplay::bellwether::Specialist;
+    using gameplay::dialogue::Line;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=Specialist::RelicDealer;
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* visit=gameplay::FindDevelopmentCheckpoint("bellwether-relic-dealer");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=visit && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*visit);
+    const auto& state=game.Snapshot();
+    if(!ready) {
+        std::cerr<<"Relic dealer route stopped at "<<state.playerX<<','<<state.playerZ<<'\n';
+        Check(false,"the ordinary player motor can walk from the tavern to the dealer's mark");return;
+    }
+    const auto support=ChapterExteriorStepSupport(*terrain,kBellwetherRelicDealerStand.x,
+        kBellwetherRelicDealerStand.z,.28f,1.78f);
+    Check(support.grounded && state.relicDealer && state.tavernKeeper && state.chapterCompanion.grounded &&
+          !state.recordKeeper && !state.artificer && !state.salvager && state.relicDealerTradeAvailable &&
+          std::abs(state.relicDealer->foot[1]-support.worldY)<.001f,
+          "the dealer fits the authored support and the existing three-actor roster");
+    if(!state.relicDealer)return;
+
+    sim::InputSnapshot input;
+    input.damageEnabled=false;input.tutorialEnabled=false;
+    input.yawRadians=visit->yaw+3.14159265359f;
+    input.pitchRadians=visit->pitch;
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    Check(!state.relicDealerTradeAvailable && state.chapterDialogue.line==Line::None,
+          "a player facing away cannot start the dealer's trade caption");
+    input.yawRadians=visit->yaw;
+    const auto revision=game.CampaignBoundaryRevision();
+    const auto purse=state.treasurePurse;
+    ++input.commands.interact;
+    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    Check(state.chapterDialogue.line==Line::RelicDealerOrdinarySale &&
+          gameplay::dialogue::RequiresChapterCaption(state.chapterDialogue.line) &&
+          state.chapterDialogue.source.x==state.relicDealer->foot[0] &&
+          state.chapterDialogue.source.z==state.relicDealer->foot[2] &&
+          state.treasurePurse==purse && game.CampaignBoundaryRevision()==revision,
+          "the normal action starts the source-backed caption and leaves the purse and save intact");
+}
+
 void TestBellwetherSalvagerPractice(
     const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
     namespace sim=gameplay::simulation;
@@ -2845,6 +2894,7 @@ void TestFullSurroundings()
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
             TestBellwetherMillRepairAndLeakTrial(recreatedTerrain);
             TestBellwetherSalvagerPractice(recreatedTerrain);
+            TestBellwetherRelicDealerVisit(recreatedTerrain);
             TestBellwetherResidentRosters(recreatedTerrain);
         }
     }

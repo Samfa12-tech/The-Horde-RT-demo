@@ -330,6 +330,11 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
         addResident({horde::gameplay::bellwether::kSalvagerActorId, salvager.foot,
             horde::scene::CompanionModelYaw(salvager.yaw), horde::scene::SkinnedClip::Idle, salvager.idleSeconds});
     }
+    if (simulation.relicDealer) {
+        const auto& dealer = *simulation.relicDealer;
+        addResident({horde::gameplay::bellwether::kRelicDealerActorId, dealer.foot,
+            horde::scene::CompanionModelYaw(dealer.yaw), horde::scene::SkinnedClip::Idle, 0.f});
+    }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;

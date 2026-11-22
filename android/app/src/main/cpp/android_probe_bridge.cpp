@@ -667,6 +667,7 @@ horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
 
 constexpr auto AndroidBellwetherSpecialist() {
     using horde::gameplay::bellwether::Specialist;
+    if constexpr (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE) return Specialist::RelicDealer;
     if constexpr (HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) return Specialist::Salvager;
     return HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE ? Specialist::Artificer : Specialist::RecordKeeper;
 }
@@ -1374,6 +1375,10 @@ void PublishSimulationUiState()
                 detail = 35 + static_cast<int>(seconds);
         }
         contextualControls |= (riverTag << 16) | (detail << 25) | (actionable ? 1 : 0);
+    }
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.relicDealerTradeAvailable) {
+        constexpr int residentTag = 7, tradeDetail = 52;
+        contextualControls |= (residentTag << 16) | (tradeDetail << 25) | 1;
     }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
@@ -2594,7 +2599,8 @@ bool ApplyBenchmarkCheckpoint(
 #endif
     const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-        || checkpoint.id == 329 || checkpoint.id == 335 || measureDoorway || measureResidentRoundtrip
+        || checkpoint.id == 329 || checkpoint.id == 335 ||
+        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && checkpoint.id == 348) || measureDoorway || measureResidentRoundtrip
 #endif
         );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)

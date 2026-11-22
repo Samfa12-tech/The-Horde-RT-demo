@@ -387,6 +387,16 @@ On Windows Debug, pass the two-role mill folder to the existing `--bellwether-ca
 
 The native walkthrough installs and tests the drive, takes the rig through the ordinary interaction, walks to the river and confirms the seal after checking pause, retreat, retry and reload. Matched empty and tested Windows captures passed at 960 × 540 on both hardware RT backends. The regular Windows Debug mill profile reached the tavern through the native campaign menus and restored its earned save. The separate ARM64 Debug package passed the checkpoint and interaction tests, and the APK inspection verified the exact gear, resident and voice entries. Moving between those rosters during play, phone performance and exact distribution clearance remain open.
 
+### Relic dealer west of the square
+
+The [west route](../../../src/gameplay/traversal/BellwetherWestRoute.h) branches from the square to the original S6 dealer mark. It uses the existing terrain and village collision. After the tavern conversation, face the dealer within reach and choose **Ask about trade**. The authored `hub.ordinary_sale` caption introduces ordinary silver. The conversation leaves the purse and checkpoint record intact.
+
+The private profile uses the existing two resident slots with the tavern keeper and dealer, alongside Kit. The dealer uses the November 7 rig and its standing pose with one layer of 1K material maps on each platform. The native character loader passed the idle and walk. The existing dealer voice bank is available for audition. Trading, a named relic, its living claimant and the route for recovering it after a sale still need design approval.
+
+The Windows Debug `bellwether-relic-dealer` capture uses `--chapter-resident-fixture` with the pinned `tavern-keeper` and `relic-dealer` folders. Use `--bellwether-campaign-dir` with the same folders to start the private campaign and its separate save slot. Both hardware RT backends presented the 960 × 540 west approach with all three actor instance masks active and the trade caption selected. The player lantern lights the dealer at the approach. The ordinary Windows menu validation also reached the staffed hearth from the lookout, earned the tavern save and loaded it again.
+
+Android Debug uses the corresponding `hordeBellwetherResidentDir` overlay and the isolated `.debug.bellwether.dealer` package. The `horde.debug.checkpoint` and `horde.debug.autostart` intent extras reach the same live player view. The ARM64 package contains the two pinned residents, and the Java tests exercised the checkpoint binding and trade prompt. The permanent storefront, combined village residency and physical phone evidence are pending.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

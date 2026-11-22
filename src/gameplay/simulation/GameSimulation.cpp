@@ -882,6 +882,7 @@ void GameSimulation::ResetRoute()
     millLeakTestSeconds_=0.f;
     millDriveTurnSeconds_.reset();
     salvager_.reset();
+    relicDealer_.reset();
     shorePracticeStage_={};
     shorePracticeBreathTicksRemaining_=0;
     salvagerShorePracticeCompleted_=false;
@@ -3539,6 +3540,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.recordKeeper=currentExterior && IsBellwetherResidentReady(traversal::kRecordKeeperResident) ? recordKeeper_ : std::nullopt;
     snapshot_.artificer=currentExterior && IsBellwetherResidentReady(traversal::kArtificerResident) ? artificer_ : std::nullopt;
     snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
+    snapshot_.relicDealer=currentExterior ? relicDealer_ : std::nullopt;
+    snapshot_.relicDealerTradeAvailable=chapterDialogue_.CanStartRelicDealer(chapterContext);
     snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
     snapshot_.shorePracticeStage=shorePracticeStage_;
     snapshot_.shorePracticeBreathTicksRemaining=shorePracticeBreathTicksRemaining_;

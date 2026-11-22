@@ -1033,6 +1033,27 @@ Wise Animation Mentor. The code pins the PCM WAVs and their sample counts.
 Owner listening acceptance and distribution clearance for these takes remain
 open.
 
+## Bellwether relic dealer candidate - 23 November 2026
+
+The private west visit reuses the November 7 source study, its original
+project-generated reference, Meshy T2.5 geometry, Meshy 7 PBR textures and
+Meshy's humanoid rig and walk. The original rigged, walking and running GLBs
+retain their source receipt hashes. The local Blender assembly grounds the
+1.73 m idle and brings the upper arms inward 12 degrees. The runtime GLB has
+15,800 triangles and SHA-256
+`588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe`.
+
+The earlier source study consumed 20 Meshy credits. Preparing this candidate
+used zero additional credits. The private archive retains the source files,
+editable Blender assembly, exact platform texture hashes and review images.
+The shared Blender recipe accepts the rig and walk under `rigged.glb` and
+`walking.glb` with their source receipt hashes, the asset ID
+`bellwether-relic-dealer`, a 12-degree idle adjustment and zero walk offset.
+One tangent component varied by 0.0001 on re-export. The platform overlays
+use the exact archived and validated GLB.
+The candidate remains private pending distribution clearance. Its trade line
+is caption-only. The existing dealer recordings remain in the audio archive.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

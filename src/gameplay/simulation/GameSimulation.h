@@ -413,6 +413,7 @@ private:
     std::optional<dialogue::RecordKeeperPose> recordKeeper_;
     std::optional<bellwether::ArtificerPose> artificer_;
     std::optional<bellwether::SalvagerPose> salvager_;
+    std::optional<bellwether::RelicDealerPose> relicDealer_;
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
     bellwether::MillPreparation millPreparation_{};

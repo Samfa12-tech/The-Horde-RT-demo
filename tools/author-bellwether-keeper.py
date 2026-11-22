@@ -240,8 +240,8 @@ if __name__ == "__main__":
         if set(source_hashes) != set(KEEPER_SOURCE_HASHES):
             raise ValueError("The resident profile must pin rigged.glb and walking.glb.")
         idle_upper_arm_inward_degrees = float(profile.get("idleUpperArmInwardDegrees", 0.0))
-        if not 0.0 <= idle_upper_arm_inward_degrees <= 8.0:
-            raise ValueError("Choose a small inward adjustment for the standing upper arms.")
+        if not 0.0 <= idle_upper_arm_inward_degrees <= 16.0:
+            raise ValueError("Choose an inward adjustment between zero and sixteen degrees for the standing upper arms.")
         walk_lower_metres = float(profile.get("walkLowerMetres", 0.0))
         if not 0.0 <= walk_lower_metres <= 0.04:
             raise ValueError("Choose a walking stance correction between zero and four centimetres.")

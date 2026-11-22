@@ -472,6 +472,7 @@ struct CaptureLaunchOptions
     bool recordKeeperCapture = false;
     bool artificerCapture = false;
     bool salvagerCapture = false;
+    bool relicDealerCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -564,6 +565,8 @@ struct ShowcaseCaptureRecord
     std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
     std::optional<horde::gameplay::bellwether::ArtificerPose> artificer;
     std::optional<horde::gameplay::bellwether::SalvagerPose> salvager;
+    std::optional<horde::gameplay::bellwether::RelicDealerPose> relicDealer;
+    std::array<std::uint8_t,3> relicDealerResidentMasks{};
     std::array<std::uint8_t,3> salvagerResidentMasks{};
     std::array<std::uint8_t,3> millResidentMasks{};
     horde::gameplay::bellwether::MillPreparation millPreparation{};
@@ -727,6 +730,7 @@ struct VulkanSurfaceContext
     bool recordKeeperCapture = false;
     bool artificerCapture = false;
     bool salvagerCapture = false;
+    bool relicDealerCapture = false;
     bool combinedBellwetherResidents = false;
     bool bellwetherFurnitureTransitions=false;
     bool bellwetherFurnitureResidency=false;
@@ -1480,9 +1484,11 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
          residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillDriveTested);
     options.salvagerCapture = residentCheckpoint &&
         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::SalvagerShore;
+    options.relicDealerCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RelicDealerVisit;
     options.staffedTavernCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None ||
-         returnToKit || options.artificerCapture || options.salvagerCapture);
+         returnToKit || options.artificerCapture || options.salvagerCapture || options.relicDealerCapture);
     options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RegisterHandoff);
     if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
@@ -1491,7 +1497,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
          (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
         options.error = "Chapter resident fixtures require a compatible hidden Bellwether or reunion capture.";
-    if (options.error.empty() && (options.artificerCapture || options.salvagerCapture) &&
+    if (options.error.empty() && (options.artificerCapture || options.salvagerCapture || options.relicDealerCapture) &&
         !options.bellwetherCampaignDirectory.empty())
         options.error = "Pass the specialist and tavern keeper together in --chapter-resident-fixture.";
     if (options.error.empty() && (!options.chapterResidentTextureRoundTrip.empty() || !options.chapterResidentModelRoundTrip.empty()) &&
@@ -1755,6 +1761,13 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
         {"salvager/normal.windows.ktx2", "ea2bee3dfd0a2eaad084f0511406696a1e764b3a50a10efcb15bbf5aca65d3a7"},
         {"salvager/orm.windows.ktx2", "bd75d588cd6d3e92161aba844bb083e040b1ec68ce0f7ceabd9fbb300c1fc57e"}
     };
+    constexpr std::pair<std::string_view, std::string_view> relicDealer[]{
+        {"relic-dealer/asset.manifest.json", "840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae"},
+        {"relic-dealer/resident.glb", "588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe"},
+        {"relic-dealer/base-color.windows.ktx2", "d87516c62dd29c30605f8c1cbb4a7245fd964097fbd28a65097c863da63d3d6f"},
+        {"relic-dealer/normal.windows.ktx2", "f1f443710b7ca242caa0126c7c73378b4da0bf65a7ef368e93b68116b0a2cee7"},
+        {"relic-dealer/orm.windows.ktx2", "538f0755b2f15e6726b977ceae4a0b04bb08a525d8cfcc53f7d2b6944037fca8"}
+    };
     std::error_code error;
     const auto root = std::filesystem::canonical(directory, error);
     if (error) return false;
@@ -1775,19 +1788,23 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
     if (error) return false;
     const bool shore = std::filesystem::exists(root / "salvager", error);
     if (error) return false;
-    const int specialistCount = static_cast<int>(mill) + static_cast<int>(church) + static_cast<int>(shore);
-    const bool combined = specialistCount == 3;
+    const bool west = std::filesystem::exists(root / "relic-dealer", error);
+    if (error) return false;
+    const int specialistCount = static_cast<int>(mill) + static_cast<int>(church) +
+        static_cast<int>(shore) + static_cast<int>(west);
+    const bool combined = mill && church && shore && !west;
     if (combined) {
         if (!textured || !matches(recordKeeper) || !matches(artificer) || !matches(salvager)) return false;
     } else if (specialistCount != 1 ||
-               (shore ? !matches(salvager) : (mill ? !matches(artificer) : !matches(recordKeeper)))) {
+               (west ? !matches(relicDealer) : shore ? !matches(salvager) :
+                    mill ? !matches(artificer) : !matches(recordKeeper))) {
         return false;
     }
     gBellwetherCampaignActors = root;
     gBellwetherCombinedCampaignActors = combined;
     using horde::gameplay::bellwether::Specialist;
-    gBellwetherCampaignSpecialist = combined ? Specialist::RecordKeeper : (shore ? Specialist::Salvager :
-        (mill ? Specialist::Artificer : Specialist::RecordKeeper));
+    gBellwetherCampaignSpecialist = combined ? Specialist::RecordKeeper : west ? Specialist::RelicDealer :
+        shore ? Specialist::Salvager : mill ? Specialist::Artificer : Specialist::RecordKeeper;
     return true;
 }
 #endif
@@ -3697,6 +3714,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         case SalvagerAction::RecallPractice: text="LEFT-CLICK / A TO RECALL THE LESSON"; break;
         case SalvagerAction::None: break;
         }
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.relicDealerTradeAvailable) {
+        text = "LEFT-CLICK / A TO ASK ABOUT TRADE";
         context.tavernInteractionPromptPresented=visible;
     }
     else if(chapterInteract) {
@@ -7034,10 +7055,12 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         ctx.lastRtFrameError="Bellwether furniture detail must be selected before scene creation.";
         return false;
     }
-    if (ctx.artificerCapture || ctx.salvagerCapture) {
+    if (ctx.artificerCapture || ctx.salvagerCapture || ctx.relicDealerCapture) {
         using horde::gameplay::bellwether::Specialist;
+        const auto specialist = ctx.relicDealerCapture ? Specialist::RelicDealer :
+            ctx.artificerCapture ? Specialist::Artificer : Specialist::Salvager;
         auto sources = horde::vulkan::raytracing::BellwetherResidentSources(
-            ctx.chapterResidentFixture, ctx.artificerCapture ? Specialist::Artificer : Specialist::Salvager);
+            ctx.chapterResidentFixture, specialist);
         const auto& alternate = ParseCaptureLaunchOptions().chapterResidentModelRoundTrip;
         if (!alternate.empty()) {
             using horde::scene::assets::AssetManifest;
@@ -8909,6 +8932,15 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      << unsigned(capture.salvagerResidentMasks[1]) << ", \"salvager\": "
                      << unsigned(capture.salvagerResidentMasks[2]) << "}}";
         }
+        if (capture.relicDealer) {
+            const auto& foot = capture.relicDealer->foot;
+            manifest << ", \"relicDealer\": {\"foot\": [" << foot[0] << ", " << foot[1] << ", " << foot[2]
+                     << "], \"yaw\": " << capture.relicDealer->yaw << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
+                     << "\", \"submittedMasks\": {\"kit\": " << unsigned(capture.relicDealerResidentMasks[0])
+                     << ", \"tavernKeeper\": " << unsigned(capture.relicDealerResidentMasks[1])
+                     << ", \"relicDealer\": " << unsigned(capture.relicDealerResidentMasks[2]) << "}}";
+        }
         if (capture.tavernLanternPresentedRaiseTick) {
             manifest << ", \"tavernLanternIntroduction\": {\"presentedRaiseTick\": "
                      << capture.tavernLanternPresentedRaiseTick << ", \"linesStarted\": "
@@ -9511,6 +9543,24 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             ApplyCaptureCheckpoint(context, checkpoint);
         }
 #if defined(_DEBUG)
+        if (context.relicDealerCapture) {
+            using namespace horde::gameplay::dialogue;
+            const auto& state = context.simulation.Snapshot();
+            if (!state.relicDealerTradeAvailable)
+                return fail("The west approach did not offer the relic dealer's trade introduction.");
+            const auto boundary = context.simulation.CampaignBoundaryRevision();
+            auto input = context.simulationInput;
+            input.paused = false;
+            input.yawRadians = state.playerYawRadians;
+            input.pitchRadians = state.playerPitchRadians;
+            input.commands.interact = state.lastConsumedInteractSequence + 1;
+            context.simulation.StepFixed(input, 1.f/60.f, state.inputPublicationSequence + 1);
+            if (state.chapterDialogue.line != Line::RelicDealerOrdinarySale ||
+                context.simulation.CampaignBoundaryRevision() != boundary)
+                return fail("The ordinary west-counter interaction did not present its trade line without a transaction.");
+            context.simulation.ClearEvents();
+            MirrorSimulationSnapshot(context);
+        }
         if (context.developmentCheckpoint == "bellwether-return-to-kit") {
             using horde::gameplay::dialogue::Line;
             const auto& state = context.simulation.Snapshot();
@@ -9728,6 +9778,18 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.recordKeeper = simulation.recordKeeper;
         record.artificer = simulation.artificer;
         record.salvager = simulation.salvager;
+        record.relicDealer = simulation.relicDealer;
+        if (context.relicDealerCapture) {
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.relicDealerResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};
+            constexpr std::array residents{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::bellwether::kRelicDealerActorId};
+            if (!record.relicDealer || context.rtScene.ChapterResidentSourceIds() != residents ||
+                record.relicDealerResidentMasks != std::array<std::uint8_t,3>{1,1,1})
+                return fail("The relic dealer capture did not present the admitted three-actor roster.");
+        }
         if (context.salvagerCapture) {
             using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
             record.salvagerResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
@@ -10476,6 +10538,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
     context.artificerCapture=ParseCaptureLaunchOptions().artificerCapture;
     context.salvagerCapture=ParseCaptureLaunchOptions().salvagerCapture;
+    context.relicDealerCapture=ParseCaptureLaunchOptions().relicDealerCapture;
     context.bellwetherFurnitureDetail=ParseCaptureLaunchOptions().bellwetherFurnitureDetail;
     context.bellwetherFurnitureTransitions=ParseCaptureLaunchOptions().bellwetherFurnitureTransitions;
     context.bellwetherFurnitureResidency=ParseCaptureLaunchOptions().bellwetherFurnitureResidency;
@@ -10519,6 +10582,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Artificer;
         else if (context.salvagerCapture)
             simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Salvager;
+        else if (context.relicDealerCapture)
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RelicDealer;
         else if (!context.chapterResidentFixture.empty() &&
                  (context.combinedBellwetherResidents || context.recordKeeperCapture))
             simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;

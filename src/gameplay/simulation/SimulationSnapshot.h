@@ -13,6 +13,7 @@
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/traversal/BellwetherMill.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 
 #include <array>
 #include <cstddef>
@@ -96,18 +97,20 @@ struct SimulationSnapshot
     bellwether::SalvagerAction salvagerAction{};
     std::uint16_t shorePracticeBreathTicksRemaining=0;
     bool salvagerShorePracticeCompleted=false;
+    bool relicDealerTradeAvailable=false;
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
-            salvagerAction!=bellwether::SalvagerAction::None;
+            salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;
     std::optional<bellwether::ArtificerPose> artificer;
     std::optional<bellwether::SalvagerPose> salvager;
+    std::optional<bellwether::RelicDealerPose> relicDealer;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
