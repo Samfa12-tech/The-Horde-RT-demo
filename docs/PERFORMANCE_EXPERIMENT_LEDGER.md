@@ -11,6 +11,36 @@
 - CPU render-entry-through-present cycles include waits; GPU intervals may include AS, trace/shading and transfer. Neither reciprocal GPU time nor nominal display refresh is playable FPS. Actual-present rates, fixed-step routes, generated-input motion and sustained ordinary play are separate evidence classes. Never add overlapping stage medians or interpolate between different APKs, OS versions, extents or profiles.
 - **Repository evidence** means committed reports, receipts, selected CSVs or images explicitly named below. **Private/local evidence** means raw material reported as retained outside Git; this documentation pass did not access or verify those private bytes. A hash/manifest is not the image or APK itself. Missing raw PNGs cannot be reconstructed from hashes or summary statistics; do not invent replacement captures or silently upgrade availability.
 
+## Bellwether 1.8 performance baseline
+
+**23 November five-resident replay.** The private Android and Windows QA
+builds share the native 60 Hz route and its twelve resident swaps. The
+[Galaxy S26 Ultra run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-five-resident-shippingmobile-round-trip)
+used Shipping/Mobile Pipeline at 33% and took 159.40 seconds. Median GPU
+time was 64.90 ms in the staffed tavern and 51.20 ms at the east fork. The
+room medians increased from 51.06 to 68.97 ms across visits. This makes a
+warmed tavern capture with per-GPU-stage timings the next useful handset
+baseline. Keep the room lighting, actor state and render settings matched.
+
+The Windows run uses optimized Debug code (`/O2 /Ob2`) to preserve the private
+fixture gates, with Shipping/High shaders and 960 × 540 trace and output
+on an RTX 5050 Laptop GPU. The executable SHA-256 is
+`00eb88034fe01220921b9672c1d6dfae46bff97745fcbb70c5f92ec9d0a7bcec`.
+Pipeline and RayQueryCompute each completed both returns in 156.94 seconds
+with 9,416 simulation ticks and zero pending ticks at peak. They recorded
+25,496 and 25,523 completed frames respectively.
+
+| Windows RT backend | Staffed room GPU median / p95 (ms) | Staffed room native cycle median / p95 (ms) | East fork simulation per tick median / p95 (ms) |
+| --- | ---: | ---: | ---: |
+| RayTracingPipeline | 2.38 / 3.87 | 5.86 / 5.91 | 2.41 / 2.71 |
+| RayQueryCompute | 2.28 / 3.67 | 5.86 / 5.92 | 2.40 / 2.78 |
+
+The hidden Windows replays establish a native timing baseline with both
+CPU changes present. Measuring each change's optimized-build gain still
+requires matched control builds. Raw runs, including the first Windows
+launch that stopped on missing private staging assets, are retained locally
+under `reports/horde-bellwether-shipping-profile-20261123-100005`.
+
 ## Closed or retained rendering experiments
 
 **23 November Bellwether held-item clearance — KEEP for 1.8.** One carry reach search reuses the camera support check and sampled heights at the 64 authored tree roots. Each candidate reach still checks the same solids, trunk bounds, terrain slope and current tavern door pose. The cache ends with the search.

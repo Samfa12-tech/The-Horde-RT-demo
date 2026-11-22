@@ -4328,3 +4328,50 @@ native report recorded `Integrity: COMPLETE`. The test exercised completion
 and dismissal through system Back. Cancellation, sharing review, repeated
 runs and background/resume remain separate device cases. The production app
 and its saves were untouched. [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
+### 23 November 2026 — Bellwether five-resident Shipping/Mobile round trip
+
+**Evidence class — actual-device scripted route, completed RT submissions
+and sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API
+37, Adreno 840) ran the ARM64 private combined Debug APK from `f0fdf289`
+with optimized native code. The installed APK SHA-256 matched
+`94bec5dda41a8ae215e313effe3f052acb56f9b74d49bae668f1f4a48e8c71ca`.
+It contained all five pinned residents and the thirteen audition lines.
+The test updated only the private package in place and preserved its data.
+
+The `bellwether-resident-roundtrip-measurement` checkpoint completed both
+east-fork round trips in 159.40 s with 9,413 simulation ticks and 2,618 GPU
+completions joined to successful native RT presents. Each outbound walk
+replaced the record keeper with the relic dealer, the dealer with the
+salvager, and the tavern keeper with the artificer. The inbound walk
+reversed those swaps. The door instance remained submitted and the three
+fire lights were present in the staffed room. RayTracingPipeline presented
+at 33% scale (475 × 980 internal, 1440 × 2971 output) with glass off and the
+Shipping/Mobile opaque-fast shader
+`8772697daea24068acea25db8ca168c8c2b37f8d7f3e547374d2a75fac8755b1`.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 64.90 / 80.43 | 75.01 / 88.69 |
+| Doorway outbound | 48.99 / 65.85 | 57.68 / 76.78 |
+| East fork | 51.20 / 52.86 | 63.80 / 66.79 |
+| Doorway inbound | 48.01 / 61.74 | 58.12 / 72.18 |
+
+The analysis excludes the first five seconds of the route. The worst native
+present-return interval on a resident swap was 80.32 ms. SurfaceFlinger
+sampled 550 adjacent game-layer display intervals covering 35.1 seconds
+between 123.0 and 159.4 s into the route, with a median of 66.67 ms and p95
+of 87.50 ms. The display intervals have no per-submission join.
+
+Post-warmup room GPU medians across the three visits were 51.06, 64.19 and
+68.97 ms. On USB, the battery warmed from 32.1 °C to 35.7 °C while Android
+thermal status remained 0 at the recorded endpoints. This run establishes
+the five-resident route on Shipping/Mobile Pipeline. The cause of the
+increasing room cost, sustained play, ordinary campaign input and the
+handset's RayQueryCompute route still need separate evidence. The shorter
+Diagnostic route used a different workload and shader profile.
+
+Raw measurements, the exact APK and the previous private APK are retained
+locally under `reports/horde-bellwether-shipping-profile-20261123-100005`.
+The test app was stopped after measurement and the private candidate remains
+installed.

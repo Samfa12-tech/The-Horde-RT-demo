@@ -135,7 +135,12 @@ $bellwetherPackage = 'com.samfa12.hordelanternrt.debug.bellwether.combined'
 adb shell am start -n "${bellwetherPackage}/com.samfa12.hordelanternrt.MainActivity" --ez horde.debug.autostart true --ez horde.debug.gpu_timing true --es horde.debug.checkpoint bellwether-resident-roundtrip-measurement
 ```
 
-Start from a fresh launch of the private package and keep it in the foreground.
+For an optimized private Debug run with the Shipping/Mobile shaders, add
+`-PhordeRtInstrumentationOverride=Shipping`,
+`-PhordeRtDielectricQualityOverride=Mobile` and `-PhordeRtRouteTiming=true`
+to the resident Debug build. Record the active shader name and SHA-256 from
+the launch log. Start from a fresh launch and keep the private app in the
+foreground.
 Wait for that launch's `HORDE_BELLWETHER_RESIDENT_ROUNDTRIP complete returns=2`
 marker. Record the APK hash, render settings, backend and device temperatures
 with the fresh `files/reports/bellwether-resident-roundtrip.csv` retrieved via
@@ -143,8 +148,12 @@ with the fresh `files/reports/bellwether-resident-roundtrip.csv` retrieved via
 directory and verify it from the repository root.
 
 ```powershell
-python tools/analyze-chapter-route-measurement.py --android-bellwether-resident-roundtrip <run-directory>
+python tools/analyze-chapter-route-measurement.py --android-bellwether-resident-roundtrip --expect-relic-dealer <run-directory>
 ```
+
+Use `--expect-relic-dealer` for the five-resident package. The four-resident
+fixture uses the same command without that flag. The verifier checks the
+exact sequence for the installed roster on both returns.
 
 The report measures native present-return intervals. Display timing requires
 separate display evidence. The shorter doorway check remains available under

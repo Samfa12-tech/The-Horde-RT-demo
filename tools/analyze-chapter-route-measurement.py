@@ -33,15 +33,19 @@ BELLWETHER_RESIDENT_SOURCE_IDS = {
     'Artificer': 0x42303541,
     'Salvager': 0x42303553,
 }
-def verify_bellwether_resident_roster(rows, intervals=None):
+def verify_bellwether_resident_roster(rows, intervals=None, *, relic_dealer=False):
     """Validate the resident sequence shared by the Windows and Android routes."""
-    ids = BELLWETHER_RESIDENT_SOURCE_IDS
+    ids = BELLWETHER_RESIDENT_SOURCE_IDS.copy()
     role_names = [('TavernKeeper', 'RecordKeeper'), ('TavernKeeper', 'Salvager'),
                   ('Artificer', 'Salvager')]
-    town, fork, east = (tuple(ids[name] for name in names) for names in role_names)
-    names_by_pair = dict(zip((town, fork, east), map('+'.join, role_names)))
-    expected_pairs = {'room': [town], 'doorway-outbound': [town, fork, east],
-                      'east-fork': [east], 'doorway-inbound': [east, fork, town],
+    if relic_dealer:
+        ids['RelicDealer'] = 0x42303644
+        role_names.insert(1, ('TavernKeeper', 'RelicDealer'))
+    outbound = [tuple(ids[name] for name in names) for names in role_names]
+    town, east = outbound[0], outbound[-1]
+    names_by_pair = dict(zip(outbound, map('+'.join, role_names)))
+    expected_pairs = {'room': [town], 'doorway-outbound': outbound,
+                      'east-fork': [east], 'doorway-inbound': outbound[::-1],
                       'complete': [town]}
     expected_phases = [(phase, lap) for lap in range(2)
                        for phase in expected_pairs if phase != 'complete']
@@ -293,8 +297,7 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         dealer_files = {f'relic-dealer/{suffix}' for suffix in suffixes}
         assert set(fixtures) in (required_files, required_files | dealer_files)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in fixtures.values())
-        roster = verify_bellwether_resident_roster(rows)
-        assert roster['transitionCounts'] == {'outbound': {'1': 2, '2': 2}, 'inbound': {'1': 2, '2': 2}}
+        roster = verify_bellwether_resident_roster(rows, relic_dealer=dealer_files.issubset(fixtures))
         assert all(int(row[key]) >= 0 for row in rows
                    for key in ('simulation_step_cpu_ns', 'wholeFrameCycleCpuMs_ns'))
     for row in rows:
@@ -456,7 +459,7 @@ ANDROID_CPU_STAGE_COLUMNS = (
 )
 
 
-def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False):
+def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False, relic_dealer=False):
     directory = pathlib.Path(name)
     filename = 'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv'
     with (directory / filename).open(newline='') as source:
@@ -544,7 +547,7 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False)
     if door_witness:
         summary['openDoorWitness'] = True
     if resident_roundtrip:
-        roster = verify_bellwether_resident_roster(rows, intervals)
+        roster = verify_bellwether_resident_roster(rows, intervals, relic_dealer=relic_dealer)
         summary.update(scope='Android Debug RT resident round-trip submissions and present-call returns',
                        residentSourceIds=roster['sourceIds'],
                        residentSlotSequencesByPhase={phase: [list(pair) for pair in pairs]
@@ -592,7 +595,11 @@ if __name__=='__main__':
     mode.add_argument('--compare-bellwether-keeper', action='store_true')
     mode.add_argument('--android-bellwether-doorway', action='store_true')
     mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
+    parser.add_argument('--expect-relic-dealer', action='store_true',
+                        help='Require the five-resident Android fixture, including the relic dealer')
     args=parser.parse_args()
+    if args.expect_relic_dealer and not args.android_bellwether_resident_roundtrip:
+        parser.error('--expect-relic-dealer requires --android-bellwether-resident-roundtrip')
     if args.compare_bellwether_keeper:
         if len(args.directories) != 2:
             parser.error('--compare-bellwether-keeper expects a baseline and a candidate directory')
@@ -601,7 +608,8 @@ if __name__=='__main__':
     for name in args.directories:
         if args.android_bellwether_doorway or args.android_bellwether_resident_roundtrip:
             analyze_android_bellwether(name, args.analysis_name,
-                                      resident_roundtrip=args.android_bellwether_resident_roundtrip)
+                                      resident_roundtrip=args.android_bellwether_resident_roundtrip,
+                                      relic_dealer=args.expect_relic_dealer)
         elif args.bellwether_doorway or args.bellwether_resident_roundtrip:
             analyze_bellwether(name, args.analysis_name, resident_roundtrip=args.bellwether_resident_roundtrip)
         else:
