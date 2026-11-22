@@ -483,6 +483,11 @@ public:
 #endif
     bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
+    // The caller must own the frame boundary and prove all prior sampling complete.
+    // Only the actor's three existing atlas layers are changed.
+    bool ReplaceChapterResidentTextureLayers(std::uint32_t stableId,
+        const std::filesystem::path& directory, bool (*retireReferences)(void*, std::string&),
+        void* user, std::string& diagnostic);
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
@@ -1238,6 +1243,9 @@ private:
         VkDeviceSize allocationSize = 0u;
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
         std::uint32_t mipLevels = 0u;
+        VkFormat format = VK_FORMAT_UNDEFINED;
+        VkExtent2D extent{};
+        std::uint32_t layers = 0u;
     };
     struct TextureUploadRecovery {
         Buffer staging;
@@ -1464,7 +1472,7 @@ private:
     TextureArray lichEmissive_;
     KeeperTextureLifetimeEvidence keeperTextureLifetime_{};
     std::array<TextureArray,2> keeperTextureRestoreQuarantine_{};
-    TextureUploadRecovery keeperTextureUploadRecovery_{};
+    TextureUploadRecovery textureUploadRecovery_{};
     std::string keeperTextureDirectory_;
     TextureArray staticBaseColor_;
     TextureArray staticNormal_;

@@ -701,7 +701,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     lichEmissive_ = std::exchange(other.lichEmissive_, TextureArray{});
     keeperTextureLifetime_ = std::exchange(other.keeperTextureLifetime_, {});
     keeperTextureRestoreQuarantine_ = std::exchange(other.keeperTextureRestoreQuarantine_, {});
-    keeperTextureUploadRecovery_ = std::exchange(other.keeperTextureUploadRecovery_, {});
+    textureUploadRecovery_ = std::exchange(other.textureUploadRecovery_, {});
     keeperTextureDirectory_ = std::exchange(other.keeperTextureDirectory_, {});
     staticBaseColor_ = std::exchange(other.staticBaseColor_, TextureArray{});
     staticNormal_ = std::exchange(other.staticNormal_, TextureArray{});
@@ -1852,8 +1852,8 @@ void PresentableTinyRtScene::Destroy()
     // The platform proves device idle before destroying a scene. Pending upload
     // commands and staging must outlive every image referenced by that work.
     if (device_ != VK_NULL_HANDLE)
-        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, keeperTextureUploadRecovery_.work);
-    else keeperTextureUploadRecovery_.work = {};
+        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, textureUploadRecovery_.work);
+    else textureUploadRecovery_.work = {};
 #if defined(_DEBUG)
     if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},diagnosticPreviewPairBuild_);
     else diagnosticPreviewPairBuild_={};
@@ -1865,7 +1865,7 @@ void PresentableTinyRtScene::Destroy()
     forestRetentionProof_={};forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
     forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
     forestSharedLayout_={};forestF01NorthPrototype_.reset();forestSurroundingsPrototype_.reset();sharedForestGeometryActive_=false;
-    DestroyBuffer(keeperTextureUploadRecovery_.staging);
+    DestroyBuffer(textureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
     keeperTextureLifetime_ = {};
     keeperTextureDirectory_.clear();
@@ -2243,7 +2243,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
              &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_,
              &rescueWorldUpdateScratch_, &waterDropletBlasUpdateScratch_,
-             &tlas_.backing, &tlasUpdateScratch_, &keeperTextureUploadRecovery_.staging})
+             &tlas_.backing, &tlasUpdateScratch_, &textureUploadRecovery_.staging})
     {
         AccumulateRtGpuBuffer(inventory, *buffer);
     }
@@ -3181,6 +3181,9 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         return false;
     }
     texture.mipLevels = mipLevels;
+    texture.format = format;
+    texture.extent = {width, height};
+    texture.layers = layers;
     return true;
 }
 
@@ -3261,6 +3264,183 @@ bool PresentableTinyRtScene::LoadChapterResidents(std::string& diagnostic)
         resident.hasPbrMaps = sharedMaps.has_value();
     }
     return true;
+}
+
+bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
+    std::uint32_t stableId, const std::filesystem::path& directory,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    auto& recovery = textureUploadRecovery_;
+    if (!ready_ || staticGeometryCompletionUnproved_ || directory.empty() || !retireReferences ||
+        recovery.staging.buffer || recovery.work.command || recovery.work.fence)
+    {
+        diagnostic = "Resident texture replacement needs a ready scene, an empty upload owner and a frame retirement proof.";
+        return false;
+    }
+    const auto source = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& resident) { return resident.stableId == stableId; });
+    if (source == chapterResidentSources_.end())
+    {
+        diagnostic = "Resident texture replacement requested an unknown actor.";
+        return false;
+    }
+    const auto lane = static_cast<std::size_t>(source - chapterResidentSources_.begin());
+    if (!chapterResidents_[lane].hasPbrMaps)
+    {
+        diagnostic = "Resident texture replacement requires an existing PBR layer set.";
+        return false;
+    }
+
+    // Deferred resident map sets occupy the tail of each array, in source order.
+    const auto trailingSets = static_cast<std::uint32_t>(std::count_if(
+        chapterResidents_.begin() + lane, chapterResidents_.end(),
+        [](const auto& resident) { return resident.hasPbrMaps; }));
+    const auto& instance = staticMeshSlot_.InstanceMetadata()[kFirstResidentMetadataIndex + lane];
+    const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
+    const auto& materials = staticMeshSlot_.Materials();
+    if (instance.stableObjectId != stableId || !instance.primitiveCount ||
+        instance.primitiveBase >= primitives.size() ||
+        instance.primitiveCount > primitives.size() - instance.primitiveBase)
+    {
+        diagnostic = "Resident texture replacement could not resolve its packed primitive rows.";
+        return false;
+    }
+    const auto rows = std::span(primitives).subspan(instance.primitiveBase, instance.primitiveCount);
+#if defined(__ANDROID__)
+    constexpr std::array names{"base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"};
+#else
+    constexpr std::array names{"base-color.windows.ktx2", "normal.windows.ktx2", "orm.windows.ktx2"};
+#endif
+    const std::array arrays{&staticBaseColor_, &staticNormal_, &staticOrm_};
+    struct LayerUpload
+    {
+        VkImage image = VK_NULL_HANDLE;
+        VkImageSubresourceRange range{};
+        std::vector<VkBufferImageCopy> copies;
+    };
+    std::array<LayerUpload, arrays.size()> uploads{};
+    std::vector<std::uint8_t> pixels;
+    const auto readBytes = [](const std::filesystem::path& path, std::vector<std::uint8_t>& bytes) {
+        std::ifstream file(path, std::ios::binary | std::ios::ate);
+        if (!file || file.tellg() < 80) return false;
+        bytes.resize(static_cast<std::size_t>(file.tellg()));
+        file.seekg(0, std::ios::beg);
+        return bool(file.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size())));
+    };
+    for (std::size_t map = 0; map < arrays.size(); ++map)
+    {
+        const auto& texture = *arrays[map];
+        if (!texture.image || texture.layers <= trailingSets)
+        {
+            diagnostic = "Resident texture replacement requires an allocated atlas layer.";
+            return false;
+        }
+        const auto layer = texture.layers - trailingSets;
+        const auto ownsLayer = [&](const auto& row) {
+            return row.materialIndex < materials.size() &&
+                materials[row.materialIndex].textureLayers[map] == layer;
+        };
+        if (!std::all_of(rows.begin(), rows.end(), ownsLayer))
+        {
+            diagnostic = "Resident texture replacement disagrees with the packed layer ownership.";
+            return false;
+        }
+        std::vector<std::uint8_t> baseline, replacement;
+        const auto path = directory / names[map];
+        if (!readBytes(source->directory / names[map], baseline) || !readBytes(path, replacement))
+        {
+            diagnostic = "Resident texture replacement could not read a complete map: " + path.string();
+            return false;
+        }
+        RtKtxArrayAppendView mips;
+        // Reuse the strict, byte-exact KTX compatibility check used at admission.
+        // Both the original resident sidecar and the incoming map have one layer.
+        if (!PrepareRtKtxArrayAppend(baseline, replacement, static_cast<std::uint32_t>(texture.format),
+                texture.extent.width, texture.extent.height, 1u, 2u, mips, diagnostic) ||
+            mips.mipLevels != texture.mipLevels)
+        {
+            diagnostic = "Resident texture replacement does not match its atlas mip layout or colour metadata: " + path.string();
+            return false;
+        }
+        auto& upload = uploads[map];
+        upload.image = texture.image;
+        upload.range = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, mips.mipLevels, layer, 1u};
+        for (std::uint32_t mip = 0; mip < mips.mipLevels; ++mip)
+        {
+            VkBufferImageCopy copy{};
+            copy.bufferOffset = pixels.size();
+            copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, mip, layer, 1u};
+            copy.imageExtent = {std::max(1u, texture.extent.width >> mip),
+                std::max(1u, texture.extent.height >> mip), 1u};
+            upload.copies.push_back(copy);
+            pixels.insert(pixels.end(), mips.mips[mip].begin(), mips.mips[mip].end());
+        }
+    }
+
+    Buffer staging;
+    if (!CreateBuffer(pixels.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            false, staging, diagnostic))
+        return false;
+    if (!WriteBuffer(staging, pixels.data(), pixels.size(), "resident map replacement", diagnostic) ||
+        !retireReferences(user, diagnostic))
+    {
+        DestroyBuffer(staging);
+        return false;
+    }
+    struct UploadBatch
+    {
+        const decltype(uploads)& layers;
+        VkBuffer staging;
+        VkPipelineStageFlags shaderStage;
+    } batch{uploads, staging.buffer, executionPolicy_.shaderPipelineStage};
+    const auto record = [](VkCommandBuffer command, void* userData) {
+        const auto& data = *static_cast<const UploadBatch*>(userData);
+        std::array<VkImageMemoryBarrier, 3> barriers{};
+        for (std::size_t i = 0; i < data.layers.size(); ++i)
+        {
+            auto& barrier = barriers[i];
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.srcQueueFamilyIndex = barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.image = data.layers[i].image;
+            barrier.subresourceRange = data.layers[i].range;
+        }
+        vkCmdPipelineBarrier(command, data.shaderStage, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+            0, nullptr, 0, nullptr, static_cast<std::uint32_t>(barriers.size()), barriers.data());
+        for (const auto& layer : data.layers)
+            vkCmdCopyBufferToImage(command, data.staging, layer.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                static_cast<std::uint32_t>(layer.copies.size()), layer.copies.data());
+        for (auto& barrier : barriers)
+        {
+            std::swap(barrier.oldLayout, barrier.newLayout);
+            std::swap(barrier.srcAccessMask, barrier.dstAccessMask);
+        }
+        vkCmdPipelineBarrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT, data.shaderStage, 0,
+            0, nullptr, 0, nullptr, static_cast<std::uint32_t>(barriers.size()), barriers.data());
+    };
+    const RtGpuWorkApi api{device_, queue_, commandPool_};
+    const bool submitted = SubmitRtGpuWork(api, recovery.work, record, &batch, diagnostic);
+    if (submitted && vkWaitForFences(device_, 1u, &recovery.work.fence, VK_TRUE, 2'000'000'000ull) == VK_SUCCESS &&
+        PollRtGpuWork(api, recovery.work, diagnostic) == RtGpuWorkStatus::Complete)
+    {
+        DestroyBuffer(staging);
+        return true;
+    }
+    if (recovery.work.submitted)
+    {
+        recovery.work.completionUnproved = true;
+        recovery.staging = std::exchange(staging, {});
+        staticGeometryCompletionUnproved_ = true;
+        ready_ = false;
+        diagnostic = "Resident atlas replacement has unproved completion. Retain the upload until device idle.";
+        return false;
+    }
+    DestroyBuffer(staging);
+    return false;
 }
 
 namespace
@@ -9835,7 +10015,7 @@ bool PresentableTinyRtScene::PrepareThirdActorTextureLifetimeWithApi(
        (restore && (lichBaseColor_.image || lichBaseColor_.memory || lichBaseColor_.view ||
                     lichEmissive_.image || lichEmissive_.memory || lichEmissive_.view)) ||
        keeperTextureRestoreQuarantine_[0].image || keeperTextureRestoreQuarantine_[1].image ||
-       keeperTextureUploadRecovery_.work.command || keeperTextureUploadRecovery_.staging.buffer) {
+       textureUploadRecovery_.work.command || textureUploadRecovery_.staging.buffer) {
         diagnostic="Third actor texture lifetime prerequisites are incomplete.";return false;
     }
     const auto generation=staticGeometryGeneration_,actorGeneration=chapterActorPoseGeneration_;
@@ -9853,7 +10033,7 @@ bool PresentableTinyRtScene::PrepareThirdActorTextureLifetimeWithApi(
     };
     std::array<TextureArray,2> candidate{};
     const auto reject=[&] {
-        if(staticGeometryCompletionUnproved_ || keeperTextureUploadRecovery_.work.submitted) {
+        if(staticGeometryCompletionUnproved_ || textureUploadRecovery_.work.submitted) {
             // Submitted texture upload references may still be live. The owned
             // command/fence/staging and both images stay until platform idle.
             keeperTextureRestoreQuarantine_=std::exchange(candidate,{});
@@ -10048,7 +10228,7 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
         [](void* opaque, TextureArray& base, TextureArray& emission, std::string& error) {
             auto& o = *static_cast<Owner*>(opaque);
             return o.scene->CreateKeeperTexturePair(o.scene->keeperTextureDirectory_, base, emission,
-                error, &o.scene->keeperTextureUploadRecovery_, o.observation);
+                error, &o.scene->textureUploadRecovery_, o.observation);
         },
         [](void* opaque, const std::array<VkDescriptorImageInfo, 2>& images) noexcept {
             auto& scene = *static_cast<Owner*>(opaque)->scene;

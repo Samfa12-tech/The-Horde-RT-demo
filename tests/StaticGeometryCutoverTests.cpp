@@ -298,12 +298,12 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 if(!c.partial) {emission=base;emission.image=Handle<VkImage>(31);emission.memory=Handle<VkDeviceMemory>(31);emission.view=Handle<VkImageView>(31);}
                 if(c.unproved || c.pendingThrow) {
                     c.scene->staticGeometryCompletionUnproved_=c.unproved;
-                    c.scene->keeperTextureUploadRecovery_.staging=Buffer(32);
-                    c.scene->keeperTextureUploadRecovery_.staging.memoryPropertyFlags=VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-                    c.scene->keeperTextureUploadRecovery_.work.command=Handle<VkCommandBuffer>(33);
-                    c.scene->keeperTextureUploadRecovery_.work.fence=Handle<VkFence>(34);
-                    c.scene->keeperTextureUploadRecovery_.work.submitted=true;
-                    c.scene->keeperTextureUploadRecovery_.work.completionUnproved=true;
+                    c.scene->textureUploadRecovery_.staging=Buffer(32);
+                    c.scene->textureUploadRecovery_.staging.memoryPropertyFlags=VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+                    c.scene->textureUploadRecovery_.work.command=Handle<VkCommandBuffer>(33);
+                    c.scene->textureUploadRecovery_.work.fence=Handle<VkFence>(34);
+                    c.scene->textureUploadRecovery_.work.submitted=true;
+                    c.scene->textureUploadRecovery_.work.completionUnproved=true;
                     if(c.pendingThrow)throw std::runtime_error("Exception after submitted texture upload");
                     return false;
                 }
@@ -382,15 +382,15 @@ struct PresentableTinyRtSceneStaticCutoverTestAccess {
                 "unproved texture upload retains and counts both images, staging and the owning command/fence");
             auto movedOwner=std::make_unique<Scene>(std::move(s));auto& moved=*movedOwner;
             failures+=!Check(moved.keeperTextureRestoreQuarantine_[0].image==Handle<VkImage>(30) &&
-                moved.keeperTextureUploadRecovery_.work.command==Handle<VkCommandBuffer>(33) &&
-                moved.keeperTextureUploadRecovery_.staging.buffer==Handle<VkBuffer>(32) &&
+                moved.textureUploadRecovery_.work.command==Handle<VkCommandBuffer>(33) &&
+                moved.textureUploadRecovery_.staging.buffer==Handle<VkBuffer>(32) &&
                 moved.KeeperTextureLifetime().retired && moved.keeperTextureDirectory_=="exact/keeper/source" &&
-                !s.keeperTextureRestoreQuarantine_[0].image && !s.keeperTextureUploadRecovery_.work.command &&
-                !s.keeperTextureUploadRecovery_.staging.buffer && !s.KeeperTextureLifetime().retired,
+                !s.keeperTextureRestoreQuarantine_[0].image && !s.textureUploadRecovery_.work.command &&
+                !s.textureUploadRecovery_.staging.buffer && !s.KeeperTextureLifetime().retired,
                 "move transfers the quarantine and exact-source identity without duplicating GPU owners");
             moved.Destroy();
             failures+=!Check(!moved.keeperTextureRestoreQuarantine_[0].image &&
-                !moved.keeperTextureUploadRecovery_.work.command && !moved.keeperTextureUploadRecovery_.staging.buffer &&
+                !moved.textureUploadRecovery_.work.command && !moved.textureUploadRecovery_.staging.buffer &&
                 !moved.KeeperTextureLifetime().retired && moved.keeperTextureDirectory_.empty(),
                 "idle teardown clears pending texture ownership and retirement evidence");
         }
