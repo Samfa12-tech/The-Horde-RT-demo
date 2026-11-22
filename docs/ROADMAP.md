@@ -136,7 +136,7 @@ The mapped [covered well](superpowers/plans/2026-11-07-bellwether-arrival-direct
 
 The mapped [western kitchen plots](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#western-kitchen-plots) sit beyond the relic stall at T02. Two terrain-fitted beds show the village growing food. The aisle follows the existing ground, and the crops share the forest foliage material.
 
-The [west service-yard checkpoint](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#west-service-yard) stages the closed privy and washstand on a short detour from the west lane. After the tavern conversation, the unseen occupant's request appears as a local caption. The recorded performance and rag hand-over remain open.
+The [west service-yard checkpoint](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#west-service-yard) stages the closed privy and washstand on a short detour from the west lane. After the tavern conversation, the unseen occupant's request appears as a local caption. The player can take a clean rag from the basket and leave it on the sheltered shelf. Delivery persists in the tavern save. Recording remains open.
 
 The [arrival plan](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#18-route-and-tavern-checkpoint) records the textured and rigged tavern keeper candidate. Private Debug builds can use her standing pose and retimed walk with the existing door and hearth marks. Both Windows hardware RT backends presented her at the hearth. Phone validation and distribution clearance remain open.
 

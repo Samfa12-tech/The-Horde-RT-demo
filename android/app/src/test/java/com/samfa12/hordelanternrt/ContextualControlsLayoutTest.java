@@ -116,6 +116,20 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void privyRagLabelsRequireTheirActionBitAndUseNoPriceOrCountdown() {
+        final int take = 7 << 16;
+        final int pass = take | (63 << 25);
+        assertEquals(0, MainActivity.contextualInteractLabel(take));
+        assertEquals(0, MainActivity.contextualInteractLabel(pass));
+        assertEquals("Take a clean rag",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), take | 1));
+        assertEquals("Pass the rag",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), pass | 1));
+        assertEquals(0, MainActivity.contextualRiverSeconds(take | 1));
+        assertEquals(0, MainActivity.contextualOrdinarySilverPrice(pass | 1));
+    }
+
+    @Test
     public void shoreBreathDetailsKeepUntimedApproachAndExposeCeilingCountdowns() {
         final int mill = 7 << 16;
         assertEquals(R.string.salvager_enter_shallows,

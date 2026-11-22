@@ -3725,6 +3725,11 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         }
         context.tavernInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.privyRagAction!=horde::gameplay::bellwether::PrivyRagAction::None) {
+        text = snapshot.privyRagAction==horde::gameplay::bellwether::PrivyRagAction::Take
+            ? "LEFT-CLICK / A TO TAKE A CLEAN RAG" : "LEFT-CLICK / A TO PASS THE RAG";
+        context.tavernInteractionPromptPresented=visible;
+    }
     else if((chapterInteract || saleReceipt) && snapshot.ordinarySilverAction!=OrdinarySilverAction::None) {
         switch(snapshot.ordinarySilverAction) {
         case OrdinarySilverAction::Take: text="LEFT-CLICK / A TO TAKE ORDINARY SILVER"; break;

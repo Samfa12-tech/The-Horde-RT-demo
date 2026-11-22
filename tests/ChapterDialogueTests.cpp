@@ -80,6 +80,11 @@ int main() {
           privySpec.audio[0]=='\0' && std::abs(privySpec.duration-3.6f)<.000001f &&
           RequiresChapterCaption(Line::PrivyRagRequest) && IsBellwetherLine(Line::PrivyRagRequest),
           "the appended privy request is an exact timed local caption with a stable project identity");
+    const auto& privyThanks=Spec(Line::PrivyRagThanks);
+    Check(static_cast<std::uint32_t>(Line::PrivyRagThanks)==static_cast<std::uint32_t>(Line::PrivyRagRequest)+1u &&
+          std::string_view(privyThanks.text)=="Thank you." && privyThanks.audio[0]=='\0' &&
+          RequiresChapterCaption(Line::PrivyRagThanks),
+          "the provisional local thanks stays caption-only and follows the need cue in the stable line table");
     for (const auto& cut : horde::audio::kBellwetherVoiceCuts) {
         const auto& spec = Spec(cut.line);
         Check(std::string_view(spec.speaker) == "Kit" &&
@@ -833,6 +838,31 @@ int main() {
         newSession.Step(.01f,local);newSession.Reset(true);newSession.Step(.01f,local);
         Check(newSession.State().line==Line::None,
               "completion and a preserving refresh keep the request consumed for the loaded session");
+
+        Director thanks;
+        Check(thanks.RestoreProgress(arrived,local,1,0),"privy thanks fixture restores");
+        thanks.Step(.01f,local);const auto requestCue=thanks.State();
+        Check(requestCue.line==Line::PrivyRagRequest && thanks.TryStartPrivyRagThanks(local,*local.privySource) &&
+              thanks.State().line==Line::PrivyRagThanks && !thanks.Complete(requestCue.line,requestCue.generation),
+              "delivery replaces only the active need cue with the local thanks and invalidates its callback");
+        auto nearShelf=local;nearShelf.privyInReach=false;
+        thanks.Step(.05f,nearShelf);
+        Check(thanks.State().line==Line::PrivyRagThanks && thanks.State().source.x==local.privySource->x &&
+              thanks.State().elapsed>.04f,
+              "the local feedback stays bound and advances when the player looks away in the same clear pocket");
+        auto leftPocket=nearShelf;leftPocket.privySource.reset();thanks.Step(.01f,leftPocket);
+        Check(thanks.State().line==Line::None,"leaving the clear privy pocket cancels the provisional thanks");
+        thanks.Step(.01f,local);
+        Check(thanks.State().line==Line::None,"a delivered need cue stays quiet when the player returns");
+
+        Director unrelated;
+        Check(unrelated.RestoreProgress(arrived,local,1,0),"unrelated speech fixture restores");
+        unrelated.ShowTavernDirections(local);
+        const auto directions=unrelated.State();
+        Check(!unrelated.CanInteractPrivyRag(local) &&
+              !unrelated.TryStartPrivyRagThanks(local,*local.privySource) &&
+              unrelated.State().line==directions.line && unrelated.State().generation==directions.generation,
+              "the provisional response never interrupts unrelated dialogue");
 
         for(int interruption=0;interruption<2;++interruption) {
             Director canceled;Check(canceled.RestoreProgress(arrived,local,1,0),"privy interruption fixture restores");

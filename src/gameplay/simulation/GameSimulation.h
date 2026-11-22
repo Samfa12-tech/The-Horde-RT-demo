@@ -36,6 +36,7 @@
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/traversal/BellwetherResidentRoster.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
 
 namespace horde::gameplay::validation
 {
@@ -363,6 +364,10 @@ private:
     bool CanBuyLanternFitting(const dialogue::Context&) const;
     campaign::OrdinarySilverAction CurrentOrdinarySilverAction(const dialogue::Context&) const;
     void InteractWithOrdinarySilver(campaign::OrdinarySilverAction);
+    bellwether::PrivyRagAction CurrentPrivyRagAction(const dialogue::Context&) const;
+    void InteractWithPrivyRag(bellwether::PrivyRagAction,const dialogue::Context&);
+    std::optional<campaign::Checkpoint> PreparePrivyRagDeliveredCheckpoint() const;
+    void CommitPrivyRagDeliveredCheckpoint(const campaign::Checkpoint&);
     void BuyLanternFitting(const dialogue::Context&);
     std::optional<campaign::Checkpoint> PrepareTreasureCheckpoint(campaign::TreasurePurse) const;
     void CommitTreasureCheckpoint(const campaign::Checkpoint&);
@@ -428,6 +433,7 @@ private:
     std::uint16_t shorePracticeBreathTicksRemaining_=0;
     bool salvagerShorePracticeCompleted_=false;
     bellwether::TavernDoor tavernDoor_;
+    bellwether::PrivyRagState privyRagState_=bellwether::PrivyRagState::Available;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};
     ChapterLocalAmbience localAmbience_{};

@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kOrdinarySilverSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202};
+    constexpr std::array<std::size_t,cp::kPrivyRagSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -107,6 +107,26 @@ int main() {
     tavern.zone=cp::Destination(tavern.id);
     tavern.position=cp::kBellwetherCheckpointPosition;tavern.yaw=-1.40f;tavern.pitch=-.22f;
     RoundTrip(tavern);
+    auto deliveredPrivy=tavern;
+    deliveredPrivy.schema=cp::kPrivyRagSchema;
+    deliveredPrivy.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+    deliveredPrivy.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+    deliveredPrivy.privyRagDelivered=true;
+    RoundTrip(deliveredPrivy);
+    auto deliveredBytes=Encode(deliveredPrivy);
+    Check(deliveredBytes.size()==203 && deliveredBytes.back()==std::byte{1},
+          "schema19 appends one delivered bit after the complete schema18 payload");
+    auto availablePrivy=deliveredPrivy;availablePrivy.privyRagDelivered=false;
+    const auto availableBytes=Encode(availablePrivy);
+    Check(availableBytes.back()==std::byte{0},"schema19 encodes Available with a canonical false byte");
+    auto badDeliveredBool=deliveredBytes;badDeliveredBool.back()=std::byte{2};Rechecksum(badDeliveredBool);
+    Reject(badDeliveredBool,codec::Error::Malformed);
+    auto unearnedPrivy=deliveredPrivy;unearnedPrivy.dialogue.tavernConversationLinesResolved--;
+    Check(!cp::Validate(unearnedPrivy),"the delivered fact requires completed Bellwether Talk");
+    unearnedPrivy=deliveredPrivy;unearnedPrivy.schema=cp::kOrdinarySilverSchema;
+    Check(!cp::Validate(unearnedPrivy),"schema18 cannot carry a delivered privy fact");
+    unearnedPrivy=deliveredPrivy;unearnedPrivy.contentRevision=cp::kForestContentRevision;
+    Check(!cp::Validate(unearnedPrivy),"the delivered fact requires Bellwether content revision");
     for(unsigned line=1;line<=3;++line) {
         auto spoken=tavern;spoken.dialogue.hearthLinesResolved=line;
         Check(!cp::Validate(spoken),"old schema cannot silently drop hearth progress");
@@ -281,7 +301,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kOrdinarySilverSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kPrivyRagSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -402,7 +422,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kOrdinarySilverSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kPrivyRagSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -447,7 +467,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kOrdinarySilverSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kPrivyRagSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;

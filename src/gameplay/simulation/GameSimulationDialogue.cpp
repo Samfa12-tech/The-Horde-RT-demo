@@ -4,6 +4,7 @@
 #include "audio/KitAnkleAudio.h"
 #include "../../../assets/models/world/source/bellwether-road-cache-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-privy-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
@@ -60,6 +61,10 @@ void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) 
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=ChapterInteractionContext(false);
+    if(const auto rag=CurrentPrivyRagAction(context);rag!=bellwether::PrivyRagAction::None) {
+        InteractWithPrivyRag(rag,context);
+        return;
+    }
     const auto door=TavernDoorAction(context);
     if(door!=bellwether::DoorAction::None) {
         tavernDoor_.destination=door==bellwether::DoorAction::Open?1.f:0.f;
@@ -148,6 +153,50 @@ campaign::OrdinarySilverAction GameSimulation::CurrentOrdinarySilverAction(const
            mark[1]-.025f,mark[1]+.025f,.025f))
         return OrdinarySilverAction::None;
     return OrdinarySilverAction::Take;
+}
+
+bellwether::PrivyRagAction GameSimulation::CurrentPrivyRagAction(const dialogue::Context& c) const {
+    using bellwether::PrivyRagAction;
+    if(!config_.developmentRescueJourney || !config_.authoredChapterTerrain ||
+       !config_.combatFoundation1_7 || legacyCombatCheckpoint_ || !campaignBoundary_ ||
+       campaignBoundary_->privyRagDelivered ||
+       campaignBoundary_->contentRevision<campaign::kBellwetherContentRevision ||
+       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size() ||
+       chapterDialogue_.State().tavernConversationLinesResolved!=dialogue::kTavernConversation.size() ||
+       !c.claimed || !c.alive || !c.exterior || c.paused || c.combat || c.traversing || !c.kitSeated ||
+       !playerSupport_.grounded || !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       !chapterDialogue_.CanInteractPrivyRag(c) || privyRagState_==bellwether::PrivyRagState::Delivered)
+        return PrivyRagAction::None;
+    const bool taking=privyRagState_==bellwether::PrivyRagState::Available;
+    if(!taking && campaignBoundaryRevision_==UINT64_MAX)return PrivyRagAction::None;
+    const auto& mark=taking?bellwether::kPrivyRagBasket:bellwether::kPrivyRagShelf;
+    constexpr float interactionHeight=.09f;
+    const float targetY=mark[1]+interactionHeight;
+    const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
+    const float distance=std::hypot(dx,dz);
+    const float facing=std::sin(c.yaw)*dx-std::cos(c.yaw)*dz;
+    if(distance>2.f || std::abs(c.listener.y-targetY)>1.35f || facing<.65f*distance ||
+       !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
+           targetY-.025f,targetY+.025f,.025f))
+        return PrivyRagAction::None;
+    return taking?PrivyRagAction::Take:PrivyRagAction::Pass;
+}
+
+void GameSimulation::InteractWithPrivyRag(bellwether::PrivyRagAction action,const dialogue::Context& context) {
+    using bellwether::PrivyRagAction;
+    using bellwether::PrivyRagState;
+    if(action==PrivyRagAction::Take) {
+        if(CurrentPrivyRagAction(context)==PrivyRagAction::Take && privyRagState_==PrivyRagState::Available)
+            privyRagState_=PrivyRagState::Carried;
+        return;
+    }
+    if(action!=PrivyRagAction::Pass || CurrentPrivyRagAction(context)!=PrivyRagAction::Pass ||
+       privyRagState_!=PrivyRagState::Carried || !chapterDialogue_.CanInteractPrivyRag(context))return;
+    const auto updated=PreparePrivyRagDeliveredCheckpoint();
+    if(!updated)return;
+    CommitPrivyRagDeliveredCheckpoint(*updated);
+    constexpr auto& mouth=bellwether::kBellwetherPrivyMouth;
+    chapterDialogue_.TryStartPrivyRagThanks(context,dialogue::Tuple{mouth[0],mouth[1],mouth[2]});
 }
 
 bellwether::SalvagerAction GameSimulation::CurrentSalvagerAction(const dialogue::Context& c) const {
@@ -531,8 +580,11 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
        chapterDialogue_.State().hearthLinesResolved==kHearthLines.size() &&
        std::hypot(c.player.x-mark[0],c.player.z-mark[2])<=4.f && std::abs(c.listener.y-mark[1])<=1.5f)
         c.shrineLanternSource=HeldRewardLanternSource();
+    const auto privyLine=chapterDialogue_.State().line;
+    const bool privyCueRelevant=privyRagState_==bellwether::PrivyRagState::Available ||
+        privyLine==dialogue::Line::PrivyRagRequest || privyLine==dialogue::Line::PrivyRagThanks;
     if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && config_.developmentRescueJourney &&
-       config_.authoredChapterTerrain &&
+       config_.authoredChapterTerrain && privyCueRelevant &&
        chapterDialogue_.State().tavernConversationLinesResolved==kTavernConversation.size() &&
        c.claimed && c.alive && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
        playerSupport_.grounded && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
@@ -542,13 +594,14 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
         const float dx=c.player.x-listen[0],dz=c.player.z-listen[2];
         const float distance=std::hypot(dx,dz);
         const float frontDistance=dx*front[0]+dz*front[1];
-        if(distance<=2.8f && frontDistance>=.65f*distance &&
-           std::abs(c.listener.y-listen[1])<=1.5f &&
+        if(distance<=2.8f && std::abs(c.listener.y-listen[1])<=1.5f &&
            chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,listen[0],listen[2],
                listen[1]-.025f,listen[1]+.025f,.025f)) {
             c.privySource=dialogue::Tuple{mouth[0],mouth[1],mouth[2]};
-            c.privyInReach=std::sin(c.yaw)*(listen[0]-c.player.x)-
-                std::cos(c.yaw)*(listen[2]-c.player.z)>=.65f*distance;
+            c.privyInReach=privyRagState_==bellwether::PrivyRagState::Available &&
+                frontDistance>=.65f*distance &&
+                std::sin(c.yaw)*(listen[0]-c.player.x)-
+                    std::cos(c.yaw)*(listen[2]-c.player.z)>=.65f*distance;
         }
     }
     return c;

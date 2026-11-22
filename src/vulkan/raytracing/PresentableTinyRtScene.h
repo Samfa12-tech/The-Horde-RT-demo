@@ -25,6 +25,7 @@
 #include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
 #include "scene/BellwetherShell.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
@@ -186,6 +187,8 @@ struct RtSceneFrameInputs
     bool millDriveInstalled=false;
     float millDriveAngleRadians=0.f;
     float millWaterwheelAngleRadians=0.f;
+    horde::gameplay::bellwether::PrivyRagState privyRag=
+        horde::gameplay::bellwether::PrivyRagState::Available;
     std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
@@ -344,6 +347,7 @@ public:
     static constexpr std::uint32_t kTavernDoorMetadataIndex = kWaysideRegisterMetadataIndex + 1u;
     static constexpr std::uint32_t kMillDriveMetadataIndex = kTavernDoorMetadataIndex + 1u;
     static constexpr std::uint32_t kMillWaterwheelMetadataIndex = kMillDriveMetadataIndex + 1u;
+    static constexpr std::uint32_t kPrivyRagMetadataIndex = kMillWaterwheelMetadataIndex + 1u;
     static constexpr std::uint32_t kMillDrivePrimitiveCount = 1u;
     static constexpr std::uint32_t kMillWaterwheelPrimitiveOffset = kMillDrivePrimitiveCount;
     static constexpr std::uint32_t kMillWaterwheelPrimitiveCount = 2u;
@@ -366,6 +370,7 @@ public:
     static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kMillDriveMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kMillWaterwheelMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kPrivyRagMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
@@ -1387,6 +1392,8 @@ private:
         const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
     bool ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR&, float angleRadians,
         std::string& diagnostic) const;
+    bool ApplyPrivyRagInstance(VkAccelerationStructureInstanceKHR&,
+        horde::gameplay::bellwether::PrivyRagState state, std::string& diagnostic) const;
     // Showcase chapter's unused fixture/legacy arm lane, shared with no other trial.
     static constexpr std::uint32_t kBellwetherFurnitureLane=9u;
     bool UsesBellwetherNearPage() const noexcept {
@@ -1400,6 +1407,7 @@ private:
             (waysideRegisterBlas_.address ? 1u : 0u) + (tavernDoorBlas_.address ? 1u : 0u) +
             (millDriveBlas_.address ? 1u : 0u) +
             (millWaterwheelBlas_.address ? 1u : 0u) +
+            (privyRagBlas_.address ? 1u : 0u) +
             (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
             static_cast<std::uint32_t>(chapterResidentSources_.size());
     }
@@ -1575,6 +1583,7 @@ private:
     AccelerationStructure tavernDoorBlas_;
     AccelerationStructure millDriveBlas_;
     AccelerationStructure millWaterwheelBlas_;
+    AccelerationStructure privyRagBlas_;
     std::array<AccelerationStructure,horde::scene::kBellwetherFurnitureTriangles.size()> bellwetherFurnitureBlas_{};
     horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
     horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
@@ -1765,6 +1774,7 @@ private:
     horde::scene::assets::StaticMeshAsset tavernDoorAsset_;
     horde::scene::assets::StaticMeshAsset millDriveAsset_;
     horde::scene::assets::StaticMeshAsset millWaterwheelAsset_;
+    horde::scene::assets::StaticMeshAsset privyRagAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

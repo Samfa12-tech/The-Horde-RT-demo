@@ -1125,6 +1125,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/asset.manifest.json", "models/world/runtime/bellwether-tavern-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json", "models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.glb", "models/world/runtime/bellwether-tavern-v1/privy-rag.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json", "models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.glb", "models/world/runtime/bellwether-tavern-v1/garden-crops.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/window.manifest.json", "models/world/runtime/bellwether-tavern-v1/window.manifest.json") &&
@@ -9046,6 +9048,7 @@ public class MainActivity extends Activity {
             case CONTEXTUAL_MILL_TAG:
                 final int detail = (state >>> 25) & 63;
                 switch (detail) {
+                    case 0: return (state & CONTEXTUAL_INTERACT) != 0 ? R.string.take_clean_rag : 0;
                     case 1: return R.string.inspect_mill_gearing;
                     case 2: return R.string.take_spare_bearing;
                     case 3: return R.string.check_mill_bearing_fit;
@@ -9066,6 +9069,7 @@ public class MainActivity extends Activity {
                     case 18: return R.string.salvager_report_back;
                     case 19: return R.string.salvager_recover_breath;
                     case 52: return R.string.ask_relic_dealer_trade;
+                    case 63: return (state & CONTEXTUAL_INTERACT) != 0 ? R.string.pass_the_rag : 0;
                     default:
                         if (detail == 53) return R.string.take_ordinary_silver;
                         if (detail == 54) return R.string.ordinary_silver_sold;

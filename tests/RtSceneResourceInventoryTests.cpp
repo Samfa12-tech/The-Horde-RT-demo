@@ -14,6 +14,7 @@
 #include "vulkan/raytracing/RtIndexedActorGeometry.h"
 #include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -518,6 +519,58 @@ struct PresentableTinyRtSceneObservationTestAccess
         return !scene.ApplyHealingFlaskInstances(instances,frame,hand,error) &&
             std::memcmp(instances.data(),before.data(),sizeof(instances))==0;
     }
+
+    static bool CheckPrivyRagInstancePublication()
+    {
+        using horde::gameplay::bellwether::PrivyRagState;
+        PresentableTinyRtScene scene;
+        scene.privyRagBlas_.address=0xA11CEu;
+        std::string diagnostic;
+        std::array<VkAccelerationStructureInstanceKHR,3u> instances{};
+        const std::array<PrivyRagState,3u> states{{
+            PrivyRagState::Available,PrivyRagState::Carried,PrivyRagState::Delivered}};
+        bool ok=true;
+        for(std::size_t i=0;i<states.size();++i) {
+            if(!scene.ApplyPrivyRagInstance(instances[i],states[i],diagnostic)) {
+                std::cerr<<"Privy rag instance: "<<diagnostic<<'\n';
+                return false;
+            }
+            const auto& anchor=states[i]==PrivyRagState::Delivered
+                ? horde::gameplay::bellwether::kPrivyRagShelf
+                : horde::gameplay::bellwether::kPrivyRagBasket;
+            const std::uint8_t expectedMask=states[i]==PrivyRagState::Carried?0u:1u;
+            const auto& instance=instances[i];
+            const auto& matrix=instance.transform.matrix;
+            ok &= Require(instance.instanceCustomIndex==PresentableTinyRtScene::kPrivyRagMetadataIndex &&
+                instance.accelerationStructureReference==scene.privyRagBlas_.address &&
+                instance.mask==expectedMask && matrix[0][0]==1.f && matrix[0][1]==0.f &&
+                matrix[0][2]==0.f && matrix[0][3]==anchor[0] && matrix[1][0]==0.f &&
+                matrix[1][1]==1.f && matrix[1][2]==0.f && matrix[1][3]==anchor[1] &&
+                matrix[2][0]==0.f && matrix[2][1]==0.f && matrix[2][2]==1.f &&
+                matrix[2][3]==anchor[2],
+                "privy rag follows the exact basket/shelf bottom anchor and masks only while carried");
+
+            horde::gameplay::simulation::SimulationSnapshot snapshot{};
+            snapshot.privyRag=states[i];
+            const auto frame=BuildRtSceneFrameInputs(snapshot,1.f);
+            ok &= Require(frame.privyRag==states[i],
+                "simulation frame adapter preserves the privy rag's shared state");
+
+            scene.ready_=true;
+            scene.tlasInstanceCount_=1u;
+            scene.tlasInstanceDefinitionsValid_=true;
+            scene.tlasBuiltInstances_={};
+            scene.tlasBuiltInstances_[0]=instance;
+            ok &= Require(scene.SubmittedInstanceMask(PresentableTinyRtScene::kPrivyRagMetadataIndex)==expectedMask,
+                "submitted rag mask is queryable through the existing metadata-indexed RT evidence API");
+        }
+        const auto before=instances[0];
+        if(scene.ApplyPrivyRagInstance(instances[0],static_cast<PrivyRagState>(255u),diagnostic) ||
+            std::memcmp(&before,&instances[0],sizeof(before))!=0)
+            return Require(false,"invalid privy rag state must reject publication atomically");
+        scene.privyRagBlas_.address=0u;
+        return ok;
+    }
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     static bool CheckActorWorkerRetirement()
     {
@@ -824,8 +877,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==40u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?44u:43u);
+        ok &= materials.size()==41u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?45u:44u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -850,6 +903,58 @@ struct PresentableTinyRtSceneObservationTestAccess
               scene.millWaterwheelAsset_.indices.size()==2180u*3u &&
               scene.millWaterwheelAsset_.vertices.size()==4252u,
               "waterwheel retains two separate packed primitive ranges and its admitted GLB contract");
+        const auto& rag=instances[PresentableTinyRtScene::kPrivyRagMetadataIndex];
+        ok &= Require(rag.primitiveCount==1u && rag.assetIndex!=drive.assetIndex &&
+              rag.assetIndex<kRtStaticAssetCapacity && rag.stableObjectId==0x42303752u &&
+              rag.flags==static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) &&
+              rag.primitiveBase<primitives.size() && scene.privyRagAsset_.primitives.size()==1u &&
+              scene.privyRagAsset_.materials.size()==1u && scene.privyRagAsset_.vertices.size()==122u &&
+              scene.privyRagAsset_.indices.size()==horde::gameplay::bellwether::kPrivyRagTriangles*3u &&
+              scene.privyRagAsset_.materials.front().name=="HordePrivyLinen",
+              "privy rag owns one appended static asset and its exact 56-triangle linen source");
+        if(rag.primitiveBase<primitives.size()) {
+            const auto materialIndex=primitives[rag.primitiveBase].materialIndex;
+            const auto opaqueUntexturedFlags=static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+                static_cast<std::uint32_t>(RtMaterialFlag::Transmission) |
+                static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture);
+            ok &= Require(materialIndex<materials.size() &&
+                (materials[materialIndex].materialFlags[0]&opaqueUntexturedFlags)==0u,
+                "HordePrivyLinen uses an opaque untextured material row without a shader-special flag");
+        } else ok=false;
+        {
+            using namespace horde::scene::assets;
+            const auto millDirectory=std::filesystem::path(root)/"models/world/runtime/bellwether-tavern-v1";
+            AssetManifest ragManifest;StaticMeshAsset originalRag;
+            if(!AssetManifest::Load(millDirectory/"privy-rag.manifest.json",ragManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"privy-rag.glb",ragManifest,originalRag,diagnostic)) return false;
+            if(originalRag.primitives.size()!=1u || originalRag.nodeTransforms.empty() ||
+               originalRag.primitives.front().nodeTransformIndex>=originalRag.nodeTransforms.size() ||
+               originalRag.materials.size()!=1u)return false;
+            const auto& sourcePrimitive=originalRag.primitives.front();
+            const auto& sourceNode=originalRag.nodeTransforms[sourcePrimitive.nodeTransformIndex];
+            bool identity=sourceNode.name=="BellwetherCleanRag";
+            for(std::size_t row=0;row<4u;++row)for(std::size_t column=0;column<4u;++column)
+                identity &= std::abs(sourceNode.world[row*4u+column]-(row==column?1.f:0.f))<1.e-6f;
+            ok &= Require(identity &&
+                sourcePrimitive.indexCount==horde::gameplay::bellwether::kPrivyRagTriangles*3u &&
+                std::memcmp(scene.privyRagAsset_.vertices.data(),originalRag.vertices.data(),
+                    originalRag.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(scene.privyRagAsset_.indices.data(),originalRag.indices.data(),
+                    originalRag.indices.size()*sizeof(std::uint32_t))==0,
+                "runtime rag source preserves its identity node and all authored vertex/index bytes");
+            const auto& sourceMaterial=originalRag.materials.front();
+            ok &= Require(sourceMaterial.name=="HordePrivyLinen" && sourceMaterial.baseColorTexture<0 &&
+                sourceMaterial.normalTexture<0 && sourceMaterial.ormTexture<0 && sourceMaterial.emissiveTexture<0 &&
+                sourceMaterial.transmissionFactor==0.f && sourceMaterial.metallicFactor==0.f &&
+                std::abs(sourceMaterial.baseColorFactor[0]-.82f)<.001f &&
+                std::abs(sourceMaterial.baseColorFactor[1]-.74f)<.001f &&
+                std::abs(sourceMaterial.baseColorFactor[2]-.58f)<.001f &&
+                std::abs(sourceMaterial.roughnessFactor-.94f)<.001f,
+                "HordePrivyLinen retains its light opaque linen factors without texture maps");
+        }
         {
             // Model the complete accepted Bellwether tail without creating GPU
             // objects. Drive and wheel remain separate BLAS/TLAS identities,
@@ -860,39 +965,42 @@ struct PresentableTinyRtSceneObservationTestAccess
             scene.tavernDoorBlas_.address=1u;
             scene.millDriveBlas_.address=1u;
             scene.millWaterwheelBlas_.address=1u;
+            scene.privyRagBlas_.address=1u;
             scene.dielectricFixtureBlas_.address=1u;
             const auto chapterTail=scene.ChapterTailInstanceCount();
             const std::uint32_t currentProfileTlasCount=PresentableTinyRtScene::kOrdinaryTlasInstanceCount+
                 64u+12u+chapterTail;
-            constexpr std::uint32_t fullBellwetherTailCount=6u+1u+
+            constexpr std::uint32_t fullBellwetherTailCount=7u+1u+
                 static_cast<std::uint32_t>(kAdditionalChapterActorCapacity);
             constexpr std::uint32_t fullBellwetherTlasCount=
                 PresentableTinyRtScene::kOrdinaryTlasInstanceCount+64u+12u+fullBellwetherTailCount;
-            std::array<bool,kRtStaticAssetCapacity> usedAssets{},usedAssetsWithoutWheel{};
+            std::array<bool,kRtStaticAssetCapacity> usedAssets{},usedAssetsWithoutRag{};
             for(std::size_t index=0;index<instances.size();++index) {
                 const auto& row=instances[index];
                 if(!row.primitiveCount)continue;
                 if(row.assetIndex>=usedAssets.size()) {ok=false;continue;}
                 usedAssets[row.assetIndex]=true;
-                if(index!=PresentableTinyRtScene::kMillWaterwheelMetadataIndex)
-                    usedAssetsWithoutWheel[row.assetIndex]=true;
+                if(index!=PresentableTinyRtScene::kPrivyRagMetadataIndex)
+                    usedAssetsWithoutRag[row.assetIndex]=true;
             }
             const auto uniqueAssetCount=std::count(usedAssets.begin(),usedAssets.end(),true);
-            const auto baselineAssetCount=std::count(usedAssetsWithoutWheel.begin(),usedAssetsWithoutWheel.end(),true);
-            ok &= Require(chapterTail==6u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
+            const auto baselineAssetCount=std::count(usedAssetsWithoutRag.begin(),usedAssetsWithoutRag.end(),true);
+            ok &= Require(chapterTail==7u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
                     scene.chapterResidentSources_.size() &&
                 currentProfileTlasCount<=kRtTlasInstanceCapacity &&
-                fullBellwetherTlasCount==116u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
-                kRtTlasInstanceCapacity-fullBellwetherTlasCount==3u,
-                "full Bellwether tail includes its window and two resident lanes at 116 of 119 TLAS slots");
-            ok &= Require(uniqueAssetCount==baselineAssetCount && uniqueAssetCount<=kRtStaticAssetCapacity,
-                "wheel reuses the packed drive asset owner without expanding the static asset roster");
+                fullBellwetherTlasCount==117u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
+                kRtTlasInstanceCapacity-fullBellwetherTlasCount==2u,
+                "full Bellwether tail includes the rag, window and two residents at 117 of 119 TLAS slots");
+            ok &= Require(uniqueAssetCount==baselineAssetCount+1u &&
+                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=23u,
+                "privy rag adds its own static asset after the existing 23-owner roster");
             scene.roadStoneBlas_.address=0u;
             scene.waysideCoverBlas_.address=0u;
             scene.waysideRegisterBlas_.address=0u;
             scene.tavernDoorBlas_.address=0u;
             scene.millDriveBlas_.address=0u;
             scene.millWaterwheelBlas_.address=0u;
+            scene.privyRagBlas_.address=0u;
             scene.dielectricFixtureBlas_.address=0u;
         }
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
@@ -1543,7 +1651,9 @@ struct PresentableTinyRtSceneObservationTestAccess
         // Eight original F03 kerbs and one marked waystone add 144 triangles
         // in the existing consolidated masonry owner, without a new row.
         constexpr auto townTriangles=horde::scene::kBellwetherSolidTriangles+horde::scene::kBellwetherGroundTriangles;
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 39266u + 656u + 6184u + 17712u + townTriangles + 6168u + 11904u + 72u + 144u)*3u;
+        // The separate crop GLB is appended to the shared world owner after the town shell.
+        constexpr auto cropTriangles=horde::gameplay::bellwether::kBellwetherGardenCropTriangles;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 39266u + 656u + 6184u + 17712u + townTriangles + cropTriangles + 6168u + 11904u + 72u + 144u)*3u;
         // The full woodland retains the same trees/ferns/rocks and opens two
         // rail spans, keeping the end post of the adjoining retained span.
         constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
@@ -1556,8 +1666,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 43u &&
-                  tomb.staticMeshSlot_.Materials().size() == 40u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 44u &&
+                  tomb.staticMeshSlot_.Materials().size() == 41u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)
@@ -2171,6 +2281,8 @@ int main(int argc, char** argv)
         "chapter residents keep separate GPU references and retry an unsubmitted pose");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckPrivyRagInstancePublication(),
+        "privy rag is a real opaque RT instance at the basket/shelf and hidden only while carried");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckProceduralSurfaceReadiness(),
                   "chapter readiness must admit the complete world/lid code buffer and reject missing/misaligned ranges");

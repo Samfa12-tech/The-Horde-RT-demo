@@ -879,6 +879,7 @@ void GameSimulation::ResetRoute()
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
     chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    privyRagState_=bellwether::PrivyRagState::Available;
     treasurePurse_={};
     millPreparation_={};
     millLeakTestPhase_={};
@@ -3572,6 +3573,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.millWaterwheelAngleRadians=millWaterwheelAngleRadians_;
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
+    snapshot_.privyRag=privyRagState_;
+    snapshot_.privyRagAction=CurrentPrivyRagAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
         playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();

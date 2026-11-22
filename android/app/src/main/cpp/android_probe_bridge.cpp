@@ -1355,6 +1355,13 @@ void PublishSimulationUiState()
         contextualControls |= ((action & 3) << 19) | ((action & 4) << 22) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.privyRagAction != horde::gameplay::bellwether::PrivyRagAction::None) {
+        constexpr int residentTag=7;
+        // Details zero and 63 are the free codes around the existing 1–62 roster.
+        const int detail=simulation.privyRagAction==horde::gameplay::bellwether::PrivyRagAction::Take ? 0 : 63;
+        contextualControls |= (residentTag << 16) | (detail << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
              (simulation.salvagerAction != SalvagerAction::None ||
               (simulation.shorePracticeStage != ShorePracticeStage::Idle &&
                simulation.ordinarySilverAction == horde::gameplay::campaign::OrdinarySilverAction::None))) {

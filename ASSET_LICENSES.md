@@ -1087,6 +1087,11 @@ authored in Blender by Samfa12/Codex. They reuse the existing town materials.
 The editable source and receipt are in
 `assets/models/world/source/bellwether-privy-v1/`.
 
+The nearby clean-rag basket, stand and folded linen are also original Horde
+geometry. The basket shares town materials. The linen uses a single untextured
+opaque finish. Their editable source is in
+`assets/models/world/source/bellwether-privy-rag-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

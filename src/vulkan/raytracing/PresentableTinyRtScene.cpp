@@ -58,6 +58,7 @@
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RegionalWaterRenderData.h"
 #include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
+#include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 
 #include <algorithm>
 #include <array>
@@ -228,6 +229,63 @@ bool AppendBellwetherWaterwheelGeometry(
         combined.bounds.maximum[axis] = std::max(combined.bounds.maximum[axis], waterwheel.bounds.maximum[axis]);
     }
     millDrive = std::move(combined);
+    diagnostic.clear();
+    return true;
+}
+
+bool ValidateBellwetherPrivyRagAsset(
+    const horde::scene::assets::StaticMeshAsset& rag,
+    std::string& diagnostic)
+{
+    using horde::scene::assets::StaticMeshAsset;
+    if (rag.primitives.size() != 1u || rag.materials.size() != 1u ||
+        rag.vertices.size() != 122u || rag.indices.size() != horde::gameplay::bellwether::kPrivyRagTriangles * 3u ||
+        !rag.HasValidTriangleProvenance())
+    {
+        diagnostic = "The Bellwether privy rag requires one primitive/material and its exact 56-triangle source mesh.";
+        return false;
+    }
+    const auto& material = rag.materials.front();
+    if (material.name != "HordePrivyLinen" || material.baseColorTexture >= 0 ||
+        material.normalTexture >= 0 || material.ormTexture >= 0 || material.emissiveTexture >= 0 ||
+        material.textureGroup >= 0 || material.deferTextureAllocation || material.transmissionFactor != 0.0f ||
+        material.baseColorFactor[3] != 1.0f || material.metallicFactor != 0.0f ||
+        std::abs(material.baseColorFactor[0] - 0.82f) > 0.001f ||
+        std::abs(material.baseColorFactor[1] - 0.74f) > 0.001f ||
+        std::abs(material.baseColorFactor[2] - 0.58f) > 0.001f ||
+        std::abs(material.roughnessFactor - 0.94f) > 0.001f ||
+        (material.flags & (static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+            static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) != 0u)
+    {
+        diagnostic = "The Bellwether privy rag requires its opaque, untextured HordePrivyLinen material.";
+        return false;
+    }
+    const auto node = std::find_if(rag.nodeTransforms.begin(), rag.nodeTransforms.end(),
+        [](const auto& transform) { return transform.name == "BellwetherCleanRag"; });
+    if (node == rag.nodeTransforms.end())
+    {
+        diagnostic = "The Bellwether privy rag GLB is missing its BellwetherCleanRag source node.";
+        return false;
+    }
+    const auto nodeIndex = static_cast<std::uint32_t>(node - rag.nodeTransforms.begin());
+    for (std::size_t row = 0u; row < 4u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+        {
+            const float expected = row == column ? 1.0f : 0.0f;
+            if (!std::isfinite(node->world[row * 4u + column]) ||
+                std::abs(node->world[row * 4u + column] - expected) > 1.0e-5f)
+            {
+                diagnostic = "The Bellwether privy rag source node must remain at local identity.";
+                return false;
+            }
+        }
+    const auto& primitive = rag.primitives.front();
+    if (primitive.materialIndex != 0u || primitive.nodeTransformIndex != nodeIndex ||
+        primitive.indexOffset != 0u || primitive.indexCount != horde::gameplay::bellwether::kPrivyRagTriangles * 3u)
+    {
+        diagnostic = "The Bellwether privy rag primitive must retain its single identity-local material range.";
+        return false;
+    }
     diagnostic.clear();
     return true;
 }
@@ -771,6 +829,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tavernDoorBlas_ = std::exchange(other.tavernDoorBlas_, AccelerationStructure{});
     millDriveBlas_ = std::exchange(other.millDriveBlas_, AccelerationStructure{});
     millWaterwheelBlas_ = std::exchange(other.millWaterwheelBlas_, AccelerationStructure{});
+    privyRagBlas_ = std::exchange(other.privyRagBlas_, AccelerationStructure{});
     bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
     bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
@@ -835,6 +894,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tavernDoorAsset_ = std::move(other.tavernDoorAsset_);
     millDriveAsset_ = std::move(other.millDriveAsset_);
     millWaterwheelAsset_ = std::move(other.millWaterwheelAsset_);
+    privyRagAsset_ = std::move(other.privyRagAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
@@ -1927,6 +1987,7 @@ void PresentableTinyRtScene::Destroy()
         tavernDoorBlas_ = {};
         millDriveBlas_ = {};
         millWaterwheelBlas_ = {};
+        privyRagBlas_ = {};
         bellwetherFurnitureBlas_={};
         bellwetherNearCandidate_={};
         bellwetherNearBuildScratch_={};
@@ -1940,6 +2001,7 @@ void PresentableTinyRtScene::Destroy()
         tavernDoorAsset_ = {};
         millDriveAsset_ = {};
         millWaterwheelAsset_ = {};
+        privyRagAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1999,6 +2061,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(tavernDoorBlas_);
     DestroyAccelerationStructure(millDriveBlas_);
     DestroyAccelerationStructure(millWaterwheelBlas_);
+    DestroyAccelerationStructure(privyRagBlas_);
     RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
     DestroyAccelerationStructure(bellwetherNearCandidate_);
     DestroyBuffer(bellwetherNearBuildScratch_);
@@ -2080,6 +2143,7 @@ void PresentableTinyRtScene::Destroy()
     tavernDoorAsset_ = {};
     millDriveAsset_ = {};
     millWaterwheelAsset_ = {};
+    privyRagAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
@@ -2196,7 +2260,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for(const auto& owner:bellwetherFurnitureBlas_)
         append(result.bottomLevelAccelerationStructures,owner.handle);
@@ -2265,7 +2329,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -4033,6 +4097,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     tavernDoorAsset_ = {};
     millDriveAsset_ = {};
     millWaterwheelAsset_ = {};
+    privyRagAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -4198,6 +4263,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         const auto millDirectory = root / "models/world/runtime/bellwether-tavern-v1";
         horde::scene::assets::AssetManifest millDriveManifest;
         horde::scene::assets::AssetManifest millWaterwheelManifest;
+        horde::scene::assets::AssetManifest privyRagManifest;
         if (!horde::scene::assets::AssetManifest::Load(millDirectory / "mill-bench-drive.manifest.json",
                 millDriveManifest, diagnostic) ||
             !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-bench-drive.glb",
@@ -4205,13 +4271,18 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !horde::scene::assets::AssetManifest::Load(millDirectory / "mill-waterwheel.manifest.json",
                 millWaterwheelManifest, diagnostic) ||
             !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-waterwheel.glb",
-                millWaterwheelManifest, millWaterwheelAsset_, diagnostic)) return false;
+                millWaterwheelManifest, millWaterwheelAsset_, diagnostic) ||
+            !horde::scene::assets::AssetManifest::Load(millDirectory / "privy-rag.manifest.json",
+                privyRagManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "privy-rag.glb",
+                privyRagManifest, privyRagAsset_, diagnostic)) return false;
         if (!jointPropAssetAdmitted(millDriveAsset_) || millDriveAsset_.indices.size() != 384u * 3u) {
             diagnostic = "The mill bench drive requires its bounded, opaque bronze geometry.";
             return false;
         }
         if (!AppendBellwetherWaterwheelGeometry(millDriveAsset_, millWaterwheelAsset_, diagnostic))
             return false;
+        if (!ValidateBellwetherPrivyRagAsset(privyRagAsset_, diagnostic)) return false;
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
                 rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
@@ -6655,7 +6726,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!millDriveAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillDriveMetadataIndex,
             "Bellwether mill bench drive", millDriveBlas_, true)) ||
         (!millWaterwheelAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillWaterwheelMetadataIndex,
-            "Bellwether waterwheel", millWaterwheelBlas_, true)))
+            "Bellwether waterwheel", millWaterwheelBlas_, true)) ||
+        (!privyRagAsset_.primitives.empty() && !buildRegisteredStaticBlas(kPrivyRagMetadataIndex,
+            "Bellwether privy rag", privyRagBlas_, true)))
         return false;
     if(bellwetherFurnitureTransitions_) {
         const std::uint32_t firstTier=(UsesBellwetherNearPage() ||
@@ -7195,6 +7268,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     if (millWaterwheelBlas_.address) {
         auto& instance = instances[tlasInstanceCount_];
         if (!ApplyMillWaterwheelInstance(instance, 0.f, diagnostic)) return false;
+        ++tlasInstanceCount_;
+    }
+    if (privyRagBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_];
+        if (!ApplyPrivyRagInstance(instance, horde::gameplay::bellwether::PrivyRagState::Available,
+                diagnostic)) return false;
         ++tlasInstanceCount_;
     }
     if(bellwetherFurnitureTransitions_) {
@@ -8532,6 +8611,48 @@ bool PresentableTinyRtScene::ApplyMillWaterwheelInstance(VkAccelerationStructure
     return true;
 }
 
+bool PresentableTinyRtScene::ApplyPrivyRagInstance(VkAccelerationStructureInstanceKHR& instance,
+    const horde::gameplay::bellwether::PrivyRagState state, std::string& diagnostic) const
+{
+    if (privyRagBlas_.address == 0u)
+    {
+        diagnostic = "Bellwether privy rag requires its registered immutable BLAS.";
+        return false;
+    }
+    std::array<float, 3u> position = horde::gameplay::bellwether::kPrivyRagBasket;
+    bool visible = true;
+    switch (state)
+    {
+    case horde::gameplay::bellwether::PrivyRagState::Available:
+        break;
+    case horde::gameplay::bellwether::PrivyRagState::Carried:
+        visible = false;
+        break;
+    case horde::gameplay::bellwether::PrivyRagState::Delivered:
+        position = horde::gameplay::bellwether::kPrivyRagShelf;
+        break;
+    default:
+        diagnostic = "Bellwether privy rag snapshot has an invalid state.";
+        return false;
+    }
+    if (std::any_of(position.begin(), position.end(), [](const float coordinate) {
+            return !std::isfinite(coordinate);
+        }))
+    {
+        diagnostic = "Bellwether privy rag anchors must be finite world coordinates.";
+        return false;
+    }
+    instance.transform = {{{1.f, 0.f, 0.f, position[0]},
+                           {0.f, 1.f, 0.f, position[1]},
+                           {0.f, 0.f, 1.f, position[2]}}};
+    instance.instanceCustomIndex = kPrivyRagMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = privyRagBlas_.address;
+    diagnostic.clear();
+    return true;
+}
+
 void PresentableTinyRtScene::ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR& instance,
                                                         bool visible) const
 {
@@ -9799,6 +9920,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (millPropSlot >= tlasInstanceCount_ ||
             !ApplyMillWaterwheelInstance(instances[millPropSlot++],
                 frame.millWaterwheelAngleRadians, diagnostic)) return false;
+    }
+    if (privyRagBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_ ||
+            !ApplyPrivyRagInstance(instances[millPropSlot++], frame.privyRag, diagnostic)) return false;
     }
     if (millPropSlot != tlasInstanceCount_) {
         diagnostic = "Bellwether chapter TLAS tail does not match its submitted dynamic owners.";

@@ -166,6 +166,35 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     resumed.StepFixed(resumedInput,1.f/60.f,3);
     Check(!resumed.Snapshot().tavernConversationAvailable && resumed.Snapshot().chapterDialogue.line==Line::None,
           "the real tavern remains quiet on Interact until a keeper is admitted");
+
+    // Model the same-boundary update published by the simulation after the hand-over.
+    auto afterTalk=complete;
+    afterTalk.schema=cp::kTavernConversationSchema;
+    afterTalk.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+    const auto beforeTalkSave=play.State().operationRevision;
+    const bool savedTalk=Seed(fresh,afterTalk,terrain) && play.ObserveSafeBoundary() && awaitSave(play,beforeTalkSave);
+    Check(savedTalk,"the completed Talk is the baseline autosave for the rag favour");
+    if(savedTalk) {
+        auto delivered=afterTalk;
+        delivered.schema=cp::kPrivyRagSchema;
+        delivered.privyRagDelivered=true;
+        const auto beforeDeliverySave=play.State().operationRevision;
+        const bool savedDelivery=Seed(fresh,delivered,terrain) && play.ObserveSafeBoundary() &&
+            awaitSave(play,beforeDeliverySave);
+        Check(savedDelivery,"rag delivery alone refreshes the existing tavern autosave");
+        if(savedDelivery) {
+            const auto saved=Read(directory.path,1,cp::SaveKind::Autosave);
+            Check(saved.checkpoint.schema==cp::kPrivyRagSchema && saved.checkpoint.privyRagDelivered &&
+                  saved.checkpoint.id==afterTalk.id && saved.checkpoint.treasurePurse==afterTalk.treasurePurse &&
+                  saved.checkpoint.flask==afterTalk.flask,
+                  "the exact new disk record retains the tavern boundary and resources");
+            const auto operation=play.State().operationRevision;
+            for(unsigned tick=0;tick<16;++tick){play.ObserveSafeBoundary();play.Poll();}
+            Check(play.State().operationRevision==operation,
+                  "observing a delivered rag again does not queue another autosave");
+        }
+    }
+
     auto staffedConfig=sim::ProductionGameSimulationConfig();
     staffedConfig.bellwetherTavernKeeperAdmitted=true;
     for (const auto& [name,expected] : std::array{

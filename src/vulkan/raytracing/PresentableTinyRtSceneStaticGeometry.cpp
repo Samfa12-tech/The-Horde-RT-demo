@@ -653,6 +653,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         if (furnitureOffset) tiers.primitiveCount = static_cast<std::uint32_t>(furniture->primitives.size());
         registrations.push_back(tiers);
     }
+    if (!privyRagAsset_.primitives.empty())
+        registrations.push_back({kPrivyRagMetadataIndex, 0x42303752u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &privyRagAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)

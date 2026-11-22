@@ -287,6 +287,12 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(listen[0],listen[2],mouth[0],mouth[2],
                       mouth[1]-.025f,mouth[1]+.025f,.025f),
                   "the listener can approach the door while the solid leaf conceals the occupant");
+            for(const auto& rag:{kPrivyRagBasket,kPrivyRagShelf}) {
+                check(follow(yard[1],yard.back()) && std::hypot(yard.back().x-rag[0],yard.back().z-rag[2])<2.f &&
+                      support->NonWalkableVolumeClear(yard.back().x,yard.back().z,rag[0],rag[2],
+                          rag[1]+.07f,rag[1]+.11f,.025f),
+                      "a grounded visitor can reach the cloth above both the basket and the door shelf");
+            }
         }
         {
             using namespace horde::gameplay::traversal;

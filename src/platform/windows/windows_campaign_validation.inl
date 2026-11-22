@@ -992,7 +992,7 @@ int FinishHiddenLookoutValidation(HWND owner,int result)
         gBellwetherHearthRestValidation ? 110 : 90;
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
         !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
-    const int timeLimit = baseTimeLimit + (verifiesSilver ? 90 : 0);
+    const int timeLimit = baseTimeLimit + (verifiesSilver ? 135 : 0);
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1208,7 +1208,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
         !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
     const auto deadline = std::chrono::steady_clock::now() +
-        std::chrono::seconds(baseTimeLimit + (verifiesSilver ? 65 : 0));
+        std::chrono::seconds(baseTimeLimit + (verifiesSilver ? 110 : 0));
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1693,6 +1693,66 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             state.treasurePurse.coins == 0 && savedSilver(OrdinarySilverProgress::Sold, 0, true) &&
                             reloadWithTownResidents() && state.treasurePurse.lanternFittingPurchased,
                             "the silver proceeds pay for the existing hinge fitting without taking the register reward");
+                    }
+                    if (progressed && verifiesSilver) {
+                        const auto visitYard = [&] {
+                            return leaveTavern() && walkTo(westBranch) &&
+                                std::all_of(kBellwetherServiceYardApproach.begin(), kBellwetherServiceYardApproach.end(), walkTo);
+                        };
+                        const auto inspectRag = [&](const std::array<float,3>& mark) {
+                            input.pitchRadians = -.32f;
+                            return face(mark[0],mark[2]) && setInspectionLight(HeldLightPose::High) && frame();
+                        };
+                        const auto ragVisible = [&](bool visible) {
+                            return ctx.rtScene.SubmittedInstanceMask(Scene::kPrivyRagMetadataIndex) == (visible ? 1u : 0u);
+                        };
+                        const auto controlIs = [&](int id, std::string_view expected) {
+                            std::array<char,96> prompt{};
+                            return GetWindowTextA(GetDlgItem(ctx.windowHandle,id),prompt.data(),
+                                static_cast<int>(prompt.size())) > 0 && std::string_view(prompt.data()) == expected;
+                        };
+                        const auto storedDelivery = [&](bool delivered) {
+                            campaign::storage::StoredCheckpoint stored;
+                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status ==
+                                campaign::storage::Status::Read && stored.checkpoint.privyRagDelivered == delivered &&
+                                (!delivered || stored.checkpoint.schema==campaign::kPrivyRagSchema);
+                        };
+                        const auto initialPurse = state.treasurePurse;
+                        const auto initialFlask = state.healingFlask.resources;
+                        const auto initialRevision = ctx.simulation.CampaignBoundaryRevision();
+                        const auto takeRag = [&] {
+                            return state.privyRagAction == PrivyRagAction::Take &&
+                                controlIs(kChestPromptControlId,"LEFT-CLICK / A TO TAKE A CLEAN RAG") && interact() && frame() &&
+                                state.privyRag == PrivyRagState::Carried && ragVisible(false);
+                        };
+                        const float previousPitch = input.pitchRadians;
+                        const bool ragProgress = visitYard() && inspectRag(kPrivyRagBasket) &&
+                            state.privyRag == PrivyRagState::Available && ragVisible(true) &&
+                            capture("windows-combined-rag-basket.png",false) && takeRag() &&
+                            ctx.simulation.CampaignBoundaryRevision() == initialRevision && storedDelivery(false) &&
+                            reloadWithTownResidents() && state.privyRag == PrivyRagState::Available && ragVisible(true) &&
+                            visitYard() && inspectRag(kPrivyRagBasket) && takeRag() && inspectRag(kPrivyRagShelf) &&
+                            state.privyRagAction == PrivyRagAction::Pass &&
+                            controlIs(kChestPromptControlId,"LEFT-CLICK / A TO PASS THE RAG");
+                        if (!ragProgress) std::cerr << "Service-yard rag before delivery: position=" << state.playerX
+                            << ',' << state.playerZ << " rag=" << static_cast<int>(state.privyRag)
+                            << " action=" << static_cast<int>(state.privyRagAction)
+                            << " caption=" << static_cast<int>(state.chapterDialogue.line) << '\n';
+                        const auto deliveryRevision = ctx.simulation.CampaignBoundaryRevision();
+                        const bool delivered = ragProgress && interact() && frame() &&
+                            state.privyRag == PrivyRagState::Delivered && state.privyRagAction == PrivyRagAction::None &&
+                            state.chapterDialogue.line == Line::PrivyRagThanks && ragVisible(true) &&
+                            controlIs(kChapterSubtitleId,"Privy occupant: Thank you.") &&
+                            ctx.simulation.CampaignBoundaryRevision() == deliveryRevision + 1;
+                        const bool deliverySaved = delivered && until([&] { return storedDelivery(true); },false);
+                        if (delivered && !deliverySaved) std::cerr << "Service-yard rag delivery never reached the autosave.\n";
+                        progressed = check(deliverySaved &&
+                            capture("windows-combined-rag-shelf.png",false) && interact() &&
+                            ctx.simulation.CampaignBoundaryRevision() == deliveryRevision + 1 &&
+                            state.treasurePurse == initialPurse && state.healingFlask.resources == initialFlask &&
+                            reloadWithTownResidents() && state.privyRag == PrivyRagState::Delivered && ragVisible(true),
+                            "the clean rag returns after an interrupted pickup and persists on the shelf after one delivery");
+                        input.pitchRadians = previousPitch;
                     }
                 }
                 if (progressed) progressed = check(town() &&

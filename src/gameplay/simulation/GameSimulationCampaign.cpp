@@ -34,7 +34,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
         c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,
-        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted);};
+        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted,c.privyRagDelivered);};
     return facts(a)==facts(b);
 }
 }
@@ -220,6 +220,10 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         c.salvagerShorePracticeCompleted=true;
         c.schema=std::max(c.schema,campaign::kSalvagerShorePracticeSchema);
     }
+    if(privyRagState_==bellwether::PrivyRagState::Delivered) {
+        c.privyRagDelivered=true;
+        c.schema=std::max(c.schema,campaign::kPrivyRagSchema);
+    }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -256,6 +260,27 @@ std::optional<campaign::Checkpoint> GameSimulation::PrepareTreasureCheckpoint(ca
     RecordTreasurePurse(updated,purse);
     if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return std::nullopt;
     return updated;
+}
+std::optional<campaign::Checkpoint> GameSimulation::PreparePrivyRagDeliveredCheckpoint() const {
+    if(privyRagState_!=bellwether::PrivyRagState::Carried || !campaignBoundary_ ||
+       campaignBoundaryRevision_==UINT64_MAX || campaignBoundary_->privyRagDelivered || !chapterTerrain_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation ||
+       campaignBoundary_->contentRevision<campaign::kBellwetherContentRevision ||
+       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())
+        return std::nullopt;
+    auto updated=*campaignBoundary_;
+    updated.privyRagDelivered=true;
+    updated.schema=std::max(updated.schema,campaign::kPrivyRagSchema);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return std::nullopt;
+    return updated;
+}
+void GameSimulation::CommitPrivyRagDeliveredCheckpoint(const campaign::Checkpoint& updated) {
+    if(privyRagState_!=bellwether::PrivyRagState::Carried || !updated.privyRagDelivered ||
+       !campaignBoundary_ || campaignBoundary_->privyRagDelivered || campaignBoundaryRevision_==UINT64_MAX)
+        return;
+    campaignBoundary_=updated;
+    privyRagState_=bellwether::PrivyRagState::Delivered;
+    ++campaignBoundaryRevision_;
 }
 void GameSimulation::CommitTreasureCheckpoint(const campaign::Checkpoint& updated) {
     treasurePurse_=updated.treasurePurse;
@@ -473,6 +498,8 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
     next.treasurePurse_=c.treasurePurse;
+    next.privyRagState_=c.privyRagDelivered?bellwether::PrivyRagState::Delivered:
+        bellwether::PrivyRagState::Available;
     next.millPreparation_=c.millPreparation;
     next.salvagerShorePracticeCompleted_=c.salvagerShorePracticeCompleted;
     if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;

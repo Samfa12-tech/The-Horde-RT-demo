@@ -12,6 +12,7 @@
 #include "gameplay/simulation/StaticDetailLease.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/traversal/BellwetherMill.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
 #include "gameplay/traversal/BellwetherWestRoute.h"
 
@@ -101,13 +102,16 @@ struct SimulationSnapshot
     campaign::OrdinarySilverAction ordinarySilverAction{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
+    bellwether::PrivyRagState privyRag=bellwether::PrivyRagState::Available;
+    bellwether::PrivyRagAction privyRagAction=bellwether::PrivyRagAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
             salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||
             ordinarySilverAction==campaign::OrdinarySilverAction::Take ||
-            ordinarySilverAction==campaign::OrdinarySilverAction::Sell;
+            ordinarySilverAction==campaign::OrdinarySilverAction::Sell ||
+            privyRagAction!=bellwether::PrivyRagAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;
