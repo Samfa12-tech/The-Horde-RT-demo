@@ -2196,6 +2196,45 @@ void TestBellwetherResidentRosters(
           combined.Snapshot().salvager && combined.Snapshot().artificer->foot==artificerFoot &&
           combined.Snapshot().salvager->foot==salvagerFoot,
           "re-admission restores the persisted east actor poses");
+
+    const auto* repeatVisit=gameplay::FindDevelopmentCheckpoint("bellwether-repeat-visit");
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) && repeatVisit &&
+          gameplay::StageDevelopmentCheckpointSimulation(combined,*repeatVisit),
+          "the combined performance route stages the same completed room as the doorway route");
+    gameplay::validation::BellwetherDoorwayProbe probe;
+    if(!probe.Start(combined.Snapshot(),true)) {
+        Check(false,"the combined performance route admits the staffed town pair");return;
+    }
+    const auto startTick=combined.Snapshot().tickIndex;
+    unsigned eastVisits=0;
+    bool atEast=false;
+    const auto deadlineTicks=static_cast<std::uint64_t>(probe.kResidentRoundTripDeadlineSeconds*60);
+    while(combined.Snapshot().tickIndex-startTick<deadlineTicks && !probe.Complete() && !probe.Failed()) {
+        const auto& state=combined.Snapshot();
+        const auto input=probe.Next(state);
+        if(probe.PhaseName()=="east-fork") {
+            if(!atEast) {
+                atEast=true;
+                ++eastVisits;
+                Check(std::hypot(state.playerX-kBellwetherSalvagerMark.x,
+                                 state.playerZ-kBellwetherSalvagerMark.z)<.045f && state.playerGrounded,
+                      "the normal player motor reaches the grounded salvager's fork mark");
+                auto missingResident=probe;
+                Check(missingResident.Next(state).paused && missingResident.Failed(),
+                      "the fork hold rejects a stale town roster");
+                if(!combined.PublishBellwetherResidents(kEastResidentMask)) break;
+            }
+        } else if(atEast && probe.PhaseName()=="doorway-inbound") {
+            atEast=false;
+            if(!combined.PublishBellwetherResidents(kTownResidentMask)) break;
+        }
+        if(!input.paused) combined.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        combined.ClearEvents();
+    }
+    Check(probe.Complete() && probe.Returns()==2 && eastVisits==2 &&
+          combined.Snapshot().tickIndex-startTick>=3600 &&
+          combined.Snapshot().tavernKeeper && combined.Snapshot().recordKeeper,
+          "the combined input schedule walks to the east fork and back into the staffed tavern twice within the measurement deadline");
 }
 
 void TestBellwetherSalvagerPractice(

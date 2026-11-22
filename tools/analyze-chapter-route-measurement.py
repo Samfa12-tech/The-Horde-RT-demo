@@ -26,6 +26,79 @@ def stats(values):
     return dict(count=len(v), mean=statistics.fmean(v), median=statistics.median(v),
                 p95=rank(.95), p99=rank(.99), maximum=v[-1], minimum=v[0])
 
+
+BELLWETHER_RESIDENT_SOURCE_IDS = {
+    'TavernKeeper': 0x4230314b,
+    'RecordKeeper': 0x42303252,
+    'Artificer': 0x42303541,
+    'Salvager': 0x42303553,
+}
+def verify_bellwether_resident_roster(rows, intervals=None):
+    """Validate the resident sequence shared by the Windows and Android routes."""
+    ids = BELLWETHER_RESIDENT_SOURCE_IDS
+    role_names = [('TavernKeeper', 'RecordKeeper'), ('TavernKeeper', 'Salvager'),
+                  ('Artificer', 'Salvager')]
+    town, fork, east = (tuple(ids[name] for name in names) for names in role_names)
+    names_by_pair = dict(zip((town, fork, east), map('+'.join, role_names)))
+    expected_pairs = {'room': [town], 'doorway-outbound': [town, fork, east],
+                      'east-fork': [east], 'doorway-inbound': [east, fork, town],
+                      'complete': [town]}
+    expected_phases = [(phase, lap) for lap in range(2)
+                       for phase in expected_pairs if phase != 'complete']
+    expected_phases += [('room', 2), ('complete', 2)]
+
+    pairs = []
+    for row in rows:
+        fields = ('resident_slot0_id', 'resident_slot1_id')
+        values = [row.get(key, '') for key in fields]
+        if any(not re.fullmatch(r'[0-9]+', value or '') for value in values):
+            raise ValueError(f'Frame {row["submission_serial"]} lacks decimal resident source IDs')
+        if any(row[key] != '1' for key in ('resident_mask', 'record_keeper_mask') if key in row):
+            raise ValueError(f'Frame {row["submission_serial"]} lost a resident slot mask')
+        pairs.append(tuple(map(int, values)))
+
+    observed_phases = []
+    for (phase, lap), frames in itertools.groupby(
+            zip(rows, pairs), key=lambda entry: (entry[0]['phase'], int(entry[0]['returns']))):
+        observed_phases.append((phase, lap))
+        observed_pairs = [pair for pair, _ in itertools.groupby(pair for _, pair in frames)]
+        if observed_pairs != expected_pairs.get(phase):
+            raise ValueError(f'Return {lap + 1} has the wrong resident pair sequence in {phase}')
+    if observed_phases != expected_phases:
+        raise ValueError('Expected two complete room-doorway-east-fork returns')
+    if intervals is not None and len(intervals) != len(rows):
+        raise ValueError('Resident transition intervals do not match rows')
+
+    counts = {'outbound': {}, 'inbound': {}}
+    transitions = {}
+    for index, (before, after) in enumerate(zip(pairs, pairs[1:]), start=1):
+        if before == after:
+            continue
+        row = rows[index]
+        direction = row['phase'].removeprefix('doorway-')
+        if direction not in counts:
+            raise ValueError(f'Frame {row["submission_serial"]} changed residents outside the walk')
+        trip = int(row['returns']) + 1
+        counts[direction][str(trip)] = counts[direction].get(str(trip), 0) + 1
+        name = f'{direction}:{names_by_pair[before]}->{names_by_pair[after]}'
+        transition = transitions.setdefault(name, {'returns': [], 'intervals': []})
+        transition['returns'].append(trip)
+        if intervals is not None:
+            interval = intervals[index]
+            if interval is None or interval <= 0:
+                raise ValueError(f'Frame {row["submission_serial"]} lost its transition present interval')
+            transition['intervals'].append(interval)
+
+    for transition in transitions.values():
+        values = transition.pop('intervals')
+        transition['count'] = len(transition['returns'])
+        if values:
+            transition['presentReturnIntervalMilliseconds'] = stats(values)
+            transition['worstPresentReturnIntervalMilliseconds'] = max(values)
+    return dict(sourceIds=ids, phasePairSequences=expected_pairs,
+                transitionCounts=counts, transitions=transitions)
+
+
 def analyze(name, analysis_name='analysis-v3.json'):
     root=pathlib.Path(name); sealed=(root/'completed-frames.csv').exists()
     directory=root if sealed else root/'shipping-route'
@@ -328,11 +401,13 @@ def compare_bellwether_keeper(baseline, candidate, analysis_name):
     print(json.dumps(result, indent=2))
 
 
-def analyze_android_bellwether(name, analysis_name):
+def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False):
     directory = pathlib.Path(name)
-    with (directory / 'bellwether-doorway.csv').open(newline='') as source:
+    filename = 'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv'
+    with (directory / filename).open(newline='') as source:
         reader = csv.DictReader(source)
-        door_witness = 'tavern_door_mask' in (reader.fieldnames or ())
+        fields = set(reader.fieldnames or ())
+        door_witness = 'tavern_door_mask' in fields
         rows = list(reader)
 
     def require(condition, detail):
@@ -340,14 +415,20 @@ def analyze_android_bellwether(name, analysis_name):
             raise ValueError(detail)
 
     require(bool(rows), 'Bellwether route report is empty')
-    groups = [pair for pair, _ in itertools.groupby(
-        (row['phase'], int(row['returns'])) for row in rows)]
-    expected = [(phase, lap) for lap in range(2)
-                for phase in ('room', 'doorway-outbound', 'square', 'doorway-inbound')]
-    require(groups == expected + [('room', 2), ('complete', 2)],
-            'Expected two complete room-doorway-square returns')
+    destination = 'east-fork' if resident_roundtrip else 'square'
+    phases = ('room', 'doorway-outbound', destination, 'doorway-inbound')
+    if resident_roundtrip:
+        require({'resident_slot0_id', 'resident_slot1_id', 'tavern_door_mask'} <= fields,
+                'Resident round-trip report lacks source IDs or the tavern door witness')
+    else:
+        groups = [pair for pair, _ in itertools.groupby(
+            (row['phase'], int(row['returns'])) for row in rows)]
+        expected = [(phase, lap) for lap in range(2) for phase in phases]
+        require(groups == expected + [('room', 2), ('complete', 2)],
+                'Expected two complete room-doorway-square returns')
     backend = rows[0]['backend']
     identity = rows[0]['scene_epoch'], rows[0]['generation']
+    shader_hash = rows[0]['shader_sha256']
     setting_fields = ('internal_width', 'internal_height', 'output_width', 'output_height', 'glass_enabled')
     width, height, surface_width, surface_height, glass = tuple(int(rows[0][key]) for key in setting_fields)
     require(backend in ('RayTracingPipeline', 'RayQueryCompute') and all(int(key) > 0 for key in identity),
@@ -360,7 +441,8 @@ def analyze_android_bellwether(name, analysis_name):
     returned = [int(row['present_return_ns']) for row in rows]
     require(serials[0] > 0 and serials == list(range(serials[0], serials[0] + len(rows))),
             'Submissions must be continuous')
-    require(elapsed[0] > 0 and 60e9 <= elapsed[-1] <= 151e9 and ticks[-1] - ticks[0] >= 3600,
+    deadline_ns = 241e9 if resident_roundtrip else 151e9
+    require(elapsed[0] > 0 and 60e9 <= elapsed[-1] <= deadline_ns and ticks[-1] - ticks[0] >= 3600,
             'Missing a full simulated or wall-clock route')
     clock_base = returned[0] - elapsed[0]
     intervals = []
@@ -374,10 +456,16 @@ def analyze_android_bellwether(name, analysis_name):
                 f'Frame {serial} lost the GPU-to-present join')
         require(int(row['record_serial']) > 0 and int(row['gpu_ns']) > 0 and int(row['cpu_cycle_ns']) > 0 and
                 re.fullmatch(r'[0-9a-f]{64}', row['shader_sha256']), f'Frame {serial} lacks timing or shader evidence')
-        require(row['record_keeper_mask'] == '1', f'Frame {serial} lost the record keeper instance')
+        require(not resident_roundtrip or row['shader_sha256'] == shader_hash,
+                f'Frame {serial} changed the active shader')
+        if resident_roundtrip:
+            require(row['resident_mask'] == row['record_keeper_mask'] == '1',
+                    f'Frame {serial} lost a resident slot mask')
+        else:
+            require(row['record_keeper_mask'] == '1', f'Frame {serial} lost the record keeper instance')
         if door_witness:
             require(row['tavern_door_mask'] == '1', f'Frame {serial} lost the open tavern door instance')
-        if row['phase'] == 'room':
+        if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
             require([row[key] for key in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', str(glass), '1'],
                     f'Frame {serial} changed the staffed tavern workload')
         require(returned[index] - elapsed[index] == clock_base and
@@ -392,19 +480,30 @@ def analyze_android_bellwether(name, analysis_name):
                    phases={})
     if door_witness:
         summary['openDoorWitness'] = True
-    for phase in dict.fromkeys(phase for phase, _ in expected):
+    if resident_roundtrip:
+        roster = verify_bellwether_resident_roster(rows, intervals)
+        summary.update(scope='Android Debug RT resident round-trip submissions and present-call returns',
+                       residentSourceIds=roster['sourceIds'],
+                       residentSlotSequencesByPhase={phase: [list(pair) for pair in pairs]
+                                                     for phase, pairs in roster['phasePairSequences'].items()},
+                       transitionCounts=roster['transitionCounts'], transitions=roster['transitions'])
+    for phase in phases:
         indices = [i for i, row in enumerate(rows) if row['phase'] == phase and elapsed[i] >= 5e9]
         require(bool(indices), f'No post-warmup frames for {phase}')
         resources = {}
         for key in ('device_local_bytes', 'host_visible_bytes', 'tlas_instances', 'blas_owners'):
             values = [int(rows[i][key]) for i in indices]
             resources[key] = [min(values), max(values)]
-        summary['phases'][phase] = dict(
+        phase_intervals = [intervals[i] for i in indices
+                           if i and rows[i - 1]['phase'] == phase and elapsed[i - 1] >= 5e9]
+        phase_summary = dict(
             gpuMilliseconds=stats([int(rows[i]['gpu_ns']) / 1e6 for i in indices]),
             nativeCycleMilliseconds=stats([int(rows[i]['cpu_cycle_ns']) / 1e6 for i in indices]),
-            presentReturnIntervalMilliseconds=stats([
-                intervals[i] for i in indices if i and rows[i - 1]['phase'] == phase and elapsed[i - 1] >= 5e9]),
+            presentReturnIntervalMilliseconds=stats(phase_intervals),
             resourceMinMax=resources)
+        if resident_roundtrip:
+            phase_summary['worstPresentReturnIntervalMilliseconds'] = max(phase_intervals, default=None)
+        summary['phases'][phase] = phase_summary
     require(pathlib.Path(analysis_name).name == analysis_name and analysis_name.endswith('.json'),
             'Expected a plain JSON analysis filename')
     target = directory / analysis_name
@@ -423,13 +522,18 @@ if __name__=='__main__':
     mode.add_argument('--bellwether-doorway', action='store_true')
     mode.add_argument('--compare-bellwether-keeper', action='store_true')
     mode.add_argument('--android-bellwether-doorway', action='store_true')
+    mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
     args=parser.parse_args()
     if args.compare_bellwether_keeper:
         if len(args.directories) != 2:
             parser.error('--compare-bellwether-keeper expects a baseline and a candidate directory')
         compare_bellwether_keeper(*args.directories, args.analysis_name)
         raise SystemExit(0)
-    analyzer = (analyze_android_bellwether if args.android_bellwether_doorway else
-                analyze_bellwether if args.bellwether_doorway else analyze)
     for name in args.directories:
-        analyzer(name,args.analysis_name)
+        if args.android_bellwether_doorway or args.android_bellwether_resident_roundtrip:
+            analyze_android_bellwether(name, args.analysis_name,
+                                      resident_roundtrip=args.android_bellwether_resident_roundtrip)
+        elif args.bellwether_doorway:
+            analyze_bellwether(name, args.analysis_name)
+        else:
+            analyze(name, args.analysis_name)

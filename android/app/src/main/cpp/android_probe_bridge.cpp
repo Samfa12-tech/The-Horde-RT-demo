@@ -141,6 +141,9 @@ constexpr float kDefaultAndroidRtRenderScale = 0.50f;
 constexpr uint32_t kMaxFramesInFlight = 1u;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
 constexpr std::int32_t kBellwetherDoorwayMeasurementCheckpoint = 337;
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+constexpr std::int32_t kBellwetherResidentRoundtripMeasurementCheckpoint = 347;
+#endif
 #endif
 
 std::string JsonUtf8String(const std::string_view value)
@@ -434,6 +437,7 @@ struct SwapchainContext
     bool rtFrameEvidenceInitialised = false;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     bool bellwetherDoorwayRequested = false;
+    bool bellwetherResidentRoundtripRequested = false;
     std::optional<horde::platform::android::BellwetherDoorwayMeasurement> bellwetherDoorway;
 #endif
     float outputExposure = 0.92f;
@@ -2137,6 +2141,14 @@ bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& sel
         selection.checkpoint.name = "bellwether-doorway-measurement";
         return true;
     }
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if (id == kBellwetherResidentRoundtripMeasurementCheckpoint) {
+        if (!ResolveDebugCheckpoint(329, selection)) return false;
+        selection.checkpoint.id = id;
+        selection.checkpoint.name = "bellwether-resident-roundtrip-measurement";
+        return true;
+    }
+#endif
 #endif
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
@@ -2534,12 +2546,18 @@ void WriteChapterStartAcknowledgement(
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
 void CancelBellwetherDoorwayMeasurement(SwapchainContext& context, const char* reason)
 {
-    if (!context.bellwetherDoorway && !context.bellwetherDoorwayRequested) return;
+    if (!context.bellwetherDoorway && !context.bellwetherDoorwayRequested &&
+        !context.bellwetherResidentRoundtripRequested) return;
+    const bool residentRoundtrip = context.bellwetherResidentRoundtripRequested ||
+        (context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast());
     context.bellwetherDoorwayRequested = false;
+    context.bellwetherResidentRoundtripRequested = false;
     context.bellwetherDoorway.reset();
     context.lastInputOwnerSteadyNs = 0u;
     gGameSimulation.ResetTiming();
-    __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_BELLWETHER_DOORWAY failed reason=%s", reason);
+    __android_log_print(ANDROID_LOG_ERROR, kTag, residentRoundtrip
+        ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP failed reason=%s"
+        : "HORDE_BELLWETHER_DOORWAY failed reason=%s", reason);
 }
 #endif
 
@@ -2552,11 +2570,17 @@ bool ApplyBenchmarkCheckpoint(
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     CancelBellwetherDoorwayMeasurement(context, "checkpoint changed");
     const bool measureDoorway = checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint;
-    if (measureDoorway && (!context.gpuFrameTimingEnabled || kMaxFramesInFlight != 1u)) return false;
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    const bool measureResidentRoundtrip = checkpoint.id == kBellwetherResidentRoundtripMeasurementCheckpoint;
+#else
+    const bool measureResidentRoundtrip = false;
+#endif
+    if ((measureDoorway || measureResidentRoundtrip) &&
+        (!context.gpuFrameTimingEnabled || kMaxFramesInFlight != 1u)) return false;
 #endif
     const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-        || checkpoint.id == 329 || checkpoint.id == 335 || measureDoorway
+        || checkpoint.id == 329 || checkpoint.id == 335 || measureDoorway || measureResidentRoundtrip
 #endif
         );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
@@ -2610,6 +2634,7 @@ bool ApplyBenchmarkCheckpoint(
     {
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
         context.bellwetherDoorwayRequested = measureDoorway;
+        context.bellwetherResidentRoundtripRequested = measureResidentRoundtrip;
 #endif
         // This owner playtest route is not a benchmark: retain ordinary damage,
         // teaching and dialogue timing from its first live fixed step.
@@ -2643,7 +2668,11 @@ bool ApplyCaptureCheckpoint(
     const auto& checkpoint = selection.checkpoint;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     CancelBellwetherDoorwayMeasurement(context, "capture requested");
-    if (checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint) return false;
+    if (checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+        || checkpoint.id == kBellwetherResidentRoundtripMeasurementCheckpoint
+#endif
+        ) return false;
 #endif
     context.combatFeedbackCaptureSnapshot.reset();
     if (!ApplyDebugCheckpointSimulation(context, selection, observation))
@@ -4405,10 +4434,13 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot)) {
                 CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
             } else if (context.bellwetherDoorway->probe.Complete()) {
+                const bool residentRoundtrip = context.bellwetherDoorway->CombinedEast();
                 context.bellwetherDoorway.reset();
                 context.lastInputOwnerSteadyNs = 0u;
                 gGameSimulation.ResetTiming();
-                __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_BELLWETHER_DOORWAY complete returns=2");
+                __android_log_print(ANDROID_LOG_INFO, kTag, residentRoundtrip
+                    ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP complete returns=2"
+                    : "HORDE_BELLWETHER_DOORWAY complete returns=2");
             }
         }
 #endif
@@ -5502,20 +5534,28 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-    if (context.bellwetherDoorway || context.bellwetherDoorwayRequested) {
+    if (context.bellwetherDoorway || context.bellwetherDoorwayRequested ||
+        context.bellwetherResidentRoundtripRequested) {
+        const bool residentRoundtrip = context.bellwetherResidentRoundtripRequested ||
+            (context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast());
         horde::telemetry::RtSubmittedFrameIdentity owner{};
         const auto& state = gGameSimulation.Snapshot();
         if (!evidenceFrame || acquireResult != VK_SUCCESS || presentResult != VK_SUCCESS ||
             !context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
             owner.frame.simulationTick != state.tickIndex) {
             CancelBellwetherDoorwayMeasurement(context, "no stable RT submission for the staged pose");
-        } else if (context.bellwetherDoorwayRequested) {
+        } else if (context.bellwetherDoorwayRequested || context.bellwetherResidentRoundtripRequested) {
             context.bellwetherDoorwayRequested = false;
+            context.bellwetherResidentRoundtripRequested = false;
             auto& run = context.bellwetherDoorway.emplace();
-            if (!run.Start(state, std::filesystem::path(context.reportDirectory) / "bellwether-doorway.csv", presentDone))
+            if (!run.Start(state, std::filesystem::path(context.reportDirectory) /
+                    (residentRoundtrip ? "bellwether-resident-roundtrip.csv" : "bellwether-doorway.csv"),
+                    presentDone, residentRoundtrip))
                 CancelBellwetherDoorwayMeasurement(context, "staffed repeat visit or report unavailable");
             else
-                __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_BELLWETHER_DOORWAY started");
+                __android_log_print(ANDROID_LOG_INFO, kTag, residentRoundtrip
+                    ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP started"
+                    : "HORDE_BELLWETHER_DOORWAY started");
         } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene)) {
             CancelBellwetherDoorwayMeasurement(context, "submission sequence or resource generation changed");
         }

@@ -22,6 +22,8 @@ public final class ChapterDebugCheckpointTest {
         assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 337 : -1,
                 MainActivity.checkpointId("bellwether-doorway-measurement"));
         final boolean combined = BuildConfig.BELLWETHER_COMBINED_RESIDENTS;
+        assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && combined ? 347 : -1,
+                MainActivity.checkpointId("bellwether-resident-roundtrip-measurement"));
         final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !combined;
         final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !combined;
         final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
@@ -38,10 +40,16 @@ public final class ChapterDebugCheckpointTest {
             assertArrayEquals(new float[]{-.14f, -.11f}, MainActivity.developmentCheckpointViewPose(329), .000001f);
             assertArrayEquals(MainActivity.developmentCheckpointViewPose(329),
                     MainActivity.developmentCheckpointViewPose(337), .000001f);
+            if (combined)
+                assertArrayEquals(MainActivity.developmentCheckpointViewPose(329),
+                        MainActivity.developmentCheckpointViewPose(347), .000001f);
         } else {
             assertNull(MainActivity.developmentCheckpointViewPose(329));
             assertNull(MainActivity.developmentCheckpointViewPose(337));
+            assertNull(MainActivity.developmentCheckpointViewPose(347));
         }
+        if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !combined)
+            assertNull(MainActivity.developmentCheckpointViewPose(347));
         if (church)
             assertArrayEquals(new float[]{1.57079632679f, -.07f}, MainActivity.developmentCheckpointViewPose(335), .000001f);
         else

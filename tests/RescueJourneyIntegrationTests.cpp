@@ -83,6 +83,10 @@ int main(int argc,char** argv) {
   ChapterRouteMeasurementClock reset;
   check(reset.Consume(0)==0 && reset.ConsumedTicks()==0 && reset.PendingTicks()==0,
         "new measurement must have no inherited time or input debt");
+  ChapterRouteMeasurementClock longerRoute(240.0);
+  check(longerRoute.Consume(160.0)==4 && longerRoute.PendingTicks()==9596 &&
+        longerRoute.Consume(240.0)==4 && !longerRoute.Consume(240.01),
+        "the longer route has its own deadline and the same per-render catch-up bound");
   using horde::gameplay::validation::MeasureChapterRouteHostPhases;
   const std::array<std::uint64_t,7> marks{{100,110,120,720,730,740,750}};
   const auto host=MeasureChapterRouteHostPhases(marks,5,true);

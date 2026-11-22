@@ -102,3 +102,101 @@ def verify_android_route():
 
 verify_android_route()
 print('Android doorway verification rejected stale GPU, missing residents, mixed generations and truncated runs.')
+
+
+def verify_android_resident_roundtrip():
+    source_ids = {
+        'TavernKeeper': 0x4230314b,
+        'RecordKeeper': 0x42303252,
+        'Artificer': 0x42303541,
+        'Salvager': 0x42303553,
+    }
+    phase_roles = {
+        'room': ('TavernKeeper', 'RecordKeeper'),
+        'doorway-outbound': ('TavernKeeper', 'Salvager'),
+        'east-fork': ('Artificer', 'Salvager'),
+        'doorway-inbound': ('TavernKeeper', 'Salvager'),
+        'complete': ('TavernKeeper', 'RecordKeeper'),
+    }
+    phase_sequences = {
+        'room': [phase_roles['room']],
+        'doorway-outbound': [phase_roles['room'], phase_roles['doorway-outbound'],
+                             ('Artificer', 'Salvager')],
+        'east-fork': [('Artificer', 'Salvager')],
+        'doorway-inbound': [('Artificer', 'Salvager'), phase_roles['doorway-inbound'],
+                            phase_roles['room']],
+        'complete': [phase_roles['complete']],
+    }
+    phases = [(phase, lap) for lap in range(2)
+              for phase in ('room', 'doorway-outbound', 'east-fork', 'doorway-inbound')]
+    rows = []
+    for phase, lap in phases + [('room', 2), ('complete', 2)]:
+        for role0, role1 in phase_sequences[phase]:
+            for _ in range(1 if phase == 'complete' else 55):
+                serial = 100 + len(rows)
+                elapsed = (len(rows) + 1) * 67_000_000
+                rows.append(dict(phase=phase, station=1, returns=lap, elapsed_ns=elapsed,
+                    present_return_ns=200_000_000_000 + elapsed, scene_epoch=4, generation=3,
+                    record_serial=serial, submission_serial=serial, tick=4 * len(rows),
+                    completion_serial=serial, present_serial=serial, gpu_serial=serial,
+                    gpu_ns=40_000_000, cpu_cycle_ns=66_000_000, backend='RayTracingPipeline',
+                    shader_sha256='a' * 64, internal_width=475, internal_height=980,
+                    output_width=1440, output_height=2971, glass_enabled=0,
+                    fire_count=3 if phase in ('room', 'complete') else 2,
+                    tlas_instances=37, blas_owners=28,
+                    device_local_bytes=231_192_576, host_visible_bytes=78_070_656,
+                    kit_mask=1, window_mask=0, resident_mask=1, record_keeper_mask=1,
+                    tavern_door_mask=1,
+                    resident_slot0_id=str(source_ids[role0]),
+                    resident_slot1_id=str(source_ids[role1])))
+
+    with TemporaryDirectory() as root:
+        report = pathlib.Path(root) / 'bellwether-resident-roundtrip.csv'
+
+        def analyze(rows, name='resident-analysis.json'):
+            with report.open('w', newline='') as output:
+                writer = csv.DictWriter(output, fieldnames=rows[0])
+                writer.writeheader()
+                writer.writerows(rows)
+            with redirect_stdout(StringIO()):
+                m.analyze_android_bellwether(root, name, resident_roundtrip=True)
+
+        analyze(rows)
+        summary = json.loads((report.parent / 'resident-analysis.json').read_text())
+        assert summary['residentSourceIds'] == source_ids
+        assert summary['transitionCounts'] == {'outbound': {'1': 2, '2': 2},
+                                                'inbound': {'1': 2, '2': 2}}
+        assert summary['transitions']['outbound:TavernKeeper+RecordKeeper->TavernKeeper+Salvager']['count'] == 2
+        assert summary['transitions']['inbound:Artificer+Salvager->TavernKeeper+Salvager']['count'] == 2
+        assert all('worstPresentReturnIntervalMilliseconds' in phase
+                   for phase in summary['phases'].values())
+        assert 'presentReturnThroughputHz' not in summary
+        host_rows = [{key: row[key] for key in
+                      ('phase', 'returns', 'submission_serial', 'resident_slot0_id', 'resident_slot1_id')}
+                     for row in rows]
+        host_proof = m.verify_bellwether_resident_roster(
+            host_rows, [None] + [67.0] * (len(host_rows) - 1))
+        assert host_proof['transitionCounts'] == summary['transitionCounts']
+
+        stale = [dict(row) for row in rows]
+        stale[230]['resident_slot0_id'] = str(source_ids['TavernKeeper'])
+        try:
+            analyze(stale, 'stale-roster.json')
+        except ValueError as error:
+            assert ('stale resident roster' in str(error) or
+                    'wrong resident pair sequence' in str(error)), error
+        else:
+            raise AssertionError('A stale east-fork resident roster passed')
+
+        faulty_join = [dict(row) for row in rows]
+        faulty_join[230]['gpu_serial'] = 0
+        try:
+            analyze(faulty_join, 'faulty-join.json')
+        except ValueError as error:
+            assert 'GPU-to-present join' in str(error), error
+        else:
+            raise AssertionError('A faulty resident-roundtrip timing join passed')
+
+
+verify_android_resident_roundtrip()
+print('Android resident round-trip verification accepted exact roles and rejected stale roster and faulty timing join.')

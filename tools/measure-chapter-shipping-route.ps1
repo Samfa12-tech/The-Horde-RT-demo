@@ -1,12 +1,15 @@
 param([Parameter(Mandatory=$true)][string]$Output,[switch]$Query,
  [ValidateSet('Debug','Release')][string]$Configuration='Release',[switch]$Foreground,[string]$Executable,
- [string]$BellwetherResidentFixture)
+ [string]$BellwetherResidentFixture,[string]$BellwetherCampaignDirectory)
 $ErrorActionPreference='Stop'
-$doorway=-not [string]::IsNullOrWhiteSpace($BellwetherResidentFixture)
+$residentRoundTrip=-not [string]::IsNullOrWhiteSpace($BellwetherCampaignDirectory)
+$hasDoorwayFixture=-not [string]::IsNullOrWhiteSpace($BellwetherResidentFixture)
+if($residentRoundTrip -and $hasDoorwayFixture) { throw 'Choose one Bellwether measurement fixture.' }
+$doorway=$residentRoundTrip -or $hasDoorwayFixture
 if($doorway -and ($Configuration -ne 'Debug' -or $Foreground)) {
  throw 'The Bellwether fixture is a hidden Debug GPU and resource measurement.'
 }
-$deadlineSeconds=if($doorway){300}else{180}
+$deadlineSeconds=if($residentRoundTrip){420}elseif($doorway){300}else{180}
 $root=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $destination=if([IO.Path]::IsPathRooted($Output)){$Output}else{Join-Path $root $Output}
 foreach($path in @($destination,($destination+'.stdout.log'),($destination+'.stderr.log'),($destination+'.candidate.json'))){
@@ -21,19 +24,29 @@ foreach($argument in @('--development-rescue-journey','--capture-showcase',$dest
  '--development-checkpoint')){$start.ArgumentList.Add($argument)}
 $fixtureHashes=$null
 if($doorway) {
- $fixture=(Resolve-Path -LiteralPath $BellwetherResidentFixture).Path
- foreach($argument in @('bellwether-repeat-visit','--measure-bellwether-doorway','--capture-hidden',
-  '--chapter-resident-fixture',$fixture)){$start.ArgumentList.Add($argument)}
- $fixtureHashes=@{}
- $rolePrefixes=@('')
- if(Test-Path -LiteralPath (Join-Path $fixture 'tavern-keeper') -PathType Container) {
-  $rolePrefixes=@('tavern-keeper/','record-keeper/')
+ $start.ArgumentList.Add('bellwether-repeat-visit')
+ $start.ArgumentList.Add('--capture-hidden')
+ if($residentRoundTrip) {
+  $fixture=(Resolve-Path -LiteralPath $BellwetherCampaignDirectory).Path
+  $start.ArgumentList.Add('--measure-bellwether-resident-roundtrip')
+  $start.ArgumentList.Add('--bellwether-campaign-dir')
+  $rolePrefixes=@('tavern-keeper/','record-keeper/','artificer/','salvager/')
+ }else{
+  $fixture=(Resolve-Path -LiteralPath $BellwetherResidentFixture).Path
+  $start.ArgumentList.Add('--measure-bellwether-doorway')
+  $start.ArgumentList.Add('--chapter-resident-fixture')
+  $rolePrefixes=@('')
+  if(Test-Path -LiteralPath (Join-Path $fixture 'tavern-keeper') -PathType Container) {
+   $rolePrefixes=@('tavern-keeper/','record-keeper/')
+  }
  }
+ $start.ArgumentList.Add($fixture)
+ $fixtureHashes=@{}
  foreach($prefix in $rolePrefixes) {
   foreach($name in @('asset.manifest.json','resident.glb','base-color.windows.ktx2','normal.windows.ktx2','orm.windows.ktx2')) {
    $relative=$prefix+$name
    $path=Join-Path $fixture $relative
-   if($name.EndsWith('.ktx2') -and !(Test-Path -LiteralPath $path -PathType Leaf)){continue}
+   if(!$residentRoundTrip -and $name.EndsWith('.ktx2') -and !(Test-Path -LiteralPath $path -PathType Leaf)){continue}
    $fixtureHashes[$relative]=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
   }
  }
@@ -71,6 +84,7 @@ $tavernAssetHashes=$null
 if($doorway) {
  foreach($source in @('src/gameplay/validation/BellwetherDoorwayProbe.h','src/gameplay/DevelopmentCheckpointSimulation.h',
   'src/gameplay/DevelopmentCheckpoints.h','src/gameplay/traversal/BellwetherTavernRoute.h',
+  'src/gameplay/traversal/BellwetherEastRoute.h','src/vulkan/raytracing/BellwetherResidents.h',
   'src/gameplay/traversal/BellwetherTavernDoor.h')) {
   $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
  }
@@ -96,7 +110,8 @@ if(Test-Path -LiteralPath $cachePath) {
  }
  $buildProfile=@{cachePath=$cachePath;cacheSha256=(Get-FileHash -LiteralPath $cachePath -Algorithm SHA256).Hash.ToLowerInvariant();configuration=$Configuration;policy=$policy}
 }
-$scope=if($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixture; GPU and resource evidence only'}else{
+$scope=if($residentRoundTrip){'Debug CPU; hidden Bellwether resident round trip; GPU and resource evidence only'}
+elseif($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixture; GPU and resource evidence only'}else{
  $Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance'
 }
 @{scope=$scope;

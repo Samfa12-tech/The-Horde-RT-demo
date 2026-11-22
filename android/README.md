@@ -106,6 +106,37 @@ the repository root, verify and summarize it with
 `python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
 For the hinged-door build, the analysis must report `openDoorWitness: true`.
 
+#### Combined resident round trip
+
+The `.debug.bellwether.combined` package also accepts
+`bellwether-resident-roundtrip-measurement`. It starts from the same completed
+tavern visit, walks through the south door to the salvager's talk mark, and
+returns to the staffed room twice. The walk uses the shared player motor and
+the normal resident replacement path. The longer route allows four minutes
+for the same 60 Hz simulation and four-tick catch-up limit. The completed-frame
+CSV records both resident source IDs beside the instance masks, GPU interval
+and present-call return for that submission.
+
+```powershell
+$bellwetherPackage = 'com.samfa12.hordelanternrt.debug.bellwether.combined'
+adb shell am start -n "${bellwetherPackage}/com.samfa12.hordelanternrt.MainActivity" --ez horde.debug.autostart true --ez horde.debug.gpu_timing true --es horde.debug.checkpoint bellwether-resident-roundtrip-measurement
+```
+
+Start from a fresh launch of the private package and keep it in the foreground.
+Wait for that launch's `HORDE_BELLWETHER_RESIDENT_ROUNDTRIP complete returns=2`
+marker. Record the APK hash, render settings, backend and device temperatures
+with the fresh `files/reports/bellwether-resident-roundtrip.csv` retrieved via
+`adb exec-out run-as`. Save it as `bellwether-resident-roundtrip.csv` in the run
+directory and verify it from the repository root.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-resident-roundtrip <run-directory>
+```
+
+The report measures native present-return intervals. Display timing requires
+separate display evidence. The shorter doorway check remains available under
+its existing checkpoint and report name.
+
 The five privately approved Kit takes can be enabled by adding
 `-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
 Use the same property with the ten-file overlay to audition the three

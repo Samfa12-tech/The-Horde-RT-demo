@@ -91,6 +91,17 @@ int main()
     wrongDoorway[5]=L"bellwether-staffed-room";
     check(!ParseWindowsChapterShippingLaunch(wrongDoorway,true).error.empty(),
         "doorway measurement must start from a completed visit");
+    auto residentRoundTrip=doorwayArgs;
+    residentRoundTrip[0]=L"--measure-bellwether-resident-roundtrip";
+    residentRoundTrip[6]=L"--bellwether-campaign-dir";
+    const auto residentLaunch=ParseWindowsChapterShippingLaunch(residentRoundTrip,true);
+    check(residentLaunch.requested && residentLaunch.bellwetherDoorway &&
+        residentLaunch.bellwetherResidentRoundTrip && residentLaunch.error.empty() &&
+        !ParseWindowsChapterShippingLaunch(residentRoundTrip,false,true).error.empty(),
+        "resident round trip uses the hidden Debug measurement and campaign resident directory");
+    residentRoundTrip[6]=L"--chapter-resident-fixture";
+    check(!ParseWindowsChapterShippingLaunch(residentRoundTrip,true).error.empty(),
+        "resident round trip cannot use the stationary doorway fixtures");
     for(const auto conflict:{L"--validate-chapter-roundtrip",L"--validate-static-zone-cutover",
         L"--validate-static-triangle-cutover",L"--capture-graphics-preview",L"--benchmark-showcase",
         L"--validate-output-resize",L"--validate-native-motion",L"--capture-sky-attribution",L"--mist-off",

@@ -2,13 +2,18 @@
 
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <locale>
 #include <optional>
 
+#include "gameplay/dialogue/RecordKeeperPlacement.h"
+#include "gameplay/dialogue/TavernKeeperPlacement.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
+#include "gameplay/traversal/BellwetherMill.h"
+#include "gameplay/traversal/BellwetherSalvager.h"
 #include "telemetry/RtPerformanceEvidence.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 
@@ -21,16 +26,23 @@ public:
     using TimePoint = std::chrono::steady_clock::time_point;
 
     bool Start(const gameplay::simulation::SimulationSnapshot& state,
-               const std::filesystem::path& report, TimePoint now) {
+               const std::filesystem::path& report, TimePoint now,
+               bool combinedEast = false) {
+        combinedEast_ = combinedEast;
+        clock_ = gameplay::validation::ChapterRouteMeasurementClock(
+            combinedEast_ ? gameplay::validation::BellwetherDoorwayProbe::kResidentRoundTripDeadlineSeconds
+                          : gameplay::validation::ChapterRouteMeasurementClock::kDefaultDeadlineSeconds);
         frames_.open(report, std::ios::trunc);
         frames_.imbue(std::locale::classic());
-        if (!frames_ || !probe.Start(state)) return false;
+        if (!frames_ || !probe.Start(state, combinedEast_)) return false;
         start_ = now;
         frames_ << "phase,station,returns,elapsed_ns,present_return_ns,scene_epoch,generation,record_serial,"
                    "submission_serial,tick,completion_serial,present_serial,gpu_serial,gpu_ns,cpu_cycle_ns,"
                    "backend,shader_sha256,internal_width,internal_height,output_width,output_height,glass_enabled,"
                    "fire_count,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
-                   "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask\n";
+                   "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
+        if (combinedEast_) frames_ << ",resident_slot0_id,resident_slot1_id";
+        frames_ << "\n";
         return static_cast<bool>(frames_);
     }
 
@@ -56,11 +68,13 @@ public:
              scene.SubmittedInstanceMask(Scene::kChapterWindowMetadataIndex),
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1)},
-            scene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex)};
+            scene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex),
+            combinedEast_ ? scene.ChapterResidentSourceIds() : std::array<std::uint32_t, 2>{}};
         return true;
     }
 
     bool AwaitingFrame() const { return pending_.has_value(); }
+    bool CombinedEast() const { return combinedEast_; }
 
     bool CompleteFence(const telemetry::RtPerformanceEvidenceSnapshot& sample) {
         using namespace telemetry;
@@ -79,7 +93,10 @@ public:
             sample.gpu.completedSubmissionSerial != serial || sample.gpu.durationNanoseconds == 0 ||
             !sample.scene.fireLighting || !sample.scene.dimensions || tag.masks[3] != 1 || tag.tavernDoorMask != 1 ||
             (phase == "room" && (sample.scene.fireLighting->count != 3 ||
-                                 tag.masks != std::array<unsigned, 4>{1, tag.glassEnabled ? 1u : 0u, 1, 1}))) return false;
+                                 tag.masks != std::array<unsigned, 4>{1, tag.glassEnabled ? 1u : 0u, 1, 1})) ||
+            (combinedEast_ && (tag.masks[2] != 1 ||
+                               ((phase == "room" || phase == "complete" || phase == "east-fork") &&
+                                tag.residentSourceIds != ExpectedResidentSourceIds(phase))))) return false;
 
         const auto& resources = sample.scene.resources;
         const auto& dimensions = *sample.scene.dimensions;
@@ -95,7 +112,9 @@ public:
                 << sample.scene.fireLighting->count << ',' << resources.tlasInstanceCount << ','
                 << resources.bottomLevelAccelerationStructureCount << ',' << resources.deviceLocalBytes << ',' << resources.hostVisibleBytes;
         for (const unsigned mask : tag.masks) frames_ << ',' << mask;
-        frames_ << ',' << tag.tavernDoorMask << '\n';
+        frames_ << ',' << tag.tavernDoorMask;
+        if (combinedEast_) frames_ << ',' << tag.residentSourceIds[0] << ',' << tag.residentSourceIds[1];
+        frames_ << '\n';
         lastSerial_ = serial;
         pending_.reset();
         if (probe.Complete()) frames_.close();
@@ -105,6 +124,12 @@ public:
     gameplay::validation::BellwetherDoorwayProbe probe;
 
 private:
+    static std::array<std::uint32_t, 2> ExpectedResidentSourceIds(const std::string_view phase) {
+        if (phase == "east-fork")
+            return {gameplay::bellwether::kArtificerActorId, gameplay::bellwether::kSalvagerActorId};
+        return {gameplay::dialogue::kTavernKeeperActorId, gameplay::dialogue::kRecordKeeperActorId};
+    }
+
     struct Frame {
         telemetry::RtSubmittedFrameIdentity identity;
         std::int64_t elapsedNs;
@@ -112,6 +137,7 @@ private:
         bool glassEnabled;
         std::array<unsigned, 4> masks;
         unsigned tavernDoorMask;
+        std::array<std::uint32_t, 2> residentSourceIds;
     };
 
     std::ofstream frames_;
@@ -121,6 +147,7 @@ private:
     std::uint64_t epoch_ = 0;
     std::uint64_t generation_ = 0;
     std::uint64_t lastSerial_ = 0;
+    bool combinedEast_ = false;
 };
 
 } // namespace horde::platform::android

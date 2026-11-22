@@ -9,6 +9,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     using namespace horde::telemetry;
     const auto launch=ParseCaptureLaunchOptions();
     const bool doorway=launch.measureBellwetherDoorway;
+    const bool residentRoundTrip=launch.measureBellwetherResidentRoundTrip;
     // Windows may reject SetForegroundWindow for an automation-launched
     // process. Allow the owner to activate this test window once; never attach
     // other input threads or repeatedly steal focus. This setup wait is inside
@@ -46,14 +47,16 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     if(!doorway && !context.rtScene.OrdinaryStaticDetailAvailable()) {
         error="Actual chapter geometry did not admit the corridor static-detail certificate.";return false;
     }
-    if(!(doorway ? bellwether.Start(context.simulation.Snapshot()) : probe.Start(context.simulation.Snapshot()))) {
+    if(!(doorway ? bellwether.Start(context.simulation.Snapshot(),residentRoundTrip) :
+                    probe.Start(context.simulation.Snapshot()))) {
         error=doorway ? "Doorway measurement requires the completed, staffed repeat-visit room."
                       : "Shipping route requires the admitted low-lantern reunion.";
         return false;
     }
     const auto complete=[&] {return doorway ? bellwether.Complete() : probe.Phase()==ChapterProbePhase::Complete;};
     const auto phaseName=[&] {return doorway ? bellwether.PhaseName() : ChapterProbePhaseName(probe.Phase());};
-    const auto directory=output/(doorway ? "bellwether-doorway" : "shipping-route");
+    const auto directory=output/(residentRoundTrip ? "bellwether-resident-roundtrip" :
+        doorway ? "bellwether-doorway" : "shipping-route");
     std::error_code pathError;
     if(!std::filesystem::create_directory(directory,pathError)||pathError) {
         error="Shipping route evidence directory must be new and writable.";return false;
@@ -71,6 +74,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     for(const auto name:kChapterHostPhaseNames)csv<<','<<name;
     csv<<",host_previous_evidence_ns,host_phases_available";
     if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
+    if(residentRoundTrip)csv<<",returns,resident_slot0_id,resident_slot1_id";
     csv<<'\n';
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
@@ -92,6 +96,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         ChapterRouteHostPhases host;
         std::array<unsigned,3> roomMasks{};
         unsigned recordKeeperMask=0,tavernDoorMask=0;
+        std::array<std::uint32_t,2> residents{};
+        unsigned returns=0;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -133,7 +139,9 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     auto lastSerial=initial.completedEvidence.identity.submitted.submissionSerial;
     std::string_view lastPhase;
     unsigned frames=0,samples=0;std::uint64_t maximumDebt=0;
-    ChapterRouteMeasurementClock clock;
+    const double deadline=residentRoundTrip ? BellwetherDoorwayProbe::kResidentRoundTripDeadlineSeconds :
+        ChapterRouteMeasurementClock::kDefaultDeadlineSeconds;
+    ChapterRouteMeasurementClock clock(deadline);
     const auto append=[&] {
         const auto publication=context.rtFrameEvidence.PublishedStateByValue();
         if(!publication.hasCompletedEvidence)return true;
@@ -192,6 +200,19 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
                <<sample.scene.resources.bottomLevelAccelerationStructureCount;
             for(const auto mask:tag.roomMasks)csv<<','<<mask;
             csv<<','<<tag.recordKeeperMask<<','<<tag.tavernDoorMask;
+        }
+        if(residentRoundTrip) {
+            constexpr std::array town{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::dialogue::kRecordKeeperActorId};
+            constexpr std::array east{horde::gameplay::bellwether::kArtificerActorId,
+                horde::gameplay::bellwether::kSalvagerActorId};
+            if(((tag.phase=="room" || tag.phase=="complete") && tag.residents!=town) ||
+               (tag.phase=="east-fork" && (tag.residents!=east || tag.roomMasks[2]!=1)) ||
+               sample.gpu.status!=RtSampleStatus::Valid || !sample.gpu.hasDuration ||
+               sample.gpu.completedSubmissionSerial!=id.submissionSerial) {
+                error="Resident round trip lost a staged roster or its exact submitted GPU timing.";return false;
+            }
+            csv<<','<<tag.returns<<','<<tag.residents[0]<<','<<tag.residents[1];
         }
         csv<<'\n';
         if(samples%120==0 || tag.phase!=lastPhase) {
@@ -257,7 +278,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         }
         const auto visibilityEndNs=steadyNs();
         const auto ticks=clock.Consume(elapsed());
-        if(!ticks) {error="Shipping route exceeded its bounded150-second clock.";return false;}
+        if(!ticks) {error="Chapter route exceeded its measurement clock bound.";return false;}
         maximumDebt=std::max(maximumDebt,clock.PendingTicks());
         const auto simulationStart=std::chrono::steady_clock::now();
         for(unsigned step=0;step<*ticks && !complete();++step) {
@@ -308,6 +329,10 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
                            context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex)};
             tag.recordKeeperMask=context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1);
             tag.tavernDoorMask=context.rtScene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex);
+            if(residentRoundTrip) {
+                tag.residents=context.rtScene.ChapterResidentSourceIds();
+                tag.returns=bellwether.Returns();
+            }
         }
         const auto evidenceStartNs=steadyNs();
         if(!append())return false;
@@ -340,14 +365,15 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
 #endif
     summary<<"{\"schema\":"<<(doorway?5:4)<<",\"scope\":\""<<build;
     if(doorway)summary<<" with "<<RtInstrumentationModeName(instrumentation)
-        <<" High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\","
+        <<(residentRoundTrip ? " High shaders; hidden Bellwether resident round trip; GPU and resource evidence only\"," :
+            " High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\",")
         <<"\"quietReturns\":"<<bellwether.Returns()<<','
         <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<',';
     else summary<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\",";
     summary
         <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames-1<<",\"completedSamples\":"<<samples
         <<",\"simulationTicks\":"<<state.tickIndex-baseTick<<",\"maximumPendingSimulationTicks\":"<<maximumDebt
-        <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":150,\"warmupSeconds\":5,"
+        <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":"<<deadline<<",\"warmupSeconds\":5,"
         <<"\"unoccludedClientChecks\":"<<(doorway?"false":"true")<<",\"intervalMeaning\":\""
         <<(doorway?"unavailable for hidden captures":"wall time between successful present API returns, not GPU-only or exact display scanout timestamps")<<"\","
         <<"\"foregroundRequested\":"<<(launch.measureChapterForeground?"true":"false")<<','

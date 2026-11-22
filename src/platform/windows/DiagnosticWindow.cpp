@@ -508,6 +508,7 @@ struct CaptureLaunchOptions
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
     bool measureBellwetherDoorway = false;
+    bool measureBellwetherResidentRoundTrip = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -1182,6 +1183,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     options.measureChapterShippingRoute=chapterShipping.requested;
     options.measureChapterForeground=chapterShipping.foregroundRequested;
     options.measureBellwetherDoorway=chapterShipping.bellwetherDoorway;
+    options.measureBellwetherResidentRoundTrip=chapterShipping.bellwetherResidentRoundTrip;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -1484,7 +1486,8 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RegisterHandoff);
     if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
-        (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
+        ((options.chapterResidentFixture.empty() && !options.measureBellwetherResidentRoundTrip) ||
+         !options.requested || !options.captureHidden ||
          (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
         options.error = "Chapter resident fixtures require a compatible hidden Bellwether or reunion capture.";
@@ -10470,7 +10473,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.bellwetherFurnitureResidency=ParseCaptureLaunchOptions().bellwetherFurnitureResidency;
     std::error_code fixtureError;
     context.combinedBellwetherResidents=developmentCheckpoint &&
-        (*developmentCheckpoint=="bellwether-return-to-kit" ||
+        (ParseCaptureLaunchOptions().measureBellwetherResidentRoundTrip ||
+         *developmentCheckpoint=="bellwether-return-to-kit" ||
          (*developmentCheckpoint=="bellwether-repeat-visit" && !context.chapterResidentFixture.empty() &&
           std::filesystem::is_directory(context.chapterResidentFixture / "tavern-keeper", fixtureError)));
 #if HORDE_RT_FRAME_STAGE_PROBE
@@ -14456,7 +14460,8 @@ int RunDiagnosticWindow(const int showCommand)
     }
 #if defined(_DEBUG)
     if (!launchOptions.bellwetherCampaignDirectory.empty() &&
-        (launchOptions.requested || launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
+        ((launchOptions.requested && !launchOptions.measureBellwetherResidentRoundTrip) ||
+         launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
          launchOptions.graphicsPreview || launchOptions.outputResizeValidation ||
          !launchOptions.nativeMotionScenario.empty() || gOpeningBenchmarkMenuValidation || gRouteHiddenValidation ||
          gAcceptanceProfile.Active())) {
@@ -14471,8 +14476,9 @@ int RunDiagnosticWindow(const int showCommand)
         std::cerr << "The hidden tavern save check requires private Bellwether campaign residents.\n";
         return 2;
     }
-    if (gBellwetherPreparationsValidation && !gBellwetherCombinedCampaignActors) {
-        std::cerr << "The hidden preparations check requires the combined Bellwether roster.\n";
+    if ((gBellwetherPreparationsValidation || launchOptions.measureBellwetherResidentRoundTrip) &&
+        !gBellwetherCombinedCampaignActors) {
+        std::cerr << "This Bellwether check requires the combined resident roster.\n";
         return 2;
     }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
