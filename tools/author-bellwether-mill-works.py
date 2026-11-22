@@ -103,11 +103,11 @@ def wheel_with_admitted_finishes(wheel_path, provider_path, output):
     return sum(wheel["accessors"][p["indices"]]["count"]//3 for p in wheel["meshes"][0]["primitives"])
 
 
-def join_town(town_path, supports_path, output):
+def join_town(town_path, supports_path, output, *, node_name="BellwetherSolid"):
     town, blocks = read_glb(town_path)
     supports, additions = read_glb(supports_path)
-    solid = next(node for node in town["nodes"] if node["name"] == "BellwetherSolid")
-    targets = town["meshes"][solid["mesh"]]["primitives"]
+    target_node = next(node for node in town["nodes"] if node["name"] == node_name)
+    targets = town["meshes"][target_node["mesh"]]["primitives"]
     names = {material["name"]: index for index, material in enumerate(town["materials"])}
     support_mesh, = supports["meshes"]
     extra_triangles = 0
@@ -127,8 +127,9 @@ def join_town(town_path, supports_path, output):
         write_accessor(town, blocks, target["indices"], indices)
         extra_triangles += len(added)//3
     save_glb(output, town, blocks)
+    primitives = [primitive for mesh in town["meshes"] for primitive in mesh["primitives"]]
     return extra_triangles, sum(town["accessors"][p["attributes"]["POSITION"]]["count"]
-                                for mesh in town["meshes"] for p in mesh["primitives"]), len(targets)+1
+                                for p in primitives), len(primitives)
 
 
 def terrain_probe(path):

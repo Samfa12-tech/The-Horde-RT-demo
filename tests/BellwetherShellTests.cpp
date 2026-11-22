@@ -293,6 +293,27 @@ int main(int argc,char** argv) {
                           rag[1]+.07f,rag[1]+.11f,.025f),
                       "a grounded visitor can reach the cloth above both the basket and the door shelf");
             }
+            const auto& graveyard=kBellwetherGraveyardApproach;
+            const auto church=kBellwetherChurchApproach.back();
+            bool graveyardRoundTrip=follow(church,graveyard.front()) && follow(graveyard.front(),church);
+            for(std::size_t i=1;i<graveyard.size();++i) {
+                if(follow(graveyard[i-1],graveyard[i]) && follow(graveyard[i],graveyard[i-1]))continue;
+                std::cerr<<"Graveyard path blocked between stations "<<i-1<<" and "<<i<<'\n';
+                graveyardRoundTrip=false;
+            }
+            check(graveyardRoundTrip,
+                  "the original church service connects to the last grave row and back through the dry south entrance");
+            const auto wallGround=support->Query(98.2f,71.25f);
+            check(wallGround.found && !support->NonWalkableVolumeClear(98.2f,72.2f,98.2f,70.3f,
+                      wallGround.worldY+.08f,wallGround.worldY+.85f,radius),
+                  "the dry-stone boundary blocks a player sweep alongside the open gate");
+            for(const auto& marker:kBellwetherGraveyardMarkers) {
+                const auto ground=support->Query(marker[0],marker[1]);
+                check(ground.found && ground.walkable &&
+                      !support->NonWalkableVolumeClear(marker[0]-.54f,marker[1],marker[0]+.54f,marker[1],
+                          ground.worldY+.04f,ground.worldY+.80f,radius),
+                      "each original marker has contact on the authored terrain");
+            }
         }
         {
             using namespace horde::gameplay::traversal;

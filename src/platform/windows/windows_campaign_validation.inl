@@ -1656,8 +1656,37 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     };
                     if (progressed && verifiesSilver) {
                         const auto church = kBellwetherTavernRoute.begin() + kBellwetherChurchJunction;
+                        const auto& path = kBellwetherGraveyardApproach;
+                        const auto& arrival = kBellwetherNorthApproach;
+                        const auto& marker = kBellwetherGraveyardMarkers.front();
+                        const BellwetherStation plotView{94.18f,56.43f};
+                        const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        const float previousPitch = input.pitchRadians;
+                        const auto inspect = [&](float x, float z, const char* image) {
+                            input.pitchRadians = -.23f;
+                            return face(x,z) && setInspectionLight(HeldLightPose::High) &&
+                                state.playerGrounded && frame() && capture(image,false);
+                        };
                         progressed = check(
-                            std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(church), walkTo) &&
+                            std::all_of(kBellwetherTavernRoute.rbegin(),std::make_reverse_iterator(church),walkTo) &&
+                            std::all_of(arrival.begin(),arrival.end(),walkTo) &&
+                            walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherRecordKeeperApproach) &&
+                            std::all_of(path.begin(),path.begin()+6,walkTo) &&
+                            inspect(path[6].x,path[6].z,"windows-combined-graveyard-gateway.png") &&
+                            std::all_of(path.begin()+6,path.end(),walkTo) &&
+                            walkTo(plotView) &&
+                            inspect(marker[0],marker[1],"windows-combined-graveyard-plots.png") &&
+                            walkTo(path.back()) &&
+                            std::all_of(std::next(path.rbegin()),path.rend(),walkTo) &&
+                            walkTo(kBellwetherRecordKeeperApproach) && walkTo(kBellwetherChurchApproach.front()) &&
+                            std::all_of(arrival.rbegin(),arrival.rend(),walkTo) &&
+                            ctx.simulation.CampaignBoundaryRevision()==boundary,
+                            "the active graveyard is reachable from the church and returns to the fork without creating a save");
+                        input.pitchRadians = previousPitch;
+                    }
+                    if (progressed && verifiesSilver) {
+                        // The graveyard walk has already brought the player back to this fork.
+                        progressed = check(
                             walkTo({kRoadSilverCacheApproach[0], kRoadSilverCacheApproach[1]}) &&
                             face(kRoadSilverCacheReach[0], kRoadSilverCacheReach[2]) &&
                             state.ordinarySilverAction == OrdinarySilverAction::Take &&

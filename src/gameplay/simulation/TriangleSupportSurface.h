@@ -32,8 +32,9 @@ public:
         std::uint32_t testedTriangles=0;
     };
     static constexpr float kMaximumWalkableSlope=.65f;
-    // Bounded intake capacity, not a renderer/quality budget or runtime growth.
-    static constexpr std::size_t kMaximumTriangles=147456;
+    // Static admission ceiling for the dressed forest and town together.
+    // Storage and BVH nodes are allocated for the triangles actually admitted.
+    static constexpr std::size_t kMaximumTriangles=163840;
     static constexpr std::size_t kMaximumSweepIntervals=512;
     static std::shared_ptr<const TriangleSupportSurface> Build(std::span<const Triangle> input,
                                                               std::string& diagnostic)

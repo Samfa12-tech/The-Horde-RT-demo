@@ -1092,6 +1092,15 @@ geometry. The basket shares town materials. The linen uses a single untextured
 opaque finish. Their editable source is in
 `assets/models/world/source/bellwether-privy-rag-v1/`.
 
+## Bellwether active churchyard - 23 November 2026
+
+The T03 churchyard walls, footstones and path are original Horde geometry
+authored in Blender by Samfa12/Codex. The nine headstones reuse the original
+Horde grave-marker r03 geometry. The churchyard shares the existing
+MedievalWall02 masonry family and its recorded CC0 attribution. Editable
+geometry and exact source digests are in
+`assets/models/world/source/bellwether-graveyard-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

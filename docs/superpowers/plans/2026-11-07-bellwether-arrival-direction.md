@@ -433,6 +433,14 @@ After the first tavern conversation, the occupant's approved request appears onc
 
 The private Windows campaign passed all 19 checks on each hardware RT backend. The replay showed the local request, took the rag, reloaded before delivery, then delivered it once and reloaded from the updated autosave. Captures show the cloth in the basket and on the shelf. The private ARM64 Debug package contains the same pinned town and cloth assets. Physical phone play and performance remain open.
 
+### Active graveyard east of the church
+
+The [T03 churchyard](../../../assets/models/world/source/bellwether-graveyard-v1/README.md) connects to the existing church approach. Its path follows the terrain past the south frontage and through an opening in the dry-stone boundary. Nine plain stone markers establish the grave rows. The existing record keeper's service mark and the north wayside route stay available.
+
+The combined native forest and town admit 152,228 collision triangles and retain 10,510,616 bytes of CPU support data. The intake ceiling is 163,840 triangles. This keeps the authored ground and collision in the same owner and permits the full woodland to load with the town.
+
+Each Windows hardware RT backend passed all 20 checks in the private campaign replay. The player walked from the church to the grave rows and back to the fork without creating a save, then continued through the silver, rag and eastern routes. The private ARM64 Debug package contains the same pinned town GLB. Physical phone play and performance remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

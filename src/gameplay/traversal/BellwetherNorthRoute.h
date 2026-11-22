@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../../assets/models/world/source/bellwether-graveyard-v1/geometry.generated.h"
 
 namespace horde::gameplay::traversal {
 
@@ -19,6 +20,14 @@ inline constexpr std::array kBellwetherChurchApproach{
     BellwetherMapStation(-14.f,51.f),
     kBellwetherRecordKeeperMark,
 };
+inline constexpr auto kBellwetherGraveyardApproach=[] {
+    std::array<BellwetherStation, bellwether::kBellwetherGraveyardPath.size()> stations{};
+    for(std::size_t i=0;i<stations.size();++i) {
+        const auto& position=bellwether::kBellwetherGraveyardPath[i];
+        stations[i]={position[0],position[1]};
+    }
+    return stations;
+}();
 inline constexpr std::array kBellwetherWaysideApproach{
     BellwetherMapStation(-17.f,81.f),
     BellwetherMapStation(0.f,90.f),

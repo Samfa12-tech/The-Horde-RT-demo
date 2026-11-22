@@ -1658,7 +1658,16 @@ struct PresentableTinyRtSceneObservationTestAccess
         // rail spans, keeping the end post of the adjoining retained span.
         constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
         const auto& woodland=tomb.forestSurroundingsPrototype_;
-        bool ok = woodland && woodland->report.extraTrees==416u &&
+        const auto& support=tomb.chapterTerrainSurface_;
+        const auto supportTriangles=support ? support->TriangleCount()+
+            support->NonWalkableTriangleCount()+support->StepTriangleCount() : 0u;
+        constexpr auto churchyardTriangles=horde::gameplay::bellwether::kBellwetherGraveyardSolidTriangles+
+            horde::gameplay::bellwether::kBellwetherGraveyardGroundTriangles;
+        const bool supportFits= supportTriangles==143304u+churchyardTriangles &&
+            supportTriangles<=horde::gameplay::simulation::TriangleSupportSurface::kMaximumTriangles;
+        std::cout << "Combined forest and town native support: " << supportTriangles
+                  << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
+        bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
                   woodland->report.addedIndices==woodlandIndices &&
                   woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&
                   woodland->report.bellwetherRoadRuns==2u &&
