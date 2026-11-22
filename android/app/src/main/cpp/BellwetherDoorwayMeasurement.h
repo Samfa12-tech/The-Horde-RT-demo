@@ -42,6 +42,7 @@ public:
                    "fire_count,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
                    "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
         if (combinedEast_) frames_ << ",resident_slot0_id,resident_slot1_id";
+        for (const auto& column : kCpuStages) frames_ << ',' << column.name;
         frames_ << "\n";
         return static_cast<bool>(frames_);
     }
@@ -100,7 +101,8 @@ public:
 
         const auto& resources = sample.scene.resources;
         const auto& dimensions = *sample.scene.dimensions;
-        const auto& cycle = sample.scene.stages.values[static_cast<std::size_t>(RtStage::WholeFrameCycle)];
+        const auto& stages = sample.scene.stages.values;
+        const auto& cycle = stages[RtStageIndex(RtStage::WholeFrameCycle)];
         frames_ << phase << ',' << probe.Station() << ',' << probe.Returns() << ','
                 << tag.elapsedNs << ',' << tag.presentReturnNs << ',' << epoch_ << ',' << generation_ << ','
                 << frame.frame.recordSerial << ',' << serial << ',' << frame.frame.simulationTick << ','
@@ -114,6 +116,8 @@ public:
         for (const unsigned mask : tag.masks) frames_ << ',' << mask;
         frames_ << ',' << tag.tavernDoorMask;
         if (combinedEast_) frames_ << ',' << tag.residentSourceIds[0] << ',' << tag.residentSourceIds[1];
+        for (const auto& column : kCpuStages)
+            frames_ << ',' << stages[RtStageIndex(column.stage)].durationNanoseconds;
         frames_ << '\n';
         lastSerial_ = serial;
         pending_.reset();
@@ -124,6 +128,25 @@ public:
     gameplay::validation::BellwetherDoorwayProbe probe;
 
 private:
+    using Stage = telemetry::RtStage;
+    struct CpuStageColumn {
+        const char* name;
+        Stage stage;
+    };
+    static constexpr CpuStageColumn kCpuStages[] = {
+        {"simulation_step_ns", Stage::SimulationStep},
+        {"player_skin_ns", Stage::PlayerSkin},
+        {"character_skin_ns", Stage::CharacterSkin},
+        {"dynamic_upload_ns", Stage::DynamicUpload},
+        {"blas_refit_record_ns", Stage::BlasRefitRecord},
+        {"tlas_update_record_ns", Stage::TlasUpdateRecord},
+        {"trace_copy_record_ns", Stage::TraceCopyRecord},
+        {"frame_fence_wait_ns", Stage::FrameFenceWait},
+        {"image_acquire_ns", Stage::ImageAcquire},
+        {"queue_submit_ns", Stage::QueueSubmit},
+        {"present_call_ns", Stage::PresentCall},
+    };
+
     static std::array<std::uint32_t, 2> ExpectedResidentSourceIds(const std::string_view phase) {
         if (phase == "east-fork")
             return {gameplay::bellwether::kArtificerActorId, gameplay::bellwether::kSalvagerActorId};

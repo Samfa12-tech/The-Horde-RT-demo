@@ -401,6 +401,13 @@ def compare_bellwether_keeper(baseline, candidate, analysis_name):
     print(json.dumps(result, indent=2))
 
 
+ANDROID_CPU_STAGE_COLUMNS = (
+    'simulation_step_ns', 'player_skin_ns', 'character_skin_ns', 'dynamic_upload_ns',
+    'blas_refit_record_ns', 'tlas_update_record_ns', 'trace_copy_record_ns',
+    'frame_fence_wait_ns', 'image_acquire_ns', 'queue_submit_ns', 'present_call_ns',
+)
+
+
 def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False):
     directory = pathlib.Path(name)
     filename = 'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv'
@@ -415,6 +422,10 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False)
             raise ValueError(detail)
 
     require(bool(rows), 'Bellwether route report is empty')
+    stage_fields = fields.intersection(ANDROID_CPU_STAGE_COLUMNS)
+    require(not stage_fields or stage_fields == set(ANDROID_CPU_STAGE_COLUMNS),
+            'Incomplete CPU stage columns in Bellwether route report')
+    cpu_samples = []
     destination = 'east-fork' if resident_roundtrip else 'square'
     phases = ('room', 'doorway-outbound', destination, 'doorway-inbound')
     if resident_roundtrip:
@@ -456,6 +467,10 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False)
                 f'Frame {serial} lost the GPU-to-present join')
         require(int(row['record_serial']) > 0 and int(row['gpu_ns']) > 0 and int(row['cpu_cycle_ns']) > 0 and
                 re.fullmatch(r'[0-9a-f]{64}', row['shader_sha256']), f'Frame {serial} lacks timing or shader evidence')
+        if stage_fields:
+            require(all(re.fullmatch(r'[0-9]+', row[key] or '') for key in ANDROID_CPU_STAGE_COLUMNS),
+                    f'Frame {serial} has a missing or invalid CPU stage interval')
+            cpu_samples.append({key: int(row[key]) for key in ANDROID_CPU_STAGE_COLUMNS})
         require(not resident_roundtrip or row['shader_sha256'] == shader_hash,
                 f'Frame {serial} changed the active shader')
         if resident_roundtrip:
@@ -501,6 +516,11 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False)
             nativeCycleMilliseconds=stats([int(rows[i]['cpu_cycle_ns']) / 1e6 for i in indices]),
             presentReturnIntervalMilliseconds=stats(phase_intervals),
             resourceMinMax=resources)
+        if cpu_samples:
+            phase_summary['cpuStageMilliseconds'] = {
+                key.removesuffix('_ns'): stats([cpu_samples[i][key] / 1e6 for i in indices])
+                for key in ANDROID_CPU_STAGE_COLUMNS
+            }
         if resident_roundtrip:
             phase_summary['worstPresentReturnIntervalMilliseconds'] = max(phase_intervals, default=None)
         summary['phases'][phase] = phase_summary

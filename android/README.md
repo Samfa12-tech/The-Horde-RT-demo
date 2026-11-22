@@ -105,6 +105,12 @@ Save that output as `bellwether-doorway.csv` in the local run directory. From
 the repository root, verify and summarize it with
 `python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
 For the hinged-door build, the analysis must report `openDoorWitness: true`.
+New doorway and resident round-trip reports also summarize CPU stage medians
+and tails by route phase. Fence and acquire waits can reflect GPU or surface
+backpressure. Each duration belongs to the frame's recording cycle, so fence
+wait can cover the previous submission. Stage durations are measured spans
+which can overlap. Compare them individually with the whole cycle and GPU
+interval. Older CSVs remain readable.
 
 #### Combined resident round trip
 
