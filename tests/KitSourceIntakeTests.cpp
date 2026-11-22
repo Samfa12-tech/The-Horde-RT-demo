@@ -22,13 +22,35 @@ bool CheckAnalyticTangentFrames() {
     SkinnedClipSet clips{};
     clips.clips[0]={"rotate",false,true};
     clips.clips[1]={"reflect",false,true};
-    for(std::size_t i=2;i<clips.clips.size();++i) clips.clips[i]={"",false,false};
+    clips.clips[2]={"hold",true,true};
+    for(std::size_t i=3;i<clips.clips.size();++i) clips.clips[i]={"",false,false};
     SkinnedMeshAsset model;std::string diagnostic;
     if(!model.LoadClips(HORDE_SKINNED_PBR_FIXTURE,clips,diagnostic)) {
         std::cerr<<"Analytic skin fixture import failed: "<<diagnostic<<'\n';return false;
     }
+    if (model.HasConstantClipPose(SkinnedClip::Idle) || model.HasConstantClipPose(SkinnedClip::Walking) ||
+        !model.HasConstantClipPose(SkinnedClip::Attack) || model.HasConstantClipPose(SkinnedClip::Dead) ||
+        model.HasConstantClipPose(static_cast<SkinnedClip>(255)))
+    {
+        std::cerr << "Only the mapped identical-key clip should report a constant pose.\n";
+        return false;
+    }
     std::vector<TexturedSkinnedRtVertex> vertices;
     std::vector<SkinnedPbrTangent> tangents;
+    if (!model.SkinUniquePbr(SkinnedClip::Attack, 0.f, vertices, tangents, diagnostic)) return false;
+    const auto heldVertices = vertices;
+    const auto heldTangents = tangents;
+    for (float time : {.5f, 1.f, 1.75f})
+    {
+        if (!model.SkinUniquePbr(SkinnedClip::Attack, time, vertices, tangents, diagnostic) ||
+            vertices.size() != heldVertices.size() || tangents.size() != heldTangents.size() ||
+            std::memcmp(vertices.data(), heldVertices.data(), vertices.size()*sizeof(vertices.front())) != 0 ||
+            std::memcmp(tangents.data(), heldTangents.data(), tangents.size()*sizeof(tangents.front())) != 0)
+        {
+            std::cerr << "The identical-key clip changed its skinned output.\n";
+            return false;
+        }
+    }
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         if(!model.SkinUniquePbr(clip,1,vertices,tangents,diagnostic)||vertices.size()!=3||tangents.size()!=3) return false;
         const bool reflection=clip==SkinnedClip::Walking;

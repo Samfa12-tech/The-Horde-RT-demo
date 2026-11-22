@@ -383,6 +383,7 @@ struct SkinnedMeshAsset::Clip
     std::vector<Channel> channels;
     float duration = 0.0f;
     bool loops = false;
+    bool constantPose = false;
 };
 
 struct SkinnedPlayerRigLayout
@@ -1037,6 +1038,12 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
             diagnostic = "Skinned clip contains no usable animation channels: " + binding.name;
             return false;
         }
+        clip.constantPose = std::all_of(clip.channels.begin(), clip.channels.end(), [](const Channel& channel) {
+            return std::all_of(channel.values.begin() + 1, channel.values.end(),
+                [&](const auto& key) {
+                    return std::memcmp(key.data(), channel.values.front().data(), key.size() * sizeof(float)) == 0;
+                });
+        });
         clips_.push_back(std::move(clip));
     }
     auto rig = std::make_shared<SkinnedPlayerRigLayout>();
@@ -1060,6 +1067,12 @@ float SkinnedMeshAsset::ClipDuration(SkinnedClip clip) const
 {
     const std::size_t index = static_cast<std::size_t>(clip);
     return index < clips_.size() ? clips_[index].duration : 0.0f;
+}
+
+bool SkinnedMeshAsset::HasConstantClipPose(SkinnedClip clip) const
+{
+    const auto index = static_cast<std::size_t>(clip);
+    return loaded_ && index < clips_.size() && clips_[index].constantPose;
 }
 
 bool SkinnedMeshAsset::BootGroundingMinimumY(

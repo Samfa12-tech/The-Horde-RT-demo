@@ -3320,10 +3320,13 @@ bool PresentableTinyRtScene::PrepareChapterResidents(const RtSceneFrameInputs& f
         if (!geometry.Resolve(staticMeshSlot_, kFirstResidentMetadataIndex + lane,
                 resident.actor.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
             return false;
-        if (resident.uploadedClip != pose->clip || resident.uploadedTime != pose->time) {
+        // Residents sample one clip without additive posing or blending. Equal
+        // authored keys share the same geometry even while facing changes.
+        const float sampleTime = resident.actor.HasConstantClipPose(pose->clip) ? 0.f : pose->time;
+        if (resident.uploadedClip != pose->clip || resident.uploadedTime != sampleTime) {
             RtSceneStageScope skin(observation, horde::telemetry::RtStage::CharacterSkin);
             horde::scene::SkinWorkMetrics work;
-            if (!resident.actor.Pose(pose->clip, pose->time, diagnostic, {}, nullptr,
+            if (!resident.actor.Pose(pose->clip, sampleTime, diagnostic, {}, nullptr,
                     WantsSkinWorkMetrics(observation) ? &work : nullptr)) {
                 skin.Cancel();
                 return false;
@@ -3335,7 +3338,7 @@ bool PresentableTinyRtScene::PrepareChapterResidents(const RtSceneFrameInputs& f
                     "chapter resident pose", diagnostic, observation))
                 return false;
             resident.uploadedClip = pose->clip;
-            resident.uploadedTime = pose->time;
+            resident.uploadedTime = sampleTime;
             resident.needsRefit = true;
         }
         const float sine = std::sin(pose->yaw), cosine = std::cos(pose->yaw);

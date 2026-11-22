@@ -65,6 +65,7 @@ public:
     StaticMeshAsset& Asset() { return asset_; }
     const StaticMeshAsset& Asset() const { return asset_; }
     float Duration(SkinnedClip clip) const { return skin_.ClipDuration(clip); }
+    bool HasConstantClipPose(SkinnedClip clip) const { return skin_.HasConstantClipPose(clip); }
 private:
     SkinnedMeshAsset skin_;
     StaticMeshAsset asset_;

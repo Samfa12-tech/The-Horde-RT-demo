@@ -215,6 +215,7 @@ public:
     }
     const std::vector<SkinnedPrimitiveRange>& PrimitiveRanges() const { return primitiveRanges_; }
     float ClipDuration(SkinnedClip clip) const;
+    bool HasConstantClipPose(SkinnedClip clip) const;
     bool BootGroundingMinimumY(SkinnedClip clip,
                                float timeSeconds,
                                float& minimumY,
