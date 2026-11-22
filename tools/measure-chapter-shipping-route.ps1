@@ -31,6 +31,9 @@ if($doorway) {
   $start.ArgumentList.Add('--measure-bellwether-resident-roundtrip')
   $start.ArgumentList.Add('--bellwether-campaign-dir')
   $rolePrefixes=@('tavern-keeper/','record-keeper/','artificer/','salvager/')
+  if(Test-Path -LiteralPath (Join-Path $fixture 'relic-dealer') -PathType Container) {
+   $rolePrefixes+='relic-dealer/'
+  }
  }else{
   $fixture=(Resolve-Path -LiteralPath $BellwetherResidentFixture).Path
   $start.ArgumentList.Add('--measure-bellwether-doorway')
@@ -104,13 +107,13 @@ $buildProfile=$null
 if(Test-Path -LiteralPath $cachePath) {
  $policy=@{}
  foreach($line in [IO.File]::ReadLines($cachePath)) {
-  if($line -match '^((?:CMAKE_(?:GENERATOR|BUILD_TYPE|CONFIGURATION_TYPES|HOME_DIRECTORY|CXX_COMPILER|CXX_FLAGS_RELEASE))|(?:HORDE_RT_(?:INSTRUMENTATION_OVERRIDE|DIELECTRIC_QUALITY_OVERRIDE|CHAPTER_MEASUREMENT|REGION_PAGE_PROTOTYPE_ROOT))):[^=]*=(.*)$') {
+  if($line -match '^((?:CMAKE_(?:GENERATOR|BUILD_TYPE|CONFIGURATION_TYPES|HOME_DIRECTORY|CXX_COMPILER|CXX_FLAGS_DEBUG|CXX_FLAGS_RELEASE))|(?:HORDE_RT_(?:INSTRUMENTATION_OVERRIDE|DIELECTRIC_QUALITY_OVERRIDE|CHAPTER_MEASUREMENT|REGION_PAGE_PROTOTYPE_ROOT))):[^=]*=(.*)$') {
    $policy[$Matches[1]]=$Matches[2]
   }
  }
  $buildProfile=@{cachePath=$cachePath;cacheSha256=(Get-FileHash -LiteralPath $cachePath -Algorithm SHA256).Hash.ToLowerInvariant();configuration=$Configuration;policy=$policy}
 }
-$scope=if($residentRoundTrip){'Debug CPU; hidden Bellwether resident round trip; GPU and resource evidence only'}
+$scope=if($residentRoundTrip){'Debug configuration; hidden Bellwether resident round trip; native timing and resource evidence'}
 elseif($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixture; GPU and resource evidence only'}else{
  $Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance'
 }

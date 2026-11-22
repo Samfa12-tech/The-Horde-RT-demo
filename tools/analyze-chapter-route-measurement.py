@@ -241,9 +241,9 @@ def analyze(name, analysis_name='analysis-v3.json'):
     print('phase GPU (median/p95 ms):',json.dumps({k:(v['gpuMilliseconds'].get('median'),v['gpuMilliseconds'].get('p95')) for k,v in summary['phases'].items()}))
     print(interval_key,':',json.dumps(summary[interval_key]), 'throughput Hz:',summary[throughput_key])
 
-def analyze_bellwether(name, analysis_name, *, print_phases=True):
+def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_roundtrip=False):
     root = pathlib.Path(name)
-    directory = root / 'bellwether-doorway'
+    directory = root / ('bellwether-resident-roundtrip' if resident_roundtrip else 'bellwether-doorway')
     run = json.loads((directory / 'run.json').read_text())
     receipt = json.loads(pathlib.Path(name + '.candidate.json').read_text(encoding='utf-8-sig'))
     manifest = json.loads((root / 'capture-manifest.json').read_text())
@@ -261,7 +261,7 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True):
         assert set(hashes) in (original_assets, original_assets | drive_assets,
                                original_assets | drive_assets | wheel_assets)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in hashes.values())
-    assert 60 <= run['durationSeconds'] <= 150 and run['simulationHz'] == 60
+    assert 60 <= run['durationSeconds'] <= (240 if resident_roundtrip else 150) and run['simulationHz'] == 60
     assert not run['unoccludedClientChecks'] and not run['foregroundRequested']
     assert run['scope'].startswith('Debug CPU') and receipt['residentFixtureHashes']
     record_keeper_included = run.get('recordKeeperIncluded', False)
@@ -278,11 +278,29 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True):
     assert all(row['present_interval_available'] == row['present_return_interval_ns'] ==
                row['unoccluded_client'] == '0' for row in rows)
     phases = [phase for phase, _ in itertools.groupby(row['phase'] for row in rows)]
-    assert phases == ['room', 'doorway-outbound', 'square', 'doorway-inbound'] * 2 + ['room', 'complete']
+    destination = 'east-fork' if resident_roundtrip else 'square'
+    assert phases == ['room', 'doorway-outbound', destination, 'doorway-inbound'] * 2 + ['room', 'complete']
+    if resident_roundtrip:
+        assert door_witness and record_keeper_included and run['deadlineSeconds'] == 240
+        assert run['maximumTicksPerRender'] == 4 and all(0 <= b - a <= 4 for a, b in zip(ticks, ticks[1:]))
+        assert len({row['shader_sha256'] for row in rows}) == 1
+        assert all(row['gpu_status'] == 'valid' and int(row['gpu_ns']) > 0 for row in rows)
+        fixtures = receipt['residentFixtureHashes']
+        required_roles = ('tavern-keeper', 'record-keeper', 'artificer', 'salvager')
+        suffixes = ('asset.manifest.json', 'resident.glb', 'base-color.windows.ktx2',
+                    'normal.windows.ktx2', 'orm.windows.ktx2')
+        required_files = {f'{role}/{suffix}' for role in required_roles for suffix in suffixes}
+        dealer_files = {f'relic-dealer/{suffix}' for suffix in suffixes}
+        assert set(fixtures) in (required_files, required_files | dealer_files)
+        assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in fixtures.values())
+        roster = verify_bellwether_resident_roster(rows)
+        assert roster['transitionCounts'] == {'outbound': {'1': 2, '2': 2}, 'inbound': {'1': 2, '2': 2}}
+        assert all(int(row[key]) >= 0 for row in rows
+                   for key in ('simulation_step_cpu_ns', 'wholeFrameCycleCpuMs_ns'))
     for row in rows:
         verify_host_phases(row)
         assert all(int(row[column]) == 0 for column in row if column.endswith('_overflow'))
-        if row['phase'] == 'room':
+        if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
             assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', '1', '1']
         if record_keeper_included:
             assert row['record_keeper_mask'] == '1'
@@ -307,6 +325,10 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True):
         assert frame['presentation']['lastSuccessfulPresentSubmissionSerial'] == serial
         assert frame['pipeline']['executionBackend'] == receipt['backend']
         assert frame['pipeline']['activeSha256'] == row['shader_sha256']
+        if resident_roundtrip and frame['pipeline']['instrumentation'] == 'shipping':
+            counters = frame['dielectric']
+            assert not counters['compiled'] and not counters['available'] and counters['counters'] is None
+            assert counters['readCount'] == counters['resetCount'] == 0
         assert frame['gpu']['status'] == row['gpu_status']
         if frame['gpu']['status'] == 'valid':
             assert frame['gpu']['completedSubmissionSerial'] == serial
@@ -322,14 +344,40 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True):
                    presentation=manifest['presentation'], run=run, phases={})
     if door_witness:
         summary.update(openDoorWitness=True, tavernAssetHashes=hashes)
+    warmup = run['warmupSeconds']
+    if resident_roundtrip:
+        settings = {(item['evidence']['pipeline']['instrumentation'], item['evidence']['pipeline']['dielectricQuality'],
+                     tuple(item['evidence']['submittedDimensions']['internalExtent']),
+                     tuple(item['evidence']['submittedDimensions']['outputExtent'])) for item in journal}
+        assert len(settings) == 1
+        instrumentation, quality, internal, output = next(iter(settings))
+        assert quality == 'high'
+        profile = receipt.get('buildProfile')
+        override = (profile or {}).get('policy', {}).get('HORDE_RT_INSTRUMENTATION_OVERRIDE')
+        assert not override or instrumentation == override.lower(), 'Captured shaders differ from the build profile'
+        summary.update(residentRoster=roster, buildProfile=profile,
+                       renderer=dict(instrumentation=instrumentation, dielectricQuality=quality,
+                                     internalExtent=list(internal), outputExtent=list(output),
+                                     shaderSha256=rows[0]['shader_sha256']),
+                       windowsTimingScope='diagnostic native frame cycles and simulation work, hidden window')
+        advanced_ticks = {row['submission_serial']: b - a
+                          for previous, row, a, b in zip(rows, rows[1:], ticks, ticks[1:])
+                          if previous['phase'] == row['phase'] and b > a}
     for phase in dict.fromkeys(phases[:-1]):
-        samples = [row for row in rows if row['phase'] == phase and float(row['elapsed_s']) >= run['warmupSeconds']]
+        samples = [row for row in rows if row['phase'] == phase and float(row['elapsed_s']) >= warmup]
         valid = [int(row['gpu_ns']) / 1e6 for row in samples if row['gpu_status'] == 'valid' and int(row['gpu_ns']) > 0]
         assert valid
         summary['phases'][phase] = dict(samples=len(samples), gpuMilliseconds=stats(valid),
             resourcePeaks={column: max(int(row[column]) for row in samples)
                            for column in ('device_local_bytes', 'host_visible_bytes', 'tlas_instances', 'blas_owners')},
             fireCounts=sorted({int(row['fire_count']) for row in samples}))
+        if resident_roundtrip:
+            summary['phases'][phase].update(
+                nativeCycleMilliseconds=stats([int(row['wholeFrameCycleCpuMs_ns']) / 1e6 for row in samples]),
+                simulationBatchMilliseconds=stats([int(row['simulation_step_cpu_ns']) / 1e6 for row in samples]),
+                simulationPerTickMilliseconds=stats([
+                    int(row['simulation_step_cpu_ns']) / 1e6 / advanced_ticks[row['submission_serial']]
+                    for row in samples if row['submission_serial'] in advanced_ticks]))
     assert pathlib.Path(analysis_name).name == analysis_name and analysis_name.endswith('.json')
     target = directory / analysis_name
     if target.exists():
@@ -540,6 +588,7 @@ if __name__=='__main__':
     parser.add_argument('--analysis-name',default='analysis-v3.json')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--bellwether-doorway', action='store_true')
+    mode.add_argument('--bellwether-resident-roundtrip', action='store_true')
     mode.add_argument('--compare-bellwether-keeper', action='store_true')
     mode.add_argument('--android-bellwether-doorway', action='store_true')
     mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
@@ -553,7 +602,7 @@ if __name__=='__main__':
         if args.android_bellwether_doorway or args.android_bellwether_resident_roundtrip:
             analyze_android_bellwether(name, args.analysis_name,
                                       resident_roundtrip=args.android_bellwether_resident_roundtrip)
-        elif args.bellwether_doorway:
-            analyze_bellwether(name, args.analysis_name)
+        elif args.bellwether_doorway or args.bellwether_resident_roundtrip:
+            analyze_bellwether(name, args.analysis_name, resident_roundtrip=args.bellwether_resident_roundtrip)
         else:
             analyze(name, args.analysis_name)
