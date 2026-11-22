@@ -20,7 +20,8 @@ public final class ChapterVoiceAssetsTest {
 
     @Test public void everyAdmittedSpeechLineHasOneUniqueKeyAndExpectedRuntimePath() {
         assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0)
-                        + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0),
+                        + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0)
+                        + (BuildConfig.BELLWETHER_SALVAGER_AUDITION ? 3 : 0),
                 ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
@@ -82,5 +83,19 @@ public final class ChapterVoiceAssetsTest {
                 assertTrue(asset.soundKey.startsWith(i < 3 ? "kit_" : "keeper_"));
             } else assertNull(asset);
         }
+    }
+
+    @Test public void privateSalvagerAuditionAdmitsOnlyTheThreeShorePracticeTakes() {
+        final String[] ids = {"access.body_task", "access.body_progress", "hub.passing.learned_retreat"};
+        for (int i = 0; i < ids.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(52 + i);
+            if (BuildConfig.BELLWETHER_SALVAGER_AUDITION) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+                assertTrue(asset.soundKey.startsWith("salvager_"));
+            } else assertNull(asset);
+        }
+        assertNull(ChapterVoiceAssets.forLine(55));
     }
 }

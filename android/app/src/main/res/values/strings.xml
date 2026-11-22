@@ -76,6 +76,12 @@
     <string name="turn_mill_drive">Turn the drive</string>
     <string name="take_breathing_rig">Take breathing rig</string>
     <string name="mill_drive_turning">Testing the drive</string>
+    <string name="salvager_start_shore_practice">Start shore practice</string>
+    <string name="salvager_report_shore_practice">Report to the salvager</string>
+    <string name="salvager_recall_shore_practice">Recall the lesson</string>
+    <string name="salvager_find_dry_mark">Follow the causeway to the river rail</string>
+    <string name="salvager_enter_shallows">Wade to the rail</string>
+    <string name="salvager_report_back">Return to the salvager at the fork</string>
     <string name="open_tavern_door">Open tavern door</string>
     <string name="close_tavern_door">Close tavern door</string>
     <string name="show_road_mark">Show the road mark</string>

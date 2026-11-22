@@ -12,6 +12,7 @@
 #include "gameplay/simulation/StaticDetailLease.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/traversal/BellwetherMill.h"
+#include "gameplay/traversal/BellwetherSalvager.h"
 
 #include <array>
 #include <cstddef>
@@ -91,16 +92,21 @@ struct SimulationSnapshot
     float millDriveAngleRadians=0.f;
     // Continuous waterwheel presentation, driven by the shared active fixed step.
     float millWaterwheelAngleRadians=0.f;
+    bellwether::ShorePracticeStage shorePracticeStage{};
+    bellwether::SalvagerAction salvagerAction{};
+    bool salvagerShorePracticeCompleted=false;
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
         return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
-            tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None;
+            tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
+            salvagerAction!=bellwether::SalvagerAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;
     std::optional<bellwether::ArtificerPose> artificer;
+    std::optional<bellwether::SalvagerPose> salvager;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};

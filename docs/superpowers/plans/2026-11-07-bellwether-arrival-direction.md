@@ -331,7 +331,15 @@ The two fixtures add 180 triangles to the shared town mesh and reuse its existin
 
 A 1.9 m stone causeway starts just south of the salvager's existing mark, follows the mill's south edge and reaches the west bank of the main river. A timber rail marks the end of the terrace. The river covers the lower stone platform by about 20 cm. The shared collision and render mesh gives the player a continuous walk to and from dry ground.
 
-Shallow contact queries the existing, finite Vulkan water faces and compares their height with the grounded player's feet. Wet steps use the surface height for the sound source and splash droplets. The landing gives the breathing rig trial and the planned salvager lesson a common place to practise and retreat. The separate millrace sits upstream. The salvager encounter remains open.
+Shallow contact queries the existing, finite Vulkan water faces and compares their height with the grounded player's feet. Wet steps use the surface height for the sound source and splash droplets. The breathing rig trial and the salvager's shore practice share the landing. The separate millrace sits upstream.
+
+#### Salvager shore practice
+
+After the opening tavern conversation, the salvager stands by the river fork on the east route. Talk starts a walk to the last dry stone, into the shallows at the rail, and back to dry footing. The shared player motor and water contact confirm the steps. Reporting back records the completed practice in the existing safe tavern autosave. A load returns to that safe anchor and unfinished drills can be restarted. The three authored lines have named captions and an optional private audition with positional audio.
+
+The private Debug roster pairs the salvager with the tavern keeper and Kit using the existing three-character capacity. This is the first Constitution preparation. Finite breath training and the submerged route toward the Abbey still need playable implementation.
+
+Both Windows hardware RT backends presented the fork at 960 × 540 with all three resident instance masks active. The ARM64 Debug APK packages the same salvager mesh and the three private WAVs, with single-layer mipmapped ASTC textures. The night capture leaves the salvager's face dark at rest. Live readability, voice balance and sustained phone performance still need checking.
 
 The native walkthrough enters and leaves the shallows, verifies wet-footstep positions against the river height, and continues through the existing mill and shrine interactions. The `bellwether-river-landing` Debug checkpoint walks through the same geometry and then returns to its dry camera position. Both Windows hardware RT backends presented the view at 960 × 540. The Android ARM64 Debug package contains the same town export, with phone performance and listening checks pending.
 
@@ -339,7 +347,7 @@ The native walkthrough enters and leaves the shallows, verifies wet-footstep pos
 
 The private Debug checkpoint bellwether-rig-leak-trial starts on the dry causeway with the rig ready to test. Enter the shallows at the rail and choose **Start leak test**. Stay on the wet platform for two active seconds. Leaving early resets the test and the player can try again. On a successful hold, the prompt directs the player back to dry stone. **Confirm seal** updates the existing tavern return record. Pausing freezes the test and reloading an unconfirmed result requires a fresh attempt.
 
-This isolated river checkpoint supplies the rig for testing. The separate private mill campaign earns the rig from the artificer after the workbench test. The seal trial uses the existing shallow contact at the river rail. The salvager lesson, underwater traversal and Abbey crossing remain separate milestones.
+This isolated river checkpoint supplies the rig for testing. The separate private mill campaign earns the rig from the artificer after the workbench test. The seal trial and the independently playable salvager shore practice use the existing shallow contact at the river rail. Underwater traversal and the Abbey crossing remain open.
 
 The native walkthrough checks early retreat, pause, retry, the full wet hold and the dry confirmation. It checks that an unfinished trial restarts after loading and the confirmed seal survives loading. Both Windows hardware RT backends presented the Debug starting position at 960 x 540. The ARM64 Debug package passed the Android checkpoint and prompt tests. Phone performance remains open.
 

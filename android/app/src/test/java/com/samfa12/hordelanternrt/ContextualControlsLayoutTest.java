@@ -77,6 +77,10 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.confirm_rig_seal, MainActivity.contextualInteractLabel(mill | (5 << 25) | 1));
         assertEquals(R.string.rig_leak_test_in_progress, MainActivity.contextualInteractLabel(mill | (6 << 25)));
         assertEquals(R.string.rig_leak_test_return_to_dry, MainActivity.contextualInteractLabel(mill | (7 << 25)));
+        assertEquals(R.string.salvager_start_shore_practice, MainActivity.contextualInteractLabel(mill | (12 << 25) | 1));
+        assertEquals(R.string.salvager_report_shore_practice, MainActivity.contextualInteractLabel(mill | (13 << 25) | 1));
+        assertEquals(R.string.salvager_enter_shallows, MainActivity.contextualInteractLabel(mill | (16 << 25)));
+        assertEquals(R.string.salvager_report_back, MainActivity.contextualInteractLabel(mill | (18 << 25)));
         assertEquals(R.string.seat_mill_bearing, MainActivity.contextualInteractLabel(mill | (8 << 25) | 1));
         assertEquals(R.string.turn_mill_drive, MainActivity.contextualInteractLabel(mill | (9 << 25) | 1));
         assertEquals(R.string.take_breathing_rig, MainActivity.contextualInteractLabel(mill | (10 << 25) | 1));

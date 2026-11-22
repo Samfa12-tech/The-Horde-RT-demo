@@ -78,6 +78,7 @@ bool PlaySession::ObserveSafeBoundary() {
         (captured->waysideRegisterRecovered && !latest_->waysideRegisterRecovered) ||
         (captured->waysideRegisterInterpreted && !latest_->waysideRegisterInterpreted) ||
         (captured->airWardLearned && !latest_->airWardLearned) ||
+        (captured->salvagerShorePracticeCompleted && !latest_->salvagerShorePracticeCompleted) ||
         bellwether::MillProgress(captured->millPreparation)>bellwether::MillProgress(latest_->millPreparation) ||
         captured->treasurePurse!=latest_->treasurePurse);
     const bool changed=SetLatest(*captured);

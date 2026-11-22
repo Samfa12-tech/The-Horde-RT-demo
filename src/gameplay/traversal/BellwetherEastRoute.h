@@ -16,6 +16,8 @@ inline constexpr std::array kBellwetherMillApproach{
     BellwetherMapStation(38.5f, 13.f),
 };
 inline constexpr auto kBellwetherSalvagerMark = BellwetherMapStation(36.f, 0.f);
+// The standing resident stays beside the fork, clear of both walking routes.
+inline constexpr BellwetherStation kBellwetherSalvagerStand{114.20f,124.95f};
 inline constexpr auto kBellwetherMillYardView = BellwetherMapStation(35.45f, 13.22f);
 // The artificer stands beyond the south end of the bench, outside the approach.
 inline constexpr BellwetherStation kBellwetherMillArtificerMark{117.45f,117.15f};

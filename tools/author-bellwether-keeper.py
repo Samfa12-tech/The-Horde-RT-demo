@@ -6,11 +6,13 @@ Without a profile this reproduces the tavern keeper. Other residents supply an a
 
 import hashlib
 import json
+import math
 from pathlib import Path
 import struct
 import sys
 
 import bpy
+from mathutils import Quaternion, Vector
 
 
 FPS = 30
@@ -103,7 +105,7 @@ def write_manifest(model, asset):
                                                       encoding="utf-8")
 
 
-def main(source, output, asset, source_hashes):
+def main(source, output, asset, source_hashes, idle_upper_arm_inward_degrees, walk_lower_metres):
     if output.exists():
         raise ValueError("Choose an unused resident output directory.")
     for name, sha256 in source_hashes.items():
@@ -145,10 +147,16 @@ def main(source, output, asset, source_hashes):
     for frame in (first, 16):
         sample(scene, frame)
         relaxed.append({name: armature.pose.bones[name].matrix.to_quaternion() for name in ARMS})
+    root, = [bone for bone in armature.data.bones if bone.parent is None]
+    root_from_world = (armature.matrix_world @ root.matrix_local).to_3x3().inverted()
+    walk_offset = root_from_world @ Vector((0.0, 0.0, -walk_lower_metres))
     walk_poses = []
     for index in range(cycle):
         sample(scene, first + (last - first) * index / cycle)
-        walk_poses.append({bone.name: bone.matrix_basis.copy() for bone in armature.pose.bones})
+        pose = {bone.name: bone.matrix_basis.copy() for bone in armature.pose.bones}
+        if walk_lower_metres:
+            pose[root.name].translation += walk_offset
+        walk_poses.append(pose)
     walk_poses.append(walk_poses[0])
     walk = bake(armature, "Warden|walk", walk_poses)
     bpy.data.actions.remove(stock)
@@ -161,7 +169,12 @@ def main(source, output, asset, source_hashes):
     bpy.context.view_layer.update()
     for name in ARMS:
         bone = armature.pose.bones[name]
-        target = relaxed[0][name].slerp(relaxed[1][name], 0.5).to_matrix().to_4x4()
+        rotation = relaxed[0][name].slerp(relaxed[1][name], 0.5)
+        if idle_upper_arm_inward_degrees and name in ("LeftArm", "RightArm"):
+            side = math.copysign(1.0, bone.head.x)
+            inward = Quaternion((0, 1, 0), math.radians(side * idle_upper_arm_inward_degrees))
+            rotation = inward @ rotation
+        target = rotation.to_matrix().to_4x4()
         target.translation = bone.matrix.translation
         bone.matrix = target
         bone.location = neutral[name].to_translation()
@@ -179,8 +192,11 @@ def main(source, output, asset, source_hashes):
     for frame in range(1, cycle + 2):
         scene.frame_set(frame)
         walk_bounds.append(bounds(mesh))
-    if any(not 0.0 <= limits[0][2] < 0.04 or limits[1][2] > 1.78 for limits in walk_bounds):
-        raise ValueError("Walking pose is outside the native actor's grounded height envelope.")
+    foot_heights = [low[2] for low, _ in walk_bounds]
+    tallest = max(high[2] for _, high in walk_bounds)
+    if min(foot_heights) < 0.0 or max(foot_heights) >= 0.04 or tallest > 1.78:
+        raise ValueError(f"Walking ground clearance {min(foot_heights):.4f} to {max(foot_heights):.4f} m "
+                         f"and height {tallest:.4f} m exceed the native actor envelope.")
     armature.animation_data.action = idle
     scene.frame_start, scene.frame_end = 1, cycle + 1
     scene.frame_set(1)
@@ -202,6 +218,8 @@ def main(source, output, asset, source_hashes):
         "inputs": source_hashes, "runtimeGlbSha256": digest(model),
         "walkSeconds": cycle / FPS, "walkMetresPerCycle": cycle * WALK_SPEED / FPS,
         "stockMidStanceMetresPerSecond": speeds, "idleBounds": idle_bounds,
+        "idleUpperArmInwardDegrees": idle_upper_arm_inward_degrees,
+        "walkLowerMetres": walk_lower_metres,
         "walkBounds": walk_bounds,
     }, indent=2) + "\n", encoding="utf-8")
 
@@ -212,6 +230,8 @@ if __name__ == "__main__":
         raise ValueError("Expected SOURCE_DIR NEW_OUTPUT_DIR [PROFILE_JSON].")
     source, output = map(Path, args[:2])
     asset, source_hashes = "bellwether-tavern-keeper", KEEPER_SOURCE_HASHES
+    idle_upper_arm_inward_degrees = 0.0
+    walk_lower_metres = 0.0
     if len(args) == 3:
         profile = json.loads(Path(args[2]).read_text(encoding="utf-8"))
         asset, source_hashes = profile["asset"], profile["sourceHashes"]
@@ -219,4 +239,10 @@ if __name__ == "__main__":
             raise ValueError("The resident asset ID must be a Bellwether slug.")
         if set(source_hashes) != set(KEEPER_SOURCE_HASHES):
             raise ValueError("The resident profile must pin rigged.glb and walking.glb.")
-    main(source.resolve(), output.resolve(), asset, source_hashes)
+        idle_upper_arm_inward_degrees = float(profile.get("idleUpperArmInwardDegrees", 0.0))
+        if not 0.0 <= idle_upper_arm_inward_degrees <= 8.0:
+            raise ValueError("Choose a small inward adjustment for the standing upper arms.")
+        walk_lower_metres = float(profile.get("walkLowerMetres", 0.0))
+        if not 0.0 <= walk_lower_metres <= 0.04:
+            raise ValueError("Choose a walking stance correction between zero and four centimetres.")
+    main(source.resolve(), output.resolve(), asset, source_hashes, idle_upper_arm_inward_degrees, walk_lower_metres)

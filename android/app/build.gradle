@@ -66,8 +66,16 @@ def texturedTavernKeeper = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/tavern-keeper/base-color.android.ktx2').isFile()
 def bellwetherArtificer = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/artificer').isDirectory()
+def bellwetherSalvager = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/salvager').isDirectory()
 if (bellwetherResidentDirectory) {
-    def pinned = bellwetherArtificer ? [
+    def pinned = bellwetherSalvager ? [
+        'private_bellwether/salvager/asset.manifest.json': '5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc',
+        'private_bellwether/salvager/resident.glb': '26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa',
+        'private_bellwether/salvager/base-color.android.ktx2': '3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152',
+        'private_bellwether/salvager/normal.android.ktx2': '11b996752ab9c93dcd33eace337a2db2b4fad6459c63998e472c813644281628',
+        'private_bellwether/salvager/orm.android.ktx2': '26f765f78fc751e6e37196f2c5ed7843c59e7931d17b313ff333d0d702e5f117'
+    ] : bellwetherArtificer ? [
         'private_bellwether/artificer/asset.manifest.json': '890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864',
         'private_bellwether/artificer/resident.glb': '58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f',
         'private_bellwether/artificer/base-color.android.ktx2': '68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8',
@@ -106,6 +114,14 @@ def bellwetherArrivalAuditionWavs = [
 def bellwetherArrivalAudition = bellwetherVoiceDirectory && bellwetherArrivalAuditionWavs.keySet().any {
     new File(bellwetherVoiceDirectory, it).isFile()
 }
+def bellwetherSalvagerAuditionWavs = [
+    'private_bellwether_voice/access.body_task.wav': '8fe30ce30ccef9f9692f6d0f82a08bd618880038434b00336727cc70aad79ca9',
+    'private_bellwether_voice/access.body_progress.wav': '294501da575c700e3b4ed1e518f8dbfc6cb13e71c13c85a0a060e3c6ce993543',
+    'private_bellwether_voice/hub.passing.learned_retreat.wav': '01af397a57165188e559aaebe18edc5e76deeb4e2dedb91ab19a041cd11d1971'
+]
+def bellwetherSalvagerAudition = bellwetherVoiceDirectory && bellwetherSalvagerAuditionWavs.keySet().any {
+    new File(bellwetherVoiceDirectory, it).isFile()
+}
 if (bellwetherVoiceDirectory) {
     if (!bellwetherResidentDirectory)
         throw new GradleException('Bellwether voices require the separate resident Debug package.')
@@ -117,6 +133,7 @@ if (bellwetherVoiceDirectory) {
         'private_bellwether_voice/hub.hoard_answer.wav': 'a91d048e340a2f8c9adbba0046393fc1db847e48331dc84ba5d467c5e5dfa5ee'
     ]
     if (bellwetherArrivalAudition) pinned.putAll(bellwetherArrivalAuditionWavs)
+    if (bellwetherSalvagerAudition) pinned.putAll(bellwetherSalvagerAuditionWavs)
     verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
 }
 
@@ -808,9 +825,11 @@ android {
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
         buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', 'false'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
@@ -854,14 +873,18 @@ android {
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', bellwetherArtificer ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', bellwetherSalvager ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
-                def rosterSuffix = bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'
+                def rosterSuffix = bellwetherSalvager ? '.debug.bellwether.shore' :
+                    (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether')
                 applicationIdSuffix rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
-                resValue 'string', 'app_name', bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
+                def rosterLabel = bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
                     (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')
+                resValue 'string', 'app_name', bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' : rosterLabel
             } else {
                 applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             }
@@ -878,6 +901,7 @@ android {
                     arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
                         "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_SALVAGER_CANDIDATE=${bellwetherSalvager ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),

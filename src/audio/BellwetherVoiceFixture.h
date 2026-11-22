@@ -34,11 +34,20 @@ inline constexpr std::array kBellwetherArrivalAuditionCuts{
     BellwetherVoiceCut{gameplay::dialogue::Line::TavernHordeArmy, 133904, "a088307c4969f436888eb16eddf22ec23ceab59940adbf34ba7a2ba4f7401d5d"}
 };
 
-inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false) {
+inline constexpr std::array kBellwetherSalvagerAuditionCuts{
+    BellwetherVoiceCut{gameplay::dialogue::Line::SalvagerShoreTask,126704,"8fe30ce30ccef9f9692f6d0f82a08bd618880038434b00336727cc70aad79ca9"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::SalvagerShoreReminder,113264,"294501da575c700e3b4ed1e518f8dbfc6cb13e71c13c85a0a060e3c6ce993543"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::SalvagerShoreReturn,111344,"01af397a57165188e559aaebe18edc5e76deeb4e2dedb91ab19a041cd11d1971"}
+};
+
+inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false,
+                                            bool salvagerAudition = false) {
     const auto matches = [line](const BellwetherVoiceCut& cut) { return cut.line == line; };
     return std::any_of(kBellwetherVoiceCuts.begin(), kBellwetherVoiceCuts.end(), matches) ||
         (arrivalAudition && std::any_of(kBellwetherArrivalAuditionCuts.begin(),
-                                      kBellwetherArrivalAuditionCuts.end(), matches));
+                                      kBellwetherArrivalAuditionCuts.end(), matches)) ||
+        (salvagerAudition && std::any_of(kBellwetherSalvagerAuditionCuts.begin(),
+                                       kBellwetherSalvagerAuditionCuts.end(), matches));
 }
 
 } // namespace horde::audio

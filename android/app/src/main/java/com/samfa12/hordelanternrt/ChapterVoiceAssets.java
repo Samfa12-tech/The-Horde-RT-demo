@@ -59,6 +59,11 @@ final class ChapterVoiceAssets {
             assets.add(bellwether(25, "hub.horde_army", "keeper_"));
             assets.add(bellwether(27, "hub.arrival_chair", "keeper_"));
         }
+        if (BuildConfig.BELLWETHER_SALVAGER_AUDITION) {
+            assets.add(bellwether(52, "access.body_task", "salvager_"));
+            assets.add(bellwether(53, "access.body_progress", "salvager_"));
+            assets.add(bellwether(54, "hub.passing.learned_retreat", "salvager_"));
+        }
         return Collections.unmodifiableList(assets);
     }
 

@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kMillPreparationSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200};
+    constexpr std::array<std::size_t,cp::kSalvagerShorePracticeSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -130,6 +130,35 @@ int main() {
         Reject(corrupt,codec::Error::InvalidCheckpoint);
         --mill.dialogue.tavernConversationLinesResolved;
         Check(!cp::Validate(mill),"mill preparation requires the earned tavern conversation");
+    }
+    {
+        auto salvager=tavern;
+        salvager.schema=cp::kSalvagerShorePracticeSchema;
+        salvager.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+        salvager.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        salvager.salvagerShorePracticeCompleted=true;
+        RoundTrip(salvager);
+
+        auto old=salvager;
+        old.schema=cp::kMillPreparationSchema;
+        old.salvagerShorePracticeCompleted=false;
+        const auto oldBytes=Encode(old);
+        auto fallback=salvager;
+        codec::Error error{};
+        Check(codec::Decode(oldBytes,fallback,error) && error==codec::Error::None &&
+              !fallback.salvagerShorePracticeCompleted && Encode(fallback)==oldBytes,
+              "old schema records default the absent salvager shore practice flag");
+
+        auto malformed=Encode(salvager);
+        malformed.back()=std::byte{2};
+        Rechecksum(malformed);
+        Reject(malformed,codec::Error::Malformed);
+
+        auto truncated=Encode(salvager);
+        truncated.pop_back();
+        Put(truncated,12,180);
+        Rechecksum(truncated);
+        Reject(truncated,codec::Error::Malformed);
     }
     // Schema5 is used only when a safe exterior save must retain bypassed
     // guards. Their health and defeated bits are independent authoritative data.
@@ -223,7 +252,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kMillPreparationSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kSalvagerShorePracticeSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -344,7 +373,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kMillPreparationSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kSalvagerShorePracticeSchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -389,7 +418,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kMillPreparationSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kSalvagerShorePracticeSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;

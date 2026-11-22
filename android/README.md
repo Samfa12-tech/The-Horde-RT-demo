@@ -115,6 +115,17 @@ ten-file roster. The shared dialogue clock uses the measured durations, and
 an unavailable or muted cue retains its caption. The audition awaits owner
 listening approval. Both overlays are restricted to the resident Debug app.
 
+For the shore lesson, stage the salvager's pinned GLB, manifest and three
+ASTC KTX2 files in `private_bellwether/salvager/` alongside the textured
+tavern keeper. The package is `com.samfa12.hordelanternrt.debug.bellwether.shore`.
+The live Debug checkpoint `bellwether-salvager-shore` stages the river fork
+with the opening tavern conversation already complete. Talk to the salvager,
+walk to the last dry stone, touch the shallows at the rail and retreat before
+reporting back. Load the tavern autosave to check that practice was saved.
+The optional eight-file voice overlay contains the five Kit takes and
+`access.body_task.wav`, `access.body_progress.wav` and
+`hub.passing.learned_retreat.wav`.
+
 The post-benchmark Back fix from `3caefd67` is in this build. On the host,
 the opening benchmark, Android controller and campaign menu suites passed all
 115 tests. Physical confirmation of the return from benchmark results to the

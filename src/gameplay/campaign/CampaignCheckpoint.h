@@ -24,6 +24,7 @@ inline constexpr std::uint32_t kTreasurePurseSchema=13;
 inline constexpr std::uint32_t kLanternFittingSchema=14;
 inline constexpr std::uint32_t kAirWardSchema=15;
 inline constexpr std::uint32_t kMillPreparationSchema=16;
+inline constexpr std::uint32_t kSalvagerShorePracticeSchema=17;
 enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open, Restored };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
@@ -67,6 +68,7 @@ struct Checkpoint {
     TreasurePurse treasurePurse{};
     bool airWardLearned=false;
     bellwether::MillPreparation millPreparation{};
+    bool salvagerShorePracticeCompleted=false;
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
     return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
@@ -89,10 +91,13 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kMillPreparationSchema ||
+    if (c.schema < 1 || c.schema > kSalvagerShorePracticeSchema ||
         c.millPreparation>bellwether::MillPreparation::GearingVerified ||
         (c.millPreparation!=bellwether::MillPreparation::Unexamined &&
             (c.schema<kMillPreparationSchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        (c.salvagerShorePracticeCompleted &&
+            (c.schema<kSalvagerShorePracticeSchema || c.contentRevision<kBellwetherContentRevision ||
              c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
         (c.airWardLearned && c.waysideArchive!=WaysideArchiveProgress::Restored) ||
         (c.waysideArchive==WaysideArchiveProgress::Restored &&

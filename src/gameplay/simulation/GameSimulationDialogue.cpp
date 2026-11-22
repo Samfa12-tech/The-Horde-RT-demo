@@ -38,6 +38,10 @@ void GameSimulation::InteractWithClaimedChapter() {
         InteractWithMill(mill);
         return;
     }
+    if(const auto salvager=CurrentSalvagerAction(context);salvager!=bellwether::SalvagerAction::None) {
+        InteractWithSalvager(salvager,context);
+        return;
+    }
     const auto records=RecordKeeperAction(context);
     if(records==dialogue::RecordKeeperAction::CollectReward) {
         ClaimRegisterReward(context);
@@ -76,6 +80,58 @@ void GameSimulation::InteractWithClaimedChapter() {
         const auto guidance=waysideArchive_.registerInterpreted?TavernGuidance::Expeditions:
             waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
         chapterDialogue_.ShowTavernDirections(context,guidance);
+    }
+}
+
+bellwether::SalvagerAction GameSimulation::CurrentSalvagerAction(const dialogue::Context& c) const {
+    using namespace bellwether;
+    if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX || !chapterDialogue_.CanStartSalvager(c))
+        return SalvagerAction::None;
+    if(salvagerShorePracticeCompleted_)return SalvagerAction::RecallPractice;
+    if(shorePracticeStage_==ShorePracticeStage::ReportBack)return SalvagerAction::ReportPractice;
+    return shorePracticeStage_==ShorePracticeStage::Idle?SalvagerAction::StartPractice:SalvagerAction::RecallPractice;
+}
+
+void GameSimulation::InteractWithSalvager(bellwether::SalvagerAction action,const dialogue::Context& c) {
+    using namespace bellwether;
+    using dialogue::Line;
+    if(action==SalvagerAction::None)return;
+    if(action==SalvagerAction::ReportPractice) {
+        if(CommitShorePractice())chapterDialogue_.TryStartSalvager(Line::SalvagerShoreReturn,c);
+    } else if(action==SalvagerAction::StartPractice) {
+        if(chapterDialogue_.TryStartSalvager(Line::SalvagerShoreTask,c))
+            shorePracticeStage_=ShorePracticeStage::FindDryMark;
+    } else {
+        chapterDialogue_.TryStartSalvager(salvagerShorePracticeCompleted_?
+            Line::SalvagerShoreReturn:Line::SalvagerShoreReminder,c);
+    }
+}
+
+void GameSimulation::AdvanceShorePractice() {
+    using bellwether::ShorePracticeStage;
+    if(shorePracticeStage_==ShorePracticeStage::Idle)return;
+    if(!salvager_ || !UsesRescueExterior() || rescueTraversal_.IsActive() ||
+       chapterTerrainGeneration_!=worldRoute_.generation || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive) {
+        shorePracticeStage_=ShorePracticeStage::Idle;
+        return;
+    }
+    if(!playerSupport_.grounded)return;
+    constexpr auto dry=traversal::kBellwetherRiverDryMark;
+    constexpr auto wet=traversal::kBellwetherRiverLanding.back();
+    const bool wetGround=waterContact_.Snapshot().wetGround;
+    const bool atDry=!wetGround && std::hypot(playerX_-dry.x,playerZ_-dry.z)<=.48f;
+    const bool atWet=wetGround && std::hypot(playerX_-wet.x,playerZ_-wet.z)<=.40f;
+    switch(shorePracticeStage_) {
+    case ShorePracticeStage::FindDryMark:
+        if(atDry)shorePracticeStage_=ShorePracticeStage::EnterShallows;
+        break;
+    case ShorePracticeStage::EnterShallows:
+        if(atWet)shorePracticeStage_=ShorePracticeStage::Retreat;
+        break;
+    case ShorePracticeStage::Retreat:
+        if(atDry)shorePracticeStage_=ShorePracticeStage::ReportBack;
+        break;
+    default: break;
     }
 }
 
@@ -356,6 +412,20 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
                 (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance;
         }
     }
+    if(salvager_ && c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation) {
+        auto mouth=salvager_->foot;
+        mouth[1]+=kCompanionSpeechHeight;
+        const float distance=std::hypot(mouth[0]-c.player.x,mouth[2]-c.player.z);
+        const float height=std::min(mouth[1],c.listener.y);
+        if(distance<=4.f && std::abs(mouth[1]-c.listener.y)<=1.2f &&
+           chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mouth[0],mouth[2],
+               height-.025f,height+.025f,.025f)) {
+            c.salvagerSource=Tuple{mouth[0],mouth[1],mouth[2]};
+            c.salvagerInReach=distance<=2.1f &&
+                std::sin(c.yaw)*(mouth[0]-c.player.x)-std::cos(c.yaw)*(mouth[2]-c.player.z)>=.65f*distance;
+        }
+    }
     const auto& mark=bellwether::kWaysideMechanism;
     if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && c.alive && c.claimed && c.exterior &&
        !c.combat && !c.traversing && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
@@ -385,8 +455,26 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
             if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherMillArtificerMark))
                 artificer_=bellwether::ArtificerPose{*foot};
         }
+        if(!salvager_ && config_.bellwetherSpecialist==bellwether::Specialist::Salvager) {
+            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherSalvagerStand))
+                salvager_=bellwether::SalvagerPose{*foot};
+        }
     }
     auto c=ChapterInteractionContext(input.paused);
+    if(salvager_ && c.salvagerSource && !c.paused && c.alive && !c.traversing) {
+        auto& pose=*salvager_;
+        pose.idleSeconds+=seconds;
+        const auto line=chapterDialogue_.State().line;
+        const bool attending=!c.combat &&
+            ((line==Line::None && c.salvagerInReach) || IsSalvagerLine(line));
+        const float dx=c.player.x-pose.foot[0],dz=c.player.z-pose.foot[2];
+        const float target=attending && std::hypot(dx,dz)>.001f?
+            std::atan2(dx,-dz):bellwether::kSalvagerRestYaw;
+        constexpr float fullTurn=6.28318530718f;
+        const float limit=1.5f*seconds;
+        const float turn=std::remainder(target-pose.yaw,fullTurn);
+        pose.yaw=std::remainder(pose.yaw+std::clamp(turn,-limit,limit),fullTurn);
+    }
     if(recordKeeper_ && !c.paused && c.alive && !c.traversing) {
         auto& keeper=*recordKeeper_;
         if(c.recordKeeperSource)keeper.idleSeconds+=seconds;

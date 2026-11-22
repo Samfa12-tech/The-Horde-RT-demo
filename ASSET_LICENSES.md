@@ -1012,6 +1012,25 @@ The paid Meshy account charged 20 credits. Exact redistribution rights remain
 pending. The public repository records the preparation tools and provenance.
 The private archive retains the model, textures and review images.
 
+## Bellwether salvager candidate - 22 November 2026
+
+The intake records an earlier salvager rig whose files could not be recovered
+for this build. The replacement uses an original project reference made with
+built-in OpenAI image generation, Meshy T2.5 geometry, Meshy 7 PBR textures
+and Meshy's humanoid rig and walk. Blender authoring by Samfa12/Codex adjusts
+the standing arms and grounds the retimed walk. The 15,725-triangle runtime GLB
+has SHA-256 `26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa`.
+The local source archive retains the reference, prompt, original models,
+editable Blender file, platform textures and provider receipts.
+
+Meshy charged 15 credits for the textured model and five for the rig. The
+paid output and its derivatives are for private Debug testing while exact
+distribution rights are confirmed. The optional voice overlay uses three
+existing Salvager takes from the private Bellwether audio archive, cast as
+Wise Animation Mentor. The code pins the PCM WAVs and their sample counts.
+Owner listening acceptance and distribution clearance for these takes remain
+open.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

@@ -34,7 +34,7 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
         c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
         c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,
-        c.airWardLearned,c.millPreparation);};
+        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted);};
     return facts(a)==facts(b);
 }
 }
@@ -214,6 +214,10 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     if(c.dialogue.tavernLanternLinesStarted)c.schema=std::max(c.schema,campaign::kTavernLanternExchangeSchema);
     RecordTreasurePurse(c,treasurePurse_);
     RecordMillPreparation(c,millPreparation_);
+    if(salvagerShorePracticeCompleted_) {
+        c.salvagerShorePracticeCompleted=true;
+        c.schema=std::max(c.schema,campaign::kSalvagerShorePracticeSchema);
+    }
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
 }
@@ -354,6 +358,21 @@ bool GameSimulation::CommitMillPreparation(bellwether::MillPreparation preparati
     return true;
 }
 
+bool GameSimulation::CommitShorePractice() {
+    if(!campaignBoundary_ || !chapterTerrain_ || campaignBoundaryRevision_==UINT64_MAX ||
+       shorePracticeStage_!=bellwether::ShorePracticeStage::ReportBack || salvagerShorePracticeCompleted_)
+        return false;
+    auto updated=*campaignBoundary_;
+    updated.salvagerShorePracticeCompleted=true;
+    updated.schema=std::max(updated.schema,campaign::kSalvagerShorePracticeSchema);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return false;
+    salvagerShorePracticeCompleted_=true;
+    shorePracticeStage_=bellwether::ShorePracticeStage::Idle;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
+    return true;
+}
+
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {
     // An invalid request does not cancel an already validated pending request.
     // Normal gameplay keeps schema3 unavailable until admission. The explicit
@@ -444,6 +463,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
     next.treasurePurse_=c.treasurePurse;
     next.millPreparation_=c.millPreparation;
+    next.salvagerShorePracticeCompleted_=c.salvagerShorePracticeCompleted;
     if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;

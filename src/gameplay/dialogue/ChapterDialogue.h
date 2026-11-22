@@ -20,14 +20,15 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     RecordKeeperInspect, RecordKeeperErrand, RecordKeeperDirections,
     RecordKeeperRegister, RecordKeeperTwoRoads, RecordKeeperRoadOrder, TavernRegisterDirections, TavernExpeditionDirections,
     TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
-    RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson };
+    RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson,
+    SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,52> kLines{{
+inline constexpr std::array<LineSpec,55> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -79,7 +80,10 @@ inline constexpr std::array<LineSpec,52> kLines{{
     {Line::RecordKeeperReward,"hub.register_reward","Record keeper","Here, for bringing the register back.","",2.6f,1},
     {Line::TavernLanternFitting,"hub.lantern_fitting","Tavern keeper","Try that. The hinge should swing less when you walk.","",3.2f,1},
     {Line::RecordKeeperWardOffer,"access.magic_offer","Record keeper","Restore the shrine's binding, and I can teach you a ward for the crossing. Close the lower stone again.","",6.2f,1},
-    {Line::RecordKeeperWardLesson,"access.magic_limit","Record keeper","It will buy you breath. It will not last forever.","",4.2f,1}
+    {Line::RecordKeeperWardLesson,"access.magic_limit","Record keeper","It will buy you breath. It will not last forever.","",4.2f,1},
+    {Line::SalvagerShoreTask,"access.body_task","Salvager","We practise near a way out. Getting across is only half the lesson.","",126704.f/24000.f,1},
+    {Line::SalvagerShoreReminder,"access.body_progress","Salvager","Find your way back before you leave the edge. Show me.","",113264.f/24000.f,1},
+    {Line::SalvagerShoreReturn,"hub.passing.learned_retreat","Salvager","Coming back was part of the lesson. Good to see you remembered.","",111344.f/24000.f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -118,10 +122,14 @@ inline constexpr bool IsTavernLanternLine(Line line) {
 inline constexpr bool IsTavernLanternVoice(Line line) {
     return line==Line::TavernLanternIdentity || line==Line::TavernLanternSeals;
 }
+inline constexpr bool IsSalvagerLine(Line line) {
+    return line>=Line::SalvagerShoreTask && line<=Line::SalvagerShoreReturn;
+}
 inline constexpr bool IsBellwetherLine(Line line) {
     return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
         line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
-        IsRecordKeeperLine(line) || IsTavernLanternLine(line) || line==Line::TavernLanternFitting;
+        IsRecordKeeperLine(line) || IsTavernLanternLine(line) || IsSalvagerLine(line) ||
+        line==Line::TavernLanternFitting;
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -150,8 +158,10 @@ struct Context {
     std::optional<Tuple> tavernKeeperSource;
     std::optional<Tuple> shrineLanternSource;
     std::optional<Tuple> recordKeeperSource;
+    std::optional<Tuple> salvagerSource;
     std::optional<Tuple> tavernLanternSource;
     bool recordKeeperInReach=false;
+    bool salvagerInReach=false;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
     bool lanternLow=false,lanternHigh=false;
     bool flaskGuideEnabled=false; unsigned flaskCharges=0;
@@ -240,6 +250,15 @@ public:
         case RecordKeeperAction::None: return false;
         }
         StartNextRecordKeeperLine(c);
+        return true;
+    }
+    bool CanStartSalvager(const Context& c) const {
+        return c.salvagerInReach && CanHearSalvager(c) && state_.line==Line::None &&
+            continuationCount_==0 && state_.tavernConversationLinesResolved==kTavernConversation.size();
+    }
+    bool TryStartSalvager(Line line,const Context& c) {
+        if(!IsSalvagerLine(line) || !CanStartSalvager(c))return false;
+        Start(line,*c.salvagerSource,c);
         return true;
     }
     bool HoldingAnkleAssessment() const {
@@ -444,6 +463,7 @@ public:
         const bool hearsRecordKeeper=CanHearRecordKeeper(c);
         if(!hearsRecordKeeper && (IsRecordKeeperLine(state_.line) || !recordKeeperPending_.empty()))
             Cancel(false);
+        if(IsSalvagerLine(state_.line) && !CanHearSalvager(c))Cancel(false);
         if(tavernLanternActive_ && (!CanHearTavernLantern(c) || !c.lanternHigh))Cancel(false);
         if(tavernConversationActive_ && !CanHearTavernConversation(c)) {
             if(IsTavernConversationLine(state_.line))Cancel(false);
@@ -534,6 +554,10 @@ private:
         return c.alive && c.claimed && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
             c.recordKeeperSource && Finite(*c.recordKeeperSource) && Finite(c.listener) && std::isfinite(c.yaw);
     }
+    static bool CanHearSalvager(const Context& c) {
+        return c.alive && c.claimed && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
+            c.salvagerSource && Finite(*c.salvagerSource) && Finite(c.listener) && std::isfinite(c.yaw);
+    }
     void StartNextRecordKeeperLine(const Context& c) {
         const auto line=recordKeeperPending_.front();
         recordKeeperPending_=recordKeeperPending_.subspan(1);
@@ -578,6 +602,7 @@ private:
             state_.line==Line::TavernLanternFitting;
         const auto& source=IsShrineLanternLine(state_.line)?c.shrineLanternSource:
             IsTavernLanternVoice(state_.line)?c.tavernLanternSource:
+            IsSalvagerLine(state_.line)?c.salvagerSource:
             IsRecordKeeperLine(state_.line)?c.recordKeeperSource:(fromKeeper?c.tavernKeeperSource:c.companionSource);
         if(!Finite(c.listener) || !std::isfinite(c.yaw) || (source && !Finite(*source))) return;
         state_.listener=c.listener;state_.listenerYaw=c.yaw;

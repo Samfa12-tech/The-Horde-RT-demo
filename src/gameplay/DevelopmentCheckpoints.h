@@ -32,7 +32,8 @@ enum class DevelopmentRewardPose : std::uint8_t
 };
 
 enum class BellwetherBranchView : std::uint8_t {
-    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction, MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested
+    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction,
+    MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested, SalvagerShore
 };
 
 struct DevelopmentCheckpoint
@@ -62,6 +63,7 @@ struct DevelopmentCheckpoint
     bool stagesUnlockedChest = false;
     // Capture framing only; dedicated modelled primary ownership stays mandatory.
     bool primaryArmsMayBeOutsideFrame = false;
+    bool primaryHeldItemsMayBeOutsideFrame = false;
     // Explicit development capture only; production encounter defaults stay unchanged.
     bool stagesWaterfallGuards = false;
     std::uint32_t waterfallGuardFixedTicks = 0u;
@@ -95,7 +97,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 143u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 144u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -302,6 +304,13 @@ inline constexpr std::array<DevelopmentCheckpoint, 143u> kDevelopmentCheckpoints
      .yaw=1.64f,.pitch=-.32f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
      .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
      .bellwetherBranchView=BellwetherBranchView::MillDriveTested},
+    // Frame the resident at conversation distance. Keep dedicated primary ownership.
+    {.id=346,.name="bellwether-salvager-shore",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherSalvagerMark.x,.cameraZ=traversal::kBellwetherSalvagerMark.z,
+     .yaw=-.08f,.pitch=-.17f,.primaryArmsMayBeOutsideFrame=true,.primaryHeldItemsMayBeOutsideFrame=true,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::SalvagerShore},
     {.id=342,.name="bellwether-river-landing",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherRiverLandingView.x,.cameraZ=traversal::kBellwetherRiverLandingView.z,
      .yaw=1.68f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,

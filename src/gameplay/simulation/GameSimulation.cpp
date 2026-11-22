@@ -444,6 +444,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     if(!input.paused) {
         AdvanceMillDriveTest(fixedDeltaSeconds);
         AdvanceMillLeakTest(fixedDeltaSeconds);
+        AdvanceShorePractice();
     }
     if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
         dialogueDucking_.Reset();
@@ -845,6 +846,9 @@ void GameSimulation::ResetRoute()
     millLeakTestPhase_={};
     millLeakTestSeconds_=0.f;
     millDriveTurnSeconds_.reset();
+    salvager_.reset();
+    shorePracticeStage_={};
+    salvagerShorePracticeCompleted_=false;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -3496,6 +3500,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     const bool currentExterior=chapterContext.exterior && chapterTerrainGeneration_==worldRoute_.generation;
     snapshot_.recordKeeper=currentExterior ? recordKeeper_ : std::nullopt;
     snapshot_.artificer=currentExterior ? artificer_ : std::nullopt;
+    snapshot_.salvager=currentExterior ? salvager_ : std::nullopt;
+    snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
+    snapshot_.shorePracticeStage=shorePracticeStage_;
+    snapshot_.salvagerShorePracticeCompleted=salvagerShorePracticeCompleted_;
     snapshot_.recordKeeperAction=RecordKeeperAction(chapterContext);
     snapshot_.treasurePurse=treasurePurse_;
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&

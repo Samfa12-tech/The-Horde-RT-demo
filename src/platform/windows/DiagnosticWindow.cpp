@@ -218,6 +218,7 @@ bool gShowcaseCaptureHidden=false;
 #if defined(_DEBUG)
 std::filesystem::path gBellwetherVoiceDirectory;
 bool gBellwetherArrivalAudition = false;
+bool gBellwetherSalvagerAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
@@ -455,6 +456,7 @@ struct CaptureLaunchOptions
     bool staffedTavernCapture = false;
     bool recordKeeperCapture = false;
     bool artificerCapture = false;
+    bool salvagerCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -545,6 +547,8 @@ struct ShowcaseCaptureRecord
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
     std::optional<horde::gameplay::bellwether::ArtificerPose> artificer;
+    std::optional<horde::gameplay::bellwether::SalvagerPose> salvager;
+    std::array<std::uint8_t,3> salvagerResidentMasks{};
     std::array<std::uint8_t,3> millResidentMasks{};
     horde::gameplay::bellwether::MillPreparation millPreparation{};
     float millDriveAngleRadians=0.f;
@@ -706,6 +710,7 @@ struct VulkanSurfaceContext
     bool staffedTavernCapture = false;
     bool recordKeeperCapture = false;
     bool artificerCapture = false;
+    bool salvagerCapture = false;
     bool combinedBellwetherResidents = false;
     bool bellwetherFurnitureTransitions=false;
     bool bellwetherFurnitureResidency=false;
@@ -1438,18 +1443,21 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     options.artificerCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillArtificer ||
          residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillDriveTested);
+    options.salvagerCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::SalvagerShore;
     options.staffedTavernCapture = residentCheckpoint &&
         (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None ||
-         returnToKit || options.artificerCapture);
+         returnToKit || options.artificerCapture || options.salvagerCapture);
     options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RegisterHandoff);
     if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
         (options.chapterResidentFixture.empty() || !options.requested || !options.captureHidden ||
          (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
          options.validateChapterRoundTrip || options.validateStaticZoneCutover))
-        options.error = "Chapter resident fixtures require a hidden reunion, staffed tavern, record keeper or mill artificer capture.";
-    if (options.error.empty() && options.artificerCapture && !options.bellwetherCampaignDirectory.empty())
-        options.error = "Pass the artificer and tavern keeper together in --chapter-resident-fixture.";
+        options.error = "Chapter resident fixtures require a compatible hidden Bellwether or reunion capture.";
+    if (options.error.empty() && (options.artificerCapture || options.salvagerCapture) &&
+        !options.bellwetherCampaignDirectory.empty())
+        options.error = "Pass the specialist and tavern keeper together in --chapter-resident-fixture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -1655,10 +1663,19 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
         audition |= present;
     }
     if (audition && !verify(horde::audio::kBellwetherArrivalAuditionCuts)) return false;
+    bool salvagerAudition=false;
+    for(const auto& cut:horde::audio::kBellwetherSalvagerAuditionCuts) {
+        const bool present=std::filesystem::exists(pathFor(cut),error);
+        if(error)return false;
+        salvagerAudition|=present;
+    }
+    if(salvagerAudition && !verify(horde::audio::kBellwetherSalvagerAuditionCuts))return false;
     gBellwetherVoiceDirectory = root;
     gBellwetherArrivalAudition = audition;
+    gBellwetherSalvagerAudition = salvagerAudition;
     std::cerr << "Bellwether private Kit WAVs verified.\n";
     if (audition) std::cerr << "Bellwether private arrival audition WAVs verified.\n";
+    if(salvagerAudition)std::cerr<<"Bellwether private salvager audition WAVs verified.\n";
     return true;
 }
 
@@ -1690,6 +1707,13 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
         {"artificer/normal.windows.ktx2", "7185fe6d08e19f029cb2dcb3d37f8d04f94fcb9190836733e4dcbb9cc1d2493a"},
         {"artificer/orm.windows.ktx2", "f99cb2a329f67eba4270b86abfd355831326ab289bf518a3a57c386447353d1a"}
     };
+    constexpr std::pair<std::string_view, std::string_view> salvager[]{
+        {"salvager/asset.manifest.json", "5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc"},
+        {"salvager/resident.glb", "26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa"},
+        {"salvager/base-color.windows.ktx2", "8112345b1a802fd68101f64c5dffa8acdbff9cc37f47dea355ed6f27046cdc5a"},
+        {"salvager/normal.windows.ktx2", "ea2bee3dfd0a2eaad084f0511406696a1e764b3a50a10efcb15bbf5aca65d3a7"},
+        {"salvager/orm.windows.ktx2", "bd75d588cd6d3e92161aba844bb083e040b1ec68ce0f7ceabd9fbb300c1fc57e"}
+    };
     std::error_code error;
     const auto root = std::filesystem::canonical(directory, error);
     if (error) return false;
@@ -1706,10 +1730,14 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
     const bool mill = std::filesystem::exists(root / "artificer", error);
     if (error) return false;
     const bool church = std::filesystem::exists(root / "record-keeper", error);
-    if (error || mill == church || !(mill ? matches(artificer) : matches(recordKeeper))) return false;
+    if (error) return false;
+    const bool shore = std::filesystem::exists(root / "salvager", error);
+    if (error || static_cast<int>(mill) + static_cast<int>(church) + static_cast<int>(shore) != 1) return false;
+    if (shore ? !matches(salvager) : (mill ? !matches(artificer) : !matches(recordKeeper))) return false;
     gBellwetherCampaignActors = root;
     using horde::gameplay::bellwether::Specialist;
-    gBellwetherCampaignSpecialist = mill ? Specialist::Artificer : Specialist::RecordKeeper;
+    gBellwetherCampaignSpecialist = shore ? Specialist::Salvager :
+        (mill ? Specialist::Artificer : Specialist::RecordKeeper);
     return true;
 }
 #endif
@@ -2555,7 +2583,7 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     std::filesystem::path privateVoice;
 #if defined(_DEBUG)
     if (!gBellwetherVoiceDirectory.empty() &&
-        horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition))
+        horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition, gBellwetherSalvagerAudition))
         privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
 #endif
     if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))
@@ -3556,10 +3584,14 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
     const bool chapterInteract = !rescueJourney && !flaskUpgrade && snapshot.HasChapterInteractPrompt();
     using horde::gameplay::bellwether::MillLeakTestPhase;
+    using horde::gameplay::bellwether::SalvagerAction;
+    using horde::gameplay::bellwether::ShorePracticeStage;
     const auto leakTest=snapshot.millLeakTestPhase;
+    const auto shorePractice=snapshot.shorePracticeStage;
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
     const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || raiseLantern ||
-                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle || snapshot.millDriveTesting)
+                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle ||
+                          snapshot.millDriveTesting || shorePractice!=ShorePracticeStage::Idle)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
@@ -3607,6 +3639,15 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         }
         context.tavernInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.salvagerAction!=SalvagerAction::None) {
+        switch(snapshot.salvagerAction) {
+        case SalvagerAction::StartPractice: text="LEFT-CLICK / A TO START SHORE PRACTICE"; break;
+        case SalvagerAction::ReportPractice: text="LEFT-CLICK / A TO REPORT TO THE SALVAGER"; break;
+        case SalvagerAction::RecallPractice: text="LEFT-CLICK / A TO RECALL THE LESSON"; break;
+        case SalvagerAction::None: break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
     else if(chapterInteract) {
         using horde::gameplay::bellwether::ArchiveAction;
         switch (snapshot.waysideArchiveAction) {
@@ -3635,6 +3676,15 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     }
     else if(leakTest!=MillLeakTestPhase::Idle) {
         text = leakTest==MillLeakTestPhase::Testing ? "LEAK TEST | STAY IN THE SHALLOWS" : "RETURN TO DRY STONE";
+    }
+    else if(shorePractice!=ShorePracticeStage::Idle) {
+        switch(shorePractice) {
+        case ShorePracticeStage::FindDryMark: text="FOLLOW THE CAUSEWAY TO THE RIVER RAIL"; break;
+        case ShorePracticeStage::EnterShallows: text="WADE TO THE RAIL"; break;
+        case ShorePracticeStage::Retreat: text="RETURN TO DRY STONE"; break;
+        case ShorePracticeStage::ReportBack: text="RETURN TO THE SALVAGER AT THE FORK"; break;
+        case ShorePracticeStage::Idle: break;
+        }
     }
     else
     {
@@ -6919,9 +6969,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
         ctx.lastRtFrameError="Bellwether furniture detail must be selected before scene creation.";
         return false;
     }
-    if (ctx.artificerCapture) {
+    if (ctx.artificerCapture || ctx.salvagerCapture) {
+        using horde::gameplay::bellwether::Specialist;
         if (!horde::vulkan::raytracing::SetBellwetherResidentSources(ctx.rtScene,
-                ctx.chapterResidentFixture, diagnostic, horde::gameplay::bellwether::Specialist::Artificer)) {
+                ctx.chapterResidentFixture, diagnostic, ctx.artificerCapture?Specialist::Artificer:Specialist::Salvager)) {
             ctx.lastRtFrameError = diagnostic;
             return false;
         }
@@ -8752,6 +8803,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      << ", \"angleRadians\": " << capture.millDriveAngleRadians
                      << ", \"submittedMask\": " << unsigned(capture.millDriveMask) << "}";
         }
+        if (capture.salvager) {
+            const auto& foot=capture.salvager->foot;
+            manifest << ", \"salvager\": {\"foot\": [" << foot[0] << ", " << foot[1] << ", " << foot[2]
+                     << "], \"yaw\": " << capture.salvager->yaw << ", \"submittedMasks\": {\"kit\": "
+                     << unsigned(capture.salvagerResidentMasks[0]) << ", \"tavernKeeper\": "
+                     << unsigned(capture.salvagerResidentMasks[1]) << ", \"salvager\": "
+                     << unsigned(capture.salvagerResidentMasks[2]) << "}}";
+        }
         if (capture.tavernLanternPresentedRaiseTick) {
             manifest << ", \"tavernLanternIntroduction\": {\"presentedRaiseTick\": "
                      << capture.tavernLanternPresentedRaiseTick << ", \"linesStarted\": "
@@ -9412,6 +9471,16 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.tavernKeeper = simulation.tavernKeeper;
         record.recordKeeper = simulation.recordKeeper;
         record.artificer = simulation.artificer;
+        record.salvager = simulation.salvager;
+        if (context.salvagerCapture) {
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.salvagerResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};
+            if (!record.salvager || std::any_of(record.salvagerResidentMasks.begin(), record.salvagerResidentMasks.end(),
+                    [](std::uint8_t mask) { return mask == 0; }))
+                return fail("The salvager capture did not submit all three admitted actors.");
+        }
         if (record.artificer) {
             using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
             record.millPreparation = simulation.millPreparation;
@@ -9476,9 +9545,17 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             (development != nullptr &&
              development->rewardPose !=
                  horde::gameplay::DevelopmentRewardPose::None);
-        const auto claimedRewardPixelPolicy =
+        auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name,
                 horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]), &simulation);
+        if (development != nullptr && development->primaryHeldItemsMayBeOutsideFrame)
+        {
+            // This view frames the resident. The masks and final grip checks below still apply.
+            claimedRewardPixelPolicy.requirePlayerPixels = !record.primaryArmsMayBeOutsideFrame;
+            claimedRewardPixelPolicy.requireRewardRingPixels = false;
+            claimedRewardPixelPolicy.requireRewardBodyPixels = false;
+            claimedRewardPixelPolicy.requireSwordPixels = false;
+        }
         const bool claimedTorchOwnershipValid =
             horde::platform::windows::ClaimedTorchPrimaryOwnershipValid(
                 record.primaryTorchPixels, record.instanceMasks[1],
@@ -10142,6 +10219,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
     context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
     context.artificerCapture=ParseCaptureLaunchOptions().artificerCapture;
+    context.salvagerCapture=ParseCaptureLaunchOptions().salvagerCapture;
     context.bellwetherFurnitureDetail=ParseCaptureLaunchOptions().bellwetherFurnitureDetail;
     context.bellwetherFurnitureTransitions=ParseCaptureLaunchOptions().bellwetherFurnitureTransitions;
     context.bellwetherFurnitureResidency=ParseCaptureLaunchOptions().bellwetherFurnitureResidency;
@@ -10182,6 +10260,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         simulationConfig.bellwetherTavernKeeperAdmitted |= context.staffedTavernCapture;
         if (context.artificerCapture)
             simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Artificer;
+        else if (context.salvagerCapture)
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Salvager;
         else if (!context.chapterResidentFixture.empty() &&
                  (context.combinedBellwetherResidents || context.recordKeeperCapture))
             simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;

@@ -2142,6 +2142,109 @@ void TestBellwetherResidentRosters(
     }
 }
 
+void TestBellwetherSalvagerPractice(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::bellwether;
+    using namespace gameplay::traversal;
+    using gameplay::dialogue::Line;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=Specialist::Salvager;
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* checkpoint=gameplay::FindDevelopmentCheckpoint("bellwether-salvager-shore");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=checkpoint && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*checkpoint);
+    Check(ready,"the player can walk from the earned tavern to the salvager's grounded fork");
+    if(!ready)return;
+    const auto& snap=game.Snapshot();
+    const auto starting=*game.LatestCampaignBoundary();
+    Check(snap.salvager && snap.tavernKeeper && !snap.recordKeeper && !snap.artificer &&
+          snap.salvagerAction==SalvagerAction::StartPractice && !starting.salvagerShorePracticeCompleted,
+          "the admitted river resident owns the first practice prompt within the three-character roster");
+    if(!snap.salvager)return;
+    sim::InputSnapshot input;
+    input.damageEnabled=false;
+    input.tutorialEnabled=false;
+    input.yawRadians=snap.playerYawRadians;
+    input.pitchRadians=snap.playerPitchRadians;
+    input.commands.interact=snap.lastConsumedInteractSequence;
+    const auto advance=[&] {game.StepFixed(input,1.f/60.f,snap.inputPublicationSequence+1);};
+    const auto walkTo=[&](BellwetherStation mark) {
+        for(unsigned tick=0;tick<1600;++tick) {
+            const float dx=mark.x-snap.playerX,dz=mark.z-snap.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.012f) {
+                input.moveForward=0.f;
+                input.runHeld=false;
+                advance();
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            input.runHeld=false;
+            advance();
+        }
+        std::cerr<<"Salvager walk blocked at "<<snap.playerX<<','<<snap.playerZ
+                 <<" en route to "<<mark.x<<','<<mark.z<<'\n';
+        return false;
+    };
+    input.yawRadians+=3.14159265f;
+    ++input.commands.interact;advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::Idle && snap.salvagerAction==SalvagerAction::None,
+          "looking away does not start practice");
+    input.yawRadians=checkpoint->yaw;advance();
+    ++input.commands.interact;advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::FindDryMark && snap.chapterDialogue.line==Line::SalvagerShoreTask &&
+          snap.chapterDialogue.source.x==snap.salvager->foot[0] && snap.chapterDialogue.source.z==snap.salvager->foot[2],
+          "the normal action starts the named caption at the salvager's terrain-bound position");
+    input.paused=true;
+    advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::FindDryMark && snap.salvagerAction==SalvagerAction::None &&
+          snap.chapterDialogue.paused,"pause suspends the caption and the availability of practice actions");
+    input.paused=false;
+    const auto& shore=kBellwetherRiverLanding;
+    for(auto station=shore.begin();station!=shore.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"shore practice follows the authored causeway");return;}
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the dry mark is reachable");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && !snap.waterContact.wetGround &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "reaching dry footing prepares the approach and cannot award completion");
+    if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"the practice waterline is reachable through the ordinary movement motor");return;
+    }
+    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.waterContact.wetGround &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "reaching actual water contact asks for retreat without changing the save");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the wet mark can be left safely");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::ReportBack && !snap.waterContact.wetGround,
+          "regaining the dry shore advances the report without any rig or ward requirement");
+    for(auto station=shore.rbegin()+2;station!=shore.rend();++station)
+        if(!walkTo(*station)) {Check(false,"the reporting route can be retraced");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"the salvager can be revisited");return;}
+    input.yawRadians=checkpoint->yaw;advance();
+    const auto revision=game.CampaignBoundaryRevision();
+    Check(snap.salvagerAction==SalvagerAction::ReportPractice &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "the player recovers completion through a deliberate report at the fork");
+    ++input.commands.interact;advance();
+    const auto& completed=game.LatestCampaignBoundary();
+    Check(completed && completed->salvagerShorePracticeCompleted && completed->schema==cp::kSalvagerShorePracticeSchema &&
+          game.CampaignBoundaryRevision()==revision+1 && completed->id==starting.id &&
+          completed->position.x==starting.position.x && completed->position.z==starting.position.z &&
+          completed->treasurePurse==starting.treasurePurse && completed->millPreparation==starting.millPreparation &&
+          completed->airWardLearned==starting.airWardLearned && snap.chapterDialogue.line==Line::SalvagerShoreReturn,
+          "the lesson saves once at the earned tavern boundary without changing other preparations");
+    if(!completed)return;
+    const auto restore=game.BeginCampaignRestore(*completed);
+    Check(restore && game.CommitCampaignRestore(*restore,{restore->worldGeneration,completed->zone},terrain,input) &&
+          snap.salvagerShorePracticeCompleted && snap.shorePracticeStage==ShorePracticeStage::Idle &&
+          snap.chapterDialogue.line==Line::None,"the saved outcome restores without a live exercise or caption");
+}
+
 void TestBellwetherMillRepairAndLeakTrial(
     const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
     namespace sim=gameplay::simulation;
@@ -2588,6 +2691,7 @@ void TestFullSurroundings()
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
             TestBellwetherMillRepairAndLeakTrial(recreatedTerrain);
+            TestBellwetherSalvagerPractice(recreatedTerrain);
             TestBellwetherResidentRosters(recreatedTerrain);
         }
     }

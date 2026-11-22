@@ -663,6 +663,7 @@ horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
 
 constexpr auto AndroidBellwetherSpecialist() {
     using horde::gameplay::bellwether::Specialist;
+    if constexpr (HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) return Specialist::Salvager;
     return HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE ? Specialist::Artificer : Specialist::RecordKeeper;
 }
 
@@ -1266,6 +1267,8 @@ void PublishSimulationUiState()
     int contextualControls = 0;
     using horde::gameplay::bellwether::MillAction;
     using horde::gameplay::bellwether::MillLeakTestPhase;
+    using horde::gameplay::bellwether::SalvagerAction;
+    using horde::gameplay::bellwether::ShorePracticeStage;
     using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
@@ -1328,6 +1331,18 @@ void PublishSimulationUiState()
         const int action=static_cast<int>(simulation.recordKeeperAction);
         // The third action bit lives above the tavern door fields.
         contextualControls |= ((action & 3) << 19) | ((action & 4) << 22) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             (simulation.salvagerAction != SalvagerAction::None ||
+              simulation.shorePracticeStage != ShorePracticeStage::Idle)) {
+        // Shared river context uses details 12–14 for actions and 15–18 for cues.
+        constexpr int riverTag=7;
+        static_assert(static_cast<int>(SalvagerAction::RecallPractice)==3 &&
+                      static_cast<int>(ShorePracticeStage::ReportBack)==4);
+        const bool actionable=simulation.salvagerAction!=SalvagerAction::None;
+        const int detail=actionable ? 11+static_cast<int>(simulation.salvagerAction)
+            : 14+static_cast<int>(simulation.shorePracticeStage);
+        contextualControls |= (riverTag << 16) | (detail << 25) | (actionable ? 1 : 0);
     }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;

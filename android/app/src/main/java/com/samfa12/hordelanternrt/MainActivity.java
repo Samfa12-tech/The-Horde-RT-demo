@@ -974,7 +974,8 @@ public class MainActivity extends Activity {
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
-                final String specialist = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/";
+                final String specialist = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
+                        (BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/");
                 for (String asset : new String[] {
                         "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
                         specialist + "asset.manifest.json", specialist + "resident.glb",
@@ -7326,6 +7327,11 @@ public class MainActivity extends Activity {
                 HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
     }
 
+    private static boolean hasBellwetherRecordKeeper() {
+        return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
+                !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE;
+    }
+
     static int checkpointId(final String name) {
         if (name == null) return -1;
         switch (name) {
@@ -7412,9 +7418,10 @@ public class MainActivity extends Activity {
             case "bellwether-river-landing": return 342;
             case "bellwether-rig-leak-trial": return 343;
             case "bellwether-record-keeper-handoff":
-                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 335 : -1;
+                return hasBellwetherRecordKeeper() ? 335 : -1;
             case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 344 : -1;
             case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 345 : -1;
+            case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? 346 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7769,10 +7776,10 @@ public class MainActivity extends Activity {
             case 342:
             case 343: return new float[]{1.68f, -0.28f};
             case 335:
-                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ?
-                        new float[]{1.57079632679f, -0.07f} : null;
+                return hasBellwetherRecordKeeper() ? new float[]{1.57079632679f, -0.07f} : null;
             case 344:
             case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? new float[]{1.64f, -0.32f} : null;
+            case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? new float[]{-0.08f, -0.17f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};
@@ -9017,6 +9024,13 @@ public class MainActivity extends Activity {
                     case 9: return R.string.turn_mill_drive;
                     case 10: return R.string.take_breathing_rig;
                     case 11: return R.string.mill_drive_turning;
+                    case 12: return R.string.salvager_start_shore_practice;
+                    case 13: return R.string.salvager_report_shore_practice;
+                    case 14: return R.string.salvager_recall_shore_practice;
+                    case 15: return R.string.salvager_find_dry_mark;
+                    case 16: return R.string.salvager_enter_shallows;
+                    case 17: return R.string.rig_leak_test_return_to_dry;
+                    case 18: return R.string.salvager_report_back;
                     default: return 0;
                 }
             default: break;

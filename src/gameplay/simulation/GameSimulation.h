@@ -343,6 +343,10 @@ private:
     void AdvanceMillLeakTest(float seconds);
     void InteractWithMill(bellwether::MillAction);
     bool CommitMillPreparation(bellwether::MillPreparation);
+    bellwether::SalvagerAction CurrentSalvagerAction(const dialogue::Context&) const;
+    void InteractWithSalvager(bellwether::SalvagerAction,const dialogue::Context&);
+    void AdvanceShorePractice();
+    bool CommitShorePractice();
     dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
     void ClaimRegisterReward(const dialogue::Context&);
     bool CanBuyLanternFitting(const dialogue::Context&) const;
@@ -398,6 +402,7 @@ private:
     horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
     std::optional<dialogue::RecordKeeperPose> recordKeeper_;
     std::optional<bellwether::ArtificerPose> artificer_;
+    std::optional<bellwether::SalvagerPose> salvager_;
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
     bellwether::MillPreparation millPreparation_{};
@@ -405,6 +410,8 @@ private:
     float millLeakTestSeconds_{};
     float millWaterwheelAngleRadians_{};
     std::optional<float> millDriveTurnSeconds_;
+    bellwether::ShorePracticeStage shorePracticeStage_{};
+    bool salvagerShorePracticeCompleted_=false;
     bellwether::TavernDoor tavernDoor_;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};

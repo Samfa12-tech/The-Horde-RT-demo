@@ -339,6 +339,39 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
                   "the actual save file contains the mill step with unchanged return point and resources");
         }
     }
+    {
+        Directory salvagerDirectory;
+        sim::GameSimulation salvagerGame(staffedConfig);
+        cp::PlaySession salvagerPlay(salvagerGame,salvagerDirectory.path);
+        auto salvager=complete;
+        salvager.schema=cp::kTavernConversationSchema;
+        salvager.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+        salvager.salvagerShorePracticeCompleted=false;
+        Check(salvagerPlay.BeginNewGame(0) && Seed(salvagerGame,salvager,terrain) &&
+              salvagerPlay.ObserveSafeBoundary() && awaitSave(salvagerPlay,0),
+              "the salvager autosave check starts with a completed tavern record");
+        salvager.schema=cp::kSalvagerShorePracticeSchema;
+        salvager.salvagerShorePracticeCompleted=true;
+        const auto previous=salvagerPlay.State().operationRevision;
+        Check(Seed(salvagerGame,salvager,terrain) && salvagerPlay.ObserveSafeBoundary() &&
+              awaitSave(salvagerPlay,previous),
+              "completing shore practice refreshes the ordinary autosave");
+        auto saved=Read(salvagerDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+        Check(saved.schema==cp::kSalvagerShorePracticeSchema && saved.salvagerShorePracticeCompleted,
+              "the shore completion byte is retained in the autosave");
+
+        auto later=salvager;
+        later.id=cp::CheckpointId::SafeExit;
+        later.zone=cp::Destination(later.id);
+        later.position=horde::gameplay::traversal::kExteriorLanding;
+        const auto laterRevision=salvagerPlay.State().operationRevision;
+        Check(Seed(salvagerGame,later,terrain) && salvagerPlay.ObserveSafeBoundary() &&
+              awaitSave(salvagerPlay,laterRevision),
+              "a later safe-region boundary still autosaves the shore completion");
+        saved=Read(salvagerDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+        Check(saved.id==cp::CheckpointId::SafeExit && saved.salvagerShorePracticeCompleted,
+              "the later safe-region autosave preserves shore completion");
+    }
     auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
     returned.position=horde::gameplay::traversal::kExteriorLanding;
     Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,
