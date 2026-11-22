@@ -135,21 +135,34 @@ int main() {
         h.view.objective=Panel::Objective::BellwetherExpeditions;
         SendMessageA(parent,WM_COMMAND,MAKEWPARAM(Panel::ContinueId,BN_CLICKED),reinterpret_cast<LPARAM>(oldDirections));
         Check(h.actions.size()==4 && !h.panel.Visible(),"new earned directions revoke the previous page's controls");
-        h.view.purse={3,true,false};
+        h.view.directions.purse={3,true,false};
         Check(open(h.view) && Text(parent,Panel::BodyId).find("future expeditions")!=std::string::npos &&
             Text(parent,Panel::BodyId).find("Purse: 3 coins.")!=std::string::npos &&
             Text(parent,Panel::BodyId).find("Lantern fitting at the tavern: 2 coins.")!=std::string::npos &&
             Text(parent,Panel::BodyId).find("restore its binding")!=std::string::npos,
             "expedition directions show the purse, fitting price and first ward step");
-        h.view.ward=horde::gameplay::campaign::AirWardDirections::Learned;
+        h.view.directions.ward=horde::gameplay::campaign::AirWardDirections::Learned;
         Check(!h.panel.Refresh(h.view) && open(h.view) &&
               Text(parent,Panel::BodyId).find("Air ward learned")!=std::string::npos,
             "the reopened directions reflect the earned ward lesson");
         Click(parent,Panel::ContinueId);
-        h.view.ward=horde::gameplay::campaign::AirWardDirections::RestoreBinding;
-        h.view.mill=horde::gameplay::bellwether::MillPreparation::RigTrialReady;
-        h.view.shorePracticeAvailable=true;
-        h.view.shorePracticeCompleted=true;
+        h.view.objective=Panel::Objective::BellwetherShrine;
+        h.view.directions.millServiceAvailable=true;
+        h.view.directions.shorePracticeAvailable=true;
+        Check(open(h.view) && Text(parent,Panel::BodyId).find("For a breathing rig, follow the MILL signs east")!=std::string::npos &&
+              Text(parent,Panel::BodyId).find("Meet the salvager at the river fork")!=std::string::npos,
+            "early directions show both available eastern services");
+        h.view.directions.millServiceAvailable=false;
+        Check(!h.panel.Refresh(h.view) && open(h.view) &&
+              Text(parent,Panel::BodyId).find("MILL signs")==std::string::npos,
+            "a change in the admitted services revokes the old panel and hides the unavailable route");
+        h.panel.Close();
+        h.view.objective=Panel::Objective::BellwetherExpeditions;
+        h.view.directions.purse.ordinarySilver=horde::gameplay::campaign::OrdinarySilverProgress::Sold;
+        h.view.directions.ward=horde::gameplay::campaign::AirWardDirections::RestoreBinding;
+        h.view.directions.mill=horde::gameplay::bellwether::MillPreparation::RigTrialReady;
+        h.view.directions.millServiceAvailable=true;
+        h.view.directions.shorePracticeCompleted=true;
         const auto font=CreateFontA(18,0,0,0,FW_SEMIBOLD,FALSE,FALSE,FALSE,
             ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,
             DEFAULT_PITCH|FF_DONTCARE,"Segoe UI");

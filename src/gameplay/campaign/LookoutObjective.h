@@ -35,10 +35,24 @@ enum class PauseObjective {
 
 enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
 
-inline const char* BellwetherShorePracticeLine(bellwether::ShorePracticeStage stage,bool completed) {
+struct BellwetherDirections {
+    TreasurePurse purse{};
+    AirWardDirections ward=AirWardDirections::RestoreBinding;
+    bellwether::MillPreparation mill{};
+    bellwether::ShorePracticeStage shorePracticeStage{};
+    bool millServiceAvailable=false;
+    bool shorePracticeAvailable=false;
+    bool shorePracticeCompleted=false;
+    bool operator==(const BellwetherDirections&) const = default;
+};
+
+inline const char* BellwetherShorePracticeLine(const BellwetherDirections& directions) {
     using bellwether::ShorePracticeStage;
-    if(completed)return "Complete. Breath control learned. Visit the salvager at the river fork to recall the lesson.";
-    switch(stage) {
+    if(directions.shorePracticeCompleted)
+        return directions.shorePracticeAvailable ?
+            "Complete. Breath control learned. Visit the salvager at the river fork to recall the lesson." :
+            "Complete. Breath control learned.";
+    switch(directions.shorePracticeStage) {
     case ShorePracticeStage::FindDryMark:return "Follow the causeway to the dry mark by the river rail.";
     case ShorePracticeStage::EnterShallows:return "From the dry mark, wade to the river rail. Breath practice starts in the shallows.";
     case ShorePracticeStage::Retreat:return "Return from the shallows to the dry mark before your breath runs out.";
@@ -53,6 +67,14 @@ inline AirWardDirections CurrentAirWardDirections(const bellwether::WaysideArchi
     if(archive.airWardLearned)return AirWardDirections::Learned;
     return archive.stage==bellwether::ArchiveStage::Restored ?
         AirWardDirections::LearnWard:AirWardDirections::RestoreBinding;
+}
+
+inline BellwetherDirections CurrentBellwetherDirections(const simulation::SimulationSnapshot& snapshot) {
+    return {.purse=snapshot.treasurePurse,.ward=CurrentAirWardDirections(snapshot.waysideArchive),
+        .mill=snapshot.millPreparation,.shorePracticeStage=snapshot.shorePracticeStage,
+        .millServiceAvailable=snapshot.millServiceAvailable,
+        .shorePracticeAvailable=snapshot.shorePracticeServiceAvailable,
+        .shorePracticeCompleted=snapshot.salvagerShorePracticeCompleted};
 }
 
 inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
@@ -98,14 +120,12 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     return "";
 }
 
-inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse purse, AirWardDirections ward,
-    bellwether::MillPreparation mill={},bool shorePracticeAvailable=false,
-    bellwether::ShorePracticeStage shorePracticeStage=bellwether::ShorePracticeStage::Idle,
-    bool shorePracticeCompleted=false)
+inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherDirections& directions)
 {
     std::string text=PauseObjectiveText(objective);
-    if(objective==PauseObjective::BellwetherExpeditions ||
-       (objective==PauseObjective::BellwetherShrine && purse.ordinarySilver!=OrdinarySilverProgress::Unfound)) {
+    if(objective==PauseObjective::None || objective==PauseObjective::Lookout)return text;
+    const auto& purse=directions.purse;
+    if(objective==PauseObjective::BellwetherExpeditions || purse.ordinarySilver!=OrdinarySilverProgress::Unfound) {
         text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");
         if (purse.lanternFittingPurchased) text+="\r\nLantern hinge fitted.";
         else text+="\r\nLantern fitting at the tavern: "+std::to_string(TreasurePurse::kLanternFittingPrice)+" coins.";
@@ -115,18 +135,17 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
             text+="\r\nOrdinary silver sold.";
     }
     if (objective==PauseObjective::BellwetherExpeditions) {
-        switch(ward) {
+        switch(directions.ward) {
         case AirWardDirections::RestoreBinding:text+="\r\n\r\nFor an air ward, return to the wayside shrine and restore its binding.";break;
         case AirWardDirections::LearnWard:text+="\r\n\r\nBinding restored. Ask the record keeper to teach you the air ward.";break;
         case AirWardDirections::Learned:text+="\r\n\r\nAir ward learned for the Abbey crossing.";break;
         }
     }
-    if(objective!=PauseObjective::None && objective!=PauseObjective::Lookout) {
-        using bellwether::MillPreparation;
-        switch(mill) {
+    using bellwether::MillPreparation;
+    if(directions.millServiceAvailable || directions.mill!=MillPreparation::Unexamined) {
+        switch(directions.mill) {
         case MillPreparation::Unexamined:
-            if(objective==PauseObjective::BellwetherExpeditions)
-                text+="\r\n\r\nFollow the MILL signs east to inspect the gearing at the workbench.";
+            text+="\r\n\r\nFor a breathing rig, follow the MILL signs east and inspect the gearing at the artificer's workbench.";
             break;
         case MillPreparation::BearingNeeded:
             text+="\r\n\r\nFind a spare bearing in the parts bin south of the mill path.";
@@ -152,8 +171,8 @@ inline std::string PauseObjectiveText(PauseObjective objective, TreasurePurse pu
             break;
         }
     }
-    if(objective!=PauseObjective::None && objective!=PauseObjective::Lookout && shorePracticeAvailable)
-        text+="\r\n\r\nShore practice: "+std::string(BellwetherShorePracticeLine(shorePracticeStage,shorePracticeCompleted));
+    if(directions.shorePracticeAvailable || directions.shorePracticeCompleted)
+        text+="\r\n\r\nShore practice: "+std::string(BellwetherShorePracticeLine(directions));
     return text;
 }
 } // namespace horde::gameplay::campaign

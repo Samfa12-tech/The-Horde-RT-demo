@@ -102,6 +102,8 @@ Both standard Windows hardware RT backends passed all 16 checks from the lookout
 
 Completing the first tavern Talk unlocks **Bellwether directions** in the pause menu while exploring outside the tomb. The page follows the player's progress from finding the northern church or shrine, through opening the lower stone and recovering the register, to bringing it to the record keeper. After the reading it shows the downstream Abbey and eastern Foundry as leads for future expeditions. The page reads the existing campaign progress, so reloading restores the corresponding directions without an extra save field.
 
+Directions lists the mill workbench and shore practice when the artificer and salvager are part of the playable roster. Either visit can start before the church route. The directions keep the west stall sale location visible whenever the player is carrying ordinary silver, including during the shrine and register steps.
+
 Windows and Android use the same text. **Back to pause menu** keeps the game paused, and **Continue exploring** resumes through the existing pause controls. An action on an old directions page is revoked when the surface, world or objective changes.
 
 The expanded Windows campaign check passed 20 assertions on each hardware RT backend. It opened the directions at the tavern, shrine and church, then reloaded the earned tavern save and checked the same expedition leads. Ten Android menu tests covered the pause actions and stale UI, and the ARM64 Debug package contains the matching native text endpoint. Physical Android remains pending.
@@ -362,6 +364,8 @@ The native walkthrough checks early retreat, pause, retry, the full wet hold and
 The combined Windows Debug route uses `--lookout-validate-hidden --bellwether-verify-preparations` with an exported lookout fixture and the four pinned resident directories. It earns shore practice before any ward or rig, repairs the mill and confirms the shallow seal before learning the air ward. It then follows the church and shrine route, buys the lantern fitting and reloads the same tavern save with the three preparations intact. The Directions check reads and closes the actual pause panel along the way. The Windows panel measures wrapped text with the active font so the shore, rig and ward entries fit at the supported narrow size.
 
 The route passed all 35 checks on RayTracingPipeline and RayQueryCompute. The final text-sizing build repeated the full pipeline check and passed the native narrow-window panel test. The combined ARM64 Debug package contains the new Directions copy and passed 12 Android checkpoint, asset-staging and control-layout checks. Device playtesting remains open.
+
+With the fifth resident admitted, the same preparation check also walks the graveyard, buys the lantern fitting with the silver proceeds, and delivers the rag. After the eastern preparations it reloads before visiting the church and earning the air ward. The register pays three coins separately, and the already fitted hinge cannot be bought again. Both Windows hardware RT backends passed all 43 checks and retained the same final save payload once the save-request time was removed. The private ARM64 Debug package contains the shared Directions update and passed 596 host-side tests, with six skipped. Phone play and sustained performance remain open.
 
 #### Artificer source candidate
 

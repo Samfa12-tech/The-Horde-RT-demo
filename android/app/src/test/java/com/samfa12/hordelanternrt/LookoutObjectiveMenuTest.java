@@ -43,6 +43,11 @@ public final class LookoutObjectiveMenuTest {
             if(objective==null || objective[1]!=surface || objective[2]!=world || objective[3]!=id)return "";
             switch(id) {
                 case 1: return "Follow the road down to Bellwether. The tavern is across the square.";
+                case 2: return "Ask the record keeper by the northern church about the wayside shrine.\r\n\r\n"
+                        + "For a breathing rig, follow the MILL signs east and inspect the gearing at the artificer's workbench.\r\n\r\n"
+                        + "Shore practice: Meet the salvager at the river fork.";
+                case 3: return "Recover the road register from the opened wayside archive.\r\n\r\n"
+                        + "Purse: 0 coins.\r\nOrdinary silver: sell it at the stall west of the square.";
                 case 4: return "Show the road register to the record keeper by the northern church.";
                 case 5: return "The Abbey lies downstream. The Foundry is east, across the gorge. Both are leads for future expeditions.";
                 default: return "";
@@ -162,6 +167,25 @@ public final class LookoutObjectiveMenuTest {
         find("Back to pause menu").performClick();assertTrue(Bridge.paused);
         find("Bellwether directions").performClick();find("Continue exploring").performClick();
         assertFalse(Bridge.paused);assertEquals(0,Bridge.campaignRequests);assertEquals(0,actionCount());
+    }
+
+    @Test public void bellwetherMenuReadsPreparationAndTradeDirectionsFromTheCurrentPublication()throws Exception {
+        Bridge.objective[3]=2;
+        pause();
+        find("Bellwether directions").performClick();
+        String opening=text(a.findViewById(R.id.menu_scrim));
+        assertTrue(opening.contains("artificer's workbench"));
+        assertTrue(opening.contains("Meet the salvager at the river fork"));
+        find("Back to pause menu").performClick();
+        assertTrue(Bridge.paused);
+        Bridge.objective[3]=3;
+        pause();
+        find("Bellwether directions").performClick();
+        String archive=text(a.findViewById(R.id.menu_scrim));
+        assertTrue(archive.contains("Recover the road register"));
+        assertTrue(archive.contains("sell it at the stall west of the square"));
+        assertEquals(0,Bridge.campaignRequests);
+        assertEquals(0,actionCount());
     }
     @Test public void changedWorldOrSurfaceCannotBeResumedByTheOldPanel()throws Exception {
         open();Button old=find("Continue exploring");Bridge.objective[2]++;

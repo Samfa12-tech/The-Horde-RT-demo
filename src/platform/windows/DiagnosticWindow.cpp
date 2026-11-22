@@ -3971,16 +3971,9 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
     const auto objective = available ?
         horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
         LookoutPanel::Objective::None;
-    bool shorePracticeAvailable=false;
-#if defined(_DEBUG)
-    shorePracticeAvailable=!gBellwetherCampaignActors.empty() &&
-        (gBellwetherCombinedCampaignActors ||
-            gBellwetherCampaignSpecialist==horde::gameplay::bellwether::Specialist::Salvager);
-#endif
     return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
-        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,snapshot.treasurePurse,
-        horde::gameplay::campaign::CurrentAirWardDirections(snapshot.waysideArchive),snapshot.millPreparation,
-        shorePracticeAvailable,snapshot.shorePracticeStage,snapshot.salvagerShorePracticeCompleted};
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,
+        horde::gameplay::campaign::CurrentBellwetherDirections(snapshot)};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)

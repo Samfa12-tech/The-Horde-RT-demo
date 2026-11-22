@@ -977,12 +977,7 @@ horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
     horde::gameplay::SpatialAudioDomain::DungeonRoute; // guarded by gChapterDialogueUiMutex
 std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
-horde::gameplay::campaign::TreasurePurse gLookoutObjectivePurse{}; // guarded by gChapterDialogueUiMutex
-horde::gameplay::campaign::AirWardDirections gLookoutObjectiveWard{}; // guarded by gChapterDialogueUiMutex
-horde::gameplay::bellwether::MillPreparation gLookoutObjectiveMill{}; // guarded by gChapterDialogueUiMutex
-bool gLookoutObjectiveShorePracticeAvailable=false; // guarded by gChapterDialogueUiMutex
-horde::gameplay::bellwether::ShorePracticeStage gLookoutObjectiveShorePracticeStage{}; // guarded by gChapterDialogueUiMutex
-bool gLookoutObjectiveShorePracticeCompleted=false; // guarded by gChapterDialogueUiMutex
+horde::gameplay::campaign::BellwetherDirections gLookoutDirections{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -1241,16 +1236,7 @@ void PublishSimulationUiState()
             static_cast<jlong>(simulation.worldRoute.generation),
             static_cast<jlong>(horde::gameplay::campaign::CurrentPauseObjective(simulation,
                 gGameSimulation.LatestCampaignBoundary()))};
-        gLookoutObjectivePurse=simulation.treasurePurse;
-        gLookoutObjectiveWard=horde::gameplay::campaign::CurrentAirWardDirections(simulation.waysideArchive);
-        gLookoutObjectiveMill=simulation.millPreparation;
-#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE && (HORDE_RT_BELLWETHER_COMBINED_RESIDENTS || HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE)
-        gLookoutObjectiveShorePracticeAvailable=true;
-#else
-        gLookoutObjectiveShorePracticeAvailable=false;
-#endif
-        gLookoutObjectiveShorePracticeStage=simulation.shorePracticeStage;
-        gLookoutObjectiveShorePracticeCompleted=simulation.salvagerShorePracticeCompleted;
+        gLookoutDirections=horde::gameplay::campaign::CurrentBellwetherDirections(simulation);
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
@@ -7524,9 +7510,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
         gLookoutObjectiveUiState[3]!=objective)
         return env->NewStringUTF("");
     using namespace horde::gameplay::campaign;
-    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutObjectivePurse,
-        gLookoutObjectiveWard,gLookoutObjectiveMill,gLookoutObjectiveShorePracticeAvailable,
-        gLookoutObjectiveShorePracticeStage,gLookoutObjectiveShorePracticeCompleted);
+    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutDirections);
     return env->NewStringUTF(text.c_str());
 }
 

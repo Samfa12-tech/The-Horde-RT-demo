@@ -991,8 +991,9 @@ int FinishHiddenLookoutValidation(HWND owner,int result)
         gBellwetherCombinedCampaignActors && gBellwetherEarnTavernValidation ? 180 :
         gBellwetherHearthRestValidation ? 110 : 90;
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
-        !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
-    const int timeLimit = baseTimeLimit + (verifiesSilver ? 135 : 0);
+        (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation);
+    const int westernAllowance = verifiesSilver ? (gBellwetherPreparationsValidation ? 225 : 135) : 0;
+    const int timeLimit = baseTimeLimit + westernAllowance;
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1206,9 +1207,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         gBellwetherCombinedRelicDealer ? 205 : gBellwetherCombinedCampaignActors ? 150 :
         gBellwetherHearthRestValidation ? 85 : 65;
     const bool verifiesSilver = gBellwetherCombinedRelicDealer && gBellwetherEarnTavernValidation &&
-        !gBellwetherPreparationsValidation && !gBellwetherExpeditionValidation;
+        (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation);
+    // The mixed campaign walks and reloads both western and preparation routes.
+    const int westernAllowance = verifiesSilver ? (gBellwetherPreparationsValidation ? 200 : 110) : 0;
     const auto deadline = std::chrono::steady_clock::now() +
-        std::chrono::seconds(baseTimeLimit + (verifiesSilver ? 110 : 0));
+        std::chrono::seconds(baseTimeLimit + westernAllowance);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1257,7 +1260,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             input.pitchRadians = -.15f;
             unsigned ticks = 0, exchangeLines = 0, presentationInterval = 60;
             const auto step = [&] {
-                if (std::chrono::steady_clock::now() >= deadline || !hidden() || ctx.simulationPaused ||
+                if (std::chrono::steady_clock::now() >= deadline) {
+                    std::cerr << "Bellwether campaign validation deadline at tick " << state.tickIndex << '\n';
+                    return false;
+                }
+                if (!hidden() || ctx.simulationPaused ||
                     ctx.campaignRetirementUnproved || ctx.campaignPhase == CampaignMenu::Phase::Failed)
                     return false;
                 ctx.simulationInput = input;
@@ -1402,11 +1409,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 std::string text(static_cast<std::size_t>(GetWindowTextLengthA(body)) + 1, '\0');
                 const int copied = GetWindowTextA(body, text.data(), static_cast<int>(text.size()));
                 text.resize(static_cast<std::size_t>(copied));
-                const bool shoreAvailable = gBellwetherCombinedCampaignActors ||
-                    gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::Salvager;
-                const bool correct = text == campaign::PauseObjectiveText(objective, state.treasurePurse,
-                    campaign::CurrentAirWardDirections(state.waysideArchive), state.millPreparation,
-                    shoreAvailable, state.shorePracticeStage, state.salvagerShorePracticeCompleted) &&
+                const bool correct = text == campaign::PauseObjectiveText(objective, campaign::CurrentBellwetherDirections(state)) &&
                     text.find(requiredText) != std::string::npos;
                 const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
                     ctx.pauseMenuVisible && ctx.simulationPaused;
@@ -1422,8 +1425,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 return correct && resumed && unchanged && step();
             };
             if (progressed && gBellwetherPreparationsValidation) {
-                progressed = check(readDirections(campaign::PauseObjective::BellwetherShrine, "Meet the salvager"),
-                    "Bellwether Directions offers shore practice at the tavern before learning the church lead");
+                progressed = check(state.shorePracticeServiceAvailable && state.millServiceAvailable &&
+                    readDirections(campaign::PauseObjective::BellwetherShrine, "For a breathing rig, follow the MILL signs east"),
+                    "Bellwether Directions offers both eastern preparations before learning the church lead");
             }
             if (progressed && gBellwetherCombinedCampaignActors && !gBellwetherHearthRestValidation &&
                 (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation)) {
@@ -1720,7 +1724,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             face(state.tavernKeeper->foot[0], state.tavernKeeper->foot[2]) &&
                             state.tavernLanternFittingAvailable && interact() && state.treasurePurse.lanternFittingPurchased &&
                             state.treasurePurse.coins == 0 && savedSilver(OrdinarySilverProgress::Sold, 0, true) &&
-                            reloadWithTownResidents() && state.treasurePurse.lanternFittingPurchased,
+                            reloadWithTownResidents() && state.treasurePurse == campaign::TreasurePurse{0,false,true,OrdinarySilverProgress::Sold} &&
+                            campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status == campaign::storage::Status::Read &&
+                            stored.checkpoint.treasurePurse == state.treasurePurse,
                             "the silver proceeds pay for the existing hinge fitting without taking the register reward");
                     }
                     if (progressed && verifiesSilver) {
@@ -1744,8 +1750,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             campaign::storage::StoredCheckpoint stored;
                             return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status ==
                                 campaign::storage::Status::Read && stored.checkpoint.privyRagDelivered == delivered &&
+                                stored.checkpoint.treasurePurse == campaign::TreasurePurse{0,false,true,OrdinarySilverProgress::Sold} &&
                                 (!delivered || stored.checkpoint.schema==campaign::kPrivyRagSchema);
                         };
+                        const campaign::TreasurePurse westernPurse{0,false,true,OrdinarySilverProgress::Sold};
                         const auto initialPurse = state.treasurePurse;
                         const auto initialFlask = state.healingFlask.resources;
                         const auto initialRevision = ctx.simulation.CampaignBoundaryRevision();
@@ -1760,6 +1768,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             capture("windows-combined-rag-basket.png",false) && takeRag() &&
                             ctx.simulation.CampaignBoundaryRevision() == initialRevision && storedDelivery(false) &&
                             reloadWithTownResidents() && state.privyRag == PrivyRagState::Available && ragVisible(true) &&
+                            state.treasurePurse == westernPurse &&
                             visitYard() && inspectRag(kPrivyRagBasket) && takeRag() && inspectRag(kPrivyRagShelf) &&
                             state.privyRagAction == PrivyRagAction::Pass &&
                             controlIs(kChestPromptControlId,"LEFT-CLICK / A TO PASS THE RAG");
@@ -1779,7 +1788,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             capture("windows-combined-rag-shelf.png",false) && interact() &&
                             ctx.simulation.CampaignBoundaryRevision() == deliveryRevision + 1 &&
                             state.treasurePurse == initialPurse && state.healingFlask.resources == initialFlask &&
-                            reloadWithTownResidents() && state.privyRag == PrivyRagState::Delivered && ragVisible(true),
+                            reloadWithTownResidents() && state.privyRag == PrivyRagState::Delivered && ragVisible(true) &&
+                            state.treasurePurse == westernPurse && storedDelivery(true) &&
+                            campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status == campaign::storage::Status::Read &&
+                            stored.checkpoint.treasurePurse == westernPurse && stored.checkpoint.privyRagDelivered,
                             "the clean rag returns after an interrupted pickup and persists on the shelf after one delivery");
                         input.pitchRadians = previousPitch;
                     }
@@ -1909,10 +1921,13 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         eastern.checkpoint.position.z == stored.checkpoint.position.z &&
                         eastern.checkpoint.vitality == stored.checkpoint.vitality &&
                         eastern.checkpoint.treasurePurse == stored.checkpoint.treasurePurse &&
+                        eastern.checkpoint.privyRagDelivered == stored.checkpoint.privyRagDelivered &&
                         !eastern.checkpoint.airWardLearned && reloadTavern() && step() && atHearth() &&
                         state.salvagerShorePracticeCompleted && state.millPreparation == MillPreparation::RigTested &&
-                        state.millLeakTestPhase == MillLeakTestPhase::Idle && frame(),
-                        "the native tavern reload preserves both eastern preparations and the earned return position");
+                        state.millLeakTestPhase == MillLeakTestPhase::Idle &&
+                        state.treasurePurse == stored.checkpoint.treasurePurse &&
+                        state.privyRag == (stored.checkpoint.privyRagDelivered ? PrivyRagState::Delivered : PrivyRagState::Available) && frame(),
+                        "the native tavern reload preserves both eastern preparations, western purse and rag at the earned return position");
                     if (progressed) {
                         stored = std::move(eastern);
                         progressed = check(readDirections(campaign::PauseObjective::BellwetherShrine, "Shore practice: Complete."),
@@ -2056,21 +2071,27 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         },false) && readDirections(PauseObjective::BellwetherExpeditions),
                         "the rendered lower stone closes and saves the restored binding while the ward remains unlearned");
                 }
+                const bool westernSilverPaid = gBellwetherCombinedRelicDealer && gBellwetherPreparationsValidation;
+                const campaign::TreasurePurse westernPurse{0,false,true,campaign::OrdinarySilverProgress::Sold};
                 if (progressed) {
                     campaign::storage::StoredCheckpoint taught;
                     progressed = check(walk(std::next(kBellwetherWaysideApproach.rbegin()), kBellwetherWaysideApproach.rend()) &&
                         walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
                         state.recordKeeperAction == RecordKeeperAction::LearnAirWard && interact() &&
-                        state.waysideArchive.airWardLearned && state.treasurePurse == campaign::TreasurePurse{} && frame() &&
+                        state.waysideArchive.airWardLearned &&
+                        state.treasurePurse == (westernSilverPaid ? westernPurse : campaign::TreasurePurse{}) && frame() &&
                         dialogue(kRecordKeeperWard) && state.recordKeeperAction == RecordKeeperAction::CollectReward &&
                         until([&] {
                             return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",taught).status ==
                                 campaign::storage::Status::Read && taught.checkpoint.airWardLearned &&
-                                taught.checkpoint.treasurePurse == campaign::TreasurePurse{};
+                                taught.checkpoint.treasurePurse == (westernSilverPaid ? westernPurse : campaign::TreasurePurse{}) &&
+                                taught.checkpoint.privyRagDelivered == stored.checkpoint.privyRagDelivered;
                         },false) && readDirections(PauseObjective::BellwetherExpeditions),
-                        "the return lesson saves the air ward before the player earns or spends any coins");
+                        "the return lesson saves the air ward independently of the purse and register payout");
                 }
-                const campaign::TreasurePurse earned{campaign::TreasurePurse::kRegisterRewardCoins,true};
+                const campaign::TreasurePurse earned{campaign::TreasurePurse::kRegisterRewardCoins,true,
+                    westernSilverPaid,westernSilverPaid ? campaign::OrdinarySilverProgress::Sold :
+                        campaign::OrdinarySilverProgress::Unfound};
                 if (progressed) {
                     campaign::storage::StoredCheckpoint rewarded;
                     progressed = check(interact() && state.treasurePurse == earned && frame() &&
@@ -2090,28 +2111,44 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         walkTo({kConversation[0], kConversation[2]}) && face(-1.40f, -.22f) && atHearth(),
                         "the player returns through the south door to the same staffed hearth");
                 }
-                const campaign::TreasurePurse fitted{earned.coins-campaign::TreasurePurse::kLanternFittingPrice,true,true};
+                const campaign::TreasurePurse fitted{westernSilverPaid ? earned.coins :
+                    earned.coins-campaign::TreasurePurse::kLanternFittingPrice,true,true,earned.ordinarySilver};
                 if (progressed) {
                     constexpr std::array fittingLine{Line::TavernLanternFitting};
                     std::array<char,256> quote{};
                     const bool offered = walkTo(kBellwetherLanternFittingApproach) &&
                         face(std::atan2(kKeeperHearth[0]-state.playerX,state.playerZ-kKeeperHearth[2]),-.12f) &&
-                        state.tavernLanternFittingAvailable && state.treasurePurse == earned && frame() &&
-                        ctx.tavernInteractionPromptPresented &&
-                        GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),static_cast<int>(quote.size()))>0 &&
-                        std::string_view(quote.data()).find(std::to_string(campaign::TreasurePurse::kLanternFittingPrice)+" COINS")!=
-                            std::string_view::npos;
-                    campaign::storage::StoredCheckpoint purchase;
-                    progressed = check(offered && interact() && state.treasurePurse == fitted && frame() &&
-                        dialogue(fittingLine) && interact() && !state.tavernLanternFittingAvailable && state.treasurePurse == fitted &&
-                        until([&] {
-                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",purchase).status ==
-                                campaign::storage::Status::Read && purchase.checkpoint.treasurePurse == fitted &&
-                                ctx.campaign->State().operation == campaign::PlayOperation::Autosave &&
-                                ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
-                        },false) && readDirections(PauseObjective::BellwetherExpeditions) &&
-                        walkTo({kConversation[0],kConversation[2]}) && face(-1.40f,-.22f),
-                        "the keeper quotes the hinge price and saves the single purchase before the player returns to Kit");
+                        state.treasurePurse == earned && frame();
+                    if (westernSilverPaid) {
+                        const auto revision = ctx.simulation.CampaignBoundaryRevision();
+                        campaign::storage::StoredCheckpoint retained;
+                        progressed = check(offered && !state.tavernLanternFittingAvailable && interact() &&
+                            state.treasurePurse == earned && !state.tavernLanternFittingAvailable &&
+                            state.chapterDialogue.line == Line::None &&
+                            ctx.simulation.CampaignBoundaryRevision() == revision &&
+                            campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",retained).status ==
+                                campaign::storage::Status::Read && retained.checkpoint.treasurePurse == earned &&
+                            readDirections(PauseObjective::BellwetherExpeditions) &&
+                            walkTo({kConversation[0],kConversation[2]}) && face(-1.40f,-.22f),
+                            "the fitted hinge cannot be purchased a second time after the register payout");
+                    } else {
+                        const bool quoted = offered && state.tavernLanternFittingAvailable &&
+                            ctx.tavernInteractionPromptPresented &&
+                            GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),static_cast<int>(quote.size()))>0 &&
+                            std::string_view(quote.data()).find(std::to_string(campaign::TreasurePurse::kLanternFittingPrice)+" COINS")!=
+                                std::string_view::npos;
+                        campaign::storage::StoredCheckpoint purchase;
+                        progressed = check(quoted && interact() && state.treasurePurse == fitted && frame() &&
+                            dialogue(fittingLine) && interact() && !state.tavernLanternFittingAvailable && state.treasurePurse == fitted &&
+                            until([&] {
+                                return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",purchase).status ==
+                                    campaign::storage::Status::Read && purchase.checkpoint.treasurePurse == fitted &&
+                                    ctx.campaign->State().operation == campaign::PlayOperation::Autosave &&
+                                    ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+                            },false) && readDirections(PauseObjective::BellwetherExpeditions) &&
+                            walkTo({kConversation[0],kConversation[2]}) && face(-1.40f,-.22f),
+                            "the keeper quotes the hinge price and saves the single purchase before the player returns to Kit");
+                    }
                     if (!progressed)
                         std::cerr << "Bellwether fitting offered=" << offered << " prompt=" << quote.data()
                                   << " available=" << state.tavernLanternFittingAvailable << " coins=" << state.treasurePurse.coins << '\n';
@@ -2147,6 +2184,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         expedition.checkpoint.position.z == original.position.z &&
                         expedition.checkpoint.vitality == original.vitality &&
                         expedition.checkpoint.flask == original.flask && expedition.checkpoint.treasurePurse == fitted &&
+                        expedition.checkpoint.privyRagDelivered == original.privyRagDelivered &&
                         expedition.checkpoint.airWardLearned &&
                         expedition.checkpoint.dialogue.activeLine == Line::None,
                         "the expedition autosave retains the earned tavern position, resources and both discoveries");
@@ -2157,6 +2195,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             state.treasurePurse == fitted && state.waysideArchive.airWardLearned &&
                             state.waysideArchive.stage == ArchiveStage::Restored &&
                             (!state.healingFlaskEnabled || state.healingFlask.resources == expedition.checkpoint.flask) &&
+                            state.privyRag == (expedition.checkpoint.privyRagDelivered ? PrivyRagState::Delivered : PrivyRagState::Available) &&
                             state.chapterDialogue.line == Line::None && frame() &&
                             campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                                 campaign::storage::Status::Read && resumed.encoded == expedition.encoded,
@@ -2173,6 +2212,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     combined->salvagerShorePracticeCompleted &&
                     combined->millPreparation == horde::gameplay::bellwether::MillPreparation::RigTested &&
                     combined->treasurePurse.lanternFittingPurchased && state.waysideArchive.airWardLearned &&
+                    (!gBellwetherCombinedRelicDealer ||
+                        (combined->treasurePurse == campaign::TreasurePurse{campaign::TreasurePurse::kRegisterRewardCoins,
+                            true,true,campaign::OrdinarySilverProgress::Sold} && combined->privyRagDelivered &&
+                            state.treasurePurse == combined->treasurePurse && state.privyRag ==
+                                horde::gameplay::bellwether::PrivyRagState::Delivered)) &&
                     state.salvagerShorePracticeCompleted &&
                     state.millPreparation == horde::gameplay::bellwether::MillPreparation::RigTested &&
                     state.shorePracticeStage == horde::gameplay::bellwether::ShorePracticeStage::Idle &&

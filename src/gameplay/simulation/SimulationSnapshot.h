@@ -98,6 +98,8 @@ struct SimulationSnapshot
     bellwether::SalvagerAction salvagerAction{};
     std::uint16_t shorePracticeBreathTicksRemaining=0;
     bool salvagerShorePracticeCompleted=false;
+    bool millServiceAvailable=false;
+    bool shorePracticeServiceAvailable=false;
     bool relicDealerTradeAvailable=false;
     campaign::OrdinarySilverAction ordinarySilverAction{};
     bellwether::TavernDoor tavernDoor;

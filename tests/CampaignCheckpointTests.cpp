@@ -224,29 +224,56 @@ void RevivalRestoreProfile(const std::shared_ptr<const TriangleSupportSurface>& 
 }
 }
 int main(int argc,char** argv) {
-    const auto noShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
-        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined);
-    const auto idleShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
-        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,
-        bellwether::ShorePracticeStage::Idle,false);
-    Check(noShore.find("Shore practice:")==std::string::npos &&
-          idleShore.find("Shore practice: Meet the salvager at the river fork.")!=std::string::npos,
-          "only a shore-capable profile adds a discoverable idle practice direction");
+    using cp::PauseObjective;
+    const auto noServices=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,cp::BellwetherDirections{});
+    auto directions=[] {
+        SimulationSnapshot snapshot{};
+        snapshot.millServiceAvailable=true;
+        snapshot.shorePracticeServiceAvailable=true;
+        return cp::CurrentBellwetherDirections(snapshot);
+    }();
+    const auto opening=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+    Check(noServices.find("Shore practice:")==std::string::npos &&
+          noServices.find("MILL signs")==std::string::npos &&
+          opening.find("Shore practice: Meet the salvager at the river fork.")!=std::string::npos &&
+          opening.find("For a breathing rig, follow the MILL signs east")!=std::string::npos,
+          "a staffed hub advertises both eastern preparations before the first shrine visit");
+    const auto shoreOnly=cp::PauseObjectiveText(PauseObjective::BellwetherExpeditions,{.shorePracticeAvailable=true});
+    const auto millOnly=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,{.millServiceAvailable=true});
+    Check(shoreOnly.find("MILL signs")==std::string::npos &&
+          millOnly.find("Shore practice:")==std::string::npos &&
+          shoreOnly.find("Meet the salvager")!=std::string::npos && millOnly.find("artificer's workbench")!=std::string::npos,
+          "single-specialist builds advertise the service they can complete");
     for(const auto& [stage,expected]:std::array{
             std::pair{bellwether::ShorePracticeStage::FindDryMark,"Follow the causeway to the dry mark"},
             std::pair{bellwether::ShorePracticeStage::EnterShallows,"From the dry mark, wade to the river rail"},
             std::pair{bellwether::ShorePracticeStage::Retreat,"Return from the shallows to the dry mark"},
             std::pair{bellwether::ShorePracticeStage::ReportBack,"Return to the salvager at the river fork"},
             std::pair{bellwether::ShorePracticeStage::RecoverBreath,"Catch your breath on the dry mark"}}) {
-        const auto text=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
-            cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,stage,false);
+        directions.shorePracticeStage=stage;
+        const auto text=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
         Check(text.find(expected)!=std::string::npos,"directions follow the current shore-practice stage");
     }
-    const auto completedShore=cp::PauseObjectiveText(cp::PauseObjective::BellwetherShrine,{},
-        cp::AirWardDirections::RestoreBinding,bellwether::MillPreparation::Unexamined,true,
-        bellwether::ShorePracticeStage::Idle,true);
+    directions.shorePracticeStage=bellwether::ShorePracticeStage::Idle;
+    directions.shorePracticeCompleted=true;
+    const auto completedShore=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
     Check(completedShore.find("Shore practice: Complete. Breath control learned.")!=std::string::npos,
           "directions report saved shore-practice completion");
+    directions.purse.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+    for(const auto objective:{PauseObjective::BellwetherLowerStone,PauseObjective::BellwetherArchive,
+                              PauseObjective::BellwetherRegister}) {
+        Check(cp::PauseObjectiveText(objective,directions).find("sell it at the stall west of the square")!=std::string::npos,
+              "carried silver keeps its sale directions through the church objectives");
+    }
+    const cp::BellwetherDirections completedWithoutServices{
+        .ward=cp::AirWardDirections::Learned,.mill=bellwether::MillPreparation::RigTested,.shorePracticeCompleted=true};
+    const auto completed=cp::PauseObjectiveText(PauseObjective::BellwetherExpeditions,completedWithoutServices);
+    Check(completed.find("Air ward learned")!=std::string::npos &&
+          completed.find("Breathing rig passed")!=std::string::npos &&
+          completed.find("Breath control learned")!=std::string::npos &&
+          completed.find("Visit the salvager")==std::string::npos &&
+          cp::PauseObjectiveText(PauseObjective::Lookout,directions)==cp::kLookoutObjectiveText,
+          "earned preparations remain visible without their resident packs and the forest page remains spoiler-free");
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error) ||

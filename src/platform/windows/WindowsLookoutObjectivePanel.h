@@ -22,12 +22,7 @@ public:
         bool available=false,active=false;
         std::uint64_t worldGeneration=0,surfaceGeneration=0;
         Objective objective=Objective::Lookout;
-        gameplay::campaign::TreasurePurse purse{};
-        gameplay::campaign::AirWardDirections ward=gameplay::campaign::AirWardDirections::RestoreBinding;
-        gameplay::bellwether::MillPreparation mill{};
-        bool shorePracticeAvailable=false;
-        gameplay::bellwether::ShorePracticeStage shorePracticeStage=gameplay::bellwether::ShorePracticeStage::Idle;
-        bool shorePracticeCompleted=false;
+        gameplay::campaign::BellwetherDirections directions{};
     };
     static constexpr int TitleId=4320,BodyId=4321,ContinueId=4322,MenuId=4323,BackId=4324;
     static constexpr const char* Title="THE ROAD AHEAD";
@@ -40,15 +35,9 @@ public:
     bool Open(HWND parent,const View& view,HFONT font=nullptr) {
         if(visible_ || !IsWindow(parent) || !Admitted(view))return false;
         parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
-        purse_=view.purse;
-        ward_=view.ward;
-        mill_=view.mill;
-        shorePracticeAvailable_=view.shorePracticeAvailable;
-        shorePracticeStage_=view.shorePracticeStage;
-        shorePracticeCompleted_=view.shorePracticeCompleted;
+        directions_=view.directions;
         const bool lookout = objective_ == Objective::Lookout;
-        bodyText_=gameplay::campaign::PauseObjectiveText(objective_,purse_,ward_,mill_,
-            shorePracticeAvailable_,shorePracticeStage_,shorePracticeCompleted_);
+        bodyText_=gameplay::campaign::PauseObjectiveText(objective_,directions_);
         const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
             bodyText_.c_str(),"CONTINUE EXPLORING",
             lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
@@ -79,9 +68,7 @@ public:
     bool Refresh(const View& view) {
         if(!visible_)return false;
         if(!Admitted(view) || view.worldGeneration!=world_ || view.surfaceGeneration!=surface_ ||
-            view.objective!=objective_ || view.purse!=purse_ || view.ward!=ward_ || view.mill!=mill_ ||
-            view.shorePracticeAvailable!=shorePracticeAvailable_ || view.shorePracticeStage!=shorePracticeStage_ ||
-            view.shorePracticeCompleted!=shorePracticeCompleted_) {
+            view.objective!=objective_ || view.directions!=directions_) {
             Close();return false;
         }
         return true;
@@ -137,12 +124,7 @@ private:
     std::string bodyText_;
     bool visible_=false;
     std::uint64_t world_=0,surface_=0;
-    gameplay::campaign::TreasurePurse purse_{};
-    gameplay::campaign::AirWardDirections ward_=gameplay::campaign::AirWardDirections::RestoreBinding;
-    gameplay::bellwether::MillPreparation mill_{};
-    bool shorePracticeAvailable_=false;
-    gameplay::bellwether::ShorePracticeStage shorePracticeStage_=gameplay::bellwether::ShorePracticeStage::Idle;
-    bool shorePracticeCompleted_=false;
+    gameplay::campaign::BellwetherDirections directions_{};
     Objective objective_=Objective::None;
 };
 } // namespace horde::platform::windows

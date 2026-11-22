@@ -3554,6 +3554,11 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.shorePracticeStage=shorePracticeStage_;
     snapshot_.shorePracticeBreathTicksRemaining=shorePracticeBreathTicksRemaining_;
     snapshot_.salvagerShorePracticeCompleted=salvagerShorePracticeCompleted_;
+    // Services can be advertised while their residents are outside the loaded lanes.
+    snapshot_.millServiceAvailable=config_.bellwetherCombinedResidents ||
+        config_.bellwetherSpecialist==bellwether::Specialist::Artificer;
+    snapshot_.shorePracticeServiceAvailable=config_.bellwetherCombinedResidents ||
+        config_.bellwetherSpecialist==bellwether::Specialist::Salvager;
     snapshot_.recordKeeperAction=RecordKeeperAction(chapterContext);
     snapshot_.treasurePurse=treasurePurse_;
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
