@@ -121,6 +121,39 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     RefreshSnapshot(lastInput_);
 }
 
+bool GameSimulation::IsBellwetherResidentReady(traversal::ResidentMask resident) const
+{
+    if(config_.bellwetherCombinedResidents)return (bellwetherResidentMask_&resident)!=0;
+    switch(resident) {
+    case traversal::kRecordKeeperResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::RecordKeeper;
+    case traversal::kArtificerResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::Artificer;
+    case traversal::kSalvagerResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::Salvager;
+    default:return false;
+    }
+}
+
+bool GameSimulation::IsBellwetherTavernKeeperReady() const
+{
+    return config_.bellwetherCombinedResidents ?
+        IsBellwetherResidentReady(traversal::kTavernKeeperResident) : config_.bellwetherTavernKeeperAdmitted;
+}
+
+bool GameSimulation::PublishBellwetherResidents(traversal::ResidentMask residents)
+{
+    if(!config_.bellwetherCombinedResidents || (residents&~traversal::kAllResidentMask)!=0)return false;
+    unsigned count=0;
+    for(auto bits=residents;bits;bits=static_cast<traversal::ResidentMask>(bits&(bits-1u)))++count;
+    if(count>2)return false;
+    if(bellwetherResidentMask_==residents)return true;
+    bellwetherResidentMask_=residents;
+    EnsureBellwetherResidentPoses(true);
+    RefreshSnapshot(lastInput_);
+    return true;
+}
+
 std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
                                            double frameDeltaSeconds,
                                            std::uint64_t inputPublicationSequence,
@@ -828,6 +861,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 void GameSimulation::ResetRoute()
 {
     enemyHitParticles_.Clear();
+    if(config_.bellwetherCombinedResidents)bellwetherResidentMask_=traversal::kTownResidentMask;
     forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
@@ -3494,13 +3528,13 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.chapterDialogue=chapterDialogue_.State();
-    snapshot_.tavernKeeper=config_.bellwetherTavernKeeperAdmitted && chapterTerrain_ &&
+    snapshot_.tavernKeeper=IsBellwetherTavernKeeperReady() && chapterTerrain_ &&
         chapterTerrainGeneration_==worldRoute_.generation ? tavernKeeper_.Pose() : std::nullopt;
     const auto chapterContext=ChapterInteractionContext(input.paused);
     const bool currentExterior=chapterContext.exterior && chapterTerrainGeneration_==worldRoute_.generation;
-    snapshot_.recordKeeper=currentExterior ? recordKeeper_ : std::nullopt;
-    snapshot_.artificer=currentExterior ? artificer_ : std::nullopt;
-    snapshot_.salvager=currentExterior ? salvager_ : std::nullopt;
+    snapshot_.recordKeeper=currentExterior && IsBellwetherResidentReady(traversal::kRecordKeeperResident) ? recordKeeper_ : std::nullopt;
+    snapshot_.artificer=currentExterior && IsBellwetherResidentReady(traversal::kArtificerResident) ? artificer_ : std::nullopt;
+    snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
     snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
     snapshot_.shorePracticeStage=shorePracticeStage_;
     snapshot_.salvagerShorePracticeCompleted=salvagerShorePracticeCompleted_;

@@ -673,6 +673,9 @@ horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationCo
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = true;
     config.bellwetherSpecialist = AndroidBellwetherSpecialist();
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    config.bellwetherCombinedResidents = true;
+#endif
 #endif
     return config;
 }
@@ -3723,9 +3726,15 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
         __android_log_print(ANDROID_LOG_ERROR,kTag,"Bellwether furniture setup must precede scene initialization.");
         return false;
     }
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if (!horde::vulkan::raytracing::SetBellwetherCombinedResidentSources(context.rtScene,
+            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
+            diagnostic)) {
+#else
     if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
             authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
             diagnostic, AndroidBellwetherSpecialist())) {
+#endif
         __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
         return false;
     }
@@ -4468,6 +4477,26 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         return false;
     }
 
+    // The sole graphics fence completed above. This command has not bound
+    // scene descriptors yet; discard other completed recorded references.
+    struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
+    ActorRetirementOwner actorOwner{&context, imageIndex};
+    const auto retireResourceReferences=[](void* user, std::string& error) {
+        auto& owner = *static_cast<ActorRetirementOwner*>(user);
+        auto& ctx = *owner.context;
+        if (kMaxFramesInFlight != 1u ||
+            !gSurfaceSessions.IsCurrent(ctx.surfaceGeneration)) {
+            error = "Character retirement requires the current completed graphics owner.";
+            return false;
+        }
+        for (std::size_t i = 0; i < ctx.commandBuffers.size(); ++i)
+            if (i != owner.image && vkResetCommandBuffer(ctx.commandBuffers[i], 0u) != VK_SUCCESS) {
+                error = "Prior character command references could not be reset.";
+                return false;
+            }
+        return true;
+    };
+
     bool gpuTimingRecording = false;
 #if HORDE_RT_FRAME_STAGE_PROBE
     horde::vulkan::raytracing::RtSceneGpuStageProbe frameStageProbe(
@@ -4931,6 +4960,22 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationScope.Complete(1u);
             }
 
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+            if (!context.environmentSurvey && context.developmentRescueJourney &&
+                context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+                !context.captureActive && !context.routeReplayActive &&
+                !context.inAppBenchmark.IsRunning() && !context.benchmarkSampling) {
+                std::string residentDiagnostic;
+                if (!horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
+                        context.rtScene, gGameSimulation, AndroidBellwetherResidentRoot(context),
+                        retireResourceReferences, &actorOwner, residentDiagnostic)) {
+                    __android_log_print(ANDROID_LOG_ERROR, kTag,
+                        "Bellwether combined residents: %s", residentDiagnostic.c_str());
+                    if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
+                    return false;
+                }
+            }
+#endif
             // Immutable copy before the established SFX transport is drained. Music
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
             ObserveAndroidMotionAdvance(context, simulationInput, inputOwnerSteadyNs);
@@ -5065,25 +5110,6 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         {
             (void)context.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
-        // The sole graphics fence completed above. This command has not bound
-        // scene descriptors yet; discard other completed recorded references.
-        struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
-        ActorRetirementOwner actorOwner{&context, imageIndex};
-        const auto retireResourceReferences=[](void* user, std::string& error) {
-                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
-                    auto& ctx = *owner.context;
-                    if (kMaxFramesInFlight != 1u ||
-                        !gSurfaceSessions.IsCurrent(ctx.surfaceGeneration)) {
-                        error = "Character retirement requires the current completed graphics owner.";
-                        return false;
-                    }
-                    for (std::size_t i = 0; i < ctx.commandBuffers.size(); ++i)
-                        if (i != owner.image && vkResetCommandBuffer(ctx.commandBuffers[i], 0u) != VK_SUCCESS) {
-                            error = "Prior character command references could not be reset.";
-                            return false;
-                        }
-                    return true;
-                };
         if (!context.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);

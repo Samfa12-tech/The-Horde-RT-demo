@@ -485,6 +485,12 @@ public:
 #endif
     bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
     [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
+    [[nodiscard]] auto ChapterResidentSourceIds() const noexcept {
+        std::array<std::uint32_t, kAdditionalChapterActorCapacity> ids{};
+        for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+            ids[lane] = chapterResidentSources_[lane].stableId;
+        return ids;
+    }
     // The caller must own the frame boundary and prove all prior sampling complete.
     // Only the actor's three existing atlas layers are changed.
     bool ReplaceChapterResidentTextureLayers(std::uint32_t stableId,

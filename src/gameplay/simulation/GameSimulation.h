@@ -35,6 +35,7 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
+#include "gameplay/traversal/BellwetherResidentRoster.h"
 
 namespace horde::gameplay::validation
 {
@@ -90,6 +91,8 @@ struct GameSimulationConfig
     // Set by the scene profile when the placed tavern keeper is admitted.
     bool bellwetherTavernKeeperAdmitted = false;
     bellwether::Specialist bellwetherSpecialist = bellwether::Specialist::None;
+    // Private combined campaign: the owner publishes current GPU-ready residents.
+    bool bellwetherCombinedResidents = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -150,6 +153,9 @@ public:
     void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
     bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    // Owner-thread receipt of the residents whose GPU assets are currently ready.
+    // Changes only the immutable snapshot and never advances or saves gameplay.
+    bool PublishBellwetherResidents(traversal::ResidentMask residents);
     // Current owner receipt only; never awards progress. Empty receipts
     // withdraw presentation; stale world/resource responses reject.
     bool PublishFlaskUpgradeReadiness(WorldZoneToken token,const healing::FlaskUpgradeReadiness& readiness);
@@ -216,6 +222,10 @@ private:
     StaticDetailLease staticDetailLease_{};
     bool deferredStaticDetailReset_ = false;
     bool deferredStaticDetailRetry_ = false;
+    traversal::ResidentMask bellwetherResidentMask_=traversal::kTownResidentMask;
+    bool IsBellwetherResidentReady(traversal::ResidentMask resident) const;
+    bool IsBellwetherTavernKeeperReady() const;
+    void EnsureBellwetherResidentPoses(bool requireAuthoredTerrain = false);
     friend class horde::gameplay::validation::MotionEvidenceScenario;
     friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
         const horde::gameplay::DevelopmentCheckpoint&,

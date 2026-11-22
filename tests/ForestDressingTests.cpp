@@ -2140,6 +2140,47 @@ void TestBellwetherResidentRosters(
               terrain->NonWalkableVolumeClear(state.playerX,state.playerZ,foot[0],foot[2],sightY-.025f,sightY+.025f,.025f),
               "the artificer stands on real support at a clear working-side approach");
     }
+
+    auto combinedConfig=sim::ProductionGameSimulationConfig();
+    combinedConfig.bellwetherCombinedResidents=true;
+    combinedConfig.bellwetherTavernKeeperAdmitted=true;
+    combinedConfig.bellwetherSpecialist=Specialist::Artificer; // preserves authored staging policy
+    sim::GameSimulation combined(combinedConfig);
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) &&
+          !combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper,
+          "combined residency starts at the town pair before the chapter terrain is published");
+    const auto* millView=gameplay::FindDevelopmentCheckpoint("bellwether-mill-artificer");
+    if(!millView) {Check(false,"the authored mill checkpoint is registered");return;}
+    combined.SetDevelopmentRescueJourney(true,true);
+    const auto generation=combined.Snapshot().worldRoute.generation;
+    if(!combined.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain)) {
+        Check(false,"combined residency can load the authored Bellwether terrain");
+        return;
+    }
+    const auto stagedRoster=static_cast<ResidentMask>(kTavernKeeperResident|kArtificerResident);
+    Check(combined.PublishBellwetherResidents(stagedRoster),"two admitted residents can be published together");
+    Check(!combined.PublishBellwetherResidents(static_cast<ResidentMask>(stagedRoster|kRecordKeeperResident)) &&
+          !combined.PublishBellwetherResidents(0x10u),
+          "third and unknown resident bits are rejected");
+    Check(combined.PublishBellwetherResidents(stagedRoster),"resident publication is idempotent");
+    const bool staged=millView && gameplay::StageDevelopmentCheckpointSimulation(combined,*millView);
+    Check(staged && combined.Snapshot().artificer && combined.Snapshot().tavernKeeper,
+          "combined admission keeps authored mill checkpoint staging intact");
+    if(!staged)return;
+    const auto tickBefore=combined.Snapshot().tickIndex;
+    Check(combined.PublishBellwetherResidents(kEastResidentMask) &&
+          combined.Snapshot().tickIndex==tickBefore && combined.Snapshot().artificer && combined.Snapshot().salvager &&
+          !combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper,
+          "east admission immediately publishes both resident poses without stepping or saving");
+    const auto artificerFoot=combined.Snapshot().artificer->foot;
+    const auto salvagerFoot=combined.Snapshot().salvager->foot;
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) && !combined.Snapshot().artificer &&
+          !combined.Snapshot().salvager && combined.Snapshot().tavernKeeper,
+          "town admission evicts east actors from the immutable snapshot");
+    Check(combined.PublishBellwetherResidents(kEastResidentMask) && combined.Snapshot().artificer &&
+          combined.Snapshot().salvager && combined.Snapshot().artificer->foot==artificerFoot &&
+          combined.Snapshot().salvager->foot==salvagerFoot,
+          "re-admission restores the persisted east actor poses");
 }
 
 void TestBellwetherSalvagerPractice(

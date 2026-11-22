@@ -21,9 +21,11 @@ public final class ChapterDebugCheckpointTest {
                 MainActivity.checkpointId("bellwether-repeat-visit"));
         assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 337 : -1,
                 MainActivity.checkpointId("bellwether-doorway-measurement"));
-        final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE;
-        final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE;
-        final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && !mill && !shore;
+        final boolean combined = BuildConfig.BELLWETHER_COMBINED_RESIDENTS;
+        final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !combined;
+        final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !combined;
+        final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
+                (combined || (!mill && !shore));
         assertEquals(church ? 335 : -1, MainActivity.checkpointId("bellwether-record-keeper-handoff"));
         assertEquals(mill ? 344 : -1, MainActivity.checkpointId("bellwether-mill-artificer"));
         assertEquals(mill ? 345 : -1, MainActivity.checkpointId("bellwether-mill-drive-tested"));

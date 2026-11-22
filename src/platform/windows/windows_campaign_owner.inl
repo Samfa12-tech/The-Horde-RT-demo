@@ -76,8 +76,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     std::string diagnostic;
 #if defined(_DEBUG)
     if(!gBellwetherCampaignActors.empty() &&
-       !horde::vulkan::raytracing::SetBellwetherResidentSources(
-            scene,gBellwetherCampaignActors,diagnostic,gBellwetherCampaignSpecialist))
+       !SetBellwetherCampaignResidentSources(scene,gBellwetherCampaignActors,diagnostic))
         return CampaignPreparationFailure(ctx,"bellwether-residents",diagnostic);
 #endif
     auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();

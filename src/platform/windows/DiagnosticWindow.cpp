@@ -4,6 +4,7 @@
 #include "audio/ChapterDialogueSpatial.h"
 #include "audio/BellwetherVoiceFixture.h"
 #include "vulkan/raytracing/BellwetherResidents.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
@@ -220,10 +221,19 @@ std::filesystem::path gBellwetherVoiceDirectory;
 bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
+bool gBellwetherCombinedCampaignActors = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherExpeditionValidation = false;
 bool gBellwetherHearthRestValidation = false;
+
+bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::PresentableTinyRtScene& scene,
+    const std::filesystem::path& root, std::string& diagnostic)
+{
+    using namespace horde::vulkan::raytracing;
+    return gBellwetherCombinedCampaignActors ? SetBellwetherCombinedResidentSources(scene, root, diagnostic) :
+        SetBellwetherResidentSources(scene, root, diagnostic, gBellwetherCampaignSpecialist);
+}
 #endif
 
 horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
@@ -231,6 +241,7 @@ horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationCo
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
 #if defined(_DEBUG)
     config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
+    config.bellwetherCombinedResidents = gBellwetherCombinedCampaignActors;
     config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
 #endif
     return config;
@@ -1751,18 +1762,27 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
         }
         return true;
     };
-    if (!matches(standIn) && !matches(texturedKeeper)) return false;
+    const bool textured = matches(texturedKeeper);
+    if (!textured && !matches(standIn)) return false;
     const bool mill = std::filesystem::exists(root / "artificer", error);
     if (error) return false;
     const bool church = std::filesystem::exists(root / "record-keeper", error);
     if (error) return false;
     const bool shore = std::filesystem::exists(root / "salvager", error);
-    if (error || static_cast<int>(mill) + static_cast<int>(church) + static_cast<int>(shore) != 1) return false;
-    if (shore ? !matches(salvager) : (mill ? !matches(artificer) : !matches(recordKeeper))) return false;
+    if (error) return false;
+    const int specialistCount = static_cast<int>(mill) + static_cast<int>(church) + static_cast<int>(shore);
+    const bool combined = specialistCount == 3;
+    if (combined) {
+        if (!textured || !matches(recordKeeper) || !matches(artificer) || !matches(salvager)) return false;
+    } else if (specialistCount != 1 ||
+               (shore ? !matches(salvager) : (mill ? !matches(artificer) : !matches(recordKeeper)))) {
+        return false;
+    }
     gBellwetherCampaignActors = root;
+    gBellwetherCombinedCampaignActors = combined;
     using horde::gameplay::bellwether::Specialist;
-    gBellwetherCampaignSpecialist = shore ? Specialist::Salvager :
-        (mill ? Specialist::Artificer : Specialist::RecordKeeper);
+    gBellwetherCampaignSpecialist = combined ? Specialist::RecordKeeper : (shore ? Specialist::Salvager :
+        (mill ? Specialist::Artificer : Specialist::RecordKeeper));
     return true;
 }
 #endif
@@ -7019,9 +7039,8 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     } else if (!gBellwetherCampaignActors.empty()) {
         const bool authoredShowcase = rescueJourney &&
             ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
-        if (!horde::vulkan::raytracing::SetBellwetherResidentSources(ctx.rtScene,
-                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic,
-                gBellwetherCampaignSpecialist)) {
+        if (!SetBellwetherCampaignResidentSources(ctx.rtScene,
+                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic)) {
             ctx.lastRtFrameError = diagnostic;
             return false;
         }
@@ -7874,6 +7893,25 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
     if (useRtFrame)
     {
+        // The graphics fence above covers the older command recordings.
+        struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
+        ActorRetirementOwner actorOwner{&ctx, imageIndex};
+        const auto retireResourceReferences = [](void* user, std::string& error) {
+            auto& owner = *static_cast<ActorRetirementOwner*>(user);
+            auto& context = *owner.context;
+            if (context.inFlightFences.size() != 1u) {
+                error = "Character retirement requires the single completed graphics owner.";
+                return false;
+            }
+            for (std::size_t i = 0; i < context.commandBuffers.size(); ++i) {
+                if (i != owner.image && vkResetCommandBuffer(context.commandBuffers[i], 0u) != VK_SUCCESS) {
+                    error = "Prior character command references could not be reset.";
+                    return false;
+                }
+            }
+            return true;
+        };
+        std::string diagnostic;
         if (!gCampaignHiddenValidation && !ctx.environmentSurveyActive && !ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
         {
             SpatialAudioEngine().Update();
@@ -7897,6 +7935,17 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
+#if defined(_DEBUG)
+        if (gBellwetherCombinedCampaignActors && !previewFrame && !frozenDevelopmentCheckpoint &&
+            ctx.simulation.Snapshot().developmentRescueJourney &&
+            !horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
+                ctx.rtScene, ctx.simulation, gBellwetherCampaignActors,
+                retireResourceReferences, &actorOwner, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
+#endif
         if (!gCampaignHiddenValidation && !ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
 #if defined(_DEBUG)
@@ -8048,7 +8097,6 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 frameInputs.skeletonEnemyCount = 0u;
             }
         }
-        std::string diagnostic;
 #if defined(_DEBUG)
         if(ctx.lookoutKitInspectionPose) {
             // Explicit hidden pose inspection only. Reuse the coherent camera/
@@ -8096,25 +8144,6 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             (void)ctx.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
-        // This owner waited its sole graphics fence above. No scene descriptor
-        // has been bound in the current recording; reset every older recording
-        // before a binding change can invalidate its references.
-        struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
-        ActorRetirementOwner actorOwner{&ctx, imageIndex};
-        const auto retireResourceReferences=[](void* user, std::string& error) {
-                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
-                    auto& context = *owner.context;
-                    if (context.inFlightFences.size() != 1u) {
-                        error = "Character retirement requires the single completed graphics owner.";
-                        return false;
-                    }
-                    for (std::size_t i = 0; i < context.commandBuffers.size(); ++i)
-                        if (i != owner.image && vkResetCommandBuffer(context.commandBuffers[i], 0u) != VK_SUCCESS) {
-                            error = "Prior character command references could not be reset.";
-                            return false;
-                        }
-                    return true;
-                };
         if (!ctx.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             ctx.lastRtFrameError = diagnostic;

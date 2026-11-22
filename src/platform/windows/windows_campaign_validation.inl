@@ -987,7 +987,9 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
 int FinishHiddenLookoutValidation(HWND owner,int result)
 {
     if(!ObserveHiddenLookoutForeground(owner,"owner-destroyed"))result=1;
-    const int timeLimit = gBellwetherExpeditionValidation ? 230 : gBellwetherHearthRestValidation ? 110 : 90;
+    const int timeLimit = gBellwetherExpeditionValidation ? 230 :
+        gBellwetherCombinedCampaignActors && gBellwetherEarnTavernValidation ? 180 :
+        gBellwetherHearthRestValidation ? 110 : 90;
     const auto elapsed = std::chrono::steady_clock::now()-gHiddenLookout.started;
     const bool inBudget = elapsed < std::chrono::seconds(timeLimit);
     if(!inBudget || gHiddenLookout.receipt.str().empty())result=1;
@@ -1196,8 +1198,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
         ObserveCampaignPresentation(ctx, presented);
         return presented && ctx.lastFramePresentation == RtPresentationOutcome::Presented && hidden();
     };
-    const auto deadline = std::chrono::steady_clock::now() +
-        std::chrono::seconds(gBellwetherExpeditionValidation ? 205 : gBellwetherHearthRestValidation ? 85 : 65);
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(
+        gBellwetherExpeditionValidation ? 205 : gBellwetherCombinedCampaignActors ? 150 :
+        gBellwetherHearthRestValidation ? 85 : 65);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
             PumpCampaign(ctx);
@@ -1374,6 +1377,106 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     check(campaign::storage::Read(gCampaignValidationDirectory, "slot-1-auto.hrd", resumed).status ==
                         campaign::storage::Status::Read && resumed.encoded == stored.encoded,
                         "resuming the tavern preserves the earned autosave bytes");
+                }
+            }
+            if (progressed && gBellwetherCombinedCampaignActors && !gBellwetherHearthRestValidation &&
+                !gBellwetherExpeditionValidation) {
+                using namespace horde::gameplay::traversal;
+                using namespace horde::gameplay::bellwether;
+                using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+                const auto junction = kBellwetherTavernRoute.begin() + kBellwetherMillJunction;
+                const auto sceneEpoch = ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+                const auto geometryGeneration = ctx.rtScene.StaticGeometryGeneration();
+                const auto town = [&] {
+                    return state.tavernKeeper && state.recordKeeper && !state.artificer && !state.salvager &&
+                        ctx.rtScene.ChapterResidentSourceIds() ==
+                            std::array{kTavernKeeperActorId, kRecordKeeperActorId};
+                };
+                const auto east = [&] {
+                    return state.artificer && state.salvager && !state.tavernKeeper && !state.recordKeeper &&
+                        ctx.rtScene.ChapterResidentSourceIds() ==
+                            std::array{kArtificerActorId, kSalvagerActorId};
+                };
+                const auto fork = [&] {
+                    return state.tavernKeeper && state.salvager && !state.recordKeeper && !state.artificer &&
+                        ctx.rtScene.ChapterResidentSourceIds() ==
+                            std::array{kTavernKeeperActorId, kSalvagerActorId};
+                };
+                const auto capture = [&](const char* name) {
+                    if (!CompleteRtEvidenceAfterDeviceIdle(ctx, vkDeviceWaitIdle(ctx.device))) return false;
+                    const auto publication = ctx.rtFrameEvidence.PublishedStateByValue();
+                    const auto& completed = publication.completedEvidence;
+                    const auto& identity = completed.identity.submitted;
+                    if (!publication.hasCompletedEvidence || identity.frame.sceneEpoch != sceneEpoch ||
+                        identity.frame.simulationTick != state.tickIndex ||
+                        completed.presentation.outcome != RtPresentationOutcome::Presented ||
+                        completed.presentation.lastSuccessfulPresentSubmissionSerial != identity.submissionSerial ||
+                        ctx.rtScene.StaticGeometryGeneration() != geometryGeneration ||
+                        ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex) != 1u ||
+                        ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u) != 1u) {
+                        std::cerr << "Combined resident evidence mismatch in " << name
+                                  << ": completed=" << publication.hasCompletedEvidence
+                                  << " epoch=" << identity.frame.sceneEpoch << '/' << sceneEpoch
+                                  << " tick=" << identity.frame.simulationTick << '/' << state.tickIndex
+                                  << " present=" << static_cast<int>(completed.presentation.outcome)
+                                  << " serial=" << completed.presentation.lastSuccessfulPresentSubmissionSerial
+                                  << '/' << identity.submissionSerial
+                                  << " geometry=" << ctx.rtScene.StaticGeometryGeneration() << '/' << geometryGeneration
+                                  << " masks=" << static_cast<int>(ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex))
+                                  << ',' << static_cast<int>(ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u))
+                                  << '\n';
+                        return false;
+                    }
+                    Scene::StorageImageCapture image;
+                    std::string error;
+                    const bool saved = ctx.rtScene.CaptureStorageImage(image, error) &&
+                        WriteRgbaPng(gCampaignValidationDirectory / name, image, error);
+                    if (!saved) std::cerr << "Combined resident capture failed for " << name << ": " << error << '\n';
+                    return saved;
+                };
+                const auto face = [&](float x, float z) {
+                    input.yawRadians = std::atan2(x - state.playerX, state.playerZ - z);
+                    return step() && frame();
+                };
+                const auto interact = [&] {
+                    input.commands.interact = state.lastConsumedInteractSequence + 1;
+                    return step();
+                };
+                progressed = check(town() &&
+                    std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction), walkTo) &&
+                    fork() && walkTo(kBellwetherMillApproach[1]) && east() &&
+                    state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated,
+                    "the authored south route loads both eastern residents while Kit stays at the hearth");
+                if (progressed) {
+                    const bool reached = walkTo(kBellwetherSalvagerMark) && east() &&
+                        face(kBellwetherSalvagerStand.x, kBellwetherSalvagerStand.z);
+                    const auto offer = state.salvagerAction;
+                    const bool started = reached && offer == SalvagerAction::StartPractice &&
+                        interact() && state.shorePracticeStage == ShorePracticeStage::FindDryMark &&
+                        state.chapterDialogue.line == Line::SalvagerShoreTask;
+                    if (!started) std::cerr << "Combined shore: player=" << state.playerX << ',' << state.playerZ
+                        << " grounded=" << state.playerGrounded << " offer=" << static_cast<int>(offer)
+                        << " stage=" << static_cast<int>(state.shorePracticeStage)
+                        << " line=" << static_cast<int>(state.chapterDialogue.line) << '\n';
+                    progressed = check(started && frame() && capture("windows-combined-shore.png"),
+                        "the salvager starts shore practice with both eastern actors in the same presented scene");
+                }
+                if (progressed) {
+                    progressed = check(walkTo(kBellwetherMillApproach[1]) &&
+                        std::all_of(kBellwetherMillApproach.begin() + 2, kBellwetherMillApproach.end(), walkTo) &&
+                        walkTo(kBellwetherMillWorkMark) && face(kMillComparison[0], kMillComparison[2]) && east() &&
+                        state.millAction == MillAction::InspectGearing && capture("windows-combined-mill.png") &&
+                        interact() && state.millPreparation == MillPreparation::BearingNeeded,
+                        "the mill workbench advances preparation with both eastern actors in the same presented scene");
+                }
+                if (progressed) {
+                    progressed = check(
+                        std::all_of(kBellwetherMillApproach.rbegin(), kBellwetherMillApproach.rend(), walkTo) && fork() &&
+                        std::all_of(std::next(junction), kBellwetherTavernRoute.end(), walkTo) &&
+                        walkTo({target.x, target.z}) && step() && atHearth() && town() && frame() &&
+                        state.millPreparation == MillPreparation::BearingNeeded &&
+                        state.shorePracticeStage == ShorePracticeStage::FindDryMark && capture("windows-combined-return.png"),
+                        "returning to the same tavern restores both town residents and retains the two eastern activities");
                 }
             }
             if (progressed && gBellwetherHearthRestValidation) {

@@ -974,23 +974,37 @@ public class MainActivity extends Activity {
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
-                final String specialist = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
-                        (BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/");
-                for (String asset : new String[] {
-                        "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
-                        specialist + "asset.manifest.json", specialist + "resident.glb",
-                        specialist + "base-color.android.ktx2", specialist + "normal.android.ktx2",
-                        specialist + "orm.android.ktx2"
-                }) {
-                    final String path = "private_bellwether/" + asset;
-                    if (!stageAsset(path, path))
-                        throw new IllegalStateException("Bellwether Debug could not stage " + asset);
-                }
-                if (BuildConfig.BELLWETHER_TEXTURED_TAVERN_KEEPER) {
-                    for (String map : new String[] {"base-color", "normal", "orm"}) {
-                        final String path = "private_bellwether/tavern-keeper/" + map + ".android.ktx2";
+                if (BuildConfig.BELLWETHER_COMBINED_RESIDENTS) {
+                    for (String resident : new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager"}) {
+                        final String prefix = "private_bellwether/" + resident + "/";
+                        for (String asset : new String[] {
+                                "asset.manifest.json", "resident.glb",
+                                "base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"
+                        }) {
+                            final String path = prefix + asset;
+                            if (!stageAsset(path, path))
+                                throw new IllegalStateException("Bellwether combined Debug could not stage " + path);
+                        }
+                    }
+                } else {
+                    final String specialist = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
+                            (BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/");
+                    for (String asset : new String[] {
+                            "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
+                            specialist + "asset.manifest.json", specialist + "resident.glb",
+                            specialist + "base-color.android.ktx2", specialist + "normal.android.ktx2",
+                            specialist + "orm.android.ktx2"
+                    }) {
+                        final String path = "private_bellwether/" + asset;
                         if (!stageAsset(path, path))
-                            throw new IllegalStateException("Bellwether Debug could not stage " + path);
+                            throw new IllegalStateException("Bellwether Debug could not stage " + asset);
+                    }
+                    if (BuildConfig.BELLWETHER_TEXTURED_TAVERN_KEEPER) {
+                        for (String map : new String[] {"base-color", "normal", "orm"}) {
+                            final String path = "private_bellwether/tavern-keeper/" + map + ".android.ktx2";
+                            if (!stageAsset(path, path))
+                                throw new IllegalStateException("Bellwether Debug could not stage " + path);
+                        }
                     }
                 }
             }
@@ -7329,7 +7343,8 @@ public class MainActivity extends Activity {
 
     private static boolean hasBellwetherRecordKeeper() {
         return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
-                !BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE;
+                (BuildConfig.BELLWETHER_COMBINED_RESIDENTS ||
+                (!BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE));
     }
 
     static int checkpointId(final String name) {
@@ -7419,9 +7434,9 @@ public class MainActivity extends Activity {
             case "bellwether-rig-leak-trial": return 343;
             case "bellwether-record-keeper-handoff":
                 return hasBellwetherRecordKeeper() ? 335 : -1;
-            case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 344 : -1;
-            case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? 345 : -1;
-            case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? 346 : -1;
+            case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 344 : -1;
+            case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 345 : -1;
+            case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 346 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7778,8 +7793,8 @@ public class MainActivity extends Activity {
             case 335:
                 return hasBellwetherRecordKeeper() ? new float[]{1.57079632679f, -0.07f} : null;
             case 344:
-            case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? new float[]{1.64f, -0.32f} : null;
-            case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? new float[]{-0.08f, -0.17f} : null;
+            case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{1.64f, -0.32f} : null;
+            case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-0.08f, -0.17f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};

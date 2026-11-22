@@ -68,8 +68,27 @@ def bellwetherArtificer = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/artificer').isDirectory()
 def bellwetherSalvager = bellwetherResidentDirectory &&
     new File(bellwetherResidentDirectory, 'private_bellwether/salvager').isDirectory()
+def bellwetherCombinedResidents = bellwetherResidentDirectory && texturedTavernKeeper &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/record-keeper').isDirectory() &&
+    bellwetherArtificer && bellwetherSalvager
 if (bellwetherResidentDirectory) {
-    def pinned = bellwetherSalvager ? [
+    def pinned = bellwetherCombinedResidents ? [
+        'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
+        'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
+        'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
+        'private_bellwether/record-keeper/normal.android.ktx2': '04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0',
+        'private_bellwether/record-keeper/orm.android.ktx2': 'f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb',
+        'private_bellwether/artificer/asset.manifest.json': '890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864',
+        'private_bellwether/artificer/resident.glb': '58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f',
+        'private_bellwether/artificer/base-color.android.ktx2': '68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8',
+        'private_bellwether/artificer/normal.android.ktx2': '9f930fbdf2eeea390ae84a74123902f7d12e1a62fb1bccf784ac17b4606ff543',
+        'private_bellwether/artificer/orm.android.ktx2': '9985942d945dcde16a2d5e83d40778e09f5999c8425c12ac7e1815b679e7baa0',
+        'private_bellwether/salvager/asset.manifest.json': '5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc',
+        'private_bellwether/salvager/resident.glb': '26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa',
+        'private_bellwether/salvager/base-color.android.ktx2': '3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152',
+        'private_bellwether/salvager/normal.android.ktx2': '11b996752ab9c93dcd33eace337a2db2b4fad6459c63998e472c813644281628',
+        'private_bellwether/salvager/orm.android.ktx2': '26f765f78fc751e6e37196f2c5ed7843c59e7931d17b313ff333d0d702e5f117'
+    ] : bellwetherSalvager ? [
         'private_bellwether/salvager/asset.manifest.json': '5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc',
         'private_bellwether/salvager/resident.glb': '26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa',
         'private_bellwether/salvager/base-color.android.ktx2': '3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152',
@@ -827,6 +846,7 @@ android {
         buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', 'false'
         buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
         buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', 'false'
         buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', 'false'
@@ -875,16 +895,20 @@ android {
             buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', bellwetherArtificer ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', bellwetherSalvager ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', bellwetherCombinedResidents ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
-                def rosterSuffix = bellwetherSalvager ? '.debug.bellwether.shore' :
-                    (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether')
+                def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
+                    (bellwetherSalvager ? '.debug.bellwether.shore' :
+                    (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'))
                 applicationIdSuffix rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
-                def rosterLabel = bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
-                    (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')
-                resValue 'string', 'app_name', bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' : rosterLabel
+                def rosterLabel = bellwetherCombinedResidents ? 'Horde RT Bellwether Combined Debug' :
+                    (bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' :
+                    (bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
+                    (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')))
+                resValue 'string', 'app_name', rosterLabel
             } else {
                 applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             }
@@ -902,6 +926,7 @@ android {
                         "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
                         "-DHORDE_RT_BELLWETHER_SALVAGER_CANDIDATE=${bellwetherSalvager ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_COMBINED_RESIDENTS=${bellwetherCombinedResidents ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),

@@ -91,8 +91,13 @@ bool PrepareCampaignResources(SwapchainContext& context)
     const auto root=context.reportDirectory+"/..";
     std::string diagnostic;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if(!horde::vulkan::raytracing::SetBellwetherCombinedResidentSources(
+            scene, AndroidBellwetherResidentRoot(context), diagnostic))return false;
+#else
     if(!horde::vulkan::raytracing::SetBellwetherResidentSources(
             scene, AndroidBellwetherResidentRoot(context), diagnostic, AndroidBellwetherSpecialist()))return false;
+#endif
 #endif
     auto skeletonPath=root+"/skeleton_biped_merged_animations_v01.glb";
     std::vector<horde::scene::SkinnedClipBinding> bindings;

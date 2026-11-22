@@ -21,6 +21,30 @@ bool AtRiverLeakTest(const dialogue::Context& c) {
 }
 } // namespace
 
+void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) {
+    if(!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return;
+    const auto& kit=chapterCompanion_.State();
+    if(kit.bellwetherArrival!=dialogue::BellwetherArrivalStage::Seated)return;
+    if((requireAuthoredTerrain || config_.bellwetherCombinedResidents) &&
+       (!config_.developmentRescueJourney || !config_.authoredChapterTerrain || !kit.grounded ||
+        !rescueTraversal_.Snapshot().exteriorSide || rescueTraversal_.IsActive()))return;
+    if(!recordKeeper_ && (config_.bellwetherCombinedResidents ? IsBellwetherResidentReady(traversal::kRecordKeeperResident) :
+            config_.bellwetherSpecialist==bellwether::Specialist::RecordKeeper)) {
+        if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherRecordKeeperMark))
+            recordKeeper_=dialogue::RecordKeeperPose{*foot};
+    }
+    if(!artificer_ && (config_.bellwetherCombinedResidents ? IsBellwetherResidentReady(traversal::kArtificerResident) :
+            config_.bellwetherSpecialist==bellwether::Specialist::Artificer)) {
+        if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherMillArtificerMark))
+            artificer_=bellwether::ArtificerPose{*foot};
+    }
+    if(!salvager_ && (config_.bellwetherCombinedResidents ? IsBellwetherResidentReady(traversal::kSalvagerResident) :
+            config_.bellwetherSpecialist==bellwether::Specialist::Salvager)) {
+        if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherSalvagerStand))
+            salvager_=bellwether::SalvagerPose{*foot};
+    }
+}
+
 void GameSimulation::InteractWithClaimedChapter() {
     if(TryRescueInteraction() || TryFlaskUpgradeInteraction())return;
     const auto context=ChapterInteractionContext(false);
@@ -29,7 +53,7 @@ void GameSimulation::InteractWithClaimedChapter() {
         tavernDoor_.destination=door==bellwether::DoorAction::Open?1.f:0.f;
         return;
     }
-    if(config_.bellwetherTavernKeeperAdmitted && chapterDialogue_.TryStartTavernConversation(context))return;
+    if(IsBellwetherTavernKeeperReady() && chapterDialogue_.TryStartTavernConversation(context))return;
     if(CanBuyLanternFitting(context)) {
         BuyLanternFitting(context);
         return;
@@ -85,7 +109,8 @@ void GameSimulation::InteractWithClaimedChapter() {
 
 bellwether::SalvagerAction GameSimulation::CurrentSalvagerAction(const dialogue::Context& c) const {
     using namespace bellwether;
-    if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX || !chapterDialogue_.CanStartSalvager(c))
+    if(!IsBellwetherResidentReady(traversal::kSalvagerResident) || !campaignBoundary_ ||
+       campaignBoundaryRevision_==UINT64_MAX || !chapterDialogue_.CanStartSalvager(c))
         return SalvagerAction::None;
     if(salvagerShorePracticeCompleted_)return SalvagerAction::RecallPractice;
     if(shorePracticeStage_==ShorePracticeStage::ReportBack)return SalvagerAction::ReportPractice;
@@ -159,13 +184,14 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
     if(!CanWorkAtMill(c) || millPreparation_==MillPreparation::RigTested || millDriveTurnSeconds_)
         return MillAction::None;
     if(millPreparation_==MillPreparation::GearingVerified) {
-        if(!artificer_)return MillAction::None;
+        if(!IsBellwetherResidentReady(traversal::kArtificerResident) || !artificer_)return MillAction::None;
         auto speaker=artificer_->foot;
         speaker[1]+=1.37f;
         return MillTargetInReach(c,speaker,2.5f)?MillAction::TakeRig:MillAction::None;
     }
     if(millPreparation_==MillPreparation::FitChecked || millPreparation_==MillPreparation::BearingSeated) {
-        if(!artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f))return MillAction::None;
+        if(!IsBellwetherResidentReady(traversal::kArtificerResident) || !artificer_ ||
+           !MillTargetInReach(c,traversal::kMillDriveWork,1.75f))return MillAction::None;
         return millPreparation_==MillPreparation::FitChecked?MillAction::SeatBearing:MillAction::TurnDrive;
     }
     if(millPreparation_==MillPreparation::RigTrialReady) {
@@ -188,7 +214,8 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
 void GameSimulation::AdvanceMillDriveTest(float seconds) {
     if(!millDriveTurnSeconds_)return;
     const auto c=ChapterInteractionContext(false);
-    if(!CanWorkAtMill(c) || !artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f)) {
+    if(!CanWorkAtMill(c) || !IsBellwetherResidentReady(traversal::kArtificerResident) ||
+       !artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f)) {
         millDriveTurnSeconds_.reset();
         return;
     }
@@ -223,7 +250,7 @@ void GameSimulation::AdvanceMillLeakTest(float seconds) {
 
 dialogue::RecordKeeperAction GameSimulation::RecordKeeperAction(const dialogue::Context& c) const {
     using Action=dialogue::RecordKeeperAction;
-    if(!chapterDialogue_.CanStartRecordKeeper(c))return Action::None;
+    if(!IsBellwetherResidentReady(traversal::kRecordKeeperResident) || !chapterDialogue_.CanStartRecordKeeper(c))return Action::None;
     if(waysideArchive_.registerInterpreted) {
         if(campaignBoundary_ && campaignBoundary_->waysideArchive==campaign::WaysideArchiveProgress::Restored &&
            !waysideArchive_.airWardLearned && campaignBoundaryRevision_!=UINT64_MAX)
@@ -382,9 +409,8 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
             c.tavernLanternSource=source;
     }
     const auto& keeper=tavernKeeper_.Pose();
-    if(keeper && c.exterior && chapterTerrain_ &&
-       chapterTerrainGeneration_==worldRoute_.generation && config_.bellwetherTavernKeeperAdmitted &&
-       config_.combatFoundation1_7 && !legacyCombatCheckpoint_) {
+    if(keeper && IsBellwetherTavernKeeperReady() && c.exterior && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation && config_.combatFoundation1_7 && !legacyCombatCheckpoint_) {
         c.tavernKeeperSource=Tuple{keeper->foot[0],keeper->foot[1]+kCompanionSpeechHeight,keeper->foot[2]};
         c.keeperAtHearth=keeper->stage==TavernKeeperStage::AtHearth;
         if(c.keeperAtHearth && !c.tavernInReach && playerSupport_.grounded &&
@@ -398,7 +424,8 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
                     height-.025f,height+.025f,.025f);
         }
     }
-    if(recordKeeper_ && c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+    if(recordKeeper_ && IsBellwetherResidentReady(traversal::kRecordKeeperResident) &&
+       c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation) {
         const auto& foot=recordKeeper_->foot;
         const Tuple source{foot[0],foot[1]+kCompanionSpeechHeight,foot[2]};
@@ -412,7 +439,8 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
                 (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance;
         }
     }
-    if(salvager_ && c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
+    if(salvager_ && IsBellwetherResidentReady(traversal::kSalvagerResident) &&
+       c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation) {
         auto mouth=salvager_->foot;
         mouth[1]+=kCompanionSpeechHeight;
@@ -442,24 +470,11 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
     using namespace horde::gameplay::dialogue;
     const auto* terrain=chapterTerrainGeneration_==worldRoute_.generation?chapterTerrain_.get():nullptr;
     const auto arrival=chapterCompanion_.State().bellwetherArrival;
-    if(config_.bellwetherTavernKeeperAdmitted && terrain && !input.paused &&
+    if(IsBellwetherTavernKeeperReady() && terrain && !input.paused &&
        rescueTraversal_.Snapshot().exteriorSide && !rescueTraversal_.IsActive() &&
        playerVitals_.Snapshot().phase==PlayerLifePhase::Alive && arrival!=BellwetherArrivalStage::AtLookout)
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
-    if(terrain && arrival==BellwetherArrivalStage::Seated) {
-        if(!recordKeeper_ && config_.bellwetherSpecialist==bellwether::Specialist::RecordKeeper) {
-            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherRecordKeeperMark))
-                recordKeeper_=RecordKeeperPose{*foot};
-        }
-        if(!artificer_ && config_.bellwetherSpecialist==bellwether::Specialist::Artificer) {
-            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherMillArtificerMark))
-                artificer_=bellwether::ArtificerPose{*foot};
-        }
-        if(!salvager_ && config_.bellwetherSpecialist==bellwether::Specialist::Salvager) {
-            if(const auto foot=PlaceBellwetherResident(*terrain,traversal::kBellwetherSalvagerStand))
-                salvager_=bellwether::SalvagerPose{*foot};
-        }
-    }
+    EnsureBellwetherResidentPoses();
     auto c=ChapterInteractionContext(input.paused);
     if(salvager_ && c.salvagerSource && !c.paused && c.alive && !c.traversing) {
         auto& pose=*salvager_;
