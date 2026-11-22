@@ -1530,6 +1530,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     const auto westBranch = kBellwetherWestApproach.front();
                     const auto rampToe = kBellwetherTavernRoute.begin() + kBellwetherSouthDoorStation;
                     const BellwetherStation coveredHandoff{rampToe->x, rampToe->z + 1.5f};
+                    const auto presentWell = [&] {
+                        const BellwetherStation view{horde::gameplay::bellwether::kBellwetherWellView[0],
+                            horde::gameplay::bellwether::kBellwetherWellView[1]};
+                        if (!walkTo(view)) return false;
+                        const float previousPitch = input.pitchRadians;
+                        input.pitchRadians = -.025f;
+                        // Keep the well clear of the held sword in the capture.
+                        const bool presented = face(horde::gameplay::bellwether::kBellwetherWellCentre[0] + .32f,
+                            horde::gameplay::bellwether::kBellwetherWellCentre[2]) &&
+                            capture("windows-combined-well.png");
+                        input.pitchRadians = previousPitch;
+                        return presented && walkTo(*square);
+                    };
                     const auto leaveTavern = [&] {
                         if (!std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(rampToe), walkTo) ||
                             !walkTo(coveredHandoff)) return false;
@@ -1562,7 +1575,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         ctx.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) == 1u &&
                         capture("windows-combined-west-trade.png") &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
-                        walkTo(*square) && fork() &&
+                        walkTo(*square) && fork() && presentWell() && fork() &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && atHearth() && town() &&
                         !state.relicDealerTradeAvailable && state.chapterDialogue.line != Line::RelicDealerOrdinarySale &&

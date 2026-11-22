@@ -1065,6 +1065,13 @@ Samfa12/Codex. It uses the same admitted timber and char material rows.
 The editable source and receipt are in
 `assets/models/world/source/bellwether-road-cache-v1/`.
 
+## Bellwether square well - 23 November 2026
+
+The covered T01 well is original Horde geometry authored in Blender by
+Samfa12/Codex. It reuses the admitted Bellwether stone, clay, timber and char
+materials. The editable source and receipt are in
+`assets/models/world/source/bellwether-well-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

@@ -232,6 +232,36 @@ int main(int argc,char** argv) {
         using namespace horde::gameplay::bellwether;
         {
             using namespace horde::gameplay::traversal;
+            constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
+            const auto centre=kBellwetherWellCentre;
+            const auto view=kBellwetherWellView;
+            const auto ground=support->Query(centre[0],centre[2]);
+            check(ground.found && ground.walkable && std::abs(ground.worldY-centre[1])<.03f &&
+                  !support->NonWalkableVolumeClear(centre[0]-1.5f,centre[2],centre[0]+1.5f,centre[2],
+                      ground.worldY+.05f,ground.worldY+1.8f,radius),
+                  "the covered well joins the opaque town collision and blocks a player sweep across its footprint");
+            const auto square=kBellwetherTavernRoute[kBellwetherWestJunction];
+            const auto follow=[&](BellwetherStation start, BellwetherStation target) {
+                auto point=start;
+                auto contact=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f);
+                const float length=std::hypot(target.x-point.x,target.z-point.z);
+                const int steps=std::max(1,static_cast<int>(std::ceil(length/.05f)));
+                for(int i=1;i<=steps && contact.grounded;++i) {
+                    const float t=static_cast<float>(i)/steps;
+                    const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
+                    const auto move=ResolveChapterStepMovement(*support,point.x,point.z,next.x,next.z,
+                        contact.worldY,radius);
+                    if(!move.accepted)return false;
+                    contact=move.support;
+                    point=next;
+                }
+                return contact.grounded;
+            };
+            check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
+                  "the validated south well view is reachable from the square and back along grounded collision support");
+        }
+        {
+            using namespace horde::gameplay::traversal;
             const auto& cache=kRoadSilverCacheReach;
             const auto& approach=kRoadSilverCacheApproach;
             const auto fork=kBellwetherTavernRoute[kBellwetherChurchJunction];

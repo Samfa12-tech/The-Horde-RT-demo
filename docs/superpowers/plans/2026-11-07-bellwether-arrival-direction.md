@@ -413,6 +413,12 @@ Collection and sale update the earned tavern checkpoint. The sale writes the sol
 
 Both Windows hardware RT backends passed the replay from the lookout save through collection, the quoted sale, repeat Interact, the hinge purchase, and the subsequent eastern visits. The replay reloaded the saved purse after each change. The combined Android ARM64 Debug package includes the pinned cache geometry and passed 16 focused host-side Android tests. Physical phone performance remains pending.
 
+### Covered well in the square
+
+The [T01 well](../../../assets/models/world/source/bellwether-well-v1/README.md) occupies the mapped centre of the square. The stone base is solid in the shared collision mesh. Posts support a clay roof over the planked opening and hanging bucket. The tested route approaches from the south and rejoins the square. Drawing water remains outside this checkpoint.
+
+The combined Windows Debug campaign captures the well from the walked route with both hardware RT backends. The private Android ARM64 Debug package contains the same pinned town mesh. Physical phone performance remains open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
