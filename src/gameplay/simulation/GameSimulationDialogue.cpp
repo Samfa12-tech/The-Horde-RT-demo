@@ -49,8 +49,7 @@ void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) 
         if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherSalvagerStand))
             salvager_=bellwether::SalvagerPose{*foot};
     }
-    if(!relicDealer_ && !config_.bellwetherCombinedResidents && IsBellwetherTavernKeeperReady() &&
-       config_.bellwetherSpecialist==bellwether::Specialist::RelicDealer) {
+    if(!relicDealer_ && IsBellwetherResidentReady(traversal::kRelicDealerResident)) {
         if(const auto foot=PlaceBellwetherResident(*chapterTerrain_,traversal::kBellwetherRelicDealerStand))
             relicDealer_=bellwether::RelicDealerPose{*foot};
     }
@@ -491,7 +490,7 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused) const {
     };
     if(salvager_ && IsBellwetherResidentReady(traversal::kSalvagerResident))
         observeShoreOrTradeResident(salvager_->foot,c.salvagerSource,c.salvagerInReach);
-    if(relicDealer_)
+    if(relicDealer_ && IsBellwetherResidentReady(traversal::kRelicDealerResident))
         observeShoreOrTradeResident(relicDealer_->foot,c.relicDealerSource,c.relicDealerInReach);
     const auto& mark=bellwether::kWaysideMechanism;
     if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && c.alive && c.claimed && c.exterior &&

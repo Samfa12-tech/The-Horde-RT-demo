@@ -26,7 +26,7 @@ public final class ChapterDebugCheckpointTest {
                 MainActivity.checkpointId("bellwether-resident-roundtrip-measurement"));
         final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !combined;
         final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !combined;
-        final boolean dealer = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE;
+        final boolean dealer = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE && !combined;
         final boolean church = BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
                 (combined || (!mill && !shore && !dealer));
         assertEquals(church ? 335 : -1, MainActivity.checkpointId("bellwether-record-keeper-handoff"));

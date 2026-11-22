@@ -667,7 +667,8 @@ horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
 
 constexpr auto AndroidBellwetherSpecialist() {
     using horde::gameplay::bellwether::Specialist;
-    if constexpr (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE) return Specialist::RelicDealer;
+    if constexpr (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS)
+        return Specialist::RelicDealer;
     if constexpr (HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) return Specialist::Salvager;
     return HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE ? Specialist::Artificer : Specialist::RecordKeeper;
 }
@@ -2600,7 +2601,7 @@ bool ApplyBenchmarkCheckpoint(
     const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
         || checkpoint.id == 329 || checkpoint.id == 335 ||
-        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && checkpoint.id == 348) || measureDoorway || measureResidentRoundtrip
+        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS && checkpoint.id == 348) || measureDoorway || measureResidentRoundtrip
 #endif
         );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
@@ -3788,7 +3789,7 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 #if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
     if (!horde::vulkan::raytracing::SetBellwetherCombinedResidentSources(context.rtScene,
             authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
-            diagnostic)) {
+            diagnostic, HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE)) {
 #else
     if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
             authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
@@ -5030,7 +5031,8 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 std::string residentDiagnostic;
                 if (!horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
                         context.rtScene, gGameSimulation, AndroidBellwetherResidentRoot(context),
-                        retireResourceReferences, &actorOwner, residentDiagnostic)) {
+                        retireResourceReferences, &actorOwner, residentDiagnostic,
+                        HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE)) {
                     __android_log_print(ANDROID_LOG_ERROR, kTag,
                         "Bellwether combined residents: %s", residentDiagnostic.c_str());
                     if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);

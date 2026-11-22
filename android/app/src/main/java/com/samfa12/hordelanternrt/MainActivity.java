@@ -975,7 +975,10 @@ public class MainActivity extends Activity {
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
             if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
                 if (BuildConfig.BELLWETHER_COMBINED_RESIDENTS) {
-                    for (String resident : new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager"}) {
+                    final String[] residents = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE
+                            ? new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager", "relic-dealer"}
+                            : new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager"};
+                    for (String resident : residents) {
                         final String prefix = "private_bellwether/" + resident + "/";
                         for (String asset : new String[] {
                                 "asset.manifest.json", "resident.glb",
@@ -7442,7 +7445,8 @@ public class MainActivity extends Activity {
             case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 344 : -1;
             case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 345 : -1;
             case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 346 : -1;
-            case "bellwether-relic-dealer": return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? 348 : -1;
+            case "bellwether-relic-dealer": return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE &&
+                    !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 348 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7804,7 +7808,8 @@ public class MainActivity extends Activity {
             case 344:
             case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{1.64f, -0.32f} : null;
             case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-0.08f, -0.17f} : null;
-            case 348: return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? new float[]{-1.57079632679f, -0.14f} : null;
+            case 348: return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE &&
+                    !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-1.57079632679f, -0.14f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};

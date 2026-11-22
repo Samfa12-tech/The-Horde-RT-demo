@@ -3555,8 +3555,15 @@ bool PresentableTinyRtScene::PrefetchChapterResidentActor(std::uint32_t activeId
     auto& prefetch = chapterResidents_[current - chapterResidentSources_.begin()].prefetch;
     if (prefetch.import.valid())
     {
-        diagnostic = "Resident prefetch already owns this lane.";
-        return false;
+        if (prefetch.source.stableId == replacement.stableId ||
+            prefetch.import.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+        {
+            diagnostic.clear();
+            return true;
+        }
+        // An obsolete import may be discarded only after the worker is done.
+        // Keep the resident and GPU resources published throughout retargeting.
+        prefetch = {};
     }
     try
     {

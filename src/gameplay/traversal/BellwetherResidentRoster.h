@@ -9,8 +9,9 @@ inline constexpr ResidentMask kTavernKeeperResident=1u;
 inline constexpr ResidentMask kRecordKeeperResident=2u;
 inline constexpr ResidentMask kArtificerResident=4u;
 inline constexpr ResidentMask kSalvagerResident=8u;
+inline constexpr ResidentMask kRelicDealerResident=16u;
 inline constexpr ResidentMask kTownResidentMask=kTavernKeeperResident|kRecordKeeperResident;
 inline constexpr ResidentMask kEastResidentMask=kArtificerResident|kSalvagerResident;
-inline constexpr ResidentMask kAllResidentMask=kTownResidentMask|kEastResidentMask;
+inline constexpr ResidentMask kAllResidentMask=kTownResidentMask|kEastResidentMask|kRelicDealerResident;
 
 } // namespace horde::gameplay::traversal

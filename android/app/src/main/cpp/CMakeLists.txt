@@ -10,7 +10,7 @@ option(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE "Private Bellwether resident fixtu
 option(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE "Use the mill specialist in the private resident roster" OFF)
 option(HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE "Use the shore specialist in the private resident roster" OFF)
 option(HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE "Use the relic dealer in the private resident roster" OFF)
-option(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS "Use all four pinned Bellwether residents in the private Debug roster" OFF)
+option(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS "Use the four or optional five pinned Bellwether residents in the private Debug roster" OFF)
 if(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS AND NOT HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE)
     message(FATAL_ERROR "Combined Bellwether residents require the private Debug resident roster.")
 endif()
@@ -18,7 +18,8 @@ if((HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR HORDE_RT_BELLWETHER_SALVAGER_CAND
     message(FATAL_ERROR "A Bellwether specialist requires the private Debug resident roster.")
 endif()
 if(HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE AND
-   (HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE OR HORDE_RT_BELLWETHER_COMBINED_RESIDENTS))
+   (HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) AND
+   NOT HORDE_RT_BELLWETHER_COMBINED_RESIDENTS)
     message(FATAL_ERROR "The dealer fixture requires its own private resident roster.")
 endif()
 if(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE AND HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE AND NOT HORDE_RT_BELLWETHER_COMBINED_RESIDENTS)

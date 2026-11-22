@@ -223,6 +223,7 @@ bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
+bool gBellwetherCombinedRelicDealer = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherExpeditionValidation = false;
@@ -233,7 +234,8 @@ bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::Presentable
     const std::filesystem::path& root, std::string& diagnostic)
 {
     using namespace horde::vulkan::raytracing;
-    return gBellwetherCombinedCampaignActors ? SetBellwetherCombinedResidentSources(scene, root, diagnostic) :
+    return gBellwetherCombinedCampaignActors ?
+        SetBellwetherCombinedResidentSources(scene, root, diagnostic, gBellwetherCombinedRelicDealer) :
         SetBellwetherResidentSources(scene, root, diagnostic, gBellwetherCampaignSpecialist);
 }
 #endif
@@ -1792,9 +1794,10 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
     if (error) return false;
     const int specialistCount = static_cast<int>(mill) + static_cast<int>(church) +
         static_cast<int>(shore) + static_cast<int>(west);
-    const bool combined = mill && church && shore && !west;
+    const bool combined = mill && church && shore;
     if (combined) {
-        if (!textured || !matches(recordKeeper) || !matches(artificer) || !matches(salvager)) return false;
+        if (!textured || !matches(recordKeeper) || !matches(artificer) || !matches(salvager) ||
+            (west && !matches(relicDealer))) return false;
     } else if (specialistCount != 1 ||
                (west ? !matches(relicDealer) : shore ? !matches(salvager) :
                     mill ? !matches(artificer) : !matches(recordKeeper))) {
@@ -1802,6 +1805,7 @@ bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
     }
     gBellwetherCampaignActors = root;
     gBellwetherCombinedCampaignActors = combined;
+    gBellwetherCombinedRelicDealer = combined && west;
     using horde::gameplay::bellwether::Specialist;
     gBellwetherCampaignSpecialist = combined ? Specialist::RecordKeeper : west ? Specialist::RelicDealer :
         shore ? Specialist::Salvager : mill ? Specialist::Artificer : Specialist::RecordKeeper;
@@ -7983,7 +7987,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             ctx.simulation.Snapshot().developmentRescueJourney &&
             !horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
                 ctx.rtScene, ctx.simulation, gBellwetherCampaignActors,
-                retireResourceReferences, &actorOwner, diagnostic)) {
+                retireResourceReferences, &actorOwner, diagnostic, gBellwetherCombinedRelicDealer)) {
             ctx.lastRtFrameError = diagnostic;
             if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
             return false;

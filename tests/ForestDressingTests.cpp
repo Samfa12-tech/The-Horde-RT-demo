@@ -2175,7 +2175,7 @@ void TestBellwetherResidentRosters(
     const auto stagedRoster=static_cast<ResidentMask>(kTavernKeeperResident|kArtificerResident);
     Check(combined.PublishBellwetherResidents(stagedRoster),"two admitted residents can be published together");
     Check(!combined.PublishBellwetherResidents(static_cast<ResidentMask>(stagedRoster|kRecordKeeperResident)) &&
-          !combined.PublishBellwetherResidents(0x10u),
+          !combined.PublishBellwetherResidents(0x20u),
           "third and unknown resident bits are rejected");
     Check(combined.PublishBellwetherResidents(stagedRoster),"resident publication is idempotent");
     const bool staged=millView && gameplay::StageDevelopmentCheckpointSimulation(combined,*millView);
@@ -2189,9 +2189,16 @@ void TestBellwetherResidentRosters(
           "east admission immediately publishes both resident poses without stepping or saving");
     const auto artificerFoot=combined.Snapshot().artificer->foot;
     const auto salvagerFoot=combined.Snapshot().salvager->foot;
-    Check(combined.PublishBellwetherResidents(kTownResidentMask) && !combined.Snapshot().artificer &&
+    const auto westRoster=static_cast<ResidentMask>(kTavernKeeperResident|kRelicDealerResident);
+    Check(combined.PublishBellwetherResidents(westRoster) &&
+          combined.Snapshot().tickIndex==tickBefore && combined.Snapshot().relicDealer &&
+          combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper &&
+          !combined.Snapshot().artificer && !combined.Snapshot().salvager,
+          "the west pair uses the same two admissions and retains the tavern keeper");
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) && !combined.Snapshot().relicDealer &&
+          !combined.Snapshot().relicDealerTradeAvailable && !combined.Snapshot().artificer &&
           !combined.Snapshot().salvager && combined.Snapshot().tavernKeeper,
-          "town admission evicts east actors from the immutable snapshot");
+          "town admission evicts the west actor and its interaction from the immutable snapshot");
     Check(combined.PublishBellwetherResidents(kEastResidentMask) && combined.Snapshot().artificer &&
           combined.Snapshot().salvager && combined.Snapshot().artificer->foot==artificerFoot &&
           combined.Snapshot().salvager->foot==salvagerFoot,

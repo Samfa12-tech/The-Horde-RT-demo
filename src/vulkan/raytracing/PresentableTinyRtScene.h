@@ -502,6 +502,8 @@ public:
     // Import the model and prepare atlas payloads off the frame thread. The job
     // owns only CPU data. The live lane changes after publication proves completion.
     [[nodiscard]] std::uint32_t PrefetchedChapterResidentId(std::size_t lane) const noexcept;
+    // A running import retains its lane. Poll its source ID before publication
+    // and retry with the new target after an obsolete import has completed.
     bool PrefetchChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
         std::string& diagnostic);
     enum class ResidentPublication { Pending, Published, Failed };

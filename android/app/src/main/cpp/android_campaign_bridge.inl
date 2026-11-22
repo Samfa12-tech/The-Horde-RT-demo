@@ -93,7 +93,8 @@ bool PrepareCampaignResources(SwapchainContext& context)
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
 #if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
     if(!horde::vulkan::raytracing::SetBellwetherCombinedResidentSources(
-            scene, AndroidBellwetherResidentRoot(context), diagnostic))return false;
+            scene, AndroidBellwetherResidentRoot(context), diagnostic,
+            HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE))return false;
 #else
     if(!horde::vulkan::raytracing::SetBellwetherResidentSources(
             scene, AndroidBellwetherResidentRoot(context), diagnostic, AndroidBellwetherSpecialist()))return false;

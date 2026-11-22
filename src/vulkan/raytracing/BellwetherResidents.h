@@ -68,6 +68,7 @@ inline constexpr std::array kResidentRoster{
     BellwetherResident{gameplay::dialogue::kRecordKeeperActorId, gameplay::traversal::kRecordKeeperResident, "record-keeper"},
     BellwetherResident{gameplay::bellwether::kArtificerActorId, gameplay::traversal::kArtificerResident, "artificer"},
     BellwetherResident{gameplay::bellwether::kSalvagerActorId, gameplay::traversal::kSalvagerResident, "salvager"},
+    BellwetherResident{gameplay::bellwether::kRelicDealerActorId, gameplay::traversal::kRelicDealerResident, "relic-dealer"},
 };
 
 inline ChapterResidentActorSource ResidentSource(const std::filesystem::path& root, const BellwetherResident& resident)
@@ -88,11 +89,12 @@ inline gameplay::traversal::ResidentMask ResidentMaskFor(std::span<const std::ui
 }
 
 inline bool SetBellwetherCombinedResidentSources(PresentableTinyRtScene& scene,
-    const std::filesystem::path& root, std::string& diagnostic)
+    const std::filesystem::path& root, std::string& diagnostic, bool hasRelicDealer = false)
 {
     if (root.empty()) return SetBellwetherResidentSources(scene, root, diagnostic);
     RtResidentPayloadCapacity capacity{};
     for (const auto& resident : detail::kResidentRoster) {
+        if (!hasRelicDealer && resident.readyBit == gameplay::traversal::kRelicDealerResident) continue;
         horde::scene::assets::AssetManifest manifest;
         if (!horde::scene::assets::AssetManifest::Load(root / resident.directory / "asset.manifest.json", manifest, diagnostic))
             return false;
@@ -107,38 +109,49 @@ inline bool SetBellwetherCombinedResidentSources(PresentableTinyRtScene& scene,
     return true;
 }
 
-// The combined Debug route provisions both eastern residents before reaching
-// their service marks. The south approach keeps the tavern's door resident.
-// The margins stop a turn at the lane boundary from repeatedly loading assets.
+// The south and west approaches keep the tavern's door resident. The margins
+// stop a turn at the lane boundary from repeatedly loading assets.
 inline bool AdvanceBellwetherCombinedResidents(PresentableTinyRtScene& scene,
     gameplay::simulation::GameSimulation& simulation, const std::filesystem::path& root,
-    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic,
+    bool hasRelicDealer = false)
 {
     using gameplay::dialogue::BellwetherArrivalStage;
     const auto& snapshot = simulation.Snapshot();
     auto active = scene.ChapterResidentSourceIds();
-    const auto& roster = detail::kResidentRoster;
+    const auto& [keeper, records, artificer, salvager, dealer] = detail::kResidentRoster;
     const bool atTown = snapshot.rescue.exteriorSide && !snapshot.rescue.equipmentStowed &&
         snapshot.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated;
-    const bool east = atTown && snapshot.playerX >= (active[0] == roster[2].actor ? 92.f : 94.f) &&
-        snapshot.playerZ >= (active[0] == roster[2].actor ? 106.f : 108.f);
+    const bool east = atTown && snapshot.playerX >= (active[0] == artificer.actor ? 92.f : 94.f) &&
+        snapshot.playerZ >= (active[0] == artificer.actor ? 106.f : 108.f);
     const bool south = atTown && snapshot.playerX >= 74.f &&
-        snapshot.playerZ >= (active[1] == roster[3].actor ? 118.5f : 120.f);
-    const std::array desired{east ? roster[2] : roster[0], (east || south) ? roster[3] : roster[1]};
+        snapshot.playerZ >= (active[1] == salvager.actor ? 118.5f : 120.f);
+    const bool hasDealerInLane = active[1] == dealer.actor;
+    // From the south ramp, the dealer must be ready before the player turns
+    // west at the square. Keep that lane on a turn back up the ramp or east.
+    const bool west = hasRelicDealer && atTown && snapshot.playerX <= (hasDealerInLane ? 87.f : 84.f) &&
+        snapshot.playerZ >= (hasDealerInLane ? 116.5f : 119.f);
+    const bool eastReturnLead = active[1] == salvager.actor && snapshot.playerX <= 100.f && snapshot.playerZ >= 120.f;
+    const bool westLead = hasRelicDealer && atTown &&
+        ((snapshot.playerX <= 87.f && snapshot.playerZ >= 110.f) || eastReturnLead);
+    const bool rampReturnLead = snapshot.playerX >= 79.f && snapshot.playerX <= 84.f && snapshot.playerZ < 124.f;
+    const std::array desired{east ? artificer : keeper, west ? dealer : (east || south) ? salvager : records};
     const bool approachingHandoff = atTown && snapshot.playerX >= 68.f && snapshot.playerZ >= 100.f;
     using Publication = PresentableTinyRtScene::ResidentPublication;
     bool failed = false;
     for (std::size_t lane = 0; lane < desired.size(); ++lane) {
         const bool switching = active[lane] != desired[lane].actor;
-        if (!approachingHandoff && !switching) continue;
-        // Each lane owns one alternate model and keeps it through a reversal.
-        const auto& alternate = roster[active[lane] == roster[lane].actor ? lane + desired.size() : lane];
+        if (!approachingHandoff && !switching && !(lane == 1 && (westLead || hasDealerInLane))) continue;
+        const auto& leadIn = lane == 0 ? (active[0] == keeper.actor ? artificer : keeper) :
+            hasDealerInLane ? (rampReturnLead ? records : salvager) :
+            westLead ? dealer : (active[1] == records.actor ? salvager : records);
+        const auto& alternate = switching ? desired[lane] : leadIn;
         if (scene.PrefetchedChapterResidentId(lane) != alternate.actor &&
             !scene.PrefetchChapterResidentActor(active[lane], detail::ResidentSource(root, alternate), diagnostic)) {
             failed = true;
             break;
         }
-        if (!switching) continue;
+        if (!switching || scene.PrefetchedChapterResidentId(lane) != desired[lane].actor) continue;
         const auto status = scene.PublishPrefetchedChapterResidentActor(active[lane], desired[lane].actor,
             retireReferences, user, diagnostic);
         if (status == Publication::Failed) {

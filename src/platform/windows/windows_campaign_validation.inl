@@ -1200,7 +1200,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
     };
     const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(
         gBellwetherPreparationsValidation ? 325 : gBellwetherExpeditionValidation ? 205 :
-        gBellwetherCombinedCampaignActors ? 150 :
+        gBellwetherCombinedRelicDealer ? 205 : gBellwetherCombinedCampaignActors ? 150 :
         gBellwetherHearthRestValidation ? 85 : 65);
     const auto until = [&](auto done, bool render) {
         while (std::chrono::steady_clock::now() < deadline && hidden()) {
@@ -1248,7 +1248,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             input.paused = false;
             input.moveForward = input.moveStrafe = 0;
             input.pitchRadians = -.15f;
-            unsigned ticks = 0, exchangeLines = 0;
+            unsigned ticks = 0, exchangeLines = 0, presentationInterval = 60;
             const auto step = [&] {
                 if (std::chrono::steady_clock::now() >= deadline || !hidden() || ctx.simulationPaused ||
                     ctx.campaignRetirementUnproved || ctx.campaignPhase == CampaignMenu::Phase::Failed)
@@ -1260,7 +1260,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     state.chapterDialogue.line == kTavernConversation[exchangeLines])
                     ++exchangeLines;
                 PumpCampaign(ctx);
-                return state.playerAlive && (++ticks % 60 != 0 || frame());
+                return state.playerAlive && (++ticks % presentationInterval != 0 || frame());
             };
             const auto walkTo = [&](BellwetherStation target) {
                 input.runHeld = true;
@@ -1426,20 +1426,32 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const auto junction = kBellwetherTavernRoute.begin() + kBellwetherMillJunction;
                 const auto sceneEpoch = ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
                 const auto geometryGeneration = ctx.rtScene.StaticGeometryGeneration();
+                const auto checkRoster = [&](bool posesReady, const std::array<std::uint32_t, 2>& expected) {
+                    const auto active = ctx.rtScene.ChapterResidentSourceIds();
+                    if (posesReady && active == expected) return true;
+                    std::cerr << "Combined actors at " << state.playerX << ',' << state.playerZ
+                              << " ready=" << posesReady << " active=" << active[0] << ',' << active[1]
+                              << " expected=" << expected[0] << ',' << expected[1]
+                              << " pending=" << ctx.rtScene.PrefetchedChapterResidentId(0) << ','
+                              << ctx.rtScene.PrefetchedChapterResidentId(1) << '\n';
+                    return false;
+                };
                 const auto town = [&] {
-                    return state.tavernKeeper && state.recordKeeper && !state.artificer && !state.salvager &&
-                        ctx.rtScene.ChapterResidentSourceIds() ==
-                            std::array{kTavernKeeperActorId, kRecordKeeperActorId};
+                    return checkRoster(state.tavernKeeper && state.recordKeeper &&
+                        !state.artificer && !state.salvager && !state.relicDealer,
+                        {kTavernKeeperActorId, kRecordKeeperActorId});
                 };
                 const auto east = [&] {
-                    return state.artificer && state.salvager && !state.tavernKeeper && !state.recordKeeper &&
-                        ctx.rtScene.ChapterResidentSourceIds() ==
-                            std::array{kArtificerActorId, kSalvagerActorId};
+                    return checkRoster(state.artificer && state.salvager &&
+                        !state.tavernKeeper && !state.recordKeeper && !state.relicDealer,
+                        {kArtificerActorId, kSalvagerActorId});
                 };
                 const auto fork = [&] {
-                    return state.tavernKeeper && state.salvager && !state.recordKeeper && !state.artificer &&
-                        ctx.rtScene.ChapterResidentSourceIds() ==
-                            std::array{kTavernKeeperActorId, kSalvagerActorId};
+                    return checkRoster(state.tavernKeeper && !state.recordKeeper && !state.artificer &&
+                        (gBellwetherCombinedRelicDealer ? state.relicDealer && !state.salvager :
+                            state.salvager && !state.relicDealer),
+                        {kTavernKeeperActorId,
+                            gBellwetherCombinedRelicDealer ? kRelicDealerActorId : kSalvagerActorId});
                 };
                 const auto capture = [&](const char* name) {
                     if (!CompleteRtEvidenceAfterDeviceIdle(ctx, vkDeviceWaitIdle(ctx.device))) return false;
@@ -1503,7 +1515,43 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const auto useMill = [&](MillAction action, const std::array<float, 3>& mark) {
                     return face(mark[0], mark[2]) && state.millAction == action && interact();
                 };
-                progressed = check(town() &&
+                if (gBellwetherCombinedRelicDealer) {
+                    // Keep the renderer serviced throughout the shortened test
+                    // clock so that worker imports see more than the waypoints.
+                    presentationInterval = 10;
+                    const auto square = kBellwetherTavernRoute.begin() + kBellwetherWestJunction;
+                    const auto westBranch = kBellwetherWestApproach.front();
+                    const auto rampToe = kBellwetherTavernRoute.begin() + kBellwetherSouthDoorStation;
+                    const BellwetherStation coveredHandoff{rampToe->x, rampToe->z + 1.5f};
+                    const auto leaveTavern = [&] {
+                        if (!std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(rampToe), walkTo) ||
+                            !walkTo(coveredHandoff)) return false;
+                        const auto handoffDeadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(300);
+                        while (!state.relicDealer && std::chrono::steady_clock::now() < handoffDeadline)
+                            if (!frame()) return false;
+                        return fork() &&
+                            std::all_of(std::make_reverse_iterator(rampToe), std::make_reverse_iterator(square), walkTo);
+                    };
+                    const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                    const auto purse = state.treasurePurse;
+                    progressed = check(town() && leaveTavern() &&
+                        fork() && walkTo(westBranch) && fork() && walkTo(*square) &&
+                        std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
+                        walkTo({target.x, target.z}) && atHearth() && town() &&
+                        leaveTavern() && fork() &&
+                        walkTo(westBranch) && fork() && walkTo(kBellwetherRelicDealerApproach) &&
+                        face(kBellwetherRelicDealerStand.x, kBellwetherRelicDealerStand.z) &&
+                        state.relicDealerTradeAvailable && interact() &&
+                        state.chapterDialogue.line == Line::RelicDealerOrdinarySale && frame() && fork() &&
+                        ctx.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) == 1u &&
+                        capture("windows-combined-west-trade.png") && walkTo(westBranch) && walkTo(*square) && fork() &&
+                        std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
+                        walkTo({target.x, target.z}) && atHearth() && town() &&
+                        !state.relicDealerTradeAvailable && state.chapterDialogue.line != Line::RelicDealerOrdinarySale &&
+                        ctx.simulation.CampaignBoundaryRevision() == boundary && state.treasurePurse == purse,
+                        "the west lane survives reversal, presents dealer trade and restores the same tavern visit");
+                }
+                if (progressed) progressed = check(town() &&
                     std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(junction), walkTo) &&
                     fork() && walkTo(kBellwetherMillApproach[1]) && east() &&
                     state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated,

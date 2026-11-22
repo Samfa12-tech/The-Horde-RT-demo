@@ -108,6 +108,13 @@ For the hinged-door build, the analysis must report `openDoorWitness: true`.
 
 #### Combined resident round trip
 
+The combined Debug campaign also accepts the five pinned files under
+`private_bellwether/relic-dealer/` alongside the four existing residents.
+It uses the same `.debug.bellwether.combined` package ID and campaign saves.
+After the tavern conversation, walk south to the square and turn west for
+**Ask about trade**. The separate `.debug.bellwether.dealer` package keeps
+the focused `bellwether-relic-dealer` checkpoint.
+
 The `.debug.bellwether.combined` package also accepts
 `bellwether-resident-roundtrip-measurement`. It starts from the same completed
 tavern visit, walks through the south door to the salvager's talk mark, and
