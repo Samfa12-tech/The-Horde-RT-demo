@@ -140,6 +140,8 @@ The [west service-yard checkpoint](superpowers/plans/2026-11-07-bellwether-arriv
 
 The [active graveyard](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#active-graveyard-east-of-the-church) connects the existing church frontage to the mapped T03 grave rows. A stone path follows the hillside through the south entrance. The church service stays outside and the wayside route remains accessible.
 
+The [southeast smith yard](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#southeast-smith-yard) gives the mapped B06 frontage a covered forge and work surface beneath the existing building. Its approach branches off the square and keeps the west door accessible. The artificer's current service stays at the mill.
+
 The [arrival plan](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#18-route-and-tavern-checkpoint) records the textured and rigged tavern keeper candidate. Private Debug builds can use her standing pose and retimed walk with the existing door and hearth marks. Both Windows hardware RT backends presented her at the hearth. Phone validation and distribution clearance remain open.
 
 Bounded light RPG direction means ordinary treasure currency, scarce named components, gear/training/upgrades and access preparation through mixable **Magic, Tech and Constitution**. Preserve viable mixed builds, independently sufficient access alternatives, recoverable named-relic sell/return choices and meaningful hub consequences. Exact service menus, prices, XP/skill-point/respec rules, crafting, component quests and rewards remain unresolved or proposed. No automatic general inventory grid, simulated economy, universal quest engine or extra currencies.

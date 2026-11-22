@@ -1553,6 +1553,35 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = previousPitch;
                         return presented && walkTo(*square);
                     };
+                    const auto presentSmith = [&] {
+                        const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };
+                        const auto walkSmith = [&](const auto& point) { return walkTo(station(point)); };
+                        const auto& approach = kBellwetherSmithApproachXZ;
+                        const auto& door = kBellwetherSmithDoorApproachXZ;
+                        const auto viewEnd = std::prev(approach.end(), 2);
+                        if (!std::all_of(approach.begin(), viewEnd, walkSmith))
+                            return false;
+                        const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        const float previousPitch = input.pitchRadians;
+                        input.pitchRadians = -.08f;
+                        const auto& anvil = kBellwetherSmithAnvilXZ;
+                        const auto wick = horde::gameplay::effects::kBellwetherSmithLampEmitterId;
+                        const auto wickPresented = [&] {
+                            const auto& ids = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                            return state.fireEmitterCount == 4 && state.fireEmitters[3].stableId == wick &&
+                                ctx.rtScene.HasUploadedFireEmitters() && std::find(ids.begin(), ids.end(), wick) != ids.end();
+                        };
+                        const bool presented = face(anvil[0], anvil[1]) && wickPresented() &&
+                            capture("windows-combined-smith-approach.png", false) &&
+                            std::all_of(viewEnd, approach.end(), walkSmith) && face(97.15f, 151.31f) &&
+                            wickPresented() && capture("windows-combined-smith-yard.png", false);
+                        input.pitchRadians = previousPitch;
+                        return presented &&
+                            std::all_of(door.begin(), door.end(), walkSmith) &&
+                            walkSmith(door.front()) && walkSmith(approach.back()) &&
+                            std::all_of(std::next(approach.rbegin()), approach.rend(), walkSmith) &&
+                            walkTo(*square) && ctx.simulation.CampaignBoundaryRevision() == boundary;
+                    };
                     const auto presentGarden = [&] {
                         const auto& approach = kBellwetherGardenApproach;
                         if (!walkTo(kBellwetherWestApproach[1]) || !std::all_of(approach.begin(), approach.end(), walkTo) ||
@@ -1626,6 +1655,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
+                        check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
                         walkTo({target.x, target.z}) && atHearth() && town() &&

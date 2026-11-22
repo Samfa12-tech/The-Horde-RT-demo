@@ -1,4 +1,5 @@
 #include "scene/BellwetherShell.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
@@ -293,6 +294,35 @@ int main(int argc,char** argv) {
                           rag[1]+.07f,rag[1]+.11f,.025f),
                       "a grounded visitor can reach the cloth above both the basket and the door shelf");
             }
+            const auto smithStation=[](const auto& point) { return BellwetherStation{point[0],point[1]}; };
+            const auto& smith=kBellwetherSmithApproachXZ;
+            bool smithRoundTrip=follow(square,smithStation(smith.front())) &&
+                follow(smithStation(smith.front()),square);
+            for(std::size_t i=1;i<smith.size();++i) {
+                const auto before=smithStation(smith[i-1]), after=smithStation(smith[i]);
+                smithRoundTrip=smithRoundTrip && follow(before,after) && follow(after,before);
+            }
+            const auto covered=smithStation(smith.back());
+            const auto& door=kBellwetherSmithDoorApproachXZ;
+            const auto turn=smithStation(door.front()), step=smithStation(door.back());
+            check(smithRoundTrip && follow(covered,turn) && follow(turn,step) &&
+                  follow(step,turn) && follow(turn,covered),
+                  "the square, open smith yard and west door approach stay connected over grounded support");
+            const auto roadNorth=BellwetherMapStation(9.f,-18.f), roadSouth=BellwetherMapStation(18.f,-37.f);
+            check(follow(roadNorth,roadSouth) && follow(roadSouth,roadNorth),
+                  "the mapped southeast road remains walkable past the smith yard in both directions");
+            using horde::gameplay::effects::SelectBellwetherExteriorLamp;
+            const auto& wick=kBellwetherSmithLampLight;
+            check(SelectBellwetherExteriorLamp(wick[0],wick[2])==4 &&
+                  SelectBellwetherExteriorLamp(square.x,square.z)==2 &&
+                  SelectBellwetherExteriorLamp(kRelicStallLampLight[0],kRelicStallLampLight[2])==3,
+                  "the smith wick shares the exterior light slot with the preserved square and west-lane choices");
+            const auto anvil=smithStation(kBellwetherSmithAnvilXZ);
+            const auto floor=support->Query(anvil.x,anvil.z);
+            check(floor.found && floor.walkable &&
+                  !support->NonWalkableVolumeClear(anvil.x-1.f,anvil.z,anvil.x+1.f,anvil.z,
+                      floor.worldY+.08f,floor.worldY+1.8f,radius),
+                  "the anvil and its stump are solid above the walkable hardstand");
             const auto& graveyard=kBellwetherGraveyardApproach;
             const auto church=kBellwetherChurchApproach.back();
             bool graveyardRoundTrip=follow(church,graveyard.front()) && follow(graveyard.front(),church);

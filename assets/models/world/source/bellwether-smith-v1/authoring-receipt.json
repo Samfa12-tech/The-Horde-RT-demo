@@ -1,0 +1,79 @@
+{
+  "feature": "B06 exterior smith work yard",
+  "doorXZ": [
+    98.3,
+    155.2
+  ],
+  "approachXZ": [
+    [
+      82.3,
+      131.7
+    ],
+    [
+      86.8,
+      138.5
+    ],
+    [
+      89.7,
+      145.0
+    ],
+    [
+      91.15,
+      150.0
+    ],
+    [
+      93.15,
+      151.64
+    ],
+    [
+      94.72,
+      152.03
+    ]
+  ],
+  "doorApproachXZ": [
+    [
+      94.66,
+      154.05
+    ],
+    [
+      96.65,
+      155.2
+    ]
+  ],
+  "anvilXZ": [
+    95.62,
+    151.23
+  ],
+  "hardstandBoundsXZ": [
+    92.97,
+    98.27,
+    148.95,
+    153.88
+  ],
+  "lampFlame": [
+    94.02,
+    -11.232486267089843,
+    152.96
+  ],
+  "lampLight": [
+    94.065,
+    -11.082486267089843,
+    152.995
+  ],
+  "originalTownSha256": "60d21c865290ce170a5e812d6944b3c35d50ba9a57463668ae9b606f73f6e10e",
+  "originalManifestSha256": "a6b1d42b9df9edc5d8ed1018a54b10a9bfba2146918cabb308bad5dcd988b774",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "d08a45df8a6ab34792a6918833074f05bfd94d82ea1a4dd84bad4fcb00fbb72a",
+  "addedSolidTriangles": 2464,
+  "addedGroundTriangles": 420,
+  "townVertices": 48468,
+  "townTriangles": 21828,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "adda9b2548176933e7dfaa7d84963bc6801f17822f84b5bc04a472ffbb6d5192",
+  "files": {
+    "bellwether-smith.blend": "cefe700e1a3a9264ce3666ca346181f4566ebaa0bf30a977673d1dbe40128960",
+    "bellwether-tavern-v1.glb": "d08a45df8a6ab34792a6918833074f05bfd94d82ea1a4dd84bad4fcb00fbb72a",
+    "asset.manifest.json": "ecf146fb931d5826906c8c14ff5a62500d1b40976f45e1ae4c439da2af9bd7a0",
+    "geometry.generated.h": "1dbb727941a1e05ccfa981caa46ab0d875568506e9f0d73d8e55b6a6208baceb"
+  }
+}

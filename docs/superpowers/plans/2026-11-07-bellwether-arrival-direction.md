@@ -445,6 +445,14 @@ The combined native forest and town admit 152,228 collision triangles and retain
 
 Each Windows hardware RT backend passed all 20 checks in the private campaign replay. The player walked from the church to the grave rows and back to the fork without creating a save, then continued through the silver, rag and eastern routes. The private ARM64 Debug package contains the same pinned town GLB. Physical phone play and performance remain open.
 
+### Southeast smith yard
+
+The [B06 exterior work yard](../../../assets/models/world/source/bellwether-smith-v1/README.md) sits against the existing southeast smith wall. The open canopy covers a raised stone forge, anvil, heavy workbench and quench tub. The hardstand follows the surveyed hillside, with its edge seated in the existing ground. The building footprint, original west door and route past the yard are retained. A post-mounted oil wick lights the work area through the shared ray-traced fire system. The smith, west stall and river fork share the same exterior light slot. The artificer's breathing-rig work remains at the mill.
+
+The town uses the same opaque material and primitive counts. The yard shares the world mesh and physical support. The Blender recipe reproduces the runtime GLB and layout exactly. The shell checks cover the grounded walk from the square, the mapped road past the yard in both directions and the blocked sweep through the anvil.
+
+The Windows five-resident campaign replay walked the route and presented the wick, forge and workbench from two player views on both hardware RT backends. The private combined ARM64 Debug package pins the new town mesh. Phone play, sustained performance and listening to the stone footstep transition remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
