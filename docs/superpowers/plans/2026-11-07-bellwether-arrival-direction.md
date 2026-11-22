@@ -419,6 +419,12 @@ The [T01 well](../../../assets/models/world/source/bellwether-well-v1/README.md)
 
 The combined Windows Debug campaign captures the well from the walked route with both hardware RT backends. The private Android ARM64 Debug package contains the same pinned town mesh. Physical phone performance remains open.
 
+### Western kitchen plots
+
+The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/README.md) keeps two small beds centred on the mapped kitchen plots. The dry 1.32-metre aisle is accessible from the west stall approach. Raised timber edges use town collision. The foliage shares the existing alder material and is rendered as opaque leaves.
+
+The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

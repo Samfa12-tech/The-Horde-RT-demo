@@ -4255,6 +4255,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::ForestUnderstoryReport understory;
         if (!horde::scene::AppendPreparedForestUnderstory(root, collapseStaticAsset_, *chapterTerrainSurface_, understory, diagnostic))
             return false;
+        if (!horde::scene::AppendBellwetherGardenCrops(root, collapseStaticAsset_, diagnostic))
+            return false;
         horde::scene::ForestRockReport rocks;
         if (!horde::scene::AppendPreparedForestRocks(root, collapseStaticAsset_, chapterTerrainSurface_, rocks, diagnostic))
             return false;

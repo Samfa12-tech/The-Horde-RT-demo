@@ -705,6 +705,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb'
         include 'models/world/runtime/bellwether-tavern-v1/asset.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/garden-crops.glb'
         include 'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb'
         include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json'

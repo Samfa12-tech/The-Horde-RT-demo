@@ -1072,6 +1072,14 @@ Samfa12/Codex. It reuses the admitted Bellwether stone, clay, timber and char
 materials. The editable source and receipt are in
 `assets/models/world/source/bellwether-well-v1/`.
 
+## Bellwether west kitchen plots - 23 November 2026
+
+The T02 beds, soil and two crop silhouettes are original Horde geometry
+authored in Blender by Samfa12/Codex. The beds use the admitted town finishes.
+The crop foliage uses the existing original alder material and packed platform
+layers. The editable source and receipt are in
+`assets/models/world/source/bellwether-garden-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

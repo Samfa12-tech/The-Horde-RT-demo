@@ -2,6 +2,7 @@
 #include "scene/assets/WorldTriangleKey.h"
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <limits>
 #include <map>
 namespace horde::scene {
@@ -333,6 +334,105 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     if(archiveCover)*archiveCover=std::move(cover);
     if(roadRegister)*roadRegister=std::move(ledger);
     if(southDoor)*southDoor=std::move(door);
+    diagnostic.clear();
+    return true;
+}
+
+bool AppendBellwetherGardenCrops(const std::filesystem::path& root, assets::StaticMeshAsset& world,
+    std::string& diagnostic) {
+    static constexpr std::string_view nodeName="BellwetherGardenCrops";
+    constexpr std::string_view materialName="HordeGardenLeaf";
+    constexpr auto triangleCount=gameplay::bellwether::kBellwetherGardenCropTriangles;
+    constexpr std::array identity{1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f};
+    constexpr auto allowedFlags=static_cast<std::uint32_t>(horde::vulkan::raytracing::RtMaterialFlag::DoubleSided);
+    constexpr std::uint32_t maximumManifestIndices=4096u*3u;
+    constexpr std::uint32_t maximumManifestVertices=8192u;
+    if(std::any_of(world.nodeTransforms.begin(),world.nodeTransforms.end(),[](const auto& node) {
+        return node.name==nodeName;
+    })) {
+        diagnostic="Bellwether garden crops are already admitted to this owner.";return false;
+    }
+    const auto material=std::find_if(world.materials.begin(),world.materials.end(),[](const auto& row) {
+        return row.name=="ForestAlder";
+    });
+    if(!world.HasValidTriangleProvenance() || world.primitives.empty() || world.nodeTransforms.empty() ||
+       world.primitives.size()>=32 || material==world.materials.end() || material->textureGroup!=3 ||
+       !material->deferTextureAllocation || world.vertices.size()>UINT32_MAX || world.indices.size()>UINT32_MAX ||
+       world.nodeTransforms.size()>=UINT32_MAX) {
+        diagnostic="Bellwether garden crops require the admitted deferred ForestAlder family and bounded world owner.";
+        return false;
+    }
+    const auto directory=root/"models/world/runtime/bellwether-tavern-v1";
+    assets::AssetManifest manifest;
+    assets::StaticMeshAsset crops;
+    if(!assets::AssetManifest::Load(directory/"garden-crops.manifest.json",manifest,diagnostic) ||
+       !assets::StaticMeshAsset::Load(directory/"garden-crops.glb",manifest,crops,diagnostic))return false;
+    if(manifest.budgets.maxIndices>maximumManifestIndices || manifest.budgets.maxVertices>maximumManifestVertices ||
+       manifest.budgets.maxPrimitives!=1u || manifest.budgets.maxMaterials!=1u ||
+       crops.primitives.size()!=1 || crops.materials.size()!=1 || crops.nodeTransforms.size()!=1 ||
+       !crops.sockets.empty() || crops.indices.size()!=triangleCount*3u ||
+       crops.vertices.empty() || crops.primitives.front().vertexOffset!=0 ||
+       crops.primitives.front().indexOffset!=0 || crops.primitives.front().indexCount!=crops.indices.size() ||
+       crops.primitives.front().materialIndex!=0 || crops.primitives.front().nodeTransformIndex!=0 ||
+       crops.nodeTransforms.front().name!=nodeName || crops.nodeTransforms.front().world!=identity) {
+        diagnostic="Bellwether garden crops require one bounded world-space primitive with the registered node and exact triangle count.";
+        return false;
+    }
+    const auto& sourceMaterial=crops.materials.front();
+    if(sourceMaterial.name!=materialName || sourceMaterial.baseColorTexture>=0 || sourceMaterial.normalTexture>=0 ||
+       sourceMaterial.ormTexture>=0 || sourceMaterial.emissiveTexture>=0 || sourceMaterial.transmissionFactor!=0.f ||
+       sourceMaterial.baseColorFactor[3]!=1.f || sourceMaterial.emissiveFactor!=std::array<float,3>{} ||
+       sourceMaterial.metallicFactor!=0.f || (sourceMaterial.flags&~allowedFlags)!=0u) {
+        diagnostic="Bellwether garden crops require an untextured opaque HordeGardenLeaf material.";return false;
+    }
+    for(unsigned axis=0;axis<3;++axis) {
+        if(!std::isfinite(crops.bounds.minimum[axis]) || !std::isfinite(crops.bounds.maximum[axis]) ||
+           crops.bounds.minimum[axis]>crops.bounds.maximum[axis] ||
+           std::abs(crops.bounds.minimum[axis])>1000.f || std::abs(crops.bounds.maximum[axis])>1000.f) {
+            diagnostic="Bellwether garden crop bounds are not finite, local to the world, and bounded.";return false;
+        }
+    }
+    for(const auto& vertex:crops.vertices) {
+        for(const auto value:vertex.position)if(!std::isfinite(value) || std::abs(value)>1000.f) {
+            diagnostic="Bellwether garden crop geometry contains an invalid or unbounded position.";return false;
+        }
+        for(const auto value:vertex.normal)if(!std::isfinite(value)) {
+            diagnostic="Bellwether garden crop geometry contains an invalid normal.";return false;
+        }
+        for(const auto value:vertex.tangent)if(!std::isfinite(value)) {
+            diagnostic="Bellwether garden crop geometry contains an invalid tangent.";return false;
+        }
+        for(const auto value:vertex.uv0)if(!std::isfinite(value)) {
+            diagnostic="Bellwether garden crop geometry contains invalid texture coordinates.";return false;
+        }
+    }
+    if(std::any_of(crops.indices.begin(),crops.indices.end(),[&](std::uint32_t index) {
+        return index>=crops.vertices.size();
+    }) || world.vertices.size()>UINT32_MAX-crops.vertices.size() ||
+       world.indices.size()>UINT32_MAX-crops.indices.size()) {
+        diagnostic="Bellwether garden crops exceed native vertex/index addressing.";return false;
+    }
+
+    auto staged=world;
+    auto primitive=crops.primitives.front();
+    primitive.vertexOffset=static_cast<std::uint32_t>(staged.vertices.size());
+    primitive.indexOffset=static_cast<std::uint32_t>(staged.indices.size());
+    primitive.materialIndex=static_cast<std::uint32_t>(material-world.materials.begin());
+    primitive.nodeTransformIndex=static_cast<std::uint32_t>(staged.nodeTransforms.size());
+    staged.primitives.push_back(primitive);
+    staged.nodeTransforms.push_back(crops.nodeTransforms.front());
+    staged.vertices.insert(staged.vertices.end(),crops.vertices.begin(),crops.vertices.end());
+    staged.triangleRegions.resize(staged.indices.size()/3u,assets::StaticTriangleRegion::Shared);
+    staged.triangleRegions.insert(staged.triangleRegions.end(),triangleCount,assets::StaticTriangleRegion::Shared);
+    staged.indices.insert(staged.indices.end(),crops.indices.begin(),crops.indices.end());
+    for(unsigned axis=0;axis<3;++axis) {
+        staged.bounds.minimum[axis]=std::min(staged.bounds.minimum[axis],crops.bounds.minimum[axis]);
+        staged.bounds.maximum[axis]=std::max(staged.bounds.maximum[axis],crops.bounds.maximum[axis]);
+    }
+    if(!staged.HasValidTriangleProvenance() || staged.primitives.size()>32u) {
+        diagnostic="Bellwether garden crops would invalidate the shared world owner.";return false;
+    }
+    world=std::move(staged);
     diagnostic.clear();
     return true;
 }

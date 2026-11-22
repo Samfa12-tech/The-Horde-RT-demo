@@ -1460,7 +1460,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         {kTavernKeeperActorId,
                             gBellwetherCombinedRelicDealer ? kRelicDealerActorId : kSalvagerActorId});
                 };
-                const auto capture = [&](const char* name) {
+                const auto capture = [&](const char* name, bool requireResidents = true) {
                     if (!CompleteRtEvidenceAfterDeviceIdle(ctx, vkDeviceWaitIdle(ctx.device))) return false;
                     const auto publication = ctx.rtFrameEvidence.PublishedStateByValue();
                     const auto& completed = publication.completedEvidence;
@@ -1470,8 +1470,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         completed.presentation.outcome != RtPresentationOutcome::Presented ||
                         completed.presentation.lastSuccessfulPresentSubmissionSerial != identity.submissionSerial ||
                         ctx.rtScene.StaticGeometryGeneration() != geometryGeneration ||
-                        ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex) != 1u ||
-                        ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u) != 1u) {
+                        (requireResidents && (ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex) != 1u ||
+                         ctx.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u) != 1u))) {
                         std::cerr << "Combined resident evidence mismatch in " << name
                                   << ": completed=" << publication.hasCompletedEvidence
                                   << " epoch=" << identity.frame.sceneEpoch << '/' << sceneEpoch
@@ -1543,6 +1543,27 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = previousPitch;
                         return presented && walkTo(*square);
                     };
+                    const auto presentGarden = [&] {
+                        using horde::gameplay::interactions::HeldLightPose;
+                        const auto& approach = kBellwetherGardenApproach;
+                        if (!walkTo(kBellwetherWestApproach[1]) || !std::all_of(approach.begin(), approach.end(), walkTo) ||
+                            !walkTo(kBellwetherGardenAisle) || !walkTo(approach.back()) || !walkTo(kBellwetherGardenView))
+                            return false;
+                        const auto setLight = [&](HeldLightPose pose) {
+                            if (state.interaction.heldLightPose == pose) return true;
+                            input.commands.toggleHeldLightPose = state.lastConsumedToggleHeldLightPoseSequence + 1;
+                            return step() && waitFor([&] { return state.interaction.heldLightPose == pose; }, 125);
+                        };
+                        const auto previousPose = state.interaction.heldLightPose;
+                        const float previousPitch = input.pitchRadians;
+                        input.pitchRadians = -.34f;
+                        const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
+                            setLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
+                        input.pitchRadians = previousPitch;
+                        const bool restored = setLight(previousPose);
+                        return presented && restored && walkTo(approach.back()) &&
+                            std::all_of(std::next(approach.rbegin()), approach.rend(), walkTo) && walkTo(kBellwetherWestApproach[1]);
+                    };
                     const auto leaveTavern = [&] {
                         if (!std::all_of(kBellwetherTavernRoute.rbegin(), std::make_reverse_iterator(rampToe), walkTo) ||
                             !walkTo(coveredHandoff)) return false;
@@ -1573,7 +1594,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         state.chapterDialogue.line == Line::RelicDealerOrdinarySale && frame() && fork() &&
                         stallWickSelected() &&
                         ctx.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) == 1u &&
-                        capture("windows-combined-west-trade.png") &&
+                        capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&

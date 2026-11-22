@@ -134,6 +134,8 @@ The private [relic dealer visit](superpowers/plans/2026-11-07-bellwether-arrival
 
 The mapped [covered well](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#covered-well-in-the-square) is in the town mesh at T01. Its collision leaves the approaches to the tavern, west stall and mill open. It serves as a landmark with a visible winch and bucket.
 
+The mapped [western kitchen plots](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#western-kitchen-plots) sit beyond the relic stall at T02. Two terrain-fitted beds show the village growing food. The aisle follows the existing ground, and the crops share the forest foliage material.
+
 The [arrival plan](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#18-route-and-tavern-checkpoint) records the textured and rigged tavern keeper candidate. Private Debug builds can use her standing pose and retimed walk with the existing door and hearth marks. Both Windows hardware RT backends presented her at the hearth. Phone validation and distribution clearance remain open.
 
 Bounded light RPG direction means ordinary treasure currency, scarce named components, gear/training/upgrades and access preparation through mixable **Magic, Tech and Constitution**. Preserve viable mixed builds, independently sufficient access alternatives, recoverable named-relic sell/return choices and meaningful hub consequences. Exact service menus, prices, XP/skill-point/respec rules, crafting, component quests and rewards remain unresolved or proposed. No automatic general inventory grid, simulated economy, universal quest engine or extra currencies.

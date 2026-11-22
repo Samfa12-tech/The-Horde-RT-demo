@@ -259,6 +259,21 @@ int main(int argc,char** argv) {
             };
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");
+            const auto& garden=kBellwetherGardenApproach;
+            const auto stall=kBellwetherWestApproach[1];
+            check(follow(stall,garden[0]) && follow(garden[0],garden[1]) && follow(garden[1],garden.back()) &&
+                  follow(garden.back(),kBellwetherGardenView) && follow(kBellwetherGardenView,garden.back()) &&
+                  follow(garden.back(),kBellwetherGardenAisle) && follow(kBellwetherGardenAisle,garden.back()) &&
+                  follow(garden.back(),garden[1]) && follow(garden[1],garden[0]) && follow(garden[0],stall),
+                  "the west stall connects to the dry garden aisle and view without crossing the raised beds");
+            constexpr auto gardenCentre=kBellwetherGardenCentre;
+            const auto gardenGround=support->Query(gardenCentre[0],gardenCentre[1]);
+            check(gardenGround.found && gardenGround.walkable &&
+                  !support->NonWalkableVolumeClear(gardenCentre[0],gardenCentre[1],gardenCentre[0],gardenCentre[1]+1.f,
+                      gardenGround.worldY+.04f,gardenGround.worldY+1.8f,radius) &&
+                  !support->NonWalkableVolumeClear(gardenCentre[0],gardenCentre[1],gardenCentre[0],gardenCentre[1]-1.f,
+                      gardenGround.worldY+.04f,gardenGround.worldY+1.8f,radius),
+                  "both timber bed edges remain solid on either side of the garden aisle");
         }
         {
             using namespace horde::gameplay::traversal;
@@ -523,6 +538,24 @@ int main(int argc,char** argv) {
         }
         check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==3,
             "town and furniture coalesce into the three existing opaque world families");
+        const auto withoutCrops=world.indices.size();
+        check(!AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withoutCrops,
+              "garden foliage cannot allocate a replacement for a missing alder family");
+        assets::StaticMaterial alder;
+        alder.name="ForestAlder";
+        alder.textureGroup=3;
+        alder.deferTextureAllocation=true;
+        world.materials.push_back(alder);
+        const auto alderRow=world.materials.size()-1;
+        world.primitives.front().materialIndex=static_cast<std::uint32_t>(alderRow);
+        const auto withCrops=withoutCrops+3*kBellwetherGardenCropTriangles;
+        check(AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withCrops &&
+              world.primitives.back().materialIndex==alderRow && world.materials.size()==alderRow+1 &&
+              world.triangleRegions.back()==assets::StaticTriangleRegion::Shared,
+              "garden crop geometry joins the existing atlas family as shared world detail without contact");
+        check(!AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withCrops &&
+              assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==3,
+              "garden foliage rejects duplicate admission and shares an existing consolidated primitive");
     }
     auto missing=before;missing.materials[1].name="Missing";
     auto fallback=originalTerrain;

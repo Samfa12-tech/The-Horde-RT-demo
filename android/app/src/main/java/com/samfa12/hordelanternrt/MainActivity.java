@@ -1125,6 +1125,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/asset.manifest.json", "models/world/runtime/bellwether-tavern-v1/asset.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json", "models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.glb", "models/world/runtime/bellwether-tavern-v1/garden-crops.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/window.manifest.json", "models/world/runtime/bellwether-tavern-v1/window.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-window.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-window.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json") &&
