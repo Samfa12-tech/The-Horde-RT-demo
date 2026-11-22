@@ -18,9 +18,17 @@ builds share the native 60 Hz route and its twelve resident swaps. The
 [Galaxy S26 Ultra run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-five-resident-shippingmobile-round-trip)
 used Shipping/Mobile Pipeline at 33% and took 159.40 seconds. Median GPU
 time was 64.90 ms in the staffed tavern and 51.20 ms at the east fork. The
-room medians increased from 51.06 to 68.97 ms across visits. This makes a
-warmed tavern capture with per-GPU-stage timings the next useful handset
-baseline. Keep the room lighting, actor state and render settings matched.
+room medians increased from 51.06 to 68.97 ms across visits.
+
+**23 November tavern stage attribution.** A [second handset run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-tavern-gpu-stage-timings)
+used the same route and displayed graphics settings with per-stage queries
+enabled. All 2,460 frames passed the stage-to-submission join. Dispatch
+medians across the three tavern visits were 50.32, 73.51 and 67.50 ms,
+about 99% of each room's GPU interval. The actor roster, light count,
+TLAS and BLAS counts and allocations matched across all room visits.
+Prioritise a matched, output-preserving dispatch experiment for this workload.
+Keep the room lighting, actors and render settings fixed and record thermal
+and clock state before attributing a gain.
 
 The Windows run uses optimized Debug code (`/O2 /Ob2`) to preserve the private
 fixture gates, with Shipping/High shaders and 960 × 540 trace and output

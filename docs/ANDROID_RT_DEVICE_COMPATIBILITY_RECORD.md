@@ -4375,3 +4375,48 @@ Raw measurements, the exact APK and the previous private APK are retained
 locally under `reports/horde-bellwether-shipping-profile-20261123-100005`.
 The test app was stopped after measurement and the private candidate remains
 installed.
+
+### 23 November 2026 — Bellwether tavern GPU stage timings
+
+**Evidence class — actual-device scripted route, joined GPU stage timing and
+sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37)
+ran the private combined ARM64 Debug APK from `f2595749`. The installed
+hash matched the local APK SHA-256
+`5a21c5a19a37e4fbf56498e8d7d9c0e6698524586a695f397497cc2ecde25834`.
+It used RayTracingPipeline with Shipping/Mobile opaque-fast shaders at
+33% scale (475 × 980 internal, 1440 × 2971 output), glass off and the
+active shader hash
+`8772697daea24068acea25db8ca168c8c2b37f8d7f3e547374d2a75fac8755b1`.
+
+The five-resident checkpoint completed both returns and all twelve swaps
+in 160.08 s. All 2,460 frames joined acceleration-structure, dispatch
+and transfer timings to the same successful RT submission and native
+present call. Each room visit held the same keeper pair, three fire lights,
+41 TLAS instances, 35 BLAS owners and 239,510,976 device-local bytes.
+The first five seconds are excluded from the phase statistics.
+
+| Staffed room visit | Frames | Whole GPU median / p95 (ms) | AS median / p95 (ms) | Dispatch median / p95 (ms) | Transfer median / p95 (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| First | 84 | 50.83 / 51.78 | 0.39 / 0.41 | 50.32 / 51.20 | 0.11 / 0.13 |
+| First return | 150 | 74.31 / 76.87 | 0.57 / 0.62 | 73.51 / 76.10 | 0.17 / 0.20 |
+| Second return | 150 | 68.16 / 76.62 | 0.52 / 0.61 | 67.50 / 75.84 | 0.16 / 0.19 |
+
+The median per-frame dispatch share was about 99% on each visit. The
+whole-GPU median exceeded the 33.33 ms budget on all three visits, and the
+dispatch spans tracked the extra room time on both returns. The stage
+intervals can overlap. Outside at the east fork, whole GPU median / p95 was
+52.03 / 58.75 ms. Across staffed room frames, the median native present-call
+return interval was 78.85 ms with p95 87.69 ms.
+
+SurfaceFlinger yielded 2,049 adjacent display intervals for the private
+game layer, covering 132.8 seconds between 27.3 and 160.1 s into the route.
+The display median was 62.50 ms with p95 83.33 ms. These display intervals
+have no per-submission join. Battery temperature rose from 33.1 °C to
+35.9 °C on USB power, with Android thermal status 0 at both endpoints.
+The run locates the cost in the dispatch interval. The cause of the
+visit-to-visit drift and sustained ordinary campaign performance remain open.
+
+The installed APK, previous private APK and raw timing evidence are retained
+locally under `reports/horde-bellwether-directions-20261123-104723`. The
+test app was stopped after measurement and the private candidate remains
+installed.
