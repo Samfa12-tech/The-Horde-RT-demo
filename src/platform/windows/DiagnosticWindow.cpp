@@ -11037,8 +11037,8 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     if(gCampaignHiddenValidation){
         context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
-        const int result=!gBellwetherCampaignActors.empty()?RunHiddenBellwetherCampaignValidation(context,capabilities):
-            gRouteHiddenValidation?RunHiddenRouteValidation(context):
+        const int result=gRouteHiddenValidation?RunHiddenRouteValidation(context):
+            !gBellwetherCampaignActors.empty()?RunHiddenBellwetherCampaignValidation(context,capabilities):
             gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
         return renderOwner.Retire()?result:1;
     }
@@ -14619,7 +14619,8 @@ int RunDiagnosticWindow(const int showCommand)
         ((launchOptions.requested && !launchOptions.measureBellwetherResidentRoundTrip) ||
          launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
          launchOptions.graphicsPreview || launchOptions.outputResizeValidation ||
-         !launchOptions.nativeMotionScenario.empty() || gOpeningBenchmarkMenuValidation || gRouteHiddenValidation ||
+         !launchOptions.nativeMotionScenario.empty() || gOpeningBenchmarkMenuValidation ||
+         (gRouteHiddenValidation && (!gBellwetherPackagedPlaytest || gRouteReturnRecovery)) ||
          gAcceptanceProfile.Active())) {
         std::cerr << "Bellwether campaign residents require the normal Debug campaign entry.\n";
         return 2;

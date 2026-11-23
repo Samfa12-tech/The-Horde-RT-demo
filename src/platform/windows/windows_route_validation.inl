@@ -8,7 +8,8 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
         const auto name=item.path().filename().string();
         if(name=="manifest.json" || name=="slot-1-manual.hrd"){++sources;continue;}
         if(gRouteReturnRecovery && name=="slot-1-auto.hrd"){++workingAuto;continue;}
-        if(name==".slot-1-manual.hrd.lock" || ((after || gRouteReturnRecovery) && name==".slot-1-auto.hrd.lock") || (after && name==".slot-2-manual.hrd.lock")) {
+        if(name==".slot-1-manual.hrd.lock" || ((after || gRouteReturnRecovery) && name==".slot-1-auto.hrd.lock") ||
+            (after && (name==".slot-2-manual.hrd.lock" || (gBellwetherPackagedPlaytest && name==".slot-2-auto.hrd.lock")))) {
             if(item.file_size(error)!=0 || error)return false;continue;
         }
         if(after && (name=="slot-1-auto.hrd" || name=="slot-2-manual.hrd" || name==kTextReportFilename ||
@@ -16,6 +17,8 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
             name=="route-lower.png" || name=="route-lookout.png" || name=="route-return.png" || name=="route-recovered.png"))continue;
         if(after && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation || horde::gameplay::simulation::ProductionGameSimulationConfig().companionTurnStart) && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
             name=="route-kit-corner-turn.png" || name=="route-kit-corner-walk.png"))continue;
+        if (after && gBellwetherPackagedPlaytest &&
+            (name=="slot-2-auto.hrd" || name=="route-bellwether-tavern.png" || name=="route-bellwether-reloaded.png")) continue;
         return false;
     }
     return !error && sources==2 && (!gRouteReturnRecovery || workingAuto==1);
@@ -118,6 +121,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     };
     const auto catalogue=[&]{for(const auto& e:ctx.campaign->Catalogue())if(e.status==campaign::CatalogueStatus::Checking)return false;return true;};
     const auto loadComplete=[&]{return ctx.campaignBarrier.State().phase==campaign::CampaignLoadBarrier::Phase::Complete;};
+    const auto playing=[&]{return !ctx.campaignPause && !ctx.simulationPaused && !ctx.campaignMenu->Visible();};
     const auto step=[&](simulation::InputSnapshot input){
         if(input.hasAuthoritativePlayerPose || input.damageEnabled || input.commands.attack || input.commands.parry || input.commands.dodge)return false;
         input.paused=false;ctx.simulationInput=input;
@@ -146,7 +150,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         (GetWindowLongPtrA(ctx.windowHandle,GWL_EXSTYLE)&(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW))==(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW) && safe("route-entered"),
         "isolated exported seed and hidden nonactivating native owner");
     if(proceed){ApplyOverlayState(ctx);proceed=check(click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) && until(catalogue,false) &&
-        click(CampaignMenu::FirstChoiceId+(gRouteReturnRecovery?1:0)) && until(loadComplete,true),"admitted record loads through ordinary native commands input rebase and fresh RT barrier");}
+        click(CampaignMenu::FirstChoiceId) && until(loadComplete,true) && playing(),"the selected slot loads and resumes through the current native menu after fresh RT presentation");}
     if(gRouteReturnRecovery) {
         const auto& original=gHiddenLookout.source.checkpoint;
         const auto coherent=[&](bool upper){const auto& s=ctx.simulation.Snapshot();
@@ -159,8 +163,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 s.chapterCompanion.grounded && s.chapterCompanion.waypoint==simulation::kWorldRoutePoints.size() &&
                 (s.heldItems[1].parentMode==items::HeldItemParentMode::BodyStow)==original.swordStowed;};
         const auto originalPose=[&]{return (ctx.simulation.Snapshot().interaction.heldLightPose==interactions::HeldLightPose::High)==original.lanternHigh;};
-        if(proceed)proceed=check(coherent(false) && originalPose() && ctx.campaignPause && ctx.simulationPaused &&
-            capture("route-lower.png") && click(CampaignMenu::ResumeId),"actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership");
+        if(proceed)proceed=check(coherent(false) && originalPose() &&
+            capture("route-lower.png"),"actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership");
         PumpCampaign(ctx);
         const auto initialOperation=ctx.campaign->State().operationRevision;
         for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
@@ -189,9 +193,9 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             campaign::CompletedForestProgress(upper.checkpoint.dialogue) && upper.encoded!=gHiddenLookout.source.encoded,
             "actual repeat ascent durably replaces only working auto with coherent upper revision two and unchanged health equipment story");
         if(proceed){const auto generation=ctx.simulation.Snapshot().worldRoute.generation;
-            ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) && click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true);
+            ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) && click(CampaignMenu::FirstChoiceId) && until(loadComplete,true);
             proceed=check(proceed && coherent(true) && originalPose() && ctx.simulation.Snapshot().worldRoute.generation>generation &&
-                capture("route-recovered.png") && click(CampaignMenu::ResumeId),"this-run upper autosave recovers through native Load fresh RT and explicit Resume");PumpCampaign(ctx);
+                playing() && capture("route-recovered.png"),"this-run upper autosave recovers through native Load and resumes after fresh RT presentation");PumpCampaign(ctx);
         }
         if(proceed){const auto operation=ctx.campaign->State().operationRevision;
             for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
@@ -206,7 +210,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     }
     if(proceed){const auto& s=ctx.simulation.Snapshot();proceed=check(s.modernCombatRules && s.playerVitals.vitality==2 &&
         !s.rescue.firstAscentCompleted && !s.rescue.exteriorSide && !s.chapterDialogue.proofAccepted && !s.chapterDialogue.forestVillageConsumed &&
-        capture("route-lower.png") && click(CampaignMenu::ResumeId),"current rules two hearts and genuinely unset post-seed progression");PumpCampaign(ctx);}
+        capture("route-lower.png"),"current rules two hearts and genuinely unset post-seed progression");PumpCampaign(ctx);}
     if(proceed){
         bool issued=false;unsigned ticks=0;
         while(proceed && ticks<1800 && !(ctx.simulation.Snapshot().rescue.exteriorSide && !ctx.simulation.Snapshot().rescue.equipmentStowed)) {
@@ -305,18 +309,87 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             campaign::CompletedForestProgress(returned.checkpoint.dialogue),"actual lower return commits revision two autosave retaining completed forest story");
         const auto generation=ctx.simulation.Snapshot().worldRoute.generation;
         if(proceed){ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) &&
-            click(CampaignMenu::FirstChoiceId+2) && until(loadComplete,true);
+            click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true);
             const auto& s=ctx.simulation.Snapshot();
             proceed=check(proceed && s.worldRoute.generation>generation && s.modernCombatRules && s.playerVitals.vitality==2 &&
                 s.playerGrounded && s.rescue.exteriorSide && s.chapterCompanion.grounded &&
                 s.chapterDialogue.line==dialogue::Line::None && s.chapterDialogue.forestVillageConsumed &&
-                ctx.campaignPause && ctx.simulationPaused && capture("route-recovered.png") && click(CampaignMenu::ResumeId),
-                "this-run endpoint manual recovers through native load fresh generation matching RT and explicit Resume");PumpCampaign(ctx);
+                ctx.campaign->State().activeSlot==1 && playing() && capture("route-recovered.png"),
+                "this-run endpoint manual recovers through native Load and resumes after fresh RT presentation");PumpCampaign(ctx);
         }
         if(proceed){const auto operation=ctx.campaign->State().operationRevision;
             for(unsigned n=0;n<120 && proceed;++n){proceed=step(neutral());if(n%4==3 && proceed)proceed=render();}
             proceed=check(proceed && ctx.campaign->State().operationRevision==operation && !ctx.campaignPause && !ctx.simulationPaused &&
                 ctx.simulation.Snapshot().chapterDialogue.line==dialogue::Line::None,"resumed endpoint stays quiet without repeated autosave or story restart");
+        }
+    }
+    if (proceed && gBellwetherPackagedPlaytest) {
+        using namespace traversal;
+        const auto& state = ctx.simulation.Snapshot();
+        const auto playerMark = campaign::kBellwetherCheckpointPosition;
+        const auto atHearth = [&] {
+            return state.playerGrounded && IsOnBellwetherTavernRoomFloor(
+                state.playerX, state.playerSupportWorldY, state.playerZ) &&
+                state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::Seated &&
+                state.tavernKeeper && state.tavernKeeper->stage == dialogue::TavernKeeperStage::AtHearth;
+        };
+        unsigned arrivalTicks = 0;
+        const auto arrivalStep = [&](simulation::InputSnapshot input) {
+            return step(input) && (++arrivalTicks % 10 != 0 || render());
+        };
+        const auto walkTo = [&](BellwetherStation target) {
+            for (unsigned tick = 0; tick < 1200; ++tick) {
+                const float dx = target.x - state.playerX, dz = target.z - state.playerZ;
+                const float distance = std::hypot(dx,dz);
+                if (distance < .135f) return true;
+                auto input = neutral();
+                input.yawRadians = std::atan2(dx,-dz);
+                input.moveForward = std::min(distance/.20f,1.f);
+                input.runHeld = true;
+                if (!arrivalStep(input)) return false;
+            }
+            std::cerr << "Bellwether continuity walk stopped at " << state.playerX << ',' << state.playerZ
+                      << " en route to " << target.x << ',' << target.z << '\n';
+            return false;
+        };
+        const auto waitFor = [&](auto ready, unsigned ticks) {
+            for (unsigned tick=0; tick<ticks && !ready(); ++tick)
+                if (!arrivalStep(neutral())) return false;
+            return ready();
+        };
+        proceed = check(state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::AtLookout &&
+            std::all_of(kBellwetherTavernRoute.begin(),kBellwetherTavernRoute.end(),walkTo) &&
+            walkTo({playerMark.x,playerMark.z}) && waitFor([&]{return state.tavernConversationAvailable;},120*60) &&
+            atHearth() && render() &&
+            capture("route-bellwether-tavern.png"),
+            "the lookout earned in this run leads through the village and south door to Kit and the keeper");
+        campaign::storage::StoredCheckpoint tavern;
+        if (proceed) {
+            auto input = neutral();
+            input.commands.interact = state.lastConsumedInteractSequence + 1;
+            proceed = check(arrivalStep(input) && waitFor([&]{
+                return state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
+                    state.chapterDialogue.line == dialogue::Line::None;
+            },1800) && until([&]{
+                return campaign::storage::Read(gCampaignValidationDirectory,"slot-2-auto.hrd",tavern).status ==
+                    campaign::storage::Status::Read && tavern.checkpoint.id == campaign::CheckpointId::BellwetherTavern &&
+                    ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+            },false) && tavern.checkpoint.vitality == 2 && tavern.checkpoint.firstAscentCompleted &&
+                tavern.checkpoint.bellwetherAnkleAssessed && campaign::CompletedForestProgress(tavern.checkpoint.dialogue) &&
+                tavern.checkpoint.dialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size(),
+                "the earned tavern autosave preserves health and completed forest story in the same slot");
+        }
+        if (proceed) {
+            const auto generation = state.worldRoute.generation;
+            ShowPauseMenu(ctx,true);
+            proceed = check(click(kCampaignLoadButtonId) && until(catalogue,false) &&
+                click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true) && playing() &&
+                state.worldRoute.generation > generation && ctx.campaign->State().activeSlot == 1 &&
+                atHearth() && state.tavernDirectionsAvailable && !state.tavernConversationAvailable &&
+                state.chapterDialogue.line == dialogue::Line::None &&
+                state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
+                capture("route-bellwether-reloaded.png"),
+                "choosing the same slot resumes the earned Bellwether visit with Talk completed and directions available");
         }
     }
     if(!proceed && !failures)check(false,"bounded route stopped before completing all stages");
@@ -329,6 +402,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         <<",\"kitTurnStartConfigured\":"<<(turnStartConfigured?"true":"false")
         <<",\"naturalWalkWithoutScriptedEscortOrSpeechStops\":"<<(gRouteNaturalWalkValidation?"true":"false")
         <<",\"ordinaryLookAtKitPreservingWorldWalk\":"<<(gRouteNaturalWalkValidation?"true":"false")
+        <<",\"packagedBellwetherContinuation\":"<<(gBellwetherPackagedPlaytest?"true":"false")
         <<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";
     return failures?1:0;
 }
