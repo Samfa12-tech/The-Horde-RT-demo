@@ -55,6 +55,24 @@ requires matched control builds. Raw runs, including the first Windows
 launch that stopped on missing private staging assets, are retained locally
 under `reports/horde-bellwether-shipping-profile-20261123-100005`.
 
+### West village timing route
+
+The five-resident west route uses the same 60 Hz clock, four-tick catch-up
+limit and successful-present join. It walks from the staffed room through
+the south door, past the relic stall and gardens to the dry stock yard.
+Each of two 24-second holds samples all three head instances and each
+animal's gesture before the return. The east route remains its own cohort.
+Use `-BellwetherWest` with the existing Windows measurement runner and its
+private five-resident campaign directory, then verify the output.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --bellwether-west-roundtrip <run-directory>
+```
+
+The [Android launch and retrieval steps](../android/README.md#west-village-round-trip)
+use a separate checkpoint and CSV. Keep the APK and shader digests, graphics
+settings, thermal observations, and completed frame evidence with each handset run.
+
 ## Closed or retained rendering experiments
 
 **23 November Bellwether held-item clearance — KEEP for 1.8.** One carry reach search reuses the camera support check and sampled heights at the 64 authored tree roots. Each candidate reach still checks the same solids, trunk bounds, terrain slope and current tavern door pose. The cache ends with the search.

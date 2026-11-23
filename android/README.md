@@ -168,6 +168,26 @@ The report measures native present-return intervals. Display timing requires
 separate display evidence. The shorter doorway check remains available under
 its existing checkpoint and report name.
 
+#### West village round trip
+
+The five-resident package also accepts `bellwether-west-roundtrip-measurement`.
+Use the same launch command with that checkpoint name. It leaves the staffed
+tavern by the south door, passes the relic stall and gardens, and holds the
+ordinary player view at the dry stock yard for 24 simulation seconds on each
+of two visits. The route walks back into the same room after each visit.
+
+After the launch logs `HORDE_BELLWETHER_WEST_ROUNDTRIP complete returns=2`,
+retrieve that run's `files/reports/bellwether-west-roundtrip.csv`. Verify it
+from the repository root. Use `--require-gpu-stages` with a stage-probe build.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-west-roundtrip <run-directory>
+```
+
+The verifier checks the dealer handoff in each direction, the three submitted
+stock head instances and the settled pose and each gesture during both holds.
+It uses the same completed-submission and present-return joins as the east route.
+
 The five privately approved Kit takes can be enabled by adding
 `-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
 Use the same property with the ten-file overlay to audition the three

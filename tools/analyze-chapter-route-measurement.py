@@ -263,7 +263,8 @@ def verify_bellwether_stock_dwell(rows):
         # completed frames can miss up to four ticks at each edge.
         if not 1432 <= ticks <= 1440:
             raise ValueError(f'Stock-yard visit {lap + 1} lacks the full fixed-step dwell')
-        visits.append(dict(completedReturns=lap, sampledTicks=ticks, submittedHeads=3, poseMasks=sorted(masks)))
+        visits.append(dict(completedReturns=lap, sampledTicks=ticks, submittedHeads=3, poseMasks=sorted(masks),
+                           gpuMilliseconds=stats([int(row['gpu_ns']) / 1e6 for row in dwell])))
     return visits
 
 
@@ -621,6 +622,10 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
             summary['roomVisits'].append(dict(completedReturns=visit,
                                               gpuMilliseconds=stats([int(rows[i]['gpu_ns']) / 1e6 for i in indices]),
                                               gpuStageMilliseconds=gpu_stage_summary(indices)))
+        for visit in summary.get('stockYardVisits', []):
+            indices = [i for i, row in enumerate(rows) if row['phase'] == 'stock-yard' and
+                       int(row['returns']) == visit['completedReturns']]
+            visit['gpuStageMilliseconds'] = gpu_stage_summary(indices)
     for phase in phases:
         indices = [i for i, row in enumerate(rows) if row['phase'] == phase and elapsed[i] >= 5e9]
         require(bool(indices), f'No post-warmup frames for {phase}')

@@ -269,7 +269,10 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         }
         return true;
     };
-    while(frames++<30000 && !complete()) {
+    // The west route is bounded by the wall clock. A fast hidden swapchain
+    // can submit more than the legacy 30,000 frames before its second return.
+    while(!complete() && (westRoundTrip || frames<30000u)) {
+        ++frames;
         const auto iterationStartNs=steadyNs();
         sampleSystemLoad();
         const auto systemEndNs=steadyNs();
@@ -384,7 +387,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<',';
     else summary<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\",";
     summary
-        <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames-1<<",\"completedSamples\":"<<samples
+        <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames<<",\"completedSamples\":"<<samples
         <<",\"simulationTicks\":"<<state.tickIndex-baseTick<<",\"maximumPendingSimulationTicks\":"<<maximumDebt
         <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":"<<deadline<<",\"warmupSeconds\":5,"
         <<"\"unoccludedClientChecks\":"<<(doorway?"false":"true")<<",\"intervalMeaning\":\""
