@@ -481,6 +481,25 @@ adds 704 walkable triangles to the existing town owner. The render and
 footstep contact surfaces share the same geometry. The paths reuse the
 admitted town stone and keep the terrain grade and landmark positions.
 
+The full campaign hit its collision ceiling with the first 2,669-triangle
+export. The final layer uses fewer subdivisions along each lane and joins
+the existing stone bridge at the church's terrain cut. The second Blender
+export reproduced both GLBs, the manifest and the generated header byte for
+byte. The native shell and forest route tests passed, including stone
+contact on all nine authored lanes and at the church join.
+
+The extracted private Windows package from `c3073b2c` passed 51 campaign
+checks and recorded 27 views on each hardware RT backend. The replay walked
+from the lookout to the tavern and continued through the west, north and east
+service routes before restoring the earned tavern save. Its ZIP SHA-256 is
+`62b6e1b76793b25d515b980baeb59a81773a7b12769fa63f82760b10925b372f`.
+The signed ARM64 Debug APK contains the same town GLB and manifest, with APK
+SHA-256 `48240f580c330bbb371d118be5a5e8614095a4a657e4ae9881d59886e92147e2`.
+Builds, receipts and pointers to the two route captures are retained locally
+under `reports/horde-bellwether-paths-20261123-160828`. Phone play and timing
+remain open. Audio/haptic manual revalidation required — YES, for the stone
+footstep transitions at the lane edges.
+
 ### East route to the mill yard
 
 The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.
