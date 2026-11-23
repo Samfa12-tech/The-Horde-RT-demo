@@ -230,13 +230,23 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     while(proceed && probe.Phase()!=ChapterProbePhase::Lower) {
         for(unsigned n=0;n<4 && probe.Phase()!=ChapterProbePhase::Lower;++n){
             auto input=neutral();
-            const bool quietOutbound=!gRouteNaturalWalkValidation && probe.Phase()==ChapterProbePhase::Outbound && ctx.simulation.Snapshot().chapterDialogue.line!=dialogue::Line::None;
+            const auto& snapshot=ctx.simulation.Snapshot();
+            const bool outbound=probe.Phase()==ChapterProbePhase::Outbound;
+            const bool followingBasin=outbound && snapshot.chapterCompanion.basinGuide;
+            const bool quietOutbound=!gRouteNaturalWalkValidation && outbound && snapshot.chapterDialogue.line!=dialogue::Line::None;
             const auto& boundary=ctx.simulation.LatestCampaignBoundary();
             endpoint=boundary && boundary->id==campaign::CheckpointId::ForestEndpoint;
             const bool waitEndpoint=probe.Phase()==ChapterProbePhase::Lookout && !endpoint;
-            if(quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
-            else {quietTicks=0;input=probe.Next(ctx.simulation.Snapshot());}
-            if(probe.Phase()==ChapterProbePhase::Outbound) {
+            if(followingBasin || quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
+            else {quietTicks=0;input=probe.Next(snapshot);}
+            if(followingBasin) {
+                // Kit delivers the flask line only when both of us reach the landing.
+                const auto basin=simulation::kWorldRoutePoints[2];
+                const float dx=basin.x-snapshot.playerX,dz=basin.z-snapshot.playerZ;
+                const float distance=std::hypot(dx,dz);
+                input.yawRadians=std::atan2(dx,-dz);
+                if(distance>2.4f)input.moveForward=std::min(distance-2.4f,1.f);
+            } else if(probe.Phase()==ChapterProbePhase::Outbound) {
                 // Obey the current escort rule. The generic optimization probe
                 // runs ahead; here ordinary walking waits for Kit within 3 m.
                 const auto& s=ctx.simulation.Snapshot();
