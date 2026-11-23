@@ -644,6 +644,10 @@ The five audition WAV hashes match their production manifests. Each uses 24 kHz 
 
 The combined private audition can include all thirteen pinned WAVs alongside the five-resident town. The two optional groups keep their original captions, sample lengths and listening status. Android opens stored WAVs directly from the APK and keeps cache staging for assets that need it.
 
+The follow-on group adds six exact archive takes to the private playtest. The record keeper describes the two roads after the register, the relic dealer introduces ordinary silver, and Kit responds when the lantern speaks at his chair. The five November 4 takes retain their review-reel approval. The dealer take remains an audition. The six clips fit the existing subtitle windows and use the speaking actor's existing spatial source. The group accepts all six files together. Audio/haptic manual revalidation required — YES, for the integrated voice mix and playback.
+
+The Windows ZIP and signed Android ARM64 APK from `0eab2912` contain the same nineteen WAVs. Each Windows hardware RT backend admitted the overlay and passed all 51 campaign checks, including dealer trade and the lantern conversation at Kit's chair. The Android suite ran 610 tests with six skips and no failures. A modified record keeper WAV failed Windows startup, and Android rejected a partial group. In-game listening on the exact builds and handset play remain open.
+
 The private Horde audio archive retains the original MP3s, per-line review WAVs and exact text, voice and cost manifests. The Debug audition uses byte-for-byte copies, and its review receipt pins the local reel and the five source WAVs.
 
 ## Animation and gameplay acceptance gate
