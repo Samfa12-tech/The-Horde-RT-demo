@@ -163,8 +163,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         ApplyOverlayState(ctx);
         if(gRouteNewGame) {
             proceed=check(click(kResumeButtonId) && until(catalogue,false) &&
-                click(CampaignMenu::FirstChoiceId) && click(CampaignMenu::ConfirmId) &&
-                until(loadComplete,true) && playing() && ctx.campaign->State().activeSlot==0,
+                click(CampaignMenu::FirstChoiceId) && until(loadComplete,true) && playing() &&
+                ctx.campaign->State().activeSlot==0,
                 "ordinary New Game selects an empty slot and presents the playable opening");
         } else {
             proceed=check(click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) && until(catalogue,false) &&
