@@ -1718,7 +1718,8 @@ struct PresentableTinyRtSceneObservationTestAccess
         const bool supportFits= supportTriangles==143304u+churchyardTriangles+smithTriangles+
             horde::gameplay::bellwether::kBellwetherGrateSolidTriangles+
             horde::gameplay::bellwether::kMillTallySolidTriangles+
-            horde::gameplay::bellwether::kBellwetherStockSolidTriangles &&
+            horde::gameplay::bellwether::kBellwetherStockSolidTriangles+
+            horde::gameplay::bellwether::kMillBenchLampSolidTriangles &&
             supportTriangles<=horde::gameplay::simulation::TriangleSupportSurface::kMaximumTriangles;
         std::cout << "Combined forest and town native support: " << supportTriangles
                   << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';

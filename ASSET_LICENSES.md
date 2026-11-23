@@ -1145,6 +1145,12 @@ Samfa12/Codex. The editable source and authoring script are retained alongside
 the checked-in runtime GLB. The model uses one opaque material and no external
 textures or third-party asset inputs.
 
+## Bellwether mill bench oil lamp - 23 November 2026
+
+The iron clamp, clay oil cup, wick and hood are original Horde Blender geometry
+by Samfa12/Codex. They reuse existing Bellwether materials. The editable master
+and receipt are in assets/models/world/source/bellwether-mill-lamp-v1/.
+
 ## Bellwether waterwheel source - 22 November 2026
 
 The rigid wheel is original Horde geometry authored in Blender by Samfa12/Codex.

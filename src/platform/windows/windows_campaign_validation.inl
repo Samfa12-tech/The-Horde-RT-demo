@@ -1964,20 +1964,20 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     fork() && walkTo(kBellwetherMillApproach[1]) && east() &&
                     state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::Seated,
                     "the authored south route loads both eastern residents while Kit stays at the hearth");
+                const auto exteriorLampPresented = [&](std::uint32_t id) {
+                    const auto& ids = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                    return state.fireEmitterCount == 4u && state.fireEmitters[3].stableId == id &&
+                        ctx.rtScene.HasUploadedFireEmitters() && std::find(ids.begin(),ids.end(),id) != ids.end();
+                };
                 if (progressed && gBellwetherPreparationsValidation) {
                     constexpr BellwetherStation approach{
                         std::lerp(kBellwetherMillApproach[1].x, kBellwetherSalvagerMark.x, .60f),
                         std::lerp(kBellwetherMillApproach[1].z, kBellwetherSalvagerMark.z, .60f)};
-                    const auto lampSelected = [&] {
-                        const auto& ids = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
-                        return ctx.rtScene.HasUploadedFireEmitters() &&
-                            std::find(ids.begin(), ids.end(), horde::gameplay::effects::kBellwetherRiverForkLampEmitterId)
-                                != ids.end();
-                    };
                     progressed = check(walkTo(approach) &&
                         face((kRiverForkLampFlame[0] + kBellwetherSalvagerStand.x) * .5f,
                             (kRiverForkLampFlame[2] + kBellwetherSalvagerStand.z) * .5f) &&
-                        east() && lampSelected() && capture("windows-combined-fork-lamp.png"),
+                        east() && exteriorLampPresented(horde::gameplay::effects::kBellwetherRiverForkLampEmitterId) &&
+                        capture("windows-combined-fork-lamp.png"),
                         "the fork lamp reaches the normal exterior RT fire budget and presents beside the salvager");
                 }
                 if (progressed) {
@@ -1991,7 +1991,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         << " grounded=" << state.playerGrounded << " offer=" << static_cast<int>(offer)
                         << " stage=" << static_cast<int>(state.shorePracticeStage)
                         << " line=" << static_cast<int>(state.chapterDialogue.line) << '\n';
-                    progressed = check(started && frame() && capture("windows-combined-shore.png"),
+                    progressed = check(started && frame() &&
+                        exteriorLampPresented(horde::gameplay::effects::kBellwetherRiverForkLampEmitterId) &&
+                        capture("windows-combined-shore.png"),
                         "the salvager starts shore practice with both eastern actors in the same presented scene");
                 }
                 if (progressed && gBellwetherPreparationsValidation) {
@@ -2026,9 +2028,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 }
                 if (progressed) {
                     progressed = check(reachWorkbench() && face(kMillComparison[0], kMillComparison[2]) && east() &&
-                        state.millAction == MillAction::InspectGearing && capture("windows-combined-mill.png") &&
+                        state.millAction == MillAction::InspectGearing &&
+                        exteriorLampPresented(horde::gameplay::effects::kBellwetherMillBenchLampEmitterId) &&
+                        capture("windows-combined-mill.png") &&
                         interact() && state.millPreparation == MillPreparation::BearingNeeded,
-                        "the mill workbench advances preparation with both eastern actors in the same presented scene");
+                        "the lit mill workbench advances preparation with both eastern actors in the same presented scene");
                 }
                 if (progressed && gBellwetherPreparationsValidation) {
                     progressed = check(leaveWorkbench() && walkTo(kBellwetherBearingBinApproach) &&

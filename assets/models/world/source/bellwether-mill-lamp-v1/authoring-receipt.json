@@ -1,0 +1,33 @@
+{
+  "feature": "B05 mill bench oil lamp",
+  "originalTownSha256": "070b29b105fe591156d7f98c4f6fdbe449c24466bf8c91f99bee21fa91da7b5c",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "a2031a2c782d37fe9b2c3e63617c3f708bd10d9b506c025b928df69dbaf40a8f",
+  "lampFoot": [
+    116.869,
+    -12.835765380859375,
+    115.018
+  ],
+  "lampFlame": [
+    116.916,
+    -11.976765380859375,
+    115.221
+  ],
+  "lampLight": [
+    116.839,
+    -11.885765380859375,
+    115.24900000000001
+  ],
+  "addedSolidTriangles": 372,
+  "townVertices": 57362,
+  "townTriangles": 27732,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "e32a04e36507b0e4460dea12b9f65801e69096e9c4d65a7455af06827da4f319",
+  "files": {
+    "bellwether-mill-lamp.blend": "0a23280abcbc4142af1f13adda8258c95a07c9e8e9cfd71ca28f762e6498dc65",
+    "mill-bench-lamp.glb": "7cfb17fb86ea327c754aa6ef9716cab0acf5b61260c3d805d8495be4ac0ec7e2",
+    "bellwether-tavern-v1.glb": "a2031a2c782d37fe9b2c3e63617c3f708bd10d9b506c025b928df69dbaf40a8f",
+    "asset.manifest.json": "93557354819bbb13ea55ce2faa23aa4937c85f0d69e9d55c50fc328c6e424698",
+    "geometry.generated.h": "735d74a71200e05d7981368343fc52739728564d3c318890bef0823c14274000"
+  }
+}

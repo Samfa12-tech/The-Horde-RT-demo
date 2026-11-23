@@ -95,7 +95,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeBellwetherRiverForkLampFireEmitter(),
                            effects::MakeBellwetherRelicStallLampFireEmitter(),
                            effects::MakeBellwetherSmithLampFireEmitter(),
-                           effects::MakeBellwetherGrateLampFireEmitter()};
+                           effects::MakeBellwetherGrateLampFireEmitter(),
+                           effects::MakeBellwetherMillBenchLampFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2151,6 +2152,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             effects::BellwetherSmithLampFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[5],
             effects::BellwetherGrateLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[6],
+            effects::BellwetherMillBenchLampFireInput(),fixedDeltaSeconds);
     }
 }
 

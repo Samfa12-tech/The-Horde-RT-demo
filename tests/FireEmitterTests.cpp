@@ -268,6 +268,18 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
         forkUpload.selectedStableIds[0]==kBellwetherRiverForkLampEmitterId &&
         forkUpload.emitters[0].lightPositionStrength[3]>0.f,
         "fork lamp uses the authored anchors and a steady small warm outside flame within ordinary selection");
+    const auto& millLight=horde::gameplay::bellwether::kMillBenchLampLight;
+    auto millLamp=MakeBellwetherMillBenchLampFireEmitter();
+    StepFireEmitterFixed(millLamp,BellwetherMillBenchLampFireInput(),kFixedDelta);
+    const std::array millFires{hearth,candle,millLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(millLight[0],millLight[2])==6u &&
+        SelectBellwetherExteriorLamp(lampLight[0],lampLight[2])==2u &&
+        Approx(millLamp.worldFromLight[13],millLight[1]) &&
+        BuildFireEmitterUpload(millFires,{millLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+            upload.selectedStableIds[0]==kBellwetherMillBenchLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the mill wick replaces the distant fork lamp locally and still fits the held lantern in the fire budget");
     return ok;
 }
 

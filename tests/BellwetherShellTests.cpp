@@ -195,6 +195,19 @@ int main(int argc,char** argv) {
     const auto result=AppendBellwetherShell(root,world,support,error,&glazing,&cover,&ledger,&door);
     if(!result)std::cerr<<error<<'\n';
     check(result,"real exported town and its tavern interior enter the native world owner");
+    if(result) {
+        using namespace horde::gameplay::bellwether;
+        const auto& foot=kMillBenchLampFoot;
+        const auto& flame=kMillBenchLampFlame;
+        const auto& light=kMillBenchLampLight;
+        check(std::abs(foot[1]+.16f-kMillComparison[1])<.002f &&
+              !support->NonWalkableVolumeClear(foot[0]-.14f,foot[2],foot[0],foot[2],
+                  foot[1]+.01f,foot[1]+.04f,.012f) &&
+              support->NonWalkableVolumeClear(flame[0],flame[2],flame[0],flame[2],
+                  flame[1]+.005f,flame[1]+.121f,.043f) &&
+              support->NonWalkableVolumeClear(light[0],light[2],light[0],light[2],light[1]-.015f,light[1]+.015f,.012f),
+              "mill lamp clamps to the admitted bench and leaves a clear open wick and emitting point below the hood");
+    }
     using Tier=BellwetherFurnitureDetail;
     const auto select=[](float beyond,Tier current) {
         return SelectBellwetherFurnitureDetail(82.3f,
