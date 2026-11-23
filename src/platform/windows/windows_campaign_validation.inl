@@ -1686,8 +1686,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const auto stockWitness = [&](std::size_t animal, const char* resting, const char* alert) {
                             const auto settled = [&] { return state.stockHeadPoses[animal]==StockHeadPose{}; };
                             const auto moved = [&] { return std::abs(state.stockHeadPoses[animal].yawRadians) > .10f; };
-                            return waitFor(settled, 1500) && capture(resting, false) && settled() &&
-                                waitFor(moved, 1500) && capture(alert, false) && moved();
+                            return waitFor(settled, 1500) && frame() && capture(resting, false) && settled() &&
+                                waitFor(moved, 1500) && frame() && capture(alert, false) && moved();
                         };
                         input.pitchRadians=-.28f;
                         const bool visitedStock=check(talked && walkTo(approach.back()) &&
