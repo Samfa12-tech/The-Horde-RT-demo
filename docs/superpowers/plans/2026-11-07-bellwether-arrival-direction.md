@@ -503,6 +503,20 @@ additional animated resident slot. Rig admission, occasional animal motion,
 ambient sound and combined handset cost remain open for the active stock
 pocket.
 
+The [editable source and receipt](../../../assets/models/world/source/bellwether-stock-v1/README.md)
+add 5,876 solid triangles in the existing town materials and primitives.
+The final GLB and the exact approach marks reproduced byte for byte from
+Blender. The Windows replay at `43283f44` passed all 31 checks on both
+hardware RT backends. It walked from the garden to the closed gate and
+roost, presented the pig and hens under the carried lantern, and rejoined
+the existing town route without changing the save. All three host suites
+passed, including the gate's standing-body collision check and the scene
+resource inventory. The combined private ARM64 Debug build at `4ac33718`
+contains the exact town mesh and preserves the resident and voice inputs.
+Android unit tests passed 601 with six skipped. Phone presentation and
+timing remain open. Audio/haptic manual revalidation required: NO for the
+settled geometry and viewing route.
+
 ### West service yard
 
 The [closed privy](../../../assets/models/world/source/bellwether-privy-v1/README.md) sits west of the tavern with a latched door, washstand, covered jug and sheltered shelf. Its dry approach leaves the well, ramp and main routes clear. Drainage and waste handling still need review.
