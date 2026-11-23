@@ -409,6 +409,10 @@ With the artificer present, **Seat the bearing** installs the replacement drive 
 
 Follow the lower river causeway and turn north before the seal-trial platform. The stone footway reaches a standing view beside the wheel and continues to a 7 m crossing upstream. The span slopes down to a fenced service turnout on the river side of the headrace. The crossing is available before the repair and requires no equipment or progression. The terrain and the finite water course retain their original shapes. [Mill crossing source and fit](../../../assets/models/world/source/bellwether-mill-crossing-v1/README.md)
 
+After the drive test, the dry footway is within range of the new positional oak journal cue. The cue uses the wheel's fixed-step phase and shares the existing finite ambience voice. Exact-build listening and physical handset performance remain open. Audio/haptic manual revalidation required — YES, for the new cue and its spatial mix.
+
+At `6e133a54` the combined Windows preparation replay passed 51 checks on each hardware RT backend. It walked to the dry witness, observed a positional axle event and presented the wheel on that simulation tick. The private signed ARM64 Debug APK contains the same cue bytes as the Windows package staging. The Android suite ran 609 tests with six skips and no failures.
+
 The original Blender assembly uses one untextured bronze material and 384 triangles. The native renderer reuses the rigid-prop transform path. The drive adds one BLAS and one TLAS instance to the chapter and uses no extra texture layers. The `bellwether-mill-drive-tested` checkpoint walks to the bin and the workbench and reaches the tested stage through the normal action handlers.
 
 On Windows Debug, pass the two-role mill folder to the existing `--bellwether-campaign-dir` option. On Android, build Debug with the pinned `artificer` and `tavern-keeper` directories under the existing resident overlay. The mill profiles use separate save storage, and the existing church profiles continue to use the record keeper.

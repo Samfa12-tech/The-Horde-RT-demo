@@ -372,8 +372,10 @@ void WaterwheelContact() {
     event.worldZ = event.listenerZ = Local::kMillAxle.z;
     event.intensity = .65f;
     event.listenerX = event.worldX - 2.f;
+    event.listenerZ = event.worldZ + 2.f;
     const auto near = ChapterAmbienceGains(event);
     event.listenerX = event.worldX - Local::kMillRange + .05f;
+    event.listenerZ = event.worldZ;
     const auto edge = ChapterAmbienceGains(event);
     Check(near.right > near.left && near.left > .05f && !near.obstructed && edge.right < .02f,
           "the axle contact uses exterior pan and fades to the edge at ten metres");
