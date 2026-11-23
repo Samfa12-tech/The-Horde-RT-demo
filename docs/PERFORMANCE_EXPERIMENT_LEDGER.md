@@ -69,9 +69,34 @@ private five-resident campaign directory, then verify the output.
 python tools/analyze-chapter-route-measurement.py --bellwether-west-roundtrip <run-directory>
 ```
 
-The [Android launch and retrieval steps](../android/README.md#west-village-round-trip)
-use a separate checkpoint and CSV. Keep the APK and shader digests, graphics
-settings, thermal observations, and completed frame evidence with each handset run.
+Android uses a separate checkpoint and CSV. Keep the APK and shader digests,
+graphics settings, thermal observations, and completed frame evidence with each
+handset run. [Android launch and retrieval](../android/README.md#west-village-round-trip)
+
+On 23 November the RTX 5050 Laptop GPU completed both returns on each backend
+in 234.88 seconds with 14,092 simulation ticks and zero peak pending ticks.
+The same optimized Debug executable used Shipping/High at 960 × 540. The
+verifier joined every GPU sample to its successful present, saw one dealer
+handoff each way on both laps, and observed the settled pose and all three
+gestures with three submitted head instances on each visit.
+
+| Windows RT backend | Joined frames | Room GPU median | Stock-yard GPU median / p95 |
+| --- | ---: | ---: | ---: |
+| RayTracingPipeline | 38,582 | 2.38 ms | 1.45 / 2.91 ms |
+| RayQueryCompute | 38,496 | 2.28 ms | 1.31 / 2.78 ms |
+
+The Windows executable SHA-256 is
+`f60fd14f10b1375ad7a80e7561dc654fcf3a1d192f4bf831cf8b6499c8699757`.
+The first attempt reached its second yard visit before the inherited
+30,000-frame limit stopped collection at 182.72 seconds. The verified west
+run uses the 240-second route clock as its bound. Raw reports and exact
+hashes are under `reports/horde-bellwether-west-timing-20261123-130910`.
+
+The signed five-resident ARM64 Debug APK at `542cd184` has SHA-256
+`b4a2bd990d4b942cee31edc96deb52341b1331d77e93141c051b3be6384c66b2`.
+It includes the west checkpoint with Shipping/Mobile and GPU-stage recording,
+the same 25 resident files and 13 voice files, and 602 passing Android tests
+with six skipped. The phone was disconnected. Physical timings remain open.
 
 ## Closed or retained rendering experiments
 
