@@ -21,7 +21,8 @@ public final class ChapterVoiceAssetsTest {
     @Test public void everyAdmittedSpeechLineHasOneUniqueKeyAndExpectedRuntimePath() {
         assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0)
                         + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0)
-                        + (BuildConfig.BELLWETHER_SALVAGER_AUDITION ? 3 : 0),
+                        + (BuildConfig.BELLWETHER_SALVAGER_AUDITION ? 3 : 0)
+                        + (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION ? 6 : 0),
                 ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
@@ -96,6 +97,23 @@ public final class ChapterVoiceAssetsTest {
                 assertTrue(asset.soundKey.startsWith("salvager_"));
             } else assertNull(asset);
         }
-        assertNull(ChapterVoiceAssets.forLine(55));
+    }
+
+    @Test public void followOnVoicesKeepTheirExactLinesAndMissingSoundFallback() {
+        final int[] lines = {38, 39, 44, 45, 47, 55};
+        final String[] ids = {"hub.two_routes", "hub.routes_independent", "kit.voice_reaction",
+                "kit.first_direct_voice.finish", "kit.royal_claim.help", "hub.ordinary_sale"};
+        for (int i = 0; i < lines.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
+            if (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+                assertEquals(Integer.valueOf(18), ChapterVoiceAssets.soundIdForLine(
+                        lines[i], java.util.Collections.singletonMap(asset.soundKey, 18)));
+            } else assertNull(asset);
+            assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
+        }
+        assertNull(ChapterVoiceAssets.forLine(46));
     }
 }

@@ -64,6 +64,14 @@ final class ChapterVoiceAssets {
             assets.add(bellwether(53, "access.body_progress", "salvager_"));
             assets.add(bellwether(54, "hub.passing.learned_retreat", "salvager_"));
         }
+        if (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION) {
+            assets.add(bellwether(38, "hub.two_routes", "record_keeper_"));
+            assets.add(bellwether(39, "hub.routes_independent", "record_keeper_"));
+            assets.add(bellwether(44, "kit.voice_reaction", "kit_"));
+            assets.add(bellwether(45, "kit.first_direct_voice.finish", "kit_"));
+            assets.add(bellwether(47, "kit.royal_claim.help", "kit_"));
+            assets.add(bellwether(55, "hub.ordinary_sale", "relic_dealer_"));
+        }
         return Collections.unmodifiableList(assets);
     }
 

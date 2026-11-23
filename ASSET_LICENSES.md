@@ -1188,3 +1188,11 @@ five 24 kHz mono PCM16 WAVs are byte-pinned for local Debug audition.
 The private archive retains the original files, scripts, voices, receipts,
 and review copies. Owner listening approval and wider distribution rights
 for these five takes remain open.
+
+## Bellwether follow-on voice audition - 23 November 2026
+
+The private overlay reuses three Kit and two Record keeper takes from the
+approved 4 November review reels, and the 29 October Relic dealer trade
+audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
+of the archived takes. Private build admission keeps their stable line IDs
+and existing captions. Public distribution clearance remains open.

@@ -30,6 +30,18 @@ $executableIdentity = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($
 if ($executableIdentity -cnotmatch "g:$revision;i:[0-9a-f]{64};c:D;s:C") {
     throw 'Build the Windows playtest in Debug from the current clean source commit.'
 }
+$voiceLines = @(
+    'kit.accept_base.limit','kit.accept_base.work','kit.accept_base.sit','hub.kit_introduce','hub.hoard_answer',
+    'kit.approach_injury.stop','kit.approach_injury.ankle','kit.approach_injury.slow','hub.arrival_chair','hub.horde_army',
+    'access.body_task','access.body_progress','hub.passing.learned_retreat'
+)
+$followOn = @('hub.two_routes','hub.routes_independent','kit.voice_reaction','kit.first_direct_voice.finish',
+    'kit.royal_claim.help','hub.ordinary_sale')
+$presentFollowOn = @($followOn | Where-Object { Test-Path -LiteralPath (Join-Path $voices "$_.wav") })
+if ($presentFollowOn.Count -gt 0) {
+    if ($presentFollowOn.Count -ne $followOn.Count) { throw 'The follow-on audition needs all six prepared WAVs.' }
+    $voiceLines += $followOn
+}
 
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
     'reports/horde-bellwether-playtest-' + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
@@ -78,11 +90,7 @@ foreach ($role in @('tavern-keeper','record-keeper','artificer','salvager','reli
         Copy-PlaytestInput (Join-Path $residents $relative) (Join-Path $assetRoot "private_bellwether/$relative")
     }
 }
-foreach ($line in @(
-    'kit.accept_base.limit','kit.accept_base.work','kit.accept_base.sit','hub.kit_introduce','hub.hoard_answer',
-    'kit.approach_injury.stop','kit.approach_injury.ankle','kit.approach_injury.slow','hub.arrival_chair','hub.horde_army',
-    'access.body_task','access.body_progress','hub.passing.learned_retreat'
-)) {
+foreach ($line in $voiceLines) {
     Copy-PlaytestInput (Join-Path $voices "$line.wav") (Join-Path $assetRoot "private_bellwether_voice/$line.wav")
 }
 Copy-PlaytestInput $executable (Join-Path $package 'HordeLanternRT.exe')
@@ -114,6 +122,6 @@ Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $archive
     sha256 = (Get-FileHash -LiteralPath $archive).Hash.ToLowerInvariant()
     bytes = (Get-Item -LiteralPath $archive).Length
     residentFiles = 25
-    voiceFiles = 13
+    voiceFiles = $voiceLines.Count
 } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'windows-package.json')
 Write-Output $output

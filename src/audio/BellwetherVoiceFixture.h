@@ -40,14 +40,27 @@ inline constexpr std::array kBellwetherSalvagerAuditionCuts{
     BellwetherVoiceCut{gameplay::dialogue::Line::SalvagerShoreReturn,111344,"01af397a57165188e559aaebe18edc5e76deeb4e2dedb91ab19a041cd11d1971"}
 };
 
+// The November 4 Kit and record-keeper review takes and October 29 dealer
+// audition match the existing playable scripts. Keep the caption reading time.
+inline constexpr std::array kBellwetherFollowOnAuditionCuts{
+    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperTwoRoads, 106064, "dc6602591b41f3b42a598f41f2113dc01a613f2b6ec62dbf94337b72a2c28d5d"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperRoadOrder, 135824, "3506524546c1506b8183c2268f3a46c09421ffe79419ba25ae3646f826b6bcf0"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::KitVoiceReaction, 92624, "305ea7a23ee19fa7c92db51b5b1a515139209a6dd6ffaf9e490f73864ea1f0ed"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::KitVoiceListen, 45584, "fe8f68d761ad49bcdbf56e54c4f268a0584536a5c291f5051e6343391abb6048"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::KitRoadHelp, 122384, "3bf0390321c7abf02f5faf13f02773f3b560fd74f2aef1b42f9f14f753e6e817"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::RelicDealerOrdinarySale, 78704, "7f045c4859e64d7dd79d9d813cffb5cb49f66e7d999dc2a70107beac683e05b7"}
+};
+
 inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false,
-                                            bool salvagerAudition = false) {
+                                            bool salvagerAudition = false, bool followOnAudition = false) {
     const auto matches = [line](const BellwetherVoiceCut& cut) { return cut.line == line; };
     return std::any_of(kBellwetherVoiceCuts.begin(), kBellwetherVoiceCuts.end(), matches) ||
         (arrivalAudition && std::any_of(kBellwetherArrivalAuditionCuts.begin(),
                                       kBellwetherArrivalAuditionCuts.end(), matches)) ||
         (salvagerAudition && std::any_of(kBellwetherSalvagerAuditionCuts.begin(),
-                                       kBellwetherSalvagerAuditionCuts.end(), matches));
+                                       kBellwetherSalvagerAuditionCuts.end(), matches)) ||
+        (followOnAudition && std::any_of(kBellwetherFollowOnAuditionCuts.begin(),
+                                       kBellwetherFollowOnAuditionCuts.end(), matches));
 }
 
 } // namespace horde::audio

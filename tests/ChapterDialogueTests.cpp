@@ -98,6 +98,16 @@ int main() {
             std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
             "arrival audition uses the measured WAV and keeps the required timed caption");
     }
+    constexpr std::array<std::uint32_t, 6> followOnLineIds{38, 39, 44, 45, 47, 55};
+    for (std::size_t i = 0; i < followOnLineIds.size(); ++i) {
+        const auto& cut = horde::audio::kBellwetherFollowOnAuditionCuts[i];
+        const auto& spec = Spec(cut.line);
+        Check(static_cast<std::uint32_t>(cut.line) == followOnLineIds[i] &&
+            !horde::audio::HasBellwetherVoiceCut(cut.line, true, true) &&
+            horde::audio::HasBellwetherVoiceCut(cut.line, false, false, true) &&
+            RequiresChapterCaption(cut.line) && static_cast<float>(cut.frames) / 24000.f <= spec.duration,
+            "the private follow-on cut fits the existing caption window and agrees with the Android line ID");
+    }
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
           "invalid catalogue paths cannot escape the supplied asset root");

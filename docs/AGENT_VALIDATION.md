@@ -139,7 +139,8 @@ For a requested broad candidate gate, `tools/run-foundation-validation.ps1 -Mode
 Build the Windows Debug executable from a clean commit with
 `HORDE_RT_SHIPPING17_CONTENT=ON` and Shipping/High shaders. Pass it to
 `tools/package-bellwether-playtest.ps1` with the hash-pinned Windows 1.7 ZIP,
-the five Windows resident folders and the thirteen audition WAVs. It stages
+the five Windows resident folders and the thirteen base audition WAVs. The
+six follow-on takes can be supplied together as a further private group. It stages
 the current runtime roster and existing flask and revival assets in a ZIP under
 `reports/`. Extract the entire ZIP and open `HordeLanternRT.exe`. The executable
 detects the local playtest marker, validates the packaged overlays, and uses the
