@@ -2017,21 +2017,21 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         backFromShore() && walkTo(mill[1]),
                         "the earned rig only seals after a full wet hold and deliberate confirmation on dry stone");
                 }
+                const auto settleResidentPair = [&](std::uint32_t second) {
+                    const std::array expected{kTavernKeeperActorId, second};
+                    // The replay advances whole sections between frames. Give
+                    // the asynchronous prefetch a bounded wall-clock window
+                    // at the witness mark before checking publication.
+                    const auto readyBy = std::chrono::steady_clock::now() + std::chrono::milliseconds(750);
+                    while (ctx.rtScene.ChapterResidentSourceIds() != expected &&
+                           std::chrono::steady_clock::now() < readyBy)
+                        if (!frame()) return false;
+                    return ctx.rtScene.ChapterResidentSourceIds()==expected && step();
+                };
                 if (progressed) {
                     const bool complete = gBellwetherPreparationsValidation;
                     const bool backAtJunction = complete ? walkTo(*junction) :
                         std::all_of(mill.rbegin(), mill.rend(), walkTo);
-                    const auto settleResidentPair = [&](std::uint32_t second) {
-                        const std::array expected{kTavernKeeperActorId, second};
-                        // The fixed-step replay advances whole sections between frames.
-                        // Give the existing asynchronous prefetch a bounded wall-clock
-                        // window at the witness mark before checking publication.
-                        const auto readyBy = std::chrono::steady_clock::now() + std::chrono::milliseconds(750);
-                        while (ctx.rtScene.ChapterResidentSourceIds() != expected &&
-                               std::chrono::steady_clock::now() < readyBy)
-                            if (!frame()) return false;
-                        return step();
-                    };
                     const auto forkResident = gBellwetherCombinedRelicDealer ? kRelicDealerActorId : kSalvagerActorId;
                     progressed = check(
                         backAtJunction && settleResidentPair(forkResident) && fork() &&
@@ -2064,7 +2064,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     };
                     const auto tray = [&] {
                         return depart() && std::all_of(kBellwetherWestApproach.begin(),
-                            kBellwetherWestApproach.end(),walkTo) && walkAt(kMillTallyTrayView);
+                            kBellwetherWestApproach.end(),walkTo) && walkAt(kMillTallyTrayView) &&
+                            settleResidentPair(kRelicDealerActorId);
                     };
                     const auto board = [&] {
                         return depart() && std::all_of(std::next(mill.begin()),mill.end(),walkTo) &&
