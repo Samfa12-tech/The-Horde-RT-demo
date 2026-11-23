@@ -1205,41 +1205,13 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool primaryReceiver,
     bool dualSkyVisibility = primaryReceiver && primarySkyShadowSamples() > 1;
     vec3 localPosition;
     activeLocalLight(localPosition, localColor, localStrength);
-    bool localLightActive = localStrength > 0.001;
+    vec3 localVector = localPosition - h.position;
+    float localDistance = length(localVector);
+    vec3 localDirection = localVector / max(localDistance, 0.001);
     int sampleIndex = areaShadowSampleIndex();
-    float reflective = max(h.metallic, h.reflectivity);
-    vec3 sampleDirection = vec3(0.0);
-    vec3 otherDirection = vec3(0.0);
-    float sampleDistance = 0.0;
-    float otherDistance = 0.0;
-    float localDiffuse = 0.0;
-    float localSpecular = 0.0;
-    float localAttenuation = 0.0;
-    // An absent passage/staff light contributes zero. Its shadow sample
-    // slots stay disabled, while the independent fire and sky lights run.
-    if (localLightActive)
-    {
-        vec3 localVector = localPosition - h.position;
-        float localDistance = length(localVector);
-        vec3 localDirection = localVector / max(localDistance, 0.001);
-        localDiffuse = max(dot(h.normal, localDirection), 0.0);
-        localSpecular = pow(max(dot(reflect(-localDirection, h.normal),
-                                    -rayDirection), 0.0),
-                            mix(34.0, 5.0, reflective));
-        localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
-
-        vec3 sampleVector = localPosition + areaShadowOffset(sampleIndex) - h.position;
-        sampleDistance = length(sampleVector);
-        sampleDirection = sampleVector / max(sampleDistance, 0.001);
-        otherDirection = sampleDirection;
-        otherDistance = sampleDistance;
-        if (dualVisibility)
-        {
-            vec3 otherVector = localPosition + areaShadowOffset(1 - sampleIndex) - h.position;
-            otherDistance = length(otherVector);
-            otherDirection = otherVector / max(otherDistance, 0.001);
-        }
-    }
+    vec3 sampleVector = localPosition + areaShadowOffset(sampleIndex) - h.position;
+    float sampleDistance = length(sampleVector);
+    vec3 sampleDirection = sampleVector / max(sampleDistance, 0.001);
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localTransmittance = vec3(0.0);
     vec3 skyTransmittance = vec3(0.0);
@@ -1247,6 +1219,14 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool primaryReceiver,
     float skyDistance;
     vec3 skyRadiance;
     float skyGain;
+    vec3 otherDirection = sampleDirection;
+    float otherDistance = sampleDistance;
+    if (dualVisibility && localStrength > 0.001)
+    {
+        vec3 otherVector = localPosition + areaShadowOffset(1 - sampleIndex) - h.position;
+        otherDistance = length(otherVector);
+        otherDirection = otherVector / max(otherDistance, 0.001);
+    }
     activeSkyLight(h.position, sampleIndex, skyDirection, skyDistance,
                    skyRadiance, skyGain);
     vec3 otherSkyDirection = skyDirection;
@@ -1259,11 +1239,17 @@ vec3 shadeOpaqueDirect(HitInfo h, vec3 rayDirection, bool primaryReceiver,
                        otherSkyDistance, otherSkyRadiance, otherSkyGain);
         skyRadiance = 0.5 * (skyRadiance + otherSkyRadiance);
     }
+    float reflective = max(h.metallic, h.reflectivity);
+    float localDiffuse = max(dot(h.normal, localDirection), 0.0);
+    float localSpecular = pow(max(dot(reflect(-localDirection, h.normal),
+                                      -rayDirection), 0.0),
+                              mix(34.0, 5.0, reflective));
+    float localAttenuation = 1.0 / (1.0 + localDistance * localDistance * 0.58);
     skyDiffuse = max(dot(h.normal, skyDirection), 0.0);
     vec3 skyHalf = normalize(skyDirection - rayDirection);
     float skySpecular = pow(max(dot(h.normal, skyHalf), 0.0),
                             mix(12.0, 96.0, reflective));
-    bool localContributes = localLightActive &&
+    bool localContributes = localStrength > 0.001 &&
         (localDiffuse > 0.0 || localSpecular > 0.0);
     bool skyContributes = (skyGain > 0.0 || otherSkyGain > 0.0) &&
         (skyDiffuse > 0.0 || skySpecular > 0.0);
