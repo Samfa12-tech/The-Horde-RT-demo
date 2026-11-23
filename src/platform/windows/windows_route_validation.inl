@@ -360,11 +360,22 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 "actual movement fresh presented raise and quiet Kit story produce durable endpoint autosave");
             if(proceed){ShowPauseMenu(ctx,true);proceed=click(kCampaignSaveButtonId) && until(catalogue,false) &&
                 click(CampaignMenu::FirstChoiceId+1) && until([&]{return ctx.campaign->State().outcome!=campaign::PlayOutcome::Pending;},false);
-                campaign::storage::StoredCheckpoint manual;
+                campaign::storage::StoredCheckpoint manual,unchangedAuto;
                 proceed=check(proceed && ctx.campaign->State().operation==campaign::PlayOperation::ManualSave &&
                     ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded && ctx.campaign->State().activeSlot==0 &&
                     campaign::storage::Read(gCampaignValidationDirectory,"slot-2-manual.hrd",manual).status==campaign::storage::Status::Read &&
-                    manual.encoded==stored.encoded,"ordinary native Save creates endpoint manual in empty slot two without retargeting slot one auto");
+                    campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",unchangedAuto).status==
+                        campaign::storage::Status::Read && unchangedAuto.encoded==stored.encoded,
+                    "ordinary native Save creates endpoint manual in empty slot two and preserves slot one auto");
+                if(proceed){
+                    // The independent Save operation stamps its own UTC second.
+                    // Normalize that field alone before comparing checkpoint bytes.
+                    manual.checkpoint.savedAtUnixSeconds=stored.checkpoint.savedAtUnixSeconds;
+                    std::vector<std::byte> normalized;
+                    campaign::codec::Error error{};
+                    proceed=check(campaign::codec::Encode(manual.checkpoint,normalized,error) && normalized==stored.encoded,
+                        "manual and automatic lookout records preserve identical gameplay state");
+                }
                 if(proceed){proceed=click(CampaignMenu::BackId);PumpCampaign(ctx);proceed=proceed && click(kResumeButtonId);PumpCampaign(ctx);}
             }
             endpointSaved=proceed;

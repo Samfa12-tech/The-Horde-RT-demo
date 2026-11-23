@@ -162,6 +162,21 @@ its autosave. Keep `windows-route-validation.json`,
 with the ZIP receipt. Unseeded New Game evidence, physical-device performance
 and listening checks are separate.
 
+To include the tomb opening, leave the isolated directory free of save
+files. Write only the following line to `manifest.json` as UTF-8, with one
+final LF and no byte-order mark.
+
+```json
+{"evidenceClass":"empty profile for the scripted New Game route"}
+```
+
+Add `--route-from-new-game` to the packaged Windows validation command.
+This mode chooses an empty slot from the native New Game menu, defeats both
+guards and the Keeper with damage enabled, claims the lantern and earns the
+first on-disk checkpoint. It then continues the same route with the health
+left over from combat. The replay uses scripted inputs with tutorials off
+and muted audio. Repeat with a fresh directory for the other RT backend.
+
 On Android, build `:app:assembleDebug` with `-PhordeBellwetherPlaytest=true` and the
 `hordeBellwetherResidentDir`, `hordeBellwetherVoiceDir`, `hordeFlaskCandidateDir`
 and `hordePrivateRevivalDir` inputs. The full profile uses
