@@ -165,6 +165,21 @@ reloads it and climbs back outside. The check requires Kit to remain seated
 in Bellwether and the register reading, air ward, fitted hinge, purse, mill
 bearing and lantern exchange to survive both safe checkpoints.
 
+On 23 November, the extracted Windows playtest from `e0e6198a` passed 21
+checks on each hardware RT backend on the RTX 5050 Laptop GPU (driver
+610.47, Shipping/High at 1232 × 803). The isolated replay began at a seeded
+post-Keeper lower-chamber save. Ordinary controls completed the first ascent,
+lantern raise and flask guide, earned the forest lookout, returned to the
+tomb and loaded the lookout saved during the run. Kit's ankle assessment
+updated the lookout boundary. The replay used the south door, completed all
+three Talk lines, then loaded the tavern autosave through the native menu.
+Both hearts, the forest story and the completed conversation survived. Kit
+restored seated, with Directions available on the first live tick. Each
+backend recorded ten captures tied to successful RT presentations. Fresh
+New Game through both victories, handset pacing and in-game listening remain
+separate acceptance work. The private ZIP's SHA-256 is
+`f5d4fd24f2f5a2a2a44922e701fa78a4240b855d8f7173af352ff9122e24e66d`.
+
 Kit's three hearth lines now run as named captions. The first accompanies the lowering, then Kit explains his limits and pauses before offering help. A player who arrives after the sit sees the two seated lines. The tavern autosave tracks resolved lines, so a reload resumes at the first unresolved beat. Audio/haptic manual revalidation required: YES, for the hearth timing, captions and in-room mix. The reviewed recordings remain in private staging.
 
 The shared interaction and save path supports the three-line exchange between seated Kit and the tavern keeper. Talk appears only after the hearth lines resolve and both speakers reach their marks. Leaving the hearth or reloading stops the exchange. Choosing Talk again resumes at the first unresolved line. The [editable tavern](../../../assets/models/world/source/bellwether-tavern-v1/bellwether-tavern-v1.blend) marks the keeper beside the south doorway and across from Kit at the hearth, with an aisle route between them. The shared motor walks that path after Kit sits and restores the keeper at the hearth from an earned tavern save. The private campaign enables Talk with the stand-in. The final keeper model and the keeper's voiced lines remain open.
