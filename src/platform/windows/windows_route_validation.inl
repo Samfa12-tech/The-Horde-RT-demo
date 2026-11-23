@@ -224,7 +224,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             ctx.simulation.Snapshot().rescue.exteriorSide && !ctx.simulation.Snapshot().rescue.equipmentStowed,
             "ordinary context interaction and current fixed steps finish first rope ascent");
     }
-    ChapterRoundTripProbe probe;bool endpoint=false,endpointSaved=false;unsigned quietTicks=0;
+    ChapterRoundTripProbe probe;bool endpoint=false,endpointSaved=false,returningFromBasin=false;unsigned quietTicks=0;
     std::array<bool,4> kitViews{};
     if(proceed)proceed=check(probe.Start(ctx.simulation.Snapshot()),"existing input-only route driver admits the actually reached low-lantern upper state");
     while(proceed && probe.Phase()!=ChapterProbePhase::Lower) {
@@ -233,19 +233,24 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             const auto& snapshot=ctx.simulation.Snapshot();
             const bool outbound=probe.Phase()==ChapterProbePhase::Outbound;
             const bool followingBasin=outbound && snapshot.chapterCompanion.basinGuide;
+            returningFromBasin |= followingBasin;
             const bool quietOutbound=!gRouteNaturalWalkValidation && outbound && snapshot.chapterDialogue.line!=dialogue::Line::None;
             const auto& boundary=ctx.simulation.LatestCampaignBoundary();
             endpoint=boundary && boundary->id==campaign::CheckpointId::ForestEndpoint;
             const bool waitEndpoint=probe.Phase()==ChapterProbePhase::Lookout && !endpoint;
-            if(followingBasin || quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
+            if(returningFromBasin || quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
             else {quietTicks=0;input=probe.Next(snapshot);}
-            if(followingBasin) {
-                // Kit delivers the flask line only when both of us reach the landing.
-                const auto basin=simulation::kWorldRoutePoints[2];
-                const float dx=basin.x-snapshot.playerX,dz=basin.z-snapshot.playerZ;
+            if(returningFromBasin) {
+                // Hear the flask line at the landing, then rejoin the forest
+                // path at the reunion so we do not cut across the steep bank.
+                const auto mark=simulation::kWorldRoutePoints[followingBasin?2:3];
+                const float dx=mark.x-snapshot.playerX,dz=mark.z-snapshot.playerZ;
                 const float distance=std::hypot(dx,dz);
                 input.yawRadians=std::atan2(dx,-dz);
-                if(distance>2.4f)input.moveForward=std::min(distance-2.4f,1.f);
+                if(followingBasin) {
+                    if(distance>2.4f)input.moveForward=std::min(distance-2.4f,1.f);
+                } else if(distance>.10f)input.moveForward=std::min(distance/.20f,1.f);
+                else returningFromBasin=false;
             } else if(probe.Phase()==ChapterProbePhase::Outbound) {
                 // Obey the current escort rule. The generic optimization probe
                 // runs ahead; here ordinary walking waits for Kit within 3 m.
