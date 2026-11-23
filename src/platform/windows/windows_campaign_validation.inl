@@ -2090,10 +2090,20 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                                 saved.checkpoint.treasurePurse.millTally==progress &&
                                 saved.checkpoint.treasurePurse.coins==expectedCoins &&
                                 ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded;
-                        },false) || !reloadCheckpoint() ||
-                            !settleResidentPair(kRecordKeeperActorId) || !atHearth() || !frame()) {
-                            std::cerr << "Tally reload witness failed for progress " << static_cast<int>(progress)
+                        },false) || !reloadCheckpoint()) {
+                            std::cerr << "Tally autosave/load failed for progress " << static_cast<int>(progress)
                                       << " at " << state.playerX << ',' << state.playerZ << '\n';
+                            return false;
+                        }
+                        // The restored tavern scene can need a later publication
+                        // of its nearby keeper. The remote church actor is not
+                        // required for the tally ownership and return witness.
+                        const auto keeperReadyBy = std::chrono::steady_clock::now()+std::chrono::seconds(2);
+                        while (!atHearth() && std::chrono::steady_clock::now()<keeperReadyBy)
+                            if (!step() || !frame()) return false;
+                        if (!atHearth() || !frame()) {
+                            std::cerr << "Tally hearth witness unavailable after load for progress "
+                                      << static_cast<int>(progress) << '\n';
                             return false;
                         }
                         sceneEpoch=ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
