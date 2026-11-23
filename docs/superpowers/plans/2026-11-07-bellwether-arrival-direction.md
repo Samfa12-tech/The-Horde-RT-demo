@@ -457,6 +457,26 @@ together at the earned boundary. Earlier saves begin with the stamp unfound.
 Bellwether Directions shows the next steps of the chosen route. No Abbey or
 Foundry access gate depends on it.
 
+The Windows replay at `e1bd58a8` passed all 30 checks on each hardware RT
+backend. It walked the dry crossing, presented the separate ordinary and
+named trade marks, and reloaded the earned tavern checkpoint after each
+change of ownership. After recording the mill claim, the same replay
+recovered the stamp for free, returned it, and verified that existing
+silver proceeds and the fitted hinge retained their saved state. The
+accelerated replay waits up to 750 ms for the existing resident publication
+at the dealer witness. The stand, offering angle and caption are checked
+after the roster becomes ready.
+
+The codec test round-trips both return routes, verifies older saves byte for
+byte and spends all sale proceeds before testing free recovery. All six host
+suites passed. The private combined ARM64 Debug package at `ee1aafa6`
+contains the pinned town mesh, resident and voice inputs. Android unit
+tests passed 601 with six skipped. Device presentation and timing remain
+open. The case, tray and board add 320 solid triangles to the existing town
+primitives. Blender re-export reproduced the GLB and generated layout
+exactly. Audio/haptic manual revalidation required: NO. The interactions
+use text and create no audio or haptic events.
+
 ### Covered well in the square
 
 The [T01 well](../../../assets/models/world/source/bellwether-well-v1/README.md) occupies the mapped centre of the square. The stone base is solid in the shared collision mesh. Posts support a clay roof over the planked opening and hanging bucket. The tested route approaches from the south and rejoins the square. Drawing water remains outside this checkpoint.
