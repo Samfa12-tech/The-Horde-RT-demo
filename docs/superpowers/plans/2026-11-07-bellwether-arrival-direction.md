@@ -537,6 +537,21 @@ It contains the exact town and head assets and the same 25 resident files and
 six skipped. The phone was disconnected during that validation. Handset
 presentation, sustained timing and listening acceptance remain open.
 
+The audio checkpoint at `65032b0e` passed 31 checks on each Windows RT
+backend. The walkthrough recorded a fixed-step cue from each of the three
+animal mounts with nonzero spatial gain and the dry route intact. The
+walkthrough suppresses speaker playback. Six host audio and campaign suites
+passed, and a second FFmpeg conversion reproduced both admitted WAVs byte for
+byte. The provenance and closed roster are in the
+[stock audio manifest](../../../assets/audio/bellwether-stock/asset.manifest.json).
+
+The signed combined Android ARM64 Debug APK at `65032b0e` has SHA-256
+`1b281de52b3f600b53ba757f626b5f5292da819d981d7e6d43f9e3d8639f4757`.
+Both verified WAVs are stored directly for SoundPool. Unit tests passed 602
+with six skipped. Audio manual revalidation required, including at the gate,
+on the return walk, and while the man at the grate is speaking. The phone was
+disconnected, so this evidence covers APK packaging and host-side behaviour.
+
 ### West service yard
 
 The [closed privy](../../../assets/models/world/source/bellwether-privy-v1/README.md) sits west of the tavern with a latched door, washstand, covered jug and sheltered shelf. Its dry approach leaves the well, ramp and main routes clear. Drainage and waste handling still need review.
