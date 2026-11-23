@@ -435,10 +435,11 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
                     for row in samples if row['submission_serial'] in advanced_ticks]))
     assert pathlib.Path(analysis_name).name == analysis_name and analysis_name.endswith('.json')
     target = directory / analysis_name
+    payload = json.dumps(summary, indent=2) + '\n'
     if target.exists():
-        assert json.loads(target.read_text()) == summary, 'stored doorway analysis differs from verified arithmetic'
+        assert json.loads(target.read_text()) == json.loads(payload), 'stored doorway analysis differs from verified arithmetic'
     else:
-        target.write_text(json.dumps(summary, indent=2) + '\n')
+        target.write_text(payload)
     if print_phases:
         print(json.dumps(summary['phases']))
     return summary
