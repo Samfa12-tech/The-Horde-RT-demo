@@ -48,6 +48,11 @@ def bellwetherResidentPath = providers.gradleProperty('hordeBellwetherResidentDi
 def bellwetherResidentDirectory = bellwetherResidentPath ? file(bellwetherResidentPath).canonicalFile : null
 def bellwetherVoicePath = providers.gradleProperty('hordeBellwetherVoiceDir').orNull
 def bellwetherVoiceDirectory = bellwetherVoicePath ? file(bellwetherVoicePath).canonicalFile : null
+def bellwetherPlaytestValue = providers.gradleProperty('hordeBellwetherPlaytest').orElse('false').get()
+if (!(bellwetherPlaytestValue in ['true', 'false'])) {
+    throw new GradleException('hordeBellwetherPlaytest must be true or false.')
+}
+def bellwetherPlaytest = bellwetherPlaytestValue == 'true'
 def verifyBellwetherOverlay = { File root, Map pinned, String label ->
     if (!root.isDirectory()) throw new GradleException("Bellwether ${label} root is missing.")
     def actual = []
@@ -166,6 +171,10 @@ if (bellwetherVoiceDirectory) {
     if (bellwetherArrivalAudition) pinned.putAll(bellwetherArrivalAuditionWavs)
     if (bellwetherSalvagerAudition) pinned.putAll(bellwetherSalvagerAuditionWavs)
     verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
+}
+if (bellwetherPlaytest && !(bellwetherCombinedResidents && bellwetherRelicDealer &&
+        bellwetherArrivalAudition && bellwetherSalvagerAudition && flaskCandidateDirectory && privateRevivalDirectory)) {
+    throw new GradleException('Bellwether playtest requires all five residents, both voice groups, the flask and revival.')
 }
 
 def hordeVersionFile = rootProject.file('../VERSION')
@@ -456,7 +465,7 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
 if (bellwetherResidentDirectory && (actorWorkerExperiment || hordeStagedPrimaryDebugValidation ||
-        viewmodelCandidate || privateRevivalDirectory)) {
+        viewmodelCandidate || (privateRevivalDirectory && !bellwetherPlaytest))) {
     throw new GradleException('Bellwether Debug uses its own application and resident fixture.')
 }
 if (hordeBenchmarkMinRenderScale == 33 &&
@@ -929,13 +938,14 @@ android {
                     bellwetherRelicDealer ? '.debug.bellwether.dealer' :
                     (bellwetherSalvager ? '.debug.bellwether.shore' :
                     (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'))
-                applicationIdSuffix rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
+                applicationIdSuffix bellwetherPlaytest ? '.debug.bellwether.playtest' :
+                    rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
                 def rosterLabel = bellwetherCombinedResidents ? 'Horde RT Bellwether Combined Debug' :
                     bellwetherRelicDealer ? 'Horde RT Bellwether Dealer Debug' :
                     (bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' :
                     (bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
                     (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')))
-                resValue 'string', 'app_name', rosterLabel
+                resValue 'string', 'app_name', bellwetherPlaytest ? 'Horde RT Bellwether 1.8 Playtest' : rosterLabel
             } else {
                 applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
             }

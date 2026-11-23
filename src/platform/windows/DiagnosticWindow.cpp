@@ -14605,6 +14605,9 @@ int RunDiagnosticWindow(const int showCommand)
     };
     if (markerError) return failPlaytest("Could not inspect the local Bellwether playtest marker.");
     if (gBellwetherPackagedPlaytest) {
+#if !HORDE_RT_FLASK_ADMITTED || !HORDE_RT_REVIVAL_ADMITTED
+        return failPlaytest("The Bellwether playtest build needs the admitted flask and revival.");
+#endif
         if (!std::filesystem::is_regular_file(playtestMarker, markerError) || markerError ||
             !launchOptions.bellwetherCampaignDirectory.empty() || !launchOptions.bellwetherVoiceDirectory.empty())
             return failPlaytest("The Bellwether playtest requires its own packaged residents and voices.");

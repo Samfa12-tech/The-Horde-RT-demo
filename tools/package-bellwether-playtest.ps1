@@ -27,7 +27,9 @@ $voices = (Resolve-Path -LiteralPath $VoiceDirectory).Path
 $revision = (& git -C $repo rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or $revision -notmatch '^[0-9a-f]{40}$') { throw 'Could not identify the playtest source.' }
 $executableIdentity = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($executable))
-if (!$executableIdentity.Contains("g:$revision")) { throw 'Build the Windows playtest from the current source commit.' }
+if ($executableIdentity -cnotmatch "g:$revision;i:[0-9a-f]{64};c:D;s:C") {
+    throw 'Build the Windows playtest in Debug from the current clean source commit.'
+}
 
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
     'reports/horde-bellwether-playtest-' + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
