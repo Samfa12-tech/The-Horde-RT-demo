@@ -14,7 +14,9 @@ std::filesystem::path WindowsCampaignDirectory()
     if(SUCCEEDED(result) && raw) {
         root=std::filesystem::path(raw)/"HordeLanternRT";
 #if defined(_DEBUG)
-        if(!gBellwetherCampaignActors.empty()) {
+        if(gBellwetherPackagedPlaytest) {
+            root/="bellwether-playtest";
+        } else if(!gBellwetherCampaignActors.empty()) {
             using horde::gameplay::bellwether::Specialist;
             switch(gBellwetherCampaignSpecialist) {
                 case Specialist::Artificer: root/="bellwether-mill-debug"; break;

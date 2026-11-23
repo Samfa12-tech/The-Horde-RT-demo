@@ -224,6 +224,7 @@ bool gBellwetherSalvagerAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
+bool gBellwetherPackagedPlaytest = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherAnkleRestoreValidation = false;
@@ -14451,9 +14452,12 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = horde::vulkan::raytracing::SelectRtExecutionBackend(capabilities, true) !=
         horde::vulkan::RtExecutionBackend::Unsupported;
-    const std::string windowTitle = sceneMode
+    std::string windowTitle = sceneMode
         ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
+#if defined(_DEBUG)
+    if (gBellwetherPackagedPlaytest) windowTitle += " [Bellwether 1.8 playtest]";
+#endif
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
     if (sceneMode)
@@ -14577,7 +14581,7 @@ int RunDiagnosticWindow(const int showCommand)
     if(!acceptanceReady){std::cerr<<gAcceptanceProfile.Error()<<'\n';return 2;}
 
     if(!ConfigureHiddenCampaignValidation())return 2;
-    const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
+    CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
     if(gOpeningBenchmarkMenuValidation && (launchOptions.requested || launchOptions.benchmark.requested ||
         launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())) {
         std::cerr<<"Opening-menu validation cannot combine capture or standalone benchmark modes.\n";return 2;
@@ -14589,6 +14593,24 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     }
 #if defined(_DEBUG)
+    const auto packageDirectory = ExecutableDirectory();
+    const auto playtestMarker = packageDirectory / "Bellwether.playtest";
+    std::error_code markerError;
+    gBellwetherPackagedPlaytest = std::filesystem::exists(playtestMarker, markerError);
+    const auto failPlaytest = [&](const char* diagnostic) {
+        std::cerr << diagnostic << '\n';
+        if (gBellwetherPackagedPlaytest && !gCampaignHiddenValidation)
+            GameMessageBoxA(nullptr, diagnostic, "Bellwether playtest", MB_OK | MB_ICONERROR);
+        return 2;
+    };
+    if (markerError) return failPlaytest("Could not inspect the local Bellwether playtest marker.");
+    if (gBellwetherPackagedPlaytest) {
+        if (!std::filesystem::is_regular_file(playtestMarker, markerError) || markerError ||
+            !launchOptions.bellwetherCampaignDirectory.empty() || !launchOptions.bellwetherVoiceDirectory.empty())
+            return failPlaytest("The Bellwether playtest requires its own packaged residents and voices.");
+        launchOptions.bellwetherCampaignDirectory = packageDirectory / "assets/private_bellwether";
+        launchOptions.bellwetherVoiceDirectory = packageDirectory / "assets/private_bellwether_voice";
+    }
     if (!launchOptions.bellwetherCampaignDirectory.empty() &&
         ((launchOptions.requested && !launchOptions.measureBellwetherResidentRoundTrip) ||
          launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
@@ -14599,9 +14621,10 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     }
     if (!ConfigureBellwetherCampaignActors(launchOptions.bellwetherCampaignDirectory)) {
-        std::cerr << "Bellwether campaign directory failed the pinned resident identity check.\n";
-        return 2;
+        return failPlaytest("Bellwether campaign directory failed the pinned resident identity check.");
     }
+    if (gBellwetherPackagedPlaytest && !gBellwetherCombinedRelicDealer)
+        return failPlaytest("The Bellwether playtest requires the complete five-resident roster.");
     if (gBellwetherEarnTavernValidation && gBellwetherCampaignActors.empty()) {
         std::cerr << "The hidden tavern save check requires private Bellwether campaign residents.\n";
         return 2;
@@ -14616,9 +14639,10 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
-        std::cerr << "Bellwether voice directory failed the pinned WAV identity check.\n";
-        return 2;
+        return failPlaytest("Bellwether voice directory failed the pinned WAV identity check.");
     }
+    if (gBellwetherPackagedPlaytest && (!gBellwetherArrivalAudition || !gBellwetherSalvagerAudition))
+        return failPlaytest("The Bellwether playtest requires the complete arrival and shore voice overlays.");
 #endif
     gShowcaseCaptureHidden=launchOptions.captureHidden;
 #if !defined(_DEBUG)
