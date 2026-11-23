@@ -146,6 +146,20 @@ the current runtime roster and existing flask and revival assets in a ZIP under
 detects the local playtest marker, validates the packaged overlays, and uses the
 separate `bellwether-playtest/campaign-v1` save profile.
 
+For the packaged Windows campaign continuity check, export a fresh isolated
+lower-chamber fixture with `horde_rt_campaign_play_session_tests.exe
+--export-route-fixture <new directory>`. Run the extracted executable with
+`--route-validate-hidden --campaign-test-root <fixture directory>`. Use a second
+fresh fixture and add `--require-rayquery-compute` to check the other hardware
+backend. The fixture seeds the two tomb victories and lantern claim. The replay
+uses the live rope, lantern raise, flask guide, forest route and campaign menus
+to earn the lookout, return to the tomb and reload the lookout saved in that run.
+It then follows the south entrance to the tavern, earns the three-line Talk
+exchange and reloads its autosave. Keep `windows-route-validation.json`,
+`route-frames.csv`, the backend capability report and milestone PNGs together
+with the ZIP receipt. Unseeded New Game evidence, physical-device performance
+and listening checks are separate.
+
 On Android, build `:app:assembleDebug` with `-PhordeBellwetherPlaytest=true` and the
 `hordeBellwetherResidentDir`, `hordeBellwetherVoiceDir`, `hordeFlaskCandidateDir`
 and `hordePrivateRevivalDir` inputs. The full profile uses

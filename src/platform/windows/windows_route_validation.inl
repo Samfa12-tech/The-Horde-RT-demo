@@ -385,13 +385,16 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             proceed = check(arrivalStep(input) && waitFor([&]{
                 return state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
                     state.chapterDialogue.line == dialogue::Line::None;
-            },1800) && until([&]{
+            },1800), "one ordinary Talk interaction completes the three-line exchange");
+        }
+        if (proceed) {
+            proceed = check(until([&]{
                 return campaign::storage::Read(gCampaignValidationDirectory,"slot-2-auto.hrd",tavern).status ==
                     campaign::storage::Status::Read && tavern.checkpoint.id == campaign::CheckpointId::BellwetherTavern &&
+                    tavern.checkpoint.dialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
                     ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
             },false) && tavern.checkpoint.vitality == 2 && tavern.checkpoint.firstAscentCompleted &&
-                tavern.checkpoint.bellwetherAnkleAssessed && campaign::CompletedForestProgress(tavern.checkpoint.dialogue) &&
-                tavern.checkpoint.dialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size(),
+                tavern.checkpoint.bellwetherAnkleAssessed && campaign::CompletedForestProgress(tavern.checkpoint.dialogue),
                 "the earned tavern autosave preserves health and completed forest story in the same slot");
         }
         if (proceed) {
