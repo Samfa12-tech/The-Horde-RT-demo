@@ -520,6 +520,20 @@ Android unit tests passed 601 with six skipped. Phone presentation and
 timing remain open. Audio/haptic manual revalidation required: NO for the
 settled geometry and viewing route.
 
+The motion walkthrough at `22631e3a` passed all 31 checks on each Windows
+hardware RT backend. The dry route presents a resting and a moving pose for
+each animal, with the image tied to a successful RT presentation at that
+simulation tick. The host asset policy, terrain, scene resource inventory,
+shader ABI and render slot checks passed. A second Blender export reproduced
+both runtime GLBs, manifests and the mount header byte for byte.
+
+The signed combined ARM64 Debug APK at `27603992` has SHA-256
+`7ad33ef39c783e025a3c9783dd492258d0a7631d5433037fe6b9c9f54e9161df`.
+It contains the exact town and head assets and the same 25 resident files and
+13 voice files as the settled checkpoint. Android unit tests passed 601 with
+six skipped. The phone was disconnected during validation. Handset
+presentation, sustained timing and livestock audio remain open.
+
 ### West service yard
 
 The [closed privy](../../../assets/models/world/source/bellwether-privy-v1/README.md) sits west of the tavern with a latched door, washstand, covered jug and sheltered shelf. Its dry approach leaves the well, ramp and main routes clear. Drainage and waste handling still need review.
