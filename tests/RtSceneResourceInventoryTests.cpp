@@ -911,8 +911,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==41u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?45u:44u);
+        ok &= materials.size()==44u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?50u:49u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -1001,10 +1001,25 @@ struct PresentableTinyRtSceneObservationTestAccess
             scene.millWaterwheelBlas_.address=1u;
             scene.privyRagBlas_.address=1u;
             scene.dielectricFixtureBlas_.address=1u;
+            scene.stockHeadBlas_[0].address=2u;
+            scene.stockHeadBlas_[1].address=3u;
+            const auto& pig = instances[PresentableTinyRtScene::kFirstStockHeadMetadataIndex];
+            const auto& hen = instances[PresentableTinyRtScene::kFirstStockHeadMetadataIndex+1u];
+            horde::gameplay::bellwether::StockHeadPoses poses{};
+            poses[2].pitchRadians = -.2f;
+            std::array<VkAccelerationStructureInstanceKHR, 3> stock{};
+            ok &= Require(pig.primitiveCount==2u && hen.primitiveCount==3u && pig.assetIndex==hen.assetIndex &&
+                scene.ApplyStockHeadInstances(stock, poses, diagnostic) &&
+                stock[0].accelerationStructureReference==2u && stock[1].accelerationStructureReference==3u &&
+                stock[2].accelerationStructureReference==3u && stock[0].instanceCustomIndex!=stock[1].instanceCustomIndex &&
+                stock[1].instanceCustomIndex==stock[2].instanceCustomIndex &&
+                stock[0].mask==1u && stock[1].mask==1u && stock[2].mask==1u &&
+                stock[1].transform.matrix[1][0]==0.f && stock[2].transform.matrix[1][0]<-.19f,
+                "both hens share the same visible BLAS but use independent fixed-tick poses");
             const auto chapterTail=scene.ChapterTailInstanceCount();
             const std::uint32_t currentProfileTlasCount=PresentableTinyRtScene::kOrdinaryTlasInstanceCount+
                 64u+12u+chapterTail;
-            constexpr std::uint32_t fullBellwetherTailCount=7u+1u+
+            constexpr std::uint32_t fullBellwetherTailCount=10u+1u+
                 static_cast<std::uint32_t>(kAdditionalChapterActorCapacity);
             constexpr std::uint32_t fullBellwetherTlasCount=
                 PresentableTinyRtScene::kOrdinaryTlasInstanceCount+64u+12u+fullBellwetherTailCount;
@@ -1019,15 +1034,15 @@ struct PresentableTinyRtSceneObservationTestAccess
             }
             const auto uniqueAssetCount=std::count(usedAssets.begin(),usedAssets.end(),true);
             const auto baselineAssetCount=std::count(usedAssetsWithoutRag.begin(),usedAssetsWithoutRag.end(),true);
-            ok &= Require(chapterTail==7u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
+            ok &= Require(chapterTail==10u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
                     scene.chapterResidentSources_.size() &&
                 currentProfileTlasCount<=kRtTlasInstanceCapacity &&
-                fullBellwetherTlasCount==117u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
+                fullBellwetherTlasCount==120u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
                 kRtTlasInstanceCapacity-fullBellwetherTlasCount==2u,
-                "full Bellwether tail includes the rag, window and two residents at 117 of 119 TLAS slots");
+                "full Bellwether tail includes three livestock poses and two residents at 120 of 122 TLAS slots");
             ok &= Require(uniqueAssetCount==baselineAssetCount+1u &&
-                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=23u,
-                "privy rag adds its own static asset after the existing 23-owner roster");
+                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=24u,
+                "the privy rag and shared head source fit the static asset roster");
             scene.roadStoneBlas_.address=0u;
             scene.waysideCoverBlas_.address=0u;
             scene.waysideRegisterBlas_.address=0u;
@@ -1036,6 +1051,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             scene.millWaterwheelBlas_.address=0u;
             scene.privyRagBlas_.address=0u;
             scene.dielectricFixtureBlas_.address=0u;
+            scene.stockHeadBlas_={};
         }
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
         const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
@@ -1715,7 +1731,7 @@ struct PresentableTinyRtSceneObservationTestAccess
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() == 44u &&
-                  tomb.staticMeshSlot_.Materials().size() == 41u &&
+                  tomb.staticMeshSlot_.Materials().size() == 44u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)

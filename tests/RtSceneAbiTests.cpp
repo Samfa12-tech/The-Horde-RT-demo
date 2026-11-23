@@ -211,17 +211,17 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 40u,
-          "chapter residents, Bellwether props, and the privy rag have independent metadata");
-    Check(kRtTlasInstanceCapacity == 119u,
+    Check(kRtInstanceMetadataCapacity == 42u,
+          "each stock head family has independent metadata after the existing chapter owners");
+    Check(kRtTlasInstanceCapacity == 122u,
           "storage fits the legacy 31-slot prefix, forest reserves, and appended Bellwether owners");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 24u, "static asset capacity includes the independent privy rag owner");
-    Check(kRtPrimitiveMetadataCapacity == 50u, "primitive storage includes the wheel, rag and staffed mill roster");
-    Check(kRtMaterialCapacity == 47u, "material storage covers the untextured rag and staffed mill before aliases");
+    Check(kRtStaticAssetCapacity == 25u, "static asset capacity includes one shared stock head source");
+    Check(kRtPrimitiveMetadataCapacity == 55u, "primitive storage includes both stock head families");
+    Check(kRtMaterialCapacity == 50u, "material storage covers the three opaque stock finishes before aliases");
     Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&

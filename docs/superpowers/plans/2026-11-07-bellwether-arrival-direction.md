@@ -497,16 +497,19 @@ sheltered straw shelf and one rests on the dry ground nearby. Posts, trough,
 covered water vessel and the raised roost establish how the animals are
 tended. The separate grate and privy retain their own places and purposes.
 
-This staging puts the animals and the fence into the town's existing
-hardware RT geometry. It uses original editable Blender poses with no
-additional animated resident slot. Rig admission, occasional animal motion,
-ambient sound and combined handset cost remain open for the active stock
-pocket.
+The fence and bodies stay in the town's existing hardware RT geometry.
+The pig occasionally sniffs, the hen on the shelf turns to look, and the
+ground hen briefly dips its head. The shared 60 Hz simulation drives the
+gestures when the player is nearby and eases the heads into settled poses
+on departure. Three visible RT instances share two immutable BLAS geometries
+with no resident skinning or new textures. Ambient sound and combined
+handset cost remain open for the active stock pocket.
 
 The [editable source and receipt](../../../assets/models/world/source/bellwether-stock-v1/README.md)
-add 5,876 solid triangles in the existing town materials and primitives.
-The final GLB and the exact approach marks reproduced byte for byte from
-Blender. The Windows replay at `43283f44` passed all 31 checks on both
+add 4,492 solid triangles to the existing town materials and primitives.
+The two head masters contribute 1,044 triangles, with the 340-triangle hen
+head instanced twice, for the original 5,876 rendered triangles total.
+The settled checkpoint's Windows replay at `43283f44` passed all 31 checks on both
 hardware RT backends. It walked from the garden to the closed gate and
 roost, presented the pig and hens under the carried lantern, and rejoined
 the existing town route without changing the save. All three host suites

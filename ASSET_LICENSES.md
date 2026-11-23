@@ -1119,8 +1119,9 @@ exact asset receipt are in `assets/models/world/source/bellwether-grate-v1/`.
 
 The resting pig, two hens, gate, roost and care props are original Horde
 geometry authored by Samfa12/Codex in Blender. They use the admitted town
-materials and their existing texture credits. The editable objects and
-exact source receipt are in `assets/models/world/source/bellwether-stock-v1/`.
+palette and its existing texture credits. The rigid head meshes use three
+untextured finishes from that palette. The editable objects and exact source
+receipt are in `assets/models/world/source/bellwether-stock-v1/`.
 
 ## Bellwether mill tally props - 23 November 2026
 

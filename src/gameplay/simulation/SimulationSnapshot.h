@@ -13,6 +13,7 @@
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/traversal/BellwetherMill.h"
 #include "gameplay/traversal/BellwetherPrivy.h"
+#include "gameplay/traversal/BellwetherStock.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
 #include "gameplay/traversal/BellwetherWestRoute.h"
 
@@ -94,6 +95,7 @@ struct SimulationSnapshot
     float millDriveAngleRadians=0.f;
     // Continuous waterwheel presentation, driven by the shared active fixed step.
     float millWaterwheelAngleRadians=0.f;
+    bellwether::StockHeadPoses stockHeadPoses{};
     bellwether::ShorePracticeStage shorePracticeStage{};
     bellwether::SalvagerAction salvagerAction{};
     std::uint16_t shorePracticeBreathTicksRemaining=0;

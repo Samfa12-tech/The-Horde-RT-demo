@@ -301,6 +301,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.millDriveInstalled = horde::gameplay::bellwether::HasMillDrive(simulation.millPreparation);
     frame.millDriveAngleRadians = simulation.millDriveAngleRadians;
     frame.millWaterwheelAngleRadians = simulation.millWaterwheelAngleRadians;
+    frame.stockHeadPoses = simulation.stockHeadPoses;
     frame.privyRag = simulation.privyRag;
     std::size_t residentCount = 0;
     const auto addResident = [&](ChapterResidentActorPose pose) {

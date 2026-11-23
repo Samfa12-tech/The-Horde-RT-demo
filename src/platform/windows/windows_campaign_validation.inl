@@ -1683,18 +1683,26 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             std::string_view(caption.data()).starts_with("Man below the grate:") &&
                             capture("windows-combined-garden-grate.png", false),"Interact presents the grate and caption from below");
                         const auto& stock=kBellwetherStockApproach;
+                        const auto stockWitness = [&](std::size_t animal, const char* resting, const char* alert) {
+                            const auto settled = [&] { return state.stockHeadPoses[animal]==StockHeadPose{}; };
+                            const auto moved = [&] { return std::abs(state.stockHeadPoses[animal].yawRadians) > .10f; };
+                            return waitFor(settled, 1500) && capture(resting, false) && settled() &&
+                                waitFor(moved, 1500) && capture(alert, false) && moved();
+                        };
                         input.pitchRadians=-.28f;
                         const bool visitedStock=check(talked && walkTo(approach.back()) &&
                             state.chapterDialogue.line!=Line::GardenGrateTalk &&
                             std::all_of(stock.begin(),stock.end(),walkTo) && state.playerGrounded &&
                             face(kBellwetherStockPigXZ[0],kBellwetherStockPigXZ[1]) &&
-                            capture("windows-combined-stock-pig.png",false) &&
+                            stockWitness(0u, "windows-combined-stock-pig.png", "windows-combined-stock-pig-alert.png") &&
                             walkTo(kBellwetherStockRoostWitness) && state.playerGrounded && !state.waterContact.wetGround &&
                             face(kBellwetherStockRoostXZ[0],kBellwetherStockRoostXZ[1]) &&
-                            capture("windows-combined-stock-roost.png",false) && walkTo(stock.back()) &&
+                            stockWitness(1u, "windows-combined-stock-roost.png", "windows-combined-stock-roost-alert.png") &&
+                            stockWitness(2u, "windows-combined-stock-hen.png", "windows-combined-stock-hen-alert.png") &&
+                            walkTo(stock.back()) &&
                             std::all_of(std::next(stock.rbegin()),stock.rend(),walkTo) && walkTo(approach.back()) &&
                             ctx.simulation.CampaignBoundaryRevision()==journalBoundary,
-                            "the fenced stock and roost are reachable from the garden on the dry path");
+                            "the dry livestock approach presents both resting and alert poses at the pig pen and roost");
                         input.pitchRadians = previousPitch;
                         const bool restored = setInspectionLight(previousPose);
                         return visitedStock && restored &&

@@ -150,7 +150,7 @@ Kit is injured on the approach and recovers based in Bellwether, remaining a use
 
 Approved village-life direction includes brief closed-privy/rag humour, a man in a hole with contradictory unverified rumours, domestic animals and kitchen plots. [The appendix](https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/d37f16381311c6e620f0c4a9d01c1cce83260dc8/docs/BELLWETHER_VILLAGE_LIFE.md) proposes counts, placement, favour mechanics, extra gags and lines; these are not locked production packages. Preserve humane ambiguity, food/water/waste coherence and clear routes. No farming, hunger, breeding, crowd/daily-schedule, crime or livestock-combat systems are implied.
 
-The [first livestock pocket](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#settled-livestock-south-of-the-kitchen-plots) brings a pig and two hens to a fenced yard south of the kitchen plots. The separate dry viewing path connects to the existing west lane. The current night poses are part of the town geometry.
+The [first livestock pocket](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#settled-livestock-south-of-the-kitchen-plots) brings a pig and two hens to a fenced yard south of the kitchen plots. The separate dry viewing path connects to the existing west lane. Small fixed-step head movements break up the settled night poses when the player is nearby. Ambient stock sound and handset timing remain open.
 
 The [garden-edge grate](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#garden-edge-grate) adds an optional village conversation on dry ground north of the kitchen plots. The man answers from below the lock and recounts two incompatible explanations. The player can leave freely and the exchange has no effect on campaign progress.
 

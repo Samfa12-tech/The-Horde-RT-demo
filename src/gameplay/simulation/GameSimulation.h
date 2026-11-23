@@ -431,6 +431,7 @@ private:
     bellwether::MillLeakTestPhase millLeakTestPhase_{};
     float millLeakTestSeconds_{};
     float millWaterwheelAngleRadians_{};
+    bellwether::BellwetherStockIdle stockIdle_{};
     std::optional<float> millDriveTurnSeconds_;
     bellwether::ShorePracticeStage shorePracticeStage_{};
     std::uint16_t shorePracticeBreathTicksRemaining_=0;

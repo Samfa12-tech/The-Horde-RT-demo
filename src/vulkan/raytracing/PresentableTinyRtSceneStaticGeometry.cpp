@@ -656,6 +656,16 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!privyRagAsset_.primitives.empty())
         registrations.push_back({kPrivyRagMetadataIndex, 0x42303752u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &privyRagAsset_});
+    if (!stockHeadAsset_.primitives.empty()) {
+        for (std::uint32_t kind = 0; kind < kStockHeadBlasCount; ++kind) {
+            const auto& [first, count] = horde::gameplay::bellwether::kBellwetherStockHeadGeometry[kind];
+            StaticRtAssetRegistration row{kFirstStockHeadMetadataIndex + kind, 0x42305350u + kind,
+                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &stockHeadAsset_};
+            row.primitiveOffset = first;
+            row.primitiveCount = count;
+            registrations.push_back(row);
+        }
+    }
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)

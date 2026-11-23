@@ -18,6 +18,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include "gameplay/traversal/BellwetherStock.h"
 
 namespace {
 bool CheckTavernDetailCandidates(const std::filesystem::path& directory, const horde::scene::assets::StaticMeshAsset& town) {
@@ -101,6 +102,30 @@ int main(int argc,char** argv) {
     using namespace horde::scene;
     bool ok=true;
     const auto check=[&](bool v,const char* m){if(!v){ok=false;std::cerr<<"FAIL: "<<m<<'\n';}};
+    {
+        using namespace horde::gameplay::bellwether;
+        BellwetherStockIdle idle;
+        const auto& [x, z] = kBellwetherStockPigXZ;
+        const auto advance = [&](float playerX, unsigned ticks) {
+            for (unsigned tick=0; tick<ticks; ++tick) idle.Step(playerX,z,1.f/60.f);
+        };
+        advance(x+20.f,140);
+        check(idle.Poses()==StockHeadPoses{},"stock settles outside the yard without consuming its idle sequence");
+        advance(x,140);
+        const auto sniff=idle.Poses();
+        check(sniff[0].yawRadians>.12f && sniff[1]==StockHeadPose{} && sniff[2]==StockHeadPose{},
+            "the pig sniffs while both hens remain settled");
+        idle.Step(x,z,0.f);
+        check(idle.Poses()==sniff,"zero elapsed simulation time preserves the livestock pose");
+        advance(x+20.f,20);
+        check(idle.Poses()[0].yawRadians>0.f && idle.Poses()[0].yawRadians<sniff[0].yawRadians,
+            "leaving the livestock yard eases the head back toward rest");
+        advance(x+20.f,60);
+        check(idle.Poses()==StockHeadPoses{},"livestock returns fully to rest when the player leaves");
+        advance(x,120);
+        check(idle.Poses()[0]==StockHeadPose{} && idle.Poses()[1].yawRadians<-.25f && idle.Poses()[2]==StockHeadPose{},
+            "only the roost hen turns during its fixed-tick gesture");
+    }
     assets::StaticMeshAsset world;
     for(const auto* name:{"MedievalWall02","TombEarthenware","TombCharredWick"}) {
         assets::StaticMaterial m;m.name=name;world.materials.push_back(m);

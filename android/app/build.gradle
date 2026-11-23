@@ -707,6 +707,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb'
         include 'models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/privy-rag.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/stock-heads.glb'
         include 'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json'
         include 'models/world/runtime/bellwether-tavern-v1/garden-crops.glb'
         include 'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json'

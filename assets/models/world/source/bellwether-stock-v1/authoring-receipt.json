@@ -40,17 +40,30 @@
   ],
   "originalTownSha256": "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213",
   "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
-  "runtimeTownSha256": "3c1659be85077c406a6d45162ef96887fa07bdbffe9a0a072ed17b8937cda67c",
-  "addedSolidTriangles": 5876,
-  "townVertices": 57857,
-  "townTriangles": 28744,
+  "runtimeTownSha256": "070b29b105fe591156d7f98c4f6fdbe449c24466bf8c91f99bee21fa91da7b5c",
+  "addedSolidTriangles": 4492,
+  "headTriangles": 1044,
+  "headMeshes": {
+    "StockHenHead": [
+      0,
+      3
+    ],
+    "StockPigHead": [
+      3,
+      2
+    ]
+  },
+  "townVertices": 56431,
+  "townTriangles": 27360,
   "blender": "5.2.0 LTS",
-  "recipeSha256": "c7a910b0525dd8e32e9cfa7e27f9f9e9eae090e1728a158b800d5cfb448c34a2",
+  "recipeSha256": "73701f8e61f561453a3a986f6dcc3ffa8fc0959452d71f86959bb050c8fd5508",
   "files": {
-    "bellwether-stock.blend": "079e67566e21bf5063ff49b8650dabd6a830cdeee5087cd33c5a846ffee09fd6",
-    "settled-stock.glb": "841a65c03932c03a6bfba8f66f71e5fce4d1e07c17e209b4d01ffe98d846ab45",
-    "bellwether-tavern-v1.glb": "3c1659be85077c406a6d45162ef96887fa07bdbffe9a0a072ed17b8937cda67c",
-    "geometry.generated.h": "baba887a75d99c1f20790b0af3db1c65197c2f79a00c2f3b696702fbcf8fe5b6",
-    "asset.manifest.json": "08044b32a0bdd5a74ab8861bbc9fce55e5094438cec89eecd0cd32a10e341c93"
+    "bellwether-stock.blend": "c31e3a9da5f7841d8313d4af80a8bea80c7f1613500f8fdf1dc907d50ee8f83c",
+    "settled-stock.glb": "66132d430f790886c81cfbcb67a29dc965cfe0934e46b7bb4e6add3b7f3de579",
+    "bellwether-tavern-v1.glb": "070b29b105fe591156d7f98c4f6fdbe449c24466bf8c91f99bee21fa91da7b5c",
+    "geometry.generated.h": "2aae936edf924f04c1fcee65f1990b5a4385a24f21007d68c10b90a510647bb0",
+    "asset.manifest.json": "2db1f1aa9d7371eed219c123fdd9b2e69eff55c1f4624f15284a61d55f2869c7",
+    "stock-heads.glb": "529841e0f8e4e065a8dc20c69aa4f06d172a6df8e8cbc2b514935eb6dba9af09",
+    "stock-heads.manifest.json": "a1fcc25fbf9c5821c22eb9da2559eb93018d0e5aba6c25b8b1055459c979234f"
   }
 }

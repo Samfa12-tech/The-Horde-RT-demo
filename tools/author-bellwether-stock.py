@@ -7,7 +7,7 @@ import sys
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 
 RECIPE = Path(__file__).resolve()
@@ -21,6 +21,8 @@ HENS = ((31.61, 141.55), (32.28, 142.35))
 ROOST_SHIFT = 1.24
 VIEW_ROUTE = ((39.35, 139.70), (38.20, 142.02), (35.80, 142.76))
 ROOST_VIEW = (35.43, 141.21)
+PIG_HEAD = ("Jowl", "Snout", "Rounded snout plate", "Dark eye", "Nostril", "Folded ear")
+HEN_HEAD = ("Neck", "Drawn-in head", "Small comb", "Eye", "Beak tip")
 
 
 def move_to_collection(obj, collection):
@@ -233,6 +235,7 @@ class Pocket:
         faces = [(i*6+j,(i+1)*6+j,(i+1)*6+(j+1)%6,i*6+(j+1)%6) for i in range(15) for j in range(6)]
         faces += [tuple(range(6)), tuple(reversed(range(90,96)))]
         self.surface("Curled tail", tail, faces, self.clay, smooth=True, closed=True)
+        return self.head_anchor("Pig head", PIG_HEAD, orient((.344, .245, 0.)), .98, 1.)
 
     def hen(self, name, centre, floor, yaw, size, wing):
         self.begin(name)
@@ -257,6 +260,64 @@ class Pocket:
         self.surface("Beak tip",
                      [scale(p) for p in ((.213,.274,-.023),(.213,.273,.023),(.217,.301,0.),(.272,.277,0.))],
                      [(0,2,1),(0,1,3),(1,2,3),(2,0,3)], self.stone, closed=True)
+        return self.head_anchor(name + " head", HEN_HEAD, scale((.122, .167, 0.)), yaw, size)
+
+    def head_anchor(self, name, part_names, position, yaw, scale):
+        parts = [obj for obj in self.collection.objects if obj.name.split('.')[0] in part_names]
+        if not parts:
+            raise ValueError(f"{name} lacks mesh parts")
+        x, y, z = position
+        mount = Matrix.Translation((x, -z, y)) @ Matrix.Rotation(-yaw, 4, 'Z') @ Matrix.Scale(scale, 4)
+        anchor = bpy.data.objects.new(name + " pivot", None)
+        self.collection.objects.link(anchor)
+        anchor.empty_display_type = 'ARROWS'
+        anchor.empty_display_size = .10
+        anchor.matrix_world = mount
+        for part in parts:
+            part.parent = anchor
+            part.matrix_parent_inverse = mount.inverted()
+            self.parts.remove(part)
+        return position, yaw, scale, parts, mount.inverted()
+
+
+def export_stock_heads(output, anchors):
+    heads = []
+    for name, (_, _, _, parts, local_from_world) in zip(("StockPigHead", "StockHenHead"), anchors):
+        local_parts = []
+        for part in parts:
+            copy = bpy.data.objects.new(part.name + " local", part.data.copy())
+            bpy.context.scene.collection.objects.link(copy)
+            copy.data.transform(local_from_world)
+            local_parts.append(copy)
+        heads.append(model["join_parts"](local_parts, name))
+    bpy.ops.object.select_all(action="DESELECT")
+    for head in heads:
+        head.select_set(True)
+    path = output / "stock-heads.glb"
+    bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
+                             export_apply=True, export_normals=True, export_tangents=True, export_animations=False)
+    glb, _ = world["read_glb"](path)
+    nodes = [glb["nodes"][index] for index in glb["scenes"][0]["nodes"]]
+    shapes = {}
+    first = 0
+    vertices = indices = 0
+    for node in nodes:
+        primitives = glb["meshes"][node["mesh"]]["primitives"]
+        shapes[node["name"]] = (first, len(primitives))
+        first += len(primitives)
+        for primitive in primitives:
+            vertices += glb["accessors"][primitive["attributes"]["POSITION"]]["count"]
+            indices += glb["accessors"][primitive["indices"]]["count"]
+    if len(nodes) != 2 or set(shapes) != {"StockPigHead", "StockHenHead"} or first != 5 or indices > 5100:
+        raise ValueError("Stock head geometry exceeds the two-owner, five-primitive budget")
+    manifest = json.loads((output / "asset.manifest.json").read_bytes())
+    manifest.update(asset="bellwether-stock-heads-v1", requiredSockets=[], materialOverrides=[],
+                    licenceStatus="Original Horde-owned untextured rigid animal heads and finishes.")
+    manifest["budgets"].update(maxVertices=vertices, maxIndices=indices, maxPrimitives=first,
+                               maxMaterials=len(glb["materials"]), maxTextureLayersPerKind=1)
+    manifest["lods"][0]["maxTriangles"] = indices // 3
+    world["save_json"](output / "stock-heads.manifest.json", manifest)
+    return shapes, indices // 3
 
 
 def main(root, previous, output):
@@ -268,9 +329,8 @@ def main(root, previous, output):
     bpy.data.orphans_purge(do_recursive=True)
     pocket = Pocket(ground)
     shelf = pocket.habits()
-    pocket.hog()
-    pocket.hen("Hen on the straw shelf", HENS[0], shelf, -.67, 1.09, pocket.timber)
-    pocket.hen("Hen on dry ground", HENS[1], ground(*HENS[1]) - .009, .94, 1., pocket.clay)
+    mounts = (pocket.hog(), pocket.hen("Hen on the straw shelf", HENS[0], shelf, -.67, 1.09, pocket.timber),
+              pocket.hen("Hen on dry ground", HENS[1], ground(*HENS[1]) - .009, .94, 1., pocket.clay))
     output.mkdir(parents=True)
     master = output / "bellwether-stock.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(master), compress=True)
@@ -289,10 +349,18 @@ def main(root, previous, output):
     manifest["budgets"].update(maxVertices=vertices, maxIndices=indices)
     manifest["lods"][0]["maxTriangles"] = indices // 3
     world["save_json"](output / "asset.manifest.json", manifest)
+    head_shapes, head_triangles = export_stock_heads(output, mounts[:2])
+    head_placements = ", ".join("{" + ", ".join(f"{value:.7f}f" for value in (*pivot, yaw, scale)) + "}"
+                                for pivot, yaw, scale, _, _ in mounts)
+    head_geometry = ", ".join("{" + f"{first}u, {count}u" + "}"
+                              for first, count in (head_shapes["StockPigHead"], head_shapes["StockHenHead"]))
     view = ", ".join("{" + f"{x:.6f}f, {z:.6f}f" + "}" for x, z in VIEW_ROUTE)
     header = ("#pragma once\n#include <array>\n#include <cstddef>\n\n"
               "// Generated by tools/author-bellwether-stock.py.\nnamespace horde::gameplay::bellwether {\n"
               f"inline constexpr std::size_t kBellwetherStockSolidTriangles={added};\n"
+              f"inline constexpr std::size_t kBellwetherStockHeadTriangles={head_triangles};\n"
+              f"inline constexpr std::array<std::array<float,5>,3> kBellwetherStockHeadMounts{{{{{head_placements}}}}};\n"
+              f"inline constexpr std::array<std::array<unsigned,2>,2> kBellwetherStockHeadGeometry{{{{{head_geometry}}}}};\n"
               f"inline constexpr std::array<std::array<float,2>,{len(VIEW_ROUTE)}> kBellwetherStockViewRoute{{{{{view}}}}};\n"
               f"inline constexpr std::array<float,2> kBellwetherStockPigXZ{{{{{PIG[0]:.6f}f, {PIG[1]:.6f}f}}}};\n"
               f"inline constexpr std::array<float,2> kBellwetherStockRoostXZ{{{{{30.55+ROOST_SHIFT:.6f}f, 141.718000f}}}};\n"
@@ -300,11 +368,13 @@ def main(root, previous, output):
               "} // namespace horde::gameplay::bellwether\n")
     layout = output / "geometry.generated.h"
     layout.write_text(header, encoding="utf-8", newline="\n")
-    items = master, patch, town, layout, output / "asset.manifest.json"
+    items = (master, patch, town, layout, output / "asset.manifest.json", output / "stock-heads.glb",
+             output / "stock-heads.manifest.json")
     world["save_json"](output / "authoring-receipt.json", dict(
         feature="Settled village stock", bounds=BOUNDS, pig=PIG, hens=HENS, approach=VIEW_ROUTE, roostView=ROOST_VIEW,
         originalTownSha256=PARENT, terrainSha256=world["TERRAIN_HASH"], runtimeTownSha256=world["sha"](town),
-        addedSolidTriangles=added, townVertices=vertices, townTriangles=indices//3, blender=bpy.app.version_string,
+        addedSolidTriangles=added, headTriangles=head_triangles, headMeshes=head_shapes,
+        townVertices=vertices, townTriangles=indices//3, blender=bpy.app.version_string,
         recipeSha256=world["sha"](RECIPE), files={item.name: world["sha"](item) for item in items}))
 
 

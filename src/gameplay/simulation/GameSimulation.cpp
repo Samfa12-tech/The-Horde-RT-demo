@@ -332,6 +332,8 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    if (config_.developmentRescueJourney && !input.paused && playerAlive)
+        stockIdle_.Step(playerX_, playerZ_, dialogueDeltaSeconds);
     // The incoming headrace approaches from -Z. A positive rotation about
     // local +X carries the wheel's top toward +Z, downstream. Keep the
     // operating wheel tied to active 60 Hz simulation time so pause freezes
@@ -867,6 +869,7 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 void GameSimulation::ResetRoute()
 {
     enemyHitParticles_.Clear();
+    stockIdle_ = {};
     if(config_.bellwetherCombinedResidents)bellwetherResidentMask_=traversal::kTownResidentMask;
     forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
@@ -3583,6 +3586,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         (millDriveTurnSeconds_ ? *millDriveTurnSeconds_/bellwether::kMillDriveTestSeconds :
          bellwether::MillProgress(millPreparation_)>=bellwether::MillProgress(bellwether::MillPreparation::GearingVerified) ? 1.f : 0.f);
     snapshot_.millWaterwheelAngleRadians=millWaterwheelAngleRadians_;
+    snapshot_.stockHeadPoses=stockIdle_.Poses();
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
     snapshot_.gardenGrateTalkAvailable=chapterDialogue_.CanStartGardenGrateTalk(chapterContext);

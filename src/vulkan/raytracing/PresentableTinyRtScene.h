@@ -26,6 +26,7 @@
 #include "gameplay/traversal/WaysideArchive.h"
 #include "gameplay/traversal/BellwetherTavernDoor.h"
 #include "gameplay/traversal/BellwetherPrivy.h"
+#include "gameplay/traversal/BellwetherStock.h"
 #include "scene/BellwetherShell.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
@@ -187,6 +188,7 @@ struct RtSceneFrameInputs
     bool millDriveInstalled=false;
     float millDriveAngleRadians=0.f;
     float millWaterwheelAngleRadians=0.f;
+    horde::gameplay::bellwether::StockHeadPoses stockHeadPoses{};
     horde::gameplay::bellwether::PrivyRagState privyRag=
         horde::gameplay::bellwether::PrivyRagState::Available;
     std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
@@ -323,7 +325,8 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 28u + kAdditionalChapterActorCapacity;
+    static constexpr std::uint32_t kStockHeadBlasCount = 2u;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 28u + kAdditionalChapterActorCapacity + kStockHeadBlasCount;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -348,6 +351,7 @@ public:
     static constexpr std::uint32_t kMillDriveMetadataIndex = kTavernDoorMetadataIndex + 1u;
     static constexpr std::uint32_t kMillWaterwheelMetadataIndex = kMillDriveMetadataIndex + 1u;
     static constexpr std::uint32_t kPrivyRagMetadataIndex = kMillWaterwheelMetadataIndex + 1u;
+    static constexpr std::uint32_t kFirstStockHeadMetadataIndex = kPrivyRagMetadataIndex + 1u;
     static constexpr std::uint32_t kMillDrivePrimitiveCount = 1u;
     static constexpr std::uint32_t kMillWaterwheelPrimitiveOffset = kMillDrivePrimitiveCount;
     static constexpr std::uint32_t kMillWaterwheelPrimitiveCount = 2u;
@@ -371,6 +375,7 @@ public:
     static_assert(kMillDriveMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kMillWaterwheelMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kPrivyRagMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kFirstStockHeadMetadataIndex + kStockHeadBlasCount <= kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
@@ -378,7 +383,7 @@ public:
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
                   horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 6u +
-                  kAdditionalChapterActorCapacity);
+                  kAdditionalChapterActorCapacity + horde::gameplay::bellwether::kStockHeadKinds.size());
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -1390,6 +1395,10 @@ private:
     void ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
     static void ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR&,
         const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
+    static void ApplyRigidPropInstance(VkAccelerationStructureInstanceKHR&,
+        const std::array<float, 12>& worldFromModel, std::uint32_t metadataIndex, VkDeviceAddress);
+    bool ApplyStockHeadInstances(std::span<VkAccelerationStructureInstanceKHR>,
+        const horde::gameplay::bellwether::StockHeadPoses&, std::string&) const;
     bool ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR&, float angleRadians,
         std::string& diagnostic) const;
     bool ApplyPrivyRagInstance(VkAccelerationStructureInstanceKHR&,
@@ -1408,8 +1417,13 @@ private:
             (millDriveBlas_.address ? 1u : 0u) +
             (millWaterwheelBlas_.address ? 1u : 0u) +
             (privyRagBlas_.address ? 1u : 0u) +
+            StockHeadInstanceCount() +
             (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
             static_cast<std::uint32_t>(chapterResidentSources_.size());
+    }
+    std::uint32_t StockHeadInstanceCount() const noexcept {
+        return stockHeadBlas_[0].address
+            ? static_cast<std::uint32_t>(horde::gameplay::bellwether::kStockHeadKinds.size()) : 0u;
     }
     bool LoadChapterResidents(std::string&);
     struct ResidentTextureLayout {
@@ -1582,6 +1596,7 @@ private:
     AccelerationStructure millDriveBlas_;
     AccelerationStructure millWaterwheelBlas_;
     AccelerationStructure privyRagBlas_;
+    std::array<AccelerationStructure, kStockHeadBlasCount> stockHeadBlas_{};
     std::array<AccelerationStructure,horde::scene::kBellwetherFurnitureTriangles.size()> bellwetherFurnitureBlas_{};
     horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
     horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
@@ -1771,6 +1786,7 @@ private:
     horde::scene::assets::StaticMeshAsset millDriveAsset_;
     horde::scene::assets::StaticMeshAsset millWaterwheelAsset_;
     horde::scene::assets::StaticMeshAsset privyRagAsset_;
+    horde::scene::assets::StaticMeshAsset stockHeadAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

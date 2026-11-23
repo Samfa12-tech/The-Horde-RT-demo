@@ -279,13 +279,13 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 30u &&
-                      PresentableTinyRtScene::kBlasCount == 32u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 32u &&
+                      PresentableTinyRtScene::kBlasCount == 34u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 119u &&
-                      kRtInstanceMetadataCapacity == 40u &&
-                      kRtStaticAssetCapacity == 24u &&
-                      kRtPrimitiveMetadataCapacity == 50u && kRtMaterialCapacity == 47u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 122u &&
+                      kRtInstanceMetadataCapacity == 42u &&
+                      kRtStaticAssetCapacity == 25u &&
+                      kRtPrimitiveMetadataCapacity == 55u && kRtMaterialCapacity == 50u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
