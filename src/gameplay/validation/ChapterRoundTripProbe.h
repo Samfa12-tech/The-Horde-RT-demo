@@ -62,7 +62,8 @@ public:
         matchedViews_=matchedViews;
         phase_=(regionCycle && !matchedViews)?ChapterProbePhase::Return:ChapterProbePhase::Landing;station_=2;return true;
     }
-    simulation::InputSnapshot Next(const simulation::SimulationSnapshot& s,bool paused=false,unsigned inputTicks=1) {
+    simulation::InputSnapshot Next(const simulation::SimulationSnapshot& s,bool paused=false,unsigned inputTicks=1,
+                                   bool earnedLookout=false) {
         inputTicks_=std::clamp(inputTicks,1u,8u);
         simulation::InputSnapshot input;
         input.damageEnabled=false;input.tutorialEnabled=false;
@@ -106,7 +107,9 @@ public:
             }
             break;
         case ChapterProbePhase::Outbound:
-            if(Walk(s,input,simulation::kWorldRoutePoints[station_])) {
+            // A campaign caller can use its verified endpoint save as the
+            // arrival witness. The mapped point may sit past local collision.
+            if((station_==7 && earnedLookout) || Walk(s,input,simulation::kWorldRoutePoints[station_])) {
                 if(station_==7)SetPhase(ChapterProbePhase::Lookout,s,7);
                 else SetPhase(phase_,s,station_+1);
             }

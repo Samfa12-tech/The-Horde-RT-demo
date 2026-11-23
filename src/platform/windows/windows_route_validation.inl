@@ -239,7 +239,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             endpoint=boundary && boundary->id==campaign::CheckpointId::ForestEndpoint;
             const bool waitEndpoint=probe.Phase()==ChapterProbePhase::Lookout && !endpoint;
             if(returningFromBasin || quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
-            else {quietTicks=0;input=probe.Next(snapshot);}
+            else {quietTicks=0;input=probe.Next(snapshot,false,1,endpointSaved);}
             if(returningFromBasin) {
                 // Hear the flask line at the landing, then rejoin the forest
                 // path at the reunion so we do not cut across the steep bank.
