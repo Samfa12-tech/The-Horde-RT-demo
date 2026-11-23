@@ -1,7 +1,7 @@
 # Bellwether mill tally props
 
 The dry turnout's banded case holds the stamp. A separate tray on the west
-stall counter distinguishes named trade from ordinary Silver. The ownership
+stall counter distinguishes named trade from ordinary silver. The ownership
 board sits beside the mill's registered west doorway.
 
 Rebuild with Blender 5.2 in background mode and

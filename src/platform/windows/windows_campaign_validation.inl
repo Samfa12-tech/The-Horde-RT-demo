@@ -2087,6 +2087,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     };
                     const auto before=state.treasurePurse;
                     const auto quoted=before.coins+TreasurePurse::kMillTallySaleCoins;
+                    const float previousPitch=input.pitchRadians;
+                    input.pitchRadians=-.72f;
                     const auto wetSteps=state.waterContact.stepCount;
                     const auto dry=[&](BellwetherStation station) {
                         return walkTo(station) && state.playerGrounded && !state.waterContact.wetGround &&
@@ -2099,6 +2101,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-tally-case.png",false) && interact() &&
                         state.millTallyAction==MillTallyAction::None && reloadTally(MillTallyProgress::Carried,before.coins),
                         "the dry mill crossing reaches the tally case and persists the recovered stamp at the tavern");
+                    input.pitchRadians=previousPitch;
                     if(progressed) {
                         using campaign::OrdinarySilverAction;
                         std::array<char,96> text{};
