@@ -272,6 +272,25 @@ int main(int argc,char** argv) {
         {
             using namespace horde::gameplay::traversal;
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
+            constexpr std::array pathCentres{
+                BellwetherStation{41.f,87.9f},        // Lower road
+                BellwetherStation{45.f,74.75f},       // Church lane
+                BellwetherStation{61.7f,53.2f},      // Wayside spur
+                BellwetherStation{92.8f,128.45f},    // Mill lane
+                BellwetherStation{109.f,125.72f},    // River fork
+                BellwetherStation{68.f,131.7f},      // West lane
+                BellwetherStation{62.1f,130.45f},    // Dealer aisle
+                BellwetherStation{74.75f,120.f},      // Service yard
+                BellwetherStation{88.25f,141.75f},   // Smith lane
+            };
+            for(const auto [x,z]:pathCentres) {
+                const auto original=originalTerrain->Query(x,z);
+                const auto laid=support->Query(x,z);
+                check(original.found && laid.found && laid.walkable &&
+                    laid.surface==horde::gameplay::simulation::SupportSurface::Stone &&
+                    std::abs((laid.worldY-original.worldY)-.018f)<.002f,
+                    "each mapped lane presents stone contact fitted to the original ground");
+            }
             const auto centre=kBellwetherWellCentre;
             const auto view=kBellwetherWellView;
             const auto ground=support->Query(centre[0],centre[2]);

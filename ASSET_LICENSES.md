@@ -1180,6 +1180,13 @@ foley by Samfa12/Codex. Its synthesis recipe at
 tools/prepare-bellwether-mill-audio.py uses seeded noise and resonances without
 external recordings. The manifest identifies the packaged 48 kHz mono PCM.
 
+## Bellwether lanes and paths - 23 November 2026
+
+Original Horde geometry authored by Samfa12/Codex. The finished layer
+reuses the admitted town stone finish documented above. The editable layout,
+Blender master and export receipt are in
+`assets/models/world/source/bellwether-paths-v1/`.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

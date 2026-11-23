@@ -467,6 +467,20 @@ setting held through the route. The verifier accepts archived glass-on reports
 and rejects a glass-off run declared as glass-on. Audio/haptic manual
 revalidation required — NO for the shader trial and measurement changes.
 
+### Paths through Bellwether
+
+The worn stone lane leads down the lower road and around the square to
+the south tavern ramp. At the church sign, a narrower lane branches north
+and meets the churchyard path. Its spur leads to the wayside shrine. The
+square also connects to the west stall and gardens, the washstand and
+privy, the mill landing and river causeway, and the southeast smith yard.
+Existing yard, bridge and wet-landing surfaces take over at those joins.
+
+The [editable path layer](../../../assets/models/world/source/bellwether-paths-v1/README.md)
+adds 2,669 walkable triangles to the existing town owner. The render and
+footstep contact surfaces share the same geometry. The paths reuse the
+admitted town stone and keep the terrain grade and landmark positions.
+
 ### East route to the mill yard
 
 The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.

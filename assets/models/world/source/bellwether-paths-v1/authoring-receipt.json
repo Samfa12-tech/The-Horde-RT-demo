@@ -1,0 +1,31 @@
+{
+  "feature": "Mapped Bellwether footpaths and lane junctions",
+  "originalTownSha256": "a2031a2c782d37fe9b2c3e63617c3f708bd10d9b506c025b928df69dbaf40a8f",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "1d3bf0f746f19ebbcfd9505c34c3c78214c650992e41dd2a699099b5394d5132",
+  "routeTriangles": {
+    "Lower road to the south tavern ramp": 665,
+    "Church lane": 343,
+    "Wayside shrine spur": 324,
+    "East lane to the mill landing": 261,
+    "River fork to the causeway": 78,
+    "West lane to the dealer and gardens": 220,
+    "Dealer aisle": 11,
+    "West service yard": 525,
+    "South lane to the smith yard": 242
+  },
+  "addedGroundTriangles": 2669,
+  "surfaceLiftMetres": 0.018,
+  "townVertices": 61575,
+  "townTriangles": 30401,
+  "layoutSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
+  "recipeSha256": "985c99b0b0d38e299dd655f1b5f1e77af10025f5de83928fd42de3d0edd1fb62",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "bellwether-paths.blend": "ceacce26be4b81af31f9b94b10869d2e42650738ab64a4b004e7fdc9a5c97c2f",
+    "paths.glb": "cc7293bb8f45581fb58abef9815d4d1a7abdaece648d04bcf83674f9e2db4910",
+    "bellwether-tavern-v1.glb": "1d3bf0f746f19ebbcfd9505c34c3c78214c650992e41dd2a699099b5394d5132",
+    "geometry.generated.h": "5e3461b79f9ee03ea3be3eb69d462e61bfedaa82959d1a92f5c30ecb13690dd5",
+    "asset.manifest.json": "21c441a95ec81d9519530ef54718508c4f69a8c25fc873915f94af709dfa6f05"
+  }
+}
