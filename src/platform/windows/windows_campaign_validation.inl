@@ -1658,21 +1658,27 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = previousPitch;
                         const auto& listen = kBellwetherGrateListenPoint;
                         const auto journalBoundary = ctx.simulation.CampaignBoundaryRevision();
-                        if (!presented || !walkTo(approach.back()) || !walkTo(kBellwetherGardenGrateApproach) ||
-                            !face(listen[0],listen[2]+2.f) || state.gardenGrateTalkAvailable ||
-                            state.chapterDialogue.line == Line::GardenGrateTalk)
+                        if (!check(presented && walkTo(approach.back()) && walkTo(kBellwetherGardenGrateApproach) &&
+                            face(listen[0],listen[2]+2.f) && !state.gardenGrateTalkAvailable &&
+                            state.chapterDialogue.line != Line::GardenGrateTalk,
+                            "the dry garden route approaches the grate without starting speech when facing away"))
                             return false;
                         input.pitchRadians = -.41f;
-                        std::array<char, 180> caption{};
-                        const bool talked = face(listen[0],listen[2]) && state.playerGrounded &&
+                        if (!check(face(listen[0],listen[2]) && state.playerGrounded &&
                             state.gardenGrateTalkAvailable && state.HasChapterInteractPrompt() && frame() &&
-                            ctx.tavernInteractionPromptPresented && interact() &&
-                            state.chapterDialogue.line == Line::GardenGrateTalk &&
+                            ctx.tavernInteractionPromptPresented,"facing the grate shows the shared talk action")) {
+                            std::cerr << "Garden grate mark " << state.playerX << ',' << state.playerZ
+                                      << " offered=" << state.gardenGrateTalkAvailable
+                                      << " hud=" << ctx.tavernInteractionPromptPresented << '\n';
+                            return false;
+                        }
+                        std::array<char, 180> caption{};
+                        const bool talked = check(interact() && frame() && state.chapterDialogue.line == Line::GardenGrateTalk &&
                             std::abs(state.chapterDialogue.source.y - kBellwetherGrateMouth[1]) < .01f &&
                             GetWindowTextA(GetDlgItem(ctx.windowHandle,kChapterSubtitleId),caption.data(),
                                 static_cast<int>(caption.size())) > 0 &&
                             std::string_view(caption.data()).starts_with("Man below the grate:") &&
-                            capture("windows-combined-garden-grate.png");
+                            capture("windows-combined-garden-grate.png", false),"Interact presents the grate and caption from below");
                         input.pitchRadians = previousPitch;
                         const bool restored = setInspectionLight(previousPose);
                         return talked && restored && walkTo(approach.back()) &&
