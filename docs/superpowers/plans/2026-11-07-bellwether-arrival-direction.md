@@ -392,6 +392,53 @@ per-visit summaries and the ZIP receipt are retained locally under
 SHA-256 is `9844d26aedea297db804290374e3c92744a3571331abc3333b039302391912fb`.
 Audio/haptic manual revalidation required — NO for the measurement launcher.
 
+### Binary shadow traversal trial
+
+The [repeat Android baseline](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#repeat-baseline-for-the-binary-shadow-traversal-trial)
+put 49.54 ms of the staffed tavern's 50.04 ms median whole-GPU time in ray
+dispatch. Trial `6017810b` lets the binary visibility query stop at its first
+confirmed blocker and keeps the existing water and glass filters. The trial
+uses the Vulkan first-confirmed-hit traversal flag.
+[Vulkan ray traversal specification](https://registry.khronos.org/vulkan/specs/latest-ratified/pdf/vkspec.pdf)
+
+Twelve matched 960 × 540 Windows captures were pixel-identical on
+RayTracingPipeline and RayQueryCompute across the `bellwether-repeat-visit`,
+`chapter-forest-retention-east`, and `water-torch-catchment` checkpoints. Eight
+pairs used the changed opaque-fast shaders. Four pairs used generic-dielectric
+shaders with identical active bytecode. Presentation identities, lighting
+settings and resource counts matched within each pair.
+
+The RTX 5050 Laptop GPU ran the same two-return route in the original,
+trial, original order at 960 × 540, Shipping/High RayQueryCompute with
+glass off. The original executable was built from `aedb0fb3` and the trial
+from `dc1833a7`. All three runs completed 9,416 simulation ticks, the same
+twelve resident swaps, and the same staffed-room RT allocations.
+
+| Shader | Joined RT frames | Staffed room GPU median / p95 (ms) | Room median by visit (ms) | GPU temperature start / end (°C) |
+| --- | ---: | ---: | ---: | ---: |
+| Original, first run | 25,579 | 2.104 / 3.504 | 2.092 / 2.105 / 2.105 | 47 / 55 |
+| First confirmed blocker | 25,545 | 1.821 / 3.245 | 1.817 / 1.823 / 1.821 | 54 / 55 |
+| Original, final run | 25,607 | 2.105 / 3.491 | 2.102 / 2.104 / 2.107 | 53 / 56 |
+
+The staffed room median fell about 13% against both controls. Sampled GPU
+temperatures reached 60 °C in each run. These hidden Windows measurements
+cover the whole RT command buffer.
+
+The signed private trial APK from `6017810b` has SHA-256
+`1c6c4146c99d0d3e47ec6575643110d747f379cb58988b62906827dbf97aaceb`.
+All 283 packaged asset files match the original APK. The handset disconnected
+after the original-shader run. The next phone comparison uses the same USB
+setup and 33% glass-off RayQueryCompute route, with starting battery
+temperatures within 1.5 °C and GPU stages joined to their native presents.
+The 1.8 branch uses the original shader bank. The original and trial receipts,
+raw runs, and replay commands are retained locally under
+`reports/horde-bellwether-binary-shadow-20261123-153321`.
+
+The Windows measurement now verifies the window mask against the glass
+setting held through the route. The verifier accepts archived glass-on reports
+and rejects a glass-off run declared as glass-on. Audio/haptic manual
+revalidation required — NO for the shader trial and measurement changes.
+
 ### East route to the mill yard
 
 The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.

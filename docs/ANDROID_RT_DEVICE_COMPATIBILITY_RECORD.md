@@ -4423,6 +4423,25 @@ final screen are retained locally under
 `reports/horde-bellwether-phone-query-20261123-150817`. The test app was
 stopped after capture and the separate private candidate remains installed.
 
+#### Repeat baseline for the binary shadow traversal trial
+
+The same installed `0eab2912` APK and RayQueryCompute profile completed
+the two east-fork returns in 156.94 s with 9,413 simulation ticks and
+the same twelve resident swaps. All 3,187 completed RT frames had GPU
+stage timings joined to their native presents. Staffed-room GPU median
+was 50.04 ms. Ray dispatch measured 49.54 ms median and 53.64 ms p95,
+with post-warmup visit medians of 49.20, 49.52 and 49.73 ms.
+
+SurfaceFlinger yielded 3,063 deduplicated adjacent game-layer intervals
+with a 50.00 ms median and a 58.33 ms p95. The samples covered 150.66 s
+between 0.07 s and 155.22 s, without a per-submission join. Battery
+temperature rose from 26.2 °C to 32.5 °C on USB. The start was 0.9 °C
+above the previous original-shader run, whose ray dispatch median was
+49.47 ms. Raw evidence is retained under
+`reports/horde-bellwether-binary-shadow-20261123-153321/baseline-query`.
+The phone disconnected after the baseline. The paired trial APK is staged
+locally, and handset performance for the trial remains unmeasured.
+
 ### 23 November 2026 — Bellwether tavern GPU stage timings
 
 **Evidence class — actual-device scripted route, joined GPU stage timing and
