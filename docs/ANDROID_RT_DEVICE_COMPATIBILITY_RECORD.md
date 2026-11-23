@@ -4376,6 +4376,53 @@ locally under `reports/horde-bellwether-shipping-profile-20261123-100005`.
 The test app was stopped after measurement and the private candidate remains
 installed.
 
+### 23 November 2026 — Bellwether private playtest RayQueryCompute round trip
+
+**Evidence class — actual-device scripted route, completed RT submissions,
+GPU stages and sampled display pacing.** The Galaxy S26 Ultra (SM-S948B,
+Android 17/API 37, Adreno 840) ran the isolated
+`com.samfa12.hordelanternrt.debug.bellwether.playtest` package from `0eab2912`.
+The installed ARM64 Debug APK matched SHA-256
+`dedb9f0775c0157d7a009e57d31b157ac58075f32c8994625231ffd1d0e1c827`.
+It contained five pinned residents, nineteen private WAVs, and the
+Shipping/Mobile shaders with route and GPU-stage instrumentation.
+
+The run explicitly required hardware RayQueryCompute. It completed both
+east-fork returns in 157.00 s with 9,413 simulation ticks and 3,181 GPU
+completions joined to successful native RT presents. All twelve resident
+swaps followed the authored sequence. GPU stage identities matched every
+submission. The route used the fresh private profile at 33% scale
+(475 × 980 internal, 1440 × 2971 output), glass off and shader
+`b16089eca7976725533552509fd1efe085190dde16cab982622d4f2f932f0c1f`.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 49.95 / 50.86 | 59.79 / 61.90 |
+| Doorway outbound | 36.73 / 45.70 | 46.45 / 55.72 |
+| East fork | 40.58 / 41.39 | 54.03 / 56.34 |
+| Doorway inbound | 38.85 / 47.80 | 48.20 / 57.52 |
+
+The staffed room's three post-warmup GPU medians were 49.63, 50.09 and
+50.04 ms. The room's phase median comprised 49.47 ms in ray dispatch,
+0.38 ms in acceleration-structure work and 0.11 ms in image transfer, as
+separately timed spans. The room retained 240,862,400 device-local bytes
+on all three visits. These stage timings direct the next investigation
+toward the room's ray workload.
+
+SurfaceFlinger yielded 2,770 deduplicated adjacent game-layer display
+intervals from 21.47 through 157.00 s, with a 50.00 ms median and a 58.33 ms
+p95. Those intervals have no per-submission join. On USB, battery
+temperature rose from 25.3 °C to 31.0 °C. Android thermal status was 0 at
+both endpoints. The earlier Pipeline run used a different APK and began
+at 32.1 °C. These runs establish each backend individually. Matched
+backend performance, sustained target pacing and hands-on campaign play
+remain open.
+
+The raw route, display samples, installed hash, thermal endpoints and
+final screen are retained locally under
+`reports/horde-bellwether-phone-query-20261123-150817`. The test app was
+stopped after capture and the separate private candidate remains installed.
+
 ### 23 November 2026 — Bellwether tavern GPU stage timings
 
 **Evidence class — actual-device scripted route, joined GPU stage timing and
