@@ -7363,6 +7363,11 @@ public class MainActivity extends Activity {
                         !BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE));
     }
 
+    private static boolean hasBellwetherWestRoundTrip() {
+        return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && BuildConfig.BELLWETHER_COMBINED_RESIDENTS &&
+                BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE;
+    }
+
     static int checkpointId(final String name) {
         if (name == null) return -1;
         switch (name) {
@@ -7445,8 +7450,7 @@ public class MainActivity extends Activity {
                 return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
                         BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 347 : -1;
             case "bellwether-west-roundtrip-measurement":
-                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && BuildConfig.BELLWETHER_COMBINED_RESIDENTS &&
-                        BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? 349 : -1;
+                return hasBellwetherWestRoundTrip() ? 349 : -1;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
@@ -7810,6 +7814,7 @@ public class MainActivity extends Activity {
             case 347: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
                     BuildConfig.BELLWETHER_COMBINED_RESIDENTS
                     ? new float[]{-0.14f, -0.11f} : null;
+            case 349: return hasBellwetherWestRoundTrip() ? new float[]{-0.14f, -0.11f} : null;
             case 331:
             case 332:
             case 333: return new float[]{0.0f, -0.12f};
