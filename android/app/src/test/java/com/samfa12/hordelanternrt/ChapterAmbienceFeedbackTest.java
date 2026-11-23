@@ -33,6 +33,15 @@ public class ChapterAmbienceFeedbackTest {
         }
         return result;
     }
+    @Test public void stockSharesTheOrderedFiniteVoice() {
+        assertEquals(40, ChapterAmbienceFeedback.BELLWETHER_PIG_GRUNT);
+        assertEquals(41, ChapterAmbienceFeedback.BELLWETHER_HEN_CLUCK);
+        assertEquals("bellwether_pig_grunt", ChapterAmbienceFeedback.soundKey(40));
+        assertEquals("bellwether_hen_cluck", ChapterAmbienceFeedback.soundKey(41));
+        assertEquals(3, ChapterAmbienceFeedback.latestSignalIndex(batch(40,41,38)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(41,40,34)));
+        assertFalse(ChapterAmbienceFeedback.isSignal(42));
+    }
     @Test public void laterStopsSuppressOlderFoliageAcrossTheCombinedFamily() {
         long[] forestStop=batch(35,0,29);
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(forestStop));

@@ -104,6 +104,36 @@ class ChapterLocalAudioTests(unittest.TestCase):
             self.assertIn(relative + asset['file'], contents)
             self.assertNotIn('414482_1738686-hq.mp3', contents)
 
+    def test_bellwether_stock_crops_have_a_closed_package_and_provenance(self):
+        relative = 'audio/bellwether-stock/'
+        directory = ROOT / 'assets' / relative
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        self.assertFalse(manifest['listeningAcceptance'])
+        self.assertEqual({cue['runtimeFile']: cue['frames'] for cue in manifest['assets']},
+                         {'runtime/pig_grunt.wav': 42240, 'runtime/hen_cluck.wav': 21120})
+        files = {'asset.manifest.json', 'runtime/pig_grunt.wav', 'runtime/hen_cluck.wav'}
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}, files)
+        for source_roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            admitted = (ROOT / source_roster).read_text(encoding='utf-8')
+            for path in files:
+                self.assertIn(relative + path, admitted)
+            self.assertNotIn('233173_4056007-hq.mp3', admitted)
+            self.assertNotIn('607245_887696-hq.mp3', admitted)
+        for cue in manifest['assets']:
+            self.assertEqual(cue['source']['license'], 'CC0-1.0')
+            self.assertRegex(cue['source']['sha256'], r'^[0-9a-f]{64}$')
+            self.assertFalse(cue['loop'])
+            path = directory / cue['runtimeFile']
+            self.assertEqual(path.stat().st_size, cue['runtimeBytes'])
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), cue['runtimeSha256'])
+            with wave.open(str(path), 'rb') as wav:
+                self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+                self.assertEqual(wav.getnframes(), cue['frames'])
+                samples = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+            self.assertEqual((samples[0], samples[-1]), (0, 0))
+            self.assertEqual(max(map(abs, samples)), cue['peakSample'])
+            self.assertLess(cue['peakSample'], 6000)
+
     def test_kit_ankle_packages_two_finite_cues_and_their_provenance(self):
         directory = ROOT / 'assets/audio/kit-ankle'
         manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))

@@ -4,7 +4,10 @@ package com.samfa12.hordelanternrt;
 final class ChapterAmbienceFeedback {
     static final int TOMB_DRIP=32, ROPE_CONTACT=33, LOCAL_STOPPED=34, FOREST_FOLIAGE=35;
     static final int BELLWETHER_HEARTH=39;
-    static boolean isSignal(int type) { return (type>=28 && type<=FOREST_FOLIAGE) || type==BELLWETHER_HEARTH; }
+    static final int BELLWETHER_PIG_GRUNT=40, BELLWETHER_HEN_CLUCK=41;
+    static boolean isSignal(int type) {
+        return (type>=28 && type<=FOREST_FOLIAGE) || (type>=BELLWETHER_HEARTH && type<=BELLWETHER_HEN_CLUCK);
+    }
     /** Return a tuple offset, including stops, so an older start cannot replay. */
     static int latestSignalIndex(long[] events) {
         int latest=-1;
@@ -22,6 +25,8 @@ final class ChapterAmbienceFeedback {
             case ROPE_CONTACT: return "rope_contact";
             case FOREST_FOLIAGE: return "forest_leaf_rustle";
             case BELLWETHER_HEARTH: return "bellwether_hearth";
+            case BELLWETHER_PIG_GRUNT: return "bellwether_pig_grunt";
+            case BELLWETHER_HEN_CLUCK: return "bellwether_hen_cluck";
             default: return null;
         }
     }

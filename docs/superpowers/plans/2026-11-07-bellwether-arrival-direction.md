@@ -502,8 +502,11 @@ The pig occasionally sniffs, the hen on the shelf turns to look, and the
 ground hen briefly dips its head. The shared 60 Hz simulation drives the
 gestures when the player is nearby and eases the heads into settled poses
 on departure. Three visible RT instances share two immutable BLAS geometries
-with no resident skinning or new textures. Ambient sound and combined
-handset cost remain open for the active stock pocket.
+with no resident skinning or new textures. The pig's grunt and the hens'
+clucks use the existing incidental ambience voice and begin on the animals'
+fixed-step gestures. Starts use each animal's surveyed mount, with a nine-metre
+range and a minimum three-second gap across the yard. Dialogue and departure
+cancel the active sound. Combined handset cost remains open for the stock pocket.
 
 The [editable source and receipt](../../../assets/models/world/source/bellwether-stock-v1/README.md)
 add 4,492 solid triangles to the existing town materials and primitives.
@@ -531,8 +534,8 @@ The signed combined ARM64 Debug APK at `27603992` has SHA-256
 `7ad33ef39c783e025a3c9783dd492258d0a7631d5433037fe6b9c9f54e9161df`.
 It contains the exact town and head assets and the same 25 resident files and
 13 voice files as the settled checkpoint. Android unit tests passed 601 with
-six skipped. The phone was disconnected during validation. Handset
-presentation, sustained timing and livestock audio remain open.
+six skipped. The phone was disconnected during that validation. Handset
+presentation, sustained timing and listening acceptance remain open.
 
 ### West service yard
 

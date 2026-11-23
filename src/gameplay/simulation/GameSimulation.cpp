@@ -496,7 +496,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // health/action mutation can intervene before this owner snapshot is used.
     StepHealingFlask(input,fixedDeltaSeconds,flaskCompeting,healthBeforeEncounter);
     if(dialogueDeltaSeconds>0) {
-        const auto bird=forestBird_.Step(snapshot_);
+        const auto bird=ChapterLocalAmbience::StockEligible(snapshot_)?forestBird_.Step(false):forestBird_.Step(snapshot_);
         // Preserve a centred ambient
         // source/listener tuple rather than invent a perched gameplay actor.
         if(bird==ForestBirdAmbience::Cue::PlayFoliage)
@@ -511,10 +511,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                 EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
         const auto local=localAmbience_.Step(snapshot_);
         if(local.cue!=ChapterLocalAmbience::Cue::None)
-            Emit(local.cue==ChapterLocalAmbience::Cue::Drip?GameplayEventType::TombDrip:
-                 local.cue==ChapterLocalAmbience::Cue::Rope?GameplayEventType::RopeContact:
-                 local.cue==ChapterLocalAmbience::Cue::Hearth?GameplayEventType::BellwetherHearth:
-                 GameplayEventType::ChapterLocalAmbienceStopped,
+            Emit(ChapterLocalAmbience::EventType(local.cue),
                 EntityId::Invalid,EntityId::Invalid,local.position.x,local.position.z,local.gain,0,local.position.y);
     }
     if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();

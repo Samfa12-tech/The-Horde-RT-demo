@@ -268,6 +268,60 @@ void HearthCadenceAndScope() {
           "walking out of the room stops the outstanding hearth voice once");
 }
 
+void StockCadenceAndScope() {
+    using namespace horde::gameplay::bellwether;
+    auto state=DripState();
+    state.rescue.exteriorSide=true;
+    const auto& [x,z]=kBellwetherStockRoostView;
+    state.playerX=x; state.playerZ=z; state.playerSupportWorldY=kBellwetherStockHeadMounts[0][1];
+    Check(Local::StockEligible(state),"the mapped dry roost approach can hear the stock");
+    auto remote=state;
+    remote.playerSupportWorldY+=4.f;
+    Check(!Local::StockEligible(remote),"the same XZ on another level cannot hear the stock");
+    Local local;
+    BellwetherStockIdle idle;
+    std::array<unsigned,3> heard{};
+    std::uint64_t lastCue=0;
+    GameplayEvent previous;
+    for(unsigned tick=0;tick<48u*60u;++tick) {
+        ++state.tickIndex;
+        idle.Step(x,z,kTick);
+        state.stockHeadPoses=idle.Poses();
+        const auto result=local.Step(state);
+        if(result.cue==Cue::None) continue;
+        std::size_t animal=0;
+        for(;animal<kBellwetherStockHeadMounts.size();++animal) {
+            const auto& mount=kBellwetherStockHeadMounts[animal];
+            if(Same(result.position,{mount[0],mount[1],mount[2]})) break;
+        }
+        const bool aligned=animal<heard.size() && std::abs(state.stockHeadPoses[animal].yawRadians)>.06f;
+        Check(aligned && result.cue==(animal==0 ? Cue::Pig : Cue::Hen),
+              "a cue has the matching animated animal and its exact mount");
+        if(aligned) ++heard[animal];
+        Check(state.tickIndex>=(lastCue?lastCue+Local::kStockMinimumTicks:Local::kStockInitialTicks),
+              "one-shots share a finite quiet gap and never emit from a neutral pose");
+        lastCue=state.tickIndex;
+        previous.type=Local::EventType(result.cue);
+        previous.worldX=result.position.x; previous.worldY=result.position.y; previous.worldZ=result.position.z;
+        previous.listenerX=x; previous.listenerZ=z; previous.intensity=result.gain;
+        Check(IsChapterAmbienceEvent(previous.type) && ChapterAmbienceGains(previous).left>0.f &&
+              !ChapterAmbienceGains(previous).obstructed && local.Step(state).cue==Cue::None,
+              "the event enters the shared exterior voice once per fixed tick");
+    }
+    Check(std::all_of(heard.begin(),heard.end(),[](unsigned count){return count>0;}),
+          "the pig and each individual hen contribute over the real idle schedule");
+    auto boundary=previous;
+    boundary.listenerX=boundary.worldX+Local::kStockRange-.05f; boundary.listenerZ=boundary.worldZ;
+    Check(ChapterAmbienceGains(boundary).right<.02f && Local::StockEventEligible(state,previous) &&
+          !Local::StockEventEligible(remote,previous),"the authored source fades at range and drops stale playback across levels");
+    state.chapterDialogue.line=dialogue::Line::GardenGrateTalk;
+    ++state.tickIndex;
+    Check(local.Step(state).cue==Cue::Stop && !Local::StockEventEligible(state,previous),
+          "a new dialogue sends an ordered stop and invalidates queued animal sound");
+    ++state.tickIndex;
+    Check(local.Step(state).cue==Cue::None,"suppressed sounds never accrue while the player talks");
+}
+
 cp::Checkpoint Record(bool upper) {
     cp::Checkpoint c;
     c.guards = {cp::GuardPose{-4.f, -15.2f, .3f}, cp::GuardPose{-6.f, -16.f, -.7f}};
@@ -449,7 +503,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           "Windows shares one finite ambient key with current-state/focus/UI/mute cleanup and unchanged SFX gain");
     Check(drain.find("case GameplayEventType::ForestFoliage:") != std::string::npos &&
           drain.find("ForestBirdAmbience::FoliageEligible") != std::string::npos &&
-          drain.find("ChapterAmbienceEmitter(event)") != std::string::npos &&
+          drain.find("ChapterAmbienceGains(event)") != std::string::npos &&
           drain.find("audio/forest-foliage/runtime/leaf_rustle.wav") != std::string::npos,
           "Windows finite foliage uses shared event-time attenuation and current source-range admission");
     const auto bridge=Read(root/"android/app/src/main/cpp/android_probe_bridge.cpp");
@@ -473,7 +527,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
 
 int main(int argc, char** argv) {
     if (argc != 2) { std::cerr << "usage: ChapterLocalAmbienceTests <source-root>\n"; return 2; }
-    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); RopeTravelAndSource(); Transport();
+    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); StockCadenceAndScope(); RopeTravelAndSource(); Transport();
     const auto directory = std::filesystem::path(argv[1]) / "assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json", manifest, diagnostic) ||

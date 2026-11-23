@@ -1123,6 +1123,14 @@ palette and its existing texture credits. The rigid head meshes use three
 untextured finishes from that palette. The editable objects and exact source
 receipt are in `assets/models/world/source/bellwether-stock-v1/`.
 
+The positional pig grunt uses a short crop from JarredGibb's field recording.
+The hen cluck uses a short crop from D4XX's recording. Both source pages grant
+CC0 1.0. The audio manifest records the public playback copies, exact hashes,
+and FFmpeg filters and fades. The runtime ships the cropped mono WAVs and their
+manifest. [Pig recording](https://freesound.org/people/JarredGibb/sounds/233173/)
+[Hen recording](https://freesound.org/people/D4XX/sounds/607245/)
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+
 ## Bellwether mill tally props - 23 November 2026
 
 The banded case, dealer's tray and mill tally board are original Horde

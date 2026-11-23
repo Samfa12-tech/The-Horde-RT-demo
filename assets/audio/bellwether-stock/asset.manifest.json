@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "target": "Bellwether livestock finite positional one-shots",
+  "listeningAcceptance": false,
+  "processor": "FFmpeg 9.0",
+  "sampleRate": 48000,
+  "bitsPerSample": 16,
+  "channels": 1,
+  "assets": [
+    {
+      "id": "pig_grunt",
+      "source": {
+        "title": "Pig - Grunt 5 (deep) - 96kHz.wav",
+        "author": "JarredGibb",
+        "page": "https://freesound.org/people/JarredGibb/sounds/233173/",
+        "file": "https://cdn.freesound.org/previews/233/233173_4056007-hq.mp3",
+        "format": "Public high-quality mono MP3 playback copy",
+        "sha256": "08b8474a1360f6153f631a5ab947135cf493aef393233a6c99e99114b97f6fe4",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "runtimeFile": "runtime/pig_grunt.wav",
+      "runtimeSha256": "45fe4a0541814077f032c202ddf78c9aef6aba191cd1f5cc94c628b18b64488f",
+      "runtimeBytes": 84524,
+      "frames": 42240,
+      "peakSample": 5355,
+      "loop": false,
+      "processing": "ffmpeg -ss 0.72 -i <source> -t 0.88 -af 'highpass=f=68,lowpass=f=5800,volume=-10dB,afade=t=in:d=0.03,afade=t=out:st=0.74:d=0.14' -ac 1 -ar 48000 -c:a pcm_s16le -map_metadata -1 -fflags +bitexact -flags:a +bitexact <runtime>"
+    },
+    {
+      "id": "hen_cluck",
+      "source": {
+        "title": "Chicken",
+        "author": "D4XX",
+        "page": "https://freesound.org/people/D4XX/sounds/607245/",
+        "file": "https://cdn.freesound.org/previews/607/607245_887696-hq.mp3",
+        "format": "Public high-quality stereo MP3 playback copy",
+        "sha256": "4b715c8d0972058fc5cd898548fa8160c613731f8de5301b9c4ac42fbce92ac9",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/"
+      },
+      "runtimeFile": "runtime/hen_cluck.wav",
+      "runtimeSha256": "0b59e0b59995f102ebe5ef222fa26b2f1e7eaaaeaf5e0c2771997628db2c36c7",
+      "runtimeBytes": 42284,
+      "frames": 21120,
+      "peakSample": 2942,
+      "loop": false,
+      "processing": "ffmpeg -ss 0.19 -i <source> -t 0.44 -af 'pan=mono|c0=0.5*c0+0.5*c1,highpass=f=180,lowpass=f=6800,volume=-8dB,afade=t=in:d=0.012,afade=t=out:st=0.35:d=0.09' -ar 48000 -c:a pcm_s16le -map_metadata -1 -fflags +bitexact -flags:a +bitexact <runtime>"
+    }
+  ]
+}

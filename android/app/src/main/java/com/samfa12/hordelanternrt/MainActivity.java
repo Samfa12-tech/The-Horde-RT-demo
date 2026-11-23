@@ -7154,6 +7154,8 @@ public class MainActivity extends Activity {
                         case ChapterAmbienceFeedback.ROPE_CONTACT:
                         case ChapterAmbienceFeedback.FOREST_FOLIAGE:
                         case ChapterAmbienceFeedback.BELLWETHER_HEARTH:
+                        case ChapterAmbienceFeedback.BELLWETHER_PIG_GRUNT:
+                        case ChapterAmbienceFeedback.BELLWETHER_HEN_CLUCK:
                             if(eventIndex==latestAmbienceSignal)
                                 playChapterAmbience(stereoGains, ChapterAmbienceFeedback.soundKey(eventType));
                             break;
@@ -7959,6 +7961,8 @@ public class MainActivity extends Activity {
         loadSound("kit_steady_breath", "audio/kit-ankle/runtime/steady_breath.wav");
         loadSound("forest_leaf_rustle", "audio/forest-foliage/runtime/leaf_rustle.wav");
         loadSound("bellwether_hearth", "audio/bellwether-hearth/runtime/hearth_crackle.wav");
+        loadSound("bellwether_pig_grunt", "audio/bellwether-stock/runtime/pig_grunt.wav");
+        loadSound("bellwether_hen_cluck", "audio/bellwether-stock/runtime/hen_cluck.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");

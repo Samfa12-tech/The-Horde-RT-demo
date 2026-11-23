@@ -1243,6 +1243,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             "ordinary Lookout load prepares both Bellwether residents with its presented scene");
         if (gBellwetherEarnTavernValidation) {
             using namespace horde::gameplay::dialogue;
+            using horde::gameplay::bellwether::kBellwetherStockHeadMounts;
             using horde::gameplay::traversal::BellwetherStation;
             using horde::gameplay::traversal::kBellwetherTavernRoute;
             const auto catalogueReady = [&] {
@@ -1260,6 +1261,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             input.pitchRadians = -.15f;
             unsigned ticks = 0, exchangeLines = 0, presentationInterval = 60;
             bool assessmentObserved = false, ankleReloaded = false, ankleReplayed = false;
+            bool watchStockAudio = false;
+            std::array<bool, kBellwetherStockHeadMounts.size()> stockCueSources{};
             std::optional<campaign::Checkpoint> lookoutBeforeAssessment;
             const auto step = [&] {
                 if (std::chrono::steady_clock::now() >= deadline) {
@@ -1272,6 +1275,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 ctx.simulationInput = input;
                 ctx.inputPublicationSequence = std::max(ctx.inputPublicationSequence, state.inputPublicationSequence) + 1;
                 ctx.simulation.StepFixed(input, 1.f / 60.f, ctx.inputPublicationSequence);
+                if (watchStockAudio) {
+                    using namespace horde::gameplay::simulation;
+                    for (const auto& event : ctx.simulation.Events().Events()) {
+                        if (event.tickIndex!=state.tickIndex || !IsStockAmbienceEvent(event.type)) continue;
+                        const auto gains=ChapterAmbienceGains(event);
+                        if (gains.left+gains.right<=0.f || !ChapterLocalAmbience::StockEventEligible(state,event)) continue;
+                        for (std::size_t i=0; i<stockCueSources.size(); ++i) {
+                            const auto& mount=kBellwetherStockHeadMounts[i];
+                            if (event.worldX==mount[0] && event.worldY==mount[1] && event.worldZ==mount[2])
+                                stockCueSources[i]=true;
+                        }
+                    }
+                }
                 if (gBellwetherAnkleRestoreValidation) {
                     const bool assessing = state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::AnkleAssessment;
                     assessmentObserved |= assessing;
@@ -1690,6 +1706,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                                 waitFor(moved, 1500) && frame() && capture(alert, false) && moved();
                         };
                         input.pitchRadians=-.28f;
+                        watchStockAudio=true;
+                        const auto heardEveryAnimal = [&] {
+                            return std::all_of(stockCueSources.begin(),stockCueSources.end(),[](bool heard){return heard;});
+                        };
                         const bool visitedStock=check(talked && walkTo(approach.back()) &&
                             state.chapterDialogue.line!=Line::GardenGrateTalk &&
                             std::all_of(stock.begin(),stock.end(),walkTo) && state.playerGrounded &&
@@ -1699,10 +1719,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             face(kBellwetherStockRoostXZ[0],kBellwetherStockRoostXZ[1]) &&
                             stockWitness(1u, "windows-combined-stock-roost.png", "windows-combined-stock-roost-alert.png") &&
                             stockWitness(2u, "windows-combined-stock-hen.png", "windows-combined-stock-hen-alert.png") &&
+                            waitFor(heardEveryAnimal,1500) &&
                             walkTo(stock.back()) &&
                             std::all_of(std::next(stock.rbegin()),stock.rend(),walkTo) && walkTo(approach.back()) &&
                             ctx.simulation.CampaignBoundaryRevision()==journalBoundary,
-                            "the dry livestock approach presents both resting and alert poses at the pig pen and roost");
+                            "the dry livestock walk presents three animals and emits a positional cue from each mount");
+                        watchStockAudio=false;
                         input.pitchRadians = previousPitch;
                         const bool restored = setInspectionLight(previousPose);
                         return visitedStock && restored &&

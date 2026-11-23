@@ -1144,9 +1144,7 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
     const auto gains = event.type==horde::gameplay::simulation::GameplayEventType::KitAnkleFoley ?
-        horde::audio::KitAnkleGains(event) : horde::gameplay::CalculateSpatialAudio(
-        horde::gameplay::simulation::ChapterAmbienceEmitter(event),
-        {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
+        horde::audio::KitAnkleGains(event) : horde::gameplay::simulation::ChapterAmbienceGains(event);
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
     const std::uint64_t verticalMetadata =
         horde::platform::android::PackGameplayEventVerticalMetadata(event);
@@ -1187,7 +1185,8 @@ void DrainSimulationEventsToPlatform()
             EnqueuePlatformGameplayEvent(stopped);
             continue;
         }
-        if(event.type==GameplayEventType::BellwetherHearth && !ChapterLocalAmbience::HearthEligible(current)) {
+        if((event.type==GameplayEventType::BellwetherHearth && !ChapterLocalAmbience::HearthEligible(current)) ||
+           (IsStockAmbienceEvent(event.type) && !ChapterLocalAmbience::StockEventEligible(current,event))) {
             auto stopped=event;
             stopped.type=GameplayEventType::ChapterLocalAmbienceStopped;
             stopped.intensity=0.f;
