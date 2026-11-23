@@ -66,6 +66,20 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void tallyActionsUseTheirOwnNativeQuoteAndPreserveRopePriority() {
+        final int tag = (1 << 31) | 1;
+        final int sale = tag | (2 << 25) | (2 << 28);
+        assertEquals(R.string.take_mill_tally, MainActivity.contextualInteractLabel(tag | (1 << 25)));
+        assertEquals("Sell tally stamp (+2 coins)",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), sale));
+        assertEquals(R.string.record_mill_tally_claim, MainActivity.contextualInteractLabel(tag | (3 << 25)));
+        assertEquals(R.string.recover_mill_tally, MainActivity.contextualInteractLabel(tag | (4 << 25)));
+        assertEquals(R.string.return_mill_tally, MainActivity.contextualInteractLabel(tag | (5 << 25)));
+        assertEquals(0, MainActivity.lanternFittingPrice(sale));
+        assertEquals(0, MainActivity.contextualInteractLabel(sale | (1 << 9)));
+    }
+
+    @Test
     public void millWorkbenchActionsShareTheContextControlWithoutQuotingAPrice() {
         final int workbench = (7 << 16) | 1;
         assertEquals(R.string.inspect_mill_gearing, MainActivity.contextualInteractLabel(workbench | (1 << 25)));

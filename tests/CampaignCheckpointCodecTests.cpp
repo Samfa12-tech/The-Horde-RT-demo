@@ -63,7 +63,7 @@ void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    constexpr std::array<std::size_t,cp::kBellwetherAnkleSchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203,204};
+    constexpr std::array<std::size_t,cp::kMillTallySchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203,204,205};
     const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
         "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
@@ -116,6 +116,54 @@ int main() {
     auto deliveredBytes=Encode(deliveredPrivy);
     Check(deliveredBytes.size()==203 && deliveredBytes.back()==std::byte{1},
           "schema19 appends one delivered bit after the complete schema18 payload");
+    using cp::MillTallyAction;
+    using cp::MillTallyProgress;
+    auto tally=deliveredPrivy;
+    tally.schema=cp::kMillTallySchema;
+    const auto apply=[&](MillTallyAction action,MillTallyProgress progress) {
+        Check(tally.treasurePurse.ApplyMillTallyAction(action) && tally.treasurePurse.millTally==progress,
+              "the tally transition changes ownership exactly once");
+        RoundTrip(tally);
+        const auto before=tally.treasurePurse;
+        Check(!tally.treasurePurse.ApplyMillTallyAction(action) && tally.treasurePurse==before,
+              "the same tally input cannot repeat a transition");
+    };
+    apply(MillTallyAction::Take,MillTallyProgress::Carried);
+    auto direct=tally;
+    Check(direct.treasurePurse.ApplyMillTallyAction(MillTallyAction::Return) &&
+          direct.treasurePurse.millTally==MillTallyProgress::Returned &&
+          direct.treasurePurse.coins==0 && !direct.treasurePurse.HasEarnedCoins(),
+          "the stamp can be returned directly without sale or a reward");
+    RoundTrip(direct);
+    apply(MillTallyAction::Sell,MillTallyProgress::Sold);
+    Check(tally.treasurePurse.coins==cp::TreasurePurse::kMillTallySaleCoins &&
+          !tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Return) &&
+          !tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Recover),
+          "the sale credits exactly the quote and retains the stamp at the dealer until claimed");
+    Check(tally.treasurePurse.BuyLanternFitting() && tally.treasurePurse.coins==0,
+          "buying the ordinary fitting can spend every coin from the tally sale");
+    apply(MillTallyAction::RecordClaim,MillTallyProgress::ClaimRecorded);
+    apply(MillTallyAction::Recover,MillTallyProgress::Recovered);
+    Check(!tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Sell),
+          "recovered items cannot earn the sale again");
+    apply(MillTallyAction::Return,MillTallyProgress::ReturnedAfterSale);
+    Check(tally.treasurePurse.coins==0 && tally.treasurePurse.lanternFittingPurchased,
+          "recovering and returning never reverses the spent unrelated purchase");
+    auto invalidTally=Encode(tally);
+    invalidTally.back()=std::byte{7};Rechecksum(invalidTally);
+    Reject(invalidTally,codec::Error::InvalidCheckpoint);
+    auto legacyTally=tally;legacyTally.schema=cp::kBellwetherAnkleSchema;
+    Check(!cp::Validate(legacyTally),"legacy layouts cannot silently drop named ownership");
+    auto inflated=tally;
+    inflated.treasurePurse.coins=cp::TreasurePurse::kMillTallySaleCoins+1u;
+    Check(!cp::Validate(inflated),"the named sale cannot create more coins than its quote");
+    cp::Checkpoint legacyReader;
+    codec::Error tallyError{};
+    Check(codec::Decode(deliveredBytes,legacyReader,tallyError) &&
+          legacyReader.treasurePurse.millTally==MillTallyProgress::Unfound &&
+          Encode(legacyReader)==deliveredBytes,
+          "existing tavern saves open with the stamp unfound and preserve their bytes");
+
     auto availablePrivy=deliveredPrivy;availablePrivy.privyRagDelivered=false;
     const auto availableBytes=Encode(availablePrivy);
     Check(availableBytes.back()==std::byte{0},"schema19 encodes Available with a canonical false byte");
@@ -318,7 +366,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,cp::kBellwetherAnkleSchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kMillTallySchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -439,7 +487,7 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,cp::kBellwetherAnkleSchema+1,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kMillTallySchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
     for(std::uint32_t version:{0u,4u,0xffffffffu}) {
@@ -484,7 +532,7 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=cp::kBellwetherAnkleSchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kMillTallySchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
     {
         auto archive=Endpoint();
         archive.schema=cp::kWaysideArchiveSchema;

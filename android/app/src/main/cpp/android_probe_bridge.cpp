@@ -691,7 +691,7 @@ horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationCo
     config.bellwetherTavernKeeperAdmitted = true;
     config.bellwetherSpecialist = AndroidBellwetherSpecialist();
 #if HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE
-    config.bellwetherOrdinaryTrade = true;
+    config.bellwetherTrade = true;
 #endif
 #if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
     config.bellwetherCombinedResidents = true;
@@ -1328,6 +1328,16 @@ void PublishSimulationUiState()
         constexpr auto price=horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice;
         static_assert(price>0 && price<64); // Bits 25-30 carry the quoted price.
         contextualControls |= static_cast<int>(price << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.millTallyAction != horde::gameplay::campaign::MillTallyAction::None) {
+        using horde::gameplay::campaign::MillTallyAction;
+        constexpr int optionalActionTag=INT32_MIN;
+        constexpr auto price=horde::gameplay::campaign::TreasurePurse::kMillTallySaleCoins;
+        static_assert(static_cast<int>(MillTallyAction::Return)<8 && price>0u && price<8u);
+        const int action=static_cast<int>(simulation.millTallyAction);
+        const int quote=simulation.millTallyAction==MillTallyAction::Sell ? static_cast<int>(price) : 0;
+        contextualControls |= optionalActionTag | (action << 25) | (quote << 28) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
              (simulation.millAction != MillAction::None || simulation.millLeakTestPhase != MillLeakTestPhase::Idle ||

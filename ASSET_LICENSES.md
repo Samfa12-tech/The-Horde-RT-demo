@@ -1115,6 +1115,13 @@ Horde geometry authored by Samfa12/Codex in Blender. They share the admitted
 town materials and their existing texture credits. The editable model and
 exact asset receipt are in `assets/models/world/source/bellwether-grate-v1/`.
 
+## Bellwether mill tally props - 23 November 2026
+
+The banded case, dealer's tray and mill tally board are original Horde
+geometry authored by Samfa12/Codex in Blender. They use the admitted town
+materials and their existing texture credits. The editable model and exact
+source receipt are in `assets/models/world/source/bellwether-tally-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

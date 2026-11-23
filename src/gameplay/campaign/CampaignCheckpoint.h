@@ -28,6 +28,7 @@ inline constexpr std::uint32_t kSalvagerShorePracticeSchema=17;
 inline constexpr std::uint32_t kOrdinarySilverSchema=18;
 inline constexpr std::uint32_t kPrivyRagSchema=19;
 inline constexpr std::uint32_t kBellwetherAnkleSchema=20;
+inline constexpr std::uint32_t kMillTallySchema=21;
 enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open, Restored };
 // The first safe standing mark beside the chair is part of revision 3's save
 // contract. A later furniture or conversation edit must not move old saves.
@@ -98,12 +99,16 @@ inline bool Validate(const Checkpoint& c) {
     // Revision 3 retains Kit's earned seated state even when the player
     // later saves at another safe boundary. The byte layout is unchanged.
     const bool completedForest = c.contentRevision>=kForestContentRevision;
-    if (c.schema < 1 || c.schema > kBellwetherAnkleSchema ||
+    if (c.schema < 1 || c.schema > kMillTallySchema ||
         (c.bellwetherAnkleAssessed &&
             (c.schema<kBellwetherAnkleSchema || c.contentRevision!=kForestContentRevision)) ||
         (c.privyRagDelivered && (c.schema<kPrivyRagSchema || c.contentRevision<kBellwetherContentRevision ||
             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
         c.millPreparation>bellwether::MillPreparation::GearingVerified ||
+        c.treasurePurse.millTally>MillTallyProgress::ReturnedAfterSale ||
+        (c.treasurePurse.millTally!=MillTallyProgress::Unfound &&
+            (c.schema<kMillTallySchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
         c.treasurePurse.ordinarySilver>OrdinarySilverProgress::Sold ||
         (c.treasurePurse.ordinarySilver!=OrdinarySilverProgress::Unfound &&
             (c.schema<kOrdinarySilverSchema || c.contentRevision<kBellwetherContentRevision ||
@@ -122,9 +127,7 @@ inline bool Validate(const Checkpoint& c) {
             (c.schema<kLanternFittingSchema || !c.treasurePurse.HasEarnedCoins())) ||
         c.treasurePurse.coins>TreasurePurse::kMaximumCoins ||
         (c.treasurePurse.registerRewardClaimed && !c.waysideRegisterInterpreted) ||
-        (c.treasurePurse.coins!=0 && !c.treasurePurse.HasEarnedCoins()) ||
-        (!c.treasurePurse.registerRewardClaimed && c.treasurePurse.ordinarySilver==OrdinarySilverProgress::Sold &&
-            c.treasurePurse.coins>TreasurePurse::kOrdinarySilverSaleCoins) ||
+        (!c.treasurePurse.registerRewardClaimed && c.treasurePurse.coins>c.treasurePurse.CoinsIssuedFromSales()) ||
         (c.dialogue.tavernLanternLinesStarted &&
             (c.schema<kTavernLanternExchangeSchema || !c.waysideLanternRevealStarted)) ||
         (c.waysideRegisterInterpreted && (c.schema<kRegisterInterpretationSchema || !c.waysideRegisterRecovered)) ||

@@ -248,7 +248,7 @@ horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationCo
     config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
     config.bellwetherCombinedResidents = gBellwetherCombinedCampaignActors;
     config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
-    config.bellwetherOrdinaryTrade = gBellwetherCombinedRelicDealer ||
+    config.bellwetherTrade = gBellwetherCombinedRelicDealer ||
         gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::RelicDealer;
 #endif
     return config;
@@ -3700,6 +3700,22 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     }
     else if(chapterInteract && snapshot.tavernLanternFittingAvailable) {
         text = "LEFT-CLICK / A TO FIT LANTERN HINGE";
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.millTallyAction!=horde::gameplay::campaign::MillTallyAction::None) {
+        using horde::gameplay::campaign::MillTallyAction;
+        switch(snapshot.millTallyAction) {
+        case MillTallyAction::Take: text="LEFT-CLICK / A TO TAKE THE TALLY STAMP"; break;
+        case MillTallyAction::Sell:
+            tradeText="SELL TALLY STAMP (+" +
+                std::to_string(horde::gameplay::campaign::TreasurePurse::kMillTallySaleCoins) + " COINS) | LEFT-CLICK / A";
+            text=tradeText;
+            break;
+        case MillTallyAction::RecordClaim: text="LEFT-CLICK / A TO CHECK THE MILL MARK"; break;
+        case MillTallyAction::Recover: text="LEFT-CLICK / A TO RECOVER THE STAMP (FREE)"; break;
+        case MillTallyAction::Return: text="LEFT-CLICK / A TO RETURN THE TALLY STAMP"; break;
+        case MillTallyAction::None: break;
+        }
         context.tavernInteractionPromptPresented=visible;
     }
     else if(chapterInteract && snapshot.millAction!=horde::gameplay::bellwether::MillAction::None) {

@@ -2043,6 +2043,93 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-return.png"),
                         "returning to the same tavern restores both town residents and retains the two eastern activities");
                 }
+                if (progressed && verifiesSilver && !gBellwetherPreparationsValidation) {
+                    using campaign::MillTallyAction;
+                    using campaign::MillTallyProgress;
+                    using campaign::TreasurePurse;
+                    const auto depart = [&] {
+                        return std::all_of(kBellwetherTavernRoute.rbegin(),
+                            std::make_reverse_iterator(junction),walkTo);
+                    };
+                    const auto walkAt = [&](const auto& point) {return walkTo({point[0],point[1]});};
+                    const auto offer = [&](const auto& mark,MillTallyAction action) {
+                        if(!face(mark[0],mark[2]) || state.millTallyAction!=action ||
+                           !state.HasChapterInteractPrompt() || !ctx.tavernInteractionPromptPresented) {
+                            std::cerr << "Mill tally mark " << state.playerX << ',' << state.playerZ
+                                      << " offered=" << static_cast<int>(state.millTallyAction)
+                                      << " expected=" << static_cast<int>(action) << '\n';
+                            return false;
+                        }
+                        return true;
+                    };
+                    const auto tray = [&] {
+                        return depart() && std::all_of(kBellwetherWestApproach.begin(),
+                            kBellwetherWestApproach.end(),walkTo) && walkAt(kMillTallyTrayView);
+                    };
+                    const auto board = [&] {
+                        return depart() && std::all_of(std::next(mill.begin()),mill.end(),walkTo) &&
+                            walkAt(kMillTallyBoardView);
+                    };
+                    const auto reloadTally = [&](MillTallyProgress progress,std::uint32_t expectedCoins) {
+                        campaign::storage::StoredCheckpoint saved;
+                        if(!until([&] {
+                            return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",saved).status==
+                                campaign::storage::Status::Read && saved.checkpoint.schema==campaign::kMillTallySchema &&
+                                saved.checkpoint.treasurePurse.millTally==progress &&
+                                saved.checkpoint.treasurePurse.coins==expectedCoins &&
+                                ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded;
+                        },false) || !reloadCheckpoint() || !step() || !atHearth() || !frame())return false;
+                        sceneEpoch=ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+                        geometryGeneration=ctx.rtScene.StaticGeometryGeneration();
+                        return state.treasurePurse==saved.checkpoint.treasurePurse &&
+                            state.privyRag==PrivyRagState::Delivered &&
+                            saved.checkpoint.id==campaign::CheckpointId::BellwetherTavern;
+                    };
+                    const auto before=state.treasurePurse;
+                    const auto quoted=before.coins+TreasurePurse::kMillTallySaleCoins;
+                    const auto wetSteps=state.waterContact.stepCount;
+                    const auto dry=[&](BellwetherStation station) {
+                        return walkTo(station) && state.playerGrounded && !state.waterContact.wetGround &&
+                            state.waterContact.stepCount==wetSteps;
+                    };
+                    progressed=check(depart() && walkTo(mill[1]) && walkTo(kBellwetherSalvagerMark) &&
+                        std::all_of(landing.begin(),landing.end()-2,dry) &&
+                        std::all_of(kBellwetherMillCrossing.begin(),kBellwetherMillCrossing.end(),dry) &&
+                        walkAt(kMillTallyCaseView) && offer(kMillTallyCaseReach,MillTallyAction::Take) &&
+                        capture("windows-tally-case.png",false) && interact() &&
+                        state.millTallyAction==MillTallyAction::None && reloadTally(MillTallyProgress::Carried,before.coins),
+                        "the dry mill crossing reaches the tally case and persists the recovered stamp at the tavern");
+                    if(progressed) {
+                        using campaign::OrdinarySilverAction;
+                        std::array<char,96> text{};
+                        progressed=check(tray() && face(kBellwetherRelicDealerStand.x,kBellwetherRelicDealerStand.z) &&
+                            state.ordinarySilverAction==OrdinarySilverAction::Sold && state.millTallyAction==MillTallyAction::None &&
+                            offer(kMillTallyTrayReach,MillTallyAction::Sell) &&
+                            GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),text.data(),static_cast<int>(text.size()))>0 &&
+                            std::string_view(text.data()).starts_with("SELL TALLY STAMP (+2 COINS)") &&
+                            capture("windows-tally-tray.png") && interact() && state.treasurePurse.coins==quoted &&
+                            state.millTallyAction==MillTallyAction::None && reloadTally(MillTallyProgress::Sold,quoted),
+                            "the dealer tray quotes and credits a single named sale without replacing the ordinary trade mark");
+                    }
+                    if(progressed) {
+                        progressed=check(board() && offer(kMillTallyBoardReach,MillTallyAction::RecordClaim) &&
+                            capture("windows-tally-board.png",false) && interact() && state.millTallyAction==MillTallyAction::None &&
+                            reloadTally(MillTallyProgress::ClaimRecorded,quoted) &&
+                            readDirections(campaign::PauseObjective::BellwetherShrine,"Recover the tally stamp at the dealer"),
+                            "the mill mark records a recoverable claim and Directions points to the dealer");
+                    }
+                    if(progressed) {
+                        progressed=check(tray() && offer(kMillTallyTrayReach,MillTallyAction::Recover) &&
+                            interact() && state.millTallyAction==MillTallyAction::None &&
+                            reloadTally(MillTallyProgress::Recovered,quoted) && board() &&
+                            offer(kMillTallyBoardReach,MillTallyAction::Return) && interact() &&
+                            state.millTallyAction==MillTallyAction::None && reloadTally(MillTallyProgress::ReturnedAfterSale,quoted) &&
+                            state.treasurePurse.ordinarySilver==before.ordinarySilver &&
+                            state.treasurePurse.lanternFittingPurchased==before.lanternFittingPurchased &&
+                            readDirections(campaign::PauseObjective::BellwetherShrine,"The mill's tally stamp has been returned."),
+                            "the paid stamp can be recovered free and returned once without changing other purchases");
+                    }
+                }
                 if (progressed && gBellwetherPreparationsValidation) {
                     campaign::storage::StoredCheckpoint eastern;
                     progressed = check(until([&] {

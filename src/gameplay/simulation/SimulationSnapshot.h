@@ -102,6 +102,7 @@ struct SimulationSnapshot
     bool shorePracticeServiceAvailable=false;
     bool relicDealerTradeAvailable=false;
     campaign::OrdinarySilverAction ordinarySilverAction{};
+    campaign::MillTallyAction millTallyAction{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
     bool gardenGrateTalkAvailable=false;
@@ -114,6 +115,7 @@ struct SimulationSnapshot
             salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||
             ordinarySilverAction==campaign::OrdinarySilverAction::Take ||
             ordinarySilverAction==campaign::OrdinarySilverAction::Sell ||
+            millTallyAction!=campaign::MillTallyAction::None ||
             gardenGrateTalkAvailable || privyRagAction!=bellwether::PrivyRagAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;

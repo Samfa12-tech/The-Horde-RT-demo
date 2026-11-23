@@ -547,3 +547,8 @@ assets/models/world/source/bellwether-smith-v1/authoring-receipt.json text eol=l
 tools/author-bellwether-grate.py text eol=lf
 assets/models/world/source/bellwether-grate-v1/geometry.generated.h text eol=lf
 assets/models/world/source/bellwether-grate-v1/authoring-receipt.json text eol=lf
+
+# Preserve exact tally-prop recipe and generated receipt hashes.
+tools/author-bellwether-tally.py text eol=lf
+assets/models/world/source/bellwether-tally-v1/geometry.generated.h text eol=lf
+assets/models/world/source/bellwether-tally-v1/authoring-receipt.json text eol=lf

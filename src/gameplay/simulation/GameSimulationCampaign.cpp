@@ -74,6 +74,8 @@ static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::Treas
         campaign::kLanternFittingSchema:campaign::kTreasurePurseSchema);
     if(purse.ordinarySilver!=campaign::OrdinarySilverProgress::Unfound)
         checkpoint.schema=std::max(checkpoint.schema,campaign::kOrdinarySilverSchema);
+    if(purse.millTally!=campaign::MillTallyProgress::Unfound)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kMillTallySchema);
 }
 
 static void RecordMillPreparation(campaign::Checkpoint& checkpoint,bellwether::MillPreparation preparation) {
@@ -266,6 +268,11 @@ void GameSimulation::InteractWithOrdinarySilver(campaign::OrdinarySilverAction a
     if(changed) {
         if(const auto updated=PrepareTreasureCheckpoint(purse))CommitTreasureCheckpoint(*updated);
     }
+}
+void GameSimulation::InteractWithMillTally(campaign::MillTallyAction action) {
+    auto purse=treasurePurse_;
+    if(!purse.ApplyMillTallyAction(action))return;
+    if(const auto updated=PrepareTreasureCheckpoint(purse))CommitTreasureCheckpoint(*updated);
 }
 std::optional<campaign::Checkpoint> GameSimulation::PrepareTreasureCheckpoint(campaign::TreasurePurse purse) const {
     if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||

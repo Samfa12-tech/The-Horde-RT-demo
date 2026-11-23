@@ -439,6 +439,24 @@ Collection and sale update the earned tavern checkpoint. The sale writes the sol
 
 Both Windows hardware RT backends passed the replay from the lookout save through collection, the quoted sale, repeat Interact, the hinge purchase, and the subsequent eastern visits. The replay reloaded the saved purse after each change. The combined Android ARM64 Debug package includes the pinned cache geometry and passed 16 focused host-side Android tests. Physical phone performance remains pending.
 
+### Mill tally stamp
+
+A banded case at the dry millrace turnout holds the mill's tally stamp.
+The west-door board records the familiar mill mark. After the first tavern
+conversation, a player can collect the stamp from the case and return it
+directly to the board, or sell it at the separate tray on the dealer's counter.
+Facing the dealer still offers ordinary trade. The provisional named sale
+pays two coins once, enough for the existing hinge fitting.
+
+The dealer retains the marked piece. If it was sold, use the board to record
+the mill's ownership and then recover the stamp at the same tray. Recovery
+does not require money, including when its proceeds have been spent. Once
+recovered, it can only be returned. The case, board and tray have no new
+inventory, patrol, economy or loading system. The purse and ownership save
+together at the earned boundary. Earlier saves begin with the stamp unfound.
+Bellwether Directions shows the next steps of the chosen route. No Abbey or
+Foundry access gate depends on it.
+
 ### Covered well in the square
 
 The [T01 well](../../../assets/models/world/source/bellwether-well-v1/README.md) occupies the mapped centre of the square. The stone base is solid in the shared collision mesh. Posts support a clay roof over the planked opening and hanging bucket. The tested route approaches from the south and rejoins the square. Drawing water remains outside this checkpoint.

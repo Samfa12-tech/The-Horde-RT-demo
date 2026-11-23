@@ -6,6 +6,7 @@
 #include "../../../assets/models/world/source/bellwether-privy-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-tally-v1/geometry.generated.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
@@ -75,6 +76,10 @@ void GameSimulation::InteractWithClaimedChapter() {
     }
     if(chapterDialogue_.TryStartGardenGrateTalk(context))return;
     if(IsBellwetherTavernKeeperReady() && chapterDialogue_.TryStartTavernConversation(context))return;
+    if(const auto tally=CurrentMillTallyAction(context);tally!=campaign::MillTallyAction::None) {
+        InteractWithMillTally(tally);
+        return;
+    }
     if(CanBuyLanternFitting(context)) {
         BuyLanternFitting(context);
         return;
@@ -133,10 +138,39 @@ void GameSimulation::InteractWithClaimedChapter() {
     }
 }
 
+campaign::MillTallyAction GameSimulation::CurrentMillTallyAction(const dialogue::Context& c) const {
+    using campaign::MillTallyAction;
+    using campaign::MillTallyProgress;
+    if(!config_.bellwetherTrade || !campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
+       !c.claimed || !c.alive || !c.exterior || c.paused || c.combat || c.traversing || !c.kitSeated ||
+       !playerSupport_.grounded || !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
+       chapterDialogue_.State().line!=dialogue::Line::None ||
+       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())
+        return MillTallyAction::None;
+    const auto faces=[&](const std::array<float,3>& target) {
+        const float dx=target[0]-c.player.x,dz=target[2]-c.player.z;
+        const float distance=std::hypot(dx,dz);
+        return distance<=1.35f && std::abs(c.listener.y-target[1])<=1.45f &&
+            std::sin(c.yaw)*dx-std::cos(c.yaw)*dz>=.84f*distance &&
+            chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,target[0],target[2],
+                target[1]-.025f,target[1]+.025f,.025f);
+    };
+    const auto progress=treasurePurse_.millTally;
+    if(progress==MillTallyProgress::Unfound)
+        return faces(bellwether::kMillTallyCaseReach)?MillTallyAction::Take:MillTallyAction::None;
+    if(c.relicDealerSource && (progress==MillTallyProgress::ClaimRecorded || treasurePurse_.CanSellMillTally()) &&
+       faces(bellwether::kMillTallyTrayReach))
+        return progress==MillTallyProgress::ClaimRecorded?MillTallyAction::Recover:MillTallyAction::Sell;
+    if((progress==MillTallyProgress::Carried || progress==MillTallyProgress::Recovered ||
+        progress==MillTallyProgress::Sold) && faces(bellwether::kMillTallyBoardReach))
+        return progress==MillTallyProgress::Sold?MillTallyAction::RecordClaim:MillTallyAction::Return;
+    return MillTallyAction::None;
+}
+
 campaign::OrdinarySilverAction GameSimulation::CurrentOrdinarySilverAction(const dialogue::Context& c) const {
     using campaign::OrdinarySilverAction;
     using campaign::OrdinarySilverProgress;
-    if(!config_.bellwetherOrdinaryTrade || !campaignBoundary_ ||
+    if(!config_.bellwetherTrade || !campaignBoundary_ ||
        campaignBoundaryRevision_==UINT64_MAX || !c.exterior || !c.claimed || !c.alive ||
        c.combat || c.paused || c.traversing || !c.kitSeated || !playerSupport_.grounded ||
        !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||

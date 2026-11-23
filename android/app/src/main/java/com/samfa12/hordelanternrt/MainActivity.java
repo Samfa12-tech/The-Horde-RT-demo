@@ -265,7 +265,7 @@ public class MainActivity extends Activity {
     private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
-    private static final int CONTEXTUAL_GARDEN_GRATE_TALK = 1 << 31;
+    private static final int CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION = 1 << 31;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
@@ -9094,7 +9094,17 @@ public class MainActivity extends Activity {
                 }
             default: break;
         }
-        if ((state & CONTEXTUAL_GARDEN_GRATE_TALK) != 0) return R.string.talk_through_grate;
+        if ((state & CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION) != 0) {
+            switch ((state >>> 25) & 7) {
+                case 0: return R.string.talk_through_grate;
+                case 1: return R.string.take_mill_tally;
+                case 2: return R.string.sell_mill_tally;
+                case 3: return R.string.record_mill_tally_claim;
+                case 4: return R.string.recover_mill_tally;
+                case 5: return R.string.return_mill_tally;
+                default: return 0;
+            }
+        }
         if (lanternFittingPrice(state) != 0) return R.string.fit_lantern_hinge;
         final int keeperAction = ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) |
                 ((state & CONTEXTUAL_RECORD_KEEPER_EXTENDED) != 0 ? 4 : 0);
@@ -9132,6 +9142,8 @@ public class MainActivity extends Activity {
     static String contextualInteractText(final Context context, final int state) {
         final int label = contextualInteractLabel(state);
         if (label == 0) return "";
+        if (label == R.string.sell_mill_tally)
+            return context.getString(label, (state >>> 28) & 7);
         if (label == R.string.fit_lantern_hinge)
             return context.getString(label, lanternFittingPrice(state));
         if (label == R.string.salvager_enter_shallows_timed ||
@@ -9143,7 +9155,8 @@ public class MainActivity extends Activity {
     }
 
     static int lanternFittingPrice(int state) {
-        return ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) == CONTEXTUAL_MILL_TAG
+        return (state & CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION) != 0 ||
+                ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) == CONTEXTUAL_MILL_TAG
                 ? 0 : (state >>> 25) & 63;
     }
 

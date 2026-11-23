@@ -1,0 +1,47 @@
+{
+  "feature": "Mill tally case and service marks",
+  "marks": {
+    "CaseReach": [
+      143.776,
+      -17.96,
+      93.35
+    ],
+    "TrayReach": [
+      61.48,
+      -10.53088836669922,
+      128.43
+    ],
+    "BoardReach": [
+      118.028,
+      -12.644970999999998,
+      112.19
+    ],
+    "CaseView": [
+      143.72,
+      94.0
+    ],
+    "TrayView": [
+      61.87,
+      129.16
+    ],
+    "BoardView": [
+      117.2,
+      112.2
+    ]
+  },
+  "originalTownSha256": "2ed3b1b980fafe18013265caee40897fa3d67d628d5fca968685c5b55a0ff4fd",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213",
+  "addedSolidTriangles": 320,
+  "townVertices": 50551,
+  "townTriangles": 22868,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "3a02df5b2c8364495d5488eb5b64f9a424a67c222240ee4b5b37b98f00015b01",
+  "files": {
+    "bellwether-tally.blend": "365f966e334a7e0c633d484b58464bb555cf014239246ba722b748f515ff9dcd",
+    "tally-props.glb": "1440ffd811eb2a9df632de782125f0ac75d3a9b17dfbd24db04cbe4ef2322625",
+    "bellwether-tavern-v1.glb": "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213",
+    "geometry.generated.h": "4857a17fd5c0e1e5a8798fcd21a0842c2a1e44c157882269afcc469952d499ee",
+    "asset.manifest.json": "d9e5242161ccd261eea62b9f4c18fd463c16f4dc8f041cc925a863cb7a65f809"
+  }
+}

@@ -139,7 +139,8 @@ inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherD
     if(objective==PauseObjective::None || objective==PauseObjective::Lookout ||
        objective==PauseObjective::BellwetherArrival || objective==PauseObjective::BellwetherHearth)return text;
     const auto& purse=directions.purse;
-    if(objective==PauseObjective::BellwetherExpeditions || purse.ordinarySilver!=OrdinarySilverProgress::Unfound) {
+    if(objective==PauseObjective::BellwetherExpeditions || purse.ordinarySilver!=OrdinarySilverProgress::Unfound ||
+       purse.millTally!=MillTallyProgress::Unfound) {
         text+="\r\n\r\nPurse: "+std::to_string(purse.coins)+(purse.coins==1?" coin.":" coins.");
         if (purse.lanternFittingPurchased) text+="\r\nLantern hinge fitted.";
         else text+="\r\nLantern fitting at the tavern: "+std::to_string(TreasurePurse::kLanternFittingPrice)+" coins.";
@@ -147,6 +148,25 @@ inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherD
             text+="\r\nOrdinary silver: sell it at the stall west of the square.";
         if(purse.ordinarySilver==OrdinarySilverProgress::Sold)
             text+="\r\nOrdinary silver sold.";
+        switch(purse.millTally) {
+        case MillTallyProgress::Carried:
+            text+="\r\nMill tally stamp: return it at the board by the mill's west door, or sell it at the dealer's tray.";
+            break;
+        case MillTallyProgress::Sold:
+            text+="\r\nThe dealer holds the tally stamp. Check the mill's west-door board to record the claim.";
+            break;
+        case MillTallyProgress::ClaimRecorded:
+            text+="\r\nMill claim recorded. Recover the tally stamp at the dealer's tray without paying.";
+            break;
+        case MillTallyProgress::Recovered:
+            text+="\r\nTally stamp recovered. Return it at the board by the mill's west door.";
+            break;
+        case MillTallyProgress::Returned:
+        case MillTallyProgress::ReturnedAfterSale:
+            text+="\r\nThe mill's tally stamp has been returned.";
+            break;
+        case MillTallyProgress::Unfound: break;
+        }
     }
     if (objective==PauseObjective::BellwetherExpeditions) {
         switch(directions.ward) {

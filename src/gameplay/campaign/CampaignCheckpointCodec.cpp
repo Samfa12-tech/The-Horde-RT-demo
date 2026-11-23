@@ -12,7 +12,7 @@ constexpr std::array<std::byte,8> kMagic{std::byte{'H'},std::byte{'R'},std::byte
     std::byte{'C'},std::byte{'P'},std::byte{'K'},std::byte{'T'},std::byte{0}};
 constexpr std::uint32_t kFormat=1;
 constexpr std::size_t kHeaderBytes=20;
-constexpr std::array<std::uint32_t,kBellwetherAnkleSchema> kPayloadBytesBySchema{142,143,148,157,165,166,167,168,169,170,171,172,177,178,179,180,181,182,183,184};
+constexpr std::array<std::uint32_t,kMillTallySchema> kPayloadBytesBySchema{142,143,148,157,165,166,167,168,169,170,171,172,177,178,179,180,181,182,183,184,185};
 static_assert(kHeaderBytes+kPayloadBytesBySchema.back()<=kMaxFileBytes);
 constexpr std::uint32_t PayloadBytes(std::uint32_t schema) {
     return kPayloadBytesBySchema[schema-1];
@@ -50,7 +50,7 @@ private:
     std::span<const std::byte> bytes_;std::size_t offset_=0;bool valid_=true;
 };
 Error VersionError(const Checkpoint& c) {
-    if(c.schema<1 || c.schema>kBellwetherAnkleSchema) return Error::UnsupportedSchema;
+    if(c.schema<1 || c.schema>kMillTallySchema) return Error::UnsupportedSchema;
     if(c.contentRevision<1 || c.contentRevision>kBellwetherContentRevision) return Error::UnsupportedContent;
     return Error::None;
 }
@@ -101,6 +101,7 @@ bool Encode(const Checkpoint& c,std::vector<std::byte>& out,Error& error) {
     if(c.schema>=kOrdinarySilverSchema)payload.push_back(static_cast<std::byte>(c.treasurePurse.ordinarySilver));
     if(c.schema>=kPrivyRagSchema)Bool(payload,c.privyRagDelivered);
     if(c.schema>=kBellwetherAnkleSchema)Bool(payload,c.bellwetherAnkleAssessed);
+    if(c.schema>=kMillTallySchema)payload.push_back(static_cast<std::byte>(c.treasurePurse.millTally));
     std::vector<std::byte> encoded;encoded.reserve(kHeaderBytes+payloadBytes);
     encoded.insert(encoded.end(),kMagic.begin(),kMagic.end());
     U32(encoded,kFormat);U32(encoded,payloadBytes);U32(encoded,Crc32(payload));
@@ -157,6 +158,7 @@ bool Decode(std::span<const std::byte> bytes,Checkpoint& out,Error& error) {
     if(c.schema>=kOrdinarySilverSchema)c.treasurePurse.ordinarySilver=static_cast<OrdinarySilverProgress>(r.Byte());
     if(c.schema>=kPrivyRagSchema)c.privyRagDelivered=r.Bool();
     if(c.schema>=kBellwetherAnkleSchema)c.bellwetherAnkleAssessed=r.Bool();
+    if(c.schema>=kMillTallySchema)c.treasurePurse.millTally=static_cast<MillTallyProgress>(r.Byte());
     if(!r.Valid()) {error=Error::Malformed;return false;}
     if(!Validate(c)) {error=Error::InvalidCheckpoint;return false;}
     out=std::move(c);error=Error::None;return true;
