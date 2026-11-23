@@ -360,6 +360,38 @@ variant. Displayed pacing and sustained phone performance remain open. The
 raw runs and both comparison receipts are retained locally under
 `bellwether-keeper-matched-20261122-032422`.
 
+### Stress routes from the private Windows package
+
+On 23 November, the extracted five-resident, nineteen-voice Windows ZIP
+from `8cc237a1` completed the east-fork and west stock-yard routes on both
+hardware RT backends. The RTX 5050 Laptop GPU used driver 610.47, Shipping/High
+and the regular 1232 × 803 client at 100% render scale. Each run completed
+two staffed-room returns, with 12 resident swaps on each east run and
+four on each west run. All three stock heads animated during both west
+visits on each backend.
+
+| Route and backend | Duration (s) | Completed RT frames | Staffed room GPU p95 (ms) | Staffed room native cycle p95 (ms) |
+| --- | ---: | ---: | ---: | ---: |
+| East, RayTracingPipeline | 156.95 | 24,323 | 5.80 | 7.67 |
+| East, RayQueryCompute | 156.95 | 24,742 | 5.60 | 7.19 |
+| West, RayTracingPipeline | 234.88 | 37,508 | 5.93 | 7.59 |
+| West, RayQueryCompute | 234.88 | 37,594 | 5.67 | 7.54 |
+
+After the five-second warmup, every staffed room visit held 468,754,704
+device-local RT bytes. Host-visible RT allocations held at 85,016,416 bytes
+on RayTracingPipeline and 85,015,904 on RayQueryCompute. The staffed room also
+had the highest phase p95 for native cycles in each run. GPU temperature
+endpoints across the sequential runs ranged from 46 °C to 65 °C. These
+hidden runs establish RT work and resource behavior. Desktop display
+pacing still needs a visible capture.
+
+The launcher pins the executable and ZIP, and the verifier checks the
+roster, open door, three room lights and presentation identity. Raw data,
+per-visit summaries and the ZIP receipt are retained locally under
+`reports/horde-bellwether-packaged-stress-20261123-151140`. The private ZIP's
+SHA-256 is `9844d26aedea297db804290374e3c92744a3571331abc3333b039302391912fb`.
+Audio/haptic manual revalidation required — NO for the measurement launcher.
+
 ### East route to the mill yard
 
 The [east route](../../../src/gameplay/traversal/BellwetherEastRoute.h) starts below the tavern's south ramp and passes the fork to the mapped salvager's spot. It follows the tavern's east flank north before descending into the yard west of the closed B05 mill. The original diagonal crosses a steep break in the imported ground, so this route follows a walkable contour on the existing terrain. The shared 60 Hz player motor completes the trip to the salvager's spot and the mill yard and walks back with Kit seated and the earned tavern checkpoint intact.
