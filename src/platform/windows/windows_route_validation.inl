@@ -372,11 +372,17 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 if (!arrivalStep(neutral())) return false;
             return ready();
         };
+        const auto captureSeatedKit = [&](const char* name) {
+            auto input=neutral();
+            input.yawRadians=std::atan2(state.chapterCompanion.x-state.playerX,
+                                        state.playerZ-state.chapterCompanion.z);
+            input.pitchRadians=-.22f;
+            return step(input) && render() && capture(name);
+        };
         proceed = check(state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::AtLookout &&
             std::all_of(kBellwetherTavernRoute.begin(),kBellwetherTavernRoute.end(),walkTo) &&
             walkTo({playerMark.x,playerMark.z}) && waitFor([&]{return state.tavernConversationAvailable;},120*60) &&
-            atHearth() && render() &&
-            capture("route-bellwether-tavern.png"),
+            atHearth() && captureSeatedKit("route-bellwether-tavern.png"),
             "the lookout earned in this run leads through the village and south door to Kit and the keeper");
         campaign::storage::StoredCheckpoint tavern;
         if (proceed) {
@@ -406,7 +412,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 atHearth() && state.tavernDirectionsAvailable && !state.tavernConversationAvailable &&
                 state.chapterDialogue.line == dialogue::Line::None &&
                 state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
-                capture("route-bellwether-reloaded.png"),
+                captureSeatedKit("route-bellwether-reloaded.png"),
                 "choosing the same slot resumes the earned Bellwether visit with Talk completed and directions available");
         }
     }
