@@ -27,6 +27,8 @@ inline constexpr auto kBellwetherStockApproach=[] {
     for(std::size_t i=0;i<points.size();++i)route[i]={points[i][0],points[i][1]};
     return route;
 }();
+inline constexpr BellwetherStation kBellwetherStockRoostWitness{
+    bellwether::kBellwetherStockRoostView[0],bellwether::kBellwetherStockRoostView[1]};
 inline constexpr BellwetherStation kBellwetherGardenAisle{34.f,136.23f};
 inline constexpr BellwetherStation kBellwetherGardenGrateApproach{
     bellwether::kBellwetherGrateApproach[0],bellwether::kBellwetherGrateApproach[1]};

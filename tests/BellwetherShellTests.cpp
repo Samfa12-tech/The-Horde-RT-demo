@@ -277,6 +277,7 @@ int main(int argc,char** argv) {
                   "both timber bed edges remain solid on either side of the garden aisle");
             constexpr auto& stock=kBellwetherStockApproach;
             check(follow(garden.back(),stock[0]) && follow(stock[0],stock[1]) && follow(stock[1],stock.back()) &&
+                  follow(stock.back(),kBellwetherStockRoostWitness) && follow(kBellwetherStockRoostWitness,stock.back()) &&
                   follow(stock.back(),stock[1]) && follow(stock[1],stock[0]) && follow(stock[0],garden.back()),
                   "the domestic animals have a separate dry viewing path from the kitchen plots");
             constexpr auto viewOfStock=stock.back();

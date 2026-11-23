@@ -1689,8 +1689,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             std::all_of(stock.begin(),stock.end(),walkTo) && state.playerGrounded &&
                             face(kBellwetherStockPigXZ[0],kBellwetherStockPigXZ[1]) &&
                             capture("windows-combined-stock-pig.png",false) &&
+                            walkTo(kBellwetherStockRoostWitness) && state.playerGrounded && !state.waterContact.wetGround &&
                             face(kBellwetherStockRoostXZ[0],kBellwetherStockRoostXZ[1]) &&
-                            capture("windows-combined-stock-roost.png",false) &&
+                            capture("windows-combined-stock-roost.png",false) && walkTo(stock.back()) &&
                             std::all_of(std::next(stock.rbegin()),stock.rend(),walkTo) && walkTo(approach.back()) &&
                             ctx.simulation.CampaignBoundaryRevision()==journalBoundary,
                             "the fenced stock and roost are reachable from the garden on the dry path");
@@ -2089,7 +2090,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                                 saved.checkpoint.treasurePurse.millTally==progress &&
                                 saved.checkpoint.treasurePurse.coins==expectedCoins &&
                                 ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded;
-                        },false) || !reloadCheckpoint() || !step() || !atHearth() || !frame())return false;
+                        },false) || !reloadCheckpoint() ||
+                            !settleResidentPair(kRecordKeeperActorId) || !atHearth() || !frame()) {
+                            std::cerr << "Tally reload witness failed for progress " << static_cast<int>(progress)
+                                      << " at " << state.playerX << ',' << state.playerZ << '\n';
+                            return false;
+                        }
                         sceneEpoch=ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
                         geometryGeneration=ctx.rtScene.StaticGeometryGeneration();
                         return state.treasurePurse==saved.checkpoint.treasurePurse &&

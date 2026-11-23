@@ -5,7 +5,9 @@ from pathlib import Path
 import runpy
 import sys
 
+import bmesh
 import bpy
+from mathutils import Vector
 
 
 RECIPE = Path(__file__).resolve()
@@ -14,9 +16,11 @@ model = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-crossing.py"
 TOWN = Path("assets/models/world/runtime/bellwether-tavern-v1")
 PARENT = "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213"
 BOUNDS = (28.90, 34.30, 140.82, 145.17)
-PIG = (32.30, 143.75)
-HENS = ((30.33, 141.55), (30.92, 142.38))
+PIG = (32.10, 143.56)
+HENS = ((31.61, 141.55), (32.28, 142.35))
+ROOST_SHIFT = 1.24
 VIEW_ROUTE = ((39.35, 139.70), (38.20, 142.02), (35.80, 142.76))
+ROOST_VIEW = (35.43, 141.21)
 
 
 def move_to_collection(obj, collection):
@@ -46,8 +50,18 @@ class Pocket:
         move_to_collection(obj, self.collection)
         self.parts.append(obj)
 
-    def surface(self, label, points, faces, finish, smooth=False):
+    def surface(self, label, points, faces, finish, smooth=False, closed=False):
         obj = model["mesh"](label, points, faces, finish)
+        if closed:
+            mesh = bmesh.new()
+            mesh.from_mesh(obj.data)
+            bmesh.ops.recalc_face_normals(mesh, faces=list(mesh.faces))
+            if mesh.calc_volume(signed=True) < 0.:
+                bmesh.ops.reverse_faces(mesh, faces=list(mesh.faces))
+            if not all(edge.is_manifold and edge.is_contiguous for edge in mesh.edges) or mesh.calc_volume(signed=True)<=0.:
+                raise ValueError(f"Closed animal detail is invalid: {label}")
+            mesh.to_mesh(obj.data)
+            mesh.free()
         if smooth:
             obj.data.polygons.foreach_set("use_smooth", [True] * len(faces))
         self.add(obj)
@@ -99,11 +113,12 @@ class Pocket:
                  latch + .541, latch + .605, self.iron, .006)
 
         # The hens shelter above the ground on a board beside the straw.
-        floor = self.ground(29.83, 141.7)
+        floor = self.ground(29.83 + ROOST_SHIFT, 141.7)
+        start_of_roost = len(self.parts)
         for x in (29.18, 30.55):
             for z in (141.07, 142.20):
                 self.box("Roost foot", x - .08, x + .08, z - .08, z + .08,
-                         self.ground(x, z) - .10, floor + 1.17, self.timber, .009)
+                         self.ground(x + ROOST_SHIFT, z) - .10, floor + 1.17, self.timber, .009)
         self.box("Deep roost shelf", 29.093, 30.78, 140.988, 142.288,
                  floor + .40, floor + .493, self.timber)
         self.box("Sleeping side", 29.10, 29.25, 141.00, 142.29,
@@ -120,6 +135,14 @@ class Pocket:
             x, z = 30.08 + (i * .171) % .455, 141.18 + (i * .293) % .90
             self.beam(f"Loose straw {i}", (x, floor + .497, z),
                       (x + .20, floor + .502, z + .057 * ((i % 4) - 1)), .017, .03, self.clay)
+        for obj in self.parts[start_of_roost:]:
+            obj.location.x += ROOST_SHIFT
+
+        for i in range(11):
+            x, z = 31.37 + (i * .551) % 1.18, 143.13 + (i * .413) % .85
+            end = (x + .23, z + .042 * ((i % 5) - 2))
+            self.beam(f"Resting straw {i}", (x, self.ground(x,z) + .013, z),
+                      (end[0], self.ground(*end) + .014, end[1]), .016, .038, self.clay)
 
         # The trough and its covered jug are outside the kitchen beds.
         x, z = 33.24, 144.27
@@ -168,7 +191,7 @@ class Pocket:
 
     def hog(self):
         self.begin("Resting pig")
-        orient = self.animal_orientation(PIG, self.ground(*PIG), -.27)
+        orient = self.animal_orientation(PIG, self.ground(*PIG), .98)
         def ell(name, centre, radii, finish, sides=12, rows=6):
             self.ellipsoid(name, centre, radii, finish, orient, sides, rows)
         # A loose, pear-shaped silhouette with a heavy belly and tucked limbs.
@@ -193,17 +216,25 @@ class Pocket:
             face = tuple(range(6)) if sign > 0 else tuple(reversed(range(6)))
             thickness = [(j, j + 6, ((j + 1) % 6) + 6, (j + 1) % 6) for j in range(6)]
             self.surface("Folded ear", [orient(p) for p in (*outer, *inner)],
-                         [face, tuple(reversed(tuple(j+6 for j in face))), *thickness], self.clay)
-        tail = []
+                         [face, tuple(reversed(tuple(j+6 for j in face))), *thickness], self.clay, closed=True)
+        tail_path = []
         for i in range(16):
             a = i / 15 * math.tau * 1.06
             cx, cy, cz = -.752 - i * .009, .432 + .079 * math.sin(a), .077 * (1. - math.cos(a))
-            tail.extend(orient((cx + .012 * math.cos(math.tau*j/6),
-                                cy + .012 * math.sin(math.tau*j/6), cz)) for j in range(6))
+            tail_path.append(Vector((cx, cy, cz)))
+        tail = []
+        for i, centre in enumerate(tail_path):
+            tangent = (tail_path[min(15,i+1)] - tail_path[max(0,i-1)]).normalized()
+            normal = tangent.cross(Vector((1.,0.,0.))).normalized()
+            binormal = tangent.cross(normal)
+            for j in range(6):
+                a = math.tau * j / 6
+                tail.append(orient(centre + .012 * (normal * math.cos(a) + binormal * math.sin(a))))
         faces = [(i*6+j,(i+1)*6+j,(i+1)*6+(j+1)%6,i*6+(j+1)%6) for i in range(15) for j in range(6)]
-        self.surface("Curled tail", tail, faces, self.clay, True)
+        faces += [tuple(range(6)), tuple(reversed(range(90,96)))]
+        self.surface("Curled tail", tail, faces, self.clay, smooth=True, closed=True)
 
-    def hen(self, name, centre, floor, yaw, size):
+    def hen(self, name, centre, floor, yaw, size, wing):
         self.begin(name)
         orient = self.animal_orientation(centre, floor, yaw)
         def scale(point):
@@ -216,7 +247,7 @@ class Pocket:
         ell("Drawn-in head", (.168, .279, 0.), (.061, .065, .052), self.clay)
         ell("Small comb", (.169, .336, 0.), (.061, .028, .014), self.clay)
         for side in (-1, 1):
-            ell("Closed wing", (-.041, .143, side * .081), (.148, .079, .053), self.iron, 10, 6)
+            ell("Closed wing", (-.041, .143, side * .081), (.148, .079, .053), wing, 10, 6)
             ell("Eye", (.200, .289, side * .044), (.01, .011, .009), self.iron, 8, 4)
             ell("Tucked shank", (.066, .028, side * .066), (.045, .023, .017), self.clay, 8, 4)
         ell("Tail feather roots", (-.177, .166, 0.), (.089, .061, .068), self.iron)
@@ -225,7 +256,7 @@ class Pocket:
                 (.070, .025, .015), self.iron, 8, 4)
         self.surface("Beak tip",
                      [scale(p) for p in ((.213,.274,-.023),(.213,.273,.023),(.217,.301,0.),(.272,.277,0.))],
-                     [(0,2,1),(0,1,3),(1,2,3),(2,0,3)], self.stone)
+                     [(0,2,1),(0,1,3),(1,2,3),(2,0,3)], self.stone, closed=True)
 
 
 def main(root, previous, output):
@@ -238,8 +269,8 @@ def main(root, previous, output):
     pocket = Pocket(ground)
     shelf = pocket.habits()
     pocket.hog()
-    pocket.hen("Hen on the straw shelf", HENS[0], shelf, -.48, 1.)
-    pocket.hen("Hen on dry ground", HENS[1], ground(*HENS[1]) - .009, .66, .91)
+    pocket.hen("Hen on the straw shelf", HENS[0], shelf, -.67, 1.09, pocket.timber)
+    pocket.hen("Hen on dry ground", HENS[1], ground(*HENS[1]) - .009, .94, 1., pocket.clay)
     output.mkdir(parents=True)
     master = output / "bellwether-stock.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(master), compress=True)
@@ -264,13 +295,14 @@ def main(root, previous, output):
               f"inline constexpr std::size_t kBellwetherStockSolidTriangles={added};\n"
               f"inline constexpr std::array<std::array<float,2>,{len(VIEW_ROUTE)}> kBellwetherStockViewRoute{{{{{view}}}}};\n"
               f"inline constexpr std::array<float,2> kBellwetherStockPigXZ{{{{{PIG[0]:.6f}f, {PIG[1]:.6f}f}}}};\n"
-              "inline constexpr std::array<float,2> kBellwetherStockRoostXZ{{30.550000f, 141.718000f}};\n"
+              f"inline constexpr std::array<float,2> kBellwetherStockRoostXZ{{{{{30.55+ROOST_SHIFT:.6f}f, 141.718000f}}}};\n"
+              f"inline constexpr std::array<float,2> kBellwetherStockRoostView{{{{{ROOST_VIEW[0]:.6f}f, {ROOST_VIEW[1]:.6f}f}}}};\n"
               "} // namespace horde::gameplay::bellwether\n")
     layout = output / "geometry.generated.h"
     layout.write_text(header, encoding="utf-8", newline="\n")
     items = master, patch, town, layout, output / "asset.manifest.json"
     world["save_json"](output / "authoring-receipt.json", dict(
-        feature="Settled village stock", bounds=BOUNDS, pig=PIG, hens=HENS, approach=VIEW_ROUTE,
+        feature="Settled village stock", bounds=BOUNDS, pig=PIG, hens=HENS, approach=VIEW_ROUTE, roostView=ROOST_VIEW,
         originalTownSha256=PARENT, terrainSha256=world["TERRAIN_HASH"], runtimeTownSha256=world["sha"](town),
         addedSolidTriangles=added, townVertices=vertices, townTriangles=indices//3, blender=bpy.app.version_string,
         recipeSha256=world["sha"](RECIPE), files={item.name: world["sha"](item) for item in items}))

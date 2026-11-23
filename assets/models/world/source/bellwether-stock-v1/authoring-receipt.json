@@ -7,17 +7,17 @@
     145.17
   ],
   "pig": [
-    32.3,
-    143.75
+    32.1,
+    143.56
   ],
   "hens": [
     [
-      30.33,
+      31.61,
       141.55
     ],
     [
-      30.92,
-      142.38
+      32.28,
+      142.35
     ]
   ],
   "approach": [
@@ -34,19 +34,23 @@
       142.76
     ]
   ],
+  "roostView": [
+    35.43,
+    141.21
+  ],
   "originalTownSha256": "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213",
   "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
-  "runtimeTownSha256": "5ca98dcf5227875f55ffe9260476f6ef03a355536457b7017eda4a92d10930d0",
-  "addedSolidTriangles": 5736,
-  "townVertices": 57543,
-  "townTriangles": 28604,
+  "runtimeTownSha256": "3c1659be85077c406a6d45162ef96887fa07bdbffe9a0a072ed17b8937cda67c",
+  "addedSolidTriangles": 5876,
+  "townVertices": 57857,
+  "townTriangles": 28744,
   "blender": "5.2.0 LTS",
-  "recipeSha256": "cc3632bf5430acb9c61efe1f45c37ca6b3505323e916c0dcd8969028be494f33",
+  "recipeSha256": "c7a910b0525dd8e32e9cfa7e27f9f9e9eae090e1728a158b800d5cfb448c34a2",
   "files": {
-    "bellwether-stock.blend": "85a60e172cacea07ef841d940d7f9bdd891914146b1953deeac05bf6fc32138a",
-    "settled-stock.glb": "5799b564f41a43c0d01c837eb4f1e76c3096c980e035fad5617370faaa115b4d",
-    "bellwether-tavern-v1.glb": "5ca98dcf5227875f55ffe9260476f6ef03a355536457b7017eda4a92d10930d0",
-    "geometry.generated.h": "5b123d620f712e0de3618a0bff68bea18c33eac362842f67a57b263bff11b4cb",
-    "asset.manifest.json": "89f06fc8e866a76ff8592dab39692a1a3506a5e664a993314591527594ce269b"
+    "bellwether-stock.blend": "079e67566e21bf5063ff49b8650dabd6a830cdeee5087cd33c5a846ffee09fd6",
+    "settled-stock.glb": "841a65c03932c03a6bfba8f66f71e5fce4d1e07c17e209b4d01ffe98d846ab45",
+    "bellwether-tavern-v1.glb": "3c1659be85077c406a6d45162ef96887fa07bdbffe9a0a072ed17b8937cda67c",
+    "geometry.generated.h": "baba887a75d99c1f20790b0af3db1c65197c2f79a00c2f3b696702fbcf8fe5b6",
+    "asset.manifest.json": "08044b32a0bdd5a74ab8861bbc9fce55e5094438cec89eecd0cd32a10e341c93"
   }
 }
