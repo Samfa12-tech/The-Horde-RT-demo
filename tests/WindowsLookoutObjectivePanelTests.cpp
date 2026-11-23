@@ -185,6 +185,45 @@ int main() {
             "combined directions fit the complete shore, rig and ward text in a narrow window");
         h.panel.Close();
         DeleteObject(font);
+
+        h.view.directions.purse.ordinarySilver=horde::gameplay::campaign::OrdinarySilverProgress::Carried;
+        h.view.directions.purse.millTally=horde::gameplay::campaign::MillTallyProgress::Carried;
+        const auto scaledFont=CreateFontA(36,0,0,0,FW_SEMIBOLD,FALSE,FALSE,FALSE,
+            ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,
+            DEFAULT_PITCH|FF_DONTCARE,"Segoe UI");
+        Check(scaledFont && h.panel.Open(parent,h.view,scaledFont),"the longest mixed directions open at 200% DPI");
+        RECT shortWorkArea{32,32,1120,652};
+        h.panel.Layout(shortWorkArea,192);
+        CheckBounds(parent,shortWorkArea);
+        const auto scrollBody=GetDlgItem(parent,Panel::BodyId);
+        const auto firstLine=[&]{return SendMessageA(scrollBody,EM_GETFIRSTVISIBLELINE,0,0);};
+        Check((GetWindowLongPtrA(scrollBody,GWL_STYLE)&(ES_READONLY|WS_VSCROLL))==(ES_READONLY|WS_VSCROLL) &&
+            Text(parent,Panel::TitleId).find("Left / right to scroll")!=std::string::npos && firstLine()==0,
+            "the overflowing directions start at the top with native scrolling and a visible hint");
+        Check(h.panel.ScrollPage(true) && firstLine()>0 && h.panel.ScrollPage(false) && firstLine()==0,
+            "paging moves the text in both directions and leaves the action controls in place");
+        UINT wheelLines=3;
+        SystemParametersInfoA(SPI_GETWHEELSCROLLLINES,0,&wheelLines,0);
+        Check(h.panel.ScrollWheel(-WHEEL_DELTA/2) && firstLine()==0 &&
+            h.panel.ScrollWheel(-WHEEL_DELTA/2) && (wheelLines==0 ? firstLine()==0 : firstLine()>0),
+            "high-resolution wheel movement follows the system scroll setting");
+        for(int page=0;page<12;++page)h.panel.ScrollPage(true);
+        RECT visibleText{};
+        SendMessageA(scrollBody,EM_GETRECT,0,reinterpret_cast<LPARAM>(&visibleText));
+        const int textEnd=GetWindowTextLengthA(scrollBody)-1;
+        const auto lastChar=SendMessageA(scrollBody,EM_POSFROMCHAR,textEnd,0);
+        const auto lastY=static_cast<short>(HIWORD(lastChar));
+        Check(lastChar!=-1 && lastY>=visibleText.top && lastY<visibleText.bottom &&
+            Text(parent,Panel::BodyId).find("Shore practice: Complete.")!=std::string::npos,
+            "scrolling reaches the final shore note within the text viewport");
+        CheckBounds(parent,shortWorkArea);
+        RECT tallWorkArea{32,32,1120,1140};
+        h.panel.Layout(tallWorkArea,192);
+        CheckBounds(parent,tallWorkArea);
+        Check(Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" && !h.panel.ScrollPage(true) && firstLine()==0,
+            "when the whole page fits again the scrolling hint clears and the first line is readable");
+        h.panel.Close();
+        DeleteObject(scaledFont);
         h.view.directions={};
         for(const auto objective:{Panel::Objective::BellwetherArrival,Panel::Objective::BellwetherHearth,
                                   Panel::Objective::BellwetherLantern}) {

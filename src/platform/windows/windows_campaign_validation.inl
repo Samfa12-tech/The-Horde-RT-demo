@@ -1379,6 +1379,22 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 text.resize(static_cast<std::size_t>(copied));
                 const bool correct = text == campaign::PauseObjectiveText(objective, campaign::CurrentBellwetherDirections(state)) &&
                     text.find(requiredText) != std::string::npos;
+                bool scrollInputsWork = true;
+                if (objective == campaign::PauseObjective::BellwetherExpeditions) {
+                    ctx.lookoutObjective->Layout({16,16,380,256});
+                    const auto firstLine = [&] { return SendMessageA(body,EM_GETFIRSTVISIBLELINE,0,0); };
+                    SendMessageA(body,WM_KEYDOWN,VK_NEXT,0);
+                    const bool keyboardScrolled = firstLine() > 0;
+                    horde::platform::windows::ControllerMenuEdges edges{};
+                    edges.decrease = true;
+                    HandleControllerMenuEdges(ctx,edges);
+                    const bool controllerReturned = firstLine() == 0;
+                    UINT wheelLines = 3;
+                    SystemParametersInfoA(SPI_GETWHEELSCROLLLINES,0,&wheelLines,0);
+                    SendMessageA(body,WM_MOUSEWHEEL,MAKEWPARAM(0,static_cast<WORD>(-WHEEL_DELTA)),0);
+                    scrollInputsWork = keyboardScrolled && controllerReturned &&
+                        (wheelLines == 0 ? firstLine() == 0 : firstLine() > 0);
+                }
                 const bool closed = click(LookoutPanel::BackId) && !ctx.lookoutObjective->Visible() &&
                     ctx.pauseMenuVisible && ctx.simulationPaused;
                 const bool resumed = closed && click(kResumeButtonId) && !ctx.simulationPaused;
@@ -1386,11 +1402,11 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const bool unchanged = operation == ctx.campaign->State().operationRevision &&
                     dialogueGeneration == state.chapterDialogue.generation && x == state.playerX && z == state.playerZ &&
                     state.shorePracticeBreathTicksRemaining == breathTicks;
-                if (!correct || !resumed || !unchanged)
+                if (!correct || !scrollInputsWork || !resumed || !unchanged)
                     std::cerr << "Bellwether directions objective=" << static_cast<int>(objective)
-                              << " textCorrect=" << correct << " resumed=" << resumed
+                              << " textCorrect=" << correct << " scrollInputs=" << scrollInputsWork << " resumed=" << resumed
                               << " progressUnchanged=" << unchanged << '\n';
-                return correct && resumed && unchanged && step();
+                return correct && scrollInputsWork && resumed && unchanged && step();
             };
             const auto target = campaign::kBellwetherCheckpointPosition;
             // The scripted player runs ahead. Let Kit complete his independent
@@ -2518,7 +2534,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             "native reload preserves both discoveries and does not replay the speech or rewrite the save");
                         if (progressed)
                             check(readDirections(PauseObjective::BellwetherExpeditions),
-                                "the reloaded tavern pause menu restores the earned expedition directions");
+                                "the reloaded tavern directions reopen and scroll with keyboard, controller and wheel routing");
                     }
                 }
             }

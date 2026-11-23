@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -34,18 +35,21 @@ public:
 
     bool Open(HWND parent,const View& view,HFONT font=nullptr) {
         if(visible_ || !IsWindow(parent) || !Admitted(view))return false;
-        parent_=parent;world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
+        world_=view.worldGeneration;surface_=view.surfaceGeneration;objective_=view.objective;
         directions_=view.directions;
         const bool lookout = objective_ == Objective::Lookout;
-        bodyText_=gameplay::campaign::PauseObjectiveText(objective_,directions_);
+        const auto bodyText=gameplay::campaign::PauseObjectiveText(objective_,directions_);
         const std::array<const char*,5> labels{lookout?Title:"BELLWETHER DIRECTIONS",
-            bodyText_.c_str(),"CONTINUE EXPLORING",
+            bodyText.c_str(),"CONTINUE EXPLORING",
             lookout?"RETURN TO MENU":nullptr,lookout?"BACK":"BACK TO PAUSE MENU"};
         for(std::size_t i=0;i<controls_.size();++i) {
             if (!labels[i]) continue;
             const bool button=i>=2;
-            controls_[i]=CreateWindowExA(0,button?"BUTTON":"STATIC",labels[i],
-                WS_CHILD|(button?WS_TABSTOP|BS_OWNERDRAW:SS_CENTER|SS_NOPREFIX),0,0,1,1,parent,
+            const bool scrollBody=i==1 && !lookout;
+            const DWORD style=button ? WS_TABSTOP|BS_OWNERDRAW :
+                scrollBody ? ES_MULTILINE|ES_READONLY|ES_AUTOVSCROLL|WS_VSCROLL : SS_CENTER|SS_NOPREFIX;
+            controls_[i]=CreateWindowExA(0,button?"BUTTON":scrollBody?"EDIT":"STATIC",labels[i],
+                WS_CHILD|style,0,0,1,1,parent,
                 reinterpret_cast<HMENU>(static_cast<INT_PTR>(TitleId+static_cast<int>(i))),
                 GetModuleHandleA(nullptr),nullptr);
             if(!controls_[i]) {Close();return false;}
@@ -61,8 +65,8 @@ public:
         // Each opening owns distinct native controls. A queued notification from
         // a retired opening cannot choose an action on a later opening.
         for(auto& control:controls_) {if(control && IsWindow(control))DestroyWindow(control);control=nullptr;}
-        bodyText_.clear();
-        parent_=nullptr;
+        scrollable_=false;
+        wheelRemainder_=0;
     }
     bool Visible() const {return visible_;}
     bool Refresh(const View& view) {
@@ -83,32 +87,70 @@ public:
         Close();return result;
     }
     std::array<HWND,3> ActionControls() const {return {controls_[2],controls_[3],controls_[4]};}
-    void Layout(RECT bounds,int dpi=96) const {
+    bool ScrollPage(bool down) const {
+        if(!visible_ || !scrollable_)return false;
+        SendMessageA(controls_[1],EM_SCROLL,down?SB_PAGEDOWN:SB_PAGEUP,0);
+        return true;
+    }
+    bool ScrollWheel(int delta) {
+        if(!visible_ || !scrollable_)return false;
+        wheelRemainder_+=delta;
+        const int steps=wheelRemainder_/WHEEL_DELTA;
+        wheelRemainder_%=WHEEL_DELTA;
+        if(!steps)return true;
+        UINT lines=3;
+        SystemParametersInfoA(SPI_GETWHEELSCROLLLINES,0,&lines,0);
+        if(lines==WHEEL_PAGESCROLL) {
+            for(int page=0;page<std::abs(steps);++page)ScrollPage(steps<0);
+        } else {
+            const auto lineCount=static_cast<UINT>(SendMessageA(controls_[1],EM_GETLINECOUNT,0,0));
+            SendMessageA(controls_[1],EM_LINESCROLL,0,-steps*static_cast<int>(std::min(lines,lineCount)));
+        }
+        return true;
+    }
+    void Layout(RECT bounds,int dpi=96) {
         if(!visible_)return;
         const auto px=[&](int n){return MulDiv(n,std::max(96,dpi),96);};
         const int availableWidth=std::max(1L,bounds.right-bounds.left);
         const int availableHeight=std::max(1L,bounds.bottom-bounds.top);
         const int width=std::min(px(540),availableWidth);
-        const int titleHeight=px(42),gap=px(10);
-        int bodyHeight=px(objective_==Objective::BellwetherExpeditions?228:140);
+        const int titleHeight=std::min(px(42),std::max(1,availableHeight/4));
+        const int gap=std::min(px(10),availableHeight/25);
+        const int buttons=objective_==Objective::Lookout?3:2;
+        const int buttonHeight=std::clamp(availableHeight/(buttons+3),1,px(44));
+        const int gaps=buttons+2;
+        const int maxBody=std::max(1,availableHeight-titleHeight-buttons*buttonHeight-gaps*gap);
+        const int x=bounds.left+(availableWidth-width)/2;
+        int desiredBody=px(objective_==Objective::BellwetherExpeditions?228:140);
         if(objective_!=Objective::Lookout) {
             const auto body=controls_[1];
+            // Measure the native EDIT wrap at the final width, including its vertical scrollbar.
+            MoveWindow(body,x,bounds.top,width,maxBody,FALSE);
+            SendMessageA(body,EM_SETMARGINS,EC_LEFTMARGIN|EC_RIGHTMARGIN,MAKELPARAM(px(8),px(8)));
+            RECT formatting{};
+            SendMessageA(body,EM_GETRECT,0,reinterpret_cast<LPARAM>(&formatting));
+            const int visibleHeight=std::max(1L,formatting.bottom-formatting.top);
+            int requiredHeight=0;
             if(const HDC dc=GetDC(body)) {
                 const auto font=reinterpret_cast<HFONT>(SendMessageA(body,WM_GETFONT,0,0));
                 const auto previousFont=font?SelectObject(dc,font):nullptr;
-                RECT measured{0,0,width,0};
-                const int height=DrawTextA(dc,bodyText_.c_str(),static_cast<int>(bodyText_.size()),
-                    &measured,DT_CALCRECT|DT_WORDBREAK|DT_CENTER|DT_NOPREFIX);
+                TEXTMETRICA metrics{};
+                if(GetTextMetricsA(dc,&metrics))
+                    requiredHeight=metrics.tmHeight*static_cast<int>(SendMessageA(body,EM_GETLINECOUNT,0,0));
                 if(previousFont)SelectObject(dc,previousFont);
                 ReleaseDC(body,dc);
-                bodyHeight=std::max(bodyHeight,height+px(8));
+            }
+            desiredBody=std::max(desiredBody,requiredHeight+std::max(0,maxBody-visibleHeight)+px(8));
+            const bool overflow=requiredHeight>visibleHeight;
+            if(scrollable_!=overflow) {
+                scrollable_=overflow;
+                wheelRemainder_=0;
+                SetWindowTextA(controls_[0],overflow?
+                    "BELLWETHER DIRECTIONS\r\nLeft / right to scroll":"BELLWETHER DIRECTIONS");
             }
         }
-        const int buttons = objective_==Objective::Lookout ? 3 : 2;
-        const int gaps = buttons + 2;
-        const int buttonHeight=std::min(px(44),std::max(px(24),(availableHeight-titleHeight-bodyHeight-gaps*gap)/buttons));
+        const int bodyHeight=std::min(desiredBody,maxBody);
         const int total=titleHeight+bodyHeight+buttons*buttonHeight+gaps*gap;
-        const int x=bounds.left+(availableWidth-width)/2;
         int y=bounds.top+std::max(0,(availableHeight-total)/2);
         MoveWindow(controls_[0],x,y,width,titleHeight,TRUE);y+=titleHeight+gap;
         MoveWindow(controls_[1],x,y,width,bodyHeight,TRUE);y+=bodyHeight+2*gap;
@@ -119,10 +161,9 @@ private:
         return view.available && view.active && view.worldGeneration && view.surfaceGeneration &&
             view.objective!=Objective::None;
     }
-    HWND parent_=nullptr;
     std::array<HWND,5> controls_{};
-    std::string bodyText_;
-    bool visible_=false;
+    bool visible_=false,scrollable_=false;
+    int wheelRemainder_=0;
     std::uint64_t world_=0,surface_=0;
     gameplay::campaign::BellwetherDirections directions_{};
     Objective objective_=Objective::None;

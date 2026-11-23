@@ -4511,6 +4511,8 @@ void OpenLookoutObjective(VulkanSurfaceContext& context)
     const auto font=reinterpret_cast<HFONT>(SendMessageA(GetDlgItem(context.windowHandle,kResumeButtonId),WM_GETFONT,0,0));
     if(!context.lookoutObjective->Open(context.windowHandle,view,font))return;
     for(auto control:context.lookoutObjective->ActionControls())if(control)InstallControllerFocusOutline(control);
+    if(view.objective!=LookoutPanel::Objective::Lookout)
+        InstallControllerFocusOutline(GetDlgItem(context.windowHandle,LookoutPanel::BodyId));
     ApplyOverlayState(context);
     RECT client{};GetClientRect(context.windowHandle,&client);
     LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
@@ -5739,6 +5741,7 @@ void HandleControllerMenuEdges(
     }
     if (edges.decrease || edges.increase)
     {
+        if (context.lookoutObjective && context.lookoutObjective->ScrollPage(edges.increase)) return;
         if (!AdjustFocusedControllerSlider(context, edges.increase))
         {
             if (context.graphicsVisible)
@@ -12598,6 +12601,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     switch (message)
     {
     case WM_MOUSEWHEEL:
+        if (sceneContext && sceneContext->lookoutObjective &&
+            sceneContext->lookoutObjective->ScrollWheel(GET_WHEEL_DELTA_WPARAM(wParam))) return 0;
         if (sceneContext && sceneContext->rtLabVisible)
         {
             UINT configuredLines = 3u;
@@ -13246,6 +13251,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 if((lParam & (1ll<<30))==0)CancelLookoutObjective(*sceneContext);
                 return 0;
             }
+            if (sceneContext->lookoutObjective &&
+                (wParam==VK_PRIOR || wParam==VK_NEXT || wParam==VK_LEFT || wParam==VK_RIGHT) &&
+                sceneContext->lookoutObjective->ScrollPage(wParam==VK_NEXT || wParam==VK_RIGHT)) return 0;
             if(wParam==VK_ESCAPE && sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
             if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
             {
@@ -14075,7 +14083,8 @@ LRESULT CALLBACK ControllerFocusOutlineSubclass(
     {
         HWND parent = GetParent(control);
         auto* context = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(parent, GWLP_USERDATA));
-        if (context != nullptr && context->rtLabVisible)
+        if (context != nullptr && (context->rtLabVisible ||
+            (context->lookoutObjective && context->lookoutObjective->Visible())))
         {
             return SendMessageA(parent, message, wParam, lParam);
         }
