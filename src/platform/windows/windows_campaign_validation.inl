@@ -1673,7 +1673,10 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             return false;
                         }
                         std::array<char, 180> caption{};
-                        const bool talked = check(interact() && frame() && state.chapterDialogue.line == Line::GardenGrateTalk &&
+                        const auto& fire = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                        const auto grateLamp = horde::gameplay::effects::kBellwetherGrateLampEmitterId;
+                        const bool talked = check(state.fireEmitterCount == 4 && ctx.rtScene.HasUploadedFireEmitters() &&
+                            std::find(fire.begin(), fire.end(), grateLamp) != fire.end() && interact() && frame() && state.chapterDialogue.line == Line::GardenGrateTalk &&
                             std::abs(state.chapterDialogue.source.y - kBellwetherGrateMouth[1]) < .01f &&
                             GetWindowTextA(GetDlgItem(ctx.windowHandle,kChapterSubtitleId),caption.data(),
                                 static_cast<int>(caption.size())) > 0 &&
@@ -2018,10 +2021,23 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     const bool complete = gBellwetherPreparationsValidation;
                     const bool backAtJunction = complete ? walkTo(*junction) :
                         std::all_of(mill.rbegin(), mill.rend(), walkTo);
+                    const auto settleResidentPair = [&](std::uint32_t second) {
+                        const std::array expected{kTavernKeeperActorId, second};
+                        // The fixed-step replay advances whole sections between frames.
+                        // Give the existing asynchronous prefetch a bounded wall-clock
+                        // window at the witness mark before checking publication.
+                        const auto readyBy = std::chrono::steady_clock::now() + std::chrono::milliseconds(750);
+                        while (ctx.rtScene.ChapterResidentSourceIds() != expected &&
+                               std::chrono::steady_clock::now() < readyBy)
+                            if (!frame()) return false;
+                        return step();
+                    };
+                    const auto forkResident = gBellwetherCombinedRelicDealer ? kRelicDealerActorId : kSalvagerActorId;
                     progressed = check(
-                        backAtJunction && fork() &&
+                        backAtJunction && settleResidentPair(forkResident) && fork() &&
                         std::all_of(std::next(junction), kBellwetherTavernRoute.end(), walkTo) &&
-                        walkTo({target.x, target.z}) && step() && atHearth() && town() && frame() &&
+                        walkTo({target.x, target.z}) && settleResidentPair(kRecordKeeperActorId) &&
+                        atHearth() && town() && frame() &&
                         state.millPreparation == (complete ? MillPreparation::RigTested : MillPreparation::BearingNeeded) &&
                         state.shorePracticeStage == (complete ? ShorePracticeStage::Idle : ShorePracticeStage::FindDryMark) &&
                         capture("windows-combined-return.png"),

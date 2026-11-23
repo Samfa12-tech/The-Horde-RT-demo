@@ -87,7 +87,15 @@ def build_recess(ground):
     box("Water vessel lid", .465, .633, -.768, -.601, .721, .757, timber)
     box("Water vessel knob", .522, .578, -.711, -.650, .747, .787, timber)
 
-    return parts, point(.11, .68, -.42), point(0., 1.26, 1.03), point(0., 0., 1.65)
+    # Bring the shared RT flame in through the open sheltered side. The
+    # carrier remains fixed to the wall below the iron bars.
+    box("Lamp stone ledge", -.78, -.42, -.16, .06, .532, .597, stone)
+    box("Lamp oil tray", -.67, -.46, -.125, .035, .59, .641, clay)
+    box("Lamp lip", -.684, -.446, -.127, -.109, .629, .675, clay)
+    box("Lamp lip outer", -.684, -.446, .021, .038, .629, .675, clay)
+    box("Lamp wick", -.566, -.536, -.052, -.022, .64, .681, iron)
+    return (parts, point(.11, .68, -.42), point(0., 1.26, 1.03), point(0., 0., 1.65),
+            point(-.55, .683, -.037), point(-.47, .849, -.065))
 
 
 def main(root, previous, output):
@@ -97,7 +105,7 @@ def main(root, previous, output):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     ground = world["terrain_probe"](terrain)
     bpy.data.orphans_purge(do_recursive=True)
-    parts, mouth, listen, approach = build_recess(ground)
+    parts, mouth, listen, approach, flame, light = build_recess(ground)
     output.mkdir(parents=True)
     master = output / "bellwether-grate.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(master), compress=True)
@@ -122,7 +130,9 @@ def main(root, previous, output):
         "namespace horde::gameplay::bellwether {",
         f"inline constexpr std::size_t kBellwetherGrateSolidTriangles={added};",
     ]
-    for name, coordinates in (("Mouth", mouth), ("ListenPoint", listen), ("Approach", approach[::2])):
+    marks = (("Mouth", mouth), ("ListenPoint", listen), ("Approach", approach[::2]),
+             ("LampFlame", flame), ("LampLight", light))
+    for name, coordinates in marks:
         values = ", ".join(f"{value:.6f}f" for value in coordinates)
         header.append(f"inline constexpr std::array<float, {len(coordinates)}> kBellwetherGrate{name}{{{{{values}}}}};")
     header += ["} // namespace horde::gameplay::bellwether", ""]
@@ -130,7 +140,8 @@ def main(root, previous, output):
     files = (master, patch, town, output / "asset.manifest.json", output / "geometry.generated.h")
     world["save_json"](output / "authoring-receipt.json", dict(
         feature="Dry garden-edge grate", centre=CENTRE, mouth=mouth, listenPoint=listen,
-        approachXZ=approach[::2], originalTownSha256=PARENT_SHA, terrainSha256=world["TERRAIN_HASH"],
+        approachXZ=approach[::2], lampFlame=flame, lampLight=light, originalTownSha256=PARENT_SHA,
+        terrainSha256=world["TERRAIN_HASH"],
         runtimeTownSha256=world["sha"](town), addedSolidTriangles=added, townVertices=vertices,
         townTriangles=indices // 3, blender=bpy.app.version_string, recipeSha256=world["sha"](RECIPE),
         files={path.name: world["sha"](path) for path in files}))

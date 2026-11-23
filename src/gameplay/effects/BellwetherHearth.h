@@ -6,6 +6,8 @@
 #include "../../../assets/models/world/source/bellwether-relic-stall-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-smith-v1/geometry.generated.h"
 
+#include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
+
 namespace horde::gameplay::effects
 {
 inline constexpr std::uint32_t kBellwetherHearthEmitterId=0x42303148u;
@@ -13,6 +15,7 @@ inline constexpr std::uint32_t kBellwetherCandleEmitterId=0x42303143u;
 inline constexpr std::uint32_t kBellwetherRiverForkLampEmitterId=0x4230314cu;
 inline constexpr std::uint32_t kBellwetherRelicStallLampEmitterId=0x42303153u;
 inline constexpr std::uint32_t kBellwetherSmithLampEmitterId=0x4230364cu;
+inline constexpr std::uint32_t kBellwetherGrateLampEmitterId=0x4230324cu;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -81,6 +84,14 @@ inline FireEmitterState MakeBellwetherSmithLampFireEmitter()
     return emitter;
 }
 
+inline FireEmitterState MakeBellwetherGrateLampFireEmitter()
+{
+    auto emitter=MakeBellwetherCandleFireEmitter();
+    emitter.stableId=kBellwetherGrateLampEmitterId;
+    emitter.seed=0x47524154u;
+    return emitter;
+}
+
 inline FireEmitterFixedStepInput BellwetherFireInput(
     const std::array<float,3>& flame, const std::array<float,3>& light, float strength)
 {
@@ -119,6 +130,11 @@ inline FireEmitterFixedStepInput BellwetherSmithLampFireInput()
     return BellwetherFireInput(bellwether::kBellwetherSmithLampFlame,bellwether::kBellwetherSmithLampLight,.78f);
 }
 
+inline FireEmitterFixedStepInput BellwetherGrateLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kBellwetherGrateLampFlame,bellwether::kBellwetherGrateLampLight,.78f);
+}
+
 inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noexcept
 {
     struct LampZone {
@@ -129,6 +145,7 @@ inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noex
     constexpr std::array zones{
         LampZone{bellwether::kRelicStallLampLight,15.f,3},
         LampZone{bellwether::kBellwetherSmithLampLight,12.f,4},
+        LampZone{bellwether::kBellwetherGrateLampLight,8.f,5},
     };
     float nearest=std::numeric_limits<float>::max();
     std::size_t slot=2; // River fork is the existing exterior default.

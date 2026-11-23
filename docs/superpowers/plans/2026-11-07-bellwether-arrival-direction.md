@@ -480,7 +480,7 @@ The Windows five-resident campaign replay walked the route and presented the wic
 The dry recess is north of the western kitchen plots, on a short branch
 from the existing garden aisle. The stone lip and locked grate use the
 same geometry for visibility and collision. A small roof shelters a dry
-bed board, a covered water vessel and a shelf within reach of the man below.
+bed board, a covered water vessel and a shelf within reach of the man below. A wall-set oil wick uses the existing exterior light slot to illuminate the recess.
 
 After the first tavern conversation, face the grate from the dry path and
 choose **Talk through the grate**. The man recounts the two conflicting
