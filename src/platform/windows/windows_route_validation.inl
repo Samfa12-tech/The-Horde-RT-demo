@@ -233,9 +233,10 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         const auto& state=ctx.simulation.Snapshot();
         auto input=neutral();
         unsigned ticks=0;
-        auto tomb=CampaignTombInput{state,input,[&]{
+        const auto openingStep=[&]{
             return step(input) && (++ticks%4!=0 || render());
-        }};
+        };
+        const auto tomb=CampaignTombInput{state,input,openingStep};
         proceed=check(state.modernCombatRules && state.playerVitals.vitality==3 &&
             state.skeletonEnemyCount==2 && !state.skeletonEnemies[0].dead && !state.skeletonEnemies[1].dead &&
             !state.lich.revealStarted && !state.rescue.claimCount && !ctx.simulation.LatestCampaignBoundary() &&
@@ -245,11 +246,14 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         if(proceed)proceed=check(tomb.WalkTo(-31.2f,-15.2f) && tomb.DefeatKeeper() && render() &&
             state.lich.revealComplete && !ctx.simulation.LatestCampaignBoundary() && capture("route-keeper-defeated.png"),
             "ordinary combat defeats the revealed Keeper before claiming any reward");
-        if(proceed)proceed=check(tomb.WalkTo(-34.f,-17.55f) && tomb.ClaimLantern() &&
-            tomb.WalkTo(-33.7f,-15.9f) && state.rescue.ropeReady && state.rescuePrompt==traversal::RescuePrompt::Climb,
-            "opening the chest earns the lantern and reaches the deployed rope on foot");
+        if(proceed)proceed=check(tomb.WalkTo(-34.f,-17.55f) && tomb.ClaimLantern(),
+            "ordinary context interaction opens the chest and claims the lantern");
+        // The claim starts Kit's rescue sequence. Keep ticking in the chamber
+        // so the actual rope and safe boundary can become ready before loading.
+        for(unsigned tick=0;proceed && !ctx.simulation.LatestCampaignBoundary() && tick<900;++tick)
+            proceed=openingStep();
         campaign::storage::StoredCheckpoint lower;
-        if(proceed)proceed=check(until([&]{
+        if(proceed)proceed=check(state.rescue.ropeReady && ctx.simulation.LatestCampaignBoundary() && until([&]{
                 return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",lower).status==
                     campaign::storage::Status::Read && lower.checkpoint.id==campaign::CheckpointId::LowerClaimed &&
                     ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded;
@@ -257,6 +261,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             lower.checkpoint.lanternClaimed && lower.checkpoint.vitality==state.playerVitals.vitality &&
             lower.checkpoint.halfHeart==state.playerVitals.halfHeart && !lower.checkpoint.firstAscentCompleted,
             "the unseeded opening earns an on-disk lower checkpoint with the live combat results");
+        if(proceed)proceed=check(tomb.WalkTo(-33.7f,-15.9f) && state.rescuePrompt==traversal::RescuePrompt::Climb,
+            "ordinary walking reaches the deployed rope");
     }
     const auto journeyHealth=ctx.simulation.Snapshot().playerVitals;
     const auto sameHealth=[&](const auto& vitals){
