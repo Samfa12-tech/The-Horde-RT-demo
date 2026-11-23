@@ -104,16 +104,15 @@ int main()
     const auto westLaunch=ParseWindowsChapterShippingLaunch(westRoundTrip,true);
     check(westLaunch.bellwetherResidentRoundTrip && westLaunch.bellwetherWestRoundTrip && westLaunch.error.empty(),
         "west measurement has its own explicit hidden Debug launch");
-    auto packaged=std::vector<std::wstring_view>(westRoundTrip.begin(),westRoundTrip.end());
-    packaged.resize(6);
-    packaged.push_back(L"--measure-bellwether-from-package");
-    const auto packageLaunch=ParseWindowsChapterShippingLaunch(packaged,true);
+    std::vector<std::wstring_view> packagedArgs(westRoundTrip.begin(),westRoundTrip.begin()+6);
+    packagedArgs.push_back(L"--measure-bellwether-from-package");
+    const auto packageLaunch=ParseWindowsChapterShippingLaunch(packagedArgs,true);
     check(packageLaunch.bellwetherFromPackage && packageLaunch.bellwetherWestRoundTrip &&
-        packageLaunch.error.empty() && !ParseWindowsChapterShippingLaunch(packaged,false,true).error.empty(),
+        packageLaunch.error.empty() && !ParseWindowsChapterShippingLaunch(packagedArgs,false,true).error.empty(),
         "packaged stress route accepts the marker-owned roster in hidden Debug only");
-    packaged.push_back(L"--bellwether-campaign-dir");
-    packaged.push_back(L"C:\\roster");
-    check(!ParseWindowsChapterShippingLaunch(packaged,true).error.empty(),
+    packagedArgs.push_back(L"--bellwether-campaign-dir");
+    packagedArgs.push_back(L"C:\\roster");
+    check(!ParseWindowsChapterShippingLaunch(packagedArgs,true).error.empty(),
         "packaged stress route rejects a separately supplied roster");
     auto conflictingRoundTrips=std::vector<std::wstring_view>(westRoundTrip.begin(),westRoundTrip.end());
     conflictingRoundTrips.push_back(residentRoundTrip[0]);
