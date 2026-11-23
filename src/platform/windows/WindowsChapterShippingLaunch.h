@@ -5,14 +5,14 @@
 namespace horde::platform::windows {
 struct WindowsChapterShippingLaunch {
     bool requested=false,foregroundRequested=false,bellwetherDoorway=false,bellwetherResidentRoundTrip=false;
-    bool bellwetherWestRoundTrip=false;
+    bool bellwetherWestRoundTrip=false,bellwetherFromPackage=false;
     std::string error;
 };
 inline WindowsChapterShippingLaunch ParseWindowsChapterShippingLaunch(
     std::span<const std::wstring_view> args,bool debugSupported,bool optimizedMeasurementSupported=false) {
     WindowsChapterShippingLaunch result;
     unsigned requests=0,doorway=0,residentRoundTrips=0,westRoundTrips=0,captures=0,checkpoints=0,foreground=0,hidden=0;
-    unsigned residentFixtures=0,campaignDirectories=0;
+    unsigned residentFixtures=0,campaignDirectories=0,packaged=0;
     bool reunion=false,repeatVisit=false,conflict=false;
     for(std::size_t i=0;i<args.size();++i) {
         const auto a=args[i];
@@ -25,6 +25,7 @@ inline WindowsChapterShippingLaunch ParseWindowsChapterShippingLaunch(
         hidden+=a==L"--capture-hidden";
         residentFixtures+=a==L"--chapter-resident-fixture";
         campaignDirectories+=a==L"--bellwether-campaign-dir";
+        packaged+=a==L"--measure-bellwether-from-package";
         if(a==L"--development-checkpoint") {
             ++checkpoints;reunion=i+1<args.size() && args[i+1]==L"chapter-kit-reunion";
             repeatVisit=i+1<args.size() && args[i+1]==L"bellwether-repeat-visit";
@@ -39,6 +40,7 @@ inline WindowsChapterShippingLaunch ParseWindowsChapterShippingLaunch(
     result.bellwetherDoorway=doorway!=0 || residentRoundTrips!=0 || westRoundTrips!=0;
     result.bellwetherResidentRoundTrip=residentRoundTrips!=0 || westRoundTrips!=0;
     result.bellwetherWestRoundTrip=westRoundTrips!=0;
+    result.bellwetherFromPackage=packaged!=0;
     result.requested=requests!=0 || result.bellwetherDoorway;
     result.foregroundRequested=foreground!=0;
     if(foreground && (!result.requested || foreground!=1))
@@ -48,8 +50,10 @@ inline WindowsChapterShippingLaunch ParseWindowsChapterShippingLaunch(
     if(doorway && (!hiddenRepeatVisit || doorway!=1 || residentFixtures!=1 || campaignDirectories || result.bellwetherResidentRoundTrip))
         result.error="--measure-bellwether-doorway requires one hidden Debug bellwether-repeat-visit capture with a resident fixture and no tuning overrides.";
     if(result.bellwetherResidentRoundTrip && (!hiddenRepeatVisit || residentRoundTrips+westRoundTrips!=1 ||
-       campaignDirectories!=1 || residentFixtures || doorway))
-        result.error="Bellwether round trips require one hidden Debug bellwether-repeat-visit capture with the combined campaign directory.";
+       packaged+campaignDirectories!=1 || residentFixtures || doorway))
+        result.error="Bellwether round trips require one hidden Debug bellwether-repeat-visit capture and one combined roster source.";
+    if(packaged && (packaged!=1 || !result.bellwetherResidentRoundTrip))
+        result.error="Packaged Bellwether measurement requires one east or west round trip.";
     if(requests && !result.bellwetherDoorway && (!(debugSupported || optimizedMeasurementSupported) || requests!=1 || captures!=1 ||
        checkpoints!=1 || !reunion || conflict))
         result.error="--measure-chapter-shipping-route requires a Debug or separately enabled optimized measurement build and one chapter-kit-reunion capture without tuning overrides.";

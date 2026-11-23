@@ -520,6 +520,7 @@ struct CaptureLaunchOptions
     bool measureBellwetherDoorway = false;
     bool measureBellwetherResidentRoundTrip = false;
     bool measureBellwetherWestRoundTrip = false;
+    bool measureBellwetherFromPackage = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -1199,6 +1200,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     options.measureBellwetherDoorway=chapterShipping.bellwetherDoorway;
     options.measureBellwetherResidentRoundTrip=chapterShipping.bellwetherResidentRoundTrip;
     options.measureBellwetherWestRoundTrip=chapterShipping.bellwetherWestRoundTrip;
+    options.measureBellwetherFromPackage=chapterShipping.bellwetherFromPackage;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -14139,8 +14141,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset,
                         const std::optional<horde::graphics::DustQuality> captureDustQuality)
 {
-    // Only the Debug capture surface changes aspect; camera, gameplay pose,
-    // renderer quality and normal interactive-window sizing are untouched.
+    // Keep the ordinary client size for package stress measurements. Existing
+    // authored captures continue to use their fixed comparison surface.
+    const bool fixedCaptureExtent=captureDirectory!=nullptr &&
+        !ParseCaptureLaunchOptions().measureBellwetherFromPackage;
     const auto captureWidth = portraitCapture ? kCaptureHeight : kCaptureWidth;
     const auto captureHeight = portraitCapture ? kCaptureWidth : kCaptureHeight;
     const HINSTANCE instance = GetModuleHandleA(nullptr);
@@ -14164,7 +14168,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VSCROLL;
     int windowWidth = MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
-    if (captureDirectory != nullptr)
+    if (fixedCaptureExtent)
     {
         RECT captureRect{0, 0, static_cast<LONG>(captureWidth), static_cast<LONG>(captureHeight)};
         AdjustWindowRectEx(&captureRect, windowStyle, TRUE, 0u);
@@ -14202,8 +14206,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 #endif
 
     if (captureDirectory != nullptr)
-    {
         SetPropA(hWnd, kCaptureModeProperty, reinterpret_cast<HANDLE>(1));
+    if (fixedCaptureExtent)
+    {
         RECT windowRect{};
         RECT actualClientRect{};
         GetWindowRect(hWnd, &windowRect);
@@ -14497,7 +14502,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         FocusGameControl(hWnd);
     }
     UpdateWindow(hWnd);
-    if (captureDirectory != nullptr)
+    if (fixedCaptureExtent)
     {
         RECT windowRect{};
         RECT actualClientRect{};
@@ -14602,13 +14607,15 @@ int RunDiagnosticWindow(const int showCommand)
     gBellwetherPackagedPlaytest = std::filesystem::exists(playtestMarker, markerError);
     const auto failPlaytest = [&](const char* diagnostic) {
         std::cerr << diagnostic << '\n';
-        if (gBellwetherPackagedPlaytest && !gCampaignHiddenValidation)
+        if (gBellwetherPackagedPlaytest && !gCampaignHiddenValidation && !launchOptions.measureBellwetherFromPackage)
             GameMessageBoxA(nullptr, diagnostic, "Bellwether playtest", MB_OK | MB_ICONERROR);
         return 2;
     };
     if (markerError) return failPlaytest("Could not inspect the local Bellwether playtest marker.");
     if (gRouteNewGame && !gBellwetherPackagedPlaytest)
         return failPlaytest("The New Game route needs the complete private Bellwether playtest package.");
+    if (launchOptions.measureBellwetherFromPackage && !gBellwetherPackagedPlaytest)
+        return failPlaytest("The packaged round trip requires the extracted private Bellwether playtest.");
     if (gBellwetherPackagedPlaytest) {
 #if !HORDE_RT_FLASK_ADMITTED || !HORDE_RT_REVIVAL_ADMITTED
         return failPlaytest("The Bellwether playtest build needs the admitted flask and revival.");

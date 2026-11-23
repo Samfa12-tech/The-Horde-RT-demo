@@ -11,6 +11,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     const bool doorway=launch.measureBellwetherDoorway;
     const bool residentRoundTrip=launch.measureBellwetherResidentRoundTrip;
     const bool westRoundTrip=launch.measureBellwetherWestRoundTrip;
+    const bool packaged=launch.measureBellwetherFromPackage;
     const auto bellwetherRoute=westRoundTrip ? BellwetherMeasurementRoute::WestRoundTrip :
         residentRoundTrip ? BellwetherMeasurementRoute::EastRoundTrip : BellwetherMeasurementRoute::Doorway;
     // Windows may reject SetForegroundWindow for an automation-launched
@@ -37,7 +38,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     const auto& baseline=initial.completedEvidence.scene;
     const auto instrumentation=baseline.pipeline.instrumentation;
     if(!initial.hasCompletedEvidence ||
-       (!doorway && instrumentation!=RtInstrumentationMode::Shipping) ||
+       ((!doorway || packaged) && instrumentation!=RtInstrumentationMode::Shipping) ||
        initial.completedEvidence.scene.pipeline.dielectricQuality!=RtDielectricQuality::High ||
        (!doorway && (initial.completedEvidence.dielectric.compiled || initial.completedEvidence.dielectric.hasCounters)) ||
        context.inFlightFences.size()!=1) {
@@ -384,7 +385,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         <<(residentRoundTrip ? " High shaders; hidden Bellwether resident round trip; GPU and resource evidence only\"," :
             " High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\",")
         <<"\"quietReturns\":"<<bellwether.Returns()<<','
-        <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<',';
+        <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<','
+        <<"\"packagedPlaytest\":"<<(packaged?"true":"false")<<',';
     else summary<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\",";
     summary
         <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames<<",\"completedSamples\":"<<samples

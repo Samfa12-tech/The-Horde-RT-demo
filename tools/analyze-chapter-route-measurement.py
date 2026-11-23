@@ -297,6 +297,12 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
     record_keeper_included = run.get('recordKeeperIncluded', False)
     assert record_keeper_included == ('record-keeper/resident.glb' in receipt['residentFixtureHashes'])
     assert manifest['complete'] and receipt['backend'] == manifest['executionBackend']
+    package = receipt.get('playtestPackage')
+    assert run.get('packagedPlaytest', False) == (package is not None)
+    if package is not None:
+        assert resident_roundtrip and package['executableSha256'] == receipt['executableSha256']
+        assert re.fullmatch(r'[0-9a-f]{40}', package['sourceCommit'])
+        assert re.fullmatch(r'[0-9a-f]{64}', package['archiveSha256'])
     assert manifest['captures'][0]['bellwetherVisit']['quietReturns'] == 2
     assert len(rows) == run['completedSamples'] == run['renderedFrames']
     by_serial = {int(row['submission_serial']): row for row in rows}
@@ -323,7 +329,7 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         dealer_files = {f'relic-dealer/{suffix}' for suffix in suffixes}
         assert set(fixtures) in (required_files, required_files | dealer_files)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in fixtures.values())
-        assert not west or dealer_files.issubset(fixtures)
+        assert not (west or package is not None) or dealer_files.issubset(fixtures)
         roster = verify_bellwether_resident_roster(rows, relic_dealer=dealer_files.issubset(fixtures), west=west)
         assert all(int(row[key]) >= 0 for row in rows
                    for key in ('simulation_step_cpu_ns', 'wholeFrameCycleCpuMs_ns'))
@@ -392,6 +398,20 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
                                      internalExtent=list(internal), outputExtent=list(output),
                                      shaderSha256=rows[0]['shader_sha256']),
                        windowsTimingScope='diagnostic native frame cycles and simulation work, hidden window')
+        if package is not None:
+            assert instrumentation == 'shipping' and internal == output
+            summary['playtestPackage'] = package
+            visits = []
+            for visit in range(3):
+                samples = [row for row in rows if row['phase'] == 'room' and int(row['returns']) == visit
+                           and float(row['elapsed_s']) >= warmup]
+                assert samples
+                visits.append(dict(completedReturns=visit, samples=len(samples),
+                    gpuMilliseconds=stats([int(row['gpu_ns']) / 1e6 for row in samples]),
+                    nativeCycleMilliseconds=stats([int(row['wholeFrameCycleCpuMs_ns']) / 1e6 for row in samples]),
+                    deviceLocalBytes=sorted({int(row['device_local_bytes']) for row in samples}),
+                    hostVisibleBytes=sorted({int(row['host_visible_bytes']) for row in samples})))
+            summary['staffedRoomVisits'] = visits
         advanced_ticks = {row['submission_serial']: b - a
                           for previous, row, a, b in zip(rows, rows[1:], ticks, ticks[1:])
                           if previous['phase'] == row['phase'] and b > a}

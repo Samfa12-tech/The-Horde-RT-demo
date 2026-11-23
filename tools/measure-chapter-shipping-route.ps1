@@ -1,11 +1,16 @@
 param([Parameter(Mandatory=$true)][string]$Output,[switch]$Query,
  [ValidateSet('Debug','Release')][string]$Configuration='Release',[switch]$Foreground,[string]$Executable,
- [string]$BellwetherResidentFixture,[string]$BellwetherCampaignDirectory,[switch]$BellwetherWest)
+ [string]$BellwetherResidentFixture,[string]$BellwetherCampaignDirectory,
+ [string]$BellwetherPackageReceipt,[switch]$BellwetherWest)
 $ErrorActionPreference='Stop'
-$residentRoundTrip=-not [string]::IsNullOrWhiteSpace($BellwetherCampaignDirectory)
+$fromPackage=-not [string]::IsNullOrWhiteSpace($BellwetherPackageReceipt)
+$externalRoster=-not [string]::IsNullOrWhiteSpace($BellwetherCampaignDirectory)
+$residentRoundTrip=$fromPackage -or $externalRoster
 $hasDoorwayFixture=-not [string]::IsNullOrWhiteSpace($BellwetherResidentFixture)
-if($residentRoundTrip -and $hasDoorwayFixture) { throw 'Choose one Bellwether measurement fixture.' }
-if($BellwetherWest -and !$residentRoundTrip) { throw 'The west route requires the combined Bellwether campaign directory.' }
+if(($residentRoundTrip -and $hasDoorwayFixture) -or ($fromPackage -and ($externalRoster -or $Executable))) {
+ throw 'Choose one Bellwether measurement source. A packaged run uses the executable and assets in its ZIP.'
+}
+if($BellwetherWest -and !$residentRoundTrip) { throw 'The west route requires the combined Bellwether roster.' }
 $doorway=$residentRoundTrip -or $hasDoorwayFixture
 if($doorway -and ($Configuration -ne 'Debug' -or $Foreground)) {
  throw 'The Bellwether fixture is a hidden Debug GPU and resource measurement.'
@@ -16,9 +21,34 @@ $destination=if([IO.Path]::IsPathRooted($Output)){$Output}else{Join-Path $root $
 foreach($path in @($destination,($destination+'.stdout.log'),($destination+'.stderr.log'),($destination+'.candidate.json'))){
  if(Test-Path -LiteralPath $path){throw 'Choose a fresh measurement directory and receipt prefix'}
 }
+$playtestPackage=$null
+$packageRoot=$null
+if($fromPackage) {
+ $package=Get-Content -LiteralPath $BellwetherPackageReceipt -Raw | ConvertFrom-Json
+ if($package.sourceCommit -cnotmatch '^[0-9a-f]{40}$' -or $package.sha256 -cnotmatch '^[0-9a-f]{64}$' -or
+    $package.executableSha256 -cnotmatch '^[0-9a-f]{64}$' -or $package.residentFiles -ne 25) {
+  throw 'Expected the private Windows package receipt with all five residents.'
+ }
+ $archive=(Resolve-Path -LiteralPath $package.archive).Path
+ if((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $package.sha256) {
+  throw 'Private Windows ZIP differs from its package receipt.'
+ }
+ $packageRoot=$destination+'.extracted-playtest'
+ if(Test-Path -LiteralPath $packageRoot){throw 'Choose a fresh extraction destination.'}
+ [IO.Compression.ZipFile]::ExtractToDirectory($archive,$packageRoot)
+ $Executable=Join-Path $packageRoot 'HordeLanternRT.exe'
+ if((Get-FileHash -LiteralPath $Executable -Algorithm SHA256).Hash -ne $package.executableSha256 -or
+    !(Test-Path -LiteralPath (Join-Path $packageRoot 'Bellwether.playtest') -PathType Leaf) -or
+    (Test-Path -LiteralPath (Join-Path $packageRoot 'HordeLanternRT.settings.ini'))) {
+  throw 'The extracted private executable, marker or fresh settings do not match the package contract.'
+ }
+ $playtestPackage=@{sourceCommit=$package.sourceCommit;archiveSha256=$package.sha256;
+  executableSha256=$package.executableSha256;voiceFiles=$package.voiceFiles}
+}
 $start=[Diagnostics.ProcessStartInfo]::new()
 $start.FileName=if($Executable){(Resolve-Path -LiteralPath $Executable).Path}else{Join-Path $root ('build/chapter-shipping-measurement/'+$Configuration+'/HordeLanternRT.exe')}
-$start.WorkingDirectory=$root;$start.UseShellExecute=$false;$start.CreateNoWindow=$true
+$start.WorkingDirectory=if($fromPackage){$packageRoot}else{$root}
+$start.UseShellExecute=$false;$start.CreateNoWindow=$true
 $start.WindowStyle=[Diagnostics.ProcessWindowStyle]::Hidden
 $start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
 foreach($argument in @('--development-rescue-journey','--capture-showcase',$destination,
@@ -28,9 +58,14 @@ if($doorway) {
  $start.ArgumentList.Add('bellwether-repeat-visit')
  $start.ArgumentList.Add('--capture-hidden')
  if($residentRoundTrip) {
-  $fixture=(Resolve-Path -LiteralPath $BellwetherCampaignDirectory).Path
   $start.ArgumentList.Add($(if($BellwetherWest){'--measure-bellwether-west-roundtrip'}else{'--measure-bellwether-resident-roundtrip'}))
-  $start.ArgumentList.Add('--bellwether-campaign-dir')
+  if($fromPackage) {
+   $fixture=Join-Path $packageRoot 'assets/private_bellwether'
+   $start.ArgumentList.Add('--measure-bellwether-from-package')
+  }else{
+   $fixture=(Resolve-Path -LiteralPath $BellwetherCampaignDirectory).Path
+   $start.ArgumentList.Add('--bellwether-campaign-dir')
+  }
   $rolePrefixes=@('tavern-keeper/','record-keeper/','artificer/','salvager/')
   if(Test-Path -LiteralPath (Join-Path $fixture 'relic-dealer') -PathType Container) {
    $rolePrefixes+='relic-dealer/'
@@ -46,7 +81,7 @@ if($doorway) {
    $rolePrefixes=@('tavern-keeper/','record-keeper/')
   }
  }
- $start.ArgumentList.Add($fixture)
+ if(!$fromPackage){$start.ArgumentList.Add($fixture)}
  $fixtureHashes=@{}
  foreach($prefix in $rolePrefixes) {
   foreach($name in @('asset.manifest.json','resident.glb','base-color.windows.ktx2','normal.windows.ktx2','orm.windows.ktx2')) {
@@ -123,7 +158,8 @@ if(Test-Path -LiteralPath $cachePath) {
  }
  $buildProfile=@{cachePath=$cachePath;cacheSha256=(Get-FileHash -LiteralPath $cachePath -Algorithm SHA256).Hash.ToLowerInvariant();configuration=$Configuration;policy=$policy}
 }
-$scope=if($BellwetherWest){'Debug configuration; hidden Bellwether west round trip; native timing and resource evidence'}
+$scope=if($fromPackage){'Extracted private Debug playtest; hidden Bellwether round trip at ordinary Windows client size'}
+elseif($BellwetherWest){'Debug configuration; hidden Bellwether west round trip; native timing and resource evidence'}
 elseif($residentRoundTrip){'Debug configuration; hidden Bellwether resident round trip; native timing and resource evidence'}
 elseif($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixture; GPU and resource evidence only'}else{
  $Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance'
@@ -132,7 +168,7 @@ elseif($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixtu
  executablePath=$start.FileName;buildProfile=$buildProfile;
  executableSha256=(Get-FileHash -LiteralPath $start.FileName -Algorithm SHA256).Hash.ToLowerInvariant();
  sources=$sourceHashes;residentFixtureHashes=$fixtureHashes;backend=if($Query){'RayQueryCompute'}else{'RayTracingPipeline'};
- tavernAssetHashes=$tavernAssetHashes;
+ tavernAssetHashes=$tavernAssetHashes;playtestPackage=$playtestPackage;
  maximumSimulationTicksPerRender=4;simulationHz=60;deadlineSeconds=$deadlineSeconds;
  foregroundRequested=[bool]$Foreground;
 } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath ($destination+'.candidate.json') -Encoding utf8
