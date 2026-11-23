@@ -515,6 +515,7 @@ struct CaptureLaunchOptions
     bool measureChapterForeground = false;
     bool measureBellwetherDoorway = false;
     bool measureBellwetherResidentRoundTrip = false;
+    bool measureBellwetherWestRoundTrip = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -1193,6 +1194,7 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     options.measureChapterForeground=chapterShipping.foregroundRequested;
     options.measureBellwetherDoorway=chapterShipping.bellwetherDoorway;
     options.measureBellwetherResidentRoundTrip=chapterShipping.bellwetherResidentRoundTrip;
+    options.measureBellwetherWestRoundTrip=chapterShipping.bellwetherWestRoundTrip;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -14601,6 +14603,10 @@ int RunDiagnosticWindow(const int showCommand)
     if ((gBellwetherPreparationsValidation || launchOptions.measureBellwetherResidentRoundTrip) &&
         !gBellwetherCombinedCampaignActors) {
         std::cerr << "This Bellwether check requires the combined resident roster.\n";
+        return 2;
+    }
+    if (launchOptions.measureBellwetherWestRoundTrip && !gBellwetherCombinedRelicDealer) {
+        std::cerr << "The west round trip requires the prepared relic dealer.\n";
         return 2;
     }
     if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {

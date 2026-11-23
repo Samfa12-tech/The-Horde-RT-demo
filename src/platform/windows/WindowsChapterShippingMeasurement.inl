@@ -10,6 +10,9 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     const auto launch=ParseCaptureLaunchOptions();
     const bool doorway=launch.measureBellwetherDoorway;
     const bool residentRoundTrip=launch.measureBellwetherResidentRoundTrip;
+    const bool westRoundTrip=launch.measureBellwetherWestRoundTrip;
+    const auto bellwetherRoute=westRoundTrip ? BellwetherMeasurementRoute::WestRoundTrip :
+        residentRoundTrip ? BellwetherMeasurementRoute::EastRoundTrip : BellwetherMeasurementRoute::Doorway;
     // Windows may reject SetForegroundWindow for an automation-launched
     // process. Allow the owner to activate this test window once; never attach
     // other input threads or repeatedly steal focus. This setup wait is inside
@@ -47,7 +50,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     if(!doorway && !context.rtScene.OrdinaryStaticDetailAvailable()) {
         error="Actual chapter geometry did not admit the corridor static-detail certificate.";return false;
     }
-    if(!(doorway ? bellwether.Start(context.simulation.Snapshot(),residentRoundTrip) :
+    if(!(doorway ? bellwether.Start(context.simulation.Snapshot(),bellwetherRoute) :
                     probe.Start(context.simulation.Snapshot()))) {
         error=doorway ? "Doorway measurement requires the completed, staffed repeat-visit room."
                       : "Shipping route requires the admitted low-lantern reunion.";
@@ -55,8 +58,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     }
     const auto complete=[&] {return doorway ? bellwether.Complete() : probe.Phase()==ChapterProbePhase::Complete;};
     const auto phaseName=[&] {return doorway ? bellwether.PhaseName() : ChapterProbePhaseName(probe.Phase());};
-    const auto directory=output/(residentRoundTrip ? "bellwether-resident-roundtrip" :
-        doorway ? "bellwether-doorway" : "shipping-route");
+    const auto directory=output/(doorway ? BellwetherMeasurementName(bellwetherRoute) : "shipping-route");
     std::error_code pathError;
     if(!std::filesystem::create_directory(directory,pathError)||pathError) {
         error="Shipping route evidence directory must be new and writable.";return false;
@@ -75,6 +77,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     csv<<",host_previous_evidence_ns,host_phases_available";
     if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
     if(residentRoundTrip)csv<<",returns,resident_slot0_id,resident_slot1_id";
+    if(westRoundTrip)csv<<",stock_head_instances,stock_pose_mask";
     csv<<'\n';
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
@@ -98,6 +101,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         unsigned recordKeeperMask=0,tavernDoorMask=0;
         std::array<std::uint32_t,2> residents{};
         unsigned returns=0;
+        unsigned stockHeadInstances=0,stockPoseMask=0;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -206,14 +210,19 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
                 horde::gameplay::dialogue::kRecordKeeperActorId};
             constexpr std::array east{horde::gameplay::bellwether::kArtificerActorId,
                 horde::gameplay::bellwether::kSalvagerActorId};
+            constexpr std::array west{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::bellwether::kRelicDealerActorId};
             if(((tag.phase=="room" || tag.phase=="complete") && tag.residents!=town) ||
                (tag.phase=="east-fork" && (tag.residents!=east || tag.roomMasks[2]!=1)) ||
+               (tag.phase=="stock-yard" && (tag.residents!=west || tag.roomMasks[2]!=1 ||
+                                           tag.stockHeadInstances!=3u)) ||
                sample.gpu.status!=RtSampleStatus::Valid || !sample.gpu.hasDuration ||
                sample.gpu.completedSubmissionSerial!=id.submissionSerial) {
                 error="Resident round trip lost a staged roster or its exact submitted GPU timing.";return false;
             }
             csv<<','<<tag.returns<<','<<tag.residents[0]<<','<<tag.residents[1];
         }
+        if(westRoundTrip)csv<<','<<tag.stockHeadInstances<<','<<tag.stockPoseMask;
         csv<<'\n';
         if(samples%120==0 || tag.phase!=lastPhase) {
             std::string json;
@@ -332,6 +341,10 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             if(residentRoundTrip) {
                 tag.residents=context.rtScene.ChapterResidentSourceIds();
                 tag.returns=bellwether.Returns();
+                if(westRoundTrip) {
+                    tag.stockHeadInstances=context.rtScene.SubmittedStockHeadCount();
+                    tag.stockPoseMask=BellwetherStockPoseMask(context.simulation.Snapshot());
+                }
             }
         }
         const auto evidenceStartNs=steadyNs();

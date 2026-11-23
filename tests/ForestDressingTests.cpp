@@ -2279,7 +2279,7 @@ void TestBellwetherResidentRosters(
           gameplay::StageDevelopmentCheckpointSimulation(combined,*repeatVisit),
           "the combined performance route stages the same completed room as the doorway route");
     gameplay::validation::BellwetherDoorwayProbe probe;
-    if(!probe.Start(combined.Snapshot(),true)) {
+    if(!probe.Start(combined.Snapshot(),gameplay::validation::BellwetherMeasurementRoute::EastRoundTrip)) {
         Check(false,"the combined performance route admits the staffed town pair");return;
     }
     const auto startTick=combined.Snapshot().tickIndex;

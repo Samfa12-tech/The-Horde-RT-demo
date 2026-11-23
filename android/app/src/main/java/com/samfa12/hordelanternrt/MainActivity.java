@@ -7444,6 +7444,9 @@ public class MainActivity extends Activity {
             case "bellwether-resident-roundtrip-measurement":
                 return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
                         BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 347 : -1;
+            case "bellwether-west-roundtrip-measurement":
+                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && BuildConfig.BELLWETHER_COMBINED_RESIDENTS &&
+                        BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? 349 : -1;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;

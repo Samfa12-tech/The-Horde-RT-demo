@@ -24,6 +24,9 @@ public final class ChapterDebugCheckpointTest {
         final boolean combined = BuildConfig.BELLWETHER_COMBINED_RESIDENTS;
         assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && combined ? 347 : -1,
                 MainActivity.checkpointId("bellwether-resident-roundtrip-measurement"));
+        assertEquals(BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && combined &&
+                        BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? 349 : -1,
+                MainActivity.checkpointId("bellwether-west-roundtrip-measurement"));
         final boolean mill = BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !combined;
         final boolean shore = BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !combined;
         final boolean dealer = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE && !combined;

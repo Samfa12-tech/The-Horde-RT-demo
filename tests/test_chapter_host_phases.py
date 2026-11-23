@@ -104,7 +104,7 @@ verify_android_route()
 print('Android doorway verification rejected stale GPU, missing residents, mixed generations and truncated runs.')
 
 
-def verify_android_resident_roundtrip():
+def verify_android_resident_roundtrip(west=False):
     source_ids = {
         'TavernKeeper': 0x4230314b,
         'RecordKeeper': 0x42303252,
@@ -127,12 +127,19 @@ def verify_android_resident_roundtrip():
                             phase_roles['room']],
         'complete': [phase_roles['complete']],
     }
+    destination = 'stock-yard' if west else 'east-fork'
+    if west:
+        source_ids['RelicDealer'] = 0x42303644
+        town = phase_roles['room']
+        dealer = ('TavernKeeper', 'RelicDealer')
+        phase_sequences.update({'doorway-outbound': [town, dealer], 'stock-yard': [dealer],
+                                'doorway-inbound': [dealer, town]})
     phases = [(phase, lap) for lap in range(2)
-              for phase in ('room', 'doorway-outbound', 'east-fork', 'doorway-inbound')]
+              for phase in ('room', 'doorway-outbound', destination, 'doorway-inbound')]
     rows = []
     for phase, lap in phases + [('room', 2), ('complete', 2)]:
         for role0, role1 in phase_sequences[phase]:
-            for _ in range(1 if phase == 'complete' else 55):
+            for frame in range(360 if phase == 'stock-yard' else 1 if phase == 'complete' else 55):
                 serial = 100 + len(rows)
                 elapsed = (len(rows) + 1) * 67_000_000
                 rows.append(dict(phase=phase, station=1, returns=lap, elapsed_ns=elapsed,
@@ -149,9 +156,12 @@ def verify_android_resident_roundtrip():
                     tavern_door_mask=1,
                     resident_slot0_id=str(source_ids[role0]),
                     resident_slot1_id=str(source_ids[role1])))
+                if west:
+                    rows[-1].update(stock_head_instances=3, stock_pose_mask=([0, 1, 2, 4][frame % 4]
+                        if phase == 'stock-yard' else 0))
 
     with TemporaryDirectory() as root:
-        report = pathlib.Path(root) / 'bellwether-resident-roundtrip.csv'
+        report = pathlib.Path(root) / ('bellwether-west-roundtrip.csv' if west else 'bellwether-resident-roundtrip.csv')
 
         def analyze(rows, name='resident-analysis.json'):
             with report.open('w', newline='') as output:
@@ -159,15 +169,21 @@ def verify_android_resident_roundtrip():
                 writer.writeheader()
                 writer.writerows(rows)
             with redirect_stdout(StringIO()):
-                m.analyze_android_bellwether(root, name, resident_roundtrip=True)
+                m.analyze_android_bellwether(root, name, resident_roundtrip=True, west=west)
 
         analyze(rows)
         summary = json.loads((report.parent / 'resident-analysis.json').read_text())
         assert summary['residentSourceIds'] == source_ids
-        assert summary['transitionCounts'] == {'outbound': {'1': 2, '2': 2},
-                                                'inbound': {'1': 2, '2': 2}}
-        assert summary['transitions']['outbound:TavernKeeper+RecordKeeper->TavernKeeper+Salvager']['count'] == 2
-        assert summary['transitions']['inbound:Artificer+Salvager->TavernKeeper+Salvager']['count'] == 2
+        swaps = 1 if west else 2
+        assert summary['transitionCounts'] == {'outbound': {'1': swaps, '2': swaps},
+                                                'inbound': {'1': swaps, '2': swaps}}
+        if west:
+            assert len(summary['stockYardVisits']) == 2
+            assert all(visit['sampledTicks'] == 1436 and visit['poseMasks'] == [0, 1, 2, 4]
+                       for visit in summary['stockYardVisits'])
+        else:
+            assert summary['transitions']['outbound:TavernKeeper+RecordKeeper->TavernKeeper+Salvager']['count'] == 2
+            assert summary['transitions']['inbound:Artificer+Salvager->TavernKeeper+Salvager']['count'] == 2
         assert all('worstPresentReturnIntervalMilliseconds' in phase
                    for phase in summary['phases'].values())
         assert 'presentReturnThroughputHz' not in summary
@@ -175,18 +191,19 @@ def verify_android_resident_roundtrip():
                       ('phase', 'returns', 'submission_serial', 'resident_slot0_id', 'resident_slot1_id')}
                      for row in rows]
         host_proof = m.verify_bellwether_resident_roster(
-            host_rows, [None] + [67.0] * (len(host_rows) - 1))
+            host_rows, [None] + [67.0] * (len(host_rows) - 1), west=west)
         assert host_proof['transitionCounts'] == summary['transitionCounts']
 
         stale = [dict(row) for row in rows]
-        stale[230]['resident_slot0_id'] = str(source_ids['TavernKeeper'])
+        stale[230]['resident_slot1_id' if west else 'resident_slot0_id'] = str(
+            source_ids['RecordKeeper' if west else 'TavernKeeper'])
         try:
             analyze(stale, 'stale-roster.json')
         except ValueError as error:
             assert ('stale resident roster' in str(error) or
                     'wrong resident pair sequence' in str(error)), error
         else:
-            raise AssertionError('A stale east-fork resident roster passed')
+            raise AssertionError('A stale destination resident roster passed')
 
         faulty_join = [dict(row) for row in rows]
         faulty_join[230]['gpu_serial'] = 0
@@ -197,6 +214,17 @@ def verify_android_resident_roundtrip():
         else:
             raise AssertionError('A faulty resident-roundtrip timing join passed')
 
+        if west:
+            missing_head = [dict(row) for row in rows]
+            missing_head[230]['stock_head_instances'] = 2
+            try:
+                analyze(missing_head, 'missing-head.json')
+            except ValueError as error:
+                assert 'three submitted head instances' in str(error), error
+            else:
+                raise AssertionError('Accepted a missing stock head during the measured dwell')
+
 
 verify_android_resident_roundtrip()
+verify_android_resident_roundtrip(west=True)
 print('Android resident round-trip verification accepted exact roles and rejected stale roster and faulty timing join.')

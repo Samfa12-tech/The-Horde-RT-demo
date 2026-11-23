@@ -143,7 +143,31 @@ constexpr uint32_t kMaxFramesInFlight = 1u;
 constexpr std::int32_t kBellwetherDoorwayMeasurementCheckpoint = 337;
 #if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
 constexpr std::int32_t kBellwetherResidentRoundtripMeasurementCheckpoint = 347;
+constexpr std::int32_t kBellwetherWestRoundtripMeasurementCheckpoint = 349;
 #endif
+#endif
+
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+using BellwetherMeasurementRoute = horde::gameplay::validation::BellwetherMeasurementRoute;
+
+std::optional<BellwetherMeasurementRoute> BellwetherMeasurementForCheckpoint(std::int32_t id) {
+    if (id == kBellwetherDoorwayMeasurementCheckpoint) return BellwetherMeasurementRoute::Doorway;
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if (id == kBellwetherResidentRoundtripMeasurementCheckpoint) return BellwetherMeasurementRoute::EastRoundTrip;
+#if HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE
+    if (id == kBellwetherWestRoundtripMeasurementCheckpoint) return BellwetherMeasurementRoute::WestRoundTrip;
+#endif
+#endif
+    return std::nullopt;
+}
+
+const char* BellwetherMeasurementLogTag(BellwetherMeasurementRoute route) {
+    switch (route) {
+    case BellwetherMeasurementRoute::EastRoundTrip: return "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP";
+    case BellwetherMeasurementRoute::WestRoundTrip: return "HORDE_BELLWETHER_WEST_ROUNDTRIP";
+    default: return "HORDE_BELLWETHER_DOORWAY";
+    }
+}
 #endif
 
 std::string JsonUtf8String(const std::string_view value)
@@ -447,8 +471,7 @@ struct SwapchainContext
     std::uint64_t gpuFrameTimingSampleCount = 0u;
     bool rtFrameEvidenceInitialised = false;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-    bool bellwetherDoorwayRequested = false;
-    bool bellwetherResidentRoundtripRequested = false;
+    std::optional<BellwetherMeasurementRoute> bellwetherMeasurementRequested;
     std::optional<horde::platform::android::BellwetherDoorwayMeasurement> bellwetherDoorway;
 #endif
     float outputExposure = 0.92f;
@@ -2200,20 +2223,18 @@ struct DebugCheckpointSelection
 bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& selection)
 {
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-    if (id == kBellwetherDoorwayMeasurementCheckpoint) {
+    if (const auto route = BellwetherMeasurementForCheckpoint(id)) {
         if (!ResolveDebugCheckpoint(329, selection)) return false;
         selection.checkpoint.id = id;
-        selection.checkpoint.name = "bellwether-doorway-measurement";
+        switch (*route) {
+        case BellwetherMeasurementRoute::EastRoundTrip:
+            selection.checkpoint.name = "bellwether-resident-roundtrip-measurement"; break;
+        case BellwetherMeasurementRoute::WestRoundTrip:
+            selection.checkpoint.name = "bellwether-west-roundtrip-measurement"; break;
+        default: selection.checkpoint.name = "bellwether-doorway-measurement"; break;
+        }
         return true;
     }
-#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
-    if (id == kBellwetherResidentRoundtripMeasurementCheckpoint) {
-        if (!ResolveDebugCheckpoint(329, selection)) return false;
-        selection.checkpoint.id = id;
-        selection.checkpoint.name = "bellwether-resident-roundtrip-measurement";
-        return true;
-    }
-#endif
 #endif
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
@@ -2611,18 +2632,14 @@ void WriteChapterStartAcknowledgement(
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
 void CancelBellwetherDoorwayMeasurement(SwapchainContext& context, const char* reason)
 {
-    if (!context.bellwetherDoorway && !context.bellwetherDoorwayRequested &&
-        !context.bellwetherResidentRoundtripRequested) return;
-    const bool residentRoundtrip = context.bellwetherResidentRoundtripRequested ||
-        (context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast());
-    context.bellwetherDoorwayRequested = false;
-    context.bellwetherResidentRoundtripRequested = false;
+    if (!context.bellwetherDoorway && !context.bellwetherMeasurementRequested) return;
+    const auto route = context.bellwetherDoorway ? context.bellwetherDoorway->MeasurementRoute()
+        : *context.bellwetherMeasurementRequested;
+    context.bellwetherMeasurementRequested.reset();
     context.bellwetherDoorway.reset();
     context.lastInputOwnerSteadyNs = 0u;
     gGameSimulation.ResetTiming();
-    __android_log_print(ANDROID_LOG_ERROR, kTag, residentRoundtrip
-        ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP failed reason=%s"
-        : "HORDE_BELLWETHER_DOORWAY failed reason=%s", reason);
+    __android_log_print(ANDROID_LOG_ERROR, kTag, "%s failed reason=%s", BellwetherMeasurementLogTag(route), reason);
 }
 #endif
 
@@ -2634,19 +2651,14 @@ bool ApplyBenchmarkCheckpoint(
     const auto& checkpoint = selection.checkpoint;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     CancelBellwetherDoorwayMeasurement(context, "checkpoint changed");
-    const bool measureDoorway = checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint;
-#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
-    const bool measureResidentRoundtrip = checkpoint.id == kBellwetherResidentRoundtripMeasurementCheckpoint;
-#else
-    const bool measureResidentRoundtrip = false;
-#endif
-    if ((measureDoorway || measureResidentRoundtrip) &&
+    const auto measurement = BellwetherMeasurementForCheckpoint(checkpoint.id);
+    if (measurement &&
         (!context.gpuFrameTimingEnabled || kMaxFramesInFlight != 1u)) return false;
 #endif
     const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
         || checkpoint.id == 329 || checkpoint.id == 335 ||
-        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS && checkpoint.id == 348) || measureDoorway || measureResidentRoundtrip
+        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS && checkpoint.id == 348) || measurement
 #endif
         );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
@@ -2699,8 +2711,7 @@ bool ApplyBenchmarkCheckpoint(
     if (liveJourney)
     {
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-        context.bellwetherDoorwayRequested = measureDoorway;
-        context.bellwetherResidentRoundtripRequested = measureResidentRoundtrip;
+        context.bellwetherMeasurementRequested = measurement;
 #endif
         // This owner playtest route is not a benchmark: retain ordinary damage,
         // teaching and dialogue timing from its first live fixed step.
@@ -2734,11 +2745,7 @@ bool ApplyCaptureCheckpoint(
     const auto& checkpoint = selection.checkpoint;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     CancelBellwetherDoorwayMeasurement(context, "capture requested");
-    if (checkpoint.id == kBellwetherDoorwayMeasurementCheckpoint
-#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
-        || checkpoint.id == kBellwetherResidentRoundtripMeasurementCheckpoint
-#endif
-        ) return false;
+    if (BellwetherMeasurementForCheckpoint(checkpoint.id)) return false;
 #endif
     context.combatFeedbackCaptureSnapshot.reset();
     if (!ApplyDebugCheckpointSimulation(context, selection, observation))
@@ -4519,13 +4526,11 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     )) {
                 CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
             } else if (context.bellwetherDoorway->probe.Complete()) {
-                const bool residentRoundtrip = context.bellwetherDoorway->CombinedEast();
+                const auto route = context.bellwetherDoorway->MeasurementRoute();
                 context.bellwetherDoorway.reset();
                 context.lastInputOwnerSteadyNs = 0u;
                 gGameSimulation.ResetTiming();
-                __android_log_print(ANDROID_LOG_INFO, kTag, residentRoundtrip
-                    ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP complete returns=2"
-                    : "HORDE_BELLWETHER_DOORWAY complete returns=2");
+                __android_log_print(ANDROID_LOG_INFO, kTag, "%s complete returns=2", BellwetherMeasurementLogTag(route));
             }
         }
 #endif
@@ -5291,7 +5296,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         auto* activeGpuStageProbe = recordingMotionGpuStages ? &frameStageProbe : nullptr;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
         recordingBellwetherGpuStages = gpuTimingRecording && !recordingMotionGpuStages &&
-            context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast();
+            context.bellwetherDoorway && context.bellwetherDoorway->ResidentRoundTrip();
         if (recordingBellwetherGpuStages) activeGpuStageProbe = &frameStageProbe;
 #endif
 #endif
@@ -5645,29 +5650,24 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
-    if (context.bellwetherDoorway || context.bellwetherDoorwayRequested ||
-        context.bellwetherResidentRoundtripRequested) {
-        const bool residentRoundtrip = context.bellwetherResidentRoundtripRequested ||
-            (context.bellwetherDoorway && context.bellwetherDoorway->CombinedEast());
+    if (context.bellwetherDoorway || context.bellwetherMeasurementRequested) {
         horde::telemetry::RtSubmittedFrameIdentity owner{};
         const auto& state = gGameSimulation.Snapshot();
         if (!evidenceFrame || acquireResult != VK_SUCCESS || presentResult != VK_SUCCESS ||
             !context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
             owner.frame.simulationTick != state.tickIndex) {
             CancelBellwetherDoorwayMeasurement(context, "no stable RT submission for the staged pose");
-        } else if (context.bellwetherDoorwayRequested || context.bellwetherResidentRoundtripRequested) {
-            context.bellwetherDoorwayRequested = false;
-            context.bellwetherResidentRoundtripRequested = false;
+        } else if (context.bellwetherMeasurementRequested) {
+            const auto route = *context.bellwetherMeasurementRequested;
+            context.bellwetherMeasurementRequested.reset();
             auto& run = context.bellwetherDoorway.emplace();
+            const std::string report = std::string(horde::gameplay::validation::BellwetherMeasurementName(route)) + ".csv";
             if (!run.Start(state, std::filesystem::path(context.reportDirectory) /
-                    (residentRoundtrip ? "bellwether-resident-roundtrip.csv" : "bellwether-doorway.csv"),
-                    presentDone, residentRoundtrip))
+                    report, presentDone, route))
                 CancelBellwetherDoorwayMeasurement(context, "staffed repeat visit or report unavailable");
             else
-                __android_log_print(ANDROID_LOG_INFO, kTag, residentRoundtrip
-                    ? "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP started"
-                    : "HORDE_BELLWETHER_DOORWAY started");
-        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene)) {
+                __android_log_print(ANDROID_LOG_INFO, kTag, "%s started", BellwetherMeasurementLogTag(route));
+        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene, state)) {
             CancelBellwetherDoorwayMeasurement(context, "submission sequence or resource generation changed");
         }
     }

@@ -1,10 +1,11 @@
 param([Parameter(Mandatory=$true)][string]$Output,[switch]$Query,
  [ValidateSet('Debug','Release')][string]$Configuration='Release',[switch]$Foreground,[string]$Executable,
- [string]$BellwetherResidentFixture,[string]$BellwetherCampaignDirectory)
+ [string]$BellwetherResidentFixture,[string]$BellwetherCampaignDirectory,[switch]$BellwetherWest)
 $ErrorActionPreference='Stop'
 $residentRoundTrip=-not [string]::IsNullOrWhiteSpace($BellwetherCampaignDirectory)
 $hasDoorwayFixture=-not [string]::IsNullOrWhiteSpace($BellwetherResidentFixture)
 if($residentRoundTrip -and $hasDoorwayFixture) { throw 'Choose one Bellwether measurement fixture.' }
+if($BellwetherWest -and !$residentRoundTrip) { throw 'The west route requires the combined Bellwether campaign directory.' }
 $doorway=$residentRoundTrip -or $hasDoorwayFixture
 if($doorway -and ($Configuration -ne 'Debug' -or $Foreground)) {
  throw 'The Bellwether fixture is a hidden Debug GPU and resource measurement.'
@@ -28,11 +29,13 @@ if($doorway) {
  $start.ArgumentList.Add('--capture-hidden')
  if($residentRoundTrip) {
   $fixture=(Resolve-Path -LiteralPath $BellwetherCampaignDirectory).Path
-  $start.ArgumentList.Add('--measure-bellwether-resident-roundtrip')
+  $start.ArgumentList.Add($(if($BellwetherWest){'--measure-bellwether-west-roundtrip'}else{'--measure-bellwether-resident-roundtrip'}))
   $start.ArgumentList.Add('--bellwether-campaign-dir')
   $rolePrefixes=@('tavern-keeper/','record-keeper/','artificer/','salvager/')
   if(Test-Path -LiteralPath (Join-Path $fixture 'relic-dealer') -PathType Container) {
    $rolePrefixes+='relic-dealer/'
+  }elseif($BellwetherWest){
+   throw 'The west route requires the prepared relic dealer.'
   }
  }else{
   $fixture=(Resolve-Path -LiteralPath $BellwetherResidentFixture).Path
@@ -98,6 +101,13 @@ if($doorway) {
  if($drive | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$drive }
  $wheel=@('mill-waterwheel.manifest.json','mill-waterwheel.glb')
  if($wheel | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$wheel }
+ if($BellwetherWest){
+  $names+=@('stock-heads.manifest.json','stock-heads.glb')
+  foreach($source in @('src/gameplay/traversal/BellwetherWestRoute.h','src/gameplay/traversal/BellwetherStock.h',
+   'assets/models/world/source/bellwether-stock-v1/geometry.generated.h')){
+   $sourceHashes[$source]=(Get-FileHash -LiteralPath (Join-Path $root $source) -Algorithm SHA256).Hash.ToLowerInvariant()
+  }
+ }
  foreach($name in $names) {
   $tavernAssetHashes[$name]=(Get-FileHash -LiteralPath (Join-Path $tavernRoot $name) -Algorithm SHA256).Hash.ToLowerInvariant()
  }
@@ -113,7 +123,8 @@ if(Test-Path -LiteralPath $cachePath) {
  }
  $buildProfile=@{cachePath=$cachePath;cacheSha256=(Get-FileHash -LiteralPath $cachePath -Algorithm SHA256).Hash.ToLowerInvariant();configuration=$Configuration;policy=$policy}
 }
-$scope=if($residentRoundTrip){'Debug configuration; hidden Bellwether resident round trip; native timing and resource evidence'}
+$scope=if($BellwetherWest){'Debug configuration; hidden Bellwether west round trip; native timing and resource evidence'}
+elseif($residentRoundTrip){'Debug configuration; hidden Bellwether resident round trip; native timing and resource evidence'}
 elseif($doorway){'Debug CPU; hidden Bellwether doorway route with resident fixture; GPU and resource evidence only'}else{
  $Configuration+' CPU with Shipping High shaders; uncovered visible wall-clock scripted out/back and tomb backtrack after staged Keeper death; automatic static-detail lifetime; not owner/phone acceptance'
 }

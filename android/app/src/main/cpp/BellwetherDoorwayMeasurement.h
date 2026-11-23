@@ -25,27 +25,29 @@ namespace horde::platform::android {
 class BellwetherDoorwayMeasurement {
 public:
     using TimePoint = std::chrono::steady_clock::time_point;
+    using Route = gameplay::validation::BellwetherMeasurementRoute;
 
     bool Start(const gameplay::simulation::SimulationSnapshot& state,
                const std::filesystem::path& report, TimePoint now,
-               bool combinedEast = false) {
-        combinedEast_ = combinedEast;
+               Route route = Route::Doorway) {
+        route_ = route;
         clock_ = gameplay::validation::ChapterRouteMeasurementClock(
-            combinedEast_ ? gameplay::validation::BellwetherDoorwayProbe::kResidentRoundTripDeadlineSeconds
+            ResidentRoundTrip() ? gameplay::validation::BellwetherDoorwayProbe::kResidentRoundTripDeadlineSeconds
                           : gameplay::validation::ChapterRouteMeasurementClock::kDefaultDeadlineSeconds);
         frames_.open(report, std::ios::trunc);
         frames_.imbue(std::locale::classic());
-        if (!frames_ || !probe.Start(state, combinedEast_)) return false;
+        if (!frames_ || !probe.Start(state, route_)) return false;
         start_ = now;
         frames_ << "phase,station,returns,elapsed_ns,present_return_ns,scene_epoch,generation,record_serial,"
                    "submission_serial,tick,completion_serial,present_serial,gpu_serial,gpu_ns,cpu_cycle_ns,"
                    "backend,shader_sha256,internal_width,internal_height,output_width,output_height,glass_enabled,"
                    "fire_count,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
                    "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
-        if (combinedEast_) frames_ << ",resident_slot0_id,resident_slot1_id";
+        if (ResidentRoundTrip()) frames_ << ",resident_slot0_id,resident_slot1_id";
+        if (probe.West()) frames_ << ",stock_head_instances,stock_pose_mask";
         for (const auto& column : kCpuStages) frames_ << ',' << column.name;
 #if HORDE_RT_FRAME_STAGE_PROBE
-        if (combinedEast_) frames_ << ",gpu_stage_serial,gpu_as_ns,gpu_dispatch_ns,gpu_transfer_ns";
+        if (ResidentRoundTrip()) frames_ << ",gpu_stage_serial,gpu_as_ns,gpu_dispatch_ns,gpu_transfer_ns";
 #endif
         frames_ << "\n";
         return static_cast<bool>(frames_);
@@ -56,7 +58,8 @@ public:
     }
 
     bool Bind(const telemetry::RtSubmittedFrameIdentity& identity, TimePoint presentReturned,
-              const vulkan::raytracing::PresentableTinyRtScene& scene) {
+              const vulkan::raytracing::PresentableTinyRtScene& scene,
+              const gameplay::simulation::SimulationSnapshot& state) {
         if (pending_ || !identity.submissionSerial || !identity.frame.recordSerial ||
             (lastSerial_ && (identity.submissionSerial != lastSerial_ + 1 ||
                              identity.frame.sceneEpoch != epoch_ ||
@@ -74,12 +77,16 @@ public:
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1)},
             scene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex),
-            combinedEast_ ? scene.ChapterResidentSourceIds() : std::array<std::uint32_t, 2>{}};
+            ResidentRoundTrip() ? scene.ChapterResidentSourceIds() : std::array<std::uint32_t, 2>{},
+            probe.PhaseName(), probe.Station(), probe.Returns(),
+            probe.West() ? scene.SubmittedStockHeadCount() : 0u,
+            probe.West() ? gameplay::validation::BellwetherStockPoseMask(state) : 0u};
         return true;
     }
 
     bool AwaitingFrame() const { return pending_.has_value(); }
-    bool CombinedEast() const { return combinedEast_; }
+    Route MeasurementRoute() const { return route_; }
+    bool ResidentRoundTrip() const { return gameplay::validation::IsBellwetherResidentRoundTrip(route_); }
 
     bool CompleteFence(const telemetry::RtPerformanceEvidenceSnapshot& sample
 #if HORDE_RT_FRAME_STAGE_PROBE
@@ -90,7 +97,7 @@ public:
         const auto& tag = *pending_;
         const auto& frame = sample.identity.submitted;
         const auto serial = frame.submissionSerial;
-        const auto phase = probe.PhaseName();
+        const auto phase = tag.phase;
         if (serial != tag.identity.submissionSerial ||
             frame.frame.recordSerial != tag.identity.frame.recordSerial ||
             frame.frame.simulationTick != tag.identity.frame.simulationTick ||
@@ -103,15 +110,16 @@ public:
             !sample.scene.fireLighting || !sample.scene.dimensions || tag.masks[3] != 1 || tag.tavernDoorMask != 1 ||
             (phase == "room" && (sample.scene.fireLighting->count != 3 ||
                                  tag.masks != std::array<unsigned, 4>{1, tag.glassEnabled ? 1u : 0u, 1, 1})) ||
-            (combinedEast_ && (tag.masks[2] != 1 ||
-                               ((phase == "room" || phase == "complete" || phase == "east-fork") &&
-                                tag.residentSourceIds != ExpectedResidentSourceIds(phase))))) return false;
+            (ResidentRoundTrip() && (tag.masks[2] != 1 ||
+                ((phase == "room" || phase == "complete" || phase == "east-fork" || phase == "stock-yard") &&
+                 tag.residentSourceIds != ExpectedResidentSourceIds(phase)))) ||
+            (phase == "stock-yard" && tag.stockHeadInstances != 3u)) return false;
 
         const auto& resources = sample.scene.resources;
         const auto& dimensions = *sample.scene.dimensions;
         const auto& stages = sample.scene.stages.values;
         const auto& cycle = stages[RtStageIndex(RtStage::WholeFrameCycle)];
-        frames_ << phase << ',' << probe.Station() << ',' << probe.Returns() << ','
+        frames_ << phase << ',' << tag.station << ',' << tag.returns << ','
                 << tag.elapsedNs << ',' << tag.presentReturnNs << ',' << epoch_ << ',' << generation_ << ','
                 << frame.frame.recordSerial << ',' << serial << ',' << frame.frame.simulationTick << ','
                 << sample.identity.completionSerial << ',' << sample.presentation.lastSuccessfulPresentSubmissionSerial << ','
@@ -123,11 +131,12 @@ public:
                 << resources.bottomLevelAccelerationStructureCount << ',' << resources.deviceLocalBytes << ',' << resources.hostVisibleBytes;
         for (const unsigned mask : tag.masks) frames_ << ',' << mask;
         frames_ << ',' << tag.tavernDoorMask;
-        if (combinedEast_) frames_ << ',' << tag.residentSourceIds[0] << ',' << tag.residentSourceIds[1];
+        if (ResidentRoundTrip()) frames_ << ',' << tag.residentSourceIds[0] << ',' << tag.residentSourceIds[1];
+        if (probe.West()) frames_ << ',' << tag.stockHeadInstances << ',' << tag.stockPoseMask;
         for (const auto& column : kCpuStages)
             frames_ << ',' << stages[RtStageIndex(column.stage)].durationNanoseconds;
 #if HORDE_RT_FRAME_STAGE_PROBE
-        if (combinedEast_) {
+        if (ResidentRoundTrip()) {
             if (vulkan::raytracing::RtSceneGpuStagesMatchCompletedFrame(gpuStages, frame)) {
                 frames_ << ',' << gpuStages.submitted.submissionSerial;
                 for (const auto& collection : gpuStages.collections)
@@ -169,6 +178,8 @@ private:
     static std::array<std::uint32_t, 2> ExpectedResidentSourceIds(const std::string_view phase) {
         if (phase == "east-fork")
             return {gameplay::bellwether::kArtificerActorId, gameplay::bellwether::kSalvagerActorId};
+        if (phase == "stock-yard")
+            return {gameplay::dialogue::kTavernKeeperActorId, gameplay::bellwether::kRelicDealerActorId};
         return {gameplay::dialogue::kTavernKeeperActorId, gameplay::dialogue::kRecordKeeperActorId};
     }
 
@@ -180,6 +191,9 @@ private:
         std::array<unsigned, 4> masks;
         unsigned tavernDoorMask;
         std::array<std::uint32_t, 2> residentSourceIds;
+        std::string_view phase;
+        std::size_t station;
+        unsigned returns, stockHeadInstances, stockPoseMask;
     };
 
     std::ofstream frames_;
@@ -189,7 +203,7 @@ private:
     std::uint64_t epoch_ = 0;
     std::uint64_t generation_ = 0;
     std::uint64_t lastSerial_ = 0;
-    bool combinedEast_ = false;
+    Route route_ = Route::Doorway;
 };
 
 } // namespace horde::platform::android

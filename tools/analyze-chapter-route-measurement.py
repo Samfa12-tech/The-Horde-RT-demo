@@ -33,19 +33,22 @@ BELLWETHER_RESIDENT_SOURCE_IDS = {
     'Artificer': 0x42303541,
     'Salvager': 0x42303553,
 }
-def verify_bellwether_resident_roster(rows, intervals=None, *, relic_dealer=False):
+def verify_bellwether_resident_roster(rows, intervals=None, *, relic_dealer=False, west=False):
     """Validate the resident sequence shared by the Windows and Android routes."""
     ids = BELLWETHER_RESIDENT_SOURCE_IDS.copy()
     role_names = [('TavernKeeper', 'RecordKeeper'), ('TavernKeeper', 'Salvager'),
                   ('Artificer', 'Salvager')]
-    if relic_dealer:
+    if relic_dealer or west:
         ids['RelicDealer'] = 0x42303644
         role_names.insert(1, ('TavernKeeper', 'RelicDealer'))
+    if west:
+        role_names = role_names[:2]
     outbound = [tuple(ids[name] for name in names) for names in role_names]
-    town, east = outbound[0], outbound[-1]
+    town, destination_pair = outbound[0], outbound[-1]
+    destination = 'stock-yard' if west else 'east-fork'
     names_by_pair = dict(zip(outbound, map('+'.join, role_names)))
     expected_pairs = {'room': [town], 'doorway-outbound': outbound,
-                      'east-fork': [east], 'doorway-inbound': outbound[::-1],
+                      destination: [destination_pair], 'doorway-inbound': outbound[::-1],
                       'complete': [town]}
     expected_phases = [(phase, lap) for lap in range(2)
                        for phase in expected_pairs if phase != 'complete']
@@ -69,7 +72,7 @@ def verify_bellwether_resident_roster(rows, intervals=None, *, relic_dealer=Fals
         if observed_pairs != expected_pairs.get(phase):
             raise ValueError(f'Return {lap + 1} has the wrong resident pair sequence in {phase}')
     if observed_phases != expected_phases:
-        raise ValueError('Expected two complete room-doorway-east-fork returns')
+        raise ValueError(f'Expected two complete room-doorway-{destination} returns')
     if intervals is not None and len(intervals) != len(rows):
         raise ValueError('Resident transition intervals do not match rows')
 
@@ -245,9 +248,29 @@ def analyze(name, analysis_name='analysis-v3.json'):
     print('phase GPU (median/p95 ms):',json.dumps({k:(v['gpuMilliseconds'].get('median'),v['gpuMilliseconds'].get('p95')) for k,v in summary['phases'].items()}))
     print(interval_key,':',json.dumps(summary[interval_key]), 'throughput Hz:',summary[throughput_key])
 
-def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_roundtrip=False):
+def verify_bellwether_stock_dwell(rows):
+    visits = []
+    for lap in range(2):
+        dwell = [row for row in rows if row['phase'] == 'stock-yard' and int(row['returns']) == lap]
+        if not dwell or any(row.get('stock_head_instances') != '3' for row in dwell):
+            raise ValueError(f'Stock-yard visit {lap + 1} lacks three submitted head instances')
+        masks = {int(row['stock_pose_mask']) for row in dwell}
+        if not masks <= set(range(8)) or 0 not in masks or any(
+                not any(mask & (1 << head) for mask in masks) for head in range(3)):
+            raise ValueError(f'Stock-yard visit {lap + 1} does not show the settled pose and every animal gesture')
+        ticks = int(dwell[-1]['tick']) - int(dwell[0]['tick'])
+        # At four simulation ticks per submission, a phase's first and last
+        # completed frames can miss up to four ticks at each edge.
+        if not 1432 <= ticks <= 1440:
+            raise ValueError(f'Stock-yard visit {lap + 1} lacks the full fixed-step dwell')
+        visits.append(dict(completedReturns=lap, sampledTicks=ticks, submittedHeads=3, poseMasks=sorted(masks)))
+    return visits
+
+
+def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_roundtrip=False, west=False):
     root = pathlib.Path(name)
-    directory = root / ('bellwether-resident-roundtrip' if resident_roundtrip else 'bellwether-doorway')
+    directory = root / ('bellwether-west-roundtrip' if west else
+                        'bellwether-resident-roundtrip' if resident_roundtrip else 'bellwether-doorway')
     run = json.loads((directory / 'run.json').read_text())
     receipt = json.loads(pathlib.Path(name + '.candidate.json').read_text(encoding='utf-8-sig'))
     manifest = json.loads((root / 'capture-manifest.json').read_text())
@@ -262,7 +285,9 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
                            'south-door.manifest.json', 'bellwether-south-door.glb'}
         drive_assets = {'mill-bench-drive.manifest.json', 'mill-bench-drive.glb'}
         wheel_assets = {'mill-waterwheel.manifest.json', 'mill-waterwheel.glb'}
-        assert set(hashes) in (original_assets, original_assets | drive_assets,
+        stock_assets = {'stock-heads.manifest.json', 'stock-heads.glb'} if west else set()
+        assert stock_assets <= set(hashes)
+        assert set(hashes) - stock_assets in (original_assets, original_assets | drive_assets,
                                original_assets | drive_assets | wheel_assets)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in hashes.values())
     assert 60 <= run['durationSeconds'] <= (240 if resident_roundtrip else 150) and run['simulationHz'] == 60
@@ -282,7 +307,7 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
     assert all(row['present_interval_available'] == row['present_return_interval_ns'] ==
                row['unoccluded_client'] == '0' for row in rows)
     phases = [phase for phase, _ in itertools.groupby(row['phase'] for row in rows)]
-    destination = 'east-fork' if resident_roundtrip else 'square'
+    destination = 'stock-yard' if west else 'east-fork' if resident_roundtrip else 'square'
     assert phases == ['room', 'doorway-outbound', destination, 'doorway-inbound'] * 2 + ['room', 'complete']
     if resident_roundtrip:
         assert door_witness and record_keeper_included and run['deadlineSeconds'] == 240
@@ -297,7 +322,8 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         dealer_files = {f'relic-dealer/{suffix}' for suffix in suffixes}
         assert set(fixtures) in (required_files, required_files | dealer_files)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in fixtures.values())
-        roster = verify_bellwether_resident_roster(rows, relic_dealer=dealer_files.issubset(fixtures))
+        assert not west or dealer_files.issubset(fixtures)
+        roster = verify_bellwether_resident_roster(rows, relic_dealer=dealer_files.issubset(fixtures), west=west)
         assert all(int(row[key]) >= 0 for row in rows
                    for key in ('simulation_step_cpu_ns', 'wholeFrameCycleCpuMs_ns'))
     for row in rows:
@@ -347,6 +373,8 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
                    presentation=manifest['presentation'], run=run, phases={})
     if door_witness:
         summary.update(openDoorWitness=True, tavernAssetHashes=hashes)
+    if west:
+        summary['stockYardVisits'] = verify_bellwether_stock_dwell(rows)
     warmup = run['warmupSeconds']
     if resident_roundtrip:
         settings = {(item['evidence']['pipeline']['instrumentation'], item['evidence']['pipeline']['dielectricQuality'],
@@ -461,9 +489,10 @@ ANDROID_GPU_STAGE_COLUMNS = ('gpu_as_ns', 'gpu_dispatch_ns', 'gpu_transfer_ns')
 
 
 def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False, relic_dealer=False,
-                              require_gpu_stages=False):
+                              require_gpu_stages=False, west=False):
     directory = pathlib.Path(name)
-    filename = 'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv'
+    filename = ('bellwether-west-roundtrip.csv' if west else
+                'bellwether-resident-roundtrip.csv' if resident_roundtrip else 'bellwether-doorway.csv')
     with (directory / filename).open(newline='') as source:
         reader = csv.DictReader(source)
         fields = set(reader.fieldnames or ())
@@ -485,7 +514,7 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
     require(not require_gpu_stages or gpu_stage_fields, 'GPU stage columns are required')
     cpu_samples = []
     gpu_stage_samples = {}
-    destination = 'east-fork' if resident_roundtrip else 'square'
+    destination = 'stock-yard' if west else 'east-fork' if resident_roundtrip else 'square'
     phases = ('room', 'doorway-outbound', destination, 'doorway-inbound')
     if resident_roundtrip:
         require({'resident_slot0_id', 'resident_slot1_id', 'tavern_door_mask'} <= fields,
@@ -567,8 +596,10 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
                    phases={})
     if door_witness:
         summary['openDoorWitness'] = True
+    if west:
+        summary['stockYardVisits'] = verify_bellwether_stock_dwell(rows)
     if resident_roundtrip:
-        roster = verify_bellwether_resident_roster(rows, intervals, relic_dealer=relic_dealer)
+        roster = verify_bellwether_resident_roster(rows, intervals, relic_dealer=relic_dealer, west=west)
         summary.update(scope='Android Debug RT resident round-trip submissions and present-call returns',
                        residentSourceIds=roster['sourceIds'],
                        residentSlotSequencesByPhase={phase: [list(pair) for pair in pairs]
@@ -631,30 +662,34 @@ if __name__=='__main__':
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--bellwether-doorway', action='store_true')
     mode.add_argument('--bellwether-resident-roundtrip', action='store_true')
+    mode.add_argument('--bellwether-west-roundtrip', action='store_true')
     mode.add_argument('--compare-bellwether-keeper', action='store_true')
     mode.add_argument('--android-bellwether-doorway', action='store_true')
     mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
+    mode.add_argument('--android-bellwether-west-roundtrip', action='store_true')
     parser.add_argument('--expect-relic-dealer', action='store_true',
                         help='Require the five-resident Android fixture, including the relic dealer')
     parser.add_argument('--require-gpu-stages', action='store_true',
                         help='Require joined AS, dispatch and transfer timings for every Android round-trip frame')
     args=parser.parse_args()
-    if args.expect_relic_dealer and not args.android_bellwether_resident_roundtrip:
-        parser.error('--expect-relic-dealer requires --android-bellwether-resident-roundtrip')
-    if args.require_gpu_stages and not args.android_bellwether_resident_roundtrip:
-        parser.error('--require-gpu-stages requires --android-bellwether-resident-roundtrip')
+    android_roundtrip = args.android_bellwether_resident_roundtrip or args.android_bellwether_west_roundtrip
+    windows_roundtrip = args.bellwether_resident_roundtrip or args.bellwether_west_roundtrip
+    if (args.expect_relic_dealer or args.require_gpu_stages) and not android_roundtrip:
+        parser.error('--expect-relic-dealer and --require-gpu-stages require an Android round-trip mode')
     if args.compare_bellwether_keeper:
         if len(args.directories) != 2:
             parser.error('--compare-bellwether-keeper expects a baseline and a candidate directory')
         compare_bellwether_keeper(*args.directories, args.analysis_name)
         raise SystemExit(0)
     for name in args.directories:
-        if args.android_bellwether_doorway or args.android_bellwether_resident_roundtrip:
+        if args.android_bellwether_doorway or android_roundtrip:
             analyze_android_bellwether(name, args.analysis_name,
-                                      resident_roundtrip=args.android_bellwether_resident_roundtrip,
+                                      resident_roundtrip=android_roundtrip,
                                       relic_dealer=args.expect_relic_dealer,
-                                      require_gpu_stages=args.require_gpu_stages)
-        elif args.bellwether_doorway or args.bellwether_resident_roundtrip:
-            analyze_bellwether(name, args.analysis_name, resident_roundtrip=args.bellwether_resident_roundtrip)
+                                      require_gpu_stages=args.require_gpu_stages,
+                                      west=args.android_bellwether_west_roundtrip)
+        elif args.bellwether_doorway or windows_roundtrip:
+            analyze_bellwether(name, args.analysis_name, resident_roundtrip=windows_roundtrip,
+                              west=args.bellwether_west_roundtrip)
         else:
             analyze(name, args.analysis_name)

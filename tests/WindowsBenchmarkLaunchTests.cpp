@@ -96,9 +96,18 @@ int main()
     residentRoundTrip[6]=L"--bellwether-campaign-dir";
     const auto residentLaunch=ParseWindowsChapterShippingLaunch(residentRoundTrip,true);
     check(residentLaunch.requested && residentLaunch.bellwetherDoorway &&
-        residentLaunch.bellwetherResidentRoundTrip && residentLaunch.error.empty() &&
+        residentLaunch.bellwetherResidentRoundTrip && !residentLaunch.bellwetherWestRoundTrip && residentLaunch.error.empty() &&
         !ParseWindowsChapterShippingLaunch(residentRoundTrip,false,true).error.empty(),
         "resident round trip uses the hidden Debug measurement and campaign resident directory");
+    auto westRoundTrip=residentRoundTrip;
+    westRoundTrip[0]=L"--measure-bellwether-west-roundtrip";
+    const auto westLaunch=ParseWindowsChapterShippingLaunch(westRoundTrip,true);
+    check(westLaunch.bellwetherResidentRoundTrip && westLaunch.bellwetherWestRoundTrip && westLaunch.error.empty(),
+        "west measurement has its own explicit hidden Debug launch");
+    auto conflictingRoundTrips=std::vector<std::wstring_view>(westRoundTrip.begin(),westRoundTrip.end());
+    conflictingRoundTrips.push_back(residentRoundTrip[0]);
+    check(!ParseWindowsChapterShippingLaunch(conflictingRoundTrips,true).error.empty(),
+        "west and east cannot share one timing session");
     residentRoundTrip[6]=L"--chapter-resident-fixture";
     check(!ParseWindowsChapterShippingLaunch(residentRoundTrip,true).error.empty(),
         "resident round trip cannot use the stationary doorway fixtures");

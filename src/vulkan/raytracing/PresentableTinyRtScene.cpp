@@ -10768,6 +10768,16 @@ std::uint8_t PresentableTinyRtScene::SubmittedInstanceMask(const std::uint32_t m
     return mask;
 }
 
+unsigned PresentableTinyRtScene::SubmittedStockHeadCount() const noexcept
+{
+    if (!tlasInstanceDefinitionsValid_) return 0u;
+    const auto instances = std::span(tlasBuiltInstances_).first(tlasInstanceCount_);
+    return static_cast<unsigned>(std::count_if(instances.begin(), instances.end(), [](const auto& instance) {
+        return instance.mask == 1u && instance.instanceCustomIndex >= kFirstStockHeadMetadataIndex &&
+            instance.instanceCustomIndex < kFirstStockHeadMetadataIndex + kStockHeadBlasCount;
+    }));
+}
+
 bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,
                                                 VkImage swapchainImage,
                                                 VkImageLayout& swapchainImageLayout,
