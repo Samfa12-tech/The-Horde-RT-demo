@@ -134,6 +134,25 @@ same-package relaunch checks, and close owned processes after validation.
 
 For a requested broad candidate gate, `tools/run-foundation-validation.ps1 -Mode Host` runs the foundation's host-side programme; it is not the lightweight portable CI lane. `-Mode Full` includes device work. Inspect current parameters and choose the intended device explicitly rather than trusting a historical default serial. The runner writes evidence beneath ignored `reports/` and labels its staged artefacts as unpublishable/unsigned; its success does not authorise release publication.
 
+### Private Bellwether playtest packages
+
+Build the Windows Debug executable from a clean commit with
+`HORDE_RT_SHIPPING17_CONTENT=ON` and Shipping/High shaders. Pass it to
+`tools/package-bellwether-playtest.ps1` with the hash-pinned Windows 1.7 ZIP,
+the five Windows resident folders and the thirteen audition WAVs. It stages
+the current runtime roster and existing flask and revival assets in a ZIP under
+`reports/`. Extract the entire ZIP and open `HordeLanternRT.exe`. The executable
+detects the local playtest marker, validates the packaged overlays, and uses the
+separate `bellwether-playtest/campaign-v1` save profile.
+
+On Android, build `:app:assembleDebug` with `-PhordeBellwetherPlaytest=true` and the
+`hordeBellwetherResidentDir`, `hordeBellwetherVoiceDir`, `hordeFlaskCandidateDir`
+and `hordePrivateRevivalDir` inputs. The full profile uses
+`com.samfa12.hordelanternrt.debug.bellwether.playtest` and opens the ordinary
+campaign menu. Use Shipping/Mobile shaders for cross-platform acceptance.
+The unseeded New Game entry and seeded lookout walkthroughs establish separate
+evidence. Keep these packages and their private inputs in local storage.
+
 ## Android device evidence
 
 Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes when an authorised device is available. `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` explains checkpoints/replay; inspect the current runner rather than freezing old checkpoint counts into new instructions. Preserve coverage of the two-enemy encounter where the changed route requires it.

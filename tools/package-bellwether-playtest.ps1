@@ -51,6 +51,8 @@ try {
     foreach ($entry in $baseArchive.Entries) {
         $relative = $entry.FullName
         if ($relative.EndsWith('/')) { continue }
+        # The 1.8 town GLB in the current roster replaces this 1.7 skyline.
+        if ($relative.StartsWith('assets/models/world/runtime/bellwether-shell-v4/')) { continue }
         if ($relative.StartsWith('assets/')) {
             if ($relative.Substring(7) -in $activeRoster) { continue }
             Copy-PlaytestInput (Join-Path $repo $relative) (Join-Path $package $relative)
@@ -107,6 +109,7 @@ Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $archive
     sourceCommit = $revision
     foundationZipSha256 = $expectedBase
     executableSha256 = (Get-FileHash -LiteralPath $executable).Hash.ToLowerInvariant()
+    stagingScriptSha256 = (Get-FileHash -LiteralPath $PSCommandPath).Hash.ToLowerInvariant()
     archive = $archive
     sha256 = (Get-FileHash -LiteralPath $archive).Hash.ToLowerInvariant()
     bytes = (Get-Item -LiteralPath $archive).Length
