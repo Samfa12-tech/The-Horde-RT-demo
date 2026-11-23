@@ -552,3 +552,8 @@ assets/models/world/source/bellwether-grate-v1/authoring-receipt.json text eol=l
 tools/author-bellwether-tally.py text eol=lf
 assets/models/world/source/bellwether-tally-v1/geometry.generated.h text eol=lf
 assets/models/world/source/bellwether-tally-v1/authoring-receipt.json text eol=lf
+
+# Preserve exact livestock recipe and generated receipt hashes.
+tools/author-bellwether-stock.py text eol=lf
+assets/models/world/source/bellwether-stock-v1/geometry.generated.h text eol=lf
+assets/models/world/source/bellwether-stock-v1/authoring-receipt.json text eol=lf

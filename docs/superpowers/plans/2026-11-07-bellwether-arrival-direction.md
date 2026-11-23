@@ -489,6 +489,20 @@ The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/READ
 
 The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
 
+### Settled livestock south of the kitchen plots
+
+A dry side path from the gardens reaches the fenced stock yard. An adult
+pig rests on the far side of the closed gate. One hen settles on a
+sheltered straw shelf and one rests on the dry ground nearby. Posts, trough,
+covered water vessel and the raised roost establish how the animals are
+tended. The separate grate and privy retain their own places and purposes.
+
+This staging puts the animals and the fence into the town's existing
+hardware RT geometry. It uses original editable Blender poses with no
+additional animated resident slot. Rig admission, occasional animal motion,
+ambient sound and combined handset cost remain open for the active stock
+pocket.
+
 ### West service yard
 
 The [closed privy](../../../assets/models/world/source/bellwether-privy-v1/README.md) sits west of the tavern with a latched door, washstand, covered jug and sheltered shelf. Its dry approach leaves the well, ramp and main routes clear. Drainage and waste handling still need review.

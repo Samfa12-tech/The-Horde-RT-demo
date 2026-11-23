@@ -1,0 +1,52 @@
+{
+  "feature": "Settled village stock",
+  "bounds": [
+    28.9,
+    34.3,
+    140.82,
+    145.17
+  ],
+  "pig": [
+    32.3,
+    143.75
+  ],
+  "hens": [
+    [
+      30.33,
+      141.55
+    ],
+    [
+      30.92,
+      142.38
+    ]
+  ],
+  "approach": [
+    [
+      39.35,
+      139.7
+    ],
+    [
+      38.2,
+      142.02
+    ],
+    [
+      35.8,
+      142.76
+    ]
+  ],
+  "originalTownSha256": "8a5afebeec0786ee704f02a5cd5fc2bd2d9f3d1b0f74226c98d406a1e6b63213",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "5ca98dcf5227875f55ffe9260476f6ef03a355536457b7017eda4a92d10930d0",
+  "addedSolidTriangles": 5736,
+  "townVertices": 57543,
+  "townTriangles": 28604,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "cc3632bf5430acb9c61efe1f45c37ca6b3505323e916c0dcd8969028be494f33",
+  "files": {
+    "bellwether-stock.blend": "85a60e172cacea07ef841d940d7f9bdd891914146b1953deeac05bf6fc32138a",
+    "settled-stock.glb": "5799b564f41a43c0d01c837eb4f1e76c3096c980e035fad5617370faaa115b4d",
+    "bellwether-tavern-v1.glb": "5ca98dcf5227875f55ffe9260476f6ef03a355536457b7017eda4a92d10930d0",
+    "geometry.generated.h": "5b123d620f712e0de3618a0bff68bea18c33eac362842f67a57b263bff11b4cb",
+    "asset.manifest.json": "89f06fc8e866a76ff8592dab39692a1a3506a5e664a993314591527594ce269b"
+  }
+}

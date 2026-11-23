@@ -275,6 +275,16 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(gardenCentre[0],gardenCentre[1],gardenCentre[0],gardenCentre[1]-1.f,
                       gardenGround.worldY+.04f,gardenGround.worldY+1.8f,radius),
                   "both timber bed edges remain solid on either side of the garden aisle");
+            constexpr auto& stock=kBellwetherStockApproach;
+            check(follow(garden.back(),stock[0]) && follow(stock[0],stock[1]) && follow(stock[1],stock.back()) &&
+                  follow(stock.back(),stock[1]) && follow(stock[1],stock[0]) && follow(stock[0],garden.back()),
+                  "the domestic animals have a separate dry viewing path from the kitchen plots");
+            constexpr auto viewOfStock=stock.back();
+            const auto stockGround=support->Query(viewOfStock.x,viewOfStock.z);
+            check(stockGround.found && stockGround.walkable &&
+                  !support->NonWalkableVolumeClear(viewOfStock.x,viewOfStock.z,33.95f,142.76f,
+                      stockGround.worldY+.055f,stockGround.worldY+1.8f,radius),
+                  "the closed stock gate prevents the player from walking into the settled animals");
             constexpr auto grate=kBellwetherGardenGrateApproach;
             constexpr auto grateListen=kBellwetherGrateListenPoint;
             constexpr auto grateMouth=kBellwetherGrateMouth;

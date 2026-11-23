@@ -4,6 +4,8 @@
 #include "../../../assets/models/world/source/bellwether-relic-stall-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
 
+#include "../../../assets/models/world/source/bellwether-stock-v1/geometry.generated.h"
+
 #include <cstdint>
 
 namespace horde::gameplay::traversal {
@@ -19,6 +21,12 @@ inline constexpr std::array kBellwetherWestApproach{
 inline constexpr std::array kBellwetherGardenApproach{
     BellwetherStation{48.f,134.4f}, BellwetherStation{43.f,134.9f}, BellwetherStation{39.5f,136.23f}};
 inline constexpr BellwetherStation kBellwetherGardenView{38.65f,138.48f};
+inline constexpr auto kBellwetherStockApproach=[] {
+    constexpr auto& points=bellwether::kBellwetherStockViewRoute;
+    std::array<BellwetherStation,points.size()> route{};
+    for(std::size_t i=0;i<points.size();++i)route[i]={points[i][0],points[i][1]};
+    return route;
+}();
 inline constexpr BellwetherStation kBellwetherGardenAisle{34.f,136.23f};
 inline constexpr BellwetherStation kBellwetherGardenGrateApproach{
     bellwether::kBellwetherGrateApproach[0],bellwether::kBellwetherGrateApproach[1]};

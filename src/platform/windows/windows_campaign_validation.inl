@@ -1682,11 +1682,21 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                                 static_cast<int>(caption.size())) > 0 &&
                             std::string_view(caption.data()).starts_with("Man below the grate:") &&
                             capture("windows-combined-garden-grate.png", false),"Interact presents the grate and caption from below");
+                        const auto& stock=kBellwetherStockApproach;
+                        input.pitchRadians=-.28f;
+                        const bool visitedStock=check(talked && walkTo(approach.back()) &&
+                            state.chapterDialogue.line!=Line::GardenGrateTalk &&
+                            std::all_of(stock.begin(),stock.end(),walkTo) && state.playerGrounded &&
+                            face(kBellwetherStockPigXZ[0],kBellwetherStockPigXZ[1]) &&
+                            capture("windows-combined-stock-pig.png",false) &&
+                            face(kBellwetherStockRoostXZ[0],kBellwetherStockRoostXZ[1]) &&
+                            capture("windows-combined-stock-roost.png",false) &&
+                            std::all_of(std::next(stock.rbegin()),stock.rend(),walkTo) && walkTo(approach.back()) &&
+                            ctx.simulation.CampaignBoundaryRevision()==journalBoundary,
+                            "the fenced stock and roost are reachable from the garden on the dry path");
                         input.pitchRadians = previousPitch;
                         const bool restored = setInspectionLight(previousPose);
-                        return talked && restored && walkTo(approach.back()) &&
-                            state.chapterDialogue.line != Line::GardenGrateTalk &&
-                            ctx.simulation.CampaignBoundaryRevision() == journalBoundary &&
+                        return visitedStock && restored &&
                             std::all_of(std::next(approach.rbegin()), approach.rend(), walkTo) && walkTo(kBellwetherWestApproach[1]);
                     };
                     const auto presentPrivy = [&] {
