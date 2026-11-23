@@ -280,6 +280,8 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
     journal = [json.loads(line) for line in (directory / 'identities.jsonl').read_text().splitlines()]
     assert run['schema'] in (4, 5) and run['complete'] and run['quietReturns'] == 2
     door_witness = run['schema'] == 5
+    glass_enabled = run.get('glassEnabled', True)
+    assert isinstance(glass_enabled, bool)
     if door_witness:
         hashes = receipt['tavernAssetHashes']
         original_assets = {'asset.manifest.json', 'bellwether-tavern-v1.glb',
@@ -337,7 +339,8 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         verify_host_phases(row)
         assert all(int(row[column]) == 0 for column in row if column.endswith('_overflow'))
         if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
-            assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', '1', '1']
+            assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == [
+                '3', '1', '1' if glass_enabled else '0', '1']
         if record_keeper_included:
             assert row['record_keeper_mask'] == '1'
         if door_witness:

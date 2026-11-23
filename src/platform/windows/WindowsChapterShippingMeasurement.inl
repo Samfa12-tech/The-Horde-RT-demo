@@ -37,6 +37,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     const auto initial=context.rtFrameEvidence.PublishedStateByValue();
     const auto& baseline=initial.completedEvidence.scene;
     const auto instrumentation=baseline.pipeline.instrumentation;
+    const bool glassEnabled=context.rtScene.GlassEnabled();
     if(!initial.hasCompletedEvidence ||
        ((!doorway || packaged) && instrumentation!=RtInstrumentationMode::Shipping) ||
        initial.completedEvidence.scene.pipeline.dielectricQuality!=RtDielectricQuality::High ||
@@ -167,7 +168,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         if(!ValidateRtPerformanceEvidence(sample,validation)) {
             error="Shipping route completed sample failed canonical validation.";return false;
         }
-        if(doorway && (!baseline.dimensions || sample.scene.dimensions!=baseline.dimensions ||
+        if(doorway && (context.rtScene.GlassEnabled()!=glassEnabled ||
+            !baseline.dimensions || sample.scene.dimensions!=baseline.dimensions ||
             sample.scene.pipeline.executionMode!=baseline.pipeline.executionMode ||
             sample.scene.pipeline.waterQuality!=baseline.pipeline.waterQuality ||
             sample.scene.shadowQuality!=baseline.shadowQuality || sample.scene.fireQuality!=baseline.fireQuality ||
@@ -192,7 +194,8 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         csv<<','<<tag.host.previousEvidenceNanoseconds<<','<<tag.host.available;
         if(doorway) {
             if(!sample.scene.fireLighting || (tag.phase=="room" &&
-               (sample.scene.fireLighting->count!=3 || tag.roomMasks!=std::array<unsigned,3>{1,1,1}))) {
+               (sample.scene.fireLighting->count!=3 ||
+                tag.roomMasks!=std::array<unsigned,3>{1,unsigned(glassEnabled),1}))) {
                 error="Doorway frame lost the staffed room's fire or geometry admission.";return false;
             }
             if(context.combinedBellwetherResidents && tag.recordKeeperMask!=1) {
@@ -386,6 +389,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             " High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\",")
         <<"\"quietReturns\":"<<bellwether.Returns()<<','
         <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<','
+        <<"\"glassEnabled\":"<<(glassEnabled?"true":"false")<<','
         <<"\"packagedPlaytest\":"<<(packaged?"true":"false")<<',';
     else summary<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\",";
     summary
