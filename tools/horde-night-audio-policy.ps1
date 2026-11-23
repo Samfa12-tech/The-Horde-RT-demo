@@ -12,6 +12,8 @@ function Get-HordeNightAudioRuntimeFiles {
       'audio/bellwether-stock/asset.manifest.json',
       'audio/bellwether-stock/runtime/pig_grunt.wav',
       'audio/bellwether-stock/runtime/hen_cluck.wav',
+      'audio/bellwether-mill/asset.manifest.json',
+      'audio/bellwether-mill/runtime/wheel_creak.wav',
       'audio/kit-ankle/asset.manifest.json',
       'audio/kit-ankle/runtime/boot_and_gravel.wav',
       'audio/kit-ankle/runtime/steady_breath.wav',

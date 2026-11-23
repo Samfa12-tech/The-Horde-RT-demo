@@ -202,7 +202,7 @@ void Transport() {
     static_assert(static_cast<unsigned>(GameplayEventType::RopeContact) == 33);
     static_assert(static_cast<unsigned>(GameplayEventType::ChapterLocalAmbienceStopped) == 34);
     for (const auto type : {GameplayEventType::TombDrip, GameplayEventType::RopeContact,
-                            GameplayEventType::ChapterLocalAmbienceStopped}) {
+                            GameplayEventType::ChapterLocalAmbienceStopped, GameplayEventType::BellwetherWaterwheelCreak}) {
         GameplayEvent event; event.type = type; event.sequence = 0x12345678; event.worldY = 2.125f; event.listenerY = 3.2f;
         const auto metadata = horde::platform::android::PackGameplayEventMetadata(event);
         const auto vertical = horde::platform::android::PackGameplayEventVerticalMetadata(event);
@@ -320,6 +320,63 @@ void StockCadenceAndScope() {
           "a new dialogue sends an ordered stop and invalidates queued animal sound");
     ++state.tickIndex;
     Check(local.Step(state).cue==Cue::None,"suppressed sounds never accrue while the player talks");
+}
+
+void WaterwheelContact() {
+    using namespace horde::gameplay::bellwether;
+    Local local;
+    auto state = DripState();
+    state.rescue.exteriorSide = true;
+    state.playerX = Local::kMillAxle.x - 2.f;
+    state.playerZ = Local::kMillAxle.z + 3.f;
+    state.playerSupportWorldY = Local::kMillAxle.y + 1.f;
+    state.millPreparation = MillPreparation::BearingSeated;
+    const auto step = [&] { ++state.tickIndex; return local.Step(state); };
+    Check(!Local::MillEligible(state) && step().cue == Cue::None,
+          "a seated but untested bearing remains silent");
+    state.millPreparation = MillPreparation::GearingVerified;
+    step();
+    std::vector<std::uint64_t> contacts;
+    bool exact = true;
+    for (unsigned i = 0; i < 24 * 60; ++i) {
+        state.millWaterwheelAngleRadians += kMillWaterwheelRadiansPerSecond * kTick;
+        if (state.millWaterwheelAngleRadians >= kMillWaterwheelTwoPi)
+            state.millWaterwheelAngleRadians -= kMillWaterwheelTwoPi;
+        const auto result = step();
+        if (result.cue == Cue::None) continue;
+        const float expectedGain = contacts.size() % 2 == 0 ? .65f : .49f;
+        exact &= result.cue == Cue::Mill && Same(result.position, Local::kMillAxle) &&
+            Near(result.gain, expectedGain) && local.Step(state).cue == Cue::None;
+        contacts.push_back(state.tickIndex);
+    }
+    Check(exact && contacts.size() == 4 && contacts.front() < 35 &&
+          std::adjacent_find(contacts.begin(), contacts.end(), [](auto a, auto b) {
+              return b-a < 376 || b-a > 378;
+          }) == contacts.end(), "two phase-locked axle contacts per revolution survive angle wrap and share one voice");
+    state.paused = true;
+    Check(!Local::MillEligible(state) && step().cue == Cue::Stop, "pause discards the outstanding mill voice");
+    state.paused = false;
+    state.chapterDialogue.line = dialogue::Line::GardenGrateTalk;
+    Check(!Local::MillEligible(state) && step().cue == Cue::None, "speech leaves the wheel contact silent");
+    state.chapterDialogue.line = dialogue::Line::None;
+    state.millWaterwheelAngleRadians = .235f;
+    Check(step().cue == Cue::None, "re-entry samples the current wheel phase");
+    state.millWaterwheelAngleRadians = 3.44f;
+    Check(step().cue == Cue::None, "a discontinuous wheel import cannot enqueue a missed contact");
+    state.playerSupportWorldY += 3.f;
+    Check(!Local::MillEligible(state) && step().cue == Cue::Stop, "same map position on another level drops the previous voice");
+    GameplayEvent event;
+    event.type = GameplayEventType::BellwetherWaterwheelCreak;
+    event.worldX = Local::kMillAxle.x;
+    event.worldY = event.listenerY = Local::kMillAxle.y;
+    event.worldZ = event.listenerZ = Local::kMillAxle.z;
+    event.intensity = .65f;
+    event.listenerX = event.worldX - 2.f;
+    const auto near = ChapterAmbienceGains(event);
+    event.listenerX = event.worldX - Local::kMillRange + .05f;
+    const auto edge = ChapterAmbienceGains(event);
+    Check(near.right > near.left && near.left > .05f && !near.obstructed && edge.right < .02f,
+          "the axle contact uses exterior pan and fades to the edge at ten metres");
 }
 
 cp::Checkpoint Record(bool upper) {
@@ -518,6 +575,11 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           drain.find("audio/bellwether-hearth/runtime/hearth_crackle.wav") != std::string::npos &&
           java.find("loadSound(\"bellwether_hearth\", \"audio/bellwether-hearth/runtime/hearth_crackle.wav\")") != std::string::npos,
           "both platform owners bind the hearth asset and Android converts an out-of-room start to a stop");
+    Check(nativeDrain.find("!ChapterLocalAmbience::MillEligible(current)") != std::string::npos &&
+          drain.find("audio/bellwether-mill/runtime/wheel_creak.wav") != std::string::npos &&
+          java.find("case ChapterAmbienceFeedback.BELLWETHER_WATERWHEEL_CREAK:") != std::string::npos &&
+          java.find("loadSound(\"bellwether_waterwheel_creak\", \"audio/bellwether-mill/runtime/wheel_creak.wav\")") != std::string::npos,
+          "both platform owners bind the wheel asset to the existing finite voice and reject stale starts");
     const auto campaign = Read(root/"src/platform/windows/windows_campaign_owner.inl");
     const auto commit = Section(campaign, "void FinishCampaignCommit(", "\n}");
     Check(commit.find("StopLoop(\"chapter_ambience\")") != std::string::npos,
@@ -527,7 +589,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
 
 int main(int argc, char** argv) {
     if (argc != 2) { std::cerr << "usage: ChapterLocalAmbienceTests <source-root>\n"; return 2; }
-    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); StockCadenceAndScope(); RopeTravelAndSource(); Transport();
+    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); StockCadenceAndScope(); WaterwheelContact(); RopeTravelAndSource(); Transport();
     const auto directory = std::filesystem::path(argv[1]) / "assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json", manifest, diagnostic) ||

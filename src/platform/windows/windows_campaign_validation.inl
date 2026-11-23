@@ -1263,6 +1263,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             bool assessmentObserved = false, ankleReloaded = false, ankleReplayed = false;
             bool watchStockAudio = false;
             std::array<bool, kBellwetherStockHeadMounts.size()> stockCueSources{};
+            bool watchWheelContact = false, wheelContactObserved = false;
             std::optional<campaign::Checkpoint> lookoutBeforeAssessment;
             const auto step = [&] {
                 if (std::chrono::steady_clock::now() >= deadline) {
@@ -1287,6 +1288,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                                 stockCueSources[i]=true;
                         }
                     }
+                }
+                if (watchWheelContact && !wheelContactObserved &&
+                    horde::gameplay::simulation::ChapterLocalAmbience::MillEligible(state)) {
+                    using namespace horde::gameplay::simulation;
+                    constexpr auto axle = ChapterLocalAmbience::kMillAxle;
+                    const auto events = ctx.simulation.Events().Events();
+                    wheelContactObserved = std::any_of(events.begin(), events.end(), [&](const auto& event) {
+                        if (event.type != GameplayEventType::BellwetherWaterwheelCreak ||
+                            event.tickIndex != state.tickIndex || event.worldX != axle.x ||
+                            event.worldY != axle.y || event.worldZ != axle.z) return false;
+                        const auto gains = ChapterAmbienceGains(event);
+                        return gains.left + gains.right > 0.f;
+                    });
                 }
                 if (gBellwetherAnkleRestoreValidation) {
                     const bool assessing = state.chapterCompanion.bellwetherArrival == BellwetherArrivalStage::AnkleAssessment;
@@ -2050,8 +2064,24 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         "recovering and testing the bearing starts the mill and earns the rig without an air ward");
                 }
                 if (progressed && gBellwetherPreparationsValidation) {
-                    progressed = check(leaveWorkbench() && walkTo(kBellwetherSalvagerMark) &&
-                        approachShallows() && state.millAction == MillAction::StartLeakTest && interact() &&
+                    const auto& crossing = kBellwetherMillCrossing;
+                    const auto previousPitch = input.pitchRadians;
+                    input.pitchRadians = -.25f;
+                    watchWheelContact = leaveWorkbench() && walkTo(kBellwetherSalvagerMark) &&
+                        std::all_of(landing.begin(), landing.end() - 2, walkTo) &&
+                        walkTo(crossing[0]) && walkTo(crossing[1]) && !state.waterContact.wetGround &&
+                        face(kMillWaterwheelAxle[0], kMillWaterwheelAxle[2]);
+                    progressed = check(watchWheelContact &&
+                        waitFor([&] { return wheelContactObserved; }, 400) && frame() &&
+                        ctx.rtScene.MillWaterwheelInstanceMask() != 0u &&
+                        capture("windows-combined-mill-wheel-audio.png", false) &&
+                        walkTo(crossing[0]) && backFromShore(),
+                        "the repaired wheel presents above the dry walk and emits a positional axle contact");
+                    watchWheelContact = false;
+                    input.pitchRadians = previousPitch;
+                }
+                if (progressed && gBellwetherPreparationsValidation) {
+                    progressed = check(approachShallows() && state.millAction == MillAction::StartLeakTest && interact() &&
                         state.millLeakTestPhase == MillLeakTestPhase::Testing &&
                         waitFor([&] { return state.millLeakTestPhase == MillLeakTestPhase::ReturnToDry; }, 130) &&
                         state.waterContact.wetGround && state.millAction == MillAction::None &&

@@ -1173,6 +1173,13 @@ The footway, crossing, rails and turnout are original Horde geometry using
 those same Bellwether timber and masonry materials. The editable source and
 receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
 
+## Bellwether waterwheel contact audio - 23 November 2026
+
+The finite oak journal cue in assets/audio/bellwether-mill/ is original Horde
+foley by Samfa12/Codex. Its synthesis recipe at
+tools/prepare-bellwether-mill-audio.py uses seeded noise and resonances without
+external recordings. The manifest identifies the packaged 48 kHz mono PCM.
+
 ## Bellwether arrival voice audition - 22 November 2026
 
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply

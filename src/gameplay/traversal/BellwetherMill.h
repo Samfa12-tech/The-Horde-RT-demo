@@ -29,6 +29,13 @@ inline constexpr unsigned MillProgress(MillPreparation stage) {
 inline constexpr bool HasMillDrive(MillPreparation stage) {
     return MillProgress(stage)>=MillProgress(MillPreparation::BearingSeated);
 }
+inline constexpr bool IsMillWaterwheelOperating(MillPreparation stage) {
+    return MillProgress(stage)>=MillProgress(MillPreparation::GearingVerified);
+}
+// Surveyed axle from the waterwheel layout, in world metres.
+inline constexpr std::array<float,3> kMillWaterwheelAxle{137.2f,-21.10f,109.35f};
+inline constexpr float kMillWaterwheelRadiansPerSecond=.5f;
+inline constexpr float kMillWaterwheelTwoPi=6.28318530717958647692f;
 enum class MillLeakTestPhase : std::uint8_t { Idle, Testing, ReturnToDry };
 
 inline constexpr float kMillLeakTestSeconds=2.f;

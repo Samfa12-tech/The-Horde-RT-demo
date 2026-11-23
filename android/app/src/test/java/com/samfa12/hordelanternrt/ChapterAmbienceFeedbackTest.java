@@ -40,7 +40,14 @@ public class ChapterAmbienceFeedbackTest {
         assertEquals("bellwether_hen_cluck", ChapterAmbienceFeedback.soundKey(41));
         assertEquals(3, ChapterAmbienceFeedback.latestSignalIndex(batch(40,41,38)));
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(41,40,34)));
-        assertFalse(ChapterAmbienceFeedback.isSignal(42));
+        assertFalse(ChapterAmbienceFeedback.isSignal(43));
+    }
+    @Test public void wheelContactUsesTheSameOrderedFiniteVoice() {
+        final int wheel=ChapterAmbienceFeedback.BELLWETHER_WATERWHEEL_CREAK;
+        assertEquals(42, wheel);
+        assertEquals("bellwether_waterwheel_creak", ChapterAmbienceFeedback.soundKey(wheel));
+        assertEquals(3, ChapterAmbienceFeedback.latestSignalIndex(batch(41,wheel,38)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(41,wheel,34)));
     }
     @Test public void laterStopsSuppressOlderFoliageAcrossTheCombinedFamily() {
         long[] forestStop=batch(35,0,29);

@@ -562,3 +562,4 @@ assets/models/world/source/bellwether-stock-v1/authoring-receipt.json text eol=l
 tools/author-bellwether-mill-lamp.py text eol=lf
 assets/models/world/source/bellwether-mill-lamp-v1/geometry.generated.h text eol=lf
 assets/models/world/source/bellwether-mill-lamp-v1/authoring-receipt.json text eol=lf
+assets/audio/bellwether-mill/asset.manifest.json text eol=lf

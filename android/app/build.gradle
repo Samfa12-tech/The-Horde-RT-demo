@@ -786,6 +786,8 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/bellwether-stock/asset.manifest.json'
         include 'audio/bellwether-stock/runtime/pig_grunt.wav'
         include 'audio/bellwether-stock/runtime/hen_cluck.wav'
+        include 'audio/bellwether-mill/asset.manifest.json'
+        include 'audio/bellwether-mill/runtime/wheel_creak.wav'
         include 'audio/kit-ankle/asset.manifest.json'
         include 'audio/kit-ankle/runtime/boot_and_gravel.wav'
         include 'audio/kit-ankle/runtime/steady_breath.wav'

@@ -339,14 +339,11 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // local +X carries the wheel's top toward +Z, downstream. Keep the
     // operating wheel tied to active 60 Hz simulation time so pause freezes
     // it and a restored operating mill starts from the same zero phase.
-    constexpr float kMillWaterwheelRadiansPerSecond = 0.5f;
-    constexpr float kMillWaterwheelTwoPi = 6.28318530717958647692f;
-    if (!input.paused && bellwether::MillProgress(millPreparation_) >=
-        bellwether::MillProgress(bellwether::MillPreparation::GearingVerified))
+    if (!input.paused && bellwether::IsMillWaterwheelOperating(millPreparation_))
     {
-        millWaterwheelAngleRadians_ += kMillWaterwheelRadiansPerSecond * dialogueDeltaSeconds;
-        if (millWaterwheelAngleRadians_ >= kMillWaterwheelTwoPi)
-            millWaterwheelAngleRadians_ -= kMillWaterwheelTwoPi;
+        millWaterwheelAngleRadians_ += bellwether::kMillWaterwheelRadiansPerSecond * dialogueDeltaSeconds;
+        if (millWaterwheelAngleRadians_ >= bellwether::kMillWaterwheelTwoPi)
+            millWaterwheelAngleRadians_ -= bellwether::kMillWaterwheelTwoPi;
     }
     if (input.paused || !playerAlive)
     {
@@ -497,7 +494,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // health/action mutation can intervene before this owner snapshot is used.
     StepHealingFlask(input,fixedDeltaSeconds,flaskCompeting,healthBeforeEncounter);
     if(dialogueDeltaSeconds>0) {
-        const auto bird=ChapterLocalAmbience::StockEligible(snapshot_)?forestBird_.Step(false):forestBird_.Step(snapshot_);
+        const bool exteriorContact = ChapterLocalAmbience::StockEligible(snapshot_) ||
+            ChapterLocalAmbience::MillEligible(snapshot_);
+        const auto bird=exteriorContact?forestBird_.Step(false):forestBird_.Step(snapshot_);
         // Preserve a centred ambient
         // source/listener tuple rather than invent a perched gameplay actor.
         if(bird==ForestBirdAmbience::Cue::PlayFoliage)
@@ -885,6 +884,7 @@ void GameSimulation::ResetRoute()
     privyRagState_=bellwether::PrivyRagState::Available;
     treasurePurse_={};
     millPreparation_={};
+    millWaterwheelAngleRadians_=0.f;
     millLeakTestPhase_={};
     millLeakTestSeconds_=0.f;
     millDriveTurnSeconds_.reset();

@@ -134,6 +134,26 @@ class ChapterLocalAudioTests(unittest.TestCase):
             self.assertEqual(max(map(abs, samples)), cue['peakSample'])
             self.assertLess(cue['peakSample'], 6000)
 
+    def test_mill_contact_is_finite_and_packaged_on_both_platforms(self):
+        relative = 'audio/bellwether-mill/'
+        directory = ROOT / 'assets' / relative
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        cue, = manifest['assets']
+        self.assertFalse(cue['loop'])
+        raw = (directory / cue['runtimeFile']).read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), cue['runtimeSha256'])
+        self.assertEqual(len(raw), cue['runtimeBytes'])
+        with wave.open(str(directory / cue['runtimeFile']), 'rb') as wav:
+            self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+            self.assertEqual(wav.getnframes(), 36480)
+            pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+        self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+        self.assertEqual(max(map(abs, pcm)), cue['peakSample'])
+        for roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            contents = (ROOT / roster).read_text(encoding='utf-8')
+            self.assertIn(relative + 'asset.manifest.json', contents)
+            self.assertIn(relative + cue['runtimeFile'], contents)
+
     def test_kit_ankle_packages_two_finite_cues_and_their_provenance(self):
         directory = ROOT / 'assets/audio/kit-ankle'
         manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))

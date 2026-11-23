@@ -1209,7 +1209,8 @@ void DrainSimulationEventsToPlatform()
             continue;
         }
         if((event.type==GameplayEventType::BellwetherHearth && !ChapterLocalAmbience::HearthEligible(current)) ||
-           (IsStockAmbienceEvent(event.type) && !ChapterLocalAmbience::StockEventEligible(current,event))) {
+           (IsStockAmbienceEvent(event.type) && !ChapterLocalAmbience::StockEventEligible(current,event)) ||
+           (event.type==GameplayEventType::BellwetherWaterwheelCreak && !ChapterLocalAmbience::MillEligible(current))) {
             auto stopped=event;
             stopped.type=GameplayEventType::ChapterLocalAmbienceStopped;
             stopped.intensity=0.f;

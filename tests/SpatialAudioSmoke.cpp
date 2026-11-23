@@ -745,7 +745,7 @@ int main()
         using namespace horde::gameplay::simulation;
         GameplayEvent cry;cry.type=GameplayEventType::LichRevivalCry;cry.source=EntityId::Lich;cry.target=EntityId::Player;
         cry.worldX=-32.2f;cry.worldZ=-13.1f;cry.listenerX=-5.5f;cry.listenerZ=-15.2f;
-        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==42u && horde::audio::IsLichRevivalCry(cry),
+        check(static_cast<unsigned>(cry.type)==36u && kGameplayEventTypeCount==43u && horde::audio::IsLichRevivalCry(cry),
               "revival keeps ID36 without reusing damage or reveal IDs");
         const auto emitted=horde::audio::LichRevivalEmitter(cry);
         const auto routed=CalculateSpatialAudio(emitted,{cry.listenerX,cry.listenerZ,0.f,cry.listenerY});

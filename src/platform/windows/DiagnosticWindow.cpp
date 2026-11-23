@@ -3024,6 +3024,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::BellwetherHearth:
         case GameplayEventType::BellwetherPigGrunt:
         case GameplayEventType::BellwetherHenCluck:
+        case GameplayEventType::BellwetherWaterwheelCreak:
             if(event.sequence!=latestAmbienceSignal)break;
             if(event.type==GameplayEventType::ForestFoliage &&
                !horde::gameplay::simulation::ForestBirdAmbience::FoliageEligible(context.simulation.Snapshot())) {
@@ -3031,6 +3032,10 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
             }
             if(horde::gameplay::simulation::IsStockAmbienceEvent(event.type) &&
                !horde::gameplay::simulation::ChapterLocalAmbience::StockEventEligible(context.simulation.Snapshot(),event)) {
+                SpatialAudioEngine().StopLoop("chapter_ambience");break;
+            }
+            if(event.type==GameplayEventType::BellwetherWaterwheelCreak &&
+               !horde::gameplay::simulation::ChapterLocalAmbience::MillEligible(context.simulation.Snapshot())) {
                 SpatialAudioEngine().StopLoop("chapter_ambience");break;
             }
             if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
@@ -3043,7 +3048,7 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                    horde::gameplay::simulation::ChapterLocalAmbience::RopeEligible(context.simulation.Snapshot()):
                 event.type==GameplayEventType::BellwetherHearth?
                    horde::gameplay::simulation::ChapterLocalAmbience::HearthEligible(context.simulation.Snapshot()):
-                horde::gameplay::simulation::IsStockAmbienceEvent(event.type) ||
+                horde::gameplay::simulation::IsBellwetherExteriorAmbienceEvent(event.type) ||
                 (event.type==GameplayEventType::PondFrogs?
                    horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()):
                    horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot())))) {
@@ -3055,7 +3060,8 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                     "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::BellwetherHearth?
                     "audio/bellwether-hearth/runtime/hearth_crackle.wav":event.type==GameplayEventType::BellwetherPigGrunt?
                     "audio/bellwether-stock/runtime/pig_grunt.wav":event.type==GameplayEventType::BellwetherHenCluck?
-                    "audio/bellwether-stock/runtime/hen_cluck.wav":event.type==GameplayEventType::PondFrogs?
+                    "audio/bellwether-stock/runtime/hen_cluck.wav":event.type==GameplayEventType::BellwetherWaterwheelCreak?
+                    "audio/bellwether-mill/runtime/wheel_creak.wav":event.type==GameplayEventType::PondFrogs?
                     "audio/night-ambience/runtime/pond_frogs_crickets.wav":event.type==GameplayEventType::ForestCrickets?
                     "audio/night-ambience/runtime/evening_cricket.wav":"audio/night-ambience/runtime/tawny_owl.wav";
                 (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,

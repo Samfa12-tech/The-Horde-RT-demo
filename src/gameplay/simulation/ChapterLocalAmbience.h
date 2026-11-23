@@ -12,13 +12,16 @@ namespace horde::gameplay::simulation {
 // platform. Only the fixed-step simulation schedules these local contacts.
 class ChapterLocalAmbience {
 public:
-    enum class Cue { None, Stop, Drip, Rope, Hearth, Pig, Hen };
+    enum class Cue { None, Stop, Drip, Rope, Hearth, Pig, Hen, Mill };
     struct Result { Cue cue=Cue::None; traversal::Vec3 position{}; float gain=0; };
     static constexpr unsigned kDripInitialTicks=360, kRopeMinimumTicks=72;
     static constexpr unsigned kHearthInitialTicks=105, kHearthIntervalTicks=540;
     static constexpr float kHearthRange=9.f;
     static constexpr unsigned kStockInitialTicks=30, kStockMinimumTicks=180;
     static constexpr float kStockRange=9.f;
+    static constexpr float kMillRange=10.f;
+    static constexpr traversal::Vec3 kMillAxle{
+        bellwether::kMillWaterwheelAxle[0], bellwether::kMillWaterwheelAxle[1], bellwether::kMillWaterwheelAxle[2]};
     static constexpr traversal::Vec3 kHearthPosition{
         effects::kBellwetherHearthFlame[0], effects::kBellwetherHearthFlame[1], effects::kBellwetherHearthFlame[2]};
     static constexpr float kRopeTravelMetres=.35f;
@@ -56,16 +59,22 @@ public:
             });
     }
     static bool StockEligible(const SimulationSnapshot& s) {
-        return StockHabitatAvailable(s) && std::any_of(bellwether::kBellwetherStockHeadMounts.begin(),
+        return GroundedExteriorEligible(s) && std::any_of(bellwether::kBellwetherStockHeadMounts.begin(),
             bellwether::kBellwetherStockHeadMounts.end(), [&](const auto& mount) {
                 return StockSourceInRange(s,{mount[0],mount[1],mount[2]});
             });
     }
     static bool StockEventEligible(const SimulationSnapshot& s, const GameplayEvent& event) {
-        return StockHabitatAvailable(s) && StockSourceInRange(s,{event.worldX,event.worldY,event.worldZ});
+        return GroundedExteriorEligible(s) && StockSourceInRange(s,{event.worldX,event.worldY,event.worldZ});
+    }
+    static bool MillEligible(const SimulationSnapshot& s) {
+        return GroundedExteriorEligible(s) && bellwether::IsMillWaterwheelOperating(s.millPreparation) &&
+            std::abs(s.playerSupportWorldY-kMillAxle.y)<3.f &&
+            std::hypot(s.playerX-kMillAxle.x,s.playerZ-kMillAxle.z)<kMillRange &&
+            s.millWaterwheelAngleRadians>=0.f && s.millWaterwheelAngleRadians<bellwether::kMillWaterwheelTwoPi;
     }
     static bool Eligible(const SimulationSnapshot& s) {
-        return DripEligible(s)||RopeEligible(s)||HearthEligible(s)||StockEligible(s);
+        return DripEligible(s)||RopeEligible(s)||HearthEligible(s)||StockEligible(s)||MillEligible(s);
     }
     static constexpr GameplayEventType EventType(Cue cue) {
         switch(cue) {
@@ -74,6 +83,7 @@ public:
         case Cue::Hearth: return GameplayEventType::BellwetherHearth;
         case Cue::Pig: return GameplayEventType::BellwetherPigGrunt;
         case Cue::Hen: return GameplayEventType::BellwetherHenCluck;
+        case Cue::Mill: return GameplayEventType::BellwetherWaterwheelCreak;
         default: return GameplayEventType::ChapterLocalAmbienceStopped;
         }
     }
@@ -86,7 +96,7 @@ public:
         seen_=true;tick_=s.tickIndex;retry_=s.retryGeneration;
         routeReset_=s.lastConsumedRouteResetSequence;generation_=s.rescue.generation;
         const auto wanted=RopeEligible(s)?Habitat::Rope:DripEligible(s)?Habitat::Drip:HearthEligible(s)?Habitat::Hearth:
-            StockEligible(s)?Habitat::Stock:Habitat::None;
+            StockEligible(s)?Habitat::Stock:MillEligible(s)?Habitat::Mill:Habitat::None;
         if(stop) { ClearCadence(); return {Cue::Stop}; }
         if(wanted!=mode_) {
             const bool leaving=mode_!=Habitat::None;
@@ -109,6 +119,7 @@ public:
             return {Cue::Hearth,kHearthPosition,.42f};
         }
         if(mode_==Habitat::Stock) return StepStock(s);
+        if(mode_==Habitat::Mill) return StepMill(s.millWaterwheelAngleRadians);
         const auto& indices=s.rescue.grippingRopeNodeIndices;
         if(!gripsSeen_) { previousGrips_=indices;gripsSeen_=true;return {}; }
         const float delta=(std::abs(indices[0]-previousGrips_[0])+
@@ -125,9 +136,21 @@ public:
     }
     void Reset() { seen_=false;ClearCadence(); }
 private:
-    enum class Habitat { None, Drip, Rope, Hearth, Stock };
-    static bool StockHabitatAvailable(const SimulationSnapshot& s) {
+    enum class Habitat { None, Drip, Rope, Hearth, Stock, Mill };
+    static bool GroundedExteriorEligible(const SimulationSnapshot& s) {
         return CommonEligible(s) && s.rescue.exteriorSide && !s.rescue.equipmentStowed && s.playerGrounded;
+    }
+    Result StepMill(float angle) {
+        const float previous = millAngle_;
+        millAngle_ = angle;
+        // Entry or a discontinuous phase import rebases the contact clock.
+        // Both loaded journal contacts lie away from the 2π wrap.
+        if(previous<0.f || angle-previous>.02f) return {};
+        constexpr float firstContact=.24f;
+        constexpr float secondContact=firstContact+.5f*bellwether::kMillWaterwheelTwoPi;
+        if(previous<firstContact && angle>=firstContact) return {Cue::Mill,kMillAxle,.65f};
+        if(previous<secondContact && angle>=secondContact) return {Cue::Mill,kMillAxle,.49f};
+        return {};
     }
     static bool StockSourceInRange(const SimulationSnapshot& s, traversal::Vec3 position) {
         const float x=s.playerX-position.x, z=s.playerZ-position.z;
@@ -152,7 +175,7 @@ private:
         return result;
     }
     void ClearCadence() { mode_=Habitat::None;ticks_=0;nextDrip_=kDripInitialTicks;nextHearth_=kHearthInitialTicks;
-        dripVariant_=0;gripsSeen_=false;travel_=0;stockTurning_={};
+        dripVariant_=0;gripsSeen_=false;travel_=0;stockTurning_={};millAngle_=-1.f;
         stockQuietTicks_=kStockMinimumTicks-kStockInitialTicks; }
     Habitat mode_=Habitat::None;
     unsigned ticks_=0,nextDrip_=kDripInitialTicks,dripVariant_=0,nextHearth_=kHearthInitialTicks;
@@ -162,17 +185,21 @@ private:
     std::uint64_t tick_=0,routeReset_=0,generation_=0;
     std::uint32_t retry_=0;
     float travel_=0;
+    float millAngle_=-1.f;
     std::array<float,2> previousGrips_{};
 };
 inline bool IsStockAmbienceEvent(GameplayEventType type) {
     return type==GameplayEventType::BellwetherPigGrunt || type==GameplayEventType::BellwetherHenCluck;
+}
+inline bool IsBellwetherExteriorAmbienceEvent(GameplayEventType type) {
+    return IsStockAmbienceEvent(type) || type==GameplayEventType::BellwetherWaterwheelCreak;
 }
 inline bool IsChapterAmbienceEvent(GameplayEventType type) {
     return type==GameplayEventType::ForestBird || type==GameplayEventType::ForestCrickets ||
         type==GameplayEventType::PondFrogs || type==GameplayEventType::ForestBirdStopped ||
         type==GameplayEventType::TombDrip || type==GameplayEventType::RopeContact ||
         type==GameplayEventType::ChapterLocalAmbienceStopped || type==GameplayEventType::ForestFoliage ||
-        type==GameplayEventType::BellwetherHearth || IsStockAmbienceEvent(type);
+        type==GameplayEventType::BellwetherHearth || IsBellwetherExteriorAmbienceEvent(type);
 }
 // Both platform transports use one event-time source/gain calculation. Other
 // semantic events retain their existing 1/14 metre emitter contract.
@@ -180,11 +207,12 @@ inline SpatialAudioEmitter ChapterAmbienceEmitter(const GameplayEvent& event) {
     if(event.type==GameplayEventType::LichRevivalCry)return audio::LichRevivalEmitter(event);
     if(event.type==GameplayEventType::BellwetherHearth)
         return {event.worldX,event.worldZ,std::max(0.f,event.intensity),2.f,ChapterLocalAmbience::kHearthRange,event.worldY};
-    if(IsStockAmbienceEvent(event.type)) {
+    if(IsBellwetherExteriorAmbienceEvent(event.type)) {
+        const float range=IsStockAmbienceEvent(event.type)?ChapterLocalAmbience::kStockRange:ChapterLocalAmbience::kMillRange;
         const float distance=std::hypot(event.worldX-event.listenerX,event.worldZ-event.listenerZ);
-        const float edgeGain=std::clamp((ChapterLocalAmbience::kStockRange-distance)/2.5f,0.f,1.f);
+        const float edgeGain=std::clamp((range-distance)/2.5f,0.f,1.f);
         return {event.worldX,event.worldZ,std::max(0.f,event.intensity)*edgeGain,4.f,
-            ChapterLocalAmbience::kStockRange,event.worldY};
+            range,event.worldY};
     }
     const bool foliage=event.type==GameplayEventType::ForestFoliage;
     return {event.worldX,event.worldZ,std::max(0.f,event.intensity),
@@ -194,6 +222,6 @@ inline SpatialAudioEmitter ChapterAmbienceEmitter(const GameplayEvent& event) {
 inline SpatialAudioGains ChapterAmbienceGains(const GameplayEvent& event) {
     return CalculateSpatialAudio(ChapterAmbienceEmitter(event),
         {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY},
-        IsStockAmbienceEvent(event.type)?SpatialAudioDomain::ExteriorRoute:SpatialAudioDomain::DungeonRoute);
+        IsBellwetherExteriorAmbienceEvent(event.type)?SpatialAudioDomain::ExteriorRoute:SpatialAudioDomain::DungeonRoute);
 }
 } // namespace horde::gameplay::simulation
