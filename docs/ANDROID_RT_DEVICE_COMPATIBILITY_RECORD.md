@@ -4420,3 +4420,52 @@ The installed APK, previous private APK and raw timing evidence are retained
 locally under `reports/horde-bellwether-directions-20261123-104723`. The
 test app was stopped after measurement and the private candidate remains
 installed.
+
+### 23 November 2026 — Bellwether inactive-local-light trial
+
+**Evidence class — actual-device scripted route with per-submission GPU stage
+timing.** On the same Galaxy S26 Ultra (SM-S948B, Android 17/API 37), an
+original–trial–original sequence ran on USB with the same private combined
+Debug campaign, 33% render scale, Shipping/Mobile opaque-fast Pipeline, glass
+off and 475 × 980 internal / 1440 × 2971 output. Both original runs used
+the artifact and active hash recorded above. The trial used source
+`8615d03bf31a70b61694c6e7768647e604e864d1`, installed APK SHA-256
+`9b26d76a4182149b8aede8fb7c48394c6641c7f43d27232e96df4a5876381c42` and
+active shader SHA-256
+`ad5d502109dd1269721af0c6df2b0245f8c82173708a76d14bdd62c9bcf5db68`.
+An earlier install loaded the original frozen bank and was stopped before
+comparison. The trial below uses the regenerated bank, verified in the
+installed app and on every joined frame.
+
+All three runs completed both returns, all twelve resident swaps and 9,413
+simulation ticks. The acceleration-structure, dispatch and transfer samples
+joined every successful measured frame to its matching submission and native
+present call. Roster and recorded resource counts matched at the tavern and
+east fork. The trial took 158.57 s. The original runs took 160.08 s and
+163.80 s.
+
+| Run order | Joined frames | Battery start → end | First tavern visit, dispatch median / p95 (ms) | First return | Second return | All tavern visits, whole GPU median / p95 (ms) |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| Original | 2,460 | 33.1 → 35.9 °C | 50.32 / 51.20 | 73.51 / 76.10 | 67.50 / 75.84 | 67.73 / 76.57 |
+| Trial | 2,543 | 32.0 → 35.5 °C | 49.52 / 50.40 | 65.17 / 66.96 | 65.11 / 66.55 | 65.43 / 67.42 |
+| Original again | 2,391 | 33.5 → 36.0 °C | 50.46 / 51.39 | 80.19 / 95.07 | 74.61 / 76.60 | 75.45 / 91.46 |
+
+The trial dispatch was 1.6% faster than the faster original run on the first
+visit. The two originals differed by 6.69 and 7.11 ms on the returns.
+Thermal Service reported status 0 at all endpoints. Around 153 s, the
+Adreno thermal power level was 4 on the trial and 5 on the closing control.
+A matched GPU clock history was unavailable. The cooler trial and spread
+between original runs leave the shader's performance effect unresolved.
+The whole-GPU room medians remained above 33.33 ms. This was a fixed route
+with native present-call joins, without an exact display cadence measurement
+for the two new runs.
+
+On Windows RTX 5050 Laptop GPU, all eight 960 × 540 Shipping/High
+capture pairs were pixel-identical across a lit passage and the staffed
+tavern, both RT backends, and both opaque-fast and generic-dielectric
+strategies. Both frozen banks passed fresh eight-mode compilation checks.
+The original shader bank was restored on the 1.8 branch. The original
+private APK was hash-verified on the phone and stopped after the closing run.
+Exact APK and Windows executable identities, logs, capture manifests and raw
+timing remain under `reports/horde-bellwether-local-light-20261123-110155`,
+with the opening run under `reports/horde-bellwether-directions-20261123-104723`.

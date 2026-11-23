@@ -26,9 +26,15 @@ enabled. All 2,460 frames passed the stage-to-submission join. Dispatch
 medians across the three tavern visits were 50.32, 73.51 and 67.50 ms,
 about 99% of each room's GPU interval. The actor roster, light count,
 TLAS and BLAS counts and allocations matched across all room visits.
-Prioritise a matched, output-preserving dispatch experiment for this workload.
-Keep the room lighting, actors and render settings fixed and record thermal
-and clock state before attributing a gain.
+**DEFER (23 November): skip passage/staff-light math when inactive.**
+The [original–trial–original handset comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-inactive-local-light-trial)
+held roster, resolution and settings fixed and joined 7,394 measured frames.
+The trial had lower dispatch times, especially on the returns, but it started
+cooler and the original runs diverged as the phone warmed. The GPU reported
+different thermal power levels at the same point in the trial and closing
+control. Eight Windows capture pairs were pixel-identical. The branch uses
+the original shader bank. A repeat would need interleaved runs with comparable
+GPU thermal state and clock observations before attributing a gain.
 
 The Windows run uses optimized Debug code (`/O2 /Ob2`) to preserve the private
 fixture gates, with Shipping/High shaders and 960 × 540 trace and output
