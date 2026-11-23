@@ -411,10 +411,13 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         if (proceed) {
             const auto generation = state.worldRoute.generation;
             ShowPauseMenu(ctx,true);
-            proceed = check(click(kCampaignLoadButtonId) && until(catalogue,false) &&
+            const bool resumed = click(kCampaignLoadButtonId) && until(catalogue,false) &&
                 click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true) && playing() &&
-                state.worldRoute.generation > generation && ctx.campaign->State().activeSlot == 1 &&
-                atHearth() && state.tavernDirectionsAvailable && !state.tavernConversationAvailable &&
+                state.worldRoute.generation > generation && ctx.campaign->State().activeSlot == 1;
+            // The resumed simulation publishes its live interaction candidates
+            // on the first ordinary fixed tick after the presentation barrier.
+            proceed = check(resumed && step(neutral()) && atHearth() &&
+                state.tavernDirectionsAvailable && !state.tavernConversationAvailable &&
                 state.chapterDialogue.line == dialogue::Line::None &&
                 state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
                 captureSeatedKit("route-bellwether-reloaded.png"),
