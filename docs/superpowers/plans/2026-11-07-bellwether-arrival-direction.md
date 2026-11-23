@@ -175,10 +175,21 @@ updated the lookout boundary. The replay used the south door, completed all
 three Talk lines, then loaded the tavern autosave through the native menu.
 Both hearts, the forest story and the completed conversation survived. Kit
 restored seated, with Directions available on the first live tick. Each
-backend recorded ten captures tied to successful RT presentations. Fresh
-New Game through both victories, handset pacing and in-game listening remain
-separate acceptance work. The private ZIP's SHA-256 is
+backend recorded ten captures tied to successful RT presentations.
+The private ZIP's SHA-256 is
 `f5d4fd24f2f5a2a2a44922e701fa78a4240b855d8f7173af352ff9122e24e66d`.
+
+The later private Windows package from `0ce92c9f` starts the same replay
+from an empty slot in the native New Game menu. Both hardware RT backends
+passed all 28 checks on the same GPU and settings. Scripted movement and
+combat defeated the two waterfall guards and the Keeper with damage enabled.
+The player claimed the lantern, earned the lower autosave, climbed out and
+continued through the lookout and tavern. Both runs retained three full
+hearts and restored the completed Talk exchange and Directions. Each run
+recorded twelve captures tied to successful RT presentations. The test
+used tutorials off and muted audio. Owner play, handset pacing and
+in-game listening remain separate acceptance work. The private ZIP's
+SHA-256 is `a14a7e614e9ae1891d6d6fedb694936921ebbce4a368a23bae5d93afb9492889`.
 
 Kit's three hearth lines now run as named captions. The first accompanies the lowering, then Kit explains his limits and pauses before offering help. A player who arrives after the sit sees the two seated lines. The tavern autosave tracks resolved lines, so a reload resumes at the first unresolved beat. Audio/haptic manual revalidation required: YES, for the hearth timing, captions and in-room mix. The reviewed recordings remain in private staging.
 
