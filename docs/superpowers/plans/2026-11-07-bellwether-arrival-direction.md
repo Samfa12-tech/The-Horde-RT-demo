@@ -490,6 +490,25 @@ reward, consumes no item and writes no checkpoint. This private version
 uses the original caption playback path and an unseen speaker. The separate
 rumour performances, recording and any later resolution remain open.
 
+The private Windows replay at `e91fad00` walked from the earned tavern save
+to the garden, checked the facing gate, used Interact and captured the
+lit grate on an RT frame with the authored wick in the existing four-light
+upload. Both hardware RT backends passed all 26 checks, including leaving
+the grate without a new save and returning from the eastern route to the
+preserved tavern visit. The accelerated walkthrough gives the asynchronous
+resident prefetch up to 750 ms at the return marks before verifying the
+published identities. This measures the presented route and its state,
+without measuring ordinary movement pacing.
+
+The solid grate and wick support add 720 triangles to the existing town
+primitives. Blender re-export reproduced the GLB and layout exactly.
+All four targeted host suites passed. The private combined ARM64 Debug
+APK at `e91fad00` contains the pinned town mesh and unchanged private
+resident and voice entries. Android unit tests passed 600 with six skipped.
+Hardware phone presentation and timing remain open. Audio/haptic manual
+revalidation required: NO for this caption-only staging. There is no new
+audio cue or haptic event.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.
