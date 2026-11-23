@@ -3731,6 +3731,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             ? "LEFT-CLICK / A TO TAKE A CLEAN RAG" : "LEFT-CLICK / A TO PASS THE RAG";
         context.tavernInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.gardenGrateTalkAvailable) {
+        text="LEFT-CLICK / A TO TALK THROUGH THE GRATE";
+        context.tavernInteractionPromptPresented=visible;
+    }
     else if((chapterInteract || saleReceipt) && snapshot.ordinarySilverAction!=OrdinarySilverAction::None) {
         switch(snapshot.ordinarySilverAction) {
         case OrdinarySilverAction::Take: text="LEFT-CLICK / A TO TAKE ORDINARY SILVER"; break;

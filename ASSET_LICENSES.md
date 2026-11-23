@@ -1108,6 +1108,13 @@ Horde geometry authored by Samfa12/Codex in Blender. They reuse the admitted
 town palette and its existing texture credits. The editable master and exact
 geometry receipt are in `assets/models/world/source/bellwether-smith-v1/`.
 
+## Bellwether garden-edge grate - 23 November 2026
+
+The stone recess, locked grate, shelter and household goods are original
+Horde geometry authored by Samfa12/Codex in Blender. They share the admitted
+town materials and their existing texture credits. The editable model and
+exact asset receipt are in `assets/models/world/source/bellwether-grate-v1/`.
+
 ## Bellwether mill workbench drive - 22 November 2026
 
 The untextured bronze gear is original Horde geometry authored in Blender by

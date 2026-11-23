@@ -104,6 +104,7 @@ struct SimulationSnapshot
     campaign::OrdinarySilverAction ordinarySilverAction{};
     bellwether::TavernDoor tavernDoor;
     bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
+    bool gardenGrateTalkAvailable=false;
     bellwether::PrivyRagState privyRag=bellwether::PrivyRagState::Available;
     bellwether::PrivyRagAction privyRagAction=bellwether::PrivyRagAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
@@ -113,7 +114,7 @@ struct SimulationSnapshot
             salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||
             ordinarySilverAction==campaign::OrdinarySilverAction::Take ||
             ordinarySilverAction==campaign::OrdinarySilverAction::Sell ||
-            privyRagAction!=bellwether::PrivyRagAction::None;
+            gardenGrateTalkAvailable || privyRagAction!=bellwether::PrivyRagAction::None;
     }
     std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
     std::optional<dialogue::RecordKeeperPose> recordKeeper;

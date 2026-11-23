@@ -91,6 +91,7 @@
     <string name="sell_ordinary_silver">Sell ordinary silver (+%1$d coins)</string>
     <string name="take_clean_rag">Take a clean rag</string>
     <string name="pass_the_rag">Pass the rag</string>
+    <string name="talk_through_grate">Talk through the grate</string>
     <string name="open_tavern_door">Open tavern door</string>
     <string name="close_tavern_door">Close tavern door</string>
     <string name="show_road_mark">Show the road mark</string>

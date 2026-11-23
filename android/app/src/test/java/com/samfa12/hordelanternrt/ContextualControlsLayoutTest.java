@@ -58,6 +58,10 @@ public final class ContextualControlsLayoutTest {
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 12) | (1 << 9) | 1));
         assertEquals(R.string.open_chest, MainActivity.contextualInteractLabel((2 << 3) | 1));
         assertEquals(R.string.take_lantern, MainActivity.contextualInteractLabel((4 << 3) | 1));
+        final int gardenGrate = 1 << 31;
+        assertEquals(R.string.talk_through_grate, MainActivity.contextualInteractLabel(gardenGrate | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel(gardenGrate | (1 << 9) | 1));
+        assertEquals(0, MainActivity.lanternFittingPrice(gardenGrate | 1));
         assertEquals(0, MainActivity.contextualInteractLabel(0));
     }
 

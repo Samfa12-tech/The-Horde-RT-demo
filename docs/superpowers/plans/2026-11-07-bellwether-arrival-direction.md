@@ -475,6 +475,21 @@ The town uses the same opaque material and primitive counts. The yard shares the
 
 The Windows five-resident campaign replay walked the route and presented the wick, forge and workbench from two player views on both hardware RT backends. The private combined ARM64 Debug package pins the new town mesh. Phone play, sustained performance and listening to the stone footstep transition remain open.
 
+### Garden-edge grate
+
+The dry recess is north of the western kitchen plots, on a short branch
+from the existing garden aisle. The stone lip and locked grate use the
+same geometry for visibility and collision. A small roof shelters a dry
+bed board, a covered water vessel and a shelf within reach of the man below.
+
+After the first tavern conversation, face the grate from the dry path and
+choose **Talk through the grate**. The man recounts the two conflicting
+stories and gives a practical reply from his own position. Neither account
+is settled. Walking away ends the caption. The conversation confers no
+reward, consumes no item and writes no checkpoint. This private version
+uses the original caption playback path and an unseen speaker. The separate
+rumour performances, recording and any later resolution remain open.
+
 ## Open decisions deliberately preserved
 
 1. **Healing flask:** why it cannot simply heal Kit remains unresolved. Approval of this direction did not supply a new healing rule. Do not invent a diagnosis, flask restriction or miracle-cure workaround. Resolve fiction and interaction consistently before scene acceptance or recording any explanation.

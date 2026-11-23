@@ -1656,8 +1656,28 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
                             setInspectionLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
                         input.pitchRadians = previousPitch;
+                        const auto& listen = kBellwetherGrateListenPoint;
+                        const auto journalBoundary = ctx.simulation.CampaignBoundaryRevision();
+                        if (!presented || !walkTo(approach.back()) || !walkTo(kBellwetherGardenGrateApproach) ||
+                            !face(listen[0],listen[2]+2.f) || state.gardenGrateTalkAvailable ||
+                            state.chapterDialogue.line == Line::GardenGrateTalk)
+                            return false;
+                        input.pitchRadians = -.41f;
+                        std::array<char, 180> caption{};
+                        const bool talked = face(listen[0],listen[2]) && state.playerGrounded &&
+                            state.gardenGrateTalkAvailable && state.HasChapterInteractPrompt() && frame() &&
+                            ctx.tavernInteractionPromptPresented && interact() &&
+                            state.chapterDialogue.line == Line::GardenGrateTalk &&
+                            std::abs(state.chapterDialogue.source.y - kBellwetherGrateMouth[1]) < .01f &&
+                            GetWindowTextA(GetDlgItem(ctx.windowHandle,kChapterSubtitleId),caption.data(),
+                                static_cast<int>(caption.size())) > 0 &&
+                            std::string_view(caption.data()).starts_with("Man below the grate:") &&
+                            capture("windows-combined-garden-grate.png");
+                        input.pitchRadians = previousPitch;
                         const bool restored = setInspectionLight(previousPose);
-                        return presented && restored && walkTo(approach.back()) &&
+                        return talked && restored && walkTo(approach.back()) &&
+                            state.chapterDialogue.line != Line::GardenGrateTalk &&
+                            ctx.simulation.CampaignBoundaryRevision() == journalBoundary &&
                             std::all_of(std::next(approach.rbegin()), approach.rend(), walkTo) && walkTo(kBellwetherWestApproach[1]);
                     };
                     const auto presentPrivy = [&] {

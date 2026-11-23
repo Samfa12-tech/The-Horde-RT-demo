@@ -542,3 +542,8 @@ assets/models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json t
 tools/author-bellwether-smith.py text eol=lf
 assets/models/world/source/bellwether-smith-v1/geometry.generated.h text eol=lf
 assets/models/world/source/bellwether-smith-v1/authoring-receipt.json text eol=lf
+
+# Preserve exact garden-grate recipe and generated receipt hashes.
+tools/author-bellwether-grate.py text eol=lf
+assets/models/world/source/bellwether-grate-v1/geometry.generated.h text eol=lf
+assets/models/world/source/bellwether-grate-v1/authoring-receipt.json text eol=lf

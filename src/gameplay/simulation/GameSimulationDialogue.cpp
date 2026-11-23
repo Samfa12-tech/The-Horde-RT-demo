@@ -5,6 +5,7 @@
 #include "../../../assets/models/world/source/bellwether-road-cache-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-privy-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
@@ -72,6 +73,7 @@ void GameSimulation::InteractWithClaimedChapter() {
         tavernDoor_.destination=door==bellwether::DoorAction::Open?1.f:0.f;
         return;
     }
+    if(chapterDialogue_.TryStartGardenGrateTalk(context))return;
     if(IsBellwetherTavernKeeperReady() && chapterDialogue_.TryStartTavernConversation(context))return;
     if(CanBuyLanternFitting(context)) {
         BuyLanternFitting(context);
@@ -584,6 +586,20 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused,std::opt
        chapterDialogue_.State().hearthLinesResolved==kHearthLines.size() &&
        std::hypot(c.player.x-mark[0],c.player.z-mark[2])<=4.f && std::abs(c.listener.y-mark[1])<=1.5f)
         c.shrineLanternSource=HeldRewardLanternSource();
+    if(config_.combatFoundation1_7 && !legacyCombatCheckpoint_ && config_.developmentRescueJourney &&
+       config_.authoredChapterTerrain && c.exterior && c.kitSeated && playerSupport_.grounded &&
+       chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation) {
+        const auto& listen=bellwether::kBellwetherGrateListenPoint;
+        const float dx=c.player.x-listen[0],dz=c.player.z-listen[2];
+        const float distance=std::hypot(dx,dz);
+        if(dz>=.21f && distance<=2.5f && std::abs(c.listener.y-listen[1])<=1.2f &&
+           chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,listen[0],listen[2],
+               listen[1]-.025f,listen[1]+.025f,.025f)) {
+            const auto& mouth=bellwether::kBellwetherGrateMouth;
+            c.gardenGrateSource=Tuple{mouth[0],mouth[1],mouth[2]};
+            c.gardenGrateInReach=distance<=1.35f && -std::sin(c.yaw)*dx+std::cos(c.yaw)*dz>=.65f*distance;
+        }
+    }
     const auto privyLine=chapterDialogue_.State().line;
     const bool privyCueRelevant=privyRagState_==bellwether::PrivyRagState::Available ||
         privyLine==dialogue::Line::PrivyRagRequest || privyLine==dialogue::Line::PrivyRagThanks;

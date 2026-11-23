@@ -3581,6 +3581,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.millWaterwheelAngleRadians=millWaterwheelAngleRadians_;
     snapshot_.tavernDoor=tavernDoor_;
     snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
+    snapshot_.gardenGrateTalkAvailable=chapterDialogue_.CanStartGardenGrateTalk(chapterContext);
     snapshot_.privyRag=privyRagState_;
     snapshot_.privyRagAction=CurrentPrivyRagAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&

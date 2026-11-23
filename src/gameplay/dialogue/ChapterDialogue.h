@@ -22,14 +22,14 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
     RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson,
     SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn, RelicDealerOrdinarySale,
-    PrivyRagRequest, PrivyRagThanks };
+    PrivyRagRequest, PrivyRagThanks, GardenGrateTalk };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,58> kLines{{
+inline constexpr std::array<LineSpec,59> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -87,7 +87,9 @@ inline constexpr std::array<LineSpec,58> kLines{{
     {Line::SalvagerShoreReturn,"hub.passing.learned_retreat","Salvager","Coming back was part of the lesson. Good to see you remembered.","",111344.f/24000.f,1},
     {Line::RelicDealerOrdinarySale,"hub.ordinary_sale","Relic dealer","Common coin, ordinary silver. I can give you a price for those.","",4.8f,1},
     {Line::PrivyRagRequest,"hub.privy_request","Privy occupant","Can someone PLEASE get me some rag?!","",3.6f,1},
-    {Line::PrivyRagThanks,"hub.privy_thanks","Privy occupant","Thank you.","",1.2f,1}
+    {Line::PrivyRagThanks,"hub.privy_thanks","Privy occupant","Thank you.","",1.2f,1},
+    {Line::GardenGrateTalk,"hub.garden_grate_talk","Man below the grate",
+        "One says I fell in. Another says I live here. If you've brought supper, the shelf's on the left.","",6.4f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -134,7 +136,7 @@ inline constexpr bool IsBellwetherLine(Line line) {
         line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
         IsRecordKeeperLine(line) || IsTavernLanternLine(line) || IsSalvagerLine(line) ||
         line==Line::TavernLanternFitting || line==Line::RelicDealerOrdinarySale ||
-        line==Line::PrivyRagRequest || line==Line::PrivyRagThanks;
+        line==Line::PrivyRagRequest || line==Line::PrivyRagThanks || line==Line::GardenGrateTalk;
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -167,7 +169,9 @@ struct Context {
     std::optional<Tuple> relicDealerSource;
     std::optional<Tuple> tavernLanternSource;
     std::optional<Tuple> privySource;
+    std::optional<Tuple> gardenGrateSource;
     bool recordKeeperInReach=false,privyInReach=false;
+    bool gardenGrateInReach=false;
     bool salvagerInReach=false;
     bool relicDealerInReach=false;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
@@ -277,6 +281,17 @@ public:
     bool TryStartRelicDealer(const Context& c) {
         if(!CanStartRelicDealer(c))return false;
         Start(Line::RelicDealerOrdinarySale,*c.relicDealerSource,c);
+        return true;
+    }
+    bool CanStartGardenGrateTalk(const Context& c) const {
+        return c.gardenGrateInReach && CanHearResident(c,c.gardenGrateSource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0 && !tavernConversationActive_ &&
+            recordKeeperPending_.empty() && shrineRevealIndex_>=kShrineReveal.size() && !tavernLanternActive_;
+    }
+    bool TryStartGardenGrateTalk(const Context& c) {
+        if(!CanStartGardenGrateTalk(c))return false;
+        Start(Line::GardenGrateTalk,*c.gardenGrateSource,c);
         return true;
     }
     bool CanStartPrivyRagRequest(const Context& c) const {
@@ -504,6 +519,7 @@ public:
         if(state_.line==Line::TavernWelcome && !hearsWelcome)Cancel(false);
         if((state_.line==Line::PrivyRagRequest || state_.line==Line::PrivyRagThanks) &&
            !CanHearResident(c,c.privySource))Cancel(false);
+        if(state_.line==Line::GardenGrateTalk && !CanHearResident(c,c.gardenGrateSource))Cancel(false);
         if(state_.line==Line::TavernLanternFitting && (!c.tavernFittingInReach || c.combat))Cancel(false);
         if(IsGuidanceLine(state_.line) && !AtTavernHearth(c))Cancel(false);
         const bool hearsShrine=CanHearShrineLantern(c);
@@ -654,6 +670,7 @@ private:
         const auto& source=IsShrineLanternLine(state_.line)?c.shrineLanternSource:
             IsTavernLanternVoice(state_.line)?c.tavernLanternSource:
             (state_.line==Line::PrivyRagRequest || state_.line==Line::PrivyRagThanks)?c.privySource:
+            state_.line==Line::GardenGrateTalk?c.gardenGrateSource:
             IsSalvagerLine(state_.line)?c.salvagerSource:
             state_.line==Line::RelicDealerOrdinarySale?c.relicDealerSource:
             IsRecordKeeperLine(state_.line)?c.recordKeeperSource:(fromKeeper?c.tavernKeeperSource:c.companionSource);

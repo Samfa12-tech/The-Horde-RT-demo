@@ -275,6 +275,16 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(gardenCentre[0],gardenCentre[1],gardenCentre[0],gardenCentre[1]-1.f,
                       gardenGround.worldY+.04f,gardenGround.worldY+1.8f,radius),
                   "both timber bed edges remain solid on either side of the garden aisle");
+            constexpr auto grate=kBellwetherGardenGrateApproach;
+            constexpr auto grateListen=kBellwetherGrateListenPoint;
+            constexpr auto grateMouth=kBellwetherGrateMouth;
+            const auto grateGround=support->Query(grate.x,grate.z);
+            check(follow(garden.back(),grate) && follow(grate,garden.back()) &&
+                  support->NonWalkableVolumeClear(grate.x,grate.z,grateListen[0],grateListen[2],
+                      grateListen[1]-.025f,grateListen[1]+.025f,.025f) &&
+                  grateGround.found && !support->NonWalkableVolumeClear(grate.x,grate.z,
+                      grateMouth[0],grateMouth[2],grateGround.worldY+.06f,grateGround.worldY+1.8f,radius),
+                  "the dry west lane reaches the locked grate while its stone lip blocks entry");
             const auto& yard=kBellwetherServiceYardApproach;
             const auto branch=kBellwetherWestApproach.front();
             check(follow(branch,yard[0]) && follow(yard[0],yard[1]) && follow(yard[1],yard.back()) &&

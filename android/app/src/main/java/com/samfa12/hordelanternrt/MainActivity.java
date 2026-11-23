@@ -265,6 +265,7 @@ public class MainActivity extends Activity {
     private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
+    private static final int CONTEXTUAL_GARDEN_GRATE_TALK = 1 << 31;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
@@ -9093,6 +9094,7 @@ public class MainActivity extends Activity {
                 }
             default: break;
         }
+        if ((state & CONTEXTUAL_GARDEN_GRATE_TALK) != 0) return R.string.talk_through_grate;
         if (lanternFittingPrice(state) != 0) return R.string.fit_lantern_hinge;
         final int keeperAction = ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) |
                 ((state & CONTEXTUAL_RECORD_KEEPER_EXTENDED) != 0 ? 4 : 0);

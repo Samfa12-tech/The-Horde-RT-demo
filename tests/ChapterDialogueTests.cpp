@@ -773,6 +773,33 @@ int main() {
         local.privySource=Tuple{76.65f,-9.37f,112.f};
         local.listener=Tuple{75.5f,-8.f,112.f};
 
+        auto grate=local;
+        grate.privySource.reset();
+        grate.gardenGrateInReach=true;
+        grate.gardenGrateSource=Tuple{39.31f,-10.96f,130.18f};
+        Director visitor;
+        Check(visitor.RestoreProgress(arrived,grate,1,0) &&
+              RequiresChapterCaption(Line::GardenGrateTalk) && visitor.CanStartGardenGrateTalk(grate),
+              "the completed tavern opens the direct garden conversation");
+        visitor.Step(.02f,grate);
+        Check(visitor.State().line==Line::None,"standing near the grate does not start the optional line");
+        grate.gardenGrateInReach=false;
+        Check(!visitor.TryStartGardenGrateTalk(grate),"the direct conversation requires facing the grate in range");
+        grate.gardenGrateInReach=true;
+        Check(visitor.TryStartGardenGrateTalk(grate) &&
+              visitor.State().source.x==grate.gardenGrateSource->x &&
+              visitor.ExportProgress().activeLine==Line::None &&
+              !visitor.TryStartGardenGrateTalk(grate),
+              "a direct line uses its authored source, stays out of saves and cannot stack");
+        const auto elapsed=visitor.State().elapsed;
+        grate.paused=true;
+        visitor.Step(.04f,grate);
+        Check(visitor.State().line==Line::GardenGrateTalk && visitor.State().elapsed==elapsed,
+              "pause holds the conversation in place");
+        grate.paused=false;
+        grate.gardenGrateSource.reset();
+        visitor.Step(.02f,grate);
+        Check(visitor.State().line==Line::None,"leaving earshot ends the local caption");
         Director beforeExchange;
         Progress unfinished=arrived;unfinished.tavernConversationLinesResolved=0;
         Check(beforeExchange.RestoreProgress(unfinished,local,1,0) &&

@@ -1359,6 +1359,11 @@ void PublishSimulationUiState()
         contextualControls |= (residentTag << 16) | (detail << 25) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.gardenGrateTalkAvailable) {
+        constexpr int gardenGrateTalk=INT32_MIN; // Bit 31, outside the resident detail field.
+        contextualControls |= gardenGrateTalk | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
              (simulation.salvagerAction != SalvagerAction::None ||
               (simulation.shorePracticeStage != ShorePracticeStage::Idle &&
                simulation.ordinarySilverAction == horde::gameplay::campaign::OrdinarySilverAction::None))) {
