@@ -871,7 +871,10 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
 float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
 {
     rayQueryEXT query;
-    rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
+    // Only the committed hit's existence matters. Keep transparent candidates
+    // in the callback so water and clear panes still cannot confirm a blocker.
+    const uint flags = gl_RayFlagsNoOpaqueEXT | gl_RayFlagsTerminateOnFirstHitEXT;
+    rayQueryInitializeEXT(query, topLevelAS, flags, mask,
                           origin, 0.0015, direction, max(maxDistance, 0.004));
     while (rayQueryProceedEXT(query))
     {
