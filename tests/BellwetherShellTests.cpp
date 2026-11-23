@@ -291,6 +291,13 @@ int main(int argc,char** argv) {
                     std::abs((laid.worldY-original.worldY)-.018f)<.002f,
                     "each mapped lane presents stone contact fitted to the original ground");
             }
+            for(const auto [x,z]:std::array{BellwetherStation{63.4f,70.7f},
+                                           BellwetherStation{64.3f,75.2f}}) {
+                const auto contact=support->Query(x,z);
+                check(contact.found && contact.walkable &&
+                    contact.surface==horde::gameplay::simulation::SupportSurface::Stone,
+                    "the church lane connects across the existing stone approach at the terrain cut");
+            }
             const auto centre=kBellwetherWellCentre;
             const auto view=kBellwetherWellView;
             const auto ground=support->Query(centre[0],centre[2]);

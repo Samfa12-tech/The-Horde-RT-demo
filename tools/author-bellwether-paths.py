@@ -17,7 +17,7 @@ from mathutils import Vector
 
 RECIPE = Path(__file__).resolve()
 sys.path.insert(0, str(RECIPE.parent))
-from chapter_water_conformance import area, partition, triangulate
+from chapter_water_conformance import area, cross, partition, triangulate
 
 town_tools = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-works.py")))
 mesh_tools = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-crossing.py")))
@@ -42,7 +42,7 @@ def ribbon(stations):
 
     for i, (start, end) in enumerate(zip(centres, centres[1:])):
         length = (end - start).length
-        intervals = math.ceil(length / 1.65)
+        intervals = math.ceil(length / 5.5)
         for step in range(intervals):
             t = step / intervals
             half_width = (1 - t) * stations[i][2] + t * stations[i + 1][2]
@@ -51,8 +51,13 @@ def ribbon(stations):
         travelled += length
     sections.append(section(centres[-1], joints[-1], stations[-1][2], travelled))
     for (left, right), (next_left, next_right) in zip(sections, sections[1:]):
-        for piece in ((left, right, next_right), (left, next_right, next_left)):
-            yield piece if area(piece) > 0 else piece[::-1]
+        quad = (left, right, next_right, next_left)
+        if area(quad) < 0:
+            quad = quad[::-1]
+        if all(cross(quad[i - 2], quad[i - 1], point) > 0 for i, point in enumerate(quad)):
+            yield quad
+        else:
+            yield from triangulate(quad)
 
 
 def bounds(points):
@@ -155,7 +160,7 @@ def main(root, previous, output):
     write_planar_tangents(patch)
     town = output / "bellwether-tavern-v1.glb"
     triangles, vertices, primitives = town_tools["join_town"](previous, patch, town, node_name="BellwetherWalkable")
-    if triangles != sum(counts.values()) or not 0 < triangles <= 4200 or primitives != 5 or vertices > 65000:
+    if triangles != sum(counts.values()) or not 0 < triangles <= 1500 or primitives != 5 or vertices > 62000:
         raise ValueError(f"Paths exceed the town budget: {triangles} new triangles, {vertices} vertices")
     doc, _ = town_tools["read_glb"](town)
     indices = sum(doc["accessors"][p["indices"]]["count"] for mesh in doc["meshes"] for p in mesh["primitives"])

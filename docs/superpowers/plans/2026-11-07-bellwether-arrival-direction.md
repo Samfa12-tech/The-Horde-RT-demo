@@ -477,7 +477,7 @@ privy, the mill landing and river causeway, and the southeast smith yard.
 Existing yard, bridge and wet-landing surfaces take over at those joins.
 
 The [editable path layer](../../../assets/models/world/source/bellwether-paths-v1/README.md)
-adds 2,669 walkable triangles to the existing town owner. The render and
+adds 704 walkable triangles to the existing town owner. The render and
 footstep contact surfaces share the same geometry. The paths reuse the
 admitted town stone and keep the terrain grade and landmark positions.
 
