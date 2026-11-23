@@ -126,7 +126,7 @@ inline FireEmitterFixedStepInput BellwetherHearthFireInput()
 
 inline FireEmitterFixedStepInput BellwetherCandleFireInput()
 {
-    return BellwetherFireInput(bellwether::kTavernCandleFlame,bellwether::kTavernCandleLight,.58f);
+    return BellwetherFireInput(bellwether::kTavernCandleFlame,bellwether::kTavernCandleLight,.95f);
 }
 
 inline FireEmitterFixedStepInput BellwetherRiverForkLampFireInput()
