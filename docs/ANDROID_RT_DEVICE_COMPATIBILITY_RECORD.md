@@ -4403,9 +4403,9 @@ submission. The route used the fresh private profile at 33% scale
 | Doorway inbound | 38.85 / 47.80 | 48.20 / 57.52 |
 
 The staffed room's three post-warmup GPU medians were 49.63, 50.09 and
-50.04 ms. The room's phase median comprised 49.47 ms in ray dispatch,
-0.38 ms in acceleration-structure work and 0.11 ms in image transfer, as
-separately timed spans. The room retained 240,862,400 device-local bytes
+50.04 ms. Median stage durations were 49.47 ms for ray dispatch,
+0.38 ms for acceleration-structure work and 0.11 ms for image transfer.
+The room retained 240,862,400 device-local bytes
 on all three visits. These stage timings direct the next investigation
 toward the room's ray workload.
 

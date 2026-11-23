@@ -177,6 +177,24 @@ first on-disk checkpoint. It then continues the same route with the health
 left over from combat. The replay uses scripted inputs with tutorials off
 and muted audio. Repeat with a fresh directory for the other RT backend.
 
+For the packaged Windows stress routes, pass the stager's
+`windows-package.json` to the existing measurement launcher.
+
+```powershell
+$receipt = 'reports/<packaged-build>/windows-package.json'
+./tools/measure-chapter-shipping-route.ps1 -Output reports/bellwether-east-pipeline -Configuration Debug -BellwetherPackageReceipt $receipt
+python tools/analyze-chapter-route-measurement.py --bellwether-resident-roundtrip reports/bellwether-east-pipeline
+```
+
+Use a fresh output prefix for each run. Add `-Query` for RayQueryCompute.
+Add `-BellwetherWest` and analyze with `--bellwether-west-roundtrip` for the
+stock-yard route. The launcher verifies the ZIP and executable hashes,
+extracts a fresh settings profile and uses the packaged roster and voices
+with Shipping/High shaders at the regular Windows client size. The
+analyzer checks both returns and reports timings and RT allocations for
+each staffed room visit. The hidden RT results cover GPU and native
+frame-cycle durations. Visible display pacing needs its own capture.
+
 On Android, build `:app:assembleDebug` with `-PhordeBellwetherPlaytest=true` and the
 `hordeBellwetherResidentDir`, `hordeBellwetherVoiceDir`, `hordeFlaskCandidateDir`
 and `hordePrivateRevivalDir` inputs. The full profile uses
