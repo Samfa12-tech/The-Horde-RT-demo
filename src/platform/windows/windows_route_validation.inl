@@ -349,8 +349,13 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 state.tavernKeeper && state.tavernKeeper->stage == dialogue::TavernKeeperStage::AtHearth;
         };
         unsigned arrivalTicks = 0;
+        bool assessedOnRoad = false;
         const auto arrivalStep = [&](simulation::InputSnapshot input) {
-            return step(input) && (++arrivalTicks % 10 != 0 || render());
+            if (!step(input)) return false;
+            const auto& boundary = ctx.simulation.LatestCampaignBoundary();
+            assessedOnRoad |= boundary && boundary->id == campaign::CheckpointId::ForestEndpoint &&
+                boundary->bellwetherAnkleAssessed;
+            return ++arrivalTicks % 10 != 0 || render();
         };
         const auto walkTo = [&](BellwetherStation target) {
             for (unsigned tick = 0; tick < 1200; ++tick) {
@@ -382,8 +387,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         proceed = check(state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::AtLookout &&
             std::all_of(kBellwetherTavernRoute.begin(),kBellwetherTavernRoute.end(),walkTo) &&
             walkTo({playerMark.x,playerMark.z}) && waitFor([&]{return state.tavernConversationAvailable;},120*60) &&
-            atHearth() && captureSeatedKit("route-bellwether-tavern.png"),
-            "the lookout earned in this run leads through the village and south door to Kit and the keeper");
+            assessedOnRoad && atHearth() && captureSeatedKit("route-bellwether-tavern.png"),
+            "the earned lookout leads through Kit's ankle assessment and the south door to the staffed hearth");
         campaign::storage::StoredCheckpoint tavern;
         if (proceed) {
             auto input = neutral();
@@ -400,7 +405,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                     tavern.checkpoint.dialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
                     ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
             },false) && tavern.checkpoint.vitality == 2 && tavern.checkpoint.firstAscentCompleted &&
-                tavern.checkpoint.bellwetherAnkleAssessed && campaign::CompletedForestProgress(tavern.checkpoint.dialogue),
+                campaign::CompletedForestProgress(tavern.checkpoint.dialogue),
                 "the earned tavern autosave preserves health and completed forest story in the same slot");
         }
         if (proceed) {
