@@ -141,6 +141,7 @@
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
+#include "gameplay/validation/CampaignTombInput.h"
 #include "gameplay/validation/RecordedReturnCheckpoint.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "platform/windows/WindowsPresentInterval.h"
@@ -206,6 +207,7 @@ bool gOpeningBenchmarkDetachedCancelInjected=false;
 #endif
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
+bool gRouteNewGame=false;
 bool gRouteKitTurnStartValidation=false;
 bool gRouteNaturalWalkValidation=false;
 bool gRouteReturnRecovery=false;
@@ -14605,6 +14607,8 @@ int RunDiagnosticWindow(const int showCommand)
         return 2;
     };
     if (markerError) return failPlaytest("Could not inspect the local Bellwether playtest marker.");
+    if (gRouteNewGame && !gBellwetherPackagedPlaytest)
+        return failPlaytest("The New Game route needs the complete private Bellwether playtest package.");
     if (gBellwetherPackagedPlaytest) {
 #if !HORDE_RT_FLASK_ADMITTED || !HORDE_RT_REVIVAL_ADMITTED
         return failPlaytest("The Bellwether playtest build needs the admitted flask and revival.");

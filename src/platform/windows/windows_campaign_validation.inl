@@ -2575,6 +2575,7 @@ bool ConfigureHiddenCampaignValidation()
     int count=0;auto args=CommandLineToArgvW(GetCommandLineW(),&count);if(!args)return false;
     bool requested=false,lookoutRequested=false,earnTavernRequested=false,routeRequested=false,routeTurnStartRequested=false,routeNaturalWalkRequested=false,returnRequested=false,inspectKit=false,inspectMotion=false,inspectTiming=false,inspectTurns=false,inspectPartials=false,inspectPartialsDense=false,inspectController=false,benchmarkMenuRequested=false,detachedCancelRequested=false,detachedCloseRequested=false;std::filesystem::path directory;
     bool expeditionRequested = false, preparationsRequested = false, hearthRestRequested = false, ankleRestoreRequested = false;
+    bool routeNewGameRequested = false;
     for(int i=1;i<count;++i) {
         const std::wstring_view arg=args[i];
         if(arg==L"--campaign-validate-hidden")requested=true;
@@ -2588,6 +2589,7 @@ bool ConfigureHiddenCampaignValidation()
         if(arg==L"--bellwether-verify-preparations"){earnTavernRequested=true;expeditionRequested=true;preparationsRequested=true;}
         if(arg==L"--bellwether-verify-hearth-rest"){earnTavernRequested=true;hearthRestRequested=true;}
         if(arg==L"--route-validate-hidden")routeRequested=true;
+        if(arg==L"--route-from-new-game")routeNewGameRequested=true;
         if(arg==L"--route-kit-turn-start")routeTurnStartRequested=true;
         if(arg==L"--route-natural-walk")routeNaturalWalkRequested=true;
         if(arg==L"--route-return-recovery-hidden")returnRequested=true;
@@ -2615,6 +2617,9 @@ bool ConfigureHiddenCampaignValidation()
     }
     if((routeTurnStartRequested || routeNaturalWalkRequested) && !routeRequested) {
         std::cerr<<"Kit turn/start opt-in requires the isolated hidden route validator.\n";return false;
+    }
+    if(routeNewGameRequested && (!routeRequested || routeTurnStartRequested || routeNaturalWalkRequested)) {
+        std::cerr<<"New Game route requires the standard isolated hidden route validator.\n";return false;
     }
     if(inspectTurns && inspectMotion) {std::cerr<<"Select one bounded Kit motion or authored-turn inspection.\n";return false;}
     if(inspectController && (inspectMotion || inspectTurns)) {
@@ -2660,8 +2665,9 @@ bool ConfigureHiddenCampaignValidation()
     gBellwetherHearthRestValidation = hearthRestRequested;
     if (earnTavernRequested) gHiddenCampaignFaults.lookoutReadOnly = false;
     gRouteReturnRecovery=returnRequested;
+    gRouteNewGame=routeNewGameRequested;
     if((routeRequested || returnRequested) && !PrepareHiddenRouteFixture(absolute)){
-        std::cerr<<"Hidden route validation requires the unchanged exported single LowerClaimed manual record and canonical manifest only.\n";return false;
+        std::cerr<<"Hidden route validation requires the canonical fixture for the selected start.\n";return false;
     }
     gLookoutHiddenValidation=lookoutRequested;
     gRouteHiddenValidation=routeRequested || returnRequested;
