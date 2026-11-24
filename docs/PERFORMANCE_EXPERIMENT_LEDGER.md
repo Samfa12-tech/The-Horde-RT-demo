@@ -19,8 +19,23 @@ reached the hearth through the live campaign. The staffed room held
 154 SurfaceFlinger intervals across 22.19 seconds at 33% on RayTracingPipeline.
 The display interval median was 141.67 ms, with p95 at 166.67 ms and battery
 temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
-The measured room and controlled route cohorts still need a matched
-comparison to isolate the cost.
+
+**24 November ordinary Android hearth controls.** At the same position and
+graphics settings, the [stationary view comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
+recorded median display intervals of 141.67 ms facing the hearth, 108.33 ms
+facing the doorway and 141.67 ms facing the hearth again. Native GPU window
+means moved from 111.51–116.37 ms to 81.73–83.33 ms and back to 115.17 ms.
+Command-record means stayed near 24–25 ms. Turning also moved the held
+lantern. The trial bounds the cost for this position with both effects in
+play. The separate fixed-step route uses a different camera and workload.
+
+**INCONCLUSIVE (24 November): same-view Android RT backend comparison.**
+The [fresh-process controls at the hearth](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
+recorded 158.33 ms median displayed interval on the opening Pipeline run,
+129.17 ms on RayQueryCompute and 116.67 ms on the closing Pipeline run.
+Temperatures, Android thermal status and sampled GPU power limits differed.
+The original backend preference stays in place. A backend performance
+decision needs repeatable controls and equivalent ordinary-play coverage.
 
 **23 November five-resident replay.** The private Android and Windows QA
 builds share the native 60 Hz route and its twelve resident swaps. The

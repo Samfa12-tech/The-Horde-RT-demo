@@ -4689,3 +4689,63 @@ that moves from the hearth to the basin context and checks both labels.
 The Windows diagnostic executable compiled and its developer-overlay smoke
 test passed. Receipts and captures are under
 `reports/horde-android-hearth-rest-label-20261124-115838`.
+
+### 24 November 2026 — Ordinary Bellwether hearth view and backend timing
+
+**Evidence class — stationary holds loaded through the ordinary Android
+campaign menus.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) used
+the private ARM64 Debug APK from `d01e482b505c14a939b8072486d0db75213152b0`,
+installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`.
+The isolated tavern autosave kept its SHA-256
+`2ed2968160beda048f0d6f2de7e495516142b71e1a02979213081ccf04106f58`
+throughout. It contained three hearts, two flask charges and the completed
+hearth conversation. All holds used 33% (475 × 980 internal, 1440 × 2971
+output), Shipping/Mobile opaque-fast, Current shadows, Mobile fire and water,
+Low dust and mist disabled. The developer overlay was hidden while measuring.
+
+**View comparison.** One RayTracingPipeline session held the same position
+(x 84.52, z 107.68) facing the hearth, then the doorway, then the hearth
+again. Each snapshot confirmed 44 TLAS instances, 37 BLASes and the same
+three active light IDs. Turning also moved the carried lantern.
+
+| View (yaw) | Display intervals / observed span | Display median / p95 (ms) | Native windows of 120 frames | GPU window means (ms) | Battery start / end (°C) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hearth (−1.30 rad) | 272 / 38.19 s | 141.67 / 150.00 | 2 | 111.51–116.37 | 35.8 / 35.9 |
+| Doorway (−2.96 rad) | 352 / 38.05 s | 108.33 / 116.67 | 2 | 81.73–83.33 | 35.9 / 36.1 |
+| Hearth return (−1.30 rad) | 256 / 36.77 s | 141.67 / 158.33 | 1 | 115.17 | 36.1 / 36.2 |
+
+Native command-record means stayed between 23.93 and 25.43 ms. GPU
+command-buffer means and fence waits fell by roughly 30 ms at the doorway.
+The change localizes most of the difference to the GPU workload associated
+with view and held-light position combined. SurfaceFlinger intervals came
+from the game's layer. GPU means came from consecutive native cumulative
+timestamp reports. Each hold also yielded one native snapshot joining a
+valid GPU interval to the same completed and successfully presented
+submission. The two timing streams have no per-frame join.
+
+The handset stayed on USB with Android thermal status 0. The sampled
+Adreno thermal power limit varied. Live GPU clocks were unavailable.
+Raw timing windows, stills and hash receipts are retained locally under
+`reports/horde-android-hearth-view-cohort-20261124-120754`.
+
+**Same-view backend comparison, excluded from backend selection.** Three
+fresh processes loaded the same autosave through **Play → Continue** and
+held the hearth pose after a 15-second settling period. Each backend exposed
+the same 44 TLAS instances, 37 BLASes and three active light IDs. Each hold
+had a valid native GPU-to-presentation identity join at the endpoint.
+
+| Hardware RT backend | Display intervals / observed span | Display median / p95 (ms) | Native windows of 120 frames | GPU window means (ms) | Battery start / end (°C) | Android thermal status |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| RayTracingPipeline | 242 / 38.85 s | 158.33 / 183.33 | 1 | 126.25 | 37.5 / 36.9 | 0 |
+| RayQueryCompute | 307 / 38.54 s | 129.17 / 141.67 | 1 | 109.15 | 38.0 / 37.7 | 1 |
+| RayTracingPipeline return | 321 / 38.17 s | 116.67 / 133.33 | 2 | 101.82–101.83 | 38.3 / 38.1 | 1 |
+
+The two Pipeline controls differed by 41.67 ms in median display interval,
+with RayQueryCompute between them. Their sampled Adreno thermal power
+limits also differed (6–7 initially, 3–5 in the return). The test leaves the
+relative backend cost unresolved. Both comparisons cover stationary holds.
+Sustained ordinary-play performance and the backend choice remain open.
+The subsequent APK and save hash checks matched. Backend comparison receipts
+and raw captures are retained locally under
+`reports/horde-android-hearth-backend-cohort-20261124-121429`.
