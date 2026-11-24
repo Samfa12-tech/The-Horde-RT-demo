@@ -4439,8 +4439,9 @@ temperature rose from 26.2 °C to 32.5 °C on USB. The start was 0.9 °C
 above the previous original-shader run, whose ray dispatch median was
 49.47 ms. Raw evidence is retained under
 `reports/horde-bellwether-binary-shadow-20261123-153321/baseline-query`.
-The phone disconnected after the baseline. The paired trial APK is staged
-locally, and handset performance for the trial remains unmeasured.
+The phone disconnected after this baseline. The next day's
+[three-run comparison](#24-november-2026--bellwether-binary-shadow-traversal-trial)
+used a fresh pair of controls at matched starting temperatures.
 
 ### 23 November 2026 — Bellwether tavern GPU stage timings
 
@@ -4535,3 +4536,47 @@ private APK was hash-verified on the phone and stopped after the closing run.
 Exact APK and Windows executable identities, logs, capture manifests and raw
 timing remain under `reports/horde-bellwether-local-light-20261123-110155`,
 with the opening run under `reports/horde-bellwether-directions-20261123-104723`.
+
+### 24 November 2026 — Bellwether binary shadow traversal trial
+
+**Evidence class — actual-device scripted route with per-submission GPU
+stage timing and sampled display pacing.** The Galaxy S26 Ultra
+(SM-S948B, Android 17/API 37) ran the private five-resident route in
+original–trial–original order on USB power. Each run used hardware
+RayQueryCompute, Shipping/Mobile opaque-fast shaders, glass off and
+33% scale (475 × 980 internal, 1440 × 2971 output). The 283 packaged
+asset files match between APKs.
+
+Both controls used source `0eab2912`, installed APK SHA-256
+`dedb9f0775c0157d7a009e57d31b157ac58075f32c8994625231ffd1d0e1c827`
+and active shader SHA-256
+`b16089eca7976725533552509fd1efe085190dde16cab982622d4f2f932f0c1f`.
+The first-confirmed-blocker trial from `6017810b` used installed APK
+SHA-256 `1c6c4146c99d0d3e47ec6575643110d747f379cb58988b62906827dbf97aaceb`
+and active shader SHA-256
+`eb866881376725f4f97e2a09155a09dd8ab386c3dc2d62cc036c6aa42e34d42b`.
+The installed APK hash matched the local file on each run.
+
+Each run completed both returns, all twelve resident swaps and 9,413
+simulation ticks in 156.95–157.52 s. GPU stage samples joined every
+recorded RT submission to its successful native present call. The
+resident order, open door and allocations matched at the staffed
+tavern and east fork. Staffed-room statistics exclude the first five
+seconds. SurfaceFlinger intervals are adjacent samples from the game
+layer over 153.47–154.71 s per run and have no per-submission join.
+
+| Run order | Joined GPU frames | Battery start → end (°C) | Room GPU median / p95 (ms) | Room dispatch median by visit (ms) | Display samples | Display median / p95 (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Original | 3,056 | 29.4 → 34.9 | 53.90 / 59.13 | 49.17 / 53.28 / 55.48 | 2,984 | 50.00 / 66.67 |
+| Trial | 2,847 | 30.4 → 35.1 | 59.36 / 61.56 | 50.75 / 56.15 / 59.89 | 2,784 | 54.17 / 70.83 |
+| Original again | 3,045 | 30.7 → 37.9 | 50.32 / 60.41 | 49.39 / 50.61 / 49.56 | 2,961 | 50.00 / 62.50 |
+
+The trial had the slowest dispatch median on all three visits, and
+the staffed-room whole-GPU median was 10.1% above the opening control
+and 18.0% above the closing control. Starting battery temperatures
+were within 1.3 °C. Android thermal status ended at 0, 0 and 1
+respectively, and no aligned GPU clock history was available. This
+cohort provides no handset gain to adopt. The 1.8 branch retains the
+original shader bank. Sustained ordinary campaign performance remains
+open. The receipts, raw timings and display samples are retained locally
+under `reports/horde-bellwether-binary-shadow-20261123-153321`.

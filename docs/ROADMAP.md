@@ -37,8 +37,8 @@ resumption of the paused optimisation investigation.
 |---|---|
 | 1.6.1 | Published engineering baseline; preserve receipts and deferrals. |
 | 1.6.2 | Published engine readiness and tomb/demo polish, 9 October 2026. |
-| 1.7 - Beyond the Tomb | Approved tomb-to-woodland chapter plus complete mapped low-detail world; PR27 is merged to main (30 October), but the complete update remains unfinished and unaccepted. |
-| 1.8 - Bellwether, NPCs and light RPG systems | Approved bounded hub direction; detailed implementation scope follows accepted 1.7. |
+| 1.7 - Beyond the Tomb | 1.7.0 published on Windows and Android on 3 November. The [release validation](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md) records the shipped builds and physical acceptance scope. |
+| 1.8 - Bellwether, NPCs and light RPG systems | Playable in private Windows and Android builds. The authored lanes, five resident models and nineteen audition lines are packaged. Ordinary phone play, audio review, sustained performance, asset clearance and production integration remain open. |
 | Proposed 1.9 - Drowned Abbey | Approved theme, reflector and item-required Bellkeeper; delivery label provisional. |
 | Proposed 1.10 - Ashen Foundry | Approved theme, shuttered stand and item-required Master of Coin; delivery label provisional. |
 | Proposed 1.11 - Glass Court | Approved theme, focusing aperture and item-required keeper encounter; delivery label provisional. |

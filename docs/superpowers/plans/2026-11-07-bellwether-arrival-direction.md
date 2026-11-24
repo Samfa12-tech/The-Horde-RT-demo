@@ -117,7 +117,7 @@ Windows and Android use the same text. **Back to pause menu** keeps the game pau
 
 The expanded Windows campaign check passed 20 assertions on each hardware RT backend. It opened the directions at the tavern, shrine and church, then reloaded the earned tavern save and checked the same expedition leads. Ten Android menu tests covered the pause actions and stale UI, and the ARM64 Debug package contains the matching native text endpoint. Physical Android remains pending.
 
-The Windows pause panel now keeps the Back and Continue actions above the Directions text and gives the long page its own scroll area. The extracted private build from `719fc0a7` passed 82 native panel assertions, the 51-check RayTracingPipeline preparation route and the 26-check RayQueryCompute expedition route. The expedition check reopens the full page after a tavern reload and exercises keyboard, controller and wheel scrolling. A separate RayQueryCompute preparation retry stopped at the west resident handoff before it could reach the final page. The previous package at `c3073b2c` passed the full preparation route on both backends.
+The Windows pause panel now keeps the Back and Continue actions above the Directions text and gives the long page its own scroll area. The extracted private build from `719fc0a7` passed 82 native panel assertions and the 51-check preparation route on both hardware RT backends. The focused 26-check RayQueryCompute expedition route also passed. These checks reopen the full page after a tavern reload and exercise keyboard, controller and wheel scrolling. An earlier RayQueryCompute attempt stopped at the west resident handoff. The same executable completed that handoff and the full route on an isolated rerun.
 
 ### Rest by the hearth
 
@@ -456,12 +456,14 @@ cover the whole RT command buffer.
 
 The signed private trial APK from `6017810b` has SHA-256
 `1c6c4146c99d0d3e47ec6575643110d747f379cb58988b62906827dbf97aaceb`.
-All 283 packaged asset files match the original APK. The handset disconnected
-after the original-shader run. The next phone comparison uses the same USB
-setup and 33% glass-off RayQueryCompute route, with starting battery
-temperatures within 1.5 °C and GPU stages joined to their native presents.
-The 1.8 branch uses the original shader bank. The original and trial receipts,
-raw runs, and replay commands are retained locally under
+All 283 packaged asset files match the original APK. The next day's
+[Galaxy S26 Ultra comparison](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--bellwether-binary-shadow-traversal-trial)
+used the same 33% glass-off RayQueryCompute route, a fresh pair of controls,
+starting temperatures within 1.3 °C and 8,948 joined RT frames. The staffed
+tavern's whole-GPU medians were 53.90, 59.36 and 50.32 ms in run order.
+The trial also had the slowest sampled display cadence. The 1.8 branch
+retains the original shader bank. Receipts, raw runs and replay commands are
+retained locally under
 `reports/horde-bellwether-binary-shadow-20261123-153321`.
 
 The Windows measurement now verifies the window mask against the glass

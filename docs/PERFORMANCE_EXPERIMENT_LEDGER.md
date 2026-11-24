@@ -36,7 +36,17 @@ control. Eight Windows capture pairs were pixel-identical. The branch uses
 the original shader bank. A repeat would need interleaved runs with comparable
 GPU thermal state and clock observations before attributing a gain.
 
-The Windows run uses optimized Debug code (`/O2 /Ob2`) to preserve the private
+**CLOSED (24 November): first confirmed blocker in Bellwether binary shadows.**
+The [Galaxy S26 Ultra comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--bellwether-binary-shadow-traversal-trial)
+completed the two-return route in original–trial–original order with the
+same 33% Shipping/Mobile RayQueryCompute workload and matched assets.
+The trial had the slowest staffed-room dispatch on all three visits and
+the slowest sampled display cadence. The 1.8 branch retains the original
+shader bank despite a roughly 13% whole-GPU saving on the Windows route.
+The [Windows captures and route timings](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#binary-shadow-traversal-trial)
+remain useful platform-specific evidence.
+
+The five-resident Windows baseline uses optimized Debug code (`/O2 /Ob2`) to preserve the private
 fixture gates, with Shipping/High shaders and 960 × 540 trace and output
 on an RTX 5050 Laptop GPU. The executable SHA-256 is
 `00eb88034fe01220921b9672c1d6dfae46bff97745fcbb70c5f92ec9d0a7bcec`.
