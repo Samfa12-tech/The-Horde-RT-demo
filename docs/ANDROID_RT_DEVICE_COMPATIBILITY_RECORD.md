@@ -4638,3 +4638,54 @@ the physical phone, and the subtitle contrast review remain open. The
 navigation log, APK receipt and captures are retained locally under
 `reports/horde-android-combat-cards-20261124-113116`.
 [Issue #35](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
+
+### 24 November 2026 — Android touch walkthrough from the lookout to Bellwether
+
+**Evidence class — ordinary campaign menus and device touch input from a
+seeded lookout.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran
+the isolated private ARM64 Debug APK from `74cd9cf4`, installed SHA-256
+`a3a8e5ef7a4ccd21d026f146242d4b9f0d20e36d371a42fa2f426d91687bad13`.
+The 283 assets matched the preceding private package, including the five
+residents and nineteen audition WAVs. The build used Shipping/Mobile shaders
+and real RayTracingPipeline at 33% (475 × 980 internal, 1440 × 2971 output).
+
+**Play → Continue** loaded a hash-verified lookout fixture in a fresh
+test namespace. ADB sent ordinary touchscreen swipes and taps. The
+developer overlay reported successive poses from the living simulation.
+The pause directions pointed to the south door. The roadside assessment
+updated the lookout autosave at the same anchor and kept both hearts and the
+empty flask. The player then walked the square, ramp and south door to the
+hearth in the same session.
+
+The hearth directions pointed to **Talk**. One **Talk to Kit** tap played
+through the three saved exchange steps. The phone captures show Kit, the
+tavern keeper and Kit as the named speakers in order. Rest took the player
+from two hearts and zero flask charges to three hearts and two charges,
+preserving all three resolved lines. The **Pause → Load checkpoint** menu
+listed **Bellwether tavern | 3 / 3 hearts**. Selecting it presented the
+hearth with the full flask, the completed conversation and identical
+autosave bytes. In-game listening and the remaining town routes are open.
+
+After Rest, the staffed hearth was held stationary with the developer
+overlay hidden. Over 22.19 seconds, SurfaceFlinger exposed 154 deduplicated
+adjacent intervals on the game's layer. Median displayed frame interval was
+141.67 ms and p95 was 166.67 ms. Battery temperature held at 36.5 °C on USB,
+with Android thermal status 0 at both endpoints. SurfaceFlinger recorded
+display cadence independently of Vulkan submission timing. Sustained play and
+a controlled comparison with the scripted room routes remain open.
+
+The isolated saves, exact APK and capture receipts are retained locally.
+The walkthrough evidence is under
+`reports/horde-android-bellwether-walk-20261124-114635`.
+
+The walkthrough found that Android labelled the hearth action **Refill
+flask** even though the hint described resting. The follow-up APK from
+`d01e482b`, installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`,
+loaded a copy of the earned pre-Rest save in a fresh test namespace. Its
+clickable **Rest** action saved three hearts and two charges with the
+talk complete. Android passed 18 focused tests, including a regression
+that moves from the hearth to the basin context and checks both labels.
+The Windows diagnostic executable compiled and its developer-overlay smoke
+test passed. Receipts and captures are under
+`reports/horde-android-hearth-rest-label-20261124-115838`.

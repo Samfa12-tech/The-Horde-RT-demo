@@ -13,6 +13,15 @@
 
 ## Bellwether 1.8 performance baseline
 
+**24 November ordinary Android arrival.** The
+[seeded-lookout touch walkthrough](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--android-touch-walkthrough-from-the-lookout-to-bellwether)
+reached the hearth through the live campaign. The staffed room held
+154 SurfaceFlinger intervals across 22.19 seconds at 33% on RayTracingPipeline.
+The display interval median was 141.67 ms, with p95 at 166.67 ms and battery
+temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
+The measured room and controlled route cohorts still need a matched
+comparison to isolate the cost.
+
 **23 November five-resident replay.** The private Android and Windows QA
 builds share the native 60 Hz route and its twelve resident swaps. The
 [Galaxy S26 Ultra run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-five-resident-shippingmobile-round-trip)
