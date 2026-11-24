@@ -9040,7 +9040,7 @@ public class MainActivity extends Activity {
         if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
         else if(flask.hint==5 && now<flaskLessonUntil)hint=getString(flaskLessonResource);
         else if(flask.hearthNearby())
-            hint=getString(flask.allows(true)?R.string.flask_hearth_rest:R.string.flask_hearth_rest_wait);
+            hint=getString(flask.allows(true)?R.string.flask_rest_touch_guidance:R.string.flask_hearth_rest_wait);
         else if(flask.nearbyRestAnchor!=0 && !flask.allows(true))hint=getString(R.string.flask_rest_wait_hint);
         else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
         if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
@@ -9050,6 +9050,8 @@ public class MainActivity extends Activity {
         drinkFlaskButton.setEnabled(flask.allows(false));drinkFlaskButton.setContentDescription(actionDescription);
         restButton.setVisibility(touch && flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
         restButton.setEnabled(flask.allows(true));
+        final String restLabel=getString(flask.hearthNearby()?R.string.flask_hearth_rest_action:R.string.flask_rest);
+        if(!android.text.TextUtils.equals(restButton.getText(),restLabel))restButton.setText(restLabel);
         restButton.setContentDescription(getString(flask.hearthNearby()?R.string.flask_hearth_rest:R.string.flask_rest)+
                 ". "+getString(flask.restAnchor!=0?R.string.flask_rest_touch_guidance:
                         flask.hearthNearby()?R.string.flask_hearth_rest_wait:R.string.flask_rest_wait_hint));
@@ -9082,7 +9084,7 @@ public class MainActivity extends Activity {
         final HealingFlaskUiState state=readHealingFlaskState();
         if(state==null)return;
         if(!state.allows(rest)) {
-            int reason=rest?R.string.flask_rest_wait_hint:flaskHintResource(state);
+            int reason=rest?(state.hearthNearby()?R.string.flask_hearth_rest_wait:R.string.flask_rest_wait_hint):flaskHintResource(state);
             if(reason!=0) {showBriefFlaskHint(reason,SystemClock.uptimeMillis());updateHealingFlaskHud(true);}
             return;
         }

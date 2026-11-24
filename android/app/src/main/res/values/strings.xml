@@ -386,6 +386,7 @@
     <string name="flask_pickup_lesson">Flask upgrade nearby.</string>
     <string name="flask_rest_wait_hint">At the basin: stand close and still, release guard and wait for dialogue to finish.</string>
     <string name="flask_hearth_rest">Rest by the hearth</string>
+    <string name="flask_hearth_rest_action">Rest</string>
     <string name="flask_hearth_rest_wait">At the hearth: stand close and still, release guard and wait for dialogue to finish.</string>
     <string name="flask_refilled_hint">Flask refilled.</string>
 </resources>
