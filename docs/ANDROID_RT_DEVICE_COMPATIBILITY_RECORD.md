@@ -4325,9 +4325,11 @@ Back from the report returned to the front menu. The next system Back produced
 the same confirmation. **Stay** preserved the front menu, and reopening the
 confirmation and tapping **Quit Demo** returned focus to Android. The local
 native report recorded `Integrity: COMPLETE`. The test exercised completion
-and dismissal through system Back. Cancellation, sharing review, repeated
-runs and background/resume remain separate device cases. The production app
-and its saves were untouched. [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+and dismissal through system Back. The next day's
+[entry-menu check](#24-november-2026--android-back-after-the-standard-benchmark)
+also covered cancellation, both sharing review forms, repeated runs and
+background/resume. The production app and its saves were untouched.
+[Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
 
 ### 23 November 2026 — Bellwether five-resident Shipping/Mobile round trip
 
@@ -4580,3 +4582,29 @@ cohort provides no handset gain to adopt. The 1.8 branch retains the
 original shader bank. Sustained ordinary campaign performance remains
 open. The receipts, raw timings and display samples are retained locally
 under `reports/horde-bellwether-binary-shadow-20261123-153321`.
+
+### 24 November 2026 — Android Back after the Standard benchmark
+
+**Evidence class — actual-device entry-menu navigation.** The Galaxy S26
+Ultra (SM-S948B, Android 17/API 37) ran the private Bellwether lanes
+ARM64 Debug APK from `c3073b2c`, installed SHA-256
+`48240f580c330bbb371d118be5a5e8614095a4a657e4ae9881d59886e92147e2`.
+The package includes the benchmark Back fix from `3caefd67`.
+
+System Back opened **Exit The Horde?** on the cold entry menu. Two
+Standard benchmark runs finished with `Integrity: COMPLETE`. Back
+returned from each completed report to the entry menu, and the next
+Back opened the normal exit confirmation. **Stay** returned to **Play**.
+Between the completed runs, Back cancelled an active Standard after
+it reached the 1280 × 720 benchmark output. The native surface restored
+to 1440 × 2971 and the entry menu again handled Back.
+
+Both the website and developer review forms returned to the report
+with system Back. The forms were opened for local review only. Android
+Home followed by launcher resume kept the completed report. **Quit
+Demo** returned focus to Android. Relaunching opened **Play**, and
+system Back again opened the working exit confirmation. The 32 focused
+host tests for benchmark menu ownership and report review also passed.
+The navigation log and installed-hash receipt are retained locally
+under `reports/horde-android-benchmark-back-20261124-111602`.
+[Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
