@@ -1562,6 +1562,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         simulation.zone);
+    snapshot.playerX = simulation.playerX;
+    snapshot.playerZ = simulation.playerZ;
+    snapshot.playerYawRadians = simulation.playerYawRadians;
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
     snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);

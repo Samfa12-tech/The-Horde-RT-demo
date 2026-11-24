@@ -5021,6 +5021,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
+    snapshot.playerX = simulation.playerX;
+    snapshot.playerZ = simulation.playerZ;
+    snapshot.playerYawRadians = simulation.playerYawRadians;
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
     snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(context.torchFailureSnapshot.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);

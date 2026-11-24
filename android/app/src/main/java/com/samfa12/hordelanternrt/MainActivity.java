@@ -587,6 +587,7 @@ public class MainActivity extends Activity {
     private String campaignDeathMessage;
     private volatile boolean campaignDestroyed;
     private String campaignTestNamespace, campaignLocalMessage;
+    private String lastCampaignTestPose = "";
     private int campaignMenuAction=CampaignMenuState.LOAD, campaignAction;
     private long campaignRequest, campaignAcknowledgedToken, campaignAcknowledgedGeneration;
     private long campaignRebaseAttemptToken, campaignRebaseAttemptGeneration, campaignRebaseAttemptRevision;
@@ -7173,6 +7174,18 @@ public class MainActivity extends Activity {
                 if (isDebuggableApp() && developerOverlayVisible && state == 1 &&
                         !menuVisible && !diagnosticsVisible && !benchmarkRunning) {
                     final String overlayText = ProbeBridge.getDeveloperOverlayText();
+                    if (campaignTestNamespace != null) {
+                        // Mirror the developer overlay into logcat for isolated touch walkthroughs.
+                        final int start = overlayText.indexOf("\nPOSE ");
+                        final int end = start < 0 ? -1 : overlayText.indexOf('\n', start + 1);
+                        if (end > start) {
+                            final String pose = overlayText.substring(start + 1, end);
+                            if (!pose.equals(lastCampaignTestPose)) {
+                                lastCampaignTestPose = pose;
+                                Log.d("HordeCampaignWalk", pose);
+                            }
+                        }
+                    }
                     developerOverlay.setText(overlayText);
                     developerOverlay.setVisibility(overlayText.isEmpty() ? View.GONE : View.VISIBLE);
                     developerOverlay.bringToFront();

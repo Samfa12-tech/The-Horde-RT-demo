@@ -40,6 +40,9 @@ int main()
     snapshot.selectedEnemy = "lich";
     snapshot.encounterPhase = "charging";
     snapshot.playerLifePhase = "dying";
+    snapshot.playerX = 82.25f;
+    snapshot.playerZ = -12.5f;
+    snapshot.playerYawRadians = 1.57f;
     snapshot.playerVitality = 0;
     snapshot.playerMaxVitality = 3;
     snapshot.playerDamageEnabled = false;
@@ -92,6 +95,7 @@ int main()
     ok &= RequireContains(text, "GPU RT 7.4 ms  |  avg 7.8 ms  |  120 samples");
     ok &= RequireContains(text, "SCENE finale  |  torch failure settled  |  lich charging hp 2");
     ok &= RequireContains(text, "PLAYER dying  |  vitality 0/3  |  damage OFF");
+    ok &= RequireContains(text, "POSE x 82.25 z -12.50 yaw 1.57 rad");
     ok &= RequireContains(text, "SIM 1 ticks  |  accum 2.5 ms  |  overruns 2");
     ok &= RequireContains(text, "EVENTS 3 queued / 7 high / 0 overflow  |  input 42  |  cmd 5/4/2/1");
     ok &= RequireContains(text, "AS 9 BLAS / 1 TLAS / 19 inst  |  skinned 2");
