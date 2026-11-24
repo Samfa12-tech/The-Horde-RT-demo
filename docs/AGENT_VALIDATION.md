@@ -203,6 +203,18 @@ campaign menu. Use Shipping/Mobile shaders for cross-platform acceptance.
 The unseeded New Game entry and seeded lookout walkthroughs establish separate
 evidence. Keep these packages and their private inputs in local storage.
 
+For an Android touch walkthrough from a seeded lookout, use the host test
+executable's `--export-lookout-fixture` with a fresh fixture directory. Import
+the exact `slot-1-auto.hrd` under `files/campaign-tests/<unique-name>` in the
+isolated Debug app. Launch with `--es campaign_test_namespace <unique-name>`
+and load the slot from the ordinary menu. The optional
+`--ez horde.debug.overlay true` shows the player's X/Z position and heading.
+With the test namespace and overlay active, `HordeCampaignWalk` in logcat
+mirrors changed poses from the simulation. This lets a touch walkthrough
+verify its route without authoring a forced camera path. Keep the seed hash,
+walkthrough captures and resulting autosave together, and use an unseeded
+entry separately when checking the full campaign.
+
 ## Android device evidence
 
 Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes when an authorised device is available. `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` explains checkpoints/replay; inspect the current runner rather than freezing old checkpoint counts into new instructions. Preserve coverage of the two-enemy encounter where the changed route requires it.
