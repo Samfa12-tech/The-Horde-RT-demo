@@ -116,6 +116,8 @@ This refinement does not reopen deferred renderer experiments or authorize relea
 
 **Approved scope and boundaries:** extend the same road from the 1.7 lookout into the same unwalled Bellwether. Keep the central tavern/well, northern church/active graveyard, western gardens, eastern river/mill, southeast smith and nearby starter-shrine spur. Selected interiors, a small cast, useful conversation/services and repeat returns make it a place worth visiting. The Veyrlands, Bellwether and King Veyr are approved names; unpulled-bell folklore is setting lore, not a promised supernatural bell system.
 
+The Android campaign now pauses for one short card before each opening combat lesson. Continue returns to the same encounter and the practice follows immediately. Skip practice uses the existing protected exit. Replaying the opening practice starts the lessons again. [Combat tutorial and subtitle follow-up](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
+
 The first working tavern service is [Rest by the hearth](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#rest-by-the-hearth), earned through the opening Talk. It reuses the existing flask recovery and tavern autosave. The service economy and Kit's recovery remain open.
 
 The [register reward](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#register-reward-and-coin-purse) introduces ordinary coin on the existing church route. The player collects it once after the reading, and Bellwether directions shows the saved purse. The three-coin amount is provisional for the private playtest.

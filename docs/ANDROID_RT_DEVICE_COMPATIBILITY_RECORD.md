@@ -4608,3 +4608,33 @@ host tests for benchmark menu ownership and report review also passed.
 The navigation log and installed-hash receipt are retained locally
 under `reports/horde-android-benchmark-back-20261124-111602`.
 [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
+### 24 November 2026 — Paused combat lessons in a new Android campaign
+
+**Evidence class — actual-device input and navigation through an ordinary
+New Game.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the private
+Bellwether ARM64 Debug APK from `cdc6991a`, installed SHA-256
+`4b20cd47c050b64122f77f07d1e265adeba323a4bb4dd3dd247417aaa6da63c6`.
+The app's report confirmed hardware RayTracingPipeline presentation at
+475 × 980 internal in the 1440 × 2971 surface.
+
+**Play → New game** selected an empty slot. Touch movement from the opening
+reached the waterfall arena and opened **Block an attack** in front of the
+two live guards. Pressing Android Back, swiping to move and tapping outside
+the card kept it visible. Screen captures before and after those inputs
+were pixel-identical. Android Home followed by launcher resume restored
+the Block card. **Continue** returned control to the protected practice.
+
+Holding Guard completed Block and opened **Parry a guard break**. After
+Continue, actual Guard taps completed Parry and opened **Dodge an
+unblockable strike**. **Skip practice** dismissed that card and let the
+practice exit return to live combat. Android Back then opened the ordinary
+pause menu. The native campaign, gameplay and simulation timing suites
+passed, including the regression for stale Continue and held or queued
+combat input. All 80 focused Android tests passed.
+
+Finishing Dodge and Attack from Guard, controller input and landscape on
+the physical phone, and the subtitle contrast review remain open. The
+navigation log, APK receipt and captures are retained locally under
+`reports/horde-android-combat-cards-20261124-113116`.
+[Issue #35](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
