@@ -117,6 +117,8 @@ Windows and Android use the same text. **Back to pause menu** keeps the game pau
 
 The expanded Windows campaign check passed 20 assertions on each hardware RT backend. It opened the directions at the tavern, shrine and church, then reloaded the earned tavern save and checked the same expedition leads. Ten Android menu tests covered the pause actions and stale UI, and the ARM64 Debug package contains the matching native text endpoint. Physical Android remains pending.
 
+The Windows pause panel now keeps the Back and Continue actions above the Directions text and gives the long page its own scroll area. The extracted private build from `719fc0a7` passed 82 native panel assertions, the 51-check RayTracingPipeline preparation route and the 26-check RayQueryCompute expedition route. The expedition check reopens the full page after a tavern reload and exercises keyboard, controller and wheel scrolling. A separate RayQueryCompute preparation retry stopped at the west resident handoff before it could reach the final page. The previous package at `c3073b2c` passed the full preparation route on both backends.
+
 ### Rest by the hearth
 
 After the first tavern Talk, the authored standing mark by the hearth offers deliberate Rest. Stand close and still with guard released, then use **Rest** on touch, **J** on a keyboard or **D-pad Down** on a controller. The existing two-second recovery restores the player's vitality and fills the flask to its current capacity. Pausing or leaving the action early preserves the old resources. When Rest changes those resources, the game autosaves at the same earned tavern checkpoint with the resolved conversation and existing progress.
