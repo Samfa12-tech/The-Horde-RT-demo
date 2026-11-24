@@ -53,7 +53,16 @@
     <string name="combat_teaching_skip">Skip practice</string>
     <string name="combat_teaching_finish">Finish practice</string>
     <string name="combat_teaching_replay">Replay opening practice</string>
-    <string name="combat_teaching_description">Practise blocking, parrying, dodging and attacking from guard without taking damage. Move and look stay live. Finish when ready, or skip or replay the opening practice here.</string>
+    <string name="combat_teaching_description">Read each lesson, then continue to practise blocking, parrying, dodging and attacking from guard without taking damage. Finish when ready, or skip or replay the opening practice here.</string>
+    <string name="combat_card_block_title">Block an attack</string>
+    <string name="combat_card_block_body">Face the skeleton and hold Guard as its strike lands.</string>
+    <string name="combat_card_parry_title">Parry a guard break</string>
+    <string name="combat_card_parry_body">Watch for the yellow warning. Tap Guard just before the strike lands.</string>
+    <string name="combat_card_dodge_title">Dodge an unblockable strike</string>
+    <string name="combat_card_dodge_body">When the warning is red, move clear with Dodge as the skeleton swings.</string>
+    <string name="combat_card_attack_title">Attack from guard</string>
+    <string name="combat_card_attack_body">Keep holding Guard and press Attack when the skeleton is close.</string>
+    <string name="combat_card_continue">Continue</string>
     <string name="interact">INTERACT</string>
     <string name="chest_locked_until_lich_defeated">LOCKED\nSLAY LICH</string>
     <string name="open_chest">OPEN CHEST</string>

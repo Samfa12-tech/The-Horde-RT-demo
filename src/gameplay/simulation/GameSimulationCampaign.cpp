@@ -482,6 +482,7 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     config.developmentWorldRoute=false;config.developmentSupportFixture=false;
     config.swordStartsStowed=c.swordStowed;
     GameSimulation next(config);
+    next.combatTeachingCardSerial_ = combatTeachingCardSerial_;
     next.worldRoute_.generation=token.worldGeneration;
     next.worldRoute_.current=c.zone;
     next.chapterTerrain_=std::move(terrain);next.chapterTerrainGeneration_=token.worldGeneration;

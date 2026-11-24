@@ -303,6 +303,9 @@ public class MainActivity extends Activity {
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
     private TextView combatTeachingPrompt;
+    private AlertDialog combatTeachingCardDialog;
+    private long combatTeachingCardToken;
+    private long respondedCombatTeachingCard;
     private FrameLayout appRoot;
     private LinearLayout chapterSubtitlePanel;
     private ScrollView chapterSubtitleScroll;
@@ -1383,6 +1386,8 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        dismissCombatTeachingCard();
+        respondedCombatTeachingCard = 0;
         stopPrivateLichRevivalAudio();
         cancelOpeningBenchmarkRequest();
         stopChapterAmbience();
@@ -4146,9 +4151,67 @@ public class MainActivity extends Activity {
         ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
     }
 
+    private void syncCombatTeachingCard(int surfaceState, boolean cardPending) {
+        final boolean playing = resumed && surfaceStarted && surfaceState == 1 &&
+                !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+                !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
+                !deathOverlayVisible && !endingOverlayVisible;
+        if (!playing) {
+            dismissCombatTeachingCard();
+            return;
+        }
+        final long token = cardPending ? ProbeBridge.getCombatTeachingCard() : 0;
+        if (token == 0) respondedCombatTeachingCard = 0;
+        if (combatTeachingCardToken == token) return;
+        dismissCombatTeachingCard();
+        combatTeachingCardToken = token;
+        if (token == 0 || token == respondedCombatTeachingCard) return;
+
+        final int title;
+        final int body;
+        switch ((int) (token & 7)) {
+            case 4: title = R.string.combat_card_block_title; body = R.string.combat_card_block_body; break;
+            case 0: title = R.string.combat_card_parry_title; body = R.string.combat_card_parry_body; break;
+            case 1: title = R.string.combat_card_dodge_title; body = R.string.combat_card_dodge_body; break;
+            case 5: title = R.string.combat_card_attack_title; body = R.string.combat_card_attack_body; break;
+            default: return;
+        }
+        clearTouchState();
+        clearCombatTeachingPrompt();
+        final long surfaceGeneration = surfaceRequestGeneration;
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title).setMessage(body).setCancelable(false)
+                .setPositiveButton(R.string.combat_card_continue,
+                        (owner, which) -> respondToCombatTeachingCard(token, surfaceGeneration, false))
+                .setNegativeButton(R.string.combat_teaching_skip,
+                        (owner, which) -> respondToCombatTeachingCard(token, surfaceGeneration, true))
+                .create();
+        combatTeachingCardDialog = dialog;
+        dialog.show();
+        installControllerDialog(dialog);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).requestFocus();
+    }
+
+    private void respondToCombatTeachingCard(long token, long surfaceGeneration, boolean skip) {
+        if (!resumed || surfaceRequestGeneration != surfaceGeneration ||
+                combatTeachingCardToken != token || ProbeBridge.getCombatTeachingCard() != token) return;
+        clearTouchState();
+        if (ProbeBridge.respondToCombatTeachingCard(token, skip)) respondedCombatTeachingCard = token;
+        else dismissCombatTeachingCard();
+    }
+
+    private void dismissCombatTeachingCard() {
+        combatTeachingCardToken = 0;
+        if (combatTeachingCardDialog != null) {
+            combatTeachingCardDialog.dismiss();
+            combatTeachingCardDialog = null;
+        }
+    }
+
     private boolean updateCombatTeachingPrompt(int surfaceState) {
         if (combatTeachingPrompt == null) return false;
         final long packed = ProbeBridge.getCombatTeachingState();
+        syncCombatTeachingCard(surfaceState, (packed & (1L << 59)) != 0);
         final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
         final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
         final boolean practiceCue=CombatTeachingPreferences.safePractice(packed) && !CombatTeachingPreferences.lessonSuppressed(packed);
@@ -4161,6 +4224,7 @@ public class MainActivity extends Activity {
         combatAttackCueVisible = attackCue;
         combatPracticeCueVisible = practiceCue;
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
+                combatTeachingCardToken == 0 &&
                 preferences.getBoolean("show_hud", true) &&
                 !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
                 !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
@@ -8753,6 +8817,7 @@ public class MainActivity extends Activity {
             ControllerNavigation.ensureFocus(ui);
             if ((result.actions & AndroidControllerInput.CANCEL)!=0 ||
                     (result.actions & AndroidControllerInput.PAUSE)!=0) {
+                if (controllerDialog != null && controllerDialog == combatTeachingCardDialog) return;
                 if(controllerDialog!=null && controllerDialog.isShowing())controllerDialog.cancel();
                 else onBackPressed();
             } else {
@@ -9013,7 +9078,8 @@ public class MainActivity extends Activity {
 
     private boolean canSendGameplayAction() {
         return !menuVisible && !diagnosticsVisible && !deathOverlayVisible && !endingOverlayVisible &&
-                !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
+                !benchmarkRunning && combatTeachingCardToken == 0 &&
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
         keyboardFlaskBlocked|=keyboardFlaskHeld;keyboardFlaskHeld=0;
@@ -9625,6 +9691,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        dismissCombatTeachingCard();
         if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.interrupt();
         if (compatibilityReportDialog != null) compatibilityReportDialog.interruptSubmission();
         if (environmentSurveyMode) {

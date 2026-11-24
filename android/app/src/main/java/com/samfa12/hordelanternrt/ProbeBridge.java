@@ -85,6 +85,8 @@ public final class ProbeBridge {
     public static native void requestChapterDialogueSkip();
     /** Packed immutable teaching snapshot published by the simulation owner. */
     public static native long getCombatTeachingState();
+    public static native long getCombatTeachingCard();
+    public static native boolean respondToCombatTeachingCard(long token, boolean skip);
     /** Current shared envelope only; no Java duck clock or gameplay mutation. */
     public static native float getSfxDialogueBedGain();
     public static native void requestInteract();

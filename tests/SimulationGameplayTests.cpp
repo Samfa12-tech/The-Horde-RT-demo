@@ -1957,6 +1957,73 @@ int main()
           "live ResetRoute must restore the pair and override checkpoint pose with configured yaw and pitch");
 
     auto waterfallConfig = ProductionGameSimulationConfig();
+    {
+        auto cardConfig = waterfallConfig;
+        cardConfig.swordStartsStowed = false;
+        cardConfig.playerStartX = kWaterfallSkeletonPairCenter.x + 1.25f;
+        cardConfig.playerStartZ = kWaterfallSkeletonPairCenter.z;
+        auto teaching = std::make_unique<GameSimulation>(cardConfig);
+        InputSnapshot input;
+        input.tutorialCardsEnabled = true;
+        teaching->AdvanceFrame(input, 0.1);
+        const auto token = teaching->Snapshot().combatTeaching.cardToken;
+        const auto tick = teaching->Snapshot().tickIndex;
+        const auto enemyTime = teaching->Snapshot().skeletonEnemies[0].animationTime;
+        check(token != 0 && (token & 7u) == static_cast<unsigned>(TutorialStage::Block),
+              "ordinary opening practice issues a Block card before stepping the fight");
+
+        input.tutorialCardResponse = token + 8u;
+        ++input.tutorialCardResponseSequence;
+        input.commands.attack = input.commands.parry = input.commands.dodge = 1;
+        input.moveForward = 1.f;
+        input.attackHeld = input.guardHeld = true;
+        teaching->AdvanceFrame(input, 0.1);
+        check(teaching->Snapshot().combatTeaching.cardToken == token &&
+              teaching->Snapshot().tickIndex == tick &&
+              teaching->Snapshot().skeletonEnemies[0].animationTime == enemyTime,
+              "movement, combat and a stale response cannot advance a pending card");
+
+        input.tutorialCardResponse = token;
+        ++input.tutorialCardResponseSequence;
+        input.paused = true;
+        teaching->AdvanceFrame(input, 0.1);
+        check(teaching->Snapshot().combatTeaching.cardToken == token,
+              "lifecycle or menu pause owns the pending teaching card");
+        input.paused = false;
+        teaching->AdvanceFrame(input, 0.1);
+        check(teaching->Snapshot().combatTeaching.cardToken == 0 &&
+              teaching->AdvanceFrame(input, 0.1) == 0,
+              "Continue consumes the card but held controls keep gameplay suspended");
+        input.moveForward = 0.f;
+        input.attackHeld = input.guardHeld = false;
+        check(teaching->AdvanceFrame(input, 0.1) == 0 &&
+              teaching->AdvanceFrame(input, 1.0 / 60.0) == 1 &&
+              teaching->Snapshot().combatTeaching.cardToken == 0 &&
+              teaching->Snapshot().playerCombat.action == PlayerCombatAction::Idle &&
+              teaching->Snapshot().lastConsumedAttackSequence == input.commands.attack &&
+              !teaching->Snapshot().dodgeActive,
+              "neutral release resumes the same lesson without replaying queued combat");
+
+        input.commands.tutorialReplay = 1;
+        teaching->AdvanceFrame(input, 0.1);
+        input.hasAuthoritativePlayerPose = true;
+        input.authoritativePlayerX = cardConfig.playerStartX;
+        input.authoritativePlayerZ = cardConfig.playerStartZ;
+        teaching->AdvanceFrame(input, 0.1);
+        const auto replayToken = teaching->Snapshot().combatTeaching.cardToken;
+        check(replayToken != 0 && replayToken != token,
+              "explicit replay reissues the lesson under a fresh card identity");
+        input.hasAuthoritativePlayerPose = false;
+        input.tutorialCardResponse = replayToken | kSkipCombatTeachingCard;
+        ++input.tutorialCardResponseSequence;
+        teaching->AdvanceFrame(input, 0.1);
+        teaching->AdvanceFrame(input, 0.1);
+        teaching->AdvanceFrame(input, 1.0 / 60.0);
+        check(teaching->Snapshot().combatTeaching.cardToken == 0 &&
+              (teaching->Snapshot().combatTeaching.exitPending ||
+               teaching->Snapshot().combatTeaching.stage == TutorialStage::Skipped),
+              "Skip leaves the existing protected practice exit in charge");
+    }
     auto waterfallEncounter = std::make_unique<GameSimulation>(waterfallConfig);
     const auto& stagedPair = waterfallEncounter->Snapshot().skeletonEnemies;
     check(ProductionGameSimulationConfig().swordStartsStowed == true &&

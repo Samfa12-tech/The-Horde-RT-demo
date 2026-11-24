@@ -253,6 +253,8 @@ private:
                        bool activateTimestampedEdges = true);
     static EntityId EntityForEnemy(EnemyKind kind);
     void IngestCommands(const InputSnapshot& input, bool ingestCombatEdges = true);
+    bool HoldForCombatTeachingCard(const InputSnapshot& input, bool acceptResponse);
+    void DiscardCombatTeachingCardInput(const InputSnapshot& input);
     void ScheduleTimestampedCombatEdges(const InputSnapshot& input,
                                         double frameDeltaSeconds,
                                         std::uint64_t ownerAdvanceSteadyNs,
@@ -390,6 +392,12 @@ private:
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
     CombatTeaching combatTeaching_{};
+    std::uint64_t combatTeachingCardToken_ = 0;
+    std::uint64_t combatTeachingCardSerial_ = 0;
+    std::uint64_t combatTeachingCardGeneration_ = 0;
+    std::uint64_t combatTeachingCardResponseFloor_ = 0;
+    std::uint8_t acknowledgedTeachingCards_ = 0;
+    bool combatTeachingCardAwaitingRelease_ = false;
     SkeletonRevivalBridge skeletonRevival_{};
     std::uint64_t skeletonRevivalResourceGeneration_ = 0;
     float skeletonRevivalDeadDurationSeconds_ = 0.0f;

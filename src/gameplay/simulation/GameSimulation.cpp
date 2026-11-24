@@ -167,11 +167,12 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
                                            std::uint64_t ownerAdvanceSteadyNs)
 {
     const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
+    const bool teachingCardHold = HoldForCombatTeachingCard(input, true);
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
     if(input.paused) { chapterDialogue_.Pause(); chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip); }
     const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
-    combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
+    if (!teachingCardHold) combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
@@ -202,6 +203,16 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         snapshot_.simulationTicksThisFrame = 0u;
         snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
         snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
+        return 0u;
+    }
+    if (teachingCardHold)
+    {
+        DiscardCombatTeachingCardInput(input);
+        lastInput_.paused = true;
+        fixedStepRunner_.ResetAccumulator();
+        RefreshSnapshot(lastInput_);
+        snapshot_.simulationTicksThisFrame = 0u;
+        snapshot_.fixedStepAccumulatorSeconds = 0.0;
         return 0u;
     }
     if (input.paused)
@@ -250,6 +261,11 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         [this, &input, inputPublicationSequence](float fixedDeltaSeconds)
         {
             StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
+            if (input.tutorialCardsEnabled && HoldForCombatTeachingCard(input, false))
+            {
+                DiscardCombatTeachingCardInput(input);
+                fixedStepRunner_.ResetAccumulator();
+            }
         });
     // Ticked frames already resolved the final pose. Refresh only when a
     // zero-tick frame ages or cancels an existing presentation envelope.
@@ -269,6 +285,80 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         ? events_.Size() - eventsBeforeFrame
         : 0u;
     return ticks;
+}
+
+bool GameSimulation::HoldForCombatTeachingCard(const InputSnapshot& input, bool acceptResponse)
+{
+    const auto& teaching = combatTeaching_.Snapshot();
+    if (teaching.generation != combatTeachingCardGeneration_)
+    {
+        combatTeachingCardGeneration_ = teaching.generation;
+        combatTeachingCardToken_ = 0;
+        acknowledgedTeachingCards_ = 0;
+        combatTeachingCardAwaitingRelease_ = false;
+    }
+    if (combatTeachingCardAwaitingRelease_ && input.tutorialCardsEnabled)
+    {
+        if (acceptResponse && !input.paused && input.moveForward == 0.f && input.moveStrafe == 0.f &&
+            !input.attackHeld && !input.guardHeld && !input.runHeld && !input.crouchHeld)
+            combatTeachingCardAwaitingRelease_ = false;
+        return true;
+    }
+    combatTeachingCardAwaitingRelease_ = false;
+    const bool eligible = input.tutorialCardsEnabled && input.tutorialEnabled &&
+        config_.sequentialPractice1_7 && config_.waterfallSkeletonEncounter &&
+        CurrentCombatRules() && !teaching.exitPending && HasCombatTeachingCard(teaching.stage) &&
+        activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.aliveCount > 0 &&
+        playerVitals_.Snapshot().phase == PlayerLifePhase::Alive &&
+        SwordDefenseReady() && IsWaterfallSkeletonArena(playerX_, playerZ_);
+    if (!eligible)
+    {
+        combatTeachingCardToken_ = 0;
+        return false;
+    }
+    const auto stage = static_cast<std::uint8_t>(teaching.stage);
+    const auto stageMask = static_cast<std::uint8_t>(1u << stage);
+    if (combatTeachingCardToken_ == 0 && !input.paused && !(acknowledgedTeachingCards_ & stageMask))
+    {
+        combatTeachingCardToken_ = (++combatTeachingCardSerial_ << 3) | stage;
+        combatTeachingCardResponseFloor_ = input.tutorialCardResponseSequence;
+    }
+    if (combatTeachingCardToken_ == 0) return false;
+    if (acceptResponse && !input.paused &&
+        input.tutorialCardResponseSequence > combatTeachingCardResponseFloor_ &&
+        (input.tutorialCardResponse & ~kSkipCombatTeachingCard) == combatTeachingCardToken_)
+    {
+        acknowledgedTeachingCards_ |= stageMask;
+        combatTeachingCardToken_ = 0;
+        combatTeachingCardAwaitingRelease_ = true;
+        if (input.tutorialCardResponse & kSkipCombatTeachingCard) combatTeaching_.Skip();
+    }
+    return true;
+}
+
+void GameSimulation::DiscardCombatTeachingCardInput(const InputSnapshot& input)
+{
+    // Flush edge commands without altering encounter, defense or animation clocks.
+    const auto parrySource = parrySourceCommandSequence_;
+    ClearScheduledCombatEdges(true);
+    parrySourceCommandSequence_ = parrySource;
+    lastConsumedAttackSequence_ = latestAttackSequence_;
+    lastConsumedParrySequence_ = latestParrySequence_;
+    lastConsumedDodgeSequence_ = latestDodgeSequence_;
+    lastConsumedInteractSequence_ = latestInteractSequence_;
+    lastConsumedToggleHeldLightPoseSequence_ = latestToggleHeldLightPoseSequence_;
+    lastConsumedRunToggleSequence_ = latestRunToggleSequence_;
+    lastConsumedClearRunIntentSequence_ = latestClearRunIntentSequence_;
+    lastConsumedCrouchToggleSequence_ = latestCrouchToggleSequence_;
+    lastConsumedClearCrouchIntentSequence_ = latestClearCrouchIntentSequence_;
+    lastConsumedDrinkFlaskSequence_ = latestDrinkFlaskSequence_;
+    lastConsumedRestSequence_ = latestRestSequence_;
+    pendingAttackCommands_ = pendingParryCommands_ = pendingDodgeCommands_ = 0u;
+    pendingInteractCommands_ = pendingToggleHeldLightPoseCommands_ = 0u;
+    pendingRunToggleCommands_ = pendingClearRunIntentCommands_ = 0u;
+    pendingCrouchToggleCommands_ = pendingClearCrouchIntentCommands_ = 0u;
+    pendingDrinkFlaskCommands_ = pendingRestCommands_ = 0u;
+    chapterSkipFloor_ = std::max(chapterSkipFloor_, input.commands.dialogueSkip);
 }
 
 void GameSimulation::StepFixed(const InputSnapshot& publishedInput,
@@ -3641,6 +3731,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.combatTeaching.cardToken = combatTeachingCardGeneration_ == snapshot_.combatTeaching.generation &&
+        !snapshot_.combatTeaching.exitPending ? combatTeachingCardToken_ : 0u;
     snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
     snapshot_.combatTeaching.naturalContinuation = config_.naturalPracticeRevival1_7 && UsesSkeletonRevival();
     snapshot_.combatTeaching.continuationPhase = static_cast<std::uint8_t>(skeletonRevival_.Snapshot().phase);

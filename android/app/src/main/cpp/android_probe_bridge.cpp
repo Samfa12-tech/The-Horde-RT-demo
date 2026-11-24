@@ -1004,6 +1004,7 @@ std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndi
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
+std::atomic<std::uint64_t> gCombatTeachingCard{0u};
 std::atomic<float> gSfxDialogueBedGain{1.f};
 std::mutex gChapterDialogueUiMutex;
 horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
@@ -1256,10 +1257,12 @@ void PublishSimulationUiState()
         ((static_cast<std::uint64_t>(teaching.continuationPhase)&7u) << 36u) |
         (static_cast<std::uint64_t>(teaching.naturalContinuation) << 39u) |
         (static_cast<std::uint64_t>(teaching.liveFightNotice) << 58u) |
+        (static_cast<std::uint64_t>(teaching.cardToken != 0) << 59u) |
         ((static_cast<std::uint64_t>(std::clamp(simulation.swordSheathHoldProgress,0.f,1.f)*100.f)&0x7fu) << 50u) |
         (static_cast<std::uint64_t>(simulation.swordIntentionallyStowed) << 57u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
+    gCombatTeachingCard.store(teaching.cardToken, std::memory_order_release);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
@@ -5079,6 +5082,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             else if (!worldCommandsDeferred && !inAppBenchmarkFrame && !context.routeReplayActive)
             {
                 simulationInput.hasAuthoritativePlayerPose = false;
+                simulationInput.tutorialCardsEnabled = context.developmentRescueJourney &&
+                    context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+                    !context.environmentSurvey;
                 const double rawInputDeltaSeconds = context.lastInputOwnerSteadyNs != 0u &&
                     inputOwnerSteadyNs >= context.lastInputOwnerSteadyNs
                     ? static_cast<double>(inputOwnerSteadyNs - context.lastInputOwnerSteadyNs) * 1.0e-9
@@ -7525,6 +7531,29 @@ extern "C" JNIEXPORT jlong JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingState(JNIEnv*, jclass)
 {
     return static_cast<jlong>(gCombatTeachingUiState.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingCard(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gCombatTeachingCard.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_respondToCombatTeachingCard(
+    JNIEnv*, jclass, jlong token, jboolean skip)
+{
+    if (token <= 0) return JNI_FALSE;
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    const auto id = static_cast<std::uint64_t>(token);
+    if (gInputPublisherState.paused || id != gCombatTeachingCard.load(std::memory_order_acquire))
+        return JNI_FALSE;
+    if (gInputPublisherState.tutorialCardResponseSequence == UINT64_MAX) return JNI_FALSE;
+    gInputPublisherState.tutorialCardResponse = id |
+        (skip == JNI_TRUE ? horde::gameplay::simulation::kSkipCombatTeachingCard : 0u);
+    ++gInputPublisherState.tutorialCardResponseSequence;
+    PublishInputLocked();
+    return JNI_TRUE;
 }
 
 extern "C" JNIEXPORT jlongArray JNICALL
