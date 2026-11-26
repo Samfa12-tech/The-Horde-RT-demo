@@ -324,6 +324,16 @@ int main(int argc,char** argv) {
             };
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");
+            for (float offset : {-.45f,.45f}) {
+                const BellwetherStation foot{82.3f+offset,131.7f};
+                const BellwetherStation door{82.3f+offset,119.2f};
+                check(follow(foot,door) && follow(door,foot),
+                      "both sides of the dressed tavern approach remain walkable in both directions");
+            }
+            const auto& porchLight=kSquarePorchLampLight;
+            check(support->NonWalkableVolumeClear(porchLight[0],porchLight[2],84.66f,120.44f,
+                        porchLight[1]-.02f,porchLight[1],.014f),
+                  "the suspended lamp has a clear path to the tankard relief");
             const auto& garden=kBellwetherGardenApproach;
             const auto stall=kBellwetherWestApproach[1];
             check(follow(stall,garden[0]) && follow(garden[0],garden[1]) && follow(garden[1],garden.back()) &&
@@ -399,9 +409,9 @@ int main(int argc,char** argv) {
             using horde::gameplay::effects::SelectBellwetherExteriorLamp;
             const auto& wick=kBellwetherSmithLampLight;
             check(SelectBellwetherExteriorLamp(wick[0],wick[2])==4 &&
-                  SelectBellwetherExteriorLamp(square.x,square.z)==2 &&
+                  SelectBellwetherExteriorLamp(square.x,square.z)==7 &&
                   SelectBellwetherExteriorLamp(kRelicStallLampLight[0],kRelicStallLampLight[2])==3,
-                  "the smith wick shares the exterior light slot with the preserved square and west-lane choices");
+                  "the smith, tavern porch and west stall each light their own approach");
             const auto anvil=smithStation(kBellwetherSmithAnvilXZ);
             const auto floor=support->Query(anvil.x,anvil.z);
             check(floor.found && floor.walkable &&

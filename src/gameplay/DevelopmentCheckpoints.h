@@ -98,7 +98,7 @@ inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
         checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 145u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 146u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -219,6 +219,11 @@ inline constexpr std::array<DevelopmentCheckpoint, 145u> kDevelopmentCheckpoints
     {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
+    {.id=350,.name="bellwether-square-frontage",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherWestJunction].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherWestJunction].z,
+     .yaw=-.35f,.pitch=.02f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherWestJunction+1},
     {.id=320,.name="bellwether-south-approach",.baseShowcaseCheckpointId=11,
      .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].x,
      .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].z,

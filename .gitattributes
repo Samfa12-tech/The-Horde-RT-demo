@@ -568,3 +568,6 @@ assets/audio/bellwether-mill/asset.manifest.json text eol=lf
 tools/author-bellwether-paths.py text eol=lf
 assets/models/world/source/bellwether-paths-v1/*.json text eol=lf
 assets/models/world/source/bellwether-paths-v1/geometry.generated.h text eol=lf
+tools/author-bellwether-square-frontage.py text eol=lf
+assets/models/world/source/bellwether-square-frontage-v1/authoring-receipt.json text eol=lf
+assets/models/world/source/bellwether-square-frontage-v1/geometry.generated.h text eol=lf

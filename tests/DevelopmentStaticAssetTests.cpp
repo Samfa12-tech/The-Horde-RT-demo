@@ -69,7 +69,9 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 131u &&
+    Check(kDevelopmentCheckpoints.size() == 146u &&
+          FindDevelopmentCheckpoint("bellwether-square-frontage") != nullptr &&
+          FindShowcaseCheckpoint("bellwether-square-frontage") == nullptr &&
           FindShowcaseCheckpoint("bellwether-keeper-reply") == nullptr &&
           FindShowcaseCheckpoint("bellwether-staffed-room") == nullptr &&
           FindShowcaseCheckpoint("bellwether-kit-lantern-glance") == nullptr &&
@@ -419,8 +421,9 @@ int main()
         }
     }
     for (const auto& capture : kDevelopmentCheckpoints)
-        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) || (capture.id >= 180 && capture.id <= 183)),
-              "only explicit upper/lower level inspection views declare cropped primary arms");
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) ||
+              (capture.id >= 180 && capture.id <= 183) || capture.id == 346 || capture.id == 348),
+              "only the designated inspection and close resident views declare cropped primary arms");
     Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&

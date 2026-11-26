@@ -8,6 +8,7 @@
 
 #include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-mill-lamp-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-square-frontage-v1/geometry.generated.h"
 
 namespace horde::gameplay::effects
 {
@@ -18,6 +19,7 @@ inline constexpr std::uint32_t kBellwetherRelicStallLampEmitterId=0x42303153u;
 inline constexpr std::uint32_t kBellwetherSmithLampEmitterId=0x4230364cu;
 inline constexpr std::uint32_t kBellwetherGrateLampEmitterId=0x4230324cu;
 inline constexpr std::uint32_t kBellwetherMillBenchLampEmitterId=0x4230354cu;
+inline constexpr std::uint32_t kBellwetherPorchLampEmitterId=0x42303150u;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -154,6 +156,16 @@ inline FireEmitterFixedStepInput BellwetherMillBenchLampFireInput()
     return BellwetherFireInput(bellwether::kMillBenchLampFlame,bellwether::kMillBenchLampLight,.88f);
 }
 
+inline FireEmitterState MakeBellwetherPorchLampFireEmitter()
+{
+    auto emitter=MakeBellwetherRiverForkLampFireEmitter();
+    emitter.stableId=kBellwetherPorchLampEmitterId;
+    emitter.seed=0x504f5243u;
+    emitter.radius=.065f;
+    emitter.height=.17f;
+    return emitter;
+}
+
 inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noexcept
 {
     struct LampZone {
@@ -166,6 +178,7 @@ inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noex
         LampZone{bellwether::kBellwetherSmithLampLight,12.f,4},
         LampZone{bellwether::kBellwetherGrateLampLight,8.f,5},
         LampZone{bellwether::kMillBenchLampLight,6.25f,6},
+        LampZone{bellwether::kSquarePorchLampLight,12.5f,7},
     };
     float nearest=std::numeric_limits<float>::max();
     std::size_t slot=2; // River fork is the existing exterior default.

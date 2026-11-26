@@ -7530,6 +7530,7 @@ public class MainActivity extends Activity {
             case "bellwether-west-roundtrip-measurement":
                 return hasBellwetherWestRoundTrip() ? 349 : -1;
             case "bellwether-wayside-archive": return 331;
+            case "bellwether-square-frontage": return 350;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
             case "bellwether-church-approach": return 334;

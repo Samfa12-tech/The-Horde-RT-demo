@@ -1203,3 +1203,11 @@ approved 4 November review reels, and the 29 October Relic dealer trade
 audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
 of the archived takes. Private build admission keeps their stable line IDs
 and existing captions. Public distribution clearance remains open.
+
+## Bellwether square and tavern frontage - 26 November 2026
+
+Samfa12/Codex authored the water bench, fetching vessels, tiled entrance
+hood, tankard sign, oil cup and split-wood rack for Horde in Blender. They
+use the existing town stone, clay, timber and char material rows. The
+[editable source and recipe](assets/models/world/source/bellwether-square-frontage-v1/README.md)
+record the derivation from the mapped town and terrain.
