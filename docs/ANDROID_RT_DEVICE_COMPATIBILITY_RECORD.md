@@ -4749,3 +4749,52 @@ Sustained ordinary-play performance and the backend choice remain open.
 The subsequent APK and save hash checks matched. Backend comparison receipts
 and raw captures are retained locally under
 `reports/horde-android-hearth-backend-cohort-20261124-121429`.
+
+### 26 November 2026 — Bellwether wayside archive and register on Android
+
+**Evidence class — ordinary campaign menus and touchscreen input from an
+earned tavern save.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37)
+used the private ARM64 Debug APK from `d01e482b505c14a939b8072486d0db75213152b0`,
+installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`.
+The test used an isolated copy of the tavern autosave. At the shrine, the
+native report joined a completed GPU interval to successful hardware
+RayTracingPipeline presentation at 475 × 980 internal and 1440 × 2971 output.
+
+On 24 November, **Play → Continue** loaded the completed Talk and Rest
+checkpoint. The player walked through the south tavern door to the church,
+saw **Show the road mark** at the record keeper, then took the marked spur
+to the wayside archive. A straight swipe reached the edge of the church
+waymarker and stopped at x 34.29, z 81.27. Walking north around the marker
+rejoined the church lane. The kept capture records the approach friction.
+
+**Inspect archive** displayed the lantern's hinge hint. **Open lower
+stone** opened the stone and displayed three named lantern captions in order,
+from the identity claim through Veyr's request to find the seals. At this
+point the autosave held the open archive, the revealed lantern and an
+uncollected register. It preserved the tavern position, three hearts,
+two flask charges and all three finished tavern lines.
+
+On 26 November, a fresh process used **Play → Continue** to load those
+same save bytes at the hearth. The player walked back to the shrine past
+the north side of the waymarker. The open niche offered **Take the road
+register**. Pickup wrote a separate recovered state at the same tavern
+anchor and displayed the instruction to bring the register back.
+
+The player walked back to the church and selected **Show the road
+register**. Captures show the named record keeper describing the Abbey,
+Foundry and still-sealed Glass Court, then confirming that the first two
+leads can be taken in either order. The reading saved the interpreted
+state with an empty purse. **Collect register reward** saved three coins.
+The next interaction recalled the routes and preserved the rewarded save
+byte for byte. The pause directions listed both leads and the three coins.
+**Pause → Load checkpoint** returned to the original hearth position and
+preserved the rewarded save bytes. The final on-device hashes matched both
+the restored test save and the untouched source save. The restored hearth
+again presented through RayTracingPipeline. This walkthrough covers
+movement, captions and save behavior through the reward. Listening,
+the later exchange with Kit and sustained play need separate checks.
+
+The touchscreen trace, screenshots, exact APK receipt and decoded saves
+are retained locally under
+`reports/horde-android-register-walk-20261124-122154`.
