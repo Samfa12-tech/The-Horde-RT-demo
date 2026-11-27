@@ -1738,8 +1738,35 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const bool presented=facing && ctx.rtScene.HasUploadedFireEmitters() &&
                             std::find(lights.begin(),lights.end(),horde::gameplay::effects::kSquareWaymarkerLampEmitterId)!=lights.end() &&
                             capture("windows-combined-square-waymarker.png",true,true);
+                        const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        const auto purse = state.treasurePurse;
+                        const auto lineGeneration = state.chapterDialogue.generation;
+                        const auto subtitles = ctx.subtitlesEnabled;
+                        ctx.subtitlesEnabled = false;
+                        const auto controlText = [&](int control, std::string_view expected) {
+                            std::array<char, 512> text{};
+                            const HWND widget = GetDlgItem(ctx.windowHandle, control);
+                            return (GetWindowLongPtrA(widget, GWL_STYLE) & WS_VISIBLE) &&
+                                GetWindowTextA(widget, text.data(), static_cast<int>(text.size())) > 0 &&
+                                expected == text.data();
+                        };
+                        const bool readOnFoot = presented && state.squareWaymarkerReadable &&
+                            controlText(kChestPromptControlId, "LEFT-CLICK / A TO READ THE FINGERPOST") &&
+                            interact() && frame() && state.squareWaymarkerTextVisible &&
+                            controlText(kChapterSubtitleId, campaign::kSquareFingerpostInscription) &&
+                            controlText(kChestPromptControlId, "LEFT-CLICK / A TO FINISH READING") &&
+                            state.chapterDialogue.line == Line::None &&
+                            interact() && frame() && !state.squareWaymarkerTextVisible &&
+                            !(GetWindowLongPtrA(GetDlgItem(ctx.windowHandle, kChapterSubtitleId), GWL_STYLE) & WS_VISIBLE) &&
+                            interact() && frame() && state.squareWaymarkerTextVisible &&
+                            face(2.f * state.playerX - kSquareWaymarkerPost[0],
+                                 2.f * state.playerZ - kSquareWaymarkerPost[2]) &&
+                            !state.squareWaymarkerReadable && !state.squareWaymarkerTextVisible &&
+                            state.chapterDialogue.generation == lineGeneration &&
+                            ctx.simulation.CampaignBoundaryRevision() == boundary && state.treasurePurse == purse;
+                        ctx.subtitlesEnabled = subtitles;
                         input.pitchRadians=previousPitch;
-                        return presented &&
+                        return readOnFoot &&
                             readDirections(campaign::PauseObjective::BellwetherShrine,"Anvil - southeast to the smith yard.") &&
                             walkTo(*square);
                     };
@@ -1941,7 +1968,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
-                        check(presentSquareWaymarker() && fork(), "the player can read the square fingerpost from the lane and return to the tavern junction") &&
+                        check(presentSquareWaymarker() && fork(), "the square fingerpost can be read, dismissed and reread on foot with speech subtitles off, then cleared by looking away") &&
                         check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&

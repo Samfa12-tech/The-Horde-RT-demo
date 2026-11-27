@@ -66,6 +66,20 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
+    public void fingerpostUsesFreeOptionalActionDetailWithoutReplacingKitTopic() {
+        final int fingerpost = (1 << 31) | (7 << 25) | 1;
+        final int finish = fingerpost | (1 << 28);
+        assertEquals(R.string.read_fingerpost, MainActivity.contextualInteractLabel(fingerpost));
+        assertEquals("Read fingerpost", MainActivity.contextualInteractText(
+                RuntimeEnvironment.getApplication(), fingerpost));
+        assertEquals(R.string.finish_reading_fingerpost, MainActivity.contextualInteractLabel(finish));
+        assertEquals("Finish reading", MainActivity.contextualInteractText(
+                RuntimeEnvironment.getApplication(), finish));
+        assertEquals(R.string.ask_kit_about_treasure,
+                MainActivity.contextualInteractLabel((1 << 31) | (6 << 25) | 1));
+    }
+
+    @Test
     public void tallyActionsUseTheirOwnNativeQuoteAndPreserveRopePriority() {
         final int tag = (1 << 31) | 1;
         final int sale = tag | (2 << 25) | (2 << 28);

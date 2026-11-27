@@ -2,6 +2,7 @@
 #include "gameplay/dialogue/ResidentYaw.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
+#include "gameplay/traversal/BellwetherWaymarker.h"
 #include "audio/KitAnkleAudio.h"
 #include "../../../assets/models/world/source/bellwether-road-cache-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-privy-v1/geometry.generated.h"
@@ -32,6 +33,15 @@ bool OnRiverPracticeLanding(float x,float z) {
     return x>=dry.x-.75f && x<=wet.x+.5f && std::abs(z-dry.z)<=.6f;
 }
 } // namespace
+
+bool GameSimulation::SquareWaymarkerReadable(const dialogue::Context& c, float yaw) const {
+    return config_.developmentRescueJourney && config_.authoredChapterTerrain &&
+        !legacyCombatCheckpoint_ && c.exterior && c.alive && !c.paused && !c.combat &&
+        !c.traversing && playerSupport_.grounded && chapterTerrain_ &&
+        chapterTerrainGeneration_==worldRoute_.generation &&
+        chapterDialogue_.State().line==dialogue::Line::None &&
+        bellwether::SquareWaymarkerReadableFrom(c.player.x,c.listener.y,c.player.z,yaw);
+}
 
 void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) {
     if(!chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return;
@@ -138,6 +148,11 @@ void GameSimulation::InteractWithClaimedChapter() {
             waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
         chapterDialogue_.ShowTavernDirections(context,guidance);
     }
+    // The physical fingerpost is a local caption, not a speech line. Keep it
+    // behind every existing campaign/service interaction in this dispatch.
+    if(SquareWaymarkerReadable(context,context.yaw))
+        squareWaymarkerTextVisible_=bellwether::StepSquareWaymarkerTextVisible(
+            true,false,false,true,squareWaymarkerTextVisible_);
 }
 
 campaign::MillTallyAction GameSimulation::CurrentMillTallyAction(const dialogue::Context& c) const {

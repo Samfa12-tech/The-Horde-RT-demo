@@ -123,6 +123,14 @@ inline constexpr char kSquareFingerpostDirections[] =
     "Anvil - southeast to the smith yard.\r\n\r\n"
     "For the church, retrace the arrival road to the CHURCH sign.";
 
+// Compact inscription shown when the player stops to read the physical
+// fingerpost. Keep the richer pause directions above stable and separate.
+inline constexpr char kSquareFingerpostInscription[] =
+    "Tankard - Tavern, up the oak-railed ramp.\r\n"
+    "Scales - West to the dealer and gardens.\r\n"
+    "Wheel - East to the mill and river fork.\r\n"
+    "Anvil - Southeast to the smith yard.";
+
 inline const char* PauseObjectiveText(PauseObjective objective)
 {
     switch (objective)
