@@ -80,7 +80,7 @@ public final class ChapterDebugCheckpointTest {
         Path root = Paths.get("../../src/gameplay/DevelopmentCheckpoints.h");
         if (!Files.exists(root)) root = Paths.get("src/gameplay/DevelopmentCheckpoints.h");
         final String registry = new String(Files.readAllBytes(root), StandardCharsets.UTF_8);
-        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"((?:chapter-|attack-ring-|enemy-hit-)[^\"]+|bellwether-(?:mill-yard|river-landing|rig-leak-trial))\"([^}]+)\\}")
+        final Matcher rows = Pattern.compile("\\{\\.id\\s*=\\s*(\\d+)\\s*,\\s*\\.name\\s*=\\s*\"((?:chapter-|attack-ring-|enemy-hit-)[^\"]+|bellwether-(?:mill-yard|river-landing|rig-leak-trial|square-frontage|square-waymarker))\"([^}]+)\\}")
                 .matcher(registry);
         int count = 0;
         boolean millYard = false;

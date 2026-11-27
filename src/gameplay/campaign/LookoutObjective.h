@@ -111,8 +111,8 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     {
     case PauseObjective::Lookout: return kLookoutObjectiveText;
     case PauseObjective::BellwetherArrival:
-        return "Follow the road to the covered well in Bellwether square. Look for the lit tankard sign. "
-            "Follow the oak rail up to the tavern's south door.";
+        return "Follow the road to the covered well in Bellwether square. At the fingerpost, take the ramp with the oak rail. "
+            "The lit tankard sign hangs beside the tavern's south door.";
     case PauseObjective::BellwetherHearth:
         return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
     case PauseObjective::BellwetherShrine:

@@ -217,19 +217,20 @@ void StepFireEmitterFixed(FireEmitterState& state,
 }
 
 void IncludeNearbyWorldFire(std::span<FireEmitterState> worldSlots, const FireEmitterState& candidate,
-                            float eyeX, float eyeZ) noexcept
+                            float eyeX, float eyeZ, float admissionRadius) noexcept
 {
     const auto horizontalDistanceSquared = [&](const FireEmitterState& emitter) {
         const float dx = emitter.worldFromFlame[12] - eyeX;
         const float dz = emitter.worldFromFlame[14] - eyeZ;
         return dx * dx + dz * dz;
     };
-    float farthest = kDefaultFireViewDistance * kDefaultFireViewDistance;
+    if (!(admissionRadius > 0.f && admissionRadius <= kDefaultFireViewDistance)) return;
+    float farthest = admissionRadius * admissionRadius;
     if (!(horizontalDistanceSquared(candidate) <= farthest) || !(candidate.strength * candidate.fuel > 0.0f))
         return;
 
-    // Horizontal distance is a lower bound on the renderer's eye-to-flame
-    // distance. Only borrow a slot whose current flame is already out of reach.
+    // Keep every offered flame inside this area's radius. The default follows
+    // the renderer's reach. A local lamp can use a shorter authored radius.
     auto spare = worldSlots.end();
     for (auto it = worldSlots.begin(); it != worldSlots.end(); ++it) {
         if (it->stableId == candidate.stableId) return;

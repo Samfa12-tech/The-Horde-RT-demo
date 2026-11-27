@@ -1729,6 +1729,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             walkTo({kWellApronView[0], kWellApronView[1]}) && walkTo(*square),
                             "the player crosses the well paving and returns to the south tavern approach");
                     };
+                    const auto presentSquareWaymarker = [&] {
+                        if (!walkTo({kSquareWaymarkerView[0],kSquareWaymarkerView[1]})) return false;
+                        const float previousPitch=input.pitchRadians;
+                        input.pitchRadians=.08f;
+                        const bool facing=face(kSquareWaymarkerPost[0],kSquareWaymarkerPost[2]);
+                        const auto& lights=ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                        const bool presented=facing && ctx.rtScene.HasUploadedFireEmitters() &&
+                            std::find(lights.begin(),lights.end(),horde::gameplay::effects::kSquareWaymarkerLampEmitterId)!=lights.end() &&
+                            capture("windows-combined-square-waymarker.png",true,true);
+                        input.pitchRadians=previousPitch;
+                        return presented && walkTo(*square);
+                    };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };
                         const auto walkSmith = [&](const auto& point) { return walkTo(station(point)); };
@@ -1917,6 +1929,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
+                        check(presentSquareWaymarker() && fork(), "the player can read the square fingerpost from the lane and return to the tavern junction") &&
                         check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
