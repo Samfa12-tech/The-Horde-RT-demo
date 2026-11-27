@@ -1211,3 +1211,7 @@ hood, tankard sign, oil cup and split-wood rack for Horde in Blender. They
 use the existing town stone, clay, timber and char material rows. The
 [editable source and recipe](assets/models/world/source/bellwether-square-frontage-v1/README.md)
 record the derivation from the mapped town and terrain.
+
+The [church fork waymarker](assets/models/world/source/bellwether-church-waymarker-v1/README.md)
+repositions the original Horde timber post, arrow and hand-authored CHURCH
+lettering from the same Bellwether master. It uses the existing town finishes.

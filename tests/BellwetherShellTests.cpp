@@ -455,13 +455,13 @@ int main(int argc,char** argv) {
             check(!support->NonWalkableVolumeClear(approach[0],approach[1],cache[0],cache[2],
                       floor+.21f,floor+.47f,radius),
                 "the box blocks movement through its solid side");
-            const auto clearFork = [&](BellwetherStation end) {
-                auto last=fork;
+            const auto clearFork = [&](BellwetherStation start,BellwetherStation end) {
+                auto last=start;
                 auto contact=ChapterExteriorStepSupport(*support,last.x,last.z,radius,1.78f);
-                const float routeLength=std::hypot(end.x-fork.x,end.z-fork.z);
-                for(int i=1;i<=120 && contact.grounded;++i) {
-                    const float t=(i*.05f)/routeLength;
-                    const BellwetherStation next{std::lerp(fork.x,end.x,t),std::lerp(fork.z,end.z,t)};
+                const auto steps=static_cast<int>(std::ceil(std::hypot(end.x-start.x,end.z-start.z)/.05f));
+                for(int i=1;i<=steps && contact.grounded;++i) {
+                    const float t=static_cast<float>(i)/steps;
+                    const BellwetherStation next{std::lerp(start.x,end.x,t),std::lerp(start.z,end.z,t)};
                     const auto move=ResolveChapterStepMovement(*support,last.x,last.z,next.x,next.z,contact.worldY,radius);
                     if(!move.accepted)return false;
                     contact=move.support;
@@ -469,8 +469,23 @@ int main(int argc,char** argv) {
                 }
                 return contact.grounded;
             };
-            check(clearFork(nextRoad),"the grounded player capsule clears the nearby tavern path");
-            check(clearFork(church),"the grounded player capsule clears the nearby church path");
+            check(clearFork(fork,nextRoad) && clearFork(nextRoad,fork),"the tavern branch clears in both directions");
+            check(clearFork(fork,church) && clearFork(church,fork),"the church branch clears in both directions");
+            const BellwetherStation cacheMark{approach[0],approach[1]};
+            check(clearFork(fork,cacheMark) && clearFork(cacheMark,fork),"the road cache is reachable beside the sign");
+            // The 24 November phone walk departed just off the centre of the junction.
+            const BellwetherStation phoneStart{31.85f,82.51f};
+            check(clearFork(phoneStart,church) && clearFork(church,phoneStart),
+                  "the off-centre phone approach clears the church fingerboard in both directions");
+            const float run=std::hypot(church.x-fork.x,church.z-fork.z);
+            const BellwetherStation side{(fork.z-church.z)/run,(church.x-fork.x)/run};
+            for(float sign : {-1.f,1.f}) {
+                // The paved half-width grows from .65 m to .95 m along this leg.
+                const BellwetherStation entry{fork.x+side.x*.4f*sign,fork.z+side.z*.4f*sign};
+                const BellwetherStation exit{church.x+side.x*.65f*sign,church.z+side.z*.65f*sign};
+                check(clearFork(entry,exit) && clearFork(exit,entry),
+                      "both shoulders of the paved church lane clear in both directions");
+            }
         }
         {
             using namespace horde::gameplay::traversal;

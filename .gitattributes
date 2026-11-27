@@ -571,3 +571,5 @@ assets/models/world/source/bellwether-paths-v1/geometry.generated.h text eol=lf
 tools/author-bellwether-square-frontage.py text eol=lf
 assets/models/world/source/bellwether-square-frontage-v1/authoring-receipt.json text eol=lf
 assets/models/world/source/bellwether-square-frontage-v1/geometry.generated.h text eol=lf
+tools/author-bellwether-church-waymarker.py text eol=lf
+assets/models/world/source/bellwether-church-waymarker-v1/authoring-receipt.json text eol=lf

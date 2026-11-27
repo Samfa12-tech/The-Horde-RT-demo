@@ -140,6 +140,8 @@ The mapped [covered well](superpowers/plans/2026-11-07-bellwether-arrival-direct
 
 The [village lanes](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#paths-through-bellwether) mark the existing approaches to the south tavern ramp, church, wayside shrine, mill, river causeway, west stall and gardens, service yard and smith. The paths follow the surveyed heights and join the approaches already used by the campaign.
 
+The [church fingerboard](../assets/models/world/source/bellwether-church-waymarker-v1/README.md) points into the north-east lane from the road cache. The native movement test checks the off-centre approach that caught the player during the 24 November phone walkthrough.
+
 The mapped [western kitchen plots](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#western-kitchen-plots) sit beyond the relic stall at T02. Two terrain-fitted beds show the village growing food. The aisle follows the existing ground, and the crops share the forest foliage material.
 
 The [west service-yard checkpoint](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#west-service-yard) stages the closed privy and washstand on a short detour from the west lane. After the tavern conversation, the unseen occupant's request appears as a local caption. The player can take a clean rag from the basket and leave it on the sheltered shelf. Delivery persists in the tavern save. Recording remains open.
