@@ -5122,3 +5122,32 @@ expedition leads and zero coins. The learned save bytes matched across the
 restart, including the restored binding, three hearts, two flask charges
 and the unfitted lantern. All 23 pre-existing save, report and preference
 files matched after restoration. [Route and save receipt](evidence/2026-11-28-bellwether-church/ward-walk.json)
+
+### 28 November 2026 — Record keeper's spoken directions at the church
+
+The Galaxy S26 Ultra ran the private ARM64 Debug APK from `9a6ef6d8`.
+From an isolated copy of the earned tavern save, the player walked to the
+church and selected **Show the road mark**. The opening inspection displayed
+its caption. SoundPool admitted the keeper's shrine errand and northern path
+directions on distinct streams, in order, with nonzero left and right gains.
+Both captions matched the recorded text. Reading the mark left the save
+byte-identical. The updated private APK contains 23 voice files and the
+ordinary ARM64 Debug APK contains none of those private files.
+
+The private Windows archive contains the same two WAVs. The campaign replay
+passed all 59 checks on each hardware RT backend with speaker playback
+suppressed. The [playback receipt](evidence/2026-11-28-bellwether-church/voice-playback.json)
+records the exact builds, SoundPool start events, in-game capture hashes and
+the save comparison. Listening and perceived mix on the phone remain open.
+
+The separate `bellwether-record-keeper-handoff` Debug shortcut failed to
+reach its requested simulation state on this build. It supplied no church
+measurement. The ordinary on-foot church conversation above succeeded.
+
+A fresh on-foot return to the same service mark supplied 5 periodic native
+frame reports in 48 seconds at 33% Pipeline (475 × 980 RT). Every reported
+GPU submission matched its completion and successful present serial. Whole
+RT GPU times ranged from 63.17 to 74.27 ms, with a median of 66.93 ms across
+those sampled frames. There were 45 TLAS instances, 37 BLAS owners and one
+fire emitter. These snapshots do not measure displayed frame rate, frame
+pacing across the full interval or the cost of voice playback.

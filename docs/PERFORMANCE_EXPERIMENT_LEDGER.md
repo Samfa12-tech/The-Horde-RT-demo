@@ -24,6 +24,14 @@ step geometry this leaves room for 17,799 static obstacle faces. The
 measurement covers retained CPU arrays. Startup peak memory, frame time
 and sustained phone performance require separate measurements.
 
+**28 November village collision inventory.** The full native forest and town
+at `9a6ef6d8` retained 10,457,504 bytes for 176,049 collision triangles.
+Of these, 42,225 supply ground, 20 supply steps, and 133,804 are static
+obstacles. At that ground and step count, the byte budget admits 139,476
+obstacle faces, leaving 5,672 for solid furnishings. Recalculate the allowance
+when adding a walkable floor or steps. The figures come from
+`horde_rt_scene_resource_inventory_tests` loading the combined scene.
+
 **24 November ordinary Android arrival.** The
 [seeded-lookout touch walkthrough](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--android-touch-walkthrough-from-the-lookout-to-bellwether)
 reached the hearth through the live campaign. The staffed room held
