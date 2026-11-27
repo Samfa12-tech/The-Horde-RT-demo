@@ -1,0 +1,54 @@
+{
+  "sourceCommit": "db3c5a02de549cb1f3a812a3d04f7ff788bb7df7",
+  "scope": "Unpublished optimized integration checkpoint with the stock-room directions and Android reading controls",
+  "windows": {
+    "artifact": "Horde-Bellwether-Private-Candidate-Windows-x64.zip",
+    "sha256": "f9bc05a28fd2fa0a1139d584ac0a237138d553e945b0188b038137c01ab2b1c7",
+    "executableSha256": "663d734e60256a77d87b4032f9d0d754400b42bbfec4bc7b0e4b995d4bfff182",
+    "archiveEntriesComparedToStaging": 297,
+    "residentRuntimeFilesComparedToSource": 25,
+    "voiceTakesComparedToSource": 26,
+    "townGeometrySha256": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "testedDispatchResolution": [1232, 803],
+    "ordinaryMenuChecks": [
+      {
+        "backend": "RayTracingPipeline",
+        "entry": "Load prepared tavern save",
+        "rtPresented": true,
+        "directionsShowSavedPreparations": true,
+        "saveBytesPreserved": true
+      },
+      {
+        "backend": "RayQueryCompute",
+        "entry": "Load prepared tavern save",
+        "rtPresented": true,
+        "directionsShowSavedPreparations": true,
+        "saveBytesPreserved": true
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "entry": "New Game from an empty slot",
+        "rtPresented": true
+      }
+    ]
+  },
+  "android": {
+    "artifact": "Horde-Bellwether-Directions-Private-Candidate-ARM64.apk",
+    "sha256": "563dbea3e15d173bdaa148e81b64aacbcc86c6a8d0bfffe77862fd4ce9674210",
+    "nativeLibrarySha256": "bf26a0fd184f7152f5007f40bca9e4906de0bb3914efd71067ffab12208eea4e",
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "versionName": "1.7.0-bellwether-candidate",
+    "apkSignatureV2Verified": true,
+    "validatedShippingMobileSpirvModules": 4,
+    "runtimeAssetsComparedToHouseBCheckpoint": 295,
+    "unitTestsPassed": 611,
+    "unitTestsSkipped": 6,
+    "deviceRun": false
+  },
+  "remainingValidation": [
+    "Physical Android play and controller behavior",
+    "Staffed-hearth sustained timing and listening review",
+    "Integrated campaign acceptance and final 1.8 versioning"
+  ]
+}
