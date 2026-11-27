@@ -1,0 +1,71 @@
+{
+  "feature": "Covered-well fetching apron",
+  "originalTownSha256": "a41ae7e5ced3961f58f2d9c0a38a88b1ea3eba889503e9e442d0a8c023f754b5",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "surveySha256": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1",
+  "wellReceiptSha256": "6d8c6e89d0255692f7fcb362ab8b2289f74072f279bf8d4e0f5634aa5f86d7d4",
+  "pathLayoutSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
+  "benchRecipeSha256": "b4a5e41a40c15c30659d0ee96664d8e9f8cfb25a66e6c63ac673d9377b3f0382",
+  "baseCommit": "3aa4a3ff8996e06beffe4cbc3eff147597e2d8bd",
+  "historicalTopLevelRecipeSha256": "ecc966a6d2f86f55148a5896722a90d7d13858afbc72dc49138b610d81628dfb",
+  "layoutSha256": "cfac30a5c4c3e680885e78176e5f3c5da1498bde385131671e33509a96a54e32",
+  "runtimeTownSha256": "5b679d961594c8b2ce181a979aaca42a018f4699679ff296795b0911ea385269",
+  "addedSolidTriangles": 0,
+  "addedGroundTriangles": 192,
+  "townVertices": 79891,
+  "townTriangles": 37329,
+  "wellCentre": [
+    78.3,
+    126.2
+  ],
+  "benchCentre": [
+    77.75,
+    128.15
+  ],
+  "publicLaneContact": [
+    77.8,
+    130.55
+  ],
+  "existingWellView": [
+    76.9,
+    130.35
+  ],
+  "westLaneContact": [
+    76.2,
+    129.45
+  ],
+  "rampLaneContact": [
+    80.8,
+    130.5
+  ],
+  "rampToe": [
+    82.3,
+    130.7
+  ],
+  "view": [
+    77.8,
+    131.1
+  ],
+  "lookAt": [
+    77.75,
+    128.15
+  ],
+  "fetching": [
+    76.54,
+    128.61
+  ],
+  "surfaceLiftMetres": 0.018,
+  "wornCentreInsetMetres": 0.01,
+  "recipeSha256": "aced6420eb8288f65e73668b90a5b28b21b5d333cfdfdafca7e20c285d006137",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "bellwether-well-apron.blend": "3b42c7256ce76a7555b71288129347532f02c042a2a0b2838e948d0b75e2584d",
+    "well-apron-walkable.glb": "d8d84d72303e81f120628d4cea1cfdcdda37e6a0941621bc1184148f45e4bdf6",
+    "bellwether-tavern-v1.glb": "5b679d961594c8b2ce181a979aaca42a018f4699679ff296795b0911ea385269",
+    "asset.manifest.json": "c26efc0a29bd7fa35f730ab789d189b2964fa3a00f2348e8cf32522649fad39f",
+    "geometry.generated.h": "69cb8c7dffb8d57aaceb0e1da2e173afaf34c3e38b16e865ea92676a3a841b38",
+    "layout.json": "cfac30a5c4c3e680885e78176e5f3c5da1498bde385131671e33509a96a54e32",
+    "author-bellwether-well-apron.py": "aced6420eb8288f65e73668b90a5b28b21b5d333cfdfdafca7e20c285d006137",
+    "README.md": "b2cf7420b8f23f9dc226e9ade551ad75977eefada071f6f3718f7794ef0203b6"
+  }
+}

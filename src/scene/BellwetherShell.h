@@ -21,6 +21,7 @@
 #include "../../assets/models/world/source/bellwether-west-trade-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-tavern-rail-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-garden-house-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-well-apron-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
@@ -34,13 +35,14 @@ inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kMillTallySolidTriangles+gameplay::bellwether::kBellwetherStockSolidTriangles+
     gameplay::bellwether::kMillBenchLampSolidTriangles+gameplay::bellwether::kSquareFrontageSolidTriangles+
     gameplay::bellwether::kWestTradeSolidTriangles+gameplay::bellwether::kTavernRailSolidTriangles+
-    gameplay::bellwether::kGardenHouseSolidTriangles;
+    gameplay::bellwether::kGardenHouseSolidTriangles+gameplay::bellwether::kWellApronSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=
     gameplay::bellwether::kGroundTriangles+gameplay::bellwether::kMillCrossingGroundTriangles+
     gameplay::bellwether::kBellwetherGraveyardGroundTriangles+gameplay::bellwether::kBellwetherSmithGroundTriangles+
-    gameplay::bellwether::kBellwetherPathGroundTriangles+gameplay::bellwether::kGardenHousePathTriangles;
+    gameplay::bellwether::kBellwetherPathGroundTriangles+gameplay::bellwether::kGardenHousePathTriangles+
+    gameplay::bellwether::kWellApronGroundTriangles;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 enum class BellwetherFurnitureDetail { Near, Mid, Far };
 inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};

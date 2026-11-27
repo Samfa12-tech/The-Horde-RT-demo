@@ -480,6 +480,8 @@ and meets the churchyard path. Its spur leads to the wayside shrine. The
 square also connects to the west stall and gardens, the washstand and
 privy, the mill landing and river causeway, and the southeast smith yard.
 Existing yard, bridge and wet-landing surfaces take over at those joins.
+At the covered well, a short stretch of worn flagstones connects the
+collecting bench with the public lane and the foot of the tavern ramp.
 
 The [editable path layer](../../../assets/models/world/source/bellwether-paths-v1/README.md)
 adds 704 walkable triangles to the existing town owner. The render and
@@ -675,6 +677,12 @@ together from the fork in the path.
 The original stone entrance now stands at the mapped east door. That door
 stays latched. A narrow path splits from the garden lane beside the grate,
 leading to the washing bench and the foot of the east steps.
+
+At `3aa4a3ff`, both Windows RT backends presented the garden grate, cottage wick
+and held lantern together. In one paired 960 × 540 Diagnostic High west walk
+on the RTX 5050 Laptop, median GPU time through the garden changed from
+5.20 to 5.30 ms outbound and from 5.22 to 5.39 ms inbound. Both versions
+completed two returns to the staffed tavern. Handset timing remains open.
 
 The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
 

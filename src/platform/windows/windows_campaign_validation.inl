@@ -1664,7 +1664,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             horde::gameplay::bellwether::kBellwetherWellCentre[2]) &&
                             capture("windows-combined-well.png");
                         input.pitchRadians = previousPitch;
-                        return presented && walkTo(*square);
+                        if (!presented || !walkTo(*square)) return false;
+                        using horde::gameplay::bellwether::kWellApronView;
+                        using horde::gameplay::bellwether::kWellApronLookAt;
+                        using horde::gameplay::bellwether::kWellApronFetching;
+                        if (!walkTo({kWellApronView[0], kWellApronView[1]})) return false;
+                        input.pitchRadians = -.32f;
+                        const bool apron = face(kWellApronLookAt[0], kWellApronLookAt[1]) &&
+                            capture("windows-combined-well-apron.png", true, true);
+                        input.pitchRadians = previousPitch;
+                        return check(apron && walkTo({kWellApronFetching[0], kWellApronFetching[1]}) &&
+                            walkTo({kWellApronView[0], kWellApronView[1]}) && walkTo(*square),
+                            "the player crosses the well paving and returns to the south tavern approach");
                     };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };

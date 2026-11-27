@@ -319,7 +319,13 @@ int main(int argc,char** argv) {
                     const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
                     const auto move=ResolveChapterStepMovement(*support,point.x,point.z,next.x,next.z,
                         contact.worldY,radius);
-                    if(!move.accepted)return false;
+                    if(!move.accepted){
+                        const auto ground=support->Query(next.x,next.z);
+                        std::cerr<<"Blocked Bellwether walk from "<<start.x<<","<<start.z<<" to "<<target.x<<","<<target.z
+                            <<" at "<<point.x<<","<<point.z<<" -> "<<next.x<<","<<next.z
+                            <<" foot "<<contact.worldY<<" next ground "<<ground.worldY<<" walkable "<<ground.walkable<<'\n';
+                        return false;
+                    }
                     contact=move.support;
                     point=next;
                 }
@@ -327,6 +333,26 @@ int main(int argc,char** argv) {
             };
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");
+            const BellwetherStation apronView{horde::gameplay::bellwether::kWellApronView[0],
+                                               horde::gameplay::bellwether::kWellApronView[1]};
+            const BellwetherStation fetching{horde::gameplay::bellwether::kWellApronFetching[0],
+                                              horde::gameplay::bellwether::kWellApronFetching[1]};
+            const BellwetherStation rampLane{80.8f,130.5f};
+            const auto viewContact=support->Query(view[0],view[1]);
+            const auto fetchingContact=support->Query(fetching.x,fetching.z);
+            const auto terrainAtFetching=originalTerrain->Query(fetching.x,fetching.z);
+            check(viewContact.found && viewContact.walkable && viewContact.surface==
+                      horde::gameplay::simulation::SupportSurface::Stone &&
+                  fetchingContact.found && fetchingContact.walkable && fetchingContact.surface==
+                      horde::gameplay::simulation::SupportSurface::Stone && terrainAtFetching.found &&
+                  std::abs(fetchingContact.worldY-terrainAtFetching.worldY)<.025f &&
+                  support->NonWalkableVolumeClear(fetching.x,fetching.z,fetching.x,fetching.z,
+                      fetchingContact.worldY+.03f,fetchingContact.worldY+1.8f,radius),
+                  "the lane camera mark and fetching stance have grounded stone contact and capsule clearance");
+            check(follow(apronView,fetching) && follow(fetching,apronView) &&
+                  follow(square,apronView) && follow(apronView,square) &&
+                  follow(apronView,rampLane) && follow(rampLane,apronView),
+                  "a grounded player can walk from the lane view to the pail, back, and toward the ramp toe");
             for (float side : {-1.f,1.f}) {
                 const BellwetherStation foot{82.3f+side*.85f,131.7f};
                 const BellwetherStation landing{82.3f+side*.85f,120.4f};
