@@ -39,7 +39,7 @@ public:
         // Grate/rescue calls remain unseen; Keeper speech never animates Kit.
         const bool standingLine=!seated && speech.line>=Line::ReunionQuestion && speech.line<=Line::FlaskTopup;
         const bool seatedLine=seated && (speech.line==Line::TavernLimit || speech.line==Line::TavernWork ||
-            speech.line==Line::TavernIntroduce || speech.line==Line::TavernHoardAnswer ||
+            speech.line==Line::TavernIntroduce || speech.line==Line::TavernHoardAnswer || IsKitTreasureTalkLine(speech.line) ||
             (IsTavernLanternLine(speech.line) && !IsTavernLanternVoice(speech.line)));
         const bool listening=seated && IsTavernLanternVoice(speech.line);
         if(body && (standingLine || seatedLine || listening) &&

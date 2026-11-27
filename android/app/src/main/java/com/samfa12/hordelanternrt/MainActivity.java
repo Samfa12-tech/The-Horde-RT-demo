@@ -9200,6 +9200,7 @@ public class MainActivity extends Activity {
                 case 3: return R.string.record_mill_tally_claim;
                 case 4: return R.string.recover_mill_tally;
                 case 5: return R.string.return_mill_tally;
+                case 6: return R.string.ask_kit_about_treasure;
                 default: return 0;
             }
         }

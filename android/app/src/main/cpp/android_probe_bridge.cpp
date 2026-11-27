@@ -1348,6 +1348,10 @@ void PublishSimulationUiState()
         contextualControls |= (static_cast<int>(simulation.tavernDoorAction) << 22) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
         contextualControls |= (1 << 14) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.kitTreasureTalkAvailable) {
+        // Optional action 6 shares the interact-label field with the grate and tally.
+        contextualControls |= INT32_MIN | (6 << 25) | 1;
+    }
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
         contextualControls |= (1 << 15) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernLanternFittingAvailable) {

@@ -75,6 +75,8 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.record_mill_tally_claim, MainActivity.contextualInteractLabel(tag | (3 << 25)));
         assertEquals(R.string.recover_mill_tally, MainActivity.contextualInteractLabel(tag | (4 << 25)));
         assertEquals(R.string.return_mill_tally, MainActivity.contextualInteractLabel(tag | (5 << 25)));
+        assertEquals(R.string.ask_kit_about_treasure, MainActivity.contextualInteractLabel(tag | (6 << 25)));
+        assertEquals(0, MainActivity.contextualInteractLabel(tag | (6 << 25) | (1 << 9)));
         assertEquals(0, MainActivity.lanternFittingPrice(sale));
         assertEquals(0, MainActivity.contextualInteractLabel(sale | (1 << 9)));
     }

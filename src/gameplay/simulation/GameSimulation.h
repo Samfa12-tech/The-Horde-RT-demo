@@ -353,7 +353,8 @@ private:
     bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
     bellwether::MillAction CurrentMillAction(const dialogue::Context&) const;
     bool CanWorkAtMill(const dialogue::Context&) const;
-    bool MillTargetInReach(const dialogue::Context&,const std::array<float,3>& mark,float reach) const;
+    bool ChapterTargetInReach(const dialogue::Context&,const std::array<float,3>& mark,
+                              float reach,float facingCosine=.75f) const;
     void AdvanceMillDriveTest(float seconds);
     void AdvanceMillLeakTest(float seconds);
     void InteractWithMill(bellwether::MillAction);

@@ -3670,6 +3670,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.treasurePurse=treasurePurse_;
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
         chapterDialogue_.CanStartTavernConversation(chapterContext);
+    snapshot_.kitTreasureTalkAvailable=chapterDialogue_.CanAskKitAboutTreasure(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
     snapshot_.tavernLanternFittingAvailable=CanBuyLanternFitting(chapterContext);
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);

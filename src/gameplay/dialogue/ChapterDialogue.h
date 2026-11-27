@@ -22,14 +22,14 @@ enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, Rescue
     TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
     RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson,
     SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn, RelicDealerOrdinarySale,
-    PrivyRagRequest, PrivyRagThanks, GardenGrateTalk };
+    PrivyRagRequest, PrivyRagThanks, GardenGrateTalk, KitTreasureRoof, KitTreasureKey };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
 inline constexpr char kExpeditionDirections[]=
     "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,59> kLines{{
+inline constexpr std::array<LineSpec,61> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -89,7 +89,11 @@ inline constexpr std::array<LineSpec,59> kLines{{
     {Line::PrivyRagRequest,"hub.privy_request","Privy occupant","Can someone PLEASE get me some rag?!","",3.6f,1},
     {Line::PrivyRagThanks,"hub.privy_thanks","Privy occupant","Thank you.","",1.2f,1},
     {Line::GardenGrateTalk,"hub.garden_grate_talk","Man below the grate",
-        "One says I fell in. Another says I live here. If you've brought supper, the shelf's on the left.","",6.4f,1}
+        "One says I fell in. Another says I live here. If you've brought supper, the shelf's on the left.","",6.4f,1},
+    {Line::KitTreasureRoof,"hub.kit_stake","Kit",
+        "I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one.","",136784.f/24000.f,1},
+    {Line::KitTreasureKey,"kit.personal_stake.key","Kit",
+        "A door with my own key. I\xE2\x80\x99ve had worse reasons for going digging.","",113744.f/24000.f,1}
 }};
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
@@ -122,6 +126,9 @@ inline constexpr bool IsRecordKeeperLine(Line line) {
 }
 inline constexpr std::array kTavernLanternExchange{Line::TavernLanternIdentity,Line::TavernLanternSeals,
     Line::KitVoiceReaction,Line::KitVoiceListen,Line::KitRoyalClaim,Line::KitRoadHelp};
+inline constexpr bool IsKitTreasureTalkLine(Line line) {
+    return line==Line::KitTreasureRoof || line==Line::KitTreasureKey;
+}
 inline constexpr bool IsTavernLanternLine(Line line) {
     return line>=kTavernLanternExchange.front() && line<=kTavernLanternExchange.back();
 }
@@ -136,7 +143,8 @@ inline constexpr bool IsBellwetherLine(Line line) {
         line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
         IsRecordKeeperLine(line) || IsTavernLanternLine(line) || IsSalvagerLine(line) ||
         line==Line::TavernLanternFitting || line==Line::RelicDealerOrdinarySale ||
-        line==Line::PrivyRagRequest || line==Line::PrivyRagThanks || line==Line::GardenGrateTalk;
+        line==Line::PrivyRagRequest || line==Line::PrivyRagThanks || line==Line::GardenGrateTalk ||
+        IsKitTreasureTalkLine(line);
 }
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
@@ -179,6 +187,8 @@ struct Context {
     bool flaskGuideEnabled=false; unsigned flaskCharges=0;
     bool companionAtBasin=false,playerNearBasin=false;
     bool tavernInReach=false, kitAtChair=false, kitSeated=false;
+    // Supplied by the interaction snapshot: Kit is close, visible and in a reasonable facing cone.
+    bool kitTreasureTopicInReach=false;
     bool keeperAtHearth=false, tavernDoorInReach=false, kitAtSouthDoor=false;
     bool tavernFittingInReach=false;
     bool roadInReach=false, kitCaughtAnkle=false, kitReadyForProtectiveWalk=false;
@@ -210,6 +220,19 @@ public:
         return !tavernConversationActive_ && state_.line==Line::None && continuationCount_==0 &&
             state_.hearthLinesResolved==kHearthLines.size() &&
             state_.tavernConversationLinesResolved<kTavernConversation.size() && CanHearTavernConversation(c);
+    }
+    bool CanAskKitAboutTreasure(const Context& c) const {
+        return !kitTreasureKeyPending_ && state_.line==Line::None && continuationCount_==0 &&
+            state_.hearthLinesResolved==kHearthLines.size() &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            !tavernConversationActive_ && recordKeeperPending_.empty() && !tavernLanternActive_ &&
+            shrineRevealIndex_>=kShrineReveal.size() && c.kitTreasureTopicInReach && CanHearKitTreasureTalk(c);
+    }
+    bool TryStartKitTreasureTalk(const Context& c) {
+        if(!CanAskKitAboutTreasure(c))return false;
+        kitTreasureKeyPending_=true;
+        Start(Line::KitTreasureRoof,*c.companionSource,c);
+        return true;
     }
     bool TryStartTavernConversation(const Context& c) {
         if(!CanStartTavernConversation(c))return false;
@@ -443,6 +466,7 @@ public:
         state_.tavernConversationLinesResolved=p.tavernConversationLinesResolved;
         state_.tavernLanternLinesStarted=p.tavernLanternLinesStarted;
         tavernLanternActive_=false;
+        kitTreasureKeyPending_=false;
         privyRagRequestShown_=false;
         tavernLanternRaiseFloor_=c.manualRaiseSequence;
         tavernConversationActive_=tavernWelcomeStarted_=false;
@@ -480,6 +504,7 @@ public:
         tavernLanternActive_=false;
         tavernLanternRaiseFloor_=0;
         tavernConversationActive_=false;
+        kitTreasureKeyPending_=false;
         shrineRevealIndex_=kShrineReveal.size();
         recordKeeperPending_={};
         if(!preserveOnce)tavernWelcomeStarted_=false;
@@ -520,6 +545,10 @@ public:
         if((state_.line==Line::PrivyRagRequest || state_.line==Line::PrivyRagThanks) &&
            !CanHearResident(c,c.privySource))Cancel(false);
         if(state_.line==Line::GardenGrateTalk && !CanHearResident(c,c.gardenGrateSource))Cancel(false);
+        if((kitTreasureKeyPending_ || IsKitTreasureTalkLine(state_.line)) && !CanHearKitTreasureTalk(c)) {
+            kitTreasureKeyPending_=false;
+            if(IsKitTreasureTalkLine(state_.line))Cancel(false);
+        }
         if(state_.line==Line::TavernLanternFitting && (!c.tavernFittingInReach || c.combat))Cancel(false);
         if(IsGuidanceLine(state_.line) && !AtTavernHearth(c))Cancel(false);
         const bool hearsShrine=CanHearShrineLantern(c);
@@ -583,6 +612,10 @@ public:
             state_.elapsed+=dt;
             if(state_.elapsed>=state_.duration) Finish();
         }
+        if(kitTreasureKeyPending_ && state_.line==Line::None) {
+            kitTreasureKeyPending_=false;
+            Start(Line::KitTreasureKey,*c.companionSource,c);
+        }
         if(state_.line==Line::None && continuationCount_!=0) {
             const auto next=continuations_[0];
             if((next!=Line::FlaskEmpty && next!=Line::FlaskTopup) ||
@@ -636,6 +669,9 @@ private:
     }
     static bool CanHearTavernLantern(const Context& c) {
         return c.claimed && AtTavernHearth(c) && c.tavernLanternSource && Finite(*c.tavernLanternSource);
+    }
+    static bool CanHearKitTreasureTalk(const Context& c) {
+        return c.claimed && AtTavernHearth(c);
     }
     void StepTavernLantern(const Context& c) {
         if(!tavernLanternActive_) {
@@ -756,6 +792,7 @@ private:
     }
     void Cancel(bool clearContinuations=true) { state_.line=Line::None;state_.elapsed=0;state_.duration=0;
         tavernConversationActive_=false;
+        kitTreasureKeyPending_=false;
         tavernLanternActive_=false;
         shrineRevealIndex_=kShrineReveal.size();
         recordKeeperPending_={};
@@ -786,6 +823,7 @@ private:
     std::size_t shrineRevealIndex_=kShrineReveal.size();
     std::span<const Line> recordKeeperPending_;
     bool tavernConversationActive_=false;
+    bool kitTreasureKeyPending_=false;
     bool tavernWelcomeStarted_=false;
     bool tavernLanternActive_=false;
     bool privyRagRequestShown_=false;

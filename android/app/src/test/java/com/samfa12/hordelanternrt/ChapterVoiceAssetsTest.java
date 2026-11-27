@@ -22,7 +22,8 @@ public final class ChapterVoiceAssetsTest {
         assertEquals(STABLE_IDS.length + (BuildConfig.BELLWETHER_VOICE_CANDIDATE ? 5 : 0)
                         + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0)
                         + (BuildConfig.BELLWETHER_SALVAGER_AUDITION ? 3 : 0)
-                        + (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION ? 6 : 0),
+                        + (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION ? 6 : 0)
+                        + (BuildConfig.BELLWETHER_HEARTH_AUDITION ? 2 : 0),
                 ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
@@ -115,5 +116,26 @@ public final class ChapterVoiceAssetsTest {
             assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
         }
         assertNull(ChapterVoiceAssets.forLine(46));
+    }
+
+    @Test public void privateKitHearthAuditionIsIndependentAndUsesExactLineAndSoundMappings() {
+        final int[] lines = {59, 60};
+        final String[] ids = {"hub.kit_stake", "kit.personal_stake.key"};
+        for (int i = 0; i < lines.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
+            if (BuildConfig.BELLWETHER_HEARTH_AUDITION) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("kit_" + ids[i].replace('.', '_'), asset.soundKey);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+                assertEquals(Integer.valueOf(23), ChapterVoiceAssets.soundIdForLine(
+                        lines[i], java.util.Collections.singletonMap(asset.soundKey, 23)));
+            } else {
+                assertNull(asset);
+                assertNull(ChapterVoiceAssets.soundIdForLine(
+                        lines[i], java.util.Collections.singletonMap("kit_" + ids[i].replace('.', '_'), 23)));
+            }
+            assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
+        }
     }
 }

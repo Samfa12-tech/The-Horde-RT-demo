@@ -1638,6 +1638,37 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
                 };
+                if (progressed && gBellwetherPreparationsValidation) {
+                    const auto controlReads = [&](int id, std::wstring_view expected) {
+                        std::array<wchar_t,192> text{};
+                        return GetWindowTextW(GetDlgItem(ctx.windowHandle,id),text.data(),static_cast<int>(text.size()))>0 &&
+                            std::wstring_view(text.data())==expected;
+                    };
+                    const auto captionFor = [&](Line line) {
+                        return horde::platform::windows::WindowsSubtitleWideText(
+                            horde::platform::windows::WindowsSubtitleCaption("Kit",Spec(line).text));
+                    };
+                    const auto boundary=ctx.simulation.CampaignBoundaryRevision();
+                    const auto coins=state.treasurePurse;
+                    const auto& kit=state.chapterCompanion;
+                    progressed=check(face(state.playerX+1.f,state.playerZ) && !state.kitTreasureTalkAvailable &&
+                        state.tavernDirectionsAvailable && face(kit.x,kit.z) && state.kitTreasureTalkAvailable &&
+                        controlReads(kChestPromptControlId,L"LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE") &&
+                        interact() && waitFor([&]{return state.chapterDialogue.line==Line::KitTreasureRoof &&
+                            state.chapterDialogue.elapsed>.35f;},45) && frame() &&
+                        controlReads(kChapterSubtitleId,captionFor(Line::KitTreasureRoof)) &&
+                        capture("windows-combined-kit-hearth-talk.png",true,true),
+                        "looking at seated Kit offers a personal question and presents his answer at the hearth");
+                    if(progressed) {
+                        ++input.commands.dialogueSkip;
+                        progressed=check(step() && frame() && state.chapterDialogue.line==Line::KitTreasureKey &&
+                            controlReads(kChapterSubtitleId,captionFor(Line::KitTreasureKey)) &&
+                            waitFor([&]{return state.kitTreasureTalkAvailable &&
+                                state.chapterDialogue.line==Line::None;},320) &&
+                            state.treasurePurse==coins && ctx.simulation.CampaignBoundaryRevision()==boundary,
+                            "Kit finishes his second answer, and the question can be asked again without changing the tavern save");
+                    }
+                }
                 const auto& landing = kBellwetherRiverLanding;
                 const auto& mill = kBellwetherMillApproach;
                 const auto approachShallows = [&] {

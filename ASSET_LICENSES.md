@@ -1204,6 +1204,13 @@ audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
 of the archived takes. Private build admission keeps their stable line IDs
 and existing captions. Public distribution clearance remains open.
 
+The optional hearth question uses Kit's original `hub.kit_stake` and
+`kit.personal_stake.key` recordings from the 4 November campaign voice archive.
+The private Debug overlay checks the exact mono, 24 kHz PCM16 takes against
+the SHA-256 values in `src/audio/BellwetherVoiceFixture.h`. The archive holds
+the originals. Owner listening approval and public distribution clearance
+for these two takes remain open.
+
 ## Bellwether square and tavern frontage - 26 November 2026
 
 Samfa12/Codex authored the water bench, fetching vessels, tiled entrance

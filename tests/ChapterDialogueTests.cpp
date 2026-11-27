@@ -108,6 +108,18 @@ int main() {
             RequiresChapterCaption(cut.line) && static_cast<float>(cut.frames) / 24000.f <= spec.duration,
             "the private follow-on cut fits the existing caption window and agrees with the Android line ID");
     }
+    constexpr std::array<std::string_view, 2> hearthLineIds{"hub.kit_stake", "kit.personal_stake.key"};
+    for (std::size_t i = 0; i < hearthLineIds.size(); ++i) {
+        const auto& cut = horde::audio::kBellwetherHearthAuditionCuts[i];
+        const auto& spec = Spec(cut.line);
+        Check(std::string_view(spec.stableId) == hearthLineIds[i] &&
+            std::string_view(spec.speaker) == "Kit" &&
+            std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f &&
+            !horde::audio::HasBellwetherVoiceCut(cut.line, true, true, true) &&
+            horde::audio::HasBellwetherVoiceCut(cut.line, false, false, false, true) &&
+            RequiresChapterCaption(cut.line),
+            "the private Kit hearth pair is exact, independently admitted, and retains captions");
+    }
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
           "invalid catalogue paths cannot escape the supplied asset root");
@@ -912,6 +924,105 @@ int main() {
             canceled.Step(.01f,local);
             Check(canceled.State().line==Line::None,"an interrupted local request does not repeat this session");
         }
+    }
+    {
+        Check(static_cast<std::uint32_t>(Line::KitTreasureRoof)==59u &&
+              static_cast<std::uint32_t>(Line::KitTreasureKey)==60u &&
+              std::string_view(Spec(Line::KitTreasureRoof).stableId)=="hub.kit_stake" &&
+              std::string_view(Spec(Line::KitTreasureRoof).text)==
+                  "I'd like a roof that doesn't fall in. Treasure still seems a fair way to get one." &&
+              std::string_view(Spec(Line::KitTreasureKey).stableId)=="kit.personal_stake.key" &&
+              std::string_view(Spec(Line::KitTreasureKey).text)==
+                  "A door with my own key. I’ve had worse reasons for going digging." &&
+              std::string_view(Spec(Line::KitTreasureRoof).speaker)=="Kit" &&
+              std::string_view(Spec(Line::KitTreasureKey).speaker)=="Kit" &&
+              std::abs(Spec(Line::KitTreasureRoof).duration-136784.f/24000.f)<.000001f &&
+              std::abs(Spec(Line::KitTreasureKey).duration-113744.f/24000.f)<.000001f &&
+              RequiresChapterCaption(Line::KitTreasureRoof) && RequiresChapterCaption(Line::KitTreasureKey) &&
+              IsBellwetherLine(Line::KitTreasureRoof) && IsBellwetherLine(Line::KitTreasureKey),
+              "the optional Kit topic appends exact stable authored lines with measured caption clocks");
+
+        Progress settled;
+        settled.grateConsumed=settled.rescueConsumed=settled.reunionStarted=settled.proofAccepted=true;
+        settled.forestNightConsumed=settled.forestWaystoneConsumed=settled.forestClueConsumed=
+            settled.forestVillageConsumed=true;
+        settled.hearthLinesResolved=kHearthLines.size();
+        settled.tavernConversationLinesResolved=kTavernConversation.size();
+        Context room;
+        room.claimed=room.exterior=room.kitSeated=room.tavernInReach=room.kitTreasureTopicInReach=true;
+        room.companionSource=Tuple{12.4f,1.4f,-3.8f};
+        room.listener=Tuple{11.3f,1.7f,-3.1f};
+        Director topic;
+        Check(topic.RestoreProgress(settled,room,1,0) && topic.CanAskKitAboutTreasure(room),
+              "the optional question is available after Kit settles and the initial tavern exchange completes");
+        for(int condition=0;condition<7;++condition) {
+            Director gated;Check(gated.RestoreProgress(settled,room,1,0),"Kit topic gate fixture restores");
+            auto context=room;
+            switch(condition) {
+            case 0: context.claimed=false;break;
+            case 1: context.alive=false;break;
+            case 2: context.exterior=false;break;
+            case 3: context.kitSeated=false;break;
+            case 4: context.combat=true;break;
+            case 5: context.traversing=true;break;
+            default: context.kitTreasureTopicInReach=false;break;
+            }
+            Check(!gated.CanAskKitAboutTreasure(context),
+                  "asking requires the settled live Kit and explicit close-facing interaction affordance");
+        }
+        Progress beforeExchange=settled;beforeExchange.tavernConversationLinesResolved--;
+        Director notYet;Check(notYet.RestoreProgress(beforeExchange,room,1,0) &&
+              !notYet.CanAskKitAboutTreasure(room),
+              "the optional Kit topic stays unavailable until all initial tavern lines resolve");
+        Director busy;Check(busy.RestoreProgress(settled,room,1,0),"busy Kit topic fixture restores");
+        busy.ShowTavernDirections(room);
+        const auto unrelated=busy.State();
+        Check(!busy.CanAskKitAboutTreasure(room) && !busy.TryStartKitTreasureTalk(room) &&
+              busy.State().line==unrelated.line && busy.State().generation==unrelated.generation,
+              "the optional Kit topic cannot interrupt other chapter dialogue");
+
+        Check(topic.TryStartKitTreasureTalk(room) && topic.State().line==Line::KitTreasureRoof &&
+              topic.State().source.x==room.companionSource->x &&
+              !topic.TryStartKitTreasureTalk(room),
+              "an explicit ask starts the first Kit line at Kit's companion source and cannot stack");
+        const auto first=topic.State();
+        const auto initialProgress=topic.ExportProgress();
+        Check(initialProgress.activeLine==Line::None &&
+              initialProgress.hearthLinesResolved==settled.hearthLinesResolved &&
+              initialProgress.tavernConversationLinesResolved==settled.tavernConversationLinesResolved,
+              "the repeatable local conversation adds no saved flag or story tracker progress");
+        room.paused=true;topic.Step(.05f,room);
+        Check(topic.State().line==first.line && topic.State().elapsed==first.elapsed,
+              "pause freezes Kit's optional line");
+        room.paused=false;
+        for(int tick=0;tick<120 && topic.State().line==Line::KitTreasureRoof;++tick)topic.Step(.05f,room);
+        Check(topic.State().line==Line::KitTreasureKey && topic.State().source.x==room.companionSource->x,
+              "the first caption's measured clock advances within the same explicit conversation to Kit's key line");
+        topic.Skip();
+        Check(topic.State().line==Line::None && !topic.Complete(first.line,first.generation),
+              "the ordinary interaction skip ends the current optional line and invalidates its callback");
+        topic.Step(.01f,room);
+        Check(topic.State().line==Line::None && topic.CanAskKitAboutTreasure(room) &&
+              topic.ExportProgress().tavernConversationLinesResolved==settled.tavernConversationLinesResolved,
+              "a completed question stays quiet and can be asked again without advancing story progress");
+
+        Check(topic.TryStartKitTreasureTalk(room),"a completed optional conversation can be explicitly repeated");
+        const auto retry=topic.State();
+        auto away=room;away.tavernInReach=false;away.kitTreasureTopicInReach=false;
+        topic.Step(.01f,away);
+        Check(topic.State().line==Line::None && !topic.Complete(retry.line,retry.generation),
+              "walking out of Kit's hearing range cancels the pending conversation and rejects stale completion");
+        topic.Step(.01f,room);
+        Check(topic.State().line==Line::None && topic.CanAskKitAboutTreasure(room),
+              "returning to the tavern does not auto-start the canceled optional conversation");
+        Director suspended;
+        Check(suspended.RestoreProgress(settled,room,1,0) && suspended.TryStartKitTreasureTalk(room),
+              "lifecycle cancellation fixture starts the optional Kit conversation");
+        const auto beforeSuspend=suspended.State();
+        suspended.Suspend();suspended.Step(.01f,room);
+        Check(suspended.State().line==Line::None && !suspended.Complete(beforeSuspend.line,beforeSuspend.generation) &&
+              suspended.CanAskKitAboutTreasure(room),
+              "leaving or quitting cancels the pending conversation and requires a fresh explicit ask");
     }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

@@ -20,6 +20,16 @@ struct SubtitlePaintKey {
     }
 };
 
+inline std::wstring WindowsSubtitleWideText(const std::string& utf8) {
+    if(utf8.empty())return {};
+    const int count=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.c_str(),-1,nullptr,0);
+    if(count<=0)return {};
+    std::wstring wide(static_cast<std::size_t>(count),L'\0');
+    if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.c_str(),-1,wide.data(),count))return {};
+    wide.resize(wide.size()-1);
+    return wide;
+}
+
 // Native HUD only. A grayscale GDI glyph mask becomes premultiplied BGRA with
 // a small dark outline. Unoccupied pixels stay transparent over RT presentation.
 inline std::vector<std::uint32_t> RasterizeSubtitle(const SubtitlePaintKey& key, HFONT font) {
@@ -41,7 +51,8 @@ inline std::vector<std::uint32_t> RasterizeSubtitle(const SubtitlePaintKey& key,
     std::memset(bits,0,count*sizeof(std::uint32_t));
     SetBkMode(dc,TRANSPARENT); SetTextColor(dc,RGB(255,255,255));
     RECT textRect{12,8,key.width-12,key.height-8};
-    DrawTextA(dc,key.text.c_str(),-1,&textRect,DT_CENTER|DT_WORDBREAK|DT_NOPREFIX);
+    const auto wide=WindowsSubtitleWideText(key.text);
+    DrawTextW(dc,wide.c_str(),-1,&textRect,DT_CENTER|DT_WORDBREAK|DT_NOPREFIX);
     GdiFlush();
     const auto* mask=static_cast<const std::uint32_t*>(bits);
     std::vector<std::uint32_t> pixels(count);

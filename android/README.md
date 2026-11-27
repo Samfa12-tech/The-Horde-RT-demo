@@ -197,10 +197,13 @@ The five privately approved Kit takes can be enabled by adding
 Use the same property with the ten-file overlay to audition the three
 roadside pickups, the doorway welcome and the keeper's hearth reply. All
 files go under `private_bellwether_voice/`. Gradle checks the exact rosters.
-The arrival and salvager groups can be combined with the five Kit takes in
-the same thirteen-file overlay. Keep receipts and review files outside the
-overlay root. Both audition groups are restricted to the resident Debug app
-and await owner listening approval.
+The five base takes also support four optional groups. The arrival group
+adds five takes, the salvager adds three, and the follow-on conversations
+add six. Kit's hearth question adds `hub.kit_stake.wav` and
+`kit.personal_stake.key.wav`. The full overlay contains 21 takes. Each
+optional group is admitted as a complete, byte-verified set, so existing
+overlays still work. Keep receipts and review files outside the overlay
+root. These audition groups are restricted to the private resident Debug app.
 
 Stored WAVs load into SoundPool directly from the APK. Compressed assets
 and rejected direct loads use the existing cache fallback. The shared

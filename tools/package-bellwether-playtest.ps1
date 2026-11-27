@@ -42,6 +42,21 @@ if ($presentFollowOn.Count -gt 0) {
     if ($presentFollowOn.Count -ne $followOn.Count) { throw 'The follow-on audition needs all six prepared WAVs.' }
     $voiceLines += $followOn
 }
+$hearth = @('hub.kit_stake','kit.personal_stake.key')
+$presentHearth = @($hearth | Where-Object { Test-Path -LiteralPath (Join-Path $voices "$_.wav") })
+if ($presentHearth.Count -gt 0) {
+    if ($presentHearth.Count -ne $hearth.Count) { throw 'The Kit hearth audition needs both prepared WAVs.' }
+    $hearthHashes = @{
+        'hub.kit_stake' = '9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82'
+        'kit.personal_stake.key' = 'd82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0'
+    }
+    foreach ($line in $hearth) {
+        if ((Get-FileHash -LiteralPath (Join-Path $voices "$line.wav")).Hash.ToLowerInvariant() -ne $hearthHashes[$line]) {
+            throw "The Kit hearth audition differs from the exact reviewed take: $line"
+        }
+    }
+    $voiceLines += $hearth
+}
 
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
     'reports/horde-bellwether-playtest-' + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
