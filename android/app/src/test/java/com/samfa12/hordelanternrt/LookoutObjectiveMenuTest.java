@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -33,6 +34,7 @@ public final class LookoutObjectiveMenuTest {
     public static final class Bridge {
         static long[] objective;
         static long[] entryState;
+        static String directionsText;
         static boolean paused,entry,crouch;
         static float strafe,forward;
         static int lastCampaignAction,lastCampaignKind,resets,campaignRequests,attacks,parries,dodges,interacts,lanterns;
@@ -41,6 +43,7 @@ public final class LookoutObjectiveMenuTest {
         @Implementation protected static long[] getLookoutObjectiveState(long generation){return objective==null?null:objective.clone();}
         @Implementation protected static String getLookoutObjectiveText(long surface,long world,int id) {
             if(objective==null || objective[1]!=surface || objective[2]!=world || objective[3]!=id)return "";
+            if (directionsText != null) return directionsText;
             switch(id) {
                 case 1: return "Follow the road down to Bellwether. The tavern is across the square.";
                 case 2: return "Ask the record keeper by the northern church about the wayside shrine.\r\n\r\n"
@@ -111,6 +114,7 @@ public final class LookoutObjectiveMenuTest {
     private int actionCount(){return Bridge.attacks+Bridge.parries+Bridge.dodges+Bridge.interacts+Bridge.lanterns;}
     @Before public void setup()throws Exception {
         Bridge.objective=new long[]{2,31,81,1};Bridge.entryState=null;Bridge.guardHeld=false;
+        Bridge.directionsText=null;
         Bridge.paused=Bridge.entry=Bridge.crouch=false;
         Bridge.strafe=Bridge.forward=0;Bridge.order.clear();
         Bridge.resets=Bridge.campaignRequests=Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=0;
@@ -258,5 +262,64 @@ public final class LookoutObjectiveMenuTest {
                 AndroidControllerInput.CONFIRM|AndroidControllerInput.INTERACT|AndroidControllerInput.SWING,0,0,0,0,0,0);
         call("handleControllerResult",new Class<?>[]{AndroidControllerInput.Result.class},result);
         assertFalse(Bridge.paused);assertEquals(0,actionCount());assertFalse(Bridge.crouch);
+    }
+
+    private ScrollView openLongDirections() throws Exception {
+        Bridge.objective[3] = 5;
+        Bridge.directionsText = "The Abbey lies downstream. The Foundry is east, across the gorge.\n\n"
+                + "The fingerpost by the covered well\nTankard - up the oak-railed ramp to the tavern.\n"
+                + "Scales - west to the dealer, then on to the kitchen gardens.\n"
+                + "Wheel - east to the mill and the river fork.\nAnvil - southeast to the smith yard.\n\n"
+                + "Purse: 2 coins.\nLantern hinge fitted.\nThe mill's tally stamp has been returned.\n\n"
+                + "For an air ward, return to the wayside shrine and restore its binding.\n\n"
+                + "Follow the stone causeway south of the mill to the river rail. Start the leak test "
+                + "in the shallows and stay there for two seconds. Return to dry stone to confirm the seal.\n\n"
+                + "Shore practice: Return to the salvager at the river fork to report back.";
+        pause();
+        find("Bellwether directions").performClick();
+        ViewGroup root = a.findViewById(R.id.menu_scrim);
+        root.measure(View.MeasureSpec.makeMeasureSpec(720, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(260, View.MeasureSpec.EXACTLY));
+        root.layout(0, 0, 720, 260);
+        return (ScrollView) root.getChildAt(0);
+    }
+
+    @Test public void controllerReadsLongDirectionsBeforeReachingTheActions() throws Exception {
+        set("controllerMode", true);
+        ScrollView scroll = openLongDirections();
+        View root = a.findViewById(R.id.menu_scrim);
+        View heading = ControllerNavigation.ensureFocus(root);
+        assertEquals("Directions", ((TextView) heading).getText().toString());
+        assertEquals(0, scroll.getScrollY());
+        assertFalse(ControllerNavigation.confirm(root));
+        assertTrue(Bridge.paused);
+
+        ControllerNavigation.navigate(root, 0, 1);
+        assertTrue(scroll.getScrollY() > 0);
+        assertTrue(heading.hasFocus());
+        ControllerNavigation.navigate(root, 0, -1);
+        assertEquals(0, scroll.getScrollY());
+        for (int i = 0; i < 30 && heading.hasFocus(); ++i) {
+            ControllerNavigation.navigate(root, 0, 1);
+        }
+        assertTrue(find("Continue exploring").hasFocus());
+        ControllerNavigation.navigate(root, 0, 1);
+        assertTrue(find("Back to pause menu").hasFocus());
+        assertTrue(ControllerNavigation.confirm(root));
+        assertTrue(Bridge.paused);
+        assertEquals(0, Bridge.campaignRequests);
+        assertEquals(0, actionCount());
+    }
+
+    @Test public void keyboardArrowsCanReadLongDirectionsFromTheTop() throws Exception {
+        ScrollView scroll = openLongDirections();
+        View heading = scroll.findFocus();
+        assertEquals("Directions", ((TextView) heading).getText().toString());
+        assertEquals(0, scroll.getScrollY());
+        assertTrue(heading.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN)));
+        assertTrue(scroll.getScrollY() > 0);
+        assertTrue(heading.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP)));
+        assertEquals(0, scroll.getScrollY());
+        assertTrue(Bridge.paused);
     }
 }
