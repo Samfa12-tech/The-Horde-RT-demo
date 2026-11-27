@@ -77,7 +77,7 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     }
     for(const auto name:kChapterHostPhaseNames)csv<<','<<name;
     csv<<",host_previous_evidence_ns,host_phases_available";
-    if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
+    if(doorway)csv<<",fire_count,fire_ids,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
     if(residentRoundTrip)csv<<",returns,resident_slot0_id,resident_slot1_id";
     if(westRoundTrip)csv<<",stock_head_instances,stock_pose_mask";
     csv<<'\n';
@@ -193,10 +193,17 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         for(const auto duration:tag.host.nanoseconds)csv<<','<<duration;
         csv<<','<<tag.host.previousEvidenceNanoseconds<<','<<tag.host.available;
         if(doorway) {
-            if(!sample.scene.fireLighting || (tag.phase=="room" &&
-               (sample.scene.fireLighting->count!=3 ||
-                tag.roomMasks!=std::array<unsigned,3>{1,unsigned(glassEnabled),1}))) {
-                error="Doorway frame lost the staffed room's fire or geometry admission.";return false;
+            if(!sample.scene.fireLighting) {
+                error="Doorway frame has no completed fire-lighting evidence.";return false;
+            }
+            if(tag.phase=="room" && (!HasBellwetherRoomFireAdmission(*sample.scene.fireLighting) ||
+               tag.roomMasks!=std::array<unsigned,3>{1,unsigned(glassEnabled),1})) {
+                std::ostringstream detail;
+                detail<<"Staffed room admission failed. Fire IDs:";
+                for(std::uint32_t i=0;i<sample.scene.fireLighting->count;++i)
+                    detail<<' '<<sample.scene.fireLighting->emitters[i].stableId;
+                detail<<"; keeper/window/resident masks: "<<tag.roomMasks[0]<<'/'<<tag.roomMasks[1]<<'/'<<tag.roomMasks[2];
+                error=detail.str();return false;
             }
             if(context.combinedBellwetherResidents && tag.recordKeeperMask!=1) {
                 error="Doorway frame lost the submitted record keeper instance.";return false;
@@ -204,7 +211,12 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             if(tag.tavernDoorMask!=1) {
                 error="Doorway frame lost the submitted tavern door instance.";return false;
             }
-            csv<<','<<sample.scene.fireLighting->count<<','<<sample.scene.resources.tlasInstanceCount<<','
+            csv<<','<<sample.scene.fireLighting->count<<',';
+            for(std::uint32_t i=0;i<sample.scene.fireLighting->count;++i) {
+                if(i)csv<<';';
+                csv<<sample.scene.fireLighting->emitters[i].stableId;
+            }
+            csv<<','<<sample.scene.resources.tlasInstanceCount<<','
                <<sample.scene.resources.bottomLevelAccelerationStructureCount;
             for(const auto mask:tag.roomMasks)csv<<','<<mask;
             csv<<','<<tag.recordKeeperMask<<','<<tag.tavernDoorMask;

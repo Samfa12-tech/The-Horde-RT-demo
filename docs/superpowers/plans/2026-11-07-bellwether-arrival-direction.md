@@ -103,7 +103,8 @@ Both standard Windows hardware RT backends passed all 16 checks from the lookout
 ### Bellwether directions in the pause menu
 
 **Bellwether directions** is available in the pause menu once Kit takes the road.
-It points to the south tavern door, then to the hearth and **Talk** when Kit is
+It names the covered well, lit tankard sign and oak rail on the way to the
+south tavern door. It then points to the hearth and **Talk** when Kit is
 seated and the keeper is available. Completing Talk opens the church and the
 preparation leads. At the shrine the page follows the lower stone, lantern and
 road register. An already-open shrine whose claim is still unheard points to
@@ -668,6 +669,9 @@ The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/READ
 [House A](../../../assets/models/world/source/bellwether-garden-house-v1/README.md)
 has a household washing place on the garden-facing wall. A tiled shelter
 covers the basin and draining bench, and its gutter empties into a barrel.
+Beside the shelter, a partly open shutter reveals an oil wick in the
+garden-facing wall. Its light and the light below the grate are visible
+together from the fork in the path.
 The original stone entrance now stands at the mapped east door. That door
 stays latched. A narrow path splits from the garden lane beside the grate,
 leading to the washing bench and the foot of the east steps.

@@ -8388,7 +8388,7 @@ bool PresentableTinyRtScene::UpdatePreviewInstances(VkCommandBuffer commandBuffe
     if (!BuildFireEmitterUpload(
             std::span<const horde::gameplay::effects::FireEmitterState>(emitters).first(
                 emitterCount),
-            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ}, frame.zone, 24.0f},
+            {{frame.cameraX, horde::gameplay::simulation::PlayerEyeWorldY(frame.playerSupportWorldY), frame.cameraZ}, frame.zone},
             {tuning.fireStrengthScale, tuning.fireTurbulenceScale, tuning.fireSmokeScale},
             fireDetail, fire, diagnostic))
         return false;
@@ -9755,8 +9755,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             std::span<const horde::gameplay::effects::FireEmitterState>(
                 renderFireEmitters.data(),
                 std::min(frame.fireEmitterCount, renderFireEmitters.size())),
-            {eye,
-             frame.zone, 24.0f},
+            {eye, frame.zone},
             fireTuning,
             fireQuality,
             fireEmitterUpload,
@@ -9767,7 +9766,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     if (productionLanternVisible)
     {
         horde::gameplay::effects::FireEmitterState lanternEmitter{};
-        lanternEmitter.stableId = 0x4c414e54u;
+        lanternEmitter.stableId = horde::gameplay::effects::kRewardLanternFireEmitterId;
         lanternEmitter.seed = 0x474f5448u;
         lanternEmitter.strength = 0.78f;
         lanternEmitter.colourTemperatureKelvin = 1725.0f;

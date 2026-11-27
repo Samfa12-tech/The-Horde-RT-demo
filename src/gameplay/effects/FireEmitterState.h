@@ -6,12 +6,15 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <span>
 
 namespace horde::gameplay::effects
 {
 
 inline constexpr std::size_t kFireEmitterCapacity = 4u;
 inline constexpr std::size_t kActiveFireEmitterCapacity = 4u;
+inline constexpr float kDefaultFireViewDistance = 24.0f;
+inline constexpr std::uint32_t kRewardLanternFireEmitterId = 0x4c414e54u;
 
 enum class FireEmitterParentObject : std::uint32_t
 {
@@ -77,6 +80,9 @@ struct FireEmitterCheckpoint
 
 FireEmitterState MakeOpeningTorchFireEmitter();
 FireEmitterState MakeWorldTorchFireEmitter(std::uint32_t stableId, std::uint32_t seed);
+// The caller reserves held-light slots before offering the remaining world roster.
+void IncludeNearbyWorldFire(std::span<FireEmitterState> worldSlots, const FireEmitterState& candidate,
+                            float eyeX, float eyeZ) noexcept;
 void ResetFireEmitter(FireEmitterState& state);
 void StepFireEmitterFixed(FireEmitterState& state,
                           const FireEmitterFixedStepInput& input,

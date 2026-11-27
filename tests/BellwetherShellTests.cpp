@@ -379,6 +379,50 @@ int main(int argc,char** argv) {
                   follow({45.74f,120.3f},{45.63f,119.05f}) && follow({45.63f,119.05f},{45.18f,118.42f}) &&
                   follow({45.18f,118.42f},{45.63f,119.05f}) && follow({45.63f,119.05f},{45.74f,120.3f}),
                   "the domestic paths reach the washing bench and the foot of the stone steps in both directions");
+            constexpr auto& windowFlame=horde::gameplay::bellwether::kGardenHouseWindowFlame;
+            constexpr auto& windowLight=horde::gameplay::bellwether::kGardenHouseWindowLight;
+            check(support->NonWalkableVolumeClear(windowFlame[0],125.1f,windowFlame[0],123.55f,
+                      windowFlame[1]+.025f,windowFlame[1]+.045f,.008f),
+                  "the garden-facing aperture and shallow pocket admit a clear sightline to the wick");
+            check(!support->NonWalkableVolumeClear(windowFlame[0],123.55f,windowFlame[0],123.34f,
+                      windowFlame[1]-.035f,windowFlame[1]+.035f,.012f),
+                  "the opaque inner cheek bounds the window pocket behind the lamp");
+            check(!support->NonWalkableVolumeClear(39.40f,125.1f,39.40f,124.55f,-8.80f,-8.76f,.012f) &&
+                  support->NonWalkableVolumeClear(40.00f,125.1f,40.00f,123.55f,-8.80f,-8.76f,.012f),
+                  "the open shutter occupies one edge while leaving the other half of the aperture clear");
+            check(std::abs(windowFlame[1]-(-9.1585254f))<.002f &&
+                  std::abs((windowFlame[1]-.25f)-(-9.4085254f))<.003f &&
+                  std::abs(windowLight[1]-windowFlame[1]-.09f)<.002f &&
+                  std::abs(windowLight[0]-windowFlame[0])<.04f &&
+                  std::abs(windowLight[2]-windowFlame[2])<.05f &&
+                  !support->NonWalkableVolumeClear(windowFlame[0],windowFlame[2],windowFlame[0],windowFlame[2],
+                      windowFlame[1]-.006f,windowFlame[1]+.006f,.003f) &&
+                  support->NonWalkableVolumeClear(windowLight[0],windowLight[2],windowLight[0],windowLight[2],
+                      windowLight[1]-.015f,windowLight[1]+.015f,.012f),
+                  "the wick tip contacts the flame anchor and the light point retains local clearance");
+            constexpr float pocketSillY=-9.4085254f;
+            constexpr float rayStartZ=125.1f,rayEndZ=123.8f;
+            const float rayStartY=pocketSillY+.40f,rayEndY=pocketSillY-.15f;
+            const float sillT=(rayStartY-pocketSillY)/(rayStartY-rayEndY);
+            const float sillZ=std::lerp(rayStartZ,rayEndZ,sillT);
+            bool clearToSill=true;
+            const auto rayPoint=[&](float t) {
+                return std::array{std::lerp(rayStartY,rayEndY,t),std::lerp(rayStartZ,rayEndZ,t)};
+            };
+            const float clearEnd=sillT-.025f;
+            for(int step=0;step<32;++step) {
+                const float t0=clearEnd*float(step)/32.f,t1=clearEnd*float(step+1)/32.f;
+                const auto a=rayPoint(t0),b=rayPoint(t1);
+                clearToSill=clearToSill && support->NonWalkableVolumeClear(40.12f,a[1],40.12f,b[1],
+                    std::min(a[0],b[0])-.002f,std::max(a[0],b[0])+.002f,.003f);
+            }
+            const auto beforeSill=rayPoint(sillT-.012f),afterSill=rayPoint(sillT+.012f);
+            const bool sillStopsRay=!support->NonWalkableVolumeClear(40.12f,beforeSill[1],40.12f,afterSill[1],
+                std::min(beforeSill[0],afterSill[0])-.002f,
+                std::max(beforeSill[0],afterSill[0])+.002f,.003f);
+            check(clearToSill && sillStopsRay && sillZ<124.2f-.02f && sillZ>123.44f+.02f &&
+                  std::abs(windowFlame[0]-40.12f)<.35f,
+                  "an angled ray enters above the sill and first meets the full pocket floor between the wall and back");
             // At the mapped height the east stone jamb stands proud of the wall.
             // Its old position ahead of the solid north wall is clear.
             check(!support->NonWalkableVolumeClear(43.42f,116.7f,43.42f,117.5f,-9.28f,-9.22f,.025f) &&

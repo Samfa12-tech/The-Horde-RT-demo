@@ -186,6 +186,10 @@ python tools/analyze-chapter-route-measurement.py --android-bellwether-west-roun
 
 The verifier checks the dealer handoff in each direction, the three submitted
 stock head instances and the settled pose and each gesture during both holds.
+Current route CSVs record the stable IDs of the uploaded fires. A staffed
+room frame must include the hearth, the table candle, the south porch lamp
+and the player's lantern. The analyzer labels older Android recordings that
+retained only the three-light count.
 It uses the same completed-submission and present-return joins as the east route.
 
 The five privately approved Kit takes can be enabled by adding

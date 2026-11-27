@@ -1444,8 +1444,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             const auto afterRoadDirections = kBellwetherTavernRoute.begin() + 3;
             if (progressed) {
                 progressed = check(std::all_of(kBellwetherTavernRoute.begin(), afterRoadDirections, walkTo) &&
-                    readDirections(campaign::PauseObjective::BellwetherArrival, "south door"),
-                    "the ordinary pause menu points to Bellwether's south tavern door on the road");
+                    readDirections(campaign::PauseObjective::BellwetherArrival, "lit tankard sign"),
+                    "the ordinary pause menu identifies the lit tankard sign on the approach to the south tavern door");
             }
             progressed = progressed &&
                 std::all_of(afterRoadDirections, kBellwetherTavernRoute.end(), walkTo) &&
@@ -1567,7 +1567,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         {kTavernKeeperActorId,
                             gBellwetherCombinedRelicDealer ? kRelicDealerActorId : kSalvagerActorId});
                 };
-                const auto capture = [&](const char* name, bool requireResidents = true) {
+                const auto capture = [&](const char* name, bool requireResidents = true, bool saveFrameEvidence = false) {
                     if (!CompleteRtEvidenceAfterDeviceIdle(ctx, vkDeviceWaitIdle(ctx.device))) return false;
                     const auto publication = ctx.rtFrameEvidence.PublishedStateByValue();
                     const auto& completed = publication.completedEvidence;
@@ -1597,6 +1597,16 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     const bool saved = ctx.rtScene.CaptureStorageImage(image, error) &&
                         WriteRgbaPng(gCampaignValidationDirectory / name, image, error);
                     if (!saved) std::cerr << "Combined resident capture failed for " << name << ": " << error << '\n';
+                    if (saved && saveFrameEvidence) {
+                        std::string json;
+                        horde::telemetry::RtEvidenceValidationError validation{};
+                        if (!horde::telemetry::SerializeRtPerformanceEvidenceJson(completed,json,validation)) return false;
+                        auto path=gCampaignValidationDirectory / name;
+                        std::ofstream out(path.replace_extension(".frame.json"),std::ios::binary);
+                        out << json << '\n';
+                        out.close();
+                        return static_cast<bool>(out);
+                    }
                     return saved;
                 };
                 const auto face = [&](float x, float z) {
@@ -1695,13 +1705,34 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = -.34f;
                         const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
                             setInspectionLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
+                        const auto householdLightsPresented = [&] {
+                            using namespace horde::gameplay::effects;
+                            const auto& lights = ctx.rtScene.UploadedFireEmitters();
+                            const auto& ids = lights.selectedStableIds;
+                            const auto present = [&](std::uint32_t id) { return std::find(ids.begin(),ids.end(),id)!=ids.end(); };
+                            const bool visible=ctx.rtScene.HasUploadedFireEmitters() && lights.activeCount==3 &&
+                                present(kGardenHouseWindowEmitterId) && present(kBellwetherGrateLampEmitterId) &&
+                                present(kRewardLanternFireEmitterId);
+                            if (!visible) {
+                                std::cerr << "Garden fire upload at " << state.playerX << ',' << state.playerZ
+                                          << " has " << lights.activeCount << " active IDs:";
+                                for (const auto id : ids) std::cerr << ' ' << id;
+                                std::cerr << '\n';
+                            }
+                            return visible;
+                        };
                         input.pitchRadians = -.13f;
                         if (!presented || !walkTo(approach.back()) || !walkTo(approach[1]) ||
                             !face(kGardenHouseCorner.x-2.6f,kGardenHouseCorner.z-1.5f) || !frame() ||
-                            !capture("windows-combined-house-lane.png", false))
+                            !householdLightsPresented() || !capture("windows-combined-house-lane.png", false, true))
+                            return false;
+                        input.pitchRadians = .10f;
+                        if (!check(walkTo(kGardenHouseCorner) && face(kGardenHouseWindowFlame[0],kGardenHouseWindowFlame[2]) &&
+                            frame() && householdLightsPresented() && capture("windows-combined-house-window.png", false, true),
+                            "the cottage window and the grate have simultaneous ray-traced fire lighting from the path"))
                             return false;
                         input.pitchRadians = .05f;
-                        if (!check(walkTo(kGardenHouseCorner) && walkTo(kGardenHouseWashView) &&
+                        if (!check(walkTo(kGardenHouseWashView) &&
                             face(35.2f,124.9f) && frame() && capture("windows-combined-house-wash.png", false) &&
                             walkTo(kGardenHouseCorner) && walkTo(kGardenHouseDoorView) &&
                             face(43.3f,118.2f) && frame() && capture("windows-combined-house-door.png", false) &&
@@ -1726,10 +1757,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             return false;
                         }
                         std::array<char, 180> caption{};
-                        const auto& fire = ctx.rtScene.UploadedFireEmitters().selectedStableIds;
-                        const auto grateLamp = horde::gameplay::effects::kBellwetherGrateLampEmitterId;
-                        const bool talked = check(state.fireEmitterCount == 4 && ctx.rtScene.HasUploadedFireEmitters() &&
-                            std::find(fire.begin(), fire.end(), grateLamp) != fire.end() && interact() && frame() && state.chapterDialogue.line == Line::GardenGrateTalk &&
+                        const bool talked = check(state.fireEmitterCount == 4 && householdLightsPresented() &&
+                            interact() && frame() && state.chapterDialogue.line == Line::GardenGrateTalk &&
                             std::abs(state.chapterDialogue.source.y - kBellwetherGrateMouth[1]) < .01f &&
                             GetWindowTextA(GetDlgItem(ctx.windowHandle,kChapterSubtitleId),caption.data(),
                                 static_cast<int>(caption.size())) > 0 &&

@@ -7,13 +7,31 @@
     "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
     "assets/models/world/source/bellwether-shell-v2/authoring-receipt.json": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1"
   },
-  "runtimeTownSha256": "dbb32505df9666faec7da07c57381a3ea07eedf9a6652ad7f461deec0dfc99f5",
+  "runtimeTownSha256": "a41ae7e5ced3961f58f2d9c0a38a88b1ea3eba889503e9e442d0a8c023f754b5",
   "eastEntranceXZ": [
     43.3,
     118.2
   ],
   "relocatedMasonryTriangles": 48,
-  "addedSolidTriangles": 3080,
+  "removedSouthWallTriangles": 2,
+  "windowApertureXZ": [
+    39.159999237060546,
+    40.43999923706055,
+    124.2
+  ],
+  "windowPocketBackZ": 123.44,
+  "windowFlame": [
+    39.779999237060544,
+    -9.158525390625,
+    123.64
+  ],
+  "windowLight": [
+    39.754999237060545,
+    -9.068525390625,
+    123.675
+  ],
+  "addedSolidTriangles": 3126,
+  "netSolidTriangleDelta": 3124,
   "addedGroundTriangles": 53,
   "routeTriangles": {
     "Garden lane to the wash bench": 33,
@@ -21,16 +39,16 @@
   },
   "originalLanesSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
   "houseLanesSha256": "26b009b2162961664171dc0d12880e5575d38fefa3b6205bb977ba3ba6c5fff8",
-  "townVertices": 79245,
-  "townTriangles": 37093,
-  "recipeSha256": "d66f0f0d0be3fea09e3aa48c839fa81852cec21d8ad5ca3cf08b636262873897",
+  "townVertices": 79323,
+  "townTriangles": 37137,
+  "recipeSha256": "b4fd6d573ecae1385e6348d7c33bbe63df6285960d2ffbacdb507a98d9ff6751",
   "blender": "5.2.0 LTS",
   "files": {
-    "garden-house.blend": "470012f6546950050eb24fae62d28ab9b893052344f660d0c4615cb236444a29",
-    "garden-house.glb": "da05c11e6cc54c367446fc1bb75049af15e733a567d47d6d2dc786476177606f",
+    "garden-house.blend": "238caea9f451efae2b17fac98071bb3f6057f10bbafd9f7bea0945c398284765",
+    "garden-house.glb": "d742e144ef3c288d44f48f2289b4c556efb45702ff39b5532e9e32a91f8e93ce",
     "house-paths.glb": "9438d5381fec9569d5562ac2640dca1973b625119ca689cead795cb83ceef60f",
-    "bellwether-tavern-v1.glb": "dbb32505df9666faec7da07c57381a3ea07eedf9a6652ad7f461deec0dfc99f5",
-    "geometry.generated.h": "82bb38cedb8133d5c09a73a1332b9ce2bc309d82528fc90ea818606a131fe9cd",
-    "asset.manifest.json": "d8600817c32618ceb2d43a76420611b51c2e772ba2946ccd5c45d02cf1921f9b"
+    "bellwether-tavern-v1.glb": "a41ae7e5ced3961f58f2d9c0a38a88b1ea3eba889503e9e442d0a8c023f754b5",
+    "geometry.generated.h": "038c965de5e01616f31f66fa5b5fd6233dee5aa5b4888d5226a3c095aa88c5ec",
+    "asset.manifest.json": "28e0db94378972125607040afd157f73ca39b15f53ba8c1efb312d0fac8759a8"
   }
 }

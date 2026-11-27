@@ -1,6 +1,7 @@
 #include "gameplay/effects/FireEmitterState.h"
 #include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/validation/BellwetherRoomFireContract.h"
 #include "vulkan/raytracing/FireEmitterBuffer.h"
 
 #include <algorithm>
@@ -283,6 +284,65 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
     return ok;
 }
 
+bool TestGardenWindowSharesWorldLightBudget()
+{
+    using namespace horde::gameplay;
+    using namespace horde::gameplay::effects;
+    const auto& flame=bellwether::kGardenHouseWindowFlame;
+    const auto& light=bellwether::kGardenHouseWindowLight;
+    auto window=MakeGardenHouseWindowEmitter();
+    StepFireEmitterFixed(window,GardenHouseWindowFireInput(),kFixedDelta);
+    auto hearth=MakeBellwetherHearthFireEmitter(), candle=MakeBellwetherCandleFireEmitter();
+    auto grate=MakeBellwetherGrateLampFireEmitter();
+    StepFireEmitterFixed(hearth,BellwetherHearthFireInput(),kFixedDelta);
+    StepFireEmitterFixed(candle,BellwetherCandleFireInput(),kFixedDelta);
+    StepFireEmitterFixed(grate,BellwetherGrateLampFireInput(),kFixedDelta);
+    std::array world{hearth,candle,grate};
+    IncludeNearbyWorldFire(world,window,kBellwetherHearthLight[0],kBellwetherHearthLight[2]);
+    bool ok=Require(world[0].stableId==hearth.stableId && world[1].stableId==candle.stableId &&
+                    world[2].stableId==grate.stableId,
+                    "the distant cottage wick leaves the tavern roster alone");
+
+    IncludeNearbyWorldFire(world,window,flame[0],flame[2]);
+    IncludeNearbyWorldFire(world,window,flame[0],flame[2]);
+    FireEmitterUpload upload{};
+    std::string diagnostic;
+    const bool uploaded=BuildFireEmitterUpload(world,{light,ShowcaseZone::Outside},{},FireEmitterQuality::Mobile,upload,diagnostic);
+    ok &= Require(uploaded,diagnostic.c_str());
+    ok &= Require(upload.activeCount==2 && upload.selectedStableIds[0]==grate.stableId &&
+                  upload.selectedStableIds[1]==window.stableId,
+                  "repeated cottage admission uploads exactly the grate and window wicks in stable ID order");
+    ok &= Require(Approx(upload.emitters[1].lightPositionStrength[0],light[0]) &&
+                  upload.emitters[1].lightPositionStrength[3]>0.f,
+                  "the window wick emits at its authored light anchor");
+
+    const auto edge=Emitter(1,kDefaultFireViewDistance,ShowcaseZone::Outside);
+    std::array nearby{edge,Emitter(2,3.f,ShowcaseZone::Outside),Emitter(3,0.f,ShowcaseZone::Outside)};
+    IncludeNearbyWorldFire(nearby,Emitter(4,1.f,ShowcaseZone::Outside),0.f,0.f);
+    ok &= Require(nearby[0].stableId==1 && nearby[1].stableId==2 && nearby[2].stableId==3,
+                  "all in-range primary sources keep their slots, including a flame on the radius");
+    return ok;
+}
+
+bool TestStaffedRoomMeasurementLights()
+{
+    using namespace horde::gameplay::effects;
+    using horde::gameplay::validation::HasBellwetherRoomFireAdmission;
+    horde::telemetry::RtFireLightingEvidence evidence{};
+    evidence.count=4;
+    evidence.emitters[0].stableId=kBellwetherCandleEmitterId;
+    evidence.emitters[1].stableId=kRewardLanternFireEmitterId;
+    evidence.emitters[2].stableId=kBellwetherHearthEmitterId;
+    evidence.emitters[3].stableId=kBellwetherPorchLampEmitterId;
+    bool ok=Require(HasBellwetherRoomFireAdmission(evidence),"the current staffed room reports its four authored fires");
+    evidence.count=3;
+    ok &= Require(!HasBellwetherRoomFireAdmission(evidence),"a missing porch lamp invalidates the current room measurement");
+    evidence.count=4;
+    evidence.emitters[3].stableId=kBellwetherCandleEmitterId;
+    ok &= Require(!HasBellwetherRoomFireAdmission(evidence),"an extra candle cannot substitute for the porch lamp");
+    return ok;
+}
+
 bool TestTorchExtinguishZerosStrengthWithoutChangingTransforms()
 {
     FireEmitterState emitter = MakeOpeningTorchFireEmitter();
@@ -529,6 +589,8 @@ int main()
     ok &= TestDistanceBoundaryIsExactBeforeStablePublication();
     ok &= TestAllFourEligibleEmittersRemainActive();
     ok &= TestBellwetherFiresUseTheOrdinaryFireBudget();
+    ok &= TestGardenWindowSharesWorldLightBudget();
+    ok &= TestStaffedRoomMeasurementLights();
     ok &= TestTorchExtinguishZerosStrengthWithoutChangingTransforms();
     ok &= TestAuthoredTorchUsesPlausibleWarmBlackBodyColour();
     ok &= TestActualPivotAccelerationDrivesBoundedMotionResponse();

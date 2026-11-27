@@ -97,7 +97,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeBellwetherSmithLampFireEmitter(),
                            effects::MakeBellwetherGrateLampFireEmitter(),
                            effects::MakeBellwetherMillBenchLampFireEmitter(),
-                           effects::MakeBellwetherPorchLampFireEmitter()};
+                           effects::MakeBellwetherPorchLampFireEmitter(),
+                           effects::MakeGardenHouseWindowEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2248,6 +2249,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[7],
             effects::BellwetherFireInput(bellwether::kSquarePorchLampFlame,bellwether::kSquarePorchLampLight,1.25f),
             fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[8],
+            effects::GardenHouseWindowFireInput(),fixedDeltaSeconds);
     }
 }
 
@@ -3876,6 +3879,9 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         const auto exteriorLamp=effects::SelectBellwetherExteriorLamp(playerX_,playerZ_);
         snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1],
                                   bellwetherFireEmitters_[exteriorLamp]};
+        const auto torso=traversal::RescueTorsoOffset(rescueTraversal_.Snapshot());
+        effects::IncludeNearbyWorldFire(std::span{snapshot_.fireEmitters}.subspan(1),
+            bellwetherFireEmitters_[8],playerX_+torso.x,playerZ_+torso.z);
         snapshot_.fireEmitterCount = snapshot_.fireEmitters.size();
     }
     snapshot_.flaskUpgrade={};
