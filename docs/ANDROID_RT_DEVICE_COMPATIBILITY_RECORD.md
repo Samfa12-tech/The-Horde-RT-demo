@@ -4993,3 +4993,48 @@ temperature rose from 36.3 to 39.8 °C and battery temperature from 35.3 to
 turn nor a sustained frame-rate result. The nine pre-existing report files
 were verified after restoring changed files. The app was stopped, with the
 original seven saves and preference hash verified.
+
+### 28 November 2026 — Staffed hearth shader sampling on the Galaxy S26 Ultra
+
+The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the ordinary west
+route at 33% scale, with RayTracingPipeline, Shipping/Mobile and glass off.
+The first room held Kit, the tavern keeper and record keeper, four active
+lights, 45 TLAS instances and 38 BLAS owners. The internal image was
+475 × 980 on a 1440 × 2971 surface. The private shader observer retained
+the ordinary geometry and descriptor layout.
+
+Two fresh observer processes each captured three submitted, completed and
+presented frames from that stationary room. Each capture contains all 465
+pixels on a grid spaced 32 pixels apart. Across the six frames, **shadow
+visibility accounted for 36.37–37.73% of sampled invocation ticks**.
+That was the largest category. Traversal and intersection filtering
+accounted for 16.51–16.90%, hit and material decoding for 15.45–18.00%,
+and surface shading and transport for 15.21–16.47%. Between 390 and 392
+sampled primary rays per frame hit the shared static world. Those pixels
+accounted for 76.86–79.48% of the sampled shadow ticks. The primary hit
+identifies the receiving pixel. It cannot identify which object blocked
+its shadow ray.
+
+The ordinary private APK from `9053c248` and the observer from
+`c20f764a` contained 290 byte-identical runtime asset entries. At the
+frozen `bellwether-repeat-visit` checkpoint, both full 1440 × 3120
+phone captures had identical decoded RGB. In a 38-frame window of the
+first room hold, median dispatch was 76.37 ms on the ordinary build and
+89.01 ms on the observer. Elapsed device-clock shares describe the
+instrumented invocations. Use ordinary shaders to measure a candidate
+speedup. This test stopped after the first room hold. The full west
+route still needs a successful two-return performance run.
+
+The [measurement receipt](evidence/2026-11-28-bellwether-hearth-clock/receipt.json)
+records APK and shader hashes, allocation sizes, temperature readings,
+image checksums and exact sample serials. Each run retains its room CSV
+and the three ticketed binary grids with their JSON sidecars. To replay
+the joins, run this from the repository root.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-hearth-clock 1749361a52315f9db913c45ed1474bd9fb2975075bc58322fa90b4247f7855a1 docs/evidence/2026-11-28-bellwether-hearth-clock/first docs/evidence/2026-11-28-bellwether-hearth-clock/repeat
+```
+
+After testing, the temporary observer app was removed. The original
+private playtest APK, eleven saves, nine report files and one preference
+file matched their pre-test hashes. The phone was returned to Home.
