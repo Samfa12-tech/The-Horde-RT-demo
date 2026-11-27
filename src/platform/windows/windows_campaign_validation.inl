@@ -1701,9 +1701,13 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = -.34f;
                         const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
                             setInspectionLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
+                        input.pitchRadians = -.13f;
+                        if (!presented || !walkTo(approach.back()) || !walkTo(approach[1]) ||
+                            !face(kGardenHouseCorner.x-2.6f,kGardenHouseCorner.z-1.5f) || !frame() ||
+                            !capture("windows-combined-house-lane.png", false))
+                            return false;
                         input.pitchRadians = .05f;
-                        if (!check(presented && walkTo(approach.back()) && walkTo(approach[1]) &&
-                            walkTo(kGardenHouseCorner) && walkTo(kGardenHouseWashView) &&
+                        if (!check(walkTo(kGardenHouseCorner) && walkTo(kGardenHouseWashView) &&
                             face(35.2f,124.9f) && frame() && capture("windows-combined-house-wash.png", false) &&
                             walkTo(kGardenHouseCorner) && walkTo(kGardenHouseDoorView) &&
                             face(43.3f,118.2f) && frame() && capture("windows-combined-house-door.png", false) &&
