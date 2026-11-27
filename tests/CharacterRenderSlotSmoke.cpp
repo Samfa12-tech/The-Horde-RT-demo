@@ -1140,6 +1140,7 @@ int main()
                       selectedShadow.find("closedThickness") == std::string::npos &&
                       selectedShadow.find("iorThicknessAttenuationDistance.y") == std::string::npos &&
                       selectedShadow.find("vec3(0.08)") == std::string::npos &&
+                      selectedShadow.find("rayQueryTerminateEXT(") == std::string::npos &&
                       selectedShadow.find("origin, 0.000001, direction, maxDistance") != std::string::npos,
                       "selected glass shadows must measure finite geometric medium segments without authored half-thickness or scalar recovery light");
         const std::size_t binaryVisibilityEnd = lightingSource.find(
@@ -1147,6 +1148,7 @@ int main()
         const std::string binaryVisibility = shadowEnd != std::string::npos &&
             binaryVisibilityEnd != std::string::npos
                 ? lightingSource.substr(shadowEnd, binaryVisibilityEnd - shadowEnd) : "";
+        const auto opaqueCandidate = binaryVisibility.find("if (!transparentWorldPane)");
         ok &= Require(!binaryVisibility.empty() &&
                       binaryVisibility.find(
                           "rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,") != std::string::npos &&
@@ -1156,11 +1158,21 @@ int main()
                       binaryVisibility.find("if (instance == 0)") != std::string::npos &&
                       binaryVisibility.find("material == kMaterialClearGlass ||") != std::string::npos &&
                       binaryVisibility.find("material == kMaterialWater;") != std::string::npos &&
+                      opaqueCandidate != std::string::npos &&
                       binaryVisibility.find(
-                          "if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);") != std::string::npos &&
+                          "if (stopAtOpaqueBlocker)\n"
+                          "            {\n"
+                          "                rayQueryTerminateEXT(query);\n"
+                          "                return 0.0;\n"
+                          "            }\n"
+                          "            rayQueryConfirmIntersectionEXT(query);", opaqueCandidate) != std::string::npos &&
                       binaryVisibility.find(
-                          "gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;") != std::string::npos,
-                      "binary visibility must preserve measured traversal, transparent admission, masks and ray bounds");
+                          "gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;") != std::string::npos &&
+                      binaryVisibility.find(
+                          "return visibilityMask(origin, direction, maxDistance, mask, false);") != std::string::npos &&
+                      lightingSource.find(
+                          "return vec3(visibilityMask(origin, direction, maxDistance, mask, false));") != std::string::npos,
+                      "binary visibility must preserve masks, ray bounds and transparent filtering, with early exit gated on the opaque candidate");
         // The September 30 exact-phone ABBA trial did not admit the first-hit
         // optimisation. Ordered dielectric traversal must also remain intact.
         ok &= Require(lightingSource.find("gl_RayFlagsTerminateOnFirstHitEXT") == std::string::npos,
@@ -1363,6 +1375,18 @@ int main()
         const std::size_t areaLightEnd = lightingSource.find("vec3 fireEmitterDirectLighting(", areaLightBegin);
         const std::string areaLight = areaLightBegin != std::string::npos && areaLightEnd != std::string::npos
             ? lightingSource.substr(areaLightBegin, areaLightEnd - areaLightBegin) : std::string{};
+        constexpr auto directFireVisibility =
+            "vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver, true);";
+        ok &= Require(areaLight.find(
+                          "#if HORDE_GENERIC_TRANSMISSION_VARIANT\n"
+                          "        result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),\n"
+                          "            direction, distance - 0.02, 0x35u);\n"
+                          "#else\n"
+                          "        result += vec3(visibilityMask(offsetRayOrigin(h, direction),\n"
+                          "            direction, distance - 0.02, 0x35u, directFire));\n"
+                          "#endif") != std::string::npos &&
+                      raygenSource.find("areaLightTransmittance(h, localPosition, true, false)") != std::string::npos,
+                      "the fire opt-in must reach only binary area visibility while generic visibility stays ordered");
         ok &= Require(!areaLight.empty() &&
                       areaLight.find("int samples = primaryReceiver ? primaryLocalShadowSamples() : 1;") != std::string::npos &&
                       areaLight.find("sampleNumber < 4") != std::string::npos &&
@@ -1516,14 +1540,13 @@ int main()
                       lightingSource.find("primaryUnclosedVolumeCount") == std::string::npos &&
                       raygenSource.find("if (interfaceCount >= interfaceBudget)") != std::string::npos &&
                       lightingSource.find("result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),") != std::string::npos &&
-                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") != std::string::npos,
+                      lightingSource.find(directFireVisibility) != std::string::npos,
                       "nearest committed shadow traversal must retain RGB through local, sky, and fire lighting while keeping metallic blockers and mobile/high ceilings");
         ok &= Require(raygenSource.find("if (!genericTransmissionActive)") !=
                           std::string::npos &&
                       raygenSource.find("float lightVisibility = lightTransmittance.x;") !=
                           std::string::npos &&
-                      lightingSource.find("vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);") !=
-                          std::string::npos &&
+                      lightingSource.find(directFireVisibility) != std::string::npos &&
                       lightingSource.find("h.base * lightColor * lightTransmittance * diffuse * attenuation") != std::string::npos &&
                       lightingSource.find("lightColor * lightTransmittance * specular * attenuation") != std::string::npos,
                       "fixture-hidden lighting must retain released scalar arithmetic from the shared ordered query while active generic transmission uses RGB traversal");
@@ -1715,7 +1738,7 @@ int main()
                       fireDirect.find("rtFireEmitters.values[emitterIndex]") != std::string::npos &&
                       fireDirect.find("emitter.lightPositionStrength.xyz") != std::string::npos &&
                       fireDirect.find("emitter.colourIntensity.rgb") != std::string::npos &&
-                      fireDirect.find("areaLightTransmittance(h, lightPosition, primaryReceiver)") != std::string::npos &&
+                      fireDirect.find(directFireVisibility) != std::string::npos &&
                       raygenSource.find("findFireEmitter(1u") == std::string::npos &&
                       raygenSource.find("currentTorchLightPosition") == std::string::npos &&
                       raygenSource.find("sin(controls.time * 15.0)") == std::string::npos &&
