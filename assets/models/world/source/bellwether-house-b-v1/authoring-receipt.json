@@ -1,0 +1,44 @@
+{
+  "building": "B04",
+  "eastEntranceXZ": [
+    39.3,
+    97.2
+  ],
+  "floorY": -6.769609375,
+  "rampToe": [
+    42.089999999999996,
+    -7.387382385253907,
+    97.2
+  ],
+  "removedSolidTriangles": {
+    "B04_stone_foundation": 2,
+    "B04_closed_walls": 12,
+    "B04_door_post_-1": 12,
+    "B04_door_post_1": 12,
+    "B04_door_lintel": 12,
+    "B04_front_step": 12
+  },
+  "addedSolidTriangles": 1596,
+  "addedGroundTriangles": 30,
+  "runtimeTownSha256": "7d427dc05c41938845c757d7e171901a2f57108930241166878220d3b6a7cf8a",
+  "originalTownSha256": "71874a3d4b203f84045c1bd807eb3232ba7ba7246493735f12475591056cec58",
+  "blender": "5.2.0 LTS",
+  "townVertices": 94195,
+  "townTriangles": 44329,
+  "recipeSha256": "305c275ea7b79c70dcec3e3215b23c1a812947385b1702f27e3141e98f6a09cb",
+  "sources": {
+    "assets/models/world/source/bellwether-shell-v4/bellwether-shell-v4.blend": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
+    "assets/models/world/source/bellwether-shell-v4/authoring-receipt.json": "a93c72970511f41a783c12fcce986b78d9ddf4fc8f38d1a036edf767cad07b85",
+    "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+    "assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d"
+  },
+  "lanesSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
+  "files": {
+    "house-b.blend": "2a67168c111027cb796773dd246c4c19d213709330ad27f6acf68caa14d0f240",
+    "house-b-solids.glb": "e1cfeb2d65bed8a9c8ae53f7c2d1e8f522227aa4f16fd4c3f7040ab23f3251e4",
+    "house-b-ground.glb": "0728fa20b693f890439407497c48ae718dae0afe3f51209e7c9d0f672d39fb1f",
+    "bellwether-tavern-v1.glb": "7d427dc05c41938845c757d7e171901a2f57108930241166878220d3b6a7cf8a",
+    "geometry.generated.h": "11ed252ffdd8f24a7442857f647cf72415be791c00cb496bf3364ca240bfb38c",
+    "asset.manifest.json": "443cefec16bdea2d04166796bbbdebc2af3a6a4237f1b7d6bc00a53d930d9872"
+  }
+}
