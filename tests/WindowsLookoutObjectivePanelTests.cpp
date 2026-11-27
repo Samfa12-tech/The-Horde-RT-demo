@@ -123,6 +123,11 @@ int main() {
         Check(open(h.view),"final explicit opening remains available");Click(parent,Panel::MenuId);
         Check(h.actions.size()==3 && h.actions.back()==Panel::Action::ReturnToMenu && !h.panel.Visible(),
             "only current native Return to menu emits its distinct action");
+        h.view.objective=Panel::Objective::BellwetherStockRoom;
+        Check(open(h.view) && Text(parent,Panel::BodyId).find("oil lamp on the sorting table")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("back to the road")!=std::string::npos &&
+            !GetDlgItem(parent,Panel::MenuId),"the optional stock-room directions open in the native pause panel");
+        h.panel.Close();
         h.view.objective=Panel::Objective::BellwetherRegister;
         Check(open(h.view) && Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" &&
             Text(parent,Panel::BodyId)==horde::gameplay::campaign::PauseObjectiveText(h.view.objective) &&
