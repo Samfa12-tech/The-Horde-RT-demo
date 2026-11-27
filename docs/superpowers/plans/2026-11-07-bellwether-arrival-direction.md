@@ -705,6 +705,11 @@ fixed-step gestures. Starts use each animal's surveyed mount, with a nine-metre
 range and a minimum three-second gap across the yard. Dialogue and departure
 cancel the active sound. Combined handset cost remains open for the stock pocket.
 
+The [28 November phone walk](../../ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--reading-the-bellwether-fingerpost-on-foot)
+followed the public lane from the square to the pig and both hens and back on
+foot. The player returned to the fingerpost with the same saved progress.
+Listening acceptance and sustained handset pacing remain open.
+
 The [editable source and receipt](../../../assets/models/world/source/bellwether-stock-v1/README.md)
 add 4,492 solid triangles to the existing town materials and primitives.
 The two head masters contribute 1,044 triangles, with the 340-triangle hen

@@ -45,6 +45,9 @@ public class AndroidControllerIntegrationTest {
         @Implementation protected static void requestCombatTeachingReplay(){teachingReplays++;}
         @Implementation protected static void setCombatTeachingOptions(boolean enabled,boolean slowdown){}
         static boolean paused,crouchHeld,analogue; static float dodgeX,dodgeZ; static boolean dodgeAnalogue; static int context,retries,crouchToggles,crouchClears;
+        static long[] chapterState = new long[]{0,1,0,0,0,0,0}; static String chapterText = "";
+        @Implementation protected static long[] getChapterDialogueState(){return chapterState.clone();}
+        @Implementation protected static String getChapterDialogueText(long generation){return chapterState[1]==generation?chapterText:"";}
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
         @Implementation protected static long[] getEntryMenuState(){return new long[]{31,2,0,0,1};}
@@ -86,6 +89,7 @@ public class AndroidControllerIntegrationTest {
     private Button button(String name)throws Exception{return (Button)field(name).get(a);}
     @Before public void setup()throws Exception {
         Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=Bridge.runToggles=Bridge.runClears=Bridge.context=0;
+        Bridge.chapterState=new long[]{0,1,0,0,0,0,0};Bridge.chapterText="";
         Bridge.teachingState=0;Bridge.teachingSkips=Bridge.teachingReplays=0;
         Bridge.x=Bridge.z=Bridge.yaw=Bridge.pitch=0;Bridge.guardHeld=false;Bridge.flask=null;Bridge.drinks=Bridge.rests=0;
         Bridge.crouchHeld=Bridge.analogue=Bridge.dodgeAnalogue=false;Bridge.crouchToggles=Bridge.crouchClears=0;
@@ -105,7 +109,33 @@ public class AndroidControllerIntegrationTest {
         set("crouchButton",a.findViewById(R.id.crouch_button));
         call("configureGameplayActionButtons",new Class<?>[]{});
     }
-    @Test public void automaticMovementRetiresManualButtonsWithoutChangingPointersOrPreferences()throws Exception {
+    @Test public void fingerpostCaptionUsesSharedTextWithoutSubtitlePreferenceOrDialogueAudio()throws Exception {
+        set("appRoot",a.findViewById(R.id.root));call("createChapterDialogueOverlay",new Class<?>[]{});
+        a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).edit().putBoolean("chapter_subtitles_enabled",false).apply();
+        Bridge.chapterState=new long[]{0,4,0,0,0,0,1};
+        Bridge.chapterText="Tankard - Up the tavern ramp\nScales - Dealer & gardens, west\nWheel - Mill & river fork, east\nAnvil - Smith yard, southeast";
+        call("updateChapterDialoguePresentation",new Class<?>[]{int.class},1);
+        final TextView caption=(TextView)field("chapterSubtitleText").get(a);
+        final View panel=(View)field("chapterSubtitlePanel").get(a);
+        assertEquals(View.VISIBLE,panel.getVisibility());assertEquals(View.VISIBLE,caption.getVisibility());
+        assertEquals(Bridge.chapterText,caption.getText().toString());
+        assertEquals(Bridge.chapterText.replace('\n',' '),caption.getContentDescription().toString());
+        assertEquals(0,field("chapterVoiceStream").getInt(a));
+        assertFalse(field("chapterAmbienceDialogueActive").getBoolean(a));
+        assertEquals(Long.MIN_VALUE,field("chapterDialogueSkipPendingGeneration").getLong(a));
+        Bridge.context=(1 << 31) | (7 << 25) | (1 << 28) | 1;
+        call("updateContextualControls",new Class<?>[]{boolean.class},true);
+        final Button interact=button("interactButton");
+        assertEquals("Finish reading",interact.getText().toString());
+        interact.performClick();assertEquals(1,Bridge.interacts);
+        set("menuVisible",true);call("updateChapterDialoguePresentation",new Class<?>[]{int.class},1);
+        assertEquals(View.GONE,panel.getVisibility());
+        set("menuVisible",false);Bridge.chapterState=new long[]{0,4,0,0,0,0,0};Bridge.chapterText="";
+        call("updateChapterDialoguePresentation",new Class<?>[]{int.class},1);
+        assertEquals(View.GONE,panel.getVisibility());assertEquals("",caption.getText().toString());
+    }
+
+    @Test public void automaticMovementRetiresManualButtonsWithoutChangingPointersOrPreferences() throws Exception {
         assertFalse(a.getString(R.string.controls_help).contains("Ctrl"));
         assertFalse(a.getString(R.string.controller_help).contains("hold L1"));
         assertFalse(a.getString(R.string.controller_play_prompts).contains("Crouch: L1"));

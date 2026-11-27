@@ -1,15 +1,61 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/BellwetherWaymarker.h"
+#include "gameplay/campaign/LookoutObjective.h"
 #include "audio/BellwetherVoiceFixture.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsChapterDialogue.h"
 #include "gameplay/SpatialAudio.h"
 #include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <limits>
+#include <string_view>
 using namespace horde::gameplay;
 using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
 int main() {
+    using horde::gameplay::bellwether::SquareWaymarkerReadableFrom;
+    using horde::gameplay::bellwether::StepSquareWaymarkerTextVisible;
+    constexpr auto& post=horde::gameplay::bellwether::kSquareWaymarkerPost;
+    constexpr auto& witness=horde::gameplay::bellwether::kSquareWaymarkerView;
+    const auto yawToPost=[](float x,float z) {
+        return std::atan2(post[0]-x,-(post[2]-z));
+    };
+    Check(SquareWaymarkerReadableFrom(witness[0],
+              horde::gameplay::bellwether::kSquareWaymarkerTavern[1],witness[1],yawToPost(witness[0],witness[1])),
+          "the authored west-side sign view is readable at its measured 3.62 m distance");
+    constexpr float squareApproachX=82.3f,squareApproachZ=131.7f;
+    Check(SquareWaymarkerReadableFrom(squareApproachX,
+              horde::gameplay::bellwether::kSquareWaymarkerDealer[1],squareApproachZ,
+              yawToPost(squareApproachX,squareApproachZ)),
+          "the sign can also be read naturally from the tavern-side square approach");
+    Check(!SquareWaymarkerReadableFrom(witness[0],horde::gameplay::bellwether::kSquareWaymarkerTavern[1],
+              witness[1],yawToPost(witness[0],witness[1])+3.14159265f),
+          "turning away from the fingerpost removes its read action");
+    constexpr float distantX=post[0]+4.25f;
+    Check(!SquareWaymarkerReadableFrom(distantX,horde::gameplay::bellwether::kSquareWaymarkerTavern[1],post[2],
+              yawToPost(distantX,post[2])),
+          "the read action is unavailable outside the authored four metre sign reach");
+    Check(!SquareWaymarkerReadableFrom(witness[0],horde::gameplay::bellwether::kSquareWaymarkerTavern[1]+3.f,
+              witness[1],yawToPost(witness[0],witness[1])),
+          "the sign is not readable when the view is vertically separated from its boards");
+    const auto& inscription=horde::gameplay::campaign::kSquareFingerpostInscription;
+    Check(std::string_view(inscription).find("Tankard - Up the tavern ramp")!=std::string_view::npos &&
+          std::string_view(inscription).find("Scales - Dealer & gardens, west")!=std::string_view::npos &&
+          std::string_view(inscription).find("Wheel - Mill & river fork, east")!=std::string_view::npos &&
+          std::string_view(inscription).find("Anvil - Smith yard, southeast")!=std::string_view::npos,
+          "the local inscription names the four physical symbols and their authored destinations");
+    Check(StepSquareWaymarkerTextVisible(true,false,false,true,false) &&
+          StepSquareWaymarkerTextVisible(true,false,false,false,true) &&
+          !StepSquareWaymarkerTextVisible(true,false,false,true,true) &&
+          !StepSquareWaymarkerTextVisible(false,false,false,false,true) &&
+          !StepSquareWaymarkerTextVisible(true,true,false,false,true) &&
+          !StepSquareWaymarkerTextVisible(true,false,true,true,false),
+          "reading toggles locally and clears on departure, pause or competing dialogue");
+    horde::gameplay::simulation::SimulationSnapshot waymarkerPrompt;
+    waymarkerPrompt.squareWaymarkerReadable=true;
+    Check(waymarkerPrompt.HasChapterInteractPrompt(),
+          "a readable fingerpost participates in the shared interaction prompt");
     // Current-rule reveal, without the historical checkpoint import which
     // deliberately selects legacy rules and cannot validate current speech.
     auto keeperConfig=simulation::ProductionGameSimulationConfig();

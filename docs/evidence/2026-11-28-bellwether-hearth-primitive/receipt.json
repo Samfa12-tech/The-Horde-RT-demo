@@ -1,0 +1,1065 @@
+{
+  "source": "021e29ad2b94517fb73da5ee9b211f462ed34d22",
+  "device": {
+    "model": "SM-S948B",
+    "os": "Android 17",
+    "gpu": "Adreno 840"
+  },
+  "experiment": {
+    "target": "first staffed-hearth hold of the west route",
+    "backend": "RayTracingPipeline",
+    "internal": [
+      475,
+      980
+    ],
+    "surface": [
+      1440,
+      2971
+    ],
+    "renderScalePercent": 33,
+    "settings": "Shipping/Mobile, glass off, ordinary shaders, frame stage timings",
+    "order": [
+      "A-open",
+      "B-first",
+      "A-mid",
+      "B-second",
+      "A-close"
+    ],
+    "window": "180 through 540 fixed ticks after first recorded room row",
+    "primary": "median joined GPU dispatch time per run; compare both B runs against adjacent controls",
+    "also": [
+      "GPU interval",
+      "present-return interval",
+      "p95",
+      "roster",
+      "frozen RGB parity",
+      "GPU frequency and thermal power level during selected frames"
+    ],
+    "admission": "typed current HAL status 0 and same sensor starting statuses within 1.5C of opening control; record GPU clock/thermal limiting for each run. Retain failed attempts. Keep shipping bank unless gains repeat beyond baseline variation with comparable device state.",
+    "excluded": {
+      "A1": "Opened immediately after frozen-image captures at AP 45.8 C. Its unmatched B1 admission waited as the phone cooled below the reference. No B1 measurement was performed.",
+      "B1": "Admission only; no launch."
+    },
+    "cooledCohortMaximaC": {
+      "AP": 38,
+      "BAT": 34,
+      "SKIN": 35.5
+    }
+  },
+  "builds": {
+    "A": {
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "apkSha": "55d6c072af60c412493f1e635301fcc864b197b7344e9f9cb499abc728533d42",
+      "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol"
+    },
+    "B": {
+      "shader": "f6c807ff4b288f7a7167f8240084c9c892f2ec4d77c2755d1c29a3baaed1d809",
+      "apkSha": "f369228baf0578f8e6f0f56fbb30ec1b609e75512e22d0adfed5ba0b2ea849c6",
+      "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowtrial"
+    }
+  },
+  "identicalRuntimeAssetEntries": 290,
+  "frozenCaptures": {
+    "frozen-A": {
+      "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol",
+      "apk": "55d6c072af60c412493f1e635301fcc864b197b7344e9f9cb499abc728533d42",
+      "pid": "30911",
+      "marker": "HORDE_CAPTURE_READY generation=1 checkpoint=bellwether-repeat-visit scale=33 stable_frames=12 presented=1",
+      "imageSha": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32"
+    },
+    "frozen-B": {
+      "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowtrial",
+      "apk": "f369228baf0578f8e6f0f56fbb30ec1b609e75512e22d0adfed5ba0b2ea849c6",
+      "pid": "32101",
+      "marker": "HORDE_CAPTURE_READY generation=1 checkpoint=bellwether-repeat-visit scale=33 stable_frames=12 presented=1",
+      "imageSha": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32"
+    }
+  },
+  "arms": {
+    "A-open": {
+      "capture": {
+        "pid": "2803",
+        "apk": "55d6c072af60c412493f1e635301fcc864b197b7344e9f9cb499abc728533d42",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol",
+        "label": "A-open"
+      },
+      "start": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 33.7,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 31.2,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 33.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "end": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 42.4,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 33.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "joinedWindow": {
+        "roomRows": 150,
+        "tickStart": 12546,
+        "tickEnd": 12906,
+        "roster": [
+          "4",
+          "1110454595;1110454600;1110454608;1279348308",
+          "1110454603",
+          "1110454866",
+          "38",
+          "45",
+          "247343424",
+          "87392128",
+          "3"
+        ],
+        "gpuMs": {
+          "n": 91,
+          "median": 76.704581,
+          "p95": 113.030414
+        },
+        "gpu_dispatchMs": {
+          "n": 91,
+          "median": 76.189634,
+          "p95": 112.259997
+        },
+        "cpu_cycleMs": {
+          "n": 91,
+          "median": 87.704687,
+          "p95": 123.501458
+        },
+        "presentReturnMs": {
+          "n": 90,
+          "median": 87.73049499999999,
+          "p95": 123.528958
+        },
+        "clockMHzCounts": {
+          "1300": 34,
+          "902": 7
+        },
+        "thermalPowerLevels": {
+          "0": 34,
+          "5": 7
+        },
+        "gpuTempRawMinMax": [
+          50800,
+          62400
+        ]
+      },
+      "rawFiles": {
+        "A-open-room.csv.gz": {
+          "uncompressedBytes": 61246,
+          "uncompressedSha256": "4a88a3261dca496910536f394a2c3a14e1d9eaa164d867e9237094ea2b0250ad"
+        },
+        "A-open-device-gpu.csv.gz": {
+          "uncompressedBytes": 4453,
+          "uncompressedSha256": "487de9443a4b660db6daec71b96c6260bfb626d0eee23640f114924976c342be"
+        }
+      },
+      "adjacentClockSamples": {
+        "associationOnly": true,
+        "gapExceededFrames": 0,
+        "gpuDispatchMs": {
+          "median": 76.000467,
+          "n": 78,
+          "p95": 78.078852
+        },
+        "label": "both adjacent samples agree at 1300 MHz / power level 0",
+        "maxBracketGapMs": 400.0,
+        "maxObservedBracketGapMs": 201.933125,
+        "otherBracketedFrames": 13,
+        "stableBracketedFrames": 78,
+        "stableFramePercent": 85.71428571428571,
+        "unbracketedFrames": 0,
+        "windowFrames": 91
+      }
+    },
+    "B-first": {
+      "capture": {
+        "pid": "4729",
+        "apk": "f369228baf0578f8e6f0f56fbb30ec1b609e75512e22d0adfed5ba0b2ea849c6",
+        "shader": "f6c807ff4b288f7a7167f8240084c9c892f2ec4d77c2755d1c29a3baaed1d809",
+        "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowtrial",
+        "label": "B-first"
+      },
+      "start": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 35.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.2,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "end": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 43.1,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.6,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.7,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "joinedWindow": {
+        "roomRows": 150,
+        "tickStart": 12546,
+        "tickEnd": 12906,
+        "roster": [
+          "4",
+          "1110454595;1110454600;1110454608;1279348308",
+          "1110454603",
+          "1110454866",
+          "38",
+          "45",
+          "247343424",
+          "87392128",
+          "3"
+        ],
+        "gpuMs": {
+          "n": 91,
+          "median": 76.81479,
+          "p95": 142.555934
+        },
+        "gpu_dispatchMs": {
+          "n": 91,
+          "median": 76.299581,
+          "p95": 141.483226
+        },
+        "cpu_cycleMs": {
+          "n": 91,
+          "median": 87.389844,
+          "p95": 146.600156
+        },
+        "presentReturnMs": {
+          "n": 90,
+          "median": 87.4983335,
+          "p95": 146.700104
+        },
+        "clockMHzCounts": {
+          "1300": 36,
+          "726": 5
+        },
+        "thermalPowerLevels": {
+          "0": 36,
+          "7": 5
+        },
+        "gpuTempRawMinMax": [
+          50800,
+          63200
+        ]
+      },
+      "rawFiles": {
+        "B-first-room.csv.gz": {
+          "uncompressedBytes": 61234,
+          "uncompressedSha256": "76331cd3bacdb713ba962c13e14cdaa86a566f633ad7e8a9287cfcac62f15a49"
+        },
+        "B-first-device-gpu.csv.gz": {
+          "uncompressedBytes": 4457,
+          "uncompressedSha256": "619753688e6ec913dda07853a584e45b1bc0c628a60fb3c305618401c91ba65b"
+        }
+      },
+      "adjacentClockSamples": {
+        "associationOnly": true,
+        "gapExceededFrames": 0,
+        "gpuDispatchMs": {
+          "median": 76.224686,
+          "n": 83,
+          "p95": 77.733748
+        },
+        "label": "both adjacent samples agree at 1300 MHz / power level 0",
+        "maxBracketGapMs": 400.0,
+        "maxObservedBracketGapMs": 201.238906,
+        "otherBracketedFrames": 8,
+        "stableBracketedFrames": 83,
+        "stableFramePercent": 91.20879120879121,
+        "unbracketedFrames": 0,
+        "windowFrames": 91
+      }
+    },
+    "A-mid": {
+      "capture": {
+        "pid": "7696",
+        "apk": "55d6c072af60c412493f1e635301fcc864b197b7344e9f9cb499abc728533d42",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol",
+        "label": "A-mid"
+      },
+      "start": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 35.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.4,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "end": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.5,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.7,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 38.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "joinedWindow": {
+        "roomRows": 150,
+        "tickStart": 12546,
+        "tickEnd": 12906,
+        "roster": [
+          "4",
+          "1110454595;1110454600;1110454608;1279348308",
+          "1110454603",
+          "1110454866",
+          "38",
+          "45",
+          "247343424",
+          "87392128",
+          "3"
+        ],
+        "gpuMs": {
+          "n": 91,
+          "median": 76.536873,
+          "p95": 78.505884
+        },
+        "gpu_dispatchMs": {
+          "n": 91,
+          "median": 76.019113,
+          "p95": 77.982759
+        },
+        "cpu_cycleMs": {
+          "n": 91,
+          "median": 87.271771,
+          "p95": 89.329896
+        },
+        "presentReturnMs": {
+          "n": 90,
+          "median": 87.37625,
+          "p95": 89.360886
+        },
+        "clockMHzCounts": {
+          "1300": 39
+        },
+        "thermalPowerLevels": {
+          "0": 39
+        },
+        "gpuTempRawMinMax": [
+          58500,
+          63200
+        ]
+      },
+      "rawFiles": {
+        "A-mid-room.csv.gz": {
+          "uncompressedBytes": 61141,
+          "uncompressedSha256": "149f17e91546ea94ae86aff5e404d0c93699e5c1ea428e408a348585232aa625"
+        },
+        "A-mid-device-gpu.csv.gz": {
+          "uncompressedBytes": 4469,
+          "uncompressedSha256": "74f97855364cfa1465badb340b9341ee5cbc0b9db2ff4bd4aa2447c9ae345bc1"
+        }
+      },
+      "adjacentClockSamples": {
+        "associationOnly": true,
+        "gapExceededFrames": 0,
+        "gpuDispatchMs": {
+          "median": 76.019113,
+          "n": 91,
+          "p95": 77.982759
+        },
+        "label": "both adjacent samples agree at 1300 MHz / power level 0",
+        "maxBracketGapMs": 400.0,
+        "maxObservedBracketGapMs": 201.119427,
+        "otherBracketedFrames": 0,
+        "stableBracketedFrames": 91,
+        "stableFramePercent": 100.0,
+        "unbracketedFrames": 0,
+        "windowFrames": 91
+      }
+    },
+    "B-second": {
+      "capture": {
+        "pid": "9371",
+        "apk": "f369228baf0578f8e6f0f56fbb30ec1b609e75512e22d0adfed5ba0b2ea849c6",
+        "shader": "f6c807ff4b288f7a7167f8240084c9c892f2ec4d77c2755d1c29a3baaed1d809",
+        "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowtrial",
+        "label": "B-second"
+      },
+      "start": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 35.0,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.5,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.2,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "end": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 43.2,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 35.0,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 37.9,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "joinedWindow": {
+        "roomRows": 150,
+        "tickStart": 12546,
+        "tickEnd": 12906,
+        "roster": [
+          "4",
+          "1110454595;1110454600;1110454608;1279348308",
+          "1110454603",
+          "1110454866",
+          "38",
+          "45",
+          "247343424",
+          "87392128",
+          "3"
+        ],
+        "gpuMs": {
+          "n": 91,
+          "median": 76.871977,
+          "p95": 157.75984
+        },
+        "gpu_dispatchMs": {
+          "n": 91,
+          "median": 76.349686,
+          "p95": 156.619267
+        },
+        "cpu_cycleMs": {
+          "n": 91,
+          "median": 87.638385,
+          "p95": 167.737969
+        },
+        "presentReturnMs": {
+          "n": 90,
+          "median": 87.617656,
+          "p95": 167.794115
+        },
+        "clockMHzCounts": {
+          "1300": 36,
+          "646": 6
+        },
+        "thermalPowerLevels": {
+          "0": 36,
+          "8": 6
+        },
+        "gpuTempRawMinMax": [
+          50400,
+          63600
+        ]
+      },
+      "rawFiles": {
+        "B-second-room.csv.gz": {
+          "uncompressedBytes": 61257,
+          "uncompressedSha256": "5123ace6edf5272c784dd11194f993a82ea39842a57ce22168719077ba7d74e5"
+        },
+        "B-second-device-gpu.csv.gz": {
+          "uncompressedBytes": 4456,
+          "uncompressedSha256": "2e555d8b96d195332258ad81037fdbfeb93e315cb4f8f1218ac20c554dde1339"
+        }
+      },
+      "adjacentClockSamples": {
+        "associationOnly": true,
+        "gapExceededFrames": 0,
+        "gpuDispatchMs": {
+          "median": 76.211821,
+          "n": 82,
+          "p95": 78.091977
+        },
+        "label": "both adjacent samples agree at 1300 MHz / power level 0",
+        "maxBracketGapMs": 400.0,
+        "maxObservedBracketGapMs": 201.203542,
+        "otherBracketedFrames": 9,
+        "stableBracketedFrames": 82,
+        "stableFramePercent": 90.10989010989012,
+        "unbracketedFrames": 0,
+        "windowFrames": 91
+      }
+    },
+    "A-close": {
+      "capture": {
+        "pid": "11663",
+        "apk": "55d6c072af60c412493f1e635301fcc864b197b7344e9f9cb499abc728533d42",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "app": "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol",
+        "label": "A-close"
+      },
+      "start": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 34.9,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 32.5,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 34.1,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "end": {
+        "schemaVersion": 1,
+        "temperatureSource": "current HAL",
+        "frameworkStatus": 0,
+        "sensors": {
+          "AP": {
+            "type": 0,
+            "celsius": 44.6,
+            "status": 0
+          },
+          "BAT": {
+            "type": 2,
+            "celsius": 34.9,
+            "status": 0
+          },
+          "SKIN": {
+            "type": 3,
+            "celsius": 38.4,
+            "status": 0
+          }
+        },
+        "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+      },
+      "joinedWindow": {
+        "roomRows": 150,
+        "tickStart": 12546,
+        "tickEnd": 12906,
+        "roster": [
+          "4",
+          "1110454595;1110454600;1110454608;1279348308",
+          "1110454603",
+          "1110454866",
+          "38",
+          "45",
+          "247343424",
+          "87392128",
+          "3"
+        ],
+        "gpuMs": {
+          "n": 91,
+          "median": 76.78729,
+          "p95": 78.730311
+        },
+        "gpu_dispatchMs": {
+          "n": 91,
+          "median": 76.28005,
+          "p95": 78.196509
+        },
+        "cpu_cycleMs": {
+          "n": 91,
+          "median": 87.276041,
+          "p95": 89.106198
+        },
+        "presentReturnMs": {
+          "n": 90,
+          "median": 87.319062,
+          "p95": 89.141719
+        },
+        "clockMHzCounts": {
+          "1300": 39
+        },
+        "thermalPowerLevels": {
+          "0": 39
+        },
+        "gpuTempRawMinMax": [
+          58500,
+          63600
+        ]
+      },
+      "rawFiles": {
+        "A-close-room.csv.gz": {
+          "uncompressedBytes": 61146,
+          "uncompressedSha256": "6a99a6adef3bdab3b5d284c55d3828c1bc15c592230b3f9f37a654218972e5b4"
+        },
+        "A-close-device-gpu.csv.gz": {
+          "uncompressedBytes": 4467,
+          "uncompressedSha256": "81bfebf23a2ab4507bf8ece4595ec3cba496f298de2e489d9321d8cb30ebf11c"
+        }
+      },
+      "adjacentClockSamples": {
+        "associationOnly": true,
+        "gapExceededFrames": 0,
+        "gpuDispatchMs": {
+          "median": 76.28005,
+          "n": 91,
+          "p95": 78.196509
+        },
+        "label": "both adjacent samples agree at 1300 MHz / power level 0",
+        "maxBracketGapMs": 400.0,
+        "maxObservedBracketGapMs": 201.43526,
+        "otherBracketedFrames": 0,
+        "stableBracketedFrames": 91,
+        "stableFramePercent": 100.0,
+        "unbracketedFrames": 0,
+        "windowFrames": 91
+      }
+    }
+  },
+  "excludedOpening": {
+    "reason": {
+      "A1": "Opened immediately after frozen-image captures at AP 45.8 C. Its unmatched B1 admission waited as the phone cooled below the reference. No B1 measurement was performed.",
+      "B1": "Admission only; no launch."
+    },
+    "measuredA1": {
+      "roomRows": 150,
+      "tickStart": 12546,
+      "tickEnd": 12906,
+      "roster": [
+        "4",
+        "1110454595;1110454600;1110454608;1279348308",
+        "1110454603",
+        "1110454866",
+        "38",
+        "45",
+        "247343424",
+        "87392128",
+        "3"
+      ],
+      "gpuMs": {
+        "n": 91,
+        "median": 77.341873,
+        "p95": 140.575622
+      },
+      "gpu_dispatchMs": {
+        "n": 91,
+        "median": 76.841717,
+        "p95": 139.707965
+      },
+      "cpu_cycleMs": {
+        "n": 91,
+        "median": 88.17776,
+        "p95": 147.536094
+      },
+      "presentReturnMs": {
+        "n": 90,
+        "median": 88.251562,
+        "p95": 147.606094
+      },
+      "clockMHzCounts": {
+        "1300": 28,
+        "726": 10,
+        "902": 7
+      },
+      "thermalPowerLevels": {
+        "0": 28,
+        "7": 10,
+        "5": 7
+      },
+      "gpuTempRawMinMax": [
+        51500,
+        65900
+      ]
+    },
+    "startA1": {
+      "schemaVersion": 1,
+      "temperatureSource": "current HAL",
+      "frameworkStatus": 0,
+      "sensors": {
+        "AP": {
+          "type": 0,
+          "celsius": 45.8,
+          "status": 0
+        },
+        "BAT": {
+          "type": 2,
+          "celsius": 33.6,
+          "status": 0
+        },
+        "SKIN": {
+          "type": 3,
+          "celsius": 37.9,
+          "status": 0
+        }
+      },
+      "limits": "Starting-state evidence only; no GPU clock, power, sustained or causal claim."
+    }
+  },
+  "cleanup": {
+    "removedComparisonApps": [
+      "com.samfa12.hordelanternrt.debug.bellwether.shadowcontrol",
+      "com.samfa12.hordelanternrt.debug.bellwether.shadowtrial"
+    ],
+    "removedSampler": true,
+    "privatePlaytestUntouchedSha256": "ba3e93262e202c524307b26fb162a44057c7b73ee32d09f74f3ac128cb48ceb3",
+    "home": true
+  },
+  "candidateEdit": "visibilityMask reads a candidate primitive index only for instance 0; other instances do not use the value.",
+  "comparisons": {
+    "B-first": {
+      "adjacentControls": [
+        "A-open",
+        "A-mid"
+      ],
+      "availableControls": [
+        "A-open",
+        "A-mid"
+      ],
+      "cpuCycleMs": {
+        "Bmedian": 87.389844,
+        "controlMean": 87.488229,
+        "controlMedians": [
+          87.704687,
+          87.271771
+        ],
+        "delta": -0.0983850000000075,
+        "deltaPercent": -0.11245512810644216
+      },
+      "gpuDispatchMs": {
+        "Bmedian": 76.299581,
+        "controlMean": 76.10437350000001,
+        "controlMedians": [
+          76.189634,
+          76.019113
+        ],
+        "delta": 0.1952074999999951,
+        "deltaPercent": 0.2564997135151439
+      },
+      "gpuIntervalMs": {
+        "Bmedian": 76.81479,
+        "controlMean": 76.620727,
+        "controlMedians": [
+          76.704581,
+          76.536873
+        ],
+        "delta": 0.19406299999999987,
+        "deltaPercent": 0.25327741930718023
+      },
+      "jointClockPowerShareDeltas": {
+        "1300MHz/p0": {
+          "Bpercent": 87.8048780487805,
+          "controlMeanPercent": 91.46341463414635,
+          "controlPercents": [
+            82.92682926829268,
+            100.0
+          ],
+          "deltaPercentagePoints": -3.6585365853658516
+        },
+        "726MHz/p7": {
+          "Bpercent": 12.195121951219512,
+          "controlMeanPercent": 0.0,
+          "controlPercents": [
+            0.0,
+            0.0
+          ],
+          "deltaPercentagePoints": 12.195121951219512
+        },
+        "902MHz/p5": {
+          "Bpercent": 0.0,
+          "controlMeanPercent": 8.536585365853659,
+          "controlPercents": [
+            17.073170731707318,
+            0.0
+          ],
+          "deltaPercentagePoints": -8.536585365853659
+        }
+      },
+      "missingControls": [],
+      "presentReturnDeltaMs": {
+        "Bmedian": 87.4983335,
+        "controlMean": 87.5533725,
+        "controlMedians": [
+          87.73049499999999,
+          87.37625
+        ],
+        "delta": -0.05503899999999362,
+        "deltaPercent": -0.06286336942645314
+      },
+      "stableClockPowerDispatchMs": {
+        "Bmedian": 76.224686,
+        "associationOnly": true,
+        "controlMean": 76.00979000000001,
+        "controlMedians": [
+          76.000467,
+          76.019113
+        ],
+        "delta": 0.21489599999999598,
+        "deltaPercent": 0.2827214757467373
+      },
+      "status": "computed"
+    },
+    "B-second": {
+      "adjacentControls": [
+        "A-mid",
+        "A-close"
+      ],
+      "availableControls": [
+        "A-mid",
+        "A-close"
+      ],
+      "cpuCycleMs": {
+        "Bmedian": 87.638385,
+        "controlMean": 87.27390600000001,
+        "controlMedians": [
+          87.271771,
+          87.276041
+        ],
+        "delta": 0.3644789999999887,
+        "deltaPercent": 0.41762654693143747
+      },
+      "gpuDispatchMs": {
+        "Bmedian": 76.349686,
+        "controlMean": 76.14958150000001,
+        "controlMedians": [
+          76.019113,
+          76.28005
+        ],
+        "delta": 0.2001044999999948,
+        "deltaPercent": 0.2627782005604256
+      },
+      "gpuIntervalMs": {
+        "Bmedian": 76.871977,
+        "controlMean": 76.6620815,
+        "controlMedians": [
+          76.536873,
+          76.78729
+        ],
+        "delta": 0.2098955000000018,
+        "deltaPercent": 0.27379311374424625
+      },
+      "jointClockPowerShareDeltas": {
+        "1300MHz/p0": {
+          "Bpercent": 85.71428571428571,
+          "controlMeanPercent": 100.0,
+          "controlPercents": [
+            100.0,
+            100.0
+          ],
+          "deltaPercentagePoints": -14.285714285714292
+        },
+        "646MHz/p8": {
+          "Bpercent": 14.285714285714285,
+          "controlMeanPercent": 0.0,
+          "controlPercents": [
+            0.0,
+            0.0
+          ],
+          "deltaPercentagePoints": 14.285714285714285
+        }
+      },
+      "missingControls": [],
+      "presentReturnDeltaMs": {
+        "Bmedian": 87.617656,
+        "controlMean": 87.347656,
+        "controlMedians": [
+          87.37625,
+          87.319062
+        ],
+        "delta": 0.269999999999996,
+        "deltaPercent": 0.3091096113672427
+      },
+      "stableClockPowerDispatchMs": {
+        "Bmedian": 76.211821,
+        "associationOnly": true,
+        "controlMean": 76.14958150000001,
+        "controlMedians": [
+          76.019113,
+          76.28005
+        ],
+        "delta": 0.06223949999998979,
+        "deltaPercent": 0.08173321346485637
+      },
+      "status": "computed"
+    },
+    "controlBookends": {
+      "AcloseMedianMs": 76.28005,
+      "AcloseVsAopenMs": 0.09041600000000471,
+      "AcloseVsAopenPercent": 0.11867231177407248,
+      "AmidMedianMs": 76.019113,
+      "AopenMedianMs": 76.189634,
+      "jointClockPowerShares": {
+        "1300MHz/p0": {
+          "AclosePercent": 100.0,
+          "AcloseVsAopenPercentagePoints": 17.07317073170732,
+          "AmidPercent": 100.0,
+          "AopenPercent": 82.92682926829268
+        },
+        "902MHz/p5": {
+          "AclosePercent": 0.0,
+          "AcloseVsAopenPercentagePoints": -17.073170731707318,
+          "AmidPercent": 0.0,
+          "AopenPercent": 17.073170731707318
+        }
+      },
+      "stableClockPowerAssociation": {
+        "AcloseMedianMs": 76.28005,
+        "AcloseVsAopenMs": 0.27958300000000236,
+        "AcloseVsAopenPercent": 0.36787010795605024,
+        "AmidMedianMs": 76.019113,
+        "AopenMedianMs": 76.000467,
+        "associationOnly": true
+      }
+    }
+  },
+  "matchingRuntimeAssetDigest": "38199a41c48fe0ef72072e8b31987a0cc35fa558384be91e305639a3ac55f74e",
+  "buildSettings": {
+    "control": {
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "rtRouteTiming": true,
+      "frameStageProbe": true,
+      "dispatchClockProbe": false,
+      "pagedGeometry": false
+    },
+    "trial": {
+      "instrumentation": "Shipping",
+      "quality": "Mobile",
+      "rtRouteTiming": true,
+      "frameStageProbe": true,
+      "dispatchClockProbe": false,
+      "pagedGeometry": false
+    }
+  },
+  "frozenComparison": {
+    "Asha256": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32",
+    "Bsha256": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32",
+    "byteIdentical": true,
+    "changedPixels": 0,
+    "dimensions": [
+      1440,
+      3120
+    ],
+    "frozenStateFieldsCompared": [
+      "checkpoint",
+      "renderScale",
+      "executionBackend",
+      "internalExtent",
+      "outputExposure",
+      "waterQuality"
+    ],
+    "frozenStateMatch": true,
+    "maxAbsoluteChannelDifference": 0,
+    "meanAbsoluteChannelDifference": 0.0,
+    "pixelIdentical": true,
+    "receiptImageHashesMatch": true,
+    "status": "checked"
+  },
+  "decision": "Retain the existing shipping shader. No repeatable reduction in joined GPU dispatch time."
+}

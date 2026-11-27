@@ -1275,9 +1275,12 @@ void PublishSimulationUiState()
                 gGameSimulation.LatestCampaignBoundary()))};
         gLookoutDirections=horde::gameplay::campaign::CurrentBellwetherDirections(simulation);
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
+        const bool squareFingerpostVisible = simulation.squareWaymarkerTextVisible;
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
-            ? std::string{}
+            ? (squareFingerpostVisible
+                ? std::string(horde::gameplay::campaign::kSquareFingerpostInscription)
+                : std::string{})
             : (*line.speaker ? std::string(line.speaker) + "\n" + line.text : std::string(line.text));
     }
     if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
@@ -1456,6 +1459,15 @@ void PublishSimulationUiState()
     else if ((contextualControls & (1 << 9)) == 0 && simulation.relicDealerTradeAvailable) {
         constexpr int residentTag = 7, tradeDetail = 52;
         contextualControls |= (residentTag << 16) | (tradeDetail << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             (simulation.squareWaymarkerReadable || simulation.squareWaymarkerTextVisible)) {
+        // Optional-action detail 7 is reserved for the physical fingerpost;
+        // detail 6 remains Kit's treasure topic and quote bits remain scoped
+        // to the selected optional action.
+        constexpr int fingerpostDetail = 7;
+        contextualControls |= INT32_MIN | (fingerpostDetail << 25) |
+            (simulation.squareWaymarkerTextVisible ? (1 << 28) : 0) | 1;
     }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
@@ -7585,7 +7597,7 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_respondToCombatTeachingCard(
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env, jclass)
 {
-    jlong state[6]{};
+    jlong state[7]{};
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         const auto& snapshot = gChapterDialogueUiSnapshot;
@@ -7595,9 +7607,11 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env,
         state[3] = static_cast<jlong>(std::max(0.0f, snapshot.duration) * 1000.0f + 0.5f);
         state[4] = snapshot.paused ? 1 : 0;
         state[5] = horde::gameplay::dialogue::RequiresChapterCaption(snapshot.line) ? 1 : 0;
+        state[6] = snapshot.line == horde::gameplay::dialogue::Line::None &&
+            !gChapterDialogueUiText.empty() ? 1 : 0;
     }
-    jlongArray result = env->NewLongArray(6);
-    if (result != nullptr) env->SetLongArrayRegion(result, 0, 6, state);
+    jlongArray result = env->NewLongArray(7);
+    if (result != nullptr) env->SetLongArrayRegion(result, 0, 7, state);
     return result;
 }
 

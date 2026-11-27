@@ -2734,18 +2734,21 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
 {
     HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
     if (subtitle == nullptr) return;
-    const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
+    const auto& snapshot = context.simulation.Snapshot();
+    const auto& dialogue = snapshot.chapterDialogue;
+    const bool readingSign = snapshot.squareWaymarkerTextVisible &&
+        dialogue.line == horde::gameplay::dialogue::Line::None;
     const bool voicePlaying = context.playingDialogueLine == static_cast<unsigned>(dialogue.line) &&
         context.playingDialogueGeneration == dialogue.generation && context.voiceVolumePercent > 0;
     const bool requiresCaption = !voicePlaying && horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line);
-    if ((!context.subtitlesEnabled && !requiresCaption) ||
-        dialogue.line == horde::gameplay::dialogue::Line::None ||
-        dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
+    const bool showDialogue = dialogue.line != horde::gameplay::dialogue::Line::None &&
+        (context.subtitlesEnabled || requiresCaption);
+    if ((!readingSign && !showDialogue) || dialogue.paused ||
+        !context.controlsEnabled || MeasurementPausedByUi(context))
     {
         SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
         return;
     }
-    const auto& spec = horde::gameplay::dialogue::Spec(dialogue.line);
     if (context.presentedDialogueLine != dialogue.line ||
         context.presentedDialogueGeneration != dialogue.generation)
     {
@@ -2771,7 +2774,13 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
             context.appliedSubtitleFontPixels = fontPixels;
         }
     }
-    std::string text = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
+    std::string text;
+    if (readingSign) {
+        text = horde::gameplay::campaign::kSquareFingerpostInscription;
+    } else {
+        const auto& spec = horde::gameplay::dialogue::Spec(dialogue.line);
+        text = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
+    }
     const int subtitleWidth = std::max(0, std::min(900,
         width - 2 * ScaleForDpi(context.windowHandle, 24)));
     HDC measureDc = GetDC(context.windowHandle);
@@ -3816,7 +3825,13 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             case RecordKeeperAction::RecallRoutes: text = "LEFT-CLICK / A TO RECALL THE EXPEDITION ROUTES"; break;
             case RecordKeeperAction::CollectReward: text = "LEFT-CLICK / A TO COLLECT REGISTER REWARD"; break;
             case RecordKeeperAction::LearnAirWard: text = "LEFT-CLICK / A TO LEARN THE AIR WARD"; break;
-            default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
+            default:
+                if (snapshot.squareWaymarkerReadable && !snapshot.tavernConversationAvailable && !snapshot.tavernDirectionsAvailable) {
+                    text = snapshot.squareWaymarkerTextVisible ? "LEFT-CLICK / A TO FINISH READING" : "LEFT-CLICK / A TO READ THE FINGERPOST";
+                } else {
+                    text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT";
+                }
+                break;
             }
             break;
         }

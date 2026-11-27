@@ -5038,3 +5038,70 @@ python tools/analyze-chapter-route-measurement.py --android-bellwether-hearth-cl
 After testing, the temporary observer app was removed. The original
 private playtest APK, eleven saves, nine report files and one preference
 file matched their pre-test hashes. The phone was returned to Home.
+
+### 28 November 2026 — Hearth shadow-query comparison
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17), two private ARM64 apps built from
+`021e29ad` exercised the first staffed-hearth hold of the western route. They
+contained the same 290 game asset entries. Both used the ordinary Shipping/Mobile
+Pipeline shaders with stage timestamps at 33% (475 × 980 RT, 1440 × 2971 output).
+The trial deferred the shadow candidate primitive-index read until an intersection
+belonged to the shared world instance. The frozen 1440 × 3120 phone screenshots
+matched byte for byte.
+
+Each admitted run supplied 91 frames in the same simulation tick window. Each
+row joined submission, GPU completion, stage timing and successful present by
+serial. All five runs had the same four fire lights, 45 TLAS instances and 38
+BLAS owners. Framework thermal status was 0 on entry. AP, battery and skin
+starting temperatures were within 1.5 °C of the opening control.
+
+| Build in run order | RT dispatch median | RT dispatch p95 | Frames bracketed by 1300 MHz / power level 0 | Median of those frames |
+| --- | ---: | ---: | ---: | ---: |
+| Control | 76.19 ms | 112.26 ms | 78 | 76.00 ms |
+| Trial | 76.30 ms | 141.48 ms | 83 | 76.22 ms |
+| Control | 76.02 ms | 77.98 ms | 91 | 76.02 ms |
+| Trial | 76.35 ms | 156.62 ms | 82 | 76.21 ms |
+| Control | 76.28 ms | 78.20 ms | 91 | 76.28 ms |
+
+Compared with the mean of the adjoining control medians, the two trial
+medians increased by 0.195 and 0.200 ms. The handset entered different lower
+clock states during three runs. For the subset with matching 5 Hz clock and
+power readings immediately before and after present return, the differences
+were +0.215 and +0.062 ms. A frequency change between readings can go
+unobserved. These short GPU intervals establish neither a repeatable gain nor
+sustained displayed FPS. The shipping shader stays in place.
+
+The [experiment receipt](evidence/2026-11-28-bellwether-hearth-primitive/receipt.json)
+includes the settings, APK and shader identities, excluded warm start, thermal
+records, screenshot hashes, and the frame and GPU clock CSV filenames with
+their uncompressed checksums. Both test packages and the temporary sampler
+were removed after the final control.
+
+### 28 November 2026 — Reading the Bellwether fingerpost on foot
+
+The private ARM64 Debug build from `ce32058f` ran on the Galaxy S26 Ultra
+(SM-S948B, Android 17). Starting from an isolated copy of an earned hearth
+save, the player walked through the south tavern door and down the ramp to
+the square. Facing the post from the tavern side offered **Read fingerpost**.
+All four arms were visible together. The player tapped **Finish reading**,
+read the inscription again, and dismissed it by swiping to look away. The
+isolated save matched its starting SHA-256 after the walk and interactions.
+
+On the 1440 × 3120 portrait handset, shorter place names reduced the measured
+inscription height from 864 to 440 pixels at the same text setting. Each arm
+occupied one line. The packaged Windows campaign replay read the sign with
+speech subtitles disabled from the opposite side of the lane. All 59 checks
+passed on each hardware RT backend. The [playtest receipt](evidence/2026-11-28-bellwether-fingerpost/receipt.json)
+records the APK and Windows archive hashes, text bounds, and save comparison.
+
+The player then followed the western lane past the gardens to the stock gate.
+From the public lane the pig was visible at its trough, with one hen in the
+roost and another on the ground. The player walked back to the square and the
+read prompt appeared again. The save stayed byte-identical throughout. The
+ordinary 33% Pipeline view rendered at 475 × 980 into a 1440 × 2971 surface.
+SurfaceFlinger supplied no layer-latency history at either animal view. A
+ten-second FrameTimeline trace on the return contained window transactions
+and no identifiable gameplay SurfaceView rows. Displayed frame pacing and
+listening acceptance at the stock yard remain open. The updated private APK
+was left installed, all 22 pre-existing files matched after restoration, and
+the phone returned to Home.

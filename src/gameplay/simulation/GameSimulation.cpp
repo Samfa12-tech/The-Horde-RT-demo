@@ -1,5 +1,6 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/traversal/BellwetherWaymarker.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "gameplay/traversal/BellwetherTavernRoute.h"
 #include "gameplay/healing/FlaskRestSites.h"
@@ -973,7 +974,7 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;squareWaymarkerTextVisible_=false;
     privyRagState_=bellwether::PrivyRagState::Available;
     treasurePurse_={};
     millPreparation_={};
@@ -1173,7 +1174,7 @@ void GameSimulation::ImportRewardCheckpointState(
     const float authoredX = playerX_, authoredZ = playerZ_;
     const auto authoredSupport = playerSupport_;
     events_.Clear();
-    chapterDialogue_.Reset(true);dialogueDucking_.Reset();chapterVisibleRaise_=0;
+    chapterDialogue_.Reset(true);dialogueDucking_.Reset();chapterVisibleRaise_=0;squareWaymarkerTextVisible_=false;
     combatPresentation_.Reset();
     dodgeRemainingSeconds_ = 0.0f;
     CancelCombatTransients();
@@ -1740,7 +1741,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
     // An accepted explicit checkpoint replaces the loaded session's pose.
     // Its staging/practice input must not wait for the superseded camera rebase.
     campaignInputPublicationFloor_.reset();
-    chapterDialogue_.Reset(checkpointId!=0);dialogueDucking_.Reset();chapterVisibleRaise_=0;
+    chapterDialogue_.Reset(checkpointId!=0);dialogueDucking_.Reset();chapterVisibleRaise_=0;squareWaymarkerTextVisible_=false;
     pendingTutorialReplayCommands_ = 0u;
     pendingTutorialSkipCommands_ = 0u;
     gameplayTimeScale_ = 1.0f;
@@ -3677,6 +3678,12 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         chapterDialogue_.CanStartTavernConversation(chapterContext);
     snapshot_.kitTreasureTalkAvailable=chapterDialogue_.CanAskKitAboutTreasure(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
+    const float facingYaw=std::isfinite(input.yawRadians) ? input.yawRadians : chapterContext.yaw;
+    snapshot_.squareWaymarkerReadable=SquareWaymarkerReadable(chapterContext,facingYaw);
+    squareWaymarkerTextVisible_=bellwether::StepSquareWaymarkerTextVisible(
+        snapshot_.squareWaymarkerReadable,input.paused,chapterDialogue_.State().line!=dialogue::Line::None,
+        false,squareWaymarkerTextVisible_);
+    snapshot_.squareWaymarkerTextVisible=squareWaymarkerTextVisible_;
     snapshot_.tavernLanternFittingAvailable=CanBuyLanternFitting(chapterContext);
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
     snapshot_.waysideArchive=waysideArchive_;
