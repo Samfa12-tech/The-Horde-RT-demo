@@ -279,6 +279,9 @@ int main(int argc,char** argv) {
                 BellwetherStation{92.8f,128.45f},    // Mill lane
                 BellwetherStation{109.f,125.72f},    // River fork
                 BellwetherStation{68.f,131.7f},      // West lane
+                BellwetherStation{43.58f,131.9f},    // Household turning off the garden lane
+                BellwetherStation{41.7f,127.95f},    // Wash place
+                BellwetherStation{45.74f,120.3f},    // East doorstep
                 BellwetherStation{62.1f,130.45f},    // Dealer aisle
                 BellwetherStation{74.75f,120.f},      // Service yard
                 BellwetherStation{88.25f,141.75f},   // Smith lane
@@ -371,6 +374,11 @@ int main(int argc,char** argv) {
                   follow(kGardenHouseWashView,kGardenHouseCorner) && follow(kGardenHouseCorner,kGardenHouseDoorView) &&
                   follow(kGardenHouseDoorView,kGardenHouseCorner) && follow(kGardenHouseCorner,garden[1]),
                   "a grounded player can visit both cottage frontages and return around the grate");
+            check(follow(kGardenHouseWashView,{35.2f,127.15f}) && follow({35.2f,127.15f},{34.85f,125.78f}) &&
+                  follow({34.85f,125.78f},{35.2f,127.15f}) && follow({35.2f,127.15f},kGardenHouseWashView) &&
+                  follow({45.74f,120.3f},{45.63f,119.05f}) && follow({45.63f,119.05f},{45.18f,118.42f}) &&
+                  follow({45.18f,118.42f},{45.63f,119.05f}) && follow({45.63f,119.05f},{45.74f,120.3f}),
+                  "the domestic paths reach the washing bench and the foot of the stone steps in both directions");
             // At the mapped height the east stone jamb stands proud of the wall.
             // Its old position ahead of the solid north wall is clear.
             check(!support->NonWalkableVolumeClear(43.42f,116.7f,43.42f,117.5f,-9.28f,-9.22f,.025f) &&

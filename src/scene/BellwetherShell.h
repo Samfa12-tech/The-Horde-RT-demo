@@ -40,7 +40,7 @@ inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=
     gameplay::bellwether::kGroundTriangles+gameplay::bellwether::kMillCrossingGroundTriangles+
     gameplay::bellwether::kBellwetherGraveyardGroundTriangles+gameplay::bellwether::kBellwetherSmithGroundTriangles+
-    gameplay::bellwether::kBellwetherPathGroundTriangles;
+    gameplay::bellwether::kBellwetherPathGroundTriangles+gameplay::bellwether::kGardenHousePathTriangles;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;
 enum class BellwetherFurnitureDetail { Near, Mid, Far };
 inline constexpr std::array<std::size_t,3> kBellwetherFurnitureTriangles{1012,276,144};

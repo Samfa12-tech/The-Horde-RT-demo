@@ -12,6 +12,7 @@ from mathutils import Vector
 RECIPE = Path(__file__).resolve()
 town = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-works.py")))
 geometry = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-crossing.py")))
+paths = runpy.run_path(str(RECIPE.with_name("author-bellwether-paths.py")))
 PARENT = "b38d8e63d2b227ea88c6ada22462ea8c98523827125e71dcc381447f48eb87c4"
 MASTER = "assets/models/world/source/bellwether-shell-v4/bellwether-shell-v4.blend"
 MAP = "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json"
@@ -222,6 +223,16 @@ def main(root, previous, output):
     doc,blocks=town["read_glb"](previous)
     moved=relocate_surround(root/MASTER,doc,blocks,site,entrance,ground)
     parts=household(site,entrance,ground)
+    old_lanes=root/"assets/models/world/source/bellwether-paths-v1/layout.json"
+    yard_lanes=root/"assets/models/world/source/bellwether-garden-house-v1/lanes.json"
+    existing=json.loads(old_lanes.read_bytes())["routes"]
+    routes=json.loads(yard_lanes.read_bytes())["routes"]
+    # Earlier lanes claim intersecting terrain first. The new branch meets
+    # the edge of the existing surface without duplicating any part of it.
+    fitted=paths["fit_routes"](terrain,existing+routes)[len(existing):]
+    lane_parts=[paths["make_part"](r["name"],faces,bpy.data.materials["HordeTownStone"])
+                for r,faces in zip(routes,fitted,strict=True)]
+    lane_counts={obj.name:len(obj.data.polygons) for obj in lane_parts}
     output.mkdir(parents=True)
     master=output/"garden-house.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(master),compress=True)
@@ -231,24 +242,36 @@ def main(root, previous, output):
                               export_tangents=True,export_normals=True,export_animations=False)
     aligned=output/"east-surround.glb"
     town["save_glb"](aligned,doc,blocks)
-    runtime=output/previous.name
-    added,vertices,primitives=town["join_town"](aligned,patch,runtime)
+    furnished=output/"house-solids.glb"
+    added,_,primitives=town["join_town"](aligned,patch,furnished)
     if moved!=48 or not 0<added<=3200 or primitives!=5:
         raise ValueError(f"Unexpected house ownership: {moved} relocated, {added} added, {primitives} primitives")
+    geometry["join_parts"](lane_parts,"BellwetherHousePaths")
+    lane_patch=output/"house-paths.glb"
+    bpy.ops.export_scene.gltf(filepath=str(lane_patch),export_format="GLB",use_selection=True,export_apply=True,
+                              export_tangents=True,export_normals=True,export_animations=False)
+    paths["write_planar_tangents"](lane_patch)
+    runtime=output/previous.name
+    walkable,vertices,primitives=town["join_town"](furnished,lane_patch,runtime,node_name="BellwetherWalkable")
+    if walkable!=sum(lane_counts.values()) or not 0<walkable<=230 or primitives!=5:
+        raise ValueError(f"Unexpected house paths: {lane_counts}")
     manifest=json.loads((previous.parent/"asset.manifest.json").read_bytes())
-    indices=manifest["budgets"]["maxIndices"]+added*3
+    indices=manifest["budgets"]["maxIndices"]+(added+walkable)*3
     manifest["budgets"].update(maxVertices=vertices,maxIndices=indices)
     manifest["lods"][0]["maxTriangles"]=indices//3
     town["save_json"](output/"asset.manifest.json",manifest)
     header=output/"geometry.generated.h"
     header.write_text("#pragma once\n#include <cstddef>\n\nnamespace horde::gameplay::bellwether {\n"
-                      f"inline constexpr std::size_t kGardenHouseSolidTriangles={added};\n}}\n",
+                      f"inline constexpr std::size_t kGardenHouseSolidTriangles={added};\n"
+                      f"inline constexpr std::size_t kGardenHousePathTriangles={walkable};\n}}\n",
                       encoding="utf-8",newline="\n")
     town["save_json"](output/"authoring-receipt.json",dict(feature="Garden-side household and mapped east door",
         originalTownSha256=PARENT,terrainSha256=digest(terrain),sources=INPUTS,runtimeTownSha256=digest(runtime),
         eastEntranceXZ=entrance,relocatedMasonryTriangles=moved,addedSolidTriangles=added,
+        addedGroundTriangles=walkable,routeTriangles=lane_counts,originalLanesSha256=digest(old_lanes),
+        houseLanesSha256=digest(yard_lanes),
         townVertices=vertices,townTriangles=indices//3,recipeSha256=digest(RECIPE),blender=bpy.app.version_string,
-        files={p.name:digest(p) for p in (master,patch,runtime,header,output/"asset.manifest.json")}))
+        files={p.name:digest(p) for p in (master,patch,lane_patch,runtime,header,output/"asset.manifest.json")}))
 
 
 if __name__=="__main__":

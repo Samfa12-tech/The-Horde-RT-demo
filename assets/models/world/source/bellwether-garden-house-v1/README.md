@@ -8,6 +8,9 @@ door closes the frontage. House A remains an optional future interior.
 The south wall faces the kitchen plots. A pan-tiled lean-to covers a draining
 bench, wide washing basin and dipping cup. An open gutter falls towards the
 hooped rain barrel. A pair of boarded shutters faces the garden lane.
+The narrow path from the kitchen plots skirts the grate and divides towards
+the washing bench and east doorstep. Its 53 walkable triangles follow the
+terrain. The original west lane retains its surface through the junction.
 
 The editable master is `garden-house.blend`.
 The [Blender recipe](../../../../../tools/author-bellwether-garden-house.py)

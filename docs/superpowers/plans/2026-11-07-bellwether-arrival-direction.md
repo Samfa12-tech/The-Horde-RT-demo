@@ -669,7 +669,8 @@ The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/READ
 has a household washing place on the garden-facing wall. A tiled shelter
 covers the basin and draining bench, and its gutter empties into a barrel.
 The original stone entrance now stands at the mapped east door. That door
-stays latched. The path past the grate remains open to the kitchen plots.
+stays latched. A narrow path splits from the garden lane beside the grate,
+leading to the washing bench and the foot of the east steps.
 
 The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
 
