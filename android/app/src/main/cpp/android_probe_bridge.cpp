@@ -7393,6 +7393,16 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getSurfaceRuntimeState(JNIEnv*, jcla
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_setChapterVoiceEnabled(JNIEnv*, jclass, jboolean enabled)
+{
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    const bool voiceEnabled = enabled == JNI_TRUE;
+    if (gInputPublisherState.chapterVoiceEnabled == voiceEnabled) return;
+    gInputPublisherState.chapterVoiceEnabled = voiceEnabled;
+    PublishInputLocked();
+}
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_setRevivalAudioReady(JNIEnv*,jclass,jlong generation,jboolean ready)
 {
     std::lock_guard<std::mutex> lock(gInputPublisherMutex);

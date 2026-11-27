@@ -686,7 +686,10 @@ public class MainActivity extends Activity {
         hudRoot.requestApplyInsets();
         lastAppliedConfiguration = new Configuration(getResources().getConfiguration());
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
-        if(!openingBenchmarkRecoveryLaunch)applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
+        if (!openingBenchmarkRecoveryLaunch) {
+            publishChapterVoicePreference();
+            applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
+        }
         rtLabUnlocked = preferences.getBoolean(PREF_RT_LAB_UNLOCKED, false);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         if(!openingBenchmarkRecoveryLaunch)ProbeBridge.resetRtSceneTuning();
@@ -4776,7 +4779,10 @@ public class MainActivity extends Activity {
         addSlider(panel, getString(R.string.sfx_volume), preferences.getInt("sfx_volume", 70), 0, 100,
                 value -> preferences.edit().putInt("sfx_volume", value).apply());
         addSlider(panel, getString(R.string.dialogue_volume), preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100), 0, 100,
-                value -> preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply());
+                value -> {
+                    preferences.edit().putInt(PREF_CHAPTER_VOICE_VOLUME, value).apply();
+                    publishChapterVoicePreference();
+                });
         addBody(panel, "Chapter subtitles");
         final CheckBox subtitlesEnabled = new CheckBox(this);
         subtitlesEnabled.setText("Show subtitles");
@@ -4946,6 +4952,7 @@ public class MainActivity extends Activity {
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
                             .putBoolean(CombatTeachingPreferences.ENABLED, true)
                             .putBoolean(CombatTeachingPreferences.SLOWDOWN, false).apply();
+                    publishChapterVoicePreference();
                     applyCombatTeachingOptions(CombatTeachingPreferences.read(preferences));
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
@@ -4955,6 +4962,10 @@ public class MainActivity extends Activity {
                 },
                 getString(R.string.back), () -> showMainMenu(false));
         attachPanel(panel);
+    }
+
+    private void publishChapterVoicePreference() {
+        ProbeBridge.setChapterVoiceEnabled(preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) > 0);
     }
 
     /** Temporary owner tuning page; never exposed by production/benchmark builds. */

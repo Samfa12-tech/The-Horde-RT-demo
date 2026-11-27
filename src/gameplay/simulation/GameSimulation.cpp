@@ -587,7 +587,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         const auto& line = dialogue::Spec(chapterDialogue_.State().line);
         const bool recorded = line.audio[0] != '\0' ||
             config_.bellwetherRecordedVoiceLines[static_cast<std::size_t>(line.id)];
-        dialogueDucking_.Step(recorded, dialogueDeltaSeconds);
+        dialogueDucking_.Step(recorded && input.chapterVoiceEnabled, dialogueDeltaSeconds);
     }
     RefreshSnapshot(input);
     // Revalidate after damage, death and newly-started dialogue. No further

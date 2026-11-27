@@ -235,6 +235,45 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
                 "only an admitted recording for the active tavern line ducks the background");
         }
     }
+    {
+        auto voicedConfig = staffedConfig;
+        voicedConfig.bellwetherRecordedVoiceLines = *roster;
+        sim::GameSimulation muted(voicedConfig);
+        const bool ready = Seed(muted, complete, terrain);
+        Check(ready, "muted speech test restores the staffed tavern before Talk");
+        if (ready) {
+            sim::InputSnapshot input;
+            input.yawRadians = record.yaw;
+            input.pitchRadians = record.pitch;
+            input.chapterVoiceEnabled = false;
+            muted.StepFixed(input);
+            ++input.commands.interact;
+            muted.StepFixed(input);
+            ++input.commands.dialogueSkip;
+            muted.StepFixed(input);
+            for (unsigned tick = 0; tick < 15; ++tick) muted.StepFixed(input);
+            const auto speech = muted.Snapshot().chapterDialogue;
+            Check(speech.line == Line::TavernHordeArmy && muted.Snapshot().dialogueBedGain == 1.f,
+                "the admitted keeper reply begins at full background level when voice is muted");
+
+            input.chapterVoiceEnabled = true;
+            for (unsigned tick = 0; tick < 15; ++tick) muted.StepFixed(input);
+            Check(muted.Snapshot().dialogueBedGain == horde::audio::DialogueDucking::kDuckedGain,
+                "enabling voice during the recorded line starts the normal duck");
+
+            input.chapterVoiceEnabled = false;
+            muted.StepFixed(input);
+            Check(muted.Snapshot().dialogueBedGain == horde::audio::DialogueDucking::kDuckedGain,
+                "muting speech releases through the existing hold");
+            for (unsigned tick = 0; tick < 90; ++tick) muted.StepFixed(input);
+            const auto& afterMute = muted.Snapshot();
+            Check(afterMute.dialogueBedGain == 1.f && afterMute.chapterDialogue.line == speech.line &&
+                afterMute.chapterDialogue.generation == speech.generation &&
+                afterMute.chapterDialogue.duration == speech.duration &&
+                afterMute.chapterDialogue.elapsed > speech.elapsed,
+                "mute restores the background and the authored line continues on the same clock");
+        }
+    }
     sim::GameSimulation staffed(staffedConfig);
     Check(Seed(staffed,complete,terrain),"staffed tavern uses the same real room and campaign transaction");
     cp::PlaySession staffedPlay(staffed,directory.path);

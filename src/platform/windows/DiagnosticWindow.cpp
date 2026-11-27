@@ -6270,6 +6270,7 @@ void UpdateDesktopSceneControls(
     input.commands.tutorialSkip = context.combatTeachingSkipSequence;
     input.commands.tutorialReplay = context.combatTeachingReplaySequence;
     input.commands.dialogueSkip = context.dialogueSkipSequence;
+    input.chapterVoiceEnabled = context.voiceVolumePercent > 0;
     input.dialogueCompletionLine = context.dialogueCompletionLine;
     input.dialogueCompletionGeneration = context.dialogueCompletionGeneration;
     input.runHeld = context.runHeld;
