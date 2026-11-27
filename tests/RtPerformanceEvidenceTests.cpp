@@ -134,7 +134,10 @@ void* operator new[](const std::size_t size,
 }
 void operator delete(void* value) noexcept { std::free(value); }
 void operator delete[](void* value) noexcept { std::free(value); }
-#if defined(__cpp_sized_deallocation)
+// Clang's builtin deallocation lookup rejects TU-local replacement sized
+// deletes when libstdc++ instantiates its allocator. Let Clang's standard
+// runtime sized-delete overloads forward to the matching unsized free path.
+#if defined(__cpp_sized_deallocation) && !defined(__clang__)
 void operator delete(void* value, const std::size_t) noexcept { std::free(value); }
 void operator delete[](void* value, const std::size_t) noexcept { std::free(value); }
 #endif
@@ -142,7 +145,7 @@ void operator delete(void* value, const std::nothrow_t&) noexcept { std::free(va
 void operator delete[](void* value, const std::nothrow_t&) noexcept { std::free(value); }
 void operator delete(void* value, const std::align_val_t) noexcept { FreeAligned(value); }
 void operator delete[](void* value, const std::align_val_t) noexcept { FreeAligned(value); }
-#if defined(__cpp_sized_deallocation)
+#if defined(__cpp_sized_deallocation) && !defined(__clang__)
 void operator delete(void* value, const std::size_t, const std::align_val_t) noexcept
 {
     FreeAligned(value);
