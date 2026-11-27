@@ -95,6 +95,8 @@ struct GameSimulationConfig
     // Private combined campaign: the owner publishes current GPU-ready residents.
     bool bellwetherCombinedResidents = false;
     bool bellwetherTrade = false;
+    // Package admission affects the presentation envelope only.
+    dialogue::RecordedVoiceLines bellwetherRecordedVoiceLines{};
 };
 
 // Keep the historical constructor configuration available for deterministic

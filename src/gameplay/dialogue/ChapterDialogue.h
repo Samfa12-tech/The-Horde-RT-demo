@@ -95,6 +95,7 @@ inline constexpr std::array<LineSpec,61> kLines{{
     {Line::KitTreasureKey,"kit.personal_stake.key","Kit",
         "A door with my own key. I\xE2\x80\x99ve had worse reasons for going digging.","",113744.f/24000.f,1}
 }};
+using RecordedVoiceLines = std::array<bool, kLines.size()>;
 inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
 inline constexpr float kHearthWorkPauseSeconds=.55f;
 inline constexpr bool IsHearthLine(Line line) {return line>=Line::TavernSit && line<=Line::TavernWork;}

@@ -195,6 +195,7 @@ def bellwetherHearthAudition = bellwetherVoiceDirectory && bellwetherHearthAudit
 def bellwetherOptionalVoiceIds = bellwetherVoiceDirectory ? bellwetherOptionalVoiceWavs.findAll { relative, hash ->
     new File(bellwetherVoiceDirectory, relative).isFile()
 }.keySet().collect { relative -> new File(relative).name.replaceFirst(/\.wav$/, '') } : []
+def bellwetherRecordedVoiceIds = []
 if (bellwetherVoiceDirectory) {
     if (!bellwetherResidentDirectory)
         throw new GradleException('Bellwether voices require the matching resident package.')
@@ -213,6 +214,7 @@ if (bellwetherVoiceDirectory) {
         if (new File(bellwetherVoiceDirectory, relative).isFile()) pinned[relative] = hash
     }
     verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
+    bellwetherRecordedVoiceIds = pinned.keySet().collect { relative -> new File(relative).name.replaceFirst(/\.wav$/, '') }
 }
 if (bellwetherPlaytest && !(bellwetherCombinedResidents && bellwetherRelicDealer &&
         bellwetherArrivalAudition && bellwetherSalvagerAudition && flaskCandidateDirectory && privateRevivalDirectory)) {
@@ -245,7 +247,8 @@ def bellwetherNativeArguments = [
     "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
     "-DHORDE_RT_BELLWETHER_SALVAGER_CANDIDATE=${bellwetherSalvager ? 'ON' : 'OFF'}",
     "-DHORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE=${bellwetherRelicDealer ? 'ON' : 'OFF'}",
-    "-DHORDE_RT_BELLWETHER_COMBINED_RESIDENTS=${bellwetherCombinedResidents ? 'ON' : 'OFF'}"
+    "-DHORDE_RT_BELLWETHER_COMBINED_RESIDENTS=${bellwetherCombinedResidents ? 'ON' : 'OFF'}",
+    "-DHORDE_RT_BELLWETHER_RECORDED_VOICE_IDS=${bellwetherRecordedVoiceIds.join(',')}"
 ]
 
 def hordeVersionFile = rootProject.file('../VERSION')
