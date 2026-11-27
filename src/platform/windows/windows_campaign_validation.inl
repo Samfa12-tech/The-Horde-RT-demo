@@ -1781,19 +1781,27 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const auto previousPitch = input.pitchRadians;
                         const auto previousPose = state.interaction.heldLightPose;
                         const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        const auto lampPresented = [&] {
+                            const auto& ids=ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                            return ctx.rtScene.HasUploadedFireEmitters() &&
+                                std::find(ids.begin(),ids.end(),horde::gameplay::effects::kHouseBLampEmitterId)!=ids.end();
+                        };
                         input.pitchRadians = -.10f;
                         const bool visited =
                             std::all_of(kHouseBStations.begin(), kHouseBStations.begin()+4, walkStation) &&
-                            face(kHouseBEastDoorXZ[0],kHouseBEastDoorXZ[1]) &&
+                            face(kHouseBEastDoorXZ[0],kHouseBEastDoorXZ[1]) && lampPresented() &&
                             capture("windows-combined-house-b-approach.png",false,true) &&
                             std::all_of(kHouseBStations.begin()+4, kHouseBStations.end(), walkStation) &&
                             std::abs(state.playerSupportWorldY-kHouseBFloorY)<.02f &&
                             setInspectionLight(HeldLightPose::High) &&
-                            face(34.95f,102.15f) && capture("windows-combined-house-b-room.png",false,true) &&
+                            face(34.95f,102.15f) && lampPresented() &&
+                            capture("windows-combined-house-b-room.png",false,true) &&
+                            face(kHouseBLampLight[0]-.55f,kHouseBLampLight[2]) &&
+                            capture("windows-combined-house-b-lamp.png",false,true) &&
                             setInspectionLight(previousPose) &&
                             std::all_of(std::next(kHouseBStations.rbegin()), kHouseBStations.rend(), walkStation);
                         input.pitchRadians = previousPitch;
-                        return visited && std::all_of(std::next(entranceBranch),std::next(square),walkTo) &&
+                        return visited && std::all_of(std::next(entranceBranch),std::next(square),walkTo) && !lampPresented() &&
                             ctx.simulation.CampaignBoundaryRevision()==boundary;
                     };
                     const auto presentSmith = [&] {

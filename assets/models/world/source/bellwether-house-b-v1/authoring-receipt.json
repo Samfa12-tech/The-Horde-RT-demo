@@ -10,6 +10,16 @@
     -7.3973823852539065,
     97.2
   ],
+  "lampFlame": [
+    36.36,
+    -5.717609374999999,
+    99.64000000000001
+  ],
+  "lampLight": [
+    36.36,
+    -5.651609375,
+    99.64000000000001
+  ],
   "removedSolidTriangles": {
     "B04_stone_foundation": 4,
     "B04_closed_walls": 12,
@@ -18,14 +28,14 @@
     "B04_door_lintel": 12,
     "B04_front_step": 12
   },
-  "addedSolidTriangles": 1656,
+  "addedSolidTriangles": 1848,
   "addedGroundTriangles": 76,
-  "runtimeTownSha256": "a1f6f1b45096efbef1eb8c0a6406718098471f567d882235e6dbe5a028f77dd0",
+  "runtimeTownSha256": "aaa0ff5be10214504986238693f6bac9beaea97a9c92383d9a4ff462e2792d6b",
   "originalTownSha256": "71874a3d4b203f84045c1bd807eb3232ba7ba7246493735f12475591056cec58",
   "blender": "5.2.0 LTS",
-  "townVertices": 94393,
-  "townTriangles": 44433,
-  "recipeSha256": "2bfa81d5b20fc558a291dc50c0a7241077879335f15cfc09eab828498a92e60f",
+  "townVertices": 94818,
+  "townTriangles": 44625,
+  "recipeSha256": "90c2e25973de5a5e32ec5995868aaa8af665bd6266a996ad8250009085a72386",
   "sources": {
     "assets/models/world/source/bellwether-shell-v4/bellwether-shell-v4.blend": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
     "assets/models/world/source/bellwether-shell-v4/authoring-receipt.json": "a93c72970511f41a783c12fcce986b78d9ddf4fc8f38d1a036edf767cad07b85",
@@ -34,11 +44,11 @@
   },
   "lanesSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
   "files": {
-    "house-b.blend": "fb7b84e5d7a5802781d4779b0db1b836f90791f1ff4df8ab646c6eee99455f20",
-    "house-b-solids.glb": "7b6d61879aed8247325ab0217ba1d10d0404936020a15e726c27ef85dbfd7b1a",
+    "house-b.blend": "441ccc01e39f21476d6b328086bf05ab7c316f2503bd938c65a5a3ada55cace5",
+    "house-b-solids.glb": "496fe406474d57e9062a4d9b60fe25446b0f3e513ad6b010d8e39db9bbb69844",
     "house-b-ground.glb": "45e7936b6eefd1b8eefadda7280cbc391afe8def4642408924e4944712a9b12b",
-    "bellwether-tavern-v1.glb": "a1f6f1b45096efbef1eb8c0a6406718098471f567d882235e6dbe5a028f77dd0",
-    "geometry.generated.h": "2e4d894dc4cf5c2b152171c2c10b8ee4555ee7253e11da75434979f58017f2f9",
-    "asset.manifest.json": "238f141fb0c2e4aacfafd3af0df80118d11b4447067e53ee24e5e15136464481"
+    "bellwether-tavern-v1.glb": "aaa0ff5be10214504986238693f6bac9beaea97a9c92383d9a4ff462e2792d6b",
+    "geometry.generated.h": "0bd1557fa2ab37afe83a17cdd9feff2269219abdbee420df40f1bf78ffae91c5",
+    "asset.manifest.json": "c3d83fd9c015cfc6f9e7a33d7e5e0f5bc052ad41a0603444a6173c41e07f65fe"
   }
 }

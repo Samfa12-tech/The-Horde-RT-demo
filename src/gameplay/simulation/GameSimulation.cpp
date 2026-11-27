@@ -100,7 +100,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeBellwetherMillBenchLampFireEmitter(),
                            effects::MakeBellwetherPorchLampFireEmitter(),
                            effects::MakeGardenHouseWindowEmitter(),
-                           effects::MakeSquareWaymarkerLampEmitter()};
+                           effects::MakeSquareWaymarkerLampEmitter(),
+                           effects::MakeHouseBLampEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2256,6 +2257,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[9],
             effects::BellwetherFireInput(bellwether::kSquareWaymarkerFlame,bellwether::kSquareWaymarkerLight,1.4f),
             fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kHouseBLampRosterIndex],
+            effects::HouseBLampFireInput(),fixedDeltaSeconds);
     }
 }
 

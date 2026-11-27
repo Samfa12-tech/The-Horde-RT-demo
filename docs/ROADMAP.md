@@ -171,9 +171,10 @@ A [carved fingerpost beside the well](../assets/models/world/source/bellwether-s
 A short stone fork from the lower road leads to the mapped east door of
 [House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
 private store-room candidate gives the village a second walk-in building,
-with grain bins, a sorting table and storage jars. The player can return to
-the road through the same doorway. The interior selection and handset
-playtest remain open.
+with grain bins, a sorting table and storage jars. The oil cup lights the
+table and carries a warm glow through the east doorway to the ramp. The
+player can return to the road through the same doorway. The interior
+selection and handset playtest remain open.
 
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 
