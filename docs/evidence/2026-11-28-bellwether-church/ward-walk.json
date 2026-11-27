@@ -1,0 +1,121 @@
+{
+  "device": {
+    "model": "SM-S948B",
+    "android": "17",
+    "apkSha256": "cdc5c504e41ac9a144670d39de620df9c263f7051c342b1e92ef11a1d58337b8",
+    "sourceCommit": "ce32058fdd310b8c42c2179b7a95d661e12bbc14",
+    "inputSaveSha256": "5032ddb6af1f291419c7e4c98649a017301c13bc54d13efa87f735ca752f401e"
+  },
+  "operations": [
+    "Play / Continue at the earned tavern",
+    "Walk from the south door to the wayside shrine",
+    "Restore shrine binding",
+    "Walk to the record keeper outside the church",
+    "Learn the air ward",
+    "Check that Collect register reward is available",
+    "Force-stop and relaunch",
+    "Play / Continue at the hearth",
+    "Open Bellwether directions"
+  ],
+  "saves": {
+    "interpreted-register": {
+      "sha256": "5032ddb6af1f291419c7e4c98649a017301c13bc54d13efa87f735ca752f401e",
+      "schema": 11,
+      "contentRevision": 3,
+      "checkpoint": "BellwetherTavern",
+      "groundPosition": [
+        84.5199966430664,
+        -8.709550857543945,
+        107.68000030517578
+      ],
+      "vitality": 3,
+      "halfHeart": false,
+      "flaskCharges": 2,
+      "flaskRecorded": true,
+      "hearthLines": 3,
+      "tavernLines": 3,
+      "archiveStage": 2,
+      "lanternRevealed": true,
+      "registerRecovered": true,
+      "registerInterpreted": true,
+      "tavernLanternLines": null,
+      "coins": null,
+      "registerRewardClaimed": false,
+      "lanternFittingPurchased": false,
+      "airWardLearned": false,
+      "ankleAssessed": false
+    },
+    "restored-binding": {
+      "sha256": "0031104d262f032514ef2181c518e10e2df88569d0d48fe6ea2bbc74f3a83753",
+      "schema": 15,
+      "contentRevision": 3,
+      "checkpoint": "BellwetherTavern",
+      "groundPosition": [
+        84.5199966430664,
+        -8.709550857543945,
+        107.68000030517578
+      ],
+      "vitality": 3,
+      "halfHeart": false,
+      "flaskCharges": 2,
+      "flaskRecorded": true,
+      "hearthLines": 3,
+      "tavernLines": 3,
+      "archiveStage": 3,
+      "lanternRevealed": true,
+      "registerRecovered": true,
+      "registerInterpreted": true,
+      "tavernLanternLines": 0,
+      "coins": 0,
+      "registerRewardClaimed": false,
+      "lanternFittingPurchased": false,
+      "airWardLearned": false,
+      "ankleAssessed": false
+    },
+    "learned-ward": {
+      "sha256": "0fe3397abff2f53e849d090bbf6f9e2b14c5570e3960ccb908b493d28cf4b7c2",
+      "schema": 15,
+      "contentRevision": 3,
+      "checkpoint": "BellwetherTavern",
+      "groundPosition": [
+        84.5199966430664,
+        -8.709550857543945,
+        107.68000030517578
+      ],
+      "vitality": 3,
+      "halfHeart": false,
+      "flaskCharges": 2,
+      "flaskRecorded": true,
+      "hearthLines": 3,
+      "tavernLines": 3,
+      "archiveStage": 3,
+      "lanternRevealed": true,
+      "registerRecovered": true,
+      "registerInterpreted": true,
+      "tavernLanternLines": 0,
+      "coins": 0,
+      "registerRewardClaimed": false,
+      "lanternFittingPurchased": false,
+      "airWardLearned": true,
+      "ankleAssessed": false
+    }
+  },
+  "postRestartSaveSha256": "0fe3397abff2f53e849d090bbf6f9e2b14c5570e3960ccb908b493d28cf4b7c2",
+  "postRestartDirections": "The Abbey lies downstream. The Foundry is east, across the gorge.\r\n\r\nBoth are leads for future expeditions.\r\n\r\nPurse: 0 coins.\r\nLantern fitting at the tavern: 2 coins.\r\n\r\nAir ward learned for the Abbey crossing.\r\n\r\nFor a breathing rig, follow the MILL signs east and inspect the gearing at the artificer's workbench.\r\n\r\nShore practice: Meet the salvager at the river fork.",
+  "originalFilesAfterRestore": {
+    "matching": 23,
+    "originalSaves": 13,
+    "restored": [
+      "files/reports/vulkan_capability_report.txt",
+      "files/reports/vulkan_capability_report.json"
+    ]
+  },
+  "captureSha256": {
+    "after-restart-directions.png": "0363bd4b024bbd98738b9c782c341ca8bb4b6b723ad71774f749225ec1648c59",
+    "keeper-overlay.png": "a961eca2587e36a1cd34706fe36bb5c76e726fa8858f7f8748bc5173b0f50bf7",
+    "restored-shrine.png": "f6055523413718a6cd7e751293b89965b245f4d7d86d43252f38142001895d86",
+    "reward-still-available.png": "2928e1639cb5f190d528224481fc6ffd470823fbfde231fb99693ea5a09b5e2d",
+    "shrine-overlay.png": "dfacceb28ec5a2f1cde5afd00c255c66940ea27046b278cf614552fbbcd66f3b",
+    "ward-caption.png": "52971193279176a7738af228105b2275d444ff0a7463e6527fa21815e4868a9b"
+  }
+}

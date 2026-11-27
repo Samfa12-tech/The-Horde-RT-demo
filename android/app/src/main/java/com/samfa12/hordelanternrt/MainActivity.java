@@ -4557,6 +4557,11 @@ public class MainActivity extends Activity {
             chapterVoiceStream = soundPool.play(soundId, voiceGain * left, voiceGain * right,
                     2, 0, 1.0f);
             if (chapterVoiceStream == 0) Log.w(TAG, "Chapter voice playback could not start.");
+            else if (BuildConfig.DEBUG && campaignTestNamespace != null) {
+                Log.i(TAG, "HORDE_CHAPTER_VOICE_START line=" + line + " generation=" + generation +
+                        " stream=" + chapterVoiceStream + " gainLeft=" + voiceGain * left +
+                        " gainRight=" + voiceGain * right);
+            }
             return;
         }
         if (chapterVoiceStream != 0 && chapterVoicePaused != paused) {

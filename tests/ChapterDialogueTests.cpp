@@ -166,6 +166,14 @@ int main() {
             RequiresChapterCaption(cut.line),
             "the private Kit hearth pair is exact, independently admitted, and retains captions");
     }
+    for (const auto& cut : horde::audio::kBellwetherOptionalVoiceCuts) {
+        const auto& spec = Spec(cut.line);
+        Check(cut.line != Line::None && spec.id == cut.line && cut.sha256.size() == 64 &&
+            cut.frames > 0 && static_cast<float>(cut.frames) / 24000.f <= spec.duration &&
+            RequiresChapterCaption(cut.line) &&
+            !horde::audio::HasBellwetherVoiceCut(cut.line, true, true, true, true),
+            "each optional private take fits its dialogue window and keeps its missing-voice caption");
+    }
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
           "invalid catalogue paths cannot escape the supplied asset root");

@@ -41,6 +41,12 @@ final class ChapterVoiceAssets {
             kit(16, "flask.empty"),
             kit(17, "flask.topup")
     };
+    // Extend this list for individually pinned private Bellwether takes; the
+    // generated line-ID selection keeps each admission independent.
+    private static final Asset[] OPTIONAL_BELLWETHER_ASSETS = {
+            bellwether(35, "hub.first_errand", "record_keeper_"),
+            bellwether(36, "hub.shrine_direction", "record_keeper_")
+    };
     private static final List<Asset> ALL = admittedAssets();
 
     private static List<Asset> admittedAssets() {
@@ -76,7 +82,15 @@ final class ChapterVoiceAssets {
             assets.add(bellwether(59, "hub.kit_stake", "kit_"));
             assets.add(bellwether(60, "kit.personal_stake.key", "kit_"));
         }
+        for (Asset asset : OPTIONAL_BELLWETHER_ASSETS)
+            if (optionalVoiceSelected(asset.stableId)) assets.add(asset);
         return Collections.unmodifiableList(assets);
+    }
+
+    private static boolean optionalVoiceSelected(String stableId) {
+        for (String selected : BuildConfig.BELLWETHER_OPTIONAL_VOICE_IDS.split(","))
+            if (stableId.equals(selected)) return true;
+        return false;
     }
 
     private ChapterVoiceAssets() {}

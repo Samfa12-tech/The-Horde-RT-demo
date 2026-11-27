@@ -1,0 +1,28 @@
+{
+  "hub.first_errand": {
+    "script": "The wayside shrine kept a road register. If it survived, it may name the next stops.",
+    "sourceName": "hub.first_errand.wav",
+    "sourceSha256": "a61a1b8c3442e7f5abadeee864e3bea5766b52f8d5dc9fbd4d868a2ac4780d22",
+    "runtimeSha256": "7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8",
+    "channels": 1,
+    "rate": 24000,
+    "frames": 127979,
+    "runtimeBits": 16,
+    "sourceBits": 24,
+    "ownerReview": "LATER_OWNER_APPROVAL_12_OCTOBER",
+    "sampleCheck": "Every source PCM24 sample truncated to its high 16 bits exactly matches the runtime PCM16."
+  },
+  "hub.shrine_direction": {
+    "script": "Take the northern path out of Bellwether. The shrine is on a short spur beyond it.",
+    "sourceName": "hub.shrine_direction.wav",
+    "sourceSha256": "ee77e47cf5de31fe0550ff4850878d50749960e8435f0325c26efd10cd227de4",
+    "runtimeSha256": "25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44",
+    "channels": 1,
+    "rate": 24000,
+    "frames": 110730,
+    "runtimeBits": 16,
+    "sourceBits": 24,
+    "ownerReview": "LATER_OWNER_APPROVAL_12_OCTOBER",
+    "sampleCheck": "Every source PCM24 sample truncated to its high 16 bits exactly matches the runtime PCM16."
+  }
+}

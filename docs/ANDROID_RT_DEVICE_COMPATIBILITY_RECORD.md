@@ -5105,3 +5105,20 @@ and no identifiable gameplay SurfaceView rows. Displayed frame pacing and
 listening acceptance at the stock yard remain open. The updated private APK
 was left installed, all 22 pre-existing files matched after restoration, and
 the phone returned to Home.
+
+### 28 November 2026 — Wayside air ward from an unpaid register save
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17), the private Debug APK from
+`ce32058f` loaded an isolated copy of the schema-11 hearth save earned by the
+earlier register walkthrough. The register was interpreted. The keeper's
+reward was unpaid. The player walked to the wayside shrine and chose
+**Restore shrine binding**, then returned to the church and chose **Learn
+the air ward**. The keeper still offered **Collect register reward**. The
+player left it unclaimed.
+
+After a process restart, **Play → Continue** returned the player to the
+earned hearth. **Bellwether directions** showed the learned ward, both
+expedition leads and zero coins. The learned save bytes matched across the
+restart, including the restored binding, three hearts, two flask charges
+and the unfitted lantern. All 23 pre-existing save, report and preference
+files matched after restoration. [Route and save receipt](evidence/2026-11-28-bellwether-church/ward-walk.json)

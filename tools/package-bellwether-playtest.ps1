@@ -58,6 +58,20 @@ if ($presentHearth.Count -gt 0) {
     $voiceLines += $hearth
 }
 
+$optionalVoices = [ordered]@{
+    'hub.first_errand' = '7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8'
+    'hub.shrine_direction' = '25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44'
+}
+foreach ($line in $optionalVoices.Keys) {
+    $path = Join-Path $voices "$line.wav"
+    if (Test-Path -LiteralPath $path) {
+        if ((Get-FileHash -LiteralPath $path).Hash -ne $optionalVoices[$line]) {
+            throw "The private voice differs from its reviewed take: $line"
+        }
+        $voiceLines += $line
+    }
+}
+
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
     'reports/horde-bellwether-playtest-' + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
 $package = (New-Item -ItemType Directory -Path (Join-Path $output 'Bellwether Playtest')).FullName
