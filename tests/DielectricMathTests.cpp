@@ -145,13 +145,26 @@ void TestTotalInternalReflection()
 void TestCriticalAngleIsTransmissionBoundary()
 {
     Vec3 transmitted{};
+    // Equal IOR at exact tangent incidence has a binary-exact zero
+    // discriminant and must preserve the tangent direction exactly.
+    Check(RefractDirection(Vec3{1.0f, 0.0f, 0.0f},
+                           Vec3{0.0f, 1.0f, 0.0f}, 1.0f, 1.0f, transmitted),
+          "an exact binary zero Snell discriminant transmits");
+    Check(Finite(transmitted) && NearlyEqual(transmitted, Vec3{1.0f, 0.0f, 0.0f}, 0.000001f),
+          "exact zero-discriminant transmission remains tangent");
+
     // 4/5 tangent and 3/5 normal form a rational unit direction; eta=5/4
-    // places it exactly at critical incidence without a rounded sqrt(3)/2.
+    // places this dense-to-rare ray exactly at the physical critical angle.
+    // Float evaluation of 1-cos^2 can move k by a few ULPs; sqrt(k) then
+    // bounds the computed normal component by sqrt(4*epsilon).
     Check(RefractDirection(Vec3{4.0f, -3.0f, 0.0f},
                            Vec3{0.0f, 1.0f, 0.0f}, 1.25f, 1.0f, transmitted),
-          "an exact rational Snell boundary transmits instead of reporting TIR");
-    Check(Finite(transmitted) && NearlyEqual(transmitted, Vec3{1.0f, 0.0f, 0.0f}, 0.0001f),
-          "critical-angle transmission is finite and tangent to the interface");
+          "an exact rational dense-to-rare critical ray transmits");
+    const float criticalNormalErrorBound = std::sqrt(
+        4.0f * std::numeric_limits<float>::epsilon());
+    Check(Finite(transmitted) && NearlyEqual(transmitted.x, 1.0f, 0.000001f) &&
+              std::abs(transmitted.y) <= criticalNormalErrorBound,
+          "critical transmission obeys Snell tangential direction within the float-k error bound");
     const float belowCriticalTangent = std::nextafter(4.0f, 0.0f);
     const float aboveCriticalTangent = std::nextafter(4.0f, 5.0f);
     Check(RefractDirection(Vec3{belowCriticalTangent, -3.0f, 0.0f},

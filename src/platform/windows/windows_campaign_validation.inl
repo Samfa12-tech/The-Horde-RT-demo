@@ -239,26 +239,35 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         bool catalogue=true;
         for(std::size_t i=0;i<ctx.campaign->Catalogue().size();++i)
             catalogue&=ctx.campaign->Catalogue()[i].status==(i==1?campaign::CatalogueStatus::Valid:campaign::CatalogueStatus::Empty);
-        proceed=check(catalogue && click(CampaignMenu::FirstChoiceId+1) && until([&]{
+        // Load shows one choice per slot. Slot one's valid autosave is its second catalogue record.
+        proceed=check(catalogue && click(CampaignMenu::FirstChoiceId) && until([&]{
             return ctx.campaignBarrier.State().phase==campaign::CampaignLoadBarrier::Phase::Complete;
         },true),"only slot one autosave loads through owner input rebase and matching successful RT presentation");
     }
     std::uint64_t loadedTick=0,operationRevision=0,boundaryRevision=0;
     float kitY=0;
+    const auto pause=[&]{
+        if(!safe("before-pause-menu-command"))return false;
+        // The pause menu command has no child HWND.
+        SendMessageA(ctx.windowHandle,WM_COMMAND,MAKEWPARAM(kMenuPauseId,0),0);
+        return safe("after-pause-menu-command");
+    };
     if(proceed){
         const auto& s=ctx.simulation.Snapshot();const auto terrain=ctx.rtScene.ChapterTerrainSurface();
         const auto support=traversal::ChapterExteriorSupport(terrain.get(),s.playerX,s.playerZ);
         const auto kitSupport=traversal::ChapterExteriorSupport(terrain.get(),s.chapterCompanion.x,s.chapterCompanion.z);
         loadedTick=s.tickIndex;kitY=s.chapterCompanion.y;
         operationRevision=ctx.campaign->State().operationRevision;boundaryRevision=ctx.simulation.CampaignBoundaryRevision();
-        proceed=check(ctx.campaignPause && ctx.simulationPaused && ctx.pauseMenuVisible && ctx.campaignMenu->Visible() &&
-            ctx.campaign->State().activeSlot==0 && IsWindowEnabled(GetDlgItem(ctx.windowHandle,CampaignMenu::ResumeId)) &&
+        proceed=check(!ctx.campaignPause && !ctx.simulationPaused && !ctx.pauseMenuVisible && !ctx.campaignMenu->Visible() &&
+            ctx.campaign->State().activeSlot==0 &&
             s.worldRoute.current==simulation::WorldZoneId::Lookout &&
             s.worldRoute.readiness[static_cast<std::size_t>(simulation::WorldZoneId::Lookout)]==simulation::ZoneReadiness::Ready &&
             support.grounded && support.id==s.playerSupportId && static_cast<unsigned>(support.id)>=1000 &&
             support.worldY==s.playerSupportWorldY && kitSupport.grounded && std::abs(kitSupport.worldY-kitY)<.001f &&
             storySame() && neutral() && noPanel() && !ctx.endingOverlayVisible && completed(false,loadedEvidence),
             "loaded player and Kit use actual grounded forest support with completed quiet story and no automatic panel");
+        if(proceed)proceed=check(pause() && ctx.simulationPaused && ctx.pauseMenuVisible && !ctx.campaignPause,
+            "ordinary pause holds the presented lookout during deterministic inspections");
     }
     if(proceed){
         std::string error;horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
@@ -866,18 +875,9 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
         if(proceed)proceed=check(render() && storySame(),"ordinary loaded camera and actor return after sequential motion inspection");
     }
     if(proceed){
-        // Native notification queues owner work; the normal owner pump owns its
-        // effects. Checking menu/pause state before that pump is not a Resume test.
-        proceed=check(click(CampaignMenu::ResumeId) && ctx.campaignCommand &&
-            ctx.campaignCommand->action==CampaignMenu::Action::Resume,
-            "explicit native Resume queues exactly the production owner command");
-        if(proceed){
-            PumpCampaign(ctx);
-            proceed=check(!ctx.campaignCommand && ctx.campaignPhase!=CampaignMenu::Phase::Failed && safe("after-resume-owner-pump"),
-                "one normal owner pump consumes Resume without failure");
-        }
-        if(proceed)proceed=check(!ctx.campaignMenu->Visible(),"Resume owner command closes load chooser");
-        if(proceed)proceed=check(!ctx.campaignPause && !ctx.simulationPaused,"Resume owner command releases both pause owners");
+        proceed=check(click(kResumeButtonId) && !ctx.campaignMenu->Visible() && !ctx.pauseMenuVisible &&
+            !ctx.campaignPause && !ctx.simulationPaused,
+            "the native pause-menu Resume releases the inspection hold and returns to play");
         if(proceed)proceed=check(noPanel() && neutral(),"Resume retains neutral input without automatically opening objective");
         if(proceed)proceed=check(render(),"first neutral live RT frame presents after Resume");
         if(proceed)proceed=check(render(),"second neutral live RT frame presents after Resume");
@@ -887,13 +887,6 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
             proceed=check(current && campaign::CompletedForestProgress(current->dialogue),
                 "live endpoint capture independently confirms no active speech or queued continuation after Resume");}
     }
-    const auto pause=[&]{
-        if(!safe("before-pause-menu-command"))return false;
-        // HMENU commands have no child HWND. Actual button commands above still
-        // require their current native child handle and visible/enabled style.
-        SendMessageA(ctx.windowHandle,WM_COMMAND,MAKEWPARAM(kMenuPauseId,0),0);
-        return safe("after-pause-menu-command");
-    };
     const auto open=[&]{return pause() && ctx.simulationPaused && noPanel() &&
         CurrentLookoutObjectiveView(ctx).available && click(kLookoutObjectiveButtonId) &&
         ctx.lookoutObjective && ctx.lookoutObjective->Visible() && ctx.simulationPaused;};
@@ -940,9 +933,10 @@ int RunHiddenLookoutValidation(VulkanSurfaceContext& ctx,horde::vulkan::DeviceCa
                 !ctx.sceneProfileDirty && safe("after-entry-replacement") && render() && completed(true,entryEvidence) &&
                 ctx.entryMenuVisible && ctx.simulationPaused && storySame() && neutral() &&
                 std::abs(ctx.simulation.Snapshot().chapterCompanion.y-kitY)<.001f &&
-                ctx.simulation.CampaignBoundaryRevision()==boundaryRevision && ctx.campaign->State().activeSlot==0 &&
+                ctx.simulation.CampaignBoundaryRevision()==boundaryRevision && !ctx.campaign->State().activeSlot &&
+                ctx.campaign->State().operation==campaign::PlayOperation::None &&
                 ctx.campaign->State().operationRevision==operationRevision && !gHiddenCampaignFaults.rejectedWrites,
-                "actual EntryMenu scene replacement and completed RT present retain player Kit story and checkpoint without save operation");
+                "returning to the presented entry menu releases the slot and preserves the checkpoint without a save operation");
         }
     }
     // This final read is independent of the logical assertions, and also runs
