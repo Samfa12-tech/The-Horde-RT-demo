@@ -1,0 +1,36 @@
+{
+  "sourceCommit": "ed7726fe2b8b71883809f078c03b92a13a5071e8",
+  "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+  "buildMode": "Private optimized BellwetherCandidate with development signing",
+  "versionName": "1.7.0-bellwether-candidate",
+  "versionCode": 11,
+  "apkSha256": "55fb753ea0b5be8d674b70fb7d676fde3368deb8ae95b9fe94e9773f5f49c3d6",
+  "apkBytes": 277444868,
+  "nativeLibrarySha256": "80099dce7bba97ec65d0088b8b3756c22f4dccf42875aad000c7e56ccd590211",
+  "fiveResidents": [
+    "artificer",
+    "record-keeper",
+    "relic-dealer",
+    "salvager",
+    "tavern-keeper"
+  ],
+  "voiceTakes": 26,
+  "runtimeAssetEntries": 295,
+  "runtimeEntriesMatchHouseBLedgerCandidate": true,
+  "referenceApkSha256": "472a8844ef6cf82de48251c2c1fc3c75070e1f67e1302530a19ecd3e503996b1",
+  "assetInventorySha256": "35ba296fd07c1ec67dfafb1e016b77113714e6cca5fb998f43e069ce32738f54",
+  "unitTests": {
+    "tests": 615,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6
+  },
+  "packagedSpirv": [
+    "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+    "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+    "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+  ],
+  "apkSignatureV2Verified": true,
+  "deviceRun": false
+}

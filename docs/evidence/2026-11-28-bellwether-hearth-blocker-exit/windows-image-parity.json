@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "driver": "610.47",
+  "profile": "Windows Debug host, Shipping/High shaders, 960x540 trace and output",
+  "control": {
+    "sourceCommit": "1070ba1ff48e81d5fc4e71b439c1ff22595ea43d",
+    "exeSha256": "4d7733d2c6773f541a11abd1e6339ae1a7e42bd7b4486be7f5d6eec40e34c9b3"
+  },
+  "candidate": {
+    "runtimeShaderCommit": "0a591797",
+    "exeSha256": "f9c2d06388523f7289451e6dd64e45b0421e7472953a350add61b326d254e160",
+    "executableSpirvSha256": [
+      "0bc5bbc866068637a95f78c2bcee3c40198a9796f15aa6b97f3cb8d7b3221482",
+      "442d64721ea84aade0931b94ce8182647944e1ce4e674d17d2347b835b25a1e7",
+      "52a70fc7cfaa8f2589d48d836bab4477339b5889ab486c67c90bce6def7c7ef2",
+      "2b2b5c0fdbed9e3787169f38b0f1eb61eca5a50f4c8cde058d6799a8951afc79"
+    ],
+    "artifactNote": "Executable built before refreshing the compatibility includes. All four runtime modules match the committed catalogs."
+  },
+  "presentedFrozenPairs": [
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "bellwether-repeat-visit",
+      "glassEnabled": false,
+      "activeStrategy": "opaque-fast",
+      "controlSpirvSha256": "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "candidateSpirvSha256": "0bc5bbc866068637a95f78c2bcee3c40198a9796f15aa6b97f3cb8d7b3221482",
+      "matchedRgbSha256": "0370d5b26a9e9575094369eee7621a0e75c72e95ec833b31fbfe74a4835143a2"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "bellwether-square-frontage",
+      "glassEnabled": false,
+      "activeStrategy": "opaque-fast",
+      "controlSpirvSha256": "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "candidateSpirvSha256": "0bc5bbc866068637a95f78c2bcee3c40198a9796f15aa6b97f3cb8d7b3221482",
+      "matchedRgbSha256": "113a21e33c8b3fa58922aed36efd78ae71f4dfb20bd44f32c5dcc6ddc6ef7b0c"
+    },
+    {
+      "backend": "RayTracingPipeline",
+      "checkpoint": "bellwether-repeat-visit",
+      "glassEnabled": true,
+      "activeStrategy": "generic-dielectric",
+      "controlSpirvSha256": "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "candidateSpirvSha256": "442d64721ea84aade0931b94ce8182647944e1ce4e674d17d2347b835b25a1e7",
+      "matchedRgbSha256": "67096989a7f3512b3b5774b6ea1d47e156fc067fa8fef1962081e4260b1030bb"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "bellwether-repeat-visit",
+      "glassEnabled": false,
+      "activeStrategy": "opaque-fast",
+      "controlSpirvSha256": "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "candidateSpirvSha256": "52a70fc7cfaa8f2589d48d836bab4477339b5889ab486c67c90bce6def7c7ef2",
+      "matchedRgbSha256": "dff55034776e29f47c4fb7cabc2addabbeecb67c9e803481642a2724bbeb9a96"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "bellwether-square-frontage",
+      "glassEnabled": false,
+      "activeStrategy": "opaque-fast",
+      "controlSpirvSha256": "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "candidateSpirvSha256": "52a70fc7cfaa8f2589d48d836bab4477339b5889ab486c67c90bce6def7c7ef2",
+      "matchedRgbSha256": "c9a14cd1813b3293d2555103bcecd4485ec9d487df42ffd5e2ad62f3211a0775"
+    },
+    {
+      "backend": "RayQueryCompute",
+      "checkpoint": "bellwether-repeat-visit",
+      "glassEnabled": true,
+      "activeStrategy": "generic-dielectric",
+      "controlSpirvSha256": "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f",
+      "candidateSpirvSha256": "2b2b5c0fdbed9e3787169f38b0f1eb61eca5a50f4c8cde058d6799a8951afc79",
+      "matchedRgbSha256": "2c150cc1a4f9f8d1db691143ffe87fb45ddc057ed7454efb02645845e89929c9"
+    }
+  ],
+  "validatedCatalogModes": {
+    "pipeline": 8,
+    "rayQueryCompute": 8
+  },
+  "compatibilityShaderChecks": "Generic and legacy include words matched fresh compilation."
+}

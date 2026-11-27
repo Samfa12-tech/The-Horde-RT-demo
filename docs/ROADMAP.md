@@ -184,6 +184,12 @@ beside the oil cup describes a delivery for the tavern and points players to
 the mill's existing tally board. The interior selection and handset playtest
 remain open.
 
+The private optimized Android checkpoint from the merged House B source
+packages the ledger, five residents and 26 existing voice recordings. Each of
+its 295 runtime assets matches the earlier ledger candidate. The new package
+includes the voice mix and passed the Android unit and packaged shader checks.
+[Exact package receipt](evidence/2026-11-28-bellwether-merged-checkpoint/receipt.json)
+
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 
 On the Galaxy S26 Ultra, [the timed west route](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#27-november-2026--church-fork-silver-west-lane-sale-and-hearth-fitting) reached the stock yard twice and the tavern once before the 240-second deadline. The staffed hearth had the highest median GPU time at 95.64 ms, with 95.01 ms in RT dispatch. At the same scale, [two hearth sampling runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--staffed-hearth-shader-sampling-on-the-galaxy-s26-ultra) identified shadow visibility as the largest sampled shader category. [Five ordinary-shader runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison) found no GPU time saving from postponing a primitive-index read. A [private direct-fire shadow trial](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--early-exit-for-direct-fire-shadow-rays) cut median hearth dispatch time by about 19% at the matched GPU clock and produced identical frozen RGB. Production integration and sustained play remain open.

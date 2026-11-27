@@ -47,6 +47,8 @@ temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
 
 **28 November direct fire shadow early exit — promising private trial.** For binary fire shadows, the trial ends the hardware ray query as soon as the existing material test finds an opaque triangle. In four alternating runs at the staffed hearth, RT dispatch medians went from 75.89–76.01 ms to 61.59–61.68 ms among frames bracketed by the same 1300 MHz GPU clock and power level 0. The frozen RGB matched exactly. The trial made two returns in the longer route and the control made one. Both full-route runs reached the 240-second deadline before finishing the final hold. Keep the trial private pending production integration and sustained validation. [Device record and exact samples](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--early-exit-for-direct-fire-shadow-rays)
 
+The normal shader catalog build produced all eight variants for each backend, and fresh compilations matched the catalogs and compatibility includes. On the RTX 5050 Laptop GPU, six paired 960 × 540 images matched pixel for pixel. Each backend presented the hearth and square with the opaque shader and the hearth with the generic dielectric shader. The Windows evidence establishes frozen-image parity. Sustained route performance and the integrated shader's handset performance remain open. [Windows shader and image receipt](evidence/2026-11-28-bellwether-hearth-blocker-exit/windows-image-parity.json)
+
 
 **24 November ordinary Android hearth controls.** At the same position and
 graphics settings, the [stationary view comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
