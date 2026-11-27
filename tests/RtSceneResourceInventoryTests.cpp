@@ -911,8 +911,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==44u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?50u:49u);
+        ok &= materials.size()==43u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?51u:50u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -1141,22 +1141,33 @@ struct PresentableTinyRtSceneObservationTestAccess
             ok &= i==kitMaterial;
         }
         ok &= emissiveOwners==1u;
+        const auto row=[&](const auto& asset,std::uint32_t owner,std::size_t offset,std::string_view finish) {
+            const auto& metadata=instances[owner];
+            for(std::size_t i=0;i<metadata.primitiveCount;++i) {
+                if(asset.materials[asset.primitives[offset+i].materialIndex].name==finish)
+                    return primitives[metadata.primitiveBase+i].materialIndex;
+            }
+            return kRtMaterialCapacity;
+        };
         for(const char* family:{"ChestWood","BlackIron"}) {
-            const auto row=[&](const auto& asset,std::uint32_t owner,std::size_t primitiveOffset) {
-                const auto& metadata=instances[owner];
-                for(std::size_t i=0;i<metadata.primitiveCount;++i)
-                    if(asset.materials[asset.primitives[primitiveOffset+i].materialIndex].name==family)
-                        return primitives[instances[owner].primitiveBase+i].materialIndex;
-                return kRtMaterialCapacity;
-            };
-            const auto base=row(scene.gothicChestBaseAsset_,5u,0u);
-            const auto lid=row(scene.gothicChestLidAsset_,6u,0u);
+            const auto base=row(scene.gothicChestBaseAsset_,5u,0u,family);
+            const auto lid=row(scene.gothicChestLidAsset_,6u,0u,family);
             const auto wheel=row(scene.millDriveAsset_,PresentableTinyRtScene::kMillWaterwheelMetadataIndex,
-                PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset);
+                PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset,family);
             ok &= Require(base<materials.size() && base==lid && base==wheel &&
                 base!=scene.dielectricFixtureMaterialIndex_,
                 "waterwheel ChestWood and BlackIron reuse the admitted immutable atlas/material rows");
         }
+        const auto oak=row(scene.gothicChestBaseAsset_,5u,0u,"ChestWood");
+        const auto townOak=row(scene.collapseStaticAsset_,PresentableTinyRtScene::kCollapseInstanceIndex,0u,"HordeTavernTimber");
+        const auto doorOak=row(scene.tavernDoorAsset_,PresentableTinyRtScene::kTavernDoorMetadataIndex,0u,"HordeTavernTimber");
+        const auto pottery=row(scene.collapseStaticAsset_,PresentableTinyRtScene::kCollapseInstanceIndex,0u,"TombEarthenware");
+        const auto woodMaps=static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) |
+            static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) | static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture);
+        ok &= Require(oak<materials.size() && townOak==oak && doorOak==oak && pottery<materials.size() &&
+            pottery!=oak && (materials[oak].materialFlags[0]&woodMaps)==woodMaps &&
+            (materials[pottery].materialFlags[0]&woodMaps)==0,
+            "the town joinery and south door share the resident wood maps while the pottery keeps its own surface");
         // These are separately owned rigid props. Grouping their baked node
         // geometry must preserve every vertex/triangle and every grip/latch
         // socket; source files and the articulated lantern-body owner stay intact.
@@ -1743,8 +1754,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 49u &&
-                  tomb.staticMeshSlot_.Materials().size() == 44u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 50u &&
+                  tomb.staticMeshSlot_.Materials().size() == 43u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)

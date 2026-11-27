@@ -63,7 +63,8 @@ bool AppendBellwetherShell(const std::filesystem::path& assetsRoot,
     assets::StaticMeshAsset* roadRegister = nullptr,
     assets::StaticMeshAsset* southDoor = nullptr,
     BellwetherFurnitureDetail furnitureDetail = BellwetherFurnitureDetail::Near,
-    assets::StaticMeshAsset* isolatedFurnitureTiers = nullptr);
+    assets::StaticMeshAsset* isolatedFurnitureTiers = nullptr,
+    const assets::StaticMaterial* timberMaterialProvider = nullptr);
 // Soft crop foliage reuses the deferred ForestAlder atlas family and creates no contact geometry.
 bool AppendBellwetherGardenCrops(const std::filesystem::path& assetsRoot,
     assets::StaticMeshAsset& world, std::string& diagnostic);

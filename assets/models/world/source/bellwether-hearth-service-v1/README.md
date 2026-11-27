@@ -2,7 +2,7 @@
 
 A clay water jug, a beaker and a turned wooden trencher sit on the table beside Kit. Against the north wall, the serving dresser holds upright platters, spare beakers and a lidded storage crock. The keeper can approach from the south aisle.
 
-The editable Blender master is `hearth-service.blend`. The [recipe](../../../../../tools/author-bellwether-hearth-service.py) fits the pieces to the original tavern floor and table. The 2,440 triangles use the town's existing oak and clay finishes. The chair and table retain their three distance-based detail levels and the same tabletop height in each.
+The editable Blender master is `hearth-service.blend`. The [recipe](../../../../../tools/author-bellwether-hearth-service.py) fits the pieces to the original tavern floor and table. The 2,440 triangles use the town's oak and clay finishes. The static joinery, south door and changing furniture detail levels share the chest's oak grain and normal and roughness maps. The clay keeps its separate earthenware surface. The chair and table retain their three distance-based detail levels and the same tabletop height in each.
 
 To reproduce the export, extract `bellwether-tavern-v1.glb` and its sibling `asset.manifest.json` from commit `dcb1f4fe`. Run Blender 5.2 from the repository root with a fresh output directory.
 

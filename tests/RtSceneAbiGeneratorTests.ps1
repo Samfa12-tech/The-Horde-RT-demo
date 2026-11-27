@@ -47,12 +47,12 @@ try {
 
     $definition = Get-Content -LiteralPath (Join-Path $repoRoot "src\vulkan\raytracing\RtSceneAbi.def") -Raw | ConvertFrom-Json
     $capacityCpu = Get-Content -LiteralPath $portableCpuPath -Raw
-    if ($definition.capacities.instanceMetadata -ne 42 -or $definition.capacities.tlasInstances -ne 122 -or $definition.capacities.primitives -ne 55 -or
+    if ($definition.capacities.instanceMetadata -ne 42 -or $definition.capacities.tlasInstances -ne 122 -or $definition.capacities.primitives -ne 56 -or
         $definition.capacities.staticAssets -ne 25 -or $definition.capacities.materials -ne 50 -or $definition.capacities.textureLayers -ne 20 -or
         $capacityCpu -notmatch 'kRtTlasInstanceCapacity = 122u;' -or
         $capacityCpu -notmatch 'kRtOrdinaryShowcaseInstanceCount = 31u;' -or
         $capacityCpu -notmatch 'kRtInstanceMetadataCapacity = 42u;' -or
-        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 55u;' -or
+        $capacityCpu -notmatch 'kRtPrimitiveMetadataCapacity = 56u;' -or
         $capacityCpu -notmatch 'kRtStaticAssetCapacity = 25u;' -or
         $capacityCpu -notmatch 'kRtMaterialCapacity = 50u;' -or
         $capacityCpu -notmatch 'kRtTextureLayerCapacity = 20u;' -or
@@ -60,10 +60,10 @@ try {
         $capacityCpu -notmatch 'kRtFireEmitterCapacity = 4u;' -or
         $generatedGlsl -notmatch 'const uint kRtInstanceMetadataCapacity = 42u;' -or
         $generatedGlsl -notmatch 'const uint kRtTlasInstanceCapacity = 122u;' -or
-        $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 55u;' -or
+        $generatedGlsl -notmatch 'const uint kRtPrimitiveMetadataCapacity = 56u;' -or
         $generatedGlsl -notmatch 'const uint kRtMaterialCapacity = 50u;' -or
         $generatedGlsl -notmatch 'const uint kRtTextureLayerCapacity = 20u;') {
-        throw 'Generated owners must admit 122 TLAS slots, 42 metadata records, 55 primitive records, 25 static assets, 50 materials, 20 texture layers, and four fire records.'
+        throw 'Generated owners must admit 122 TLAS slots, 42 metadata records, 56 primitive records, 25 static assets, 50 materials, 20 texture layers, and four fire records.'
     }
     foreach ($case in @(
         @{ name = 'tlasInstances'; value = 21 },

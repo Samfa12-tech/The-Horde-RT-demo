@@ -220,7 +220,7 @@ void TestGeneratedConstants()
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
     Check(kRtStaticAssetCapacity == 25u, "static asset capacity includes one shared stock head source");
-    Check(kRtPrimitiveMetadataCapacity == 55u, "primitive storage includes both stock head families");
+    Check(kRtPrimitiveMetadataCapacity == 56u, "the staffed town fits distinct clay and timber alongside both stock heads");
     Check(kRtMaterialCapacity == 50u, "material storage covers the three opaque stock finishes before aliases");
     Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&

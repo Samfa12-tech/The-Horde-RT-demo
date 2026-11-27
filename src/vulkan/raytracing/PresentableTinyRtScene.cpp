@@ -4331,9 +4331,15 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::GraveyardDressingReport graveyard;
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
+        const auto chestWood = std::find_if(gothicChestBaseAsset_.materials.begin(),gothicChestBaseAsset_.materials.end(),
+            [](const auto& material) { return material.name=="ChestWood"; });
+        if(chestWood==gothicChestBaseAsset_.materials.end()) {
+            diagnostic="Bellwether timber requires the admitted ChestWood provider row.";return false;
+        }
         if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
                 &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_, &tavernDoorAsset_,
-                bellwetherFurnitureDetail_,bellwetherFurnitureTransitions_ ? &bellwetherFurnitureAsset_ : nullptr))
+                bellwetherFurnitureDetail_,bellwetherFurnitureTransitions_ ? &bellwetherFurnitureAsset_ : nullptr,
+                &*chestWood))
             return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
