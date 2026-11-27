@@ -282,8 +282,9 @@ int main(int argc,char** argv) {
         const auto sign=cp::PauseObjectiveText(local,atPost);
         Check(local==PauseObjective::BellwetherSquare && atPost.atSquare &&
               sign.find("Tankard")!=sign.npos && sign.find("Scales")!=sign.npos &&
-              sign.find("Wheel")!=sign.npos && sign.find("Anvil")!=sign.npos && sign.find("CHURCH")!=sign.npos,
-              "the square offers all four physical routes and the church turn before any private service is earned");
+              sign.find("Wheel")!=sign.npos && sign.find("Anvil")!=sign.npos && sign.find("CHURCH")!=sign.npos &&
+              sign.find("short stone fork at the bend below the sign to visit the stock room")!=sign.npos,
+              "the square offers the physical routes, church turn and stock-room fork before any service is earned");
         const auto arrival=cp::PauseObjectiveText(PauseObjective::BellwetherArrival,atPost);
         Check(arrival.starts_with("Take the ramp") && arrival.ends_with(sign) &&
               cp::PauseObjectiveText(PauseObjective::BellwetherShrine,atPost).starts_with("Ask the record keeper"),
@@ -295,6 +296,30 @@ int main(int argc,char** argv) {
         visitor.playerX=junction.x;visitor.rescue.equipmentStowed=true;
         Check(cp::CurrentPauseObjective(visitor,std::nullopt)==PauseObjective::None,
               "the local sign is unavailable during a traversal");
+        visitor.rescue.equipmentStowed=false;
+        for (const auto& [x, z] : bellwether::kHouseBStations) {
+            visitor.playerX=x;visitor.playerZ=z;
+            const auto local=cp::CurrentPauseObjective(visitor,std::nullopt);
+            const auto atFork=cp::CurrentBellwetherDirections(visitor);
+            const auto page=cp::PauseObjectiveText(local,atFork);
+            Check(local==PauseObjective::BellwetherStockRoom && atFork.nearStockRoom &&
+                  page.find("ledger is beside the oil lamp")!=page.npos &&
+                  page.find("Follow the same ramp back to the road")!=page.npos,
+                  "the entire authored stock-room route offers the optional ledger and return directions");
+            const auto arrival=cp::PauseObjectiveText(PauseObjective::BellwetherArrival,atFork);
+            Check(arrival.starts_with("Follow the road to the covered well") && arrival.ends_with(page),
+                  "the optional stock-room directions follow the active tavern guidance");
+        }
+        visitor.playerGrounded=false;
+        Check(cp::CurrentPauseObjective(visitor,std::nullopt)==PauseObjective::None,
+              "stock-room hints require grounded village movement");
+        visitor.playerGrounded=true;
+        constexpr auto church=horde::gameplay::traversal::kBellwetherTavernRoute[
+            horde::gameplay::traversal::kBellwetherChurchJunction];
+        visitor.playerX=church.x;visitor.playerZ=church.z;
+        Check(!cp::CurrentBellwetherDirections(visitor).nearStockRoom &&
+              cp::CurrentPauseObjective(visitor,std::nullopt)==PauseObjective::None,
+              "the stock-room hint stays on its own fork beyond the main church junction");
     }
     for(const auto objective:{PauseObjective::BellwetherArrival,PauseObjective::BellwetherHearth}) {
         Check(cp::PauseObjectiveText(objective,directions)==cp::PauseObjectiveText(objective),
