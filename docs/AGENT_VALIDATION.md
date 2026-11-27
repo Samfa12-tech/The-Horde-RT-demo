@@ -215,6 +215,43 @@ verify its route without authoring a forced camera path. Keep the seed hash,
 walkthrough captures and resulting autosave together, and use an unseeded
 entry separately when checking the full campaign.
 
+#### Sampling the staffed-hearth dispatch on Android
+
+To investigate the normal 1.8 geometry layout, prepare the observer from the
+same checkout as the playtest. From the repository root, choose a fresh
+directory under `reports/` and use the Windows Vulkan shader tools.
+
+```powershell
+python tools/prototype-dispatch-clock.py . reports/hearth-clock-shaders
+python tools/compile-dispatch-clock.py reports/hearth-clock-shaders
+```
+
+Build the private Bellwether APK with its usual assets, Shipping/Mobile,
+`-PhordeRtRouteTiming=true`, `-PhordeFrameStageProbe=true`,
+`-PhordeDispatchClockProbe=true` and `-PhordeDispatchClockShaderRoot=<absolute path to reports/hearth-clock-shaders/source>`.
+This installs separately as `com.samfa12.hordelanternrt.debug.bellwether.clock`.
+Check the compiled observer modules against the APK. Compare a frozen
+`bellwether-repeat-visit` capture against the ordinary package at the
+same backend, orientation and scale.
+
+Run `bellwether-west-roundtrip-measurement` with GPU timing enabled. During
+the first staffed-room hold, the app writes a binary grid and JSON sidecar
+for each of three settled frames to `files/reports/`. Copy the sidecars,
+their `.bin` files and the corresponding `bellwether-west-roundtrip.csv`
+to one directory. Each JSON becomes visible after its own successful
+presentation and CSV row. The sample set can be verified during the first
+visit. A full-route timing claim still requires the two returns.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-hearth-clock <observer-SPIR-V-SHA256> <capture-directory>
+```
+
+The verifier joins each grid to its frame and checks the ticket, pixel
+coordinates, category totals and resident identities. Read each share as
+a fraction of sampled invocation time. Instrumentation changes the shader
+and can affect scheduling and register use. Use an ordinary shader build
+to measure an optimization.
+
 ## Android device evidence
 
 Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes when an authorised device is available. `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` explains checkpoints/replay; inspect the current runner rather than freezing old checkpoint counts into new instructions. Preserve coverage of the two-enemy encounter where the changed route requires it.

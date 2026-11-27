@@ -741,6 +741,8 @@ if __name__=='__main__':
     mode.add_argument('--android-bellwether-doorway', action='store_true')
     mode.add_argument('--android-bellwether-resident-roundtrip', action='store_true')
     mode.add_argument('--android-bellwether-west-roundtrip', action='store_true')
+    mode.add_argument('--android-bellwether-hearth-clock', metavar='OBSERVER_SPIRV_SHA256',
+                      help='Verify sparse settled-room samples against the owning west-route CSV rows')
     parser.add_argument('--expect-relic-dealer', action='store_true',
                         help='Require the five-resident Android fixture, including the relic dealer')
     parser.add_argument('--require-gpu-stages', action='store_true',
@@ -756,7 +758,12 @@ if __name__=='__main__':
         compare_bellwether_keeper(*args.directories, args.analysis_name)
         raise SystemExit(0)
     for name in args.directories:
-        if args.android_bellwether_doorway or android_roundtrip:
+        if args.android_bellwether_hearth_clock:
+            from analyze_android_dispatch_clock import analyze_hearth
+            result = analyze_hearth(name, args.android_bellwether_hearth_clock,
+                                    verify_bellwether_room_fire, BELLWETHER_RESIDENT_SOURCE_IDS)
+            print(json.dumps(result, indent=2))
+        elif args.android_bellwether_doorway or android_roundtrip:
             analyze_android_bellwether(name, args.analysis_name,
                                       resident_roundtrip=android_roundtrip,
                                       relic_dealer=args.expect_relic_dealer,

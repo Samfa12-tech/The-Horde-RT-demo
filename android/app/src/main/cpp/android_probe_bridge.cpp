@@ -4535,12 +4535,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         }
 #endif
         if (context.bellwetherDoorway && context.bellwetherDoorway->AwaitingFrame()) {
+            std::string measurementDiagnostic;
             if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot
 #if HORDE_RT_FRAME_STAGE_PROBE
                     , bellwetherGpuStages
 #endif
+                    , measurementDiagnostic
                     )) {
-                CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
+                CancelBellwetherDoorwayMeasurement(context, measurementDiagnostic.empty()
+                    ? "owning GPU/present evidence or scene workload changed" : measurementDiagnostic.c_str());
             } else if (context.bellwetherDoorway->probe.Complete()) {
                 const auto route = context.bellwetherDoorway->MeasurementRoute();
                 context.bellwetherDoorway.reset();
@@ -5686,8 +5689,19 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 CancelBellwetherDoorwayMeasurement(context, "staffed repeat visit or report unavailable");
             else
                 __android_log_print(ANDROID_LOG_INFO, kTag, "%s started", BellwetherMeasurementLogTag(route));
-        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene, state)) {
+        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene, state
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+                , context.rtScene.DispatchClockTicket()
+#endif
+                )) {
             CancelBellwetherDoorwayMeasurement(context, "submission sequence or resource generation changed");
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        } else {
+            std::string clockDiagnostic;
+            if (!context.bellwetherDoorway->CapturePendingDispatchClock(
+                    context.device, context.inFlightFences[context.currentFrame], context.rtScene, clockDiagnostic))
+                CancelBellwetherDoorwayMeasurement(context, clockDiagnostic.c_str());
+#endif
         }
     }
 #endif

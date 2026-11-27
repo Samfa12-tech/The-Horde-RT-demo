@@ -1,7 +1,7 @@
-"""Build a private, sparse shader-clock observer; never edit production shaders.
+"""Prepare private sparse shader-clock observation shaders for the ordinary RT layout.
 
-The input must be the already-verified region-page source. No effect is omitted.
-Experimental modules are observations, not frozen-budget production candidates.
+Never edits production shaders or geometry. The private observer is an ABI-changing
+diagnostic build and is not a frozen-budget or production candidate.
 """
 import argparse
 import hashlib
@@ -9,47 +9,60 @@ import json
 from pathlib import Path
 import re
 import shutil
-import subprocess
+
+
+CAPACITY = 8192
+STRIDE = 32
+OFFSET = 16
+RECORD_BYTES = 80
+
+
+def sha256(data):
+    return hashlib.sha256(data).hexdigest()
 
 
 def replace(path, old, new):
     text = path.read_text(encoding="utf-8")
     if text.count(old) != 1:
-        raise RuntimeError(f"Unexpected source in {path}: {old[:60]}")
+        raise RuntimeError(f"Unexpected source in {path}: {old[:80]}")
     path.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
 
 
 def observe_function(path, name, category):
     text = path.read_text(encoding="utf-8")
-    # Blank comments without changing offsets; braces/returns in comments are not code.
     clean = re.sub(r"/\*.*?\*/|//[^\n]*", lambda m: " " * len(m[0]), text, flags=re.S)
     pattern = rf"\b(\w+)\s+{name}\s*\([^;{{}}]*\)\s*\{{"
     matches = list(re.finditer(pattern, clean))
     if len(matches) != 1:
-        raise RuntimeError(f"Expected one definition of {name}")
+        raise RuntimeError(f"Expected one definition of {name} in {path}")
     match = matches[0]
     begin = match.end()
     depth, end = 1, begin
     while depth:
-        if clean[end] == "{": depth += 1
-        if clean[end] == "}": depth -= 1
+        if end >= len(clean):
+            raise RuntimeError(f"Unterminated definition of {name}")
+        if clean[end] == "{":
+            depth += 1
+        elif clean[end] == "}":
+            depth -= 1
         end += 1
-    body = text[begin:end-1]
-    body_clean = clean[begin:end-1]
+    body = text[begin:end - 1]
+    body_clean = clean[begin:end - 1]
     returns = list(re.finditer(r"\breturn\s+([^;]+);", body_clean))
     if not returns:
         raise RuntimeError(f"No value return in {name}")
-    # Evaluate the original expression before restoring the caller's category.
-    for r in reversed(returns):
-        expression = body[r.start(1):r.end(1)]
-        body = body[:r.start()] + (f"{{ {match[1]} clockResult = {expression}; "
-            "rtClockSwitch(clockPreviousCategory); return clockResult; }") + body[r.end():]
+    for result in reversed(returns):
+        expression = body[result.start(1):result.end(1)]
+        body = body[:result.start()] + (
+            f"{{ {match[1]} clockResult = {expression}; "
+            "rtClockSwitch(clockPreviousCategory); return clockResult; }") + body[result.end():]
     body = f"\n    uint clockPreviousCategory = rtClockSwitch({category}u);" + body
     if name == "traceScene":
         marker = "    if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)"
-        if body.count(marker) != 1: raise RuntimeError("trace/decode boundary changed")
+        if body.count(marker) != 1:
+            raise RuntimeError("trace/decode boundary changed")
         body = body.replace(marker, "    rtClockSwitch(2u);\n" + marker)
-    path.write_text(text[:begin]+body+text[end-1:], encoding="utf-8", newline="\n")
+    path.write_text(text[:begin] + body + text[end - 1:], encoding="utf-8", newline="\n")
 
 
 CLOCK_GLSL = r"""
@@ -95,21 +108,135 @@ void rtClockEnd(uint hitClass) {
 """
 
 
+def catalog_rows(source):
+    headers = [
+        ("src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h", "shipping_mobile_"),
+        ("src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h", "rayquery_compute_shipping_mobile_"),
+    ]
+    result = {}
+    pattern = re.compile(r'"([a-z_]+)", "src/vulkan/raytracing/variants/[^\"]+", "([0-9a-f]{64})", "([0-9a-f]{64})", (\d+), 0, false')
+    for relative, prefix in headers:
+        text = (source / relative).read_text(encoding="utf-8")
+        for match in pattern.finditer(text):
+            key = match.group(1)
+            if key.startswith(prefix):
+                result[key] = {"spirvSha256": match.group(2), "includeSha256": match.group(3),
+                               "words": int(match.group(4))}
+    expected = {
+        "shipping_mobile_opaque_fast", "shipping_mobile_generic_dielectric",
+        "rayquery_compute_shipping_mobile_opaque_fast", "rayquery_compute_shipping_mobile_generic_dielectric",
+    }
+    if set(result) != expected:
+        raise RuntimeError(f"Base Shipping/Mobile catalog rows incomplete: {sorted(result)}")
+    return result
+
+
+def shader_metadata_layout(source):
+    """Return the base metadata shape, deriving ordinary sizes from the ABI files."""
+    generated_path = source / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
+    generated = generated_path.read_text(encoding="utf-8")
+    abi_path = source / "src/vulkan/raytracing/RtSceneAbi.def"
+    abi = json.loads(abi_path.read_text(encoding="utf-8")) if abi_path.is_file() else None
+    values = re.search(r"\bRtInstanceMetadata\s+values(?:\[(\d*)\])?\s*;", generated)
+    pages = re.search(r"\buvec4\s+pages\[(\d+)\]\s*;", generated)
+    if not values:
+        raise RuntimeError("Generated GLSL has no RtInstanceMetadata storage array")
+    record = None
+    capacity = None
+    if abi is not None:
+        capacity = int(abi["capacities"]["instanceMetadata"])
+        record = next((row for row in abi["records"] if row["name"] == "RtInstanceMetadata"), None)
+        if record is None or int(record["size"]) <= 0:
+            raise RuntimeError("RtSceneAbi.def has no valid RtInstanceMetadata record size")
+        record_bytes = int(record["size"])
+    else:
+        record_bytes = None
+
+    fixed_count = int(values.group(1)) if values.group(1) else None
+    if pages:
+        if fixed_count is None:
+            raise RuntimeError("Flat-page GLSL must have an explicit metadata capacity")
+        if capacity is not None and capacity != fixed_count:
+            raise RuntimeError("Flat-page GLSL capacity disagrees with RtSceneAbi.def")
+        if record_bytes is None:
+            struct_match = re.search(r"struct\s+RtInstanceMetadata\s*\{([^}]+)\}", generated, re.S)
+            body = struct_match.group(1) if struct_match else ""
+            fields = re.findall(r"^\s*uint\s+\w+\s*;", body, re.M)
+            if not fields or len(fields) != len(re.findall(r"\buint\s+\w+\s*;", body)):
+                raise RuntimeError("Flat-page metadata record size cannot be derived from its GLSL fields")
+            record_bytes = len(fields) * 4
+        return {"layout": "flat-pages", "metadataCapacity": fixed_count,
+                "metadataRecordBytes": record_bytes, "pageCount": int(pages.group(1)),
+                "controlOffset": fixed_count * record_bytes + int(pages.group(1)) * 16}
+
+    if fixed_count is not None:
+        raise RuntimeError("Fixed metadata array without a page table is not an enrolled source layout")
+    if capacity is None or record_bytes is None:
+        raise RuntimeError("Ordinary-layout preparation requires RtSceneAbi.def")
+    return {"layout": "ordinary", "metadataCapacity": capacity,
+            "metadataRecordBytes": record_bytes, "pageCount": 0,
+            "controlOffset": capacity * record_bytes}
+
+
 def prepare(source, output):
-    root = Path(__file__).resolve().parents[1]
+    repo = Path(__file__).resolve().parents[1]
     source, output = source.resolve(), output.resolve()
-    if not output.is_relative_to(root / "reports") or output.exists():
-        raise RuntimeError("Choose a new reports directory; no overwrite")
-    if "uvec4 pages[8];" not in (source / "shaders/raytracing/include/rt_scene_abi.generated.glsl").read_text():
-        raise RuntimeError("Expected the admitted flat region-page ABI")
-    shutil.copytree(source, output / "source")
+    reports = (repo / "reports").resolve()
+    if not output.is_relative_to(reports) or output == reports or output.exists():
+        raise RuntimeError("Choose a new, non-existing directory under reports")
+    layout = shader_metadata_layout(source)
+    generated = source / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
+    generated_text = generated.read_text(encoding="utf-8")
+    if "clockControl" in generated_text or (source / "dispatch-clock-probe.json").exists():
+        raise RuntimeError("Source already contains a prepared clock observer; use its receipt with the compiler")
+    if layout["layout"] == "ordinary":
+        expected = "    RtInstanceMetadata values[];\n} rtInstances;"
+        replacement = (f"    RtInstanceMetadata values[{layout['metadataCapacity']}];\n"
+                       "    uvec4 clockControl;\n} rtInstances;")
+    else:
+        expected = f"    uvec4 pages[{layout['pageCount']}];"
+        replacement = expected + "\n    uvec4 clockControl;"
+    if generated_text.count(expected) != 1:
+        raise RuntimeError(f"Generated ABI does not match the enrolled {layout['layout']} layout")
+    base_catalog = catalog_rows(source)
+    shader_files = sorted(p for p in (source / "shaders/raytracing").rglob("*") if p.is_file())
+    base_shader_hashes = {p.relative_to(source).as_posix(): sha256(p.read_bytes()) for p in shader_files}
+    base_shader_digest = sha256(json.dumps(base_shader_hashes, sort_keys=True, separators=(",", ":")).encode())
+    abi_files = {}
+    for relative in ("src/vulkan/raytracing/RtSceneAbi.def", "src/vulkan/raytracing/RtSceneAbi.generated.h",
+                     "shaders/raytracing/include/rt_scene_abi.generated.glsl"):
+        path = source / relative
+        if path.is_file():
+            abi_files[relative] = sha256(path.read_bytes())
+    if layout["layout"] == "ordinary" and set(abi_files) != {
+            "src/vulkan/raytracing/RtSceneAbi.def", "src/vulkan/raytracing/RtSceneAbi.generated.h",
+            "shaders/raytracing/include/rt_scene_abi.generated.glsl"}:
+        raise RuntimeError("Ordinary preparation requires both source and generated RT ABI files")
     private = output / "source"
-    # Keep already-admitted variants for unselected policies; replace only the two
-    # actual Shipping/Mobile pairs after compiling the private observation.
+    private.mkdir(parents=True)
+    # This is a compiler overlay, not a repository clone. In particular, do not
+    # traverse reports/ or copy local builds, assets, or VCS metadata.
+    shutil.copytree(source / "shaders/raytracing", private / "shaders/raytracing")
+    shaders_readme = source / "shaders/README.md"
+    if shaders_readme.is_file():
+        shutil.copy2(shaders_readme, private / "shaders/README.md")
+    (private / "tools").mkdir()
+    for relative in ("tools/compile-raygen.ps1", "tools/raygen-variants.json",
+                     "tools/raygen-variant-budgets.json"):
+        target = private / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source / relative, target)
+    cpp = private / "src/vulkan/raytracing"
+    cpp.mkdir(parents=True)
+    for relative in ("src/vulkan/raytracing/RtPipelineVariantCatalog.generated.h",
+                     "src/vulkan/raytracing/RtRayQueryVariantCatalog.generated.h",
+                     "src/vulkan/raytracing/RtSceneAbi.def"):
+        if (source / relative).is_file():
+            shutil.copy2(source / relative, private / relative)
+    shutil.copytree(source / "src/vulkan/raytracing/variants", cpp / "variants")
     include = private / "shaders/raytracing/include"
-    replace(include / "rt_scene_abi.generated.glsl", "    uvec4 pages[8];",
-            "    uvec4 pages[8];\n    uvec4 clockControl;")
-    (include / "rt_dispatch_clock.glsl").write_text(CLOCK_GLSL, encoding="utf-8")
+    replace(include / "rt_scene_abi.generated.glsl", expected, replacement)
+    (include / "rt_dispatch_clock.glsl").write_text(CLOCK_GLSL, encoding="utf-8", newline="\n")
     replace(include / "rt_frame.glsl", '#include "rt_scene_abi.glsl"',
             '#include "rt_scene_abi.glsl"\n#include "rt_dispatch_clock.glsl"')
     replace(include / "rt_frame.glsl", "    vec2 uv =", "    rtClockBegin();\n    vec2 uv =")
@@ -117,7 +244,9 @@ def prepare(source, output):
             "    rtClockEnd(primary.hit ? uint(primary.instance)+1u : 0u);\n    imageStore(outputImage,")
     for entry in ("minimal.rgen", "minimal.comp"):
         replace(private / "shaders/raytracing" / entry, "#version 460",
-                "#version 460\n#extension GL_EXT_shader_realtime_clock : require")
+                "#version 460\n#extension GL_EXT_buffer_reference : require\n"
+                "#extension GL_EXT_buffer_reference_uvec2 : require\n"
+                "#extension GL_EXT_shader_realtime_clock : require")
     for file, name, category in [
         ("rt_hit_decode.glsl", "traceScene", 1),
         ("rt_lighting.glsl", "visibilityMask", 3),
@@ -129,17 +258,39 @@ def prepare(source, output):
         ("rt_indoor_dust.glsl", "composeIndoorDust", 7),
     ]:
         observe_function(include / file, name, category)
-    receipt = {"baseHead": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=root).decode().strip(),
-        "source": str(source), "method": "32x32 stratified sparse exclusive device-clock ticks; no effect omissions",
+
+    marker = {
+        "schema": 2,
+        **layout,
+        "recordBytes": RECORD_BYTES,
+        "capacity": CAPACITY,
+        "stride": STRIDE,
+        "offset": OFFSET,
+        "samplesOffset": layout["controlOffset"] + 16,
         "categories": ["other", "ray traversal/filter", "hit decode/material", "shadow visibility",
                        "surface/transport", "fire volume", "mist/electricity", "dust"],
-        "productionBudgetSha256": hashlib.sha256((root / "tools/raygen-variant-budgets.json").read_bytes()).hexdigest(),
+        "baseShaderSourceSha256": base_shader_digest,
+        "baseShaderFiles": base_shader_hashes,
+        "baseAbiFiles": abi_files,
+        "baseShippingModules": base_catalog,
+    }
+    (private / "dispatch-clock-probe.json").write_text(json.dumps(marker, indent=2) + "\n", encoding="utf-8")
+    private_hashes = {p.relative_to(private).as_posix(): sha256(p.read_bytes())
+                      for p in (private / "shaders/raytracing").rglob("*") if p.is_file()}
+    receipt = {
+        "schema": 2,
+        "sourceRoot": str(source),
+        "method": "32x32 stratified sparse exclusive device-clock ticks; no effect omissions",
+        "layout": "ordinary",
+        "baseShaderSourceSha256": base_shader_digest,
+        "baseShaderFiles": base_shader_hashes,
+        "baseAbiFiles": abi_files,
+        "baseShippingModules": base_catalog,
+        "privateShaderFilesBeforeCompile": private_hashes,
+        "markerSha256": sha256((private / "dispatch-clock-probe.json").read_bytes()),
         "notProductionBudgetAdmission": True,
-        "files": {str(p.relative_to(private)): hashlib.sha256(p.read_bytes()).hexdigest()
-                  for p in (private / "shaders").rglob("*") if p.is_file()}}
-    (output / "source-receipt.json").write_text(json.dumps(receipt, indent=2), encoding="utf-8")
-    (private / "dispatch-clock-probe.json").write_text(json.dumps({"schema": 1, "recordBytes": 80,
-        "capacity": 8192, "stride": 32, "offset": 16, "categories": receipt["categories"]}), encoding="utf-8")
+    }
+    (output / "source-receipt.json").write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     return private
 
 

@@ -4815,18 +4815,19 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable initialPageTable{};
     initialPageTable.instances=instances;
-#if HORDE_RT_DISPATCH_CLOCK_PROBE
-    std::vector<std::uint8_t> clockUpload(kDispatchClockAllocationBytes);
-    std::memcpy(clockUpload.data(),&initialPageTable,sizeof(initialPageTable));
-    enqueue(clockUpload.data(),clockUpload.size(),storage,true,"RT region metadata and private clock tail",
-            instanceMetadataBuffer_,true);
+    const auto& initialMetadata=initialPageTable;
 #else
-    enqueue(&initialPageTable,sizeof(initialPageTable),storage,false,"RT region instance metadata",
-            instanceMetadataBuffer_,true);
+    const auto& initialMetadata=instances;
 #endif
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    static_assert(sizeof(initialMetadata)==kDispatchClockControlOffset);
+    std::vector<std::uint8_t> clockUpload(kDispatchClockAllocationBytes);
+    std::memcpy(clockUpload.data(),&initialMetadata,sizeof(initialMetadata));
+    enqueue(clockUpload.data(),clockUpload.size(),storage,true,"RT instance metadata and private clock tail",
+            instanceMetadataBuffer_,true);
 #else
-    enqueue(instances.data(), sizeof(instances), storage, false, "RT instance metadata",
-            instanceMetadataBuffer_, true);
+    enqueue(&initialMetadata,sizeof(initialMetadata),storage,false,
+            HORDE_RT_REGION_PAGE_PROTOTYPE ? "RT region instance metadata" : "RT instance metadata",instanceMetadataBuffer_,true);
 #endif
     enqueue(primitives.data(), primitives.size() * sizeof(RtPrimitiveMetadata), storage, HORDE_RT_REGION_PAGE_PROTOTYPE!=0,
             "RT primitive metadata", primitiveMetadataBuffer_);
