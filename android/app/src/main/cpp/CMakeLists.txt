@@ -6,16 +6,17 @@ option(HORDE_RT_FLASK_CANDIDATE "Pinned flask application candidate" OFF)
 option(HORDE_RT_PRIVATE_REVIVAL "Private pinned owner revival candidate" OFF)
 option(HORDE_RT_SHIPPING17_CONTENT "Ordinary 1.7 pinned flask and revival content" OFF)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
-option(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE "Private Bellwether resident fixtures for the Debug app" OFF)
+option(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE "Optimized private Bellwether candidate application" OFF)
+option(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE "Use the privately packaged Bellwether residents" OFF)
 option(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE "Use the mill specialist in the private resident roster" OFF)
 option(HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE "Use the shore specialist in the private resident roster" OFF)
 option(HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE "Use the relic dealer in the private resident roster" OFF)
-option(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS "Use the four or optional five pinned Bellwether residents in the private Debug roster" OFF)
+option(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS "Use the combined Bellwether resident roster" OFF)
 if(HORDE_RT_BELLWETHER_COMBINED_RESIDENTS AND NOT HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE)
-    message(FATAL_ERROR "Combined Bellwether residents require the private Debug resident roster.")
+    message(FATAL_ERROR "Combined Bellwether residents require the private resident roster.")
 endif()
 if((HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE OR HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE) AND NOT HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE)
-    message(FATAL_ERROR "A Bellwether specialist requires the private Debug resident roster.")
+    message(FATAL_ERROR "A Bellwether specialist requires the private resident roster.")
 endif()
 if(HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE AND
    (HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) AND
@@ -29,8 +30,19 @@ option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
     message(FATAL_ERROR "The viewmodel candidate is restricted to Debug checkpoint-enabled builds.")
 endif()
-if(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
-    message(FATAL_ERROR "Bellwether resident fixtures require a Debug checkpoint-enabled build.")
+if(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE)
+    if(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo)$" OR HORDE_RT_DEBUG_CHECKPOINTS OR
+       NOT HORDE_RT_BELLWETHER_COMBINED_RESIDENTS OR NOT HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE OR
+       NOT HORDE_RT_FLASK_CANDIDATE OR NOT HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_SHIPPING17_CONTENT)
+        message(FATAL_ERROR "The optimized Bellwether candidate requires the five residents, flask and revival without debug checkpoints.")
+    endif()
+    if(NOT HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION STREQUAL "Shipping" OR
+       NOT HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY STREQUAL "Mobile")
+        message(FATAL_ERROR "The optimized Bellwether candidate requires Shipping/Mobile.")
+    endif()
+elseif(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE AND
+       (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
+    message(FATAL_ERROR "Bellwether residents require an isolated optimized candidate or Debug build.")
 endif()
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)

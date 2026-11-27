@@ -111,13 +111,20 @@ public class PerformanceProfileRequestTest {
     static java.lang.reflect.Field field(String name) throws Exception {
         java.lang.reflect.Field f=MainActivity.class.getDeclaredField(name);f.setAccessible(true);return f;
     }
-    @Test public void rejectedReplacementRetainsTheOriginalMotionAndItsPresentationGate() throws Exception {
+    @Test public void performanceProfileIsDebugOnlyAndRejectedReplacementPreservesAcceptedMotion() throws Exception {
         MainActivity a=Robolectric.buildActivity(MainActivity.class).get();
         a.getApplicationInfo().flags|=android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE;
         field("graphicsConfirmed").set(a,saved);field("surfaceRequestGeneration").setLong(a,3);
         java.lang.reflect.Method consume=MainActivity.class.getDeclaredMethod("consumeDebugAutomationIntent",Intent.class);
         consume.setAccessible(true);consume.invoke(a,intent("fire-low"));
-        Object gate=field("pendingDebugMotionGraphics").get(a);assertNotNull(gate);
+        Object gate=field("pendingDebugMotionGraphics").get(a);
+        if (!BuildConfig.DEBUG) {
+            assertNull(gate);
+            assertNull(field("pendingDebugMotionId").get(a));
+            assertNull(field("pendingDebugMotion").get(a));
+            return;
+        }
+        assertNotNull(gate);
         consume.invoke(a,intent("unknown").putExtra("horde.debug.motion_id","rejected-replacement"));
         assertSame(gate,field("pendingDebugMotionGraphics").get(a));
         assertEquals("quality-1",field("pendingDebugMotionId").get(a));

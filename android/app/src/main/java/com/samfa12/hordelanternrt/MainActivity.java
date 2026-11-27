@@ -995,7 +995,7 @@ public class MainActivity extends Activity {
                         }) {
                             final String path = prefix + asset;
                             if (!stageAsset(path, path))
-                                throw new IllegalStateException("Bellwether combined Debug could not stage " + path);
+                                throw new IllegalStateException("Bellwether resident asset could not be staged: " + path);
                         }
                     }
                 } else {
