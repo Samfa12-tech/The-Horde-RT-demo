@@ -984,6 +984,21 @@ actual owned charge fraction and persistent outline/divisions. The static icon
 above remains source artwork, not the current charge indicator. No imported
 asset, new rights claim or rendering-material ownership is introduced.
 
+## Bellwether character and voice ownership - 28 November 2026
+
+Samfa12 confirmed that the project owns the Bellwether character models
+created with Meshy and the voice recordings created with Mureka. The
+[owner intake receipt](docs/evidence/2026-11-28-bellwether-owner-intake/receipt.json)
+identifies the exact five resident meshes, platform textures and 23 voice
+takes in the private Windows and Android builds. Kit's runtime model and
+earlier voice cuts have their own entries above. The Hotstrike derivative
+retains its separate [public-source issue](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/13).
+
+The source archives stay private. The owned runtime derivatives are
+available for 1.8 packaging after the standard technical and creative
+checks. The recorded voices use the existing Mureka archive. The Mureka
+subscription has ended and lines without a verified take use their captions.
+
 ## Bellwether tavern keeper candidate - 22 November 2026
 
 The keeper uses an original project concept (OpenAI image generation) and
@@ -995,9 +1010,8 @@ and its platform texture arrays are pinned for local Debug only. The private
 keeper source archive retains the concept, prompt, project provider receipts,
 source models, editable Blender assembly, and byte inventories.
 
-The paid Meshy account charged 20 credits. Exact distribution rights are still
-pending. Keep the source models, derived textures, and APK outside public
-source and published packages until the asset's rights are recorded.
+The paid Meshy account charged 20 credits. Samfa12 confirmed ownership of
+the model on 28 November. The source remains in the private project archive.
 
 ## Bellwether artificer candidate - 22 November 2026
 
@@ -1010,9 +1024,9 @@ verification receipts. The prepared resident GLB has SHA-256
 `58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f`
 and 15,360 triangles.
 
-The paid Meshy account charged 20 credits. Exact redistribution rights remain
-pending. The public repository records the preparation tools and provenance.
-The private archive retains the model, textures and review images.
+The paid Meshy account charged 20 credits. Samfa12 confirmed ownership of
+the model on 28 November. The private archive retains the model, textures
+and review images.
 
 ## Bellwether salvager candidate - 22 November 2026
 
@@ -1026,12 +1040,10 @@ The local source archive retains the reference, prompt, original models,
 editable Blender file, platform textures and provider receipts.
 
 Meshy charged 15 credits for the textured model and five for the rig. The
-paid output and its derivatives are for private Debug testing while exact
-distribution rights are confirmed. The optional voice overlay uses three
-existing Salvager takes from the private Bellwether audio archive, cast as
-Wise Animation Mentor. The code pins the PCM WAVs and their sample counts.
-Owner listening acceptance and distribution clearance for these takes remain
-open.
+optional voice overlay uses three existing Salvager takes from the private
+Mureka archive, cast as Wise Animation Mentor. The code pins the PCM WAVs
+and their sample counts. Samfa12 confirmed ownership of the model and takes
+on 28 November. Listening acceptance remains open.
 
 ## Bellwether relic dealer candidate - 23 November 2026
 
@@ -1051,8 +1063,9 @@ The shared Blender recipe accepts the rig and walk under `rigged.glb` and
 `bellwether-relic-dealer`, a 12-degree idle adjustment and zero walk offset.
 One tangent component varied by 0.0001 on re-export. The platform overlays
 use the exact archived and validated GLB.
-The candidate remains private pending distribution clearance. Its trade line
-is caption-only. The existing dealer recordings remain in the audio archive.
+Samfa12 confirmed ownership of the model and recordings on 28 November.
+The private playtest can include the archived Mureka trade take, with a
+caption available wherever playback is unavailable.
 
 The S6 stall, weighing sign, counter, stock props and wick stand are original
 Horde geometry authored in Blender by Samfa12/Codex. They reuse the admitted
@@ -1204,9 +1217,9 @@ Blender master and export receipt are in
 The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply
 reuse the exact Mureka takes from the private Horde audio archive. The
 five 24 kHz mono PCM16 WAVs are byte-pinned for local Debug audition.
-The private archive retains the original files, scripts, voices, receipts,
-and review copies. Owner listening approval and wider distribution rights
-for these five takes remain open.
+The private archive retains the original files, scripts, voices, receipts
+and review copies. Samfa12 confirmed ownership on 28 November. In-game
+listening acceptance for these five takes remains open.
 
 ## Bellwether follow-on voice audition - 23 November 2026
 
@@ -1214,14 +1227,14 @@ The private overlay reuses three Kit and two Record keeper takes from the
 approved 4 November review reels, and the 29 October Relic dealer trade
 audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
 of the archived takes. Private build admission keeps their stable line IDs
-and existing captions. Public distribution clearance remains open.
+and existing captions. Samfa12 confirmed ownership on 28 November.
 
 The optional hearth question uses Kit's original `hub.kit_stake` and
 `kit.personal_stake.key` recordings from the 4 November campaign voice archive.
 The private Debug overlay checks the exact mono, 24 kHz PCM16 takes against
 the SHA-256 values in `src/audio/BellwetherVoiceFixture.h`. The archive holds
-the originals. Owner listening approval and public distribution clearance
-for these two takes remain open.
+the originals. Samfa12 confirmed ownership on 28 November and in-game
+listening acceptance remains open.
 
 ## Bellwether square and tavern frontage - 26 November 2026
 
@@ -1295,4 +1308,12 @@ on 12 October. Both match the playable scripts. The private playtest uses
 records the source and runtime hashes, frame counts and sample comparison.
 The uncut audition for the preceding road-mark inspection contains two lines.
 The inspection uses its existing caption. The masters and playable WAVs stay
-in private storage. Release clearance remains open.
+in private storage, with ownership recorded in the 28 November intake.
+
+## Bellwether lantern archival audition — 28 November 2026
+
+The [Mureka archive receipt](docs/evidence/2026-11-28-bellwether-owner-intake/lantern-archive.json)
+pins two lantern lines at the shrine and one heard by Kit at the tavern.
+The optional private Debug files preserve the samples and fit the existing
+dialogue timing. The recorded owner confirmation covers the voices. The takes
+remain provisional for in-game listening review.

@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "provider": "Mureka",
+  "sourceArchive": "The-Horde-Lantern02-dialogue-provisional.zip",
+  "sourceDirectoryInArchive": "The-Horde-Lantern02-dialogue/clips_provisional/",
+  "coverageInventory": "Canonical-recording-coverage-2026-11-04.csv",
+  "admission": "Optional private Debug audition. In-game listening review remains open.",
+  "verification": "Each source matched the coverage inventory hash, stable ID and playable script. Rewrapped each into the fixture WAV format and compared all decoded PCM samples against the source.",
+  "voiceFormat": "24000 Hz mono PCM16 WAV",
+  "takes": {
+    "lantern.first_identity": {
+      "lineNumber": 30,
+      "sourceSha256": "69145f5ec135465b78e3ac76dbba8562d0352254d8dd3932fbfe13338f4e14e9",
+      "runtimeSha256": "6aae2d8fbc39f78ff6da80c9ef3ebd647822f750673d6c206cdc505b5a8cde6f",
+      "frames": 94984,
+      "bytes": 190046,
+      "dialogueSeconds": 4.5
+    },
+    "lantern.first_request": {
+      "lineNumber": 32,
+      "sourceSha256": "343b578c6e3ef162982e2321dc062a5c1f7ecf06aef2bd5264e208ac0da37197",
+      "runtimeSha256": "7865d1ebaf81329338bee3d06961c98750b7f651e86a23ad01c85c9a2dd69083",
+      "frames": 125876,
+      "bytes": 251830,
+      "dialogueSeconds": 6.1
+    },
+    "lantern.town_seals": {
+      "lineNumber": 43,
+      "sourceSha256": "fb29fd0681be793f6bb89c11ff74de7b176ab86d3cf9a4cf66226482588d4431",
+      "runtimeSha256": "78580a62a2969870b0820f976753df70e1888e66ac8ab01633585dd4d2e1dd88",
+      "frames": 156828,
+      "bytes": 313734,
+      "dialogueSeconds": 8.0
+    }
+  }
+}

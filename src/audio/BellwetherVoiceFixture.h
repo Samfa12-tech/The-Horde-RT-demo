@@ -60,7 +60,10 @@ inline constexpr std::array kBellwetherHearthAuditionCuts{
 // Private village takes can be admitted one line at a time as they are reviewed.
 inline constexpr std::array kBellwetherOptionalVoiceCuts{
     BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperErrand, 127979, "7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8"},
-    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperDirections, 110730, "25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44"}
+    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperDirections, 110730, "25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::LanternFirstIdentity, 94984, "6aae2d8fbc39f78ff6da80c9ef3ebd647822f750673d6c206cdc505b5a8cde6f"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::LanternFirstRequest, 125876, "7865d1ebaf81329338bee3d06961c98750b7f651e86a23ad01c85c9a2dd69083"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::TavernLanternSeals, 156828, "78580a62a2969870b0820f976753df70e1888e66ac8ab01633585dd4d2e1dd88"}
 };
 
 inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false,

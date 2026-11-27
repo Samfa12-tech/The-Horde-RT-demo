@@ -1,0 +1,201 @@
+{
+  "schema": 1,
+  "ownerConfirmation": {
+    "date": "2026-11-28",
+    "confirmedBy": "Samfa12",
+    "residentModelProvider": "Meshy",
+    "voiceProvider": "Mureka",
+    "ownership": "Samfa12 confirmed project ownership of the Bellwether models and Mureka recordings.",
+    "voicePlan": "Reuse the existing archive. The Mureka subscription has ended. Where there is no verified individual take, retain the scripted caption.",
+    "scope": "Identifies the five 1.8 overlay residents and 23 exact runtime voice takes. Kit's existing runtime asset entries are recorded separately."
+  },
+  "verification": {
+    "sourceCommit": "9f1081de2d263164556ee87e2f2f27bd5d6c513a",
+    "windowsPrivateZipSha256": "c909ebc4309dbd296c5b0a21ce0f6681ffe1727afbafa23af09533b0a1a47c2d",
+    "androidPrivateApkSha256": "02f03109d54daba1b6ccd5fda42a205dbde72da4b0ae46efa51629de06186d3f",
+    "residentFilesPerPlatform": 25,
+    "identicalVoiceFilesBetweenPlatforms": 23,
+    "voiceFormat": "24000 Hz mono PCM16 WAV"
+  },
+  "residents": {
+    "tavern-keeper": {
+      "glbSha256": "61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827",
+      "platforms": {
+        "android": {
+          "asset.manifest.json": "e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341",
+          "base-color.android.ktx2": "57eed409fa5b6bbdbac2da57490eb3ed102a1fdc9b3423118d8ca39bcc37888e",
+          "normal.android.ktx2": "7d6debe36b993c982758a2ec2768d76b724adee57389e844746b178c06af9f8a",
+          "orm.android.ktx2": "03da79e706d71840c5f3f1de1cbf76a8f8c19f5ae8250d3c0fc0b227eaf9c43e"
+        },
+        "windows": {
+          "asset.manifest.json": "e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341",
+          "base-color.windows.ktx2": "a6b150a54e3b5ae66513b104078960a96d4d7d6a45e0c95201407174bb574feb",
+          "normal.windows.ktx2": "d00d3af09449b6edf2331d7fcf49b96fe1eca16607bd4a7264787946ff3d4050",
+          "orm.windows.ktx2": "e66ba00bbb9669ec62d322549972b700bf9e8fe427dc48ec56348215052cbafd"
+        }
+      }
+    },
+    "record-keeper": {
+      "glbSha256": "10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884",
+      "platforms": {
+        "android": {
+          "asset.manifest.json": "5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864",
+          "base-color.android.ktx2": "e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837",
+          "normal.android.ktx2": "04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0",
+          "orm.android.ktx2": "f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb"
+        },
+        "windows": {
+          "asset.manifest.json": "5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864",
+          "base-color.windows.ktx2": "38b1c2ece28db386be8c2633311c487c3a8b4d70a0cd1852ae16c362d718e6dc",
+          "normal.windows.ktx2": "ac7b1b04940c66b88176b2209a4d934467c67ece2e85497aae3c387c73f091a0",
+          "orm.windows.ktx2": "98163b1d3313ed5aa6fbab5cc00b37f25bbba9546c73f370ad1fcd3ae2bdded6"
+        }
+      }
+    },
+    "artificer": {
+      "glbSha256": "58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f",
+      "platforms": {
+        "android": {
+          "asset.manifest.json": "890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864",
+          "base-color.android.ktx2": "68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8",
+          "normal.android.ktx2": "9f930fbdf2eeea390ae84a74123902f7d12e1a62fb1bccf784ac17b4606ff543",
+          "orm.android.ktx2": "9985942d945dcde16a2d5e83d40778e09f5999c8425c12ac7e1815b679e7baa0"
+        },
+        "windows": {
+          "asset.manifest.json": "890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864",
+          "base-color.windows.ktx2": "8dc88a5c8b417e044611e423c7ac512e85d751fb1d9baee1f849e731edce5492",
+          "normal.windows.ktx2": "7185fe6d08e19f029cb2dcb3d37f8d04f94fcb9190836733e4dcbb9cc1d2493a",
+          "orm.windows.ktx2": "f99cb2a329f67eba4270b86abfd355831326ab289bf518a3a57c386447353d1a"
+        }
+      }
+    },
+    "salvager": {
+      "glbSha256": "26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa",
+      "platforms": {
+        "android": {
+          "asset.manifest.json": "5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc",
+          "base-color.android.ktx2": "3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152",
+          "normal.android.ktx2": "11b996752ab9c93dcd33eace337a2db2b4fad6459c63998e472c813644281628",
+          "orm.android.ktx2": "26f765f78fc751e6e37196f2c5ed7843c59e7931d17b313ff333d0d702e5f117"
+        },
+        "windows": {
+          "asset.manifest.json": "5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc",
+          "base-color.windows.ktx2": "8112345b1a802fd68101f64c5dffa8acdbff9cc37f47dea355ed6f27046cdc5a",
+          "normal.windows.ktx2": "ea2bee3dfd0a2eaad084f0511406696a1e764b3a50a10efcb15bbf5aca65d3a7",
+          "orm.windows.ktx2": "bd75d588cd6d3e92161aba844bb083e040b1ec68ce0f7ceabd9fbb300c1fc57e"
+        }
+      }
+    },
+    "relic-dealer": {
+      "glbSha256": "588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe",
+      "platforms": {
+        "android": {
+          "asset.manifest.json": "840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae",
+          "base-color.android.ktx2": "09fdcf0bdf7f9b3b9108473574ddeec75acb4e62aad39ff3fab6337f9b31d7a2",
+          "normal.android.ktx2": "b39f37aa2cf241c6e93168f32f7bebbcea444ed620af0d01d505ac74e2de9656",
+          "orm.android.ktx2": "9317c716ec88693e0bac4765e806511102c5ac3c8b4796be1de2323122144cf3"
+        },
+        "windows": {
+          "asset.manifest.json": "840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae",
+          "base-color.windows.ktx2": "d87516c62dd29c30605f8c1cbb4a7245fd964097fbd28a65097c863da63d3d6f",
+          "normal.windows.ktx2": "f1f443710b7ca242caa0126c7c73378b4da0bf65a7ef368e93b68116b0a2cee7",
+          "orm.windows.ktx2": "538f0755b2f15e6726b977ceae4a0b04bb08a525d8cfcc53f7d2b6944037fca8"
+        }
+      }
+    }
+  },
+  "voiceTakes": {
+    "access.body_progress": {
+      "frames": 113264,
+      "sha256": "294501da575c700e3b4ed1e518f8dbfc6cb13e71c13c85a0a060e3c6ce993543"
+    },
+    "access.body_task": {
+      "frames": 126704,
+      "sha256": "8fe30ce30ccef9f9692f6d0f82a08bd618880038434b00336727cc70aad79ca9"
+    },
+    "hub.arrival_chair": {
+      "frames": 88784,
+      "sha256": "927ca0dc61a138a704328079a5fa300a3b4131fabce204b9be7fc850fe1a8a0b"
+    },
+    "hub.first_errand": {
+      "frames": 127979,
+      "sha256": "7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8"
+    },
+    "hub.hoard_answer": {
+      "frames": 94544,
+      "sha256": "a91d048e340a2f8c9adbba0046393fc1db847e48331dc84ba5d467c5e5dfa5ee"
+    },
+    "hub.horde_army": {
+      "frames": 133904,
+      "sha256": "a088307c4969f436888eb16eddf22ec23ceab59940adbf34ba7a2ba4f7401d5d"
+    },
+    "hub.kit_introduce": {
+      "frames": 98384,
+      "sha256": "64646e97b066c9dc8fd04d99a2a0a68dfa3f0cfab55e4ec2aa133ec8ab1ea2b9"
+    },
+    "hub.kit_stake": {
+      "frames": 136784,
+      "sha256": "9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82"
+    },
+    "hub.ordinary_sale": {
+      "frames": 78704,
+      "sha256": "7f045c4859e64d7dd79d9d813cffb5cb49f66e7d999dc2a70107beac683e05b7"
+    },
+    "hub.passing.learned_retreat": {
+      "frames": 111344,
+      "sha256": "01af397a57165188e559aaebe18edc5e76deeb4e2dedb91ab19a041cd11d1971"
+    },
+    "hub.routes_independent": {
+      "frames": 135824,
+      "sha256": "3506524546c1506b8183c2268f3a46c09421ffe79419ba25ae3646f826b6bcf0"
+    },
+    "hub.shrine_direction": {
+      "frames": 110730,
+      "sha256": "25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44"
+    },
+    "hub.two_routes": {
+      "frames": 106064,
+      "sha256": "dc6602591b41f3b42a598f41f2113dc01a613f2b6ec62dbf94337b72a2c28d5d"
+    },
+    "kit.accept_base.limit": {
+      "frames": 113744,
+      "sha256": "f008e256ac6301240931dd98865cf5f30332f65cc64d48845d06acd64a20e22a"
+    },
+    "kit.accept_base.sit": {
+      "frames": 81104,
+      "sha256": "e088a2419814e9e055d553c11ab43cfc4459371aca9d4687279e93235593986a"
+    },
+    "kit.accept_base.work": {
+      "frames": 102224,
+      "sha256": "9888430432f1972e100366a66b4aa932e757819bdb67cb1c8ead8ba989014e1e"
+    },
+    "kit.approach_injury.ankle": {
+      "frames": 122384,
+      "sha256": "ddb89b45e4bef7205c983c9fedf3e0cceca18db8479f0ac326cd0e6dc218c2e4"
+    },
+    "kit.approach_injury.slow": {
+      "frames": 85904,
+      "sha256": "8c16e87f66d1514735c33d18a8d678ec2d1fea88993eb9800394cab7267826f4"
+    },
+    "kit.approach_injury.stop": {
+      "frames": 53264,
+      "sha256": "817f8f5527b1d9764977b9c255f119d9cc1ad9f2903f6283f640440fe96a9391"
+    },
+    "kit.first_direct_voice.finish": {
+      "frames": 45584,
+      "sha256": "fe8f68d761ad49bcdbf56e54c4f268a0584536a5c291f5051e6343391abb6048"
+    },
+    "kit.personal_stake.key": {
+      "frames": 113744,
+      "sha256": "d82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0"
+    },
+    "kit.royal_claim.help": {
+      "frames": 122384,
+      "sha256": "3bf0390321c7abf02f5faf13f02773f3b560fd74f2aef1b42f9f14f753e6e817"
+    },
+    "kit.voice_reaction": {
+      "frames": 92624,
+      "sha256": "305ea7a23ee19fa7c92db51b5b1a515139209a6dd6ffaf9e490f73864ea1f0ed"
+    }
+  }
+}
