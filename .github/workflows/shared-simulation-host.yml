@@ -106,6 +106,7 @@ jobs:
           HORDE_VALIDATION_UNSIGNED: '1'
         run: >-
           bash gradlew --no-daemon --max-workers=2 --console=plain
+          --init-script ../tools/ci-maven-central.gradle
           :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 
       - name: Check actual Java results and runtime APK payload
