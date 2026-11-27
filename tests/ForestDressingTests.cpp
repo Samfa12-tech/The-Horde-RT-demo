@@ -2002,10 +2002,12 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 keeperHeadingToPlayer-acknowledging->yaw,6.28318530718f)):0.f;
             const auto firstTurn=acknowledging?std::abs(std::remainder(
                 acknowledging->yaw-keeperYawBeforeApproach,6.28318530718f)):100.f;
-            Check(acknowledging && firstTurn<=1.5f/60.f+.0001f && currentPlayerError<initialPlayerError &&
+            constexpr float turnRadiansPerTick=1.5f/60.f;
+            const auto halfTurnTicks=static_cast<unsigned>(std::ceil(std::acos(-1.f)/turnRadiansPerTick));
+            Check(acknowledging && firstTurn<=turnRadiansPerTick+.0001f && currentPlayerError<initialPlayerError &&
                   game.CampaignBoundaryRevision()==revisionBeforeAcknowledgement,
                   "the keeper starts a bounded fixed-step turn toward a nearby service visitor without changing the save");
-            for(unsigned tick=0;tick<100;++tick)step();
+            for(unsigned tick=0;tick<halfTurnTicks;++tick)step();
             const auto& facingVisitor=game.Snapshot().tavernKeeper;
             const auto visitorError=facingVisitor?std::abs(std::remainder(
                 keeperHeadingToPlayer-facingVisitor->yaw,6.28318530718f)):100.f;
@@ -2031,7 +2033,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             input.moveForward=1;input.runHeld=true;
             const auto departed=walkTo({88.5f,kBellwetherLanternFittingApproach.z});
             input.moveForward=0;input.runHeld=false;
-            for(unsigned tick=0;tick<100;++tick)step();
+            for(unsigned tick=0;tick<halfTurnTicks;++tick)step();
             const auto& facingKit=game.Snapshot().tavernKeeper;
             const auto kitError=facingKit?std::abs(std::remainder(
                 kKeeperHearthFacingRadians-facingKit->yaw,6.28318530718f)):100.f;
