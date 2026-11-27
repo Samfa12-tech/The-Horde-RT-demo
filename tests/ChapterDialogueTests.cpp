@@ -40,10 +40,10 @@ int main() {
               witness[1],yawToPost(witness[0],witness[1])),
           "the sign is not readable when the view is vertically separated from its boards");
     const auto& inscription=horde::gameplay::campaign::kSquareFingerpostInscription;
-    Check(std::string_view(inscription).find("Tankard - Tavern, up the oak-railed ramp.")!=std::string_view::npos &&
-          std::string_view(inscription).find("Scales - West to the dealer and gardens.")!=std::string_view::npos &&
-          std::string_view(inscription).find("Wheel - East to the mill and river fork.")!=std::string_view::npos &&
-          std::string_view(inscription).find("Anvil - Southeast to the smith yard.")!=std::string_view::npos,
+    Check(std::string_view(inscription).find("Tankard - Up the tavern ramp")!=std::string_view::npos &&
+          std::string_view(inscription).find("Scales - Dealer & gardens, west")!=std::string_view::npos &&
+          std::string_view(inscription).find("Wheel - Mill & river fork, east")!=std::string_view::npos &&
+          std::string_view(inscription).find("Anvil - Smith yard, southeast")!=std::string_view::npos,
           "the local inscription names the four physical symbols and their authored destinations");
     Check(StepSquareWaymarkerTextVisible(true,false,false,true,false) &&
           StepSquareWaymarkerTextVisible(true,false,false,false,true) &&

@@ -113,7 +113,7 @@ public class AndroidControllerIntegrationTest {
         set("appRoot",a.findViewById(R.id.root));call("createChapterDialogueOverlay",new Class<?>[]{});
         a.getSharedPreferences("controller-integration",Context.MODE_PRIVATE).edit().putBoolean("chapter_subtitles_enabled",false).apply();
         Bridge.chapterState=new long[]{0,4,0,0,0,0,1};
-        Bridge.chapterText="Tankard - Tavern, up the oak-railed ramp.\nScales - West to the dealer and gardens.\nWheel - East to the mill and river fork.\nAnvil - Southeast to the smith yard.";
+        Bridge.chapterText="Tankard - Up the tavern ramp\nScales - Dealer & gardens, west\nWheel - Mill & river fork, east\nAnvil - Smith yard, southeast";
         call("updateChapterDialoguePresentation",new Class<?>[]{int.class},1);
         final TextView caption=(TextView)field("chapterSubtitleText").get(a);
         final View panel=(View)field("chapterSubtitlePanel").get(a);
