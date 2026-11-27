@@ -1,8 +1,11 @@
 #pragma once
 
+#include "../../../assets/models/world/source/bellwether-house-b-v1/geometry.generated.h"
 #include "gameplay/campaign/CampaignCheckpoint.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/traversal/BellwetherWestRoute.h"
+#include <algorithm>
+#include <cmath>
 #include <optional>
 #include <string>
 
@@ -32,7 +35,7 @@ inline bool LookoutObjectiveAvailable(const simulation::SimulationSnapshot& s,
 // existing progress, with no saved quest state or gameplay command of its own.
 enum class PauseObjective {
     None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone,
-    BellwetherArrival, BellwetherHearth, BellwetherLantern, BellwetherSquare
+    BellwetherArrival, BellwetherHearth, BellwetherLantern, BellwetherSquare, BellwetherStockRoom
 };
 
 enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
@@ -46,6 +49,7 @@ struct BellwetherDirections {
     bool shorePracticeAvailable=false;
     bool shorePracticeCompleted=false;
     bool atSquare=false;
+    bool nearStockRoom=false;
     bool operator==(const BellwetherDirections&) const = default;
 };
 
@@ -79,12 +83,31 @@ inline bool AtBellwetherSquare(const simulation::SimulationSnapshot& s) {
         s.playerAlive && s.playerGrounded && dx*dx+dz*dz<=100.f;
 }
 
+inline bool NearBellwetherStockRoom(const simulation::SimulationSnapshot& s) {
+    if (!s.developmentRescueJourney || !s.rescue.exteriorSide || s.rescue.equipmentStowed ||
+        !s.playerAlive || !s.playerGrounded) return false;
+    constexpr float hintReach = 2.5f;
+    const auto& stations = bellwether::kHouseBStations;
+    for (std::size_t i = 1; i < stations.size(); ++i) {
+        const auto [x, z] = stations[i - 1];
+        const float dx = stations[i][0] - x, dz = stations[i][1] - z;
+        const float offsetX = s.playerX - x, offsetZ = s.playerZ - z;
+        const float lengthSquared = dx * dx + dz * dz;
+        const float fraction = lengthSquared > 0.f
+            ? std::clamp((offsetX * dx + offsetZ * dz) / lengthSquared, 0.f, 1.f) : 0.f;
+        const float lateralX = offsetX - dx * fraction, lateralZ = offsetZ - dz * fraction;
+        if (lateralX * lateralX + lateralZ * lateralZ <= hintReach * hintReach) return true;
+    }
+    return false;
+}
+
 inline BellwetherDirections CurrentBellwetherDirections(const simulation::SimulationSnapshot& snapshot) {
     return {.purse=snapshot.treasurePurse,.ward=CurrentAirWardDirections(snapshot.waysideArchive),
         .mill=snapshot.millPreparation,.shorePracticeStage=snapshot.shorePracticeStage,
         .millServiceAvailable=snapshot.millServiceAvailable,
         .shorePracticeAvailable=snapshot.shorePracticeServiceAvailable,
-        .shorePracticeCompleted=snapshot.salvagerShorePracticeCompleted,.atSquare=AtBellwetherSquare(snapshot)};
+        .shorePracticeCompleted=snapshot.salvagerShorePracticeCompleted,.atSquare=AtBellwetherSquare(snapshot),
+        .nearStockRoom=NearBellwetherStockRoom(snapshot)};
 }
 
 inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
@@ -108,6 +131,7 @@ inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot
         if (arrival != BellwetherArrivalStage::AtLookout) return PauseObjective::BellwetherArrival;
     }
     if(AtBellwetherSquare(s))return PauseObjective::BellwetherSquare;
+    if(NearBellwetherStockRoom(s))return PauseObjective::BellwetherStockRoom;
     return LookoutObjectiveAvailable(s, boundary) ? PauseObjective::Lookout : PauseObjective::None;
 }
 
@@ -121,7 +145,13 @@ inline constexpr char kSquareFingerpostDirections[] =
     "Scales - west to the dealer, then on to the kitchen gardens.\r\n"
     "Wheel - east to the mill and the river fork.\r\n"
     "Anvil - southeast to the smith yard.\r\n\r\n"
-    "For the church, retrace the arrival road to the CHURCH sign.";
+    "For the church, retrace the arrival road to the CHURCH sign. "
+    "Take the short stone fork at the bend below the sign to visit the stock room.";
+
+inline constexpr char kStockRoomDirections[] =
+    "The oak-railed ramp links the church road to the open stock room. "
+    "The ledger is beside the oil lamp on the sorting table. "
+    "Follow the same ramp back to the road.";
 
 // Compact inscription shown when the player stops to read the physical
 // fingerpost. Keep the richer pause directions above stable and separate.
@@ -150,6 +180,7 @@ inline const char* PauseObjectiveText(PauseObjective objective)
     {
     case PauseObjective::Lookout: return kLookoutObjectiveText;
     case PauseObjective::BellwetherSquare: return kSquareFingerpostDirections;
+    case PauseObjective::BellwetherStockRoom: return kStockRoomDirections;
     case PauseObjective::BellwetherArrival:
         return "Follow the road to the covered well in Bellwether square. At the fingerpost, take the ramp with the oak rail. "
             "The lit tankard sign hangs beside the tavern's south door.";
@@ -178,12 +209,15 @@ inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherD
 {
     std::string text=PauseObjectiveText(objective);
     if(objective==PauseObjective::None || objective==PauseObjective::Lookout ||
-       objective==PauseObjective::BellwetherSquare)return text;
+       objective==PauseObjective::BellwetherSquare || objective==PauseObjective::BellwetherStockRoom)return text;
     if(directions.atSquare) {
         if(objective==PauseObjective::BellwetherArrival)
             text="Take the ramp to the lit tankard sign at the tavern's south door.";
         text+="\r\n\r\n";
         text+=kSquareFingerpostDirections;
+    } else if (directions.nearStockRoom) {
+        text+="\r\n\r\n";
+        text+=kStockRoomDirections;
     }
     if(objective==PauseObjective::BellwetherArrival || objective==PauseObjective::BellwetherHearth)return text;
     const auto& purse=directions.purse;

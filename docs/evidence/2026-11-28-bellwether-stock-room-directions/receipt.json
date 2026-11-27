@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "implementationCommit": "ddcc206d3f87b3adc7339cd39c59e537523599f8",
+  "testScope": "Seeded-lookout Windows campaign replays and host-side Android validation",
+  "sourceHashes": {
+    "src/gameplay/campaign/LookoutObjective.h": "dc04ed36379a26acb5e5123103f3e9097e7a2c569db87085e544aff5b42d14b6",
+    "src/platform/windows/windows_campaign_validation.inl": "9b10991818cefc08dd0600fd33a6ff5cf90078384c5d6d7b6880dd5bfcc06994",
+    "android/app/src/main/java/com/samfa12/hordelanternrt/LookoutObjectiveState.java": "6bbe9967566137c094460eaacaf993e16d59822341133e6ae7b8d22705757dcf"
+  },
+  "windows": {
+    "nativeExecutableSha256": "05505c112ca031a471e75a187747f437f9a49d4e25d8aee4411cf0f76c0c35b1",
+    "compiledProfile": "Debug with Shipping/High hardware RT shaders",
+    "townGlbSha256": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+    "voiceTakeCount": 26,
+    "pauseDirectionsRead": [
+      "square",
+      "stock-room ramp",
+      "stock-room interior"
+    ],
+    "savedProgressPreserved": true,
+    "hostSuites": [
+      "horde_rt_campaign_checkpoint_tests",
+      "horde_rt_windows_lookout_objective_panel_tests"
+    ],
+    "replays": [
+      {
+        "executionBackend": "RayTracingPipeline",
+        "passedChecks": 36,
+        "receiptSha256": "aab2c5073e9b971c78e64ba40748630f5fdcdcea0c8523618f2c4a7b02a5bcf9",
+        "stockRoomCheck": "House B's stock ledger can be read with subtitles off and the player can return to the square without changing progress",
+        "approachImageSha256": "9148c176ad9e0a6632a6034f4cbc9b474f96a5900dbfd0803782368352ddae0b",
+        "ledgerImageSha256": "0ffa34e8aac37c5e06dd0383081f1f7136c31556bdcf6f512b9291dbd51048f6"
+      },
+      {
+        "executionBackend": "RayQueryCompute",
+        "passedChecks": 36,
+        "receiptSha256": "571a831e57ddd9b2a57ccbf545eb3df18cec787dcaeeda8d6a25154e011387d3",
+        "stockRoomCheck": "House B's stock ledger can be read with subtitles off and the player can return to the square without changing progress",
+        "approachImageSha256": "1da386704abf928d5d8f7b7e3a2117c4e17dfe5d7df5d5d34b6de7e2f19697c1",
+        "ledgerImageSha256": "3b92f10ca40743054891ca4c74fb9b27b0a35cdb2a27ab4ad8695c7be98ce8c9"
+      }
+    ]
+  },
+  "android": {
+    "jvmMenuTestsPassed": 12,
+    "arm64DebugNativeBuildPassed": true,
+    "deviceRun": false
+  }
+}

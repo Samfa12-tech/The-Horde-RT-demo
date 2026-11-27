@@ -1767,7 +1767,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         ctx.subtitlesEnabled = subtitles;
                         input.pitchRadians=previousPitch;
                         return readOnFoot &&
-                            readDirections(campaign::PauseObjective::BellwetherShrine,"Anvil - southeast to the smith yard.") &&
+                            readDirections(campaign::PauseObjective::BellwetherShrine,
+                                "short stone fork at the bend below the sign to visit the stock room") &&
                             walkTo(*square);
                     };
                     const auto presentHouse = [&] {
@@ -1805,13 +1806,21 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             ctx.subtitlesEnabled = subtitles;
                             return read;
                         };
+                        const auto readStockRoomDirections = [&] {
+                            return campaign::NearBellwetherStockRoom(state) &&
+                                readDirections(campaign::CurrentPauseObjective(
+                                    state, ctx.simulation.LatestCampaignBoundary()),
+                                    "Follow the same ramp back to the road.");
+                        };
                         input.pitchRadians = -.10f;
                         const bool visited =
                             std::all_of(kHouseBStations.begin(), kHouseBStations.begin()+4, walkStation) &&
+                            readStockRoomDirections() &&
                             face(kHouseBEastDoorXZ[0],kHouseBEastDoorXZ[1]) && lampPresented() &&
                             capture("windows-combined-house-b-approach.png",false,true) &&
                             std::all_of(kHouseBStations.begin()+4, kHouseBStations.end(), walkStation) &&
                             std::abs(state.playerSupportWorldY-kHouseBFloorY)<.02f &&
+                            readStockRoomDirections() &&
                             setInspectionLight(HeldLightPose::High) &&
                             face(34.95f,102.15f) && lampPresented() &&
                             capture("windows-combined-house-b-room.png",false,true) &&
@@ -1821,6 +1830,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             std::all_of(std::next(kHouseBStations.rbegin()), kHouseBStations.rend(), walkStation);
                         input.pitchRadians = previousPitch;
                         return visited && std::all_of(std::next(entranceBranch),std::next(square),walkTo) && !lampPresented() &&
+                            !campaign::NearBellwetherStockRoom(state) &&
                             ctx.simulation.CampaignBoundaryRevision()==boundary && state.treasurePurse==purse;
                     };
                     const auto presentSmith = [&] {
