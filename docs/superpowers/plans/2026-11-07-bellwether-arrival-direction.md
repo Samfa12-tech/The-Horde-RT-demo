@@ -296,7 +296,7 @@ The collected register offers **Show the road register**. That deliberate handof
 
 The record keeper turns in place toward a player who faces him within reach, then keeps addressing that position in earshot during the exchange. Pausing holds the facing and idle time. Leaving returns him to the church-path stance at the same grounded mark. The `bellwether-record-keeper-listener` capture reaches the handoff from 0.66 m off the original approach and waits for the keeper to face the listener. Both Windows hardware RT backends presented the same 21.1° turn and retained the saved register interpretation. The native route and dialogue suites passed. The private ARM64 build includes shared facing, with the physical phone check pending.
 
-A private 23.025-second review reel collects the four available cuts in church scene order. The October `hub.first_errand` and `hub.shrine_direction` cuts still need a listening check at their split. The November `hub.two_routes` and `hub.routes_independent` takes still need listening review. `hub.record_inspect` is logged in a combined audition without a verified individual cut, and the November audit holds the exact `shrine.register` reading. The reel retains each cut's samples with one second between clips. A cue sheet and source hashes accompany it outside the repo. The church encounter continues to use captions.
+A private 23.025-second review reel collects the four available cuts in church scene order. The October `hub.first_errand` and `hub.shrine_direction` cuts still need a listening check at their split. The November `hub.two_routes` and `hub.routes_independent` takes still need listening review. `hub.record_inspect` is logged in a combined audition without a verified individual cut. The November audit records `shrine.register` as held before recording. These two lines use the existing captions. The private Windows and Android builds can play the verified errand, directions and two route readings.
 
 The `bellwether-record-keeper-handoff` debug view loads a local resident fixture. It walks from the tavern to the shrine, recovers the register, returns to the church and verifies the handoff in simulation and in the save latch. The full native route test also verifies the road-mark lead before pickup and the return reading after pickup.
 
@@ -322,7 +322,7 @@ The native host check loaded the earned tavern save before and after purchase. E
 
 The local fixture now uses the prepared 15,322-triangle record keeper. Its four-second idle preserves the standing stance, settles the arms using the supplied rig, and adds a small breathing motion and head glance. The shared simulation advances the idle in earshot and holds it while paused or outside earshot. [The source recipe](../../../tools/author-record-keeper-idle.py) preserves the rigged and walking GLBs and writes an editable Blend and a separate local export.
 
-Both Windows hardware RT backends presented the textured actor at 960 × 540 and recorded the same idle time and completed interpretation. The exact-byte texture check verified all 11 mips and the unchanged preceding layers in both Windows RGBA8 and Android ASTC. One resident adds 16,777,212 bytes of Windows texture payload and 2,650,704 bytes of Android texture payload. The Android ARM64 debug package built without the local fixture. Phone performance, model and voice distribution clearance, and normal package integration remain open.
+Both Windows hardware RT backends presented the textured actor at 960 × 540 and recorded the same idle time and completed interpretation. The exact-byte texture check verified all 11 mips and the unchanged preceding layers in both Windows RGBA8 and Android ASTC. One resident adds 16,777,212 bytes of Windows texture payload and 2,650,704 bytes of Android texture payload. The Android ARM64 debug package built without the local fixture. Phone performance, in-game listening and normal package integration remain open.
 
 ### The lantern speaks to Kit
 
@@ -821,6 +821,8 @@ audio cue or haptic event.
 
 ## Voice audit and production handoff
 
+The owner confirmed the Meshy models and Mureka takes are project-owned. The current plan reuses the archive and preserves captions for gaps, including the lantern's claim to Kit and Kit's reply about King Veyr. The existing private intake records exact model and audio bytes. [Owner intake](../../evidence/2026-11-28-bellwether-owner-intake/receipt.json)
+
 Four missing takes were identified for this exact arrival, using established voices and plain spoken text without direction tags:
 
 | ID | Voice | Delivery intent |
@@ -834,7 +836,7 @@ The five existing Kit tavern/conversation WAVs were verified present and hash-ma
 
 The Windows Debug option `--bellwether-voice-dir <local WAV directory>` and the [private Android voice overlay](../../../android/README.md#bellwether-three-actor-playtest) accept the five approved Kit WAVs. With the complete ten-file overlay, both can also audition the three roadside lines, the doorway welcome and the keeper's hearth reply. The spatial voice path uses each line's existing actor source and the Voice preference. Bellwether keeps the required caption whenever playback is unavailable or muted. The shared clock uses the measured lengths in both voice and caption-only play, including the roadside assessment.
 
-The five audition WAV hashes match their production manifests. Each uses 24 kHz mono PCM16, and its manifest text matches the runtime caption. The doorway take lasts 3.699333 s and the reply lasts 5.579333 s. The local review reel includes the three roadside lines, the welcome and the reply in scene order. Exact-build listening, the foley and voice balance, and public distribution clearance remain open.
+The five audition WAV hashes match their production manifests. Each uses 24 kHz mono PCM16, and its manifest text matches the runtime caption. The doorway take lasts 3.699333 s and the reply lasts 5.579333 s. The local review reel includes the three roadside lines, the welcome and the reply in scene order. Exact-build listening and the foley and voice balance remain open.
 
 The combined private audition can include all thirteen pinned WAVs alongside the five-resident town. The two optional groups keep their original captions, sample lengths and listening status. Android opens stored WAVs directly from the APK and keeps cache staging for assets that need it.
 

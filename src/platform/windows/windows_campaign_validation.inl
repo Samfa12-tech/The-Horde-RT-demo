@@ -2526,9 +2526,28 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
                 };
-                const auto dialogue = [&](std::span<const Line> lines) {
+                const auto requiredCaption = [&](Line line) {
+                    const auto& spec = Spec(line);
+                    const auto expected = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
+                    const bool previous = ctx.subtitlesEnabled;
+                    ctx.subtitlesEnabled = false;
+                    const bool presented = frame();
+                    const HWND control = GetDlgItem(ctx.windowHandle, kChapterSubtitleId);
+                    std::array<char, 512> text{};
+                    const bool readable = presented && control &&
+                        (GetWindowLongPtrA(control, GWL_STYLE) & WS_VISIBLE) &&
+                        GetWindowTextA(control, text.data(), static_cast<int>(text.size())) > 0 &&
+                        expected == text.data();
+                    ctx.subtitlesEnabled = previous;
+                    if (!readable)
+                        std::cerr << "Required Bellwether caption missing for " << spec.stableId << '\n';
+                    return readable;
+                };
+                const auto dialogue = [&](std::span<const Line> lines, std::span<const Line> captionLines = {}) {
                     for (const auto line : lines) {
-                        if (state.chapterDialogue.line != line) return false;
+                        if (state.chapterDialogue.line != line ||
+                            (std::find(captionLines.begin(), captionLines.end(), line) != captionLines.end() &&
+                             !requiredCaption(line))) return false;
                         ++input.commands.dialogueSkip;
                         if (!step()) return false;
                     }
@@ -2546,8 +2565,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const auto offered = state.recordKeeperAction;
                 const bool presentedLead = reachedKeeper && offered == RecordKeeperAction::ShowRoadMark &&
                     interact() && frame();
-                progressed = check(presentedLead && dialogue(kRecordKeeperLead),
-                    "the staffed church gives the wayside lead after the player leaves the earned tavern");
+                constexpr std::array churchLeadCaptions{Line::RecordKeeperInspect};
+                progressed = check(presentedLead && dialogue(kRecordKeeperLead, churchLeadCaptions),
+                    "the staffed church gives the wayside lead and keeps the inspection readable with optional subtitles off");
                 if (!progressed)
                     std::cerr << "Bellwether church lead reached=" << reachedKeeper
                               << " offered=" << static_cast<int>(offered) << " presented=" << presentedLead
@@ -2581,13 +2601,15 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     progressed = check(readDirections(PauseObjective::BellwetherRegister),
                         "away from the tavern the pause directions point the recovered register back to the record keeper");
                 if (progressed) {
+                    constexpr std::array registerCaptions{Line::RecordKeeperRegister};
                     progressed = check(walk(std::next(kBellwetherWaysideApproach.rbegin()), kBellwetherWaysideApproach.rend()) &&
                         walkTo(kBellwetherNorthApproach.back()) && approachKeeper() &&
                         state.recordKeeperAction == RecordKeeperAction::ShowRegister && interact() &&
-                        state.waysideArchive.registerInterpreted && frame() && dialogue(kRecordKeeperFirstReading) &&
+                        state.waysideArchive.registerInterpreted && frame() &&
+                        dialogue(kRecordKeeperFirstReading, registerCaptions) &&
                         state.recordKeeperAction == RecordKeeperAction::CollectReward && state.treasurePurse.coins == 0 &&
                         state.chapterDialogue.tavernLanternLinesStarted == 0,
-                        "the real register handoff teaches both routes independently of Kit's firsthand knowledge");
+                        "the register handoff presents the unvoiced reading with optional subtitles off and teaches both routes independently of Kit");
                 }
                 if (progressed)
                     progressed = check(readDirections(PauseObjective::BellwetherExpeditions),
@@ -2700,11 +2722,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     };
                     const bool lowered = state.interaction.heldLightPose == HeldLightPose::Low ||
                         (toggle() && settle(HeldLightPose::Low));
+                    constexpr std::array introductionCaptions{Line::TavernLanternIdentity, Line::KitRoyalClaim};
                     progressed = check(lowered && state.NeedsRaiseLanternPrompt() && toggle() &&
                         settle(HeldLightPose::High) && state.chapterDialogue.line == Line::None &&
                         frame() && ctx.lastChapterPresentationAckTick == state.tickIndex && step() &&
-                        dialogue(kTavernLanternExchange),
-                        "a newly presented high lantern starts all six firsthand lines at Kit's chair");
+                        dialogue(kTavernLanternExchange, introductionCaptions),
+                        "the raised lantern starts all six firsthand lines and keeps the unvoiced parts readable with optional subtitles off");
                 }
                 if (progressed) {
                     campaign::storage::StoredCheckpoint expedition;
