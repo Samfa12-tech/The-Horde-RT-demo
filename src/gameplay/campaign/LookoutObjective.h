@@ -2,6 +2,7 @@
 
 #include "gameplay/campaign/CampaignCheckpoint.h"
 #include "gameplay/simulation/SimulationSnapshot.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 #include <optional>
 #include <string>
 
@@ -31,7 +32,7 @@ inline bool LookoutObjectiveAvailable(const simulation::SimulationSnapshot& s,
 // existing progress, with no saved quest state or gameplay command of its own.
 enum class PauseObjective {
     None, Lookout, BellwetherShrine, BellwetherArchive, BellwetherRegister, BellwetherExpeditions, BellwetherLowerStone,
-    BellwetherArrival, BellwetherHearth, BellwetherLantern
+    BellwetherArrival, BellwetherHearth, BellwetherLantern, BellwetherSquare
 };
 
 enum class AirWardDirections { RestoreBinding, LearnWard, Learned };
@@ -44,6 +45,7 @@ struct BellwetherDirections {
     bool millServiceAvailable=false;
     bool shorePracticeAvailable=false;
     bool shorePracticeCompleted=false;
+    bool atSquare=false;
     bool operator==(const BellwetherDirections&) const = default;
 };
 
@@ -70,12 +72,19 @@ inline AirWardDirections CurrentAirWardDirections(const bellwether::WaysideArchi
         AirWardDirections::LearnWard:AirWardDirections::RestoreBinding;
 }
 
+inline bool AtBellwetherSquare(const simulation::SimulationSnapshot& s) {
+    constexpr auto junction=traversal::kBellwetherTavernRoute[traversal::kBellwetherWestJunction];
+    const float dx=s.playerX-junction.x,dz=s.playerZ-junction.z;
+    return s.developmentRescueJourney && s.rescue.exteriorSide && !s.rescue.equipmentStowed &&
+        s.playerAlive && s.playerGrounded && dx*dx+dz*dz<=100.f;
+}
+
 inline BellwetherDirections CurrentBellwetherDirections(const simulation::SimulationSnapshot& snapshot) {
     return {.purse=snapshot.treasurePurse,.ward=CurrentAirWardDirections(snapshot.waysideArchive),
         .mill=snapshot.millPreparation,.shorePracticeStage=snapshot.shorePracticeStage,
         .millServiceAvailable=snapshot.millServiceAvailable,
         .shorePracticeAvailable=snapshot.shorePracticeServiceAvailable,
-        .shorePracticeCompleted=snapshot.salvagerShorePracticeCompleted};
+        .shorePracticeCompleted=snapshot.salvagerShorePracticeCompleted,.atSquare=AtBellwetherSquare(snapshot)};
 }
 
 inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot& s,
@@ -98,6 +107,7 @@ inline PauseObjective CurrentPauseObjective(const simulation::SimulationSnapshot
         if (arrival == BellwetherArrivalStage::Seated && s.tavernKeeper) return PauseObjective::BellwetherHearth;
         if (arrival != BellwetherArrivalStage::AtLookout) return PauseObjective::BellwetherArrival;
     }
+    if(AtBellwetherSquare(s))return PauseObjective::BellwetherSquare;
     return LookoutObjectiveAvailable(s, boundary) ? PauseObjective::Lookout : PauseObjective::None;
 }
 
@@ -105,11 +115,20 @@ inline constexpr char kLookoutObjectiveText[] =
     "Follow the road down to Bellwether. The tavern is across the square.\r\n\r\n"
     "You can also turn back toward the tomb.";
 
+inline constexpr char kSquareFingerpostDirections[] =
+    "The fingerpost by the covered well\r\n"
+    "Tankard - up the oak-railed ramp to the tavern.\r\n"
+    "Scales - west to the dealer, then on to the kitchen gardens.\r\n"
+    "Wheel - east to the mill and the river fork.\r\n"
+    "Anvil - southeast to the smith yard.\r\n\r\n"
+    "For the church, retrace the arrival road to the CHURCH sign.";
+
 inline const char* PauseObjectiveText(PauseObjective objective)
 {
     switch (objective)
     {
     case PauseObjective::Lookout: return kLookoutObjectiveText;
+    case PauseObjective::BellwetherSquare: return kSquareFingerpostDirections;
     case PauseObjective::BellwetherArrival:
         return "Follow the road to the covered well in Bellwether square. At the fingerpost, take the ramp with the oak rail. "
             "The lit tankard sign hangs beside the tavern's south door.";
@@ -138,7 +157,14 @@ inline std::string PauseObjectiveText(PauseObjective objective,const BellwetherD
 {
     std::string text=PauseObjectiveText(objective);
     if(objective==PauseObjective::None || objective==PauseObjective::Lookout ||
-       objective==PauseObjective::BellwetherArrival || objective==PauseObjective::BellwetherHearth)return text;
+       objective==PauseObjective::BellwetherSquare)return text;
+    if(directions.atSquare) {
+        if(objective==PauseObjective::BellwetherArrival)
+            text="Take the ramp to the lit tankard sign at the tavern's south door.";
+        text+="\r\n\r\n";
+        text+=kSquareFingerpostDirections;
+    }
+    if(objective==PauseObjective::BellwetherArrival || objective==PauseObjective::BellwetherHearth)return text;
     const auto& purse=directions.purse;
     if(objective==PauseObjective::BellwetherExpeditions || purse.ordinarySilver!=OrdinarySilverProgress::Unfound ||
        purse.millTally!=MillTallyProgress::Unfound) {
