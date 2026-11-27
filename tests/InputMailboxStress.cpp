@@ -41,6 +41,7 @@ InputSnapshot MakeSnapshot(std::uint64_t sequence)
     input.analogueMovement = (sequence & 64u) != 0u;
     input.tutorialEnabled = (sequence & 8u) != 0u;
     input.tutorialSlowdownEnabled = (sequence & 16u) != 0u;
+    input.chapterVoiceEnabled = (sequence & 256u) != 0u;
     input.commands.attack = sequence;
     input.commands.parry = sequence + 7u;
     input.commands.dodge = sequence + 9u;
@@ -85,6 +86,7 @@ bool MatchesSequence(const PublishedInput& published)
            actual.analogueMovement == expected.analogueMovement &&
            actual.tutorialEnabled == expected.tutorialEnabled &&
            actual.tutorialSlowdownEnabled == expected.tutorialSlowdownEnabled &&
+           actual.chapterVoiceEnabled == expected.chapterVoiceEnabled &&
            actual.commands.attack == expected.commands.attack &&
            actual.commands.parry == expected.commands.parry &&
            actual.commands.dodge == expected.commands.dodge &&

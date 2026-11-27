@@ -851,12 +851,13 @@ The private Horde audio archive retains the original MP3s, per-line review WAVs 
 ### Background level during Bellwether speech
 
 The package's verified line roster feeds the shared simulation envelope.
-The same tavern keeper reply ducks the music and existing continuous beds
-when its WAV is included, and keeps the background level steady in a fresh
-caption-only run. A caption-only line after speech follows the existing
-hold and release. The original WAVs, line lengths and subtitle policy stay
-as authored. Audio/haptic manual revalidation required — YES, for speech
-intelligibility and the background level during ordinary play.
+The tavern keeper reply ducks the music and existing continuous beds when
+its WAV is included and Dialogue volume is above zero. The background level
+holds steady in a fresh caption-only run or when Dialogue volume is already
+zero. Muting during speech follows the existing
+hold and release, and the caption continues on the same clock.
+Audio/haptic manual revalidation required — YES, for speech intelligibility
+and the background level during ordinary play.
 
 ## Animation and gameplay acceptance gate
 
