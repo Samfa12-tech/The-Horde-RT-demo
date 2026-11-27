@@ -1,0 +1,127 @@
+{
+  "device": "Samsung Galaxy S26 Ultra (SM-S948B)",
+  "androidApi": 37,
+  "source": "754a06f42ae3893f944fc1aeae0ea5b847eb9d6a",
+  "apkSha256": "1500a177ead8fd391a929ad3ee297ff5b4a659efa3b0cd67ce8aee3e00f56fce",
+  "applicationId": "com.samfa12.hordelanternrt.debug.bellwether.playtest",
+  "nativeFrame": "RayTracingPipeline, Shipping/Mobile at 33%",
+  "capturePixels": [
+    1440,
+    3120
+  ],
+  "foregroundSrgb": {
+    "white": "#F2E9D8",
+    "yellow": "#FFDF69"
+  },
+  "backingEnabled": false,
+  "captionSource": "hub.kit_stake",
+  "method": "The separate test runner staged the canonical Kit line in the installed game\u2019s OutlinedSubtitleView. Unchanged screenshots from Android screencap were converted from their embedded Display P3 profile to sRGB for colour checks. Each pair has both foreground colours at the same glyph positions.",
+  "localReport": "reports/horde-bellwether-square-directions-20261127-195103/subtitle-matrix/",
+  "samples": [
+    {
+      "scene": "Torchlit stone floor",
+      "checkpoint": "pbr-torch-fire",
+      "effectiveRoomMistSetting": true,
+      "directory": "bright-floor",
+      "whitePngSha256": "0c4320b05cd32b2f78ea28478901050e774ee80218e4d8a94ffa0d9b304d4935",
+      "yellowPngSha256": "37defdf0418062dfc7278d775035b1a7a1654923e87c525d6575952beef5948f",
+      "fillBoundsPixels": [
+        88,
+        1918,
+        1359,
+        2323
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Bright held lantern",
+      "checkpoint": "layout-e-finale-opening",
+      "effectiveRoomMistSetting": true,
+      "directory": "bright-lantern",
+      "whitePngSha256": "4939eb4420b1f3404a6b54f5224628094f0e16b8e40907a4d62372ce1f2e1388",
+      "yellowPngSha256": "f46adc1b6efac15209a826522a98cee0310b5d159448c81ba0ff6292967d9632",
+      "fillBoundsPixels": [
+        88,
+        1918,
+        1359,
+        2323
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Dark interior",
+      "checkpoint": "skylight",
+      "effectiveRoomMistSetting": true,
+      "directory": "skylight",
+      "whitePngSha256": "926f1b145408436b4638fa7cbc55f82467c7344297fa47f45c934eed8e04bd42",
+      "yellowPngSha256": "48a7f494a322f372832b8685ebbcab9f01b1ced3d8bb158b03172e8de5f002de",
+      "fillBoundsPixels": [
+        88,
+        780,
+        1359,
+        1185
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Keeper room with ground mist",
+      "checkpoint": "chapter-keeper-death-held",
+      "effectiveRoomMistSetting": true,
+      "directory": "held-full-mist",
+      "whitePngSha256": "92df0e9ab47f613a0cd5d20eee23333db2f56bde68ca256e3a14120c167d40ec",
+      "yellowPngSha256": "12f7271249983c6372ed81088fc449522e45751d6fb1ab7ab02e873eea314d48",
+      "fillBoundsPixels": [
+        88,
+        1918,
+        1359,
+        2323
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Same Keeper room, mist disabled",
+      "checkpoint": "chapter-keeper-death-held",
+      "effectiveRoomMistSetting": false,
+      "directory": "held-full-control",
+      "whitePngSha256": "7419bab9319a56aaa78e3547d0feb85e2abf92f344d1063be99ed444f024862f",
+      "yellowPngSha256": "f113cbfa84de7d7c8ea8fc1fa7825f293e552c8223ddb834b57d690d0ee6bb4f",
+      "fillBoundsPixels": [
+        88,
+        1918,
+        1359,
+        2323
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Outside at the village fingerpost",
+      "checkpoint": "bellwether-square-waymarker",
+      "effectiveRoomMistSetting": true,
+      "directory": "bellwether-square-waymarker",
+      "whitePngSha256": "b4630953f7e0720bcf34fc70814b874bbe08239fb9baa76e1fda0292d05c4713",
+      "yellowPngSha256": "8adcd1a29c53d7f6379ac289536535999fe065ffedbee361ea91c33bacc43b91",
+      "fillBoundsPixels": [
+        88,
+        780,
+        1359,
+        1185
+      ],
+      "matchingDualColourFillPixels": 61274
+    },
+    {
+      "scene": "Staffed village interior",
+      "checkpoint": "bellwether-repeat-visit",
+      "effectiveRoomMistSetting": true,
+      "directory": "tavern",
+      "whitePngSha256": "6f8fe0feca87ade10f61846b98b02c69fd3d331fc342589778b931b062ba8c17",
+      "yellowPngSha256": "9d5bd99512a5ecfe971ff2fa48d7901f2d3c750eaa049cc954543ff8267ae5cb",
+      "fillBoundsPixels": [
+        88,
+        780,
+        1359,
+        1185
+      ],
+      "matchingDualColourFillPixels": 61274
+    }
+  ]
+}
