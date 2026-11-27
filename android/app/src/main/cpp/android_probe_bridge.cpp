@@ -1,4 +1,5 @@
 #include "gameplay/simulation/PrivateRevivalApplication.h"
+#include "audio/BellwetherVoiceFixture.h"
 #include "audio/ChapterDialogueSpatial.h"
 #include <android/log.h>
 #include <android/native_window.h>
@@ -710,6 +711,10 @@ constexpr auto AndroidBellwetherSpecialist() {
 horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationConfig()
 {
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+    constexpr auto recordedVoiceLines = horde::audio::BellwetherVoiceLinesFromIds(
+        HORDE_RT_BELLWETHER_RECORDED_VOICE_IDS);
+    static_assert(recordedVoiceLines.has_value(), "Invalid Bellwether voice package roster");
+    config.bellwetherRecordedVoiceLines = *recordedVoiceLines;
 #if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = true;
     config.bellwetherSpecialist = AndroidBellwetherSpecialist();

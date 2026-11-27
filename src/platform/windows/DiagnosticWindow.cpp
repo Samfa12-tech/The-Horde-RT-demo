@@ -229,7 +229,7 @@ bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
 bool gBellwetherFollowOnAudition = false;
 bool gBellwetherHearthAudition = false;
-std::array<bool, horde::gameplay::dialogue::kLines.size()> gBellwetherOptionalVoices{};
+horde::gameplay::dialogue::RecordedVoiceLines gBellwetherRecordedVoiceLines{};
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
@@ -262,6 +262,7 @@ horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationCo
     config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
     config.bellwetherTrade = gBellwetherCombinedRelicDealer ||
         gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::RelicDealer;
+    config.bellwetherRecordedVoiceLines = gBellwetherRecordedVoiceLines;
 #endif
     return config;
 }
@@ -1739,13 +1740,17 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
         !admitOptional(horde::audio::kBellwetherSalvagerAuditionCuts, gBellwetherSalvagerAudition) ||
         !admitOptional(horde::audio::kBellwetherFollowOnAuditionCuts, gBellwetherFollowOnAudition) ||
         !admitOptional(horde::audio::kBellwetherHearthAuditionCuts, gBellwetherHearthAudition)) return false;
-    decltype(gBellwetherOptionalVoices) optionalVoices{};
+    horde::gameplay::dialogue::RecordedVoiceLines recordedVoiceLines{};
+    for (const auto& spec : horde::gameplay::dialogue::kLines)
+        recordedVoiceLines[static_cast<std::size_t>(spec.id)] = horde::audio::HasBellwetherVoiceCut(
+            spec.id, gBellwetherArrivalAudition, gBellwetherSalvagerAudition,
+            gBellwetherFollowOnAudition, gBellwetherHearthAudition);
     for (const auto& cut : horde::audio::kBellwetherOptionalVoiceCuts) {
         const bool present = std::filesystem::exists(pathFor(cut), error);
         if (error || (present && !verifyCut(cut))) return false;
-        optionalVoices[static_cast<std::size_t>(cut.line)] = present;
+        recordedVoiceLines[static_cast<std::size_t>(cut.line)] = present;
     }
-    gBellwetherOptionalVoices = optionalVoices;
+    gBellwetherRecordedVoiceLines = recordedVoiceLines;
     gBellwetherVoiceDirectory = root;
     std::cerr << "Bellwether private Kit WAVs verified.\n";
     if (gBellwetherArrivalAudition) std::cerr << "Bellwether private arrival audition WAVs verified.\n";
@@ -2680,10 +2685,7 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     const auto& spec = horde::gameplay::dialogue::Spec(line);
     std::filesystem::path privateVoice;
 #if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
-    if (!gBellwetherVoiceDirectory.empty() &&
-        ((lineId < gBellwetherOptionalVoices.size() && gBellwetherOptionalVoices[lineId]) ||
-         horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
-             gBellwetherSalvagerAudition, gBellwetherFollowOnAudition, gBellwetherHearthAudition)))
+    if (lineId < gBellwetherRecordedVoiceLines.size() && gBellwetherRecordedVoiceLines[lineId])
         privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
 #endif
     if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))

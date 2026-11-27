@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <string_view>
 
 #include "gameplay/dialogue/ChapterDialogue.h"
@@ -79,6 +80,27 @@ inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool 
                                        kBellwetherFollowOnAuditionCuts.end(), matches)) ||
         (hearthAudition && std::any_of(kBellwetherHearthAuditionCuts.begin(),
                                      kBellwetherHearthAuditionCuts.end(), matches));
+}
+
+// Android supplies IDs from the hash-checked package inventory at build time.
+inline constexpr std::optional<gameplay::dialogue::RecordedVoiceLines>
+BellwetherVoiceLinesFromIds(std::string_view ids) {
+    using namespace gameplay::dialogue;
+    RecordedVoiceLines recorded{};
+    while (!ids.empty()) {
+        const auto comma = ids.find(',');
+        const auto id = ids.substr(0, comma);
+        const auto line = std::find_if(kLines.begin(), kLines.end(), [&](const LineSpec& spec) {
+            return spec.stableId == id && IsBellwetherLine(spec.id);
+        });
+        if (line == kLines.end()) return std::nullopt;
+        const auto index = static_cast<std::size_t>(line->id);
+        if (recorded[index]) return std::nullopt;
+        recorded[index] = true;
+        if (comma == std::string_view::npos) break;
+        ids.remove_prefix(comma + 1);
+    }
+    return recorded;
 }
 
 } // namespace horde::audio

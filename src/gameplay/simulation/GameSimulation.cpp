@@ -583,8 +583,12 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     }
     if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
         dialogueDucking_.Reset();
-    else if(!input.paused)
-        dialogueDucking_.Step(dialogue::Spec(chapterDialogue_.State().line).audio[0]!='\0',dialogueDeltaSeconds);
+    else if(!input.paused) {
+        const auto& line = dialogue::Spec(chapterDialogue_.State().line);
+        const bool recorded = line.audio[0] != '\0' ||
+            config_.bellwetherRecordedVoiceLines[static_cast<std::size_t>(line.id)];
+        dialogueDucking_.Step(recorded, dialogueDeltaSeconds);
+    }
     RefreshSnapshot(input);
     // Revalidate after damage, death and newly-started dialogue. No further
     // health/action mutation can intervene before this owner snapshot is used.
