@@ -203,6 +203,17 @@ campaign menu. Use Shipping/Mobile shaders for cross-platform acceptance.
 The unseeded New Game entry and seeded lookout walkthroughs establish separate
 evidence. Keep these packages and their private inputs in local storage.
 
+Use the optimized candidate for Android acceptance through the ordinary menus.
+Build `:app:assembleBellwetherCandidate` with `-PhordeBellwetherCandidate=true`,
+the same resident, flask and revival inputs, and the optional pinned voice
+directory. Omitting the Bellwether voice directory leaves the village dialogue
+captioned. The candidate uses standard Shipping/Mobile shaders, the local
+development key and the isolated app ID
+`com.samfa12.hordelanternrt.bellwether.candidate`. Its package version derives
+from the shared `VERSION` file with a candidate suffix. It has no development
+checkpoints or seeded-profile entry. Keep the Debug playtest for controlled
+route replays and instrumentation.
+
 For an Android touch walkthrough from a seeded lookout, use the host test
 executable's `--export-lookout-fixture` with a fresh fixture directory. Import
 the exact `slot-1-auto.hrd` under `files/campaign-tests/<unique-name>` in the
