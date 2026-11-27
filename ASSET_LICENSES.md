@@ -1204,6 +1204,13 @@ audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
 of the archived takes. Private build admission keeps their stable line IDs
 and existing captions. Public distribution clearance remains open.
 
+The optional hearth question uses Kit's original `hub.kit_stake` and
+`kit.personal_stake.key` recordings from the 4 November campaign voice archive.
+The private Debug overlay checks the exact mono, 24 kHz PCM16 takes against
+the SHA-256 values in `src/audio/BellwetherVoiceFixture.h`. The archive holds
+the originals. Owner listening approval and public distribution clearance
+for these two takes remain open.
+
 ## Bellwether square and tavern frontage - 26 November 2026
 
 Samfa12/Codex authored the water bench, fetching vessels, tiled entrance
@@ -1249,3 +1256,7 @@ record their original layout and the town and terrain they fit.
 ## Bellwether hearth service - 27 November 2026
 
 Samfa12/Codex modeled the tavern's water jug, beakers, trencher, serving dresser, platters and storage crock in Blender. The timber uses the original Horde chest-wood base colour, normal and ORM maps recorded with the Bellwether waterwheel. The clay uses the existing earthenware surface. The [editable source and receipt](assets/models/world/source/bellwether-hearth-service-v1/README.md) record their origin and placement.
+
+## Bellwether square fingerpost and tavern delivery - 27 November 2026
+
+Samfa12/Codex modeled the four carved destination boards, oil bracket and coopered delivery cask for Horde. They use the existing town timber, stone, clay and char finishes. The [Blender master, recipes and receipt](assets/models/world/source/bellwether-square-waymarker-v1/README.md) record their origin.

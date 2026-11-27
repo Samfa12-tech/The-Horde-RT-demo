@@ -81,6 +81,7 @@ struct SimulationSnapshot
 {
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
     bool tavernConversationAvailable=false;
+    bool kitTreasureTalkAvailable=false;
     bool tavernDirectionsAvailable=false;
     bool tavernLanternFittingAvailable=false;
     bool tavernLanternAvailable=false;
@@ -111,7 +112,7 @@ struct SimulationSnapshot
     bellwether::PrivyRagState privyRag=bellwether::PrivyRagState::Available;
     bellwether::PrivyRagAction privyRagAction=bellwether::PrivyRagAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
-        return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
+        return tavernConversationAvailable || kitTreasureTalkAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
             salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||

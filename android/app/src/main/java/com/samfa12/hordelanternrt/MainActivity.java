@@ -7531,6 +7531,7 @@ public class MainActivity extends Activity {
                 return hasBellwetherWestRoundTrip() ? 349 : -1;
             case "bellwether-wayside-archive": return 331;
             case "bellwether-square-frontage": return 350;
+            case "bellwether-square-waymarker": return 351;
             case "bellwether-wayside-archive-open": return 332;
             case "bellwether-wayside-register-recovered": return 333;
             case "bellwether-church-approach": return 334;
@@ -7894,6 +7895,8 @@ public class MainActivity extends Activity {
                     BuildConfig.BELLWETHER_COMBINED_RESIDENTS
                     ? new float[]{-0.14f, -0.11f} : null;
             case 349: return hasBellwetherWestRoundTrip() ? new float[]{-0.14f, -0.11f} : null;
+            case 350: return new float[]{-.35f,.02f};
+            case 351: return new float[]{1.08f,.08f};
             case 331:
             case 332:
             case 333: return new float[]{0.0f, -0.12f};
@@ -9200,6 +9203,7 @@ public class MainActivity extends Activity {
                 case 3: return R.string.record_mill_tally_claim;
                 case 4: return R.string.recover_mill_tally;
                 case 5: return R.string.return_mill_tally;
+                case 6: return R.string.ask_kit_about_treasure;
                 default: return 0;
             }
         }

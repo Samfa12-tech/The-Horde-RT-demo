@@ -72,6 +72,10 @@ final class ChapterVoiceAssets {
             assets.add(bellwether(47, "kit.royal_claim.help", "kit_"));
             assets.add(bellwether(55, "hub.ordinary_sale", "relic_dealer_"));
         }
+        if (BuildConfig.BELLWETHER_HEARTH_AUDITION) {
+            assets.add(bellwether(59, "hub.kit_stake", "kit_"));
+            assets.add(bellwether(60, "kit.personal_stake.key", "kit_"));
+        }
         return Collections.unmodifiableList(assets);
     }
 

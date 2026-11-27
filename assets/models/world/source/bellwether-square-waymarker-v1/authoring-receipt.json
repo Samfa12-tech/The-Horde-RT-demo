@@ -1,0 +1,65 @@
+{
+  "feature": "Carved four-destination fingerpost and tavern cask at Bellwether south square",
+  "originalTownSha256": "d44bdbac5b5cea8c6807b4f86dfc28f920e44dcf73f74bb139eecc9a2bfba18e",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "layoutSha256": "7b7e9fda33d289c5e2e8cbe282317e7c2df94a91a29560acc9b083f8d5fac242",
+  "runtimeTownSha256": "5c0b850b1159e5417f0d58800e8d38dce9c1a12b80f1ddd4c9e32a229b82e6de",
+  "addedSolidTriangles": 1972,
+  "townVertices": 87617,
+  "townTriangles": 41741,
+  "postXZ": [
+    80.2,
+    129.2
+  ],
+  "baseGroundY": -11.70849609375,
+  "destinationMarks": {
+    "Tavern": [
+      80.2,
+      -9.22849609375,
+      129.2
+    ],
+    "Dealer": [
+      80.2,
+      -9.48849609375,
+      129.2
+    ],
+    "Mill": [
+      80.2,
+      -8.76849609375,
+      129.2
+    ],
+    "Smith": [
+      80.2,
+      -9.76849609375,
+      129.2
+    ]
+  },
+  "waymarkerTriangles": 752,
+  "caskTriangles": 1100,
+  "lampTriangles": 120,
+  "waymarkerFlame": [
+    79.64363098144531,
+    -8.828495979309082,
+    129.65701293945312
+  ],
+  "waymarkerLight": [
+    79.64363098144531,
+    -8.688495635986328,
+    129.65701293945312
+  ],
+  "caskRecipeSha256": "2307b282b9d6edce93cfc79c0340c88810a18d212dc877bf593bdb22c1981021",
+  "clearanceMarginMetres": 0.42,
+  "viewXZ": [
+    77.4,
+    131.5
+  ],
+  "recipeSha256": "d21f277210f577e18ff1c35242118d9786312757720fb3b2620c192fec23bbec",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "square-waymarker.blend": "c9f7c1b1364ede5f015aa07a7f9856d18ebad94e7f0074deb7ff4b0186fa4133",
+    "square-waymarker.glb": "9e0d124a7dbfa07241cfdb64e4bc78a7c2edde05099b693a0980d70a8eb3e4c2",
+    "bellwether-tavern-v1.glb": "5c0b850b1159e5417f0d58800e8d38dce9c1a12b80f1ddd4c9e32a229b82e6de",
+    "geometry.generated.h": "1f157d0946efde4537bb0c3c6cf092fdece0562fdf8e066d55db896ef6fa829c",
+    "asset.manifest.json": "ac31c5dba4d4e4018fda77662201c2108f6ef42b0f22449770a685a7b826a3f6"
+  }
+}

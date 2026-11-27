@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "feature": "South square four-destination fingerpost",
+  "coordinateSystem": "Horde world XZ in metres; +Y is vertical",
+  "postXZ": [80.2, 129.2],
+  "decisionPointXZ": [82.3, 131.7],
+  "clearanceMargin": 0.42,
+  "cameraWitness": {
+    "checkpoint": "bellwether-square-frontage",
+    "routeStation": 8,
+    "viewFromXZ": [82.3, 131.7],
+    "lookBearingRadians": -0.35,
+    "viewXZ": [77.4, 131.5]
+  },
+  "destinations": [
+    {
+      "label": "Tavern",
+      "emblem": "tavern",
+      "direction": [0.0, -1.0],
+      "routeMouth": [82.3, 131.7],
+      "routeHalfWidth": 1.35,
+      "shaftLength": 1.28,
+      "shaftHeight": 2.28,
+      "boardHeight": 2.48,
+      "boardWidth": 0.62
+    },
+    {
+      "label": "Dealer",
+      "emblem": "dealer",
+      "direction": [-1.0, 0.0],
+      "routeMouth": [82.3, 131.7],
+      "routeHalfWidth": 1.20,
+      "shaftLength": 1.42,
+      "shaftHeight": 2.02,
+      "boardHeight": 2.22,
+      "boardWidth": 0.62
+    },
+    {
+      "label": "Mill",
+      "emblem": "mill",
+      "direction": [0.955, -0.296],
+      "routeMouth": [82.3, 131.7],
+      "routeHalfWidth": 1.20,
+      "shaftLength": 1.34,
+      "shaftHeight": 2.74,
+      "boardHeight": 2.94,
+      "boardWidth": 0.62
+    },
+    {
+      "label": "Smith",
+      "emblem": "smith",
+      "direction": [0.552, 0.834],
+      "routeMouth": [82.3, 131.7],
+      "routeHalfWidth": 1.05,
+      "shaftLength": 1.18,
+      "shaftHeight": 1.74,
+      "boardHeight": 1.94,
+      "boardWidth": 0.62
+    }
+  ]
+}

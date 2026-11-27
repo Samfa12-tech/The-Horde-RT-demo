@@ -110,7 +110,7 @@ int main(int argc,char** argv) {
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==69,"the live journey, 40 chapter views and 28 Bellwether views require authored-scene admission");
+  check(chapterSelections==70,"the live journey, 40 chapter views and 29 Bellwether views require authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right",
                        "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {

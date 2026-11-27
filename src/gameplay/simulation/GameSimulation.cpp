@@ -98,7 +98,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeBellwetherGrateLampFireEmitter(),
                            effects::MakeBellwetherMillBenchLampFireEmitter(),
                            effects::MakeBellwetherPorchLampFireEmitter(),
-                           effects::MakeGardenHouseWindowEmitter()};
+                           effects::MakeGardenHouseWindowEmitter(),
+                           effects::MakeSquareWaymarkerLampEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2251,6 +2252,9 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[8],
             effects::GardenHouseWindowFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[9],
+            effects::BellwetherFireInput(bellwether::kSquareWaymarkerFlame,bellwether::kSquareWaymarkerLight,1.4f),
+            fixedDeltaSeconds);
     }
 }
 
@@ -3670,6 +3674,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.treasurePurse=treasurePurse_;
     snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
         chapterDialogue_.CanStartTavernConversation(chapterContext);
+    snapshot_.kitTreasureTalkAvailable=chapterDialogue_.CanAskKitAboutTreasure(chapterContext);
     snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
     snapshot_.tavernLanternFittingAvailable=CanBuyLanternFitting(chapterContext);
     snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
@@ -3882,6 +3887,10 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         const auto torso=traversal::RescueTorsoOffset(rescueTraversal_.Snapshot());
         effects::IncludeNearbyWorldFire(std::span{snapshot_.fireEmitters}.subspan(1),
             bellwetherFireEmitters_[8],playerX_+torso.x,playerZ_+torso.z);
+        // Across the square, one distant interior flame yields to the fingerpost
+        // wick. Keep the selected exterior lamp and the player's held light.
+        effects::IncludeNearbyWorldFire(std::span{snapshot_.fireEmitters}.subspan(1,2),
+            bellwetherFireEmitters_[9],playerX_+torso.x,playerZ_+torso.z,9.f);
         snapshot_.fireEmitterCount = snapshot_.fireEmitters.size();
     }
     snapshot_.flaskUpgrade={};

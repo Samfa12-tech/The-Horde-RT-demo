@@ -10,6 +10,7 @@
 #include "../../../assets/models/world/source/bellwether-mill-lamp-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-square-frontage-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-garden-house-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
 
 namespace horde::gameplay::effects
 {
@@ -22,6 +23,7 @@ inline constexpr std::uint32_t kBellwetherGrateLampEmitterId=0x4230324cu;
 inline constexpr std::uint32_t kBellwetherMillBenchLampEmitterId=0x4230354cu;
 inline constexpr std::uint32_t kBellwetherPorchLampEmitterId=0x42303150u;
 inline constexpr std::uint32_t kGardenHouseWindowEmitterId=0x42303357u;
+inline constexpr std::uint32_t kSquareWaymarkerLampEmitterId=0x4253514cu;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -174,6 +176,14 @@ inline FireEmitterState MakeGardenHouseWindowEmitter()
     emitter.stableId=kGardenHouseWindowEmitterId;
     emitter.seed=0x57494e44u;
     emitter.colourTemperatureKelvin=2080.f;
+    return emitter;
+}
+
+inline FireEmitterState MakeSquareWaymarkerLampEmitter()
+{
+    auto emitter=MakeBellwetherPorchLampFireEmitter();
+    emitter.stableId=kSquareWaymarkerLampEmitterId;
+    emitter.seed=0x5741594du;
     return emitter;
 }
 

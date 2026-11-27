@@ -51,8 +51,15 @@ inline constexpr std::array kBellwetherFollowOnAuditionCuts{
     BellwetherVoiceCut{gameplay::dialogue::Line::RelicDealerOrdinarySale, 78704, "7f045c4859e64d7dd79d9d813cffb5cb49f66e7d999dc2a70107beac683e05b7"}
 };
 
+// The quiet Kit hearth conversation remains a private audition overlay.
+inline constexpr std::array kBellwetherHearthAuditionCuts{
+    BellwetherVoiceCut{gameplay::dialogue::Line::KitTreasureRoof, 136784, "9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::KitTreasureKey, 113744, "d82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0"}
+};
+
 inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false,
-                                            bool salvagerAudition = false, bool followOnAudition = false) {
+                                            bool salvagerAudition = false, bool followOnAudition = false,
+                                            bool hearthAudition = false) {
     const auto matches = [line](const BellwetherVoiceCut& cut) { return cut.line == line; };
     return std::any_of(kBellwetherVoiceCuts.begin(), kBellwetherVoiceCuts.end(), matches) ||
         (arrivalAudition && std::any_of(kBellwetherArrivalAuditionCuts.begin(),
@@ -60,7 +67,9 @@ inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool 
         (salvagerAudition && std::any_of(kBellwetherSalvagerAuditionCuts.begin(),
                                        kBellwetherSalvagerAuditionCuts.end(), matches)) ||
         (followOnAudition && std::any_of(kBellwetherFollowOnAuditionCuts.begin(),
-                                       kBellwetherFollowOnAuditionCuts.end(), matches));
+                                       kBellwetherFollowOnAuditionCuts.end(), matches)) ||
+        (hearthAudition && std::any_of(kBellwetherHearthAuditionCuts.begin(),
+                                     kBellwetherHearthAuditionCuts.end(), matches));
 }
 
 } // namespace horde::audio

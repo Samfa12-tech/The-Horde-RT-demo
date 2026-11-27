@@ -277,8 +277,14 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
             if(restored)staffed.StepFixed(idle);
             Check(restored && staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3 &&
                   staffed.Snapshot().chapterDialogue.line==Line::None && !staffed.Snapshot().tavernConversationAvailable &&
-                  staffed.Snapshot().tavernDirectionsAvailable,
-                  "reopening the completed autosave keeps Talk quiet and restores the Directions action");
+                  staffed.Snapshot().kitTreasureTalkAvailable,
+                  "the saved camera faces Kit and his optional question stays quiet until asked");
+            const auto& keeper=horde::gameplay::bellwether::kKeeperHearth;
+            idle.yawRadians=std::atan2(keeper[0]-staffed.Snapshot().playerX,
+                                      staffed.Snapshot().playerZ-keeper[2]);
+            staffed.StepFixed(idle);
+            Check(staffed.Snapshot().tavernDirectionsAvailable && !staffed.Snapshot().kitTreasureTalkAvailable,
+                  "looking back to the keeper offers the Directions action after reload");
             idle.commands.interact=staffed.Snapshot().lastConsumedInteractSequence+1;
             staffed.StepFixed(idle);
             Check(staffed.Snapshot().chapterDialogue.line==Line::TavernDirections &&

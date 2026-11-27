@@ -47,6 +47,7 @@ struct DevelopmentCheckpointStageEvidence
     std::uint32_t enemyHitEvents = 0u;
     PlayerCombatAction action = PlayerCombatAction::Idle;
     float actionTime = 0.0f;
+    std::optional<std::array<float,2>> blockedWalkTarget;
     struct BellwetherVisit {
         unsigned roadsideCaptions = 0;
         bool welcomeCaption = false;
@@ -185,6 +186,7 @@ inline bool StageDevelopmentCheckpointSimulation(
             input.runHeld=distance>.3f;
             advance();
         }
+        if(evidence) evidence->blockedWalkTarget=std::array{x,z};
         return false;
     };
 
@@ -757,6 +759,11 @@ inline bool StageDevelopmentCheckpointSimulation(
            checkpoint.bellwetherStations>traversal::kBellwetherTavernRoute.size())return finalize(false);
         for(std::size_t station=3;station<=checkpoint.exteriorRouteStation;++station) {
             const auto destination=simulation::kWorldRoutePoints[station];
+            // The optional stone basin stands west of the lookout. The direct
+            // diagonal from the woods clips its rim. Approach the saved landing
+            // from the south, then continue onward through the same player motor.
+            if(station+1==simulation::kWorldRoutePoints.size() && gameSimulation.config_.flaskUtilityCandidate &&
+               !walkTo(routeInput,advance,destination.x,destination.z-1.25f))return finalize(false);
             if(!walkTo(routeInput,advance,destination.x,destination.z))return finalize(false);
         }
         // A mapped approach capture continues from F04 using the same motor;

@@ -100,6 +100,7 @@
     <string name="sell_ordinary_silver">Sell ordinary silver (+%1$d coins)</string>
     <string name="take_clean_rag">Take a clean rag</string>
     <string name="pass_the_rag">Pass the rag</string>
+    <string name="ask_kit_about_treasure">Ask Kit about the treasure</string>
     <string name="talk_through_grate">Talk through the grate</string>
     <string name="take_mill_tally">Take the tally stamp</string>
     <string name="sell_mill_tally">Sell tally stamp (+%1$d coins)</string>

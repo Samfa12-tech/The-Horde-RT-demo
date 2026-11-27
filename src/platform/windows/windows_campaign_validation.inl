@@ -1638,6 +1638,37 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
                 };
+                if (progressed && gBellwetherPreparationsValidation) {
+                    const auto controlReads = [&](int id, std::wstring_view expected) {
+                        std::array<wchar_t,192> text{};
+                        return GetWindowTextW(GetDlgItem(ctx.windowHandle,id),text.data(),static_cast<int>(text.size()))>0 &&
+                            std::wstring_view(text.data())==expected;
+                    };
+                    const auto captionFor = [&](Line line) {
+                        return horde::platform::windows::WindowsSubtitleWideText(
+                            horde::platform::windows::WindowsSubtitleCaption("Kit",Spec(line).text));
+                    };
+                    const auto boundary=ctx.simulation.CampaignBoundaryRevision();
+                    const auto coins=state.treasurePurse;
+                    const auto& kit=state.chapterCompanion;
+                    progressed=check(face(state.playerX+1.f,state.playerZ) && !state.kitTreasureTalkAvailable &&
+                        state.tavernDirectionsAvailable && face(kit.x,kit.z) && state.kitTreasureTalkAvailable &&
+                        controlReads(kChestPromptControlId,L"LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE") &&
+                        interact() && waitFor([&]{return state.chapterDialogue.line==Line::KitTreasureRoof &&
+                            state.chapterDialogue.elapsed>.35f;},45) && frame() &&
+                        controlReads(kChapterSubtitleId,captionFor(Line::KitTreasureRoof)) &&
+                        capture("windows-combined-kit-hearth-talk.png",true,true),
+                        "looking at seated Kit offers a personal question and presents his answer at the hearth");
+                    if(progressed) {
+                        ++input.commands.dialogueSkip;
+                        progressed=check(step() && frame() && state.chapterDialogue.line==Line::KitTreasureKey &&
+                            controlReads(kChapterSubtitleId,captionFor(Line::KitTreasureKey)) &&
+                            waitFor([&]{return state.kitTreasureTalkAvailable &&
+                                state.chapterDialogue.line==Line::None;},320) &&
+                            state.treasurePurse==coins && ctx.simulation.CampaignBoundaryRevision()==boundary,
+                            "Kit finishes his second answer, and the question can be asked again without changing the tavern save");
+                    }
+                }
                 const auto& landing = kBellwetherRiverLanding;
                 const auto& mill = kBellwetherMillApproach;
                 const auto approachShallows = [&] {
@@ -1697,6 +1728,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         return check(apron && walkTo({kWellApronFetching[0], kWellApronFetching[1]}) &&
                             walkTo({kWellApronView[0], kWellApronView[1]}) && walkTo(*square),
                             "the player crosses the well paving and returns to the south tavern approach");
+                    };
+                    const auto presentSquareWaymarker = [&] {
+                        if (!walkTo({kSquareWaymarkerView[0],kSquareWaymarkerView[1]})) return false;
+                        const float previousPitch=input.pitchRadians;
+                        input.pitchRadians=.08f;
+                        const bool facing=face(kSquareWaymarkerPost[0],kSquareWaymarkerPost[2]);
+                        const auto& lights=ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                        const bool presented=facing && ctx.rtScene.HasUploadedFireEmitters() &&
+                            std::find(lights.begin(),lights.end(),horde::gameplay::effects::kSquareWaymarkerLampEmitterId)!=lights.end() &&
+                            capture("windows-combined-square-waymarker.png",true,true);
+                        input.pitchRadians=previousPitch;
+                        return presented && walkTo(*square);
                     };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };
@@ -1886,6 +1929,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         capture("windows-combined-west-trade.png") && presentGarden() &&
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
+                        check(presentSquareWaymarker() && fork(), "the player can read the square fingerpost from the lane and return to the tavern junction") &&
                         check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&

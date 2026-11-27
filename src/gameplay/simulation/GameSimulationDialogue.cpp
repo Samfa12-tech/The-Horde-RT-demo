@@ -76,6 +76,7 @@ void GameSimulation::InteractWithClaimedChapter() {
     }
     if(chapterDialogue_.TryStartGardenGrateTalk(context))return;
     if(IsBellwetherTavernKeeperReady() && chapterDialogue_.TryStartTavernConversation(context))return;
+    if(chapterDialogue_.TryStartKitTreasureTalk(context))return;
     if(const auto tally=CurrentMillTallyAction(context);tally!=campaign::MillTallyAction::None) {
         InteractWithMillTally(tally);
         return;
@@ -322,12 +323,12 @@ bool GameSimulation::CanWorkAtMill(const dialogue::Context& c) const {
         chapterDialogue_.State().line==dialogue::Line::None;
 }
 
-bool GameSimulation::MillTargetInReach(const dialogue::Context& c,const std::array<float,3>& mark,
-    float reach) const {
+bool GameSimulation::ChapterTargetInReach(const dialogue::Context& c,const std::array<float,3>& mark,
+    float reach,float facingCosine) const {
     const float dx=mark[0]-c.player.x,dz=mark[2]-c.player.z;
     const float distance=std::hypot(dx,dz);
     return distance<=reach && std::abs(c.listener.y-mark[1])<=1.1f &&
-        std::sin(c.yaw)*dx-std::cos(c.yaw)*dz>=.75f*distance &&
+        std::sin(c.yaw)*dx-std::cos(c.yaw)*dz>=facingCosine*distance &&
         chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mark[0],mark[2],
             mark[1]-.02f,mark[1]+.02f,.025f);
 }
@@ -340,11 +341,11 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
         if(!IsBellwetherResidentReady(traversal::kArtificerResident) || !artificer_)return MillAction::None;
         auto speaker=artificer_->foot;
         speaker[1]+=1.37f;
-        return MillTargetInReach(c,speaker,2.5f)?MillAction::TakeRig:MillAction::None;
+        return ChapterTargetInReach(c,speaker,2.5f)?MillAction::TakeRig:MillAction::None;
     }
     if(millPreparation_==MillPreparation::FitChecked || millPreparation_==MillPreparation::BearingSeated) {
         if(!IsBellwetherResidentReady(traversal::kArtificerResident) || !artificer_ ||
-           !MillTargetInReach(c,traversal::kMillDriveWork,1.75f))return MillAction::None;
+           !ChapterTargetInReach(c,traversal::kMillDriveWork,1.75f))return MillAction::None;
         return millPreparation_==MillPreparation::FitChecked?MillAction::SeatBearing:MillAction::TurnDrive;
     }
     if(millPreparation_==MillPreparation::RigTrialReady) {
@@ -363,7 +364,7 @@ bellwether::MillAction GameSimulation::CurrentMillAction(const dialogue::Context
     }
     const bool atBin=millPreparation_==MillPreparation::BearingNeeded;
     const auto& mark=atBin?kMillBearingBin:kMillComparison;
-    if(!MillTargetInReach(c,mark,1.75f))return MillAction::None;
+    if(!ChapterTargetInReach(c,mark,1.75f))return MillAction::None;
     if(atBin)return MillAction::RecoverBearing;
     return millPreparation_==MillPreparation::Unexamined?MillAction::InspectGearing:MillAction::CheckFit;
 }
@@ -372,7 +373,7 @@ void GameSimulation::AdvanceMillDriveTest(float seconds) {
     if(!millDriveTurnSeconds_)return;
     const auto c=ChapterInteractionContext(false);
     if(!CanWorkAtMill(c) || !IsBellwetherResidentReady(traversal::kArtificerResident) ||
-       !artificer_ || !MillTargetInReach(c,traversal::kMillDriveWork,1.75f)) {
+       !artificer_ || !ChapterTargetInReach(c,traversal::kMillDriveWork,1.75f)) {
         millDriveTurnSeconds_.reset();
         return;
     }
@@ -555,6 +556,12 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused,std::opt
     if(c.exterior && kit.grounded) {
         const float lowering=kit.motion.sitPlaybackSeconds/kTavernSitDurationSeconds;
         c.companionSource=Tuple{kit.x,kit.y+kCompanionSpeechHeight-.27f*lowering,kit.z};
+    }
+    if(c.tavernInReach && c.kitSeated && c.companionSource && chapterTerrain_ &&
+       chapterTerrainGeneration_==worldRoute_.generation &&
+       chapterDialogue_.State().tavernConversationLinesResolved==kTavernConversation.size()) {
+        const auto& kitVoice=*c.companionSource;
+        c.kitTreasureTopicInReach=ChapterTargetInReach(c,{kitVoice.x,kitVoice.y,kitVoice.z},2.65f,.93f);
     }
     if(c.tavernInReach && c.kitSeated && c.companionSource && waysideArchive_.lanternRevealStarted) {
         const auto source=HeldRewardLanternSource();

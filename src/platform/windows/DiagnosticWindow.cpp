@@ -225,6 +225,7 @@ std::filesystem::path gBellwetherVoiceDirectory;
 bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
 bool gBellwetherFollowOnAudition = false;
+bool gBellwetherHearthAudition = false;
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
@@ -1730,12 +1731,14 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
     };
     if (!admitOptional(horde::audio::kBellwetherArrivalAuditionCuts, gBellwetherArrivalAudition) ||
         !admitOptional(horde::audio::kBellwetherSalvagerAuditionCuts, gBellwetherSalvagerAudition) ||
-        !admitOptional(horde::audio::kBellwetherFollowOnAuditionCuts, gBellwetherFollowOnAudition)) return false;
+        !admitOptional(horde::audio::kBellwetherFollowOnAuditionCuts, gBellwetherFollowOnAudition) ||
+        !admitOptional(horde::audio::kBellwetherHearthAuditionCuts, gBellwetherHearthAudition)) return false;
     gBellwetherVoiceDirectory = root;
     std::cerr << "Bellwether private Kit WAVs verified.\n";
     if (gBellwetherArrivalAudition) std::cerr << "Bellwether private arrival audition WAVs verified.\n";
     if (gBellwetherSalvagerAudition) std::cerr << "Bellwether private salvager audition WAVs verified.\n";
     if (gBellwetherFollowOnAudition) std::cerr << "Bellwether private follow-on audition WAVs verified.\n";
+    if (gBellwetherHearthAudition) std::cerr << "Bellwether private hearth audition WAVs verified.\n";
     return true;
 }
 
@@ -2666,7 +2669,7 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 #if defined(_DEBUG)
     if (!gBellwetherVoiceDirectory.empty() &&
         horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
-            gBellwetherSalvagerAudition, gBellwetherFollowOnAudition))
+            gBellwetherSalvagerAudition, gBellwetherFollowOnAudition, gBellwetherHearthAudition))
         privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
 #endif
     if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))
@@ -2867,7 +2870,8 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     // Vulkan's independently presented scene. The native alpha sprite owns paint.
     if (!context.subtitleBitmapCurrent || !(paint == context.subtitlePaintKey))
     {
-        if (text != context.subtitlePaintKey.text) SetWindowTextA(subtitle, text.c_str());
+        if (text != context.subtitlePaintKey.text)
+            SetWindowTextW(subtitle, horde::platform::windows::WindowsSubtitleWideText(text).c_str());
         const HFONT font = reinterpret_cast<HFONT>(SendMessageA(subtitle, WM_GETFONT, 0, 0));
         context.subtitleBitmapCurrent = horde::platform::windows::PresentSubtitleBitmap(subtitle, paint, font);
         if (context.subtitleBitmapCurrent) context.subtitlePaintKey = paint;
@@ -3719,6 +3723,10 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     else if(chapterInteract && snapshot.tavernDoorAction!=horde::gameplay::bellwether::DoorAction::None) {
         text = snapshot.tavernDoorAction==horde::gameplay::bellwether::DoorAction::Open
             ? "LEFT-CLICK / A TO OPEN THE TAVERN DOOR" : "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR";
+    }
+    else if(chapterInteract && snapshot.kitTreasureTalkAvailable) {
+        text = "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE";
+        context.tavernInteractionPromptPresented=visible;
     }
     else if(chapterInteract && snapshot.tavernLanternFittingAvailable) {
         text = "LEFT-CLICK / A TO FIT LANTERN HINGE";
@@ -14393,7 +14401,8 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     SendMessageA(subtitleSizeSlider, TBM_SETTICFREQ, 10, 0);
     SendMessageA(subtitleSizeSlider, TBM_SETPOS, TRUE, 100);
     createButton(kSubtitlePositionButtonId, "SUBTITLE POSITION: AUTO");
-    if (HWND subtitle = createStatic(kChapterSubtitleId, "", SS_OWNERDRAW | SS_NOTIFY))
+    if (HWND subtitle = CreateWindowExW(0,L"STATIC",L"",WS_CHILD | SS_OWNERDRAW | SS_NOTIFY,
+            0,0,0,0,hWnd,reinterpret_cast<HMENU>(static_cast<INT_PTR>(kChapterSubtitleId)),instance,nullptr))
         SetWindowLongPtrA(subtitle, GWL_EXSTYLE,
             GetWindowLongPtrA(subtitle, GWL_EXSTYLE) | WS_EX_LAYERED);
     SetControlVisible(hWnd, kChapterSubtitleId, false);

@@ -82,7 +82,7 @@ FireEmitterState MakeOpeningTorchFireEmitter();
 FireEmitterState MakeWorldTorchFireEmitter(std::uint32_t stableId, std::uint32_t seed);
 // The caller reserves held-light slots before offering the remaining world roster.
 void IncludeNearbyWorldFire(std::span<FireEmitterState> worldSlots, const FireEmitterState& candidate,
-                            float eyeX, float eyeZ) noexcept;
+                            float eyeX, float eyeZ, float admissionRadius=kDefaultFireViewDistance) noexcept;
 void ResetFireEmitter(FireEmitterState& state);
 void StepFireEmitterFixed(FireEmitterState& state,
                           const FireEmitterFixedStepInput& input,

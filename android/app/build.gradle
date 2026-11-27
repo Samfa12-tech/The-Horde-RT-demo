@@ -166,7 +166,14 @@ def bellwetherFollowOnAuditionWavs = [
     'private_bellwether_voice/kit.royal_claim.help.wav': '3bf0390321c7abf02f5faf13f02773f3b560fd74f2aef1b42f9f14f753e6e817',
     'private_bellwether_voice/hub.ordinary_sale.wav': '7f045c4859e64d7dd79d9d813cffb5cb49f66e7d999dc2a70107beac683e05b7'
 ]
+def bellwetherHearthAuditionWavs = [
+    'private_bellwether_voice/hub.kit_stake.wav': '9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82',
+    'private_bellwether_voice/kit.personal_stake.key.wav': 'd82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0'
+]
 def bellwetherFollowOnAudition = bellwetherVoiceDirectory && bellwetherFollowOnAuditionWavs.keySet().any {
+    new File(bellwetherVoiceDirectory, it).isFile()
+}
+def bellwetherHearthAudition = bellwetherVoiceDirectory && bellwetherHearthAuditionWavs.keySet().any {
     new File(bellwetherVoiceDirectory, it).isFile()
 }
 if (bellwetherVoiceDirectory) {
@@ -182,6 +189,7 @@ if (bellwetherVoiceDirectory) {
     if (bellwetherArrivalAudition) pinned.putAll(bellwetherArrivalAuditionWavs)
     if (bellwetherSalvagerAudition) pinned.putAll(bellwetherSalvagerAuditionWavs)
     if (bellwetherFollowOnAudition) pinned.putAll(bellwetherFollowOnAuditionWavs)
+    if (bellwetherHearthAudition) pinned.putAll(bellwetherHearthAuditionWavs)
     verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
 }
 if (bellwetherPlaytest && !(bellwetherCombinedResidents && bellwetherRelicDealer &&
@@ -896,6 +904,7 @@ android {
         buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', 'false'
         buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', 'false'
         buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_HEARTH_AUDITION', 'false'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
@@ -947,6 +956,7 @@ android {
             buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', bellwetherFollowOnAudition ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_HEARTH_AUDITION', bellwetherHearthAudition ? 'true' : 'false'
             if (bellwetherResidentDirectory) {
                 def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
                     bellwetherRelicDealer ? '.debug.bellwether.dealer' :

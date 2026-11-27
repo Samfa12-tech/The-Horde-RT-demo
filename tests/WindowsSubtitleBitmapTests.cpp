@@ -23,6 +23,8 @@ int main() {
         OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,ANTIALIASED_QUALITY,DEFAULT_PITCH|FF_ROMAN,"Georgia");
     Check(font!=nullptr,"real GDI font");
     SubtitlePaintKey key{WindowsSubtitleCaption("Keeper","Come closer"),600,60,22,false};
+    Check(WindowsSubtitleWideText("Kit: I\xE2\x80\x99ve had worse reasons.")==L"Kit: I\u2019ve had worse reasons.",
+          "the subtitle control and glyph painter receive the authored Unicode punctuation");
     auto pixels=RasterizeSubtitle(key,font);
     Check(pixels.size()==36000 && pixels.front()==0 && pixels.back()==0,"no normal-play plaque/backing");
     unsigned visible=0,opaque=0;

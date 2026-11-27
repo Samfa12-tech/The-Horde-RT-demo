@@ -14,6 +14,7 @@
 #include "scene/assets/WorldTriangleKey.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "../assets/models/world/source/bellwether-hearth-service-v1/geometry.generated.h"
+#include "../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
 #include <algorithm>
 #include <cstring>
 #include <cmath>
@@ -265,11 +266,15 @@ int main(int argc,char** argv) {
         }
         check(world.indices.size()==before.indices.size()+(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3,
             "the complete bounded town and tavern geometry is rendered");
+        using namespace horde::gameplay::bellwether;
+        check(kSquareWaymarkerSolidTriangles==1972u &&
+              kSquareWaymarkerSignTriangles==752u && kSquareWaymarkerCaskTriangles==1100u &&
+              kSquareWaymarkerLampTriangles==120u,
+            "the south square fingerpost and paired cask keep their authored solid triangle budgets");
         check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");
         check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles+kBellwetherGlazingTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "render contact preserves the authored distinction between solids and walkable surfaces");
-        using namespace horde::gameplay::bellwether;
         {
             using namespace horde::gameplay::traversal;
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
@@ -310,6 +315,18 @@ int main(int argc,char** argv) {
                       ground.worldY+.05f,ground.worldY+1.8f,radius),
                   "the covered well joins the opaque town collision and blocks a player sweep across its footprint");
             const auto square=kBellwetherTavernRoute[kBellwetherWestJunction];
+            const auto markerGround=support->Query(kSquareWaymarkerPost[0],kSquareWaymarkerPost[2]);
+            check(markerGround.found && !support->NonWalkableVolumeClear(kSquareWaymarkerPost[0],kSquareWaymarkerPost[2],
+                    kSquareWaymarkerPost[0],kSquareWaymarkerPost[2],
+                    markerGround.worldY+.18f,markerGround.worldY+2.4f,.18f),
+                  "the south square fingerpost has grounded authored contact without becoming walkable");
+            for(const auto [x,z]:std::array{BellwetherStation{82.3f,131.7f},
+                                           BellwetherStation{80.8f,130.5f},
+                                           BellwetherStation{83.6f,133.6f}}) {
+                const auto routeContact=support->Query(x,z);
+                check(routeContact.found && routeContact.walkable,
+                      "the decision-point route mouths remain grounded and walkable around the marker");
+            }
             const auto follow=[&](BellwetherStation start, BellwetherStation target) {
                 auto point=start;
                 auto contact=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f);

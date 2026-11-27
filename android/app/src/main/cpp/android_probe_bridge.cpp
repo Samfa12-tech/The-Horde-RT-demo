@@ -1348,6 +1348,10 @@ void PublishSimulationUiState()
         contextualControls |= (static_cast<int>(simulation.tavernDoorAction) << 22) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
         contextualControls |= (1 << 14) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.kitTreasureTalkAvailable) {
+        // Optional action 6 shares the interact-label field with the grate and tally.
+        contextualControls |= INT32_MIN | (6 << 25) | 1;
+    }
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
         contextualControls |= (1 << 15) | 1;
     else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernLanternFittingAvailable) {
@@ -2320,7 +2324,7 @@ bool ApplyDebugCheckpointSimulation(
             __android_log_print(ANDROID_LOG_ERROR, kTag,
                 "HORDE_CHECKPOINT_STAGE_FAILED id=%d requested=%s tick=%llu chapter=%d "
                 "reason=%s admission_world_generation=%llu admission_terrain_generation=%llu "
-                "scene_ready=%d scene_terrain=%d",
+                "scene_ready=%d scene_terrain=%d player_x=%.3f player_z=%.3f",
                 selection.checkpoint.id, selection.checkpoint.name,
                 static_cast<unsigned long long>(gGameSimulation.Snapshot().tickIndex),
                 gGameSimulation.Snapshot().developmentRescueJourney ? 1 : 0,
@@ -2328,7 +2332,12 @@ bool ApplyDebugCheckpointSimulation(
                 static_cast<unsigned long long>(evidence.worldGeneration),
                 static_cast<unsigned long long>(evidence.terrainGeneration),
                 context.rtScene.IsReady() ? 1 : 0,
-                context.rtScene.ChapterTerrainSurface() ? 1 : 0);
+                context.rtScene.ChapterTerrainSurface() ? 1 : 0,
+                static_cast<double>(gGameSimulation.Snapshot().playerX),
+                static_cast<double>(gGameSimulation.Snapshot().playerZ));
+            if (evidence.blockedWalkTarget)
+                __android_log_print(ANDROID_LOG_ERROR, kTag, "HORDE_CHECKPOINT_WALK_BLOCKED target_x=%.3f target_z=%.3f",
+                    static_cast<double>((*evidence.blockedWalkTarget)[0]),static_cast<double>((*evidence.blockedWalkTarget)[1]));
             return false;
         }
         if (selection.development->combatPose ==

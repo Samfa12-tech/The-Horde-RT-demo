@@ -321,6 +321,13 @@ bool TestGardenWindowSharesWorldLightBudget()
     IncludeNearbyWorldFire(nearby,Emitter(4,1.f,ShowcaseZone::Outside),0.f,0.f);
     ok &= Require(nearby[0].stableId==1 && nearby[1].stableId==2 && nearby[2].stableId==3,
                   "all in-range primary sources keep their slots, including a flame on the radius");
+    const auto squareWick=Emitter(4,2.f,ShowcaseZone::Outside);
+    IncludeNearbyWorldFire(std::span{nearby}.first(2),squareWick,0.f,0.f,9.f);
+    ok &= Require(nearby[0].stableId==4 && nearby[1].stableId==2 && nearby[2].stableId==3,
+                  "a close lamp can replace a distant indoor wick while the reserved street lamp stays lit");
+    IncludeNearbyWorldFire(std::span{nearby}.first(2),edge,0.f,0.f,9.f);
+    ok &= Require(nearby[0].stableId==4 && nearby[1].stableId==2,
+                  "a lamp outside the local admission radius leaves that pair alone");
     return ok;
 }
 
