@@ -134,12 +134,15 @@ void* operator new[](const std::size_t size,
 }
 void operator delete(void* value) noexcept { std::free(value); }
 void operator delete[](void* value) noexcept { std::free(value); }
+#if defined(__cpp_sized_deallocation)
 void operator delete(void* value, const std::size_t) noexcept { std::free(value); }
 void operator delete[](void* value, const std::size_t) noexcept { std::free(value); }
+#endif
 void operator delete(void* value, const std::nothrow_t&) noexcept { std::free(value); }
 void operator delete[](void* value, const std::nothrow_t&) noexcept { std::free(value); }
 void operator delete(void* value, const std::align_val_t) noexcept { FreeAligned(value); }
 void operator delete[](void* value, const std::align_val_t) noexcept { FreeAligned(value); }
+#if defined(__cpp_sized_deallocation)
 void operator delete(void* value, const std::size_t, const std::align_val_t) noexcept
 {
     FreeAligned(value);
@@ -148,6 +151,7 @@ void operator delete[](void* value, const std::size_t, const std::align_val_t) n
 {
     FreeAligned(value);
 }
+#endif
 void operator delete(void* value, const std::align_val_t, const std::nothrow_t&) noexcept
 {
     FreeAligned(value);

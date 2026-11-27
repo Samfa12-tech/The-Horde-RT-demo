@@ -86,10 +86,15 @@ class KitAudioTests(unittest.TestCase):
         manifest = json.loads((ROOT / "assets/audio/kit/runtime/asset.manifest.json").read_text())
         catalog = (ROOT / "src/gameplay/dialogue/ChapterDialogue.h").read_text()
         rows = re.findall(r'\{Line::\w+,"([^"]+)","Kit","([^"]+)","([^"]*)",([0-9.]+)f,\d+\}', catalog)
-        self.assertEqual(len(rows), 15)
         by_id = {row[0]: row for row in rows}
         guide = json.loads((ROOT / "assets/audio/kit/runtime/flask-guidance.manifest.json").read_text())
-        for cut in manifest["cuts"] + guide["cuts"]:
+        admitted_cuts = manifest["cuts"] + guide["cuts"]
+        admitted_ids = {cut["stableId"] for cut in admitted_cuts}
+        catalog_audio_ids = {row[0] for row in rows if row[2]}
+        self.assertEqual(len(rows), len(by_id), "Kit dialogue IDs remain unique as the caption-only roster grows")
+        self.assertEqual(catalog_audio_ids, admitted_ids,
+                         "only exactly admitted runtime clips have native audio paths")
+        for cut in admitted_cuts:
             _, text, audio, duration = by_id[cut["stableId"]]
             self.assertEqual(text, cut["text"])
             self.assertEqual(audio, "assets/audio/kit/runtime/" + cut["runtimeFile"])
