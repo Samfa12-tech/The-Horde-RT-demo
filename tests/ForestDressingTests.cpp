@@ -1991,14 +1991,67 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             input.yawRadians=std::atan2(kKeeperHearth[0]-state.playerX,state.playerZ-kKeeperHearth[2]);step();
             Check(state.tavernLanternFittingAvailable && state.treasurePurse==earned,
                   "the funded fitting is available beside the keeper before committing any coins");
+            const auto keeperHeadingToPlayer=std::atan2(state.playerX-state.tavernKeeper->foot[0],
+                state.tavernKeeper->foot[2]-state.playerZ);
+            const auto keeperYawBeforeApproach=state.tavernKeeper->yaw;
+            const auto revisionBeforeAcknowledgement=game.CampaignBoundaryRevision();
+            step();
+            const auto& acknowledging=game.Snapshot().tavernKeeper;
+            const auto initialPlayerError=std::abs(std::remainder(keeperHeadingToPlayer-keeperYawBeforeApproach,6.28318530718f));
+            const auto currentPlayerError=acknowledging?std::abs(std::remainder(
+                keeperHeadingToPlayer-acknowledging->yaw,6.28318530718f)):0.f;
+            const auto firstTurn=acknowledging?std::abs(std::remainder(
+                acknowledging->yaw-keeperYawBeforeApproach,6.28318530718f)):100.f;
+            constexpr float turnRadiansPerTick=1.5f/60.f;
+            const auto halfTurnTicks=static_cast<unsigned>(std::ceil(std::acos(-1.f)/turnRadiansPerTick));
+            Check(acknowledging && firstTurn<=turnRadiansPerTick+.0001f && currentPlayerError<initialPlayerError &&
+                  game.CampaignBoundaryRevision()==revisionBeforeAcknowledgement,
+                  "the keeper starts a bounded fixed-step turn toward a nearby service visitor without changing the save");
+            for(unsigned tick=0;tick<halfTurnTicks;++tick)step();
+            const auto& facingVisitor=game.Snapshot().tavernKeeper;
+            const auto visitorError=facingVisitor?std::abs(std::remainder(
+                keeperHeadingToPlayer-facingVisitor->yaw,6.28318530718f)):100.f;
+            Check(facingVisitor && visitorError<.02f && state.chapterDialogue.line==Line::None &&
+                  game.CampaignBoundaryRevision()==revisionBeforeAcknowledgement,
+                  "the keeper settles toward the visitor before a fitting line without starting progression");
             ++input.commands.interact;step();
             const cp::TreasurePurse fitted{earned.coins-cp::TreasurePurse::kLanternFittingPrice,true,true};
             const auto bought=game.LatestCampaignBoundary();
+            const auto revisionAfterPurchase=game.CampaignBoundaryRevision();
             Check(state.chapterDialogue.line==Line::TavernLanternFitting && state.treasurePurse==fitted &&
                   bought && rewarded && bought->schema==cp::kMillPreparationSchema && bought->treasurePurse==fitted &&
                   bought->position.x==rewarded->position.x && bought->position.z==rewarded->position.z &&
                   bought->vitality==rewarded->vitality && bought->flask==rewarded->flask,
                   "one fitting purchase saves its debit and ownership at the earned return point");
+            for(unsigned tick=0;tick<20;++tick)step();
+            const auto& duringFitting=game.Snapshot().tavernKeeper;
+            const auto fittingVisitorError=duringFitting?std::abs(std::remainder(
+                keeperHeadingToPlayer-duringFitting->yaw,6.28318530718f)):100.f;
+            Check(duringFitting && fittingVisitorError<.02f &&
+                  state.chapterDialogue.line==Line::TavernLanternFitting,
+                  "the keeper continues attending the visitor through the fitting line");
+            input.moveForward=1;input.runHeld=true;
+            const auto departed=walkTo({88.5f,kBellwetherLanternFittingApproach.z});
+            input.moveForward=0;input.runHeld=false;
+            for(unsigned tick=0;tick<halfTurnTicks;++tick)step();
+            const auto& facingKit=game.Snapshot().tavernKeeper;
+            const auto kitError=facingKit?std::abs(std::remainder(
+                kKeeperHearthFacingRadians-facingKit->yaw,6.28318530718f)):100.f;
+            Check(departed && state.chapterDialogue.line==Line::None && facingKit && kitError<.02f &&
+                  game.CampaignBoundaryRevision()==revisionAfterPurchase,
+                  "after the visitor leaves the service radius the keeper smoothly returns to Kit's authored facing without another save");
+            {
+                sim::GameSimulation restored(config);
+                std::optional<cp::RestoreToken> restoreToken;
+                if(bought)restoreToken=restored.BeginCampaignRestore(*bought);
+                const bool reopened=restoreToken && restored.CommitCampaignRestore(*restoreToken,
+                    {restoreToken->worldGeneration,bought->zone},terrain,input);
+                const auto& restoredKeeper=restored.Snapshot().tavernKeeper;
+                Check(reopened && restoredKeeper && restoredKeeper->stage==TavernKeeperStage::AtHearth &&
+                      std::abs(std::remainder(restoredKeeper->yaw-kKeeperHearthFacingRadians,6.28318530718f))<.001f &&
+                      restored.Snapshot().treasurePurse==fitted,
+                      "a normal campaign restoration keeps the fitting purchase and restores the keeper's authored hearth pose");
+            }
             ++input.commands.dialogueSkip;step();
             ++input.commands.interact;step();
             Check(!state.tavernLanternFittingAvailable && state.treasurePurse==fitted,

@@ -4921,3 +4921,75 @@ save and preference check. The pose overlay was enabled by launch intent
 and may still be visible if that same process resumes. Screenshots, touch
 inputs, original hashes and thermal readings are retained locally in
 `reports/horde-android-west-trade-20261127-210346`.
+
+### 27 November 2026 — Church-fork silver, west-lane sale and hearth fitting
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17/API 37), the private ARM64 APK
+from `3c52fbc2` had SHA-256
+`bf5aafbb25208dc5b1f3f13447be96479c1cd2c036df6c3367fc97ad860c2bce`.
+RayTracingPipeline presented at 33%, tracing 475 × 980 for a 1440 × 2971
+portrait surface. **Play → Continue → Slot 1** loaded an isolated copy of
+the earned tavern save. Normal touch input took the player out the south
+door and down the ramp past the well. The return walk crossed the same door
+from the other side.
+
+At the church fork the on-screen **Take ordinary silver** action collected
+the visible cup. The player carried it back along the public lane and sold
+it at the west counter for the quoted two coins. The autosave recorded the
+cup as sold and a balance of two. Back at the hearth, **Fit lantern hinge
+(2 coins)** spent both. **Pause → Load checkpoint → Continue** returned the
+player to the hearth. Directions showed the fitted hinge, the completed sale
+and an empty purse. The register reward remained unclaimed and the reloaded
+autosave matched the post-purchase bytes.
+
+The dealer faced the customer across the counter. From the fitting mark,
+the tavern keeper offered the purchase with her back to the player. The
+private device captures, UI text, touch positions and save checksums are
+in `reports/horde-android-west-eaves-20261127-225120/`. The seven existing
+saves retained their hashes during the walkthrough.
+
+On the same phone the private `9053c248` APK had SHA-256
+`ba3e93262e202c524307b26fb162a44057c7b73ee32d09f74f3ac128cb48ceb3`.
+In a fresh test namespace the player loaded a copy of the two-coin save from
+the dealer and walked back to the keeper. From X/Z (86.61, 110.21) the
+keeper turned to face the customer. The previous view was from (86.73,
+110.10) beside the same hearth. Both captures show the two-coin offer with
+the pose overlay off. Tapping it on the updated build saved the fitted hinge,
+sold cup and zero coins. The opening tavern conversation was already complete
+in both runs.
+
+The private app was stopped after the comparison. All seven pre-existing
+saves matched their original hashes, and the app's original Android framework
+preference file was restored and verified. The unedited views are
+`hinge-before.png` and `candidate-fitting-front.png` in the local report
+above.
+
+**Controlled west-route performance, partial.** The same `9053c248` APK ran
+the two-return tavern-to-stock-yard test at 33% using RayTracingPipeline,
+Shipping/Mobile, with GPU stage timestamps. It reached the stock yard twice
+and returned to the tavern once. The second inbound walk was at station 7
+when the 240-second native deadline expired. The full-route verifier rejected
+the unfinished return. An earlier attempt on `3c52fbc2` stopped at the host
+watcher's 190-second limit and is excluded.
+
+The [captured native rows](evidence/2026-11-27-bellwether-west-keeper/partial-west-route.csv.gz)
+cover 2,943 consecutive submissions. Each row has matching GPU, stage,
+completion and successful presentation serials. After the first five seconds,
+2,885 samples remained. These measurements describe the recorded phases of
+this interrupted run.
+
+| Phase | Frames | Median GPU time | 95th percentile GPU time | Median RT dispatch |
+| --- | ---: | ---: | ---: | ---: |
+| Hearth room | 242 | 95.64 ms | 101.80 ms | 95.01 ms |
+| Outbound doorway and lane | 1,176 | 69.21 ms | 149.59 ms | 68.39 ms |
+| Stock yard | 720 | 51.94 ms | 59.02 ms | 51.27 ms |
+| Inbound lane and doorway | 747 | 67.14 ms | 100.83 ms | 66.50 ms |
+
+RT dispatch accounted for a median 99.3% of hearth GPU time. That makes the
+staffed hearth the first place to isolate shader cost on this handset. The
+current HAL reported thermal status 0 at the start and 1 at the end. Skin
+temperature rose from 36.3 to 39.8 °C and battery temperature from 35.3 to
+38.2 °C. This run provides neither a before/after comparison for the keeper
+turn nor a sustained frame-rate result. The nine pre-existing report files
+were verified after restoring changed files. The app was stopped, with the
+original seven saves and preference hash verified.

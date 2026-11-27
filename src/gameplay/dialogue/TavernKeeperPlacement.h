@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/dialogue/ResidentYaw.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
 #include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
@@ -35,6 +36,15 @@ public:
     static constexpr float kBodyRadius = .28f;
     static constexpr float kBodyHeight = 1.78f;
     const std::optional<TavernKeeperPose>& Pose() const { return pose_; }
+
+    void TurnAtHearth(float seconds,bool attending,float visitorX,float visitorZ) {
+        if(!pose_ || pose_->stage!=TavernKeeperStage::AtHearth || !std::isfinite(visitorX) ||
+           !std::isfinite(visitorZ))return;
+        const float dx=visitorX-pose_->foot[0],dz=visitorZ-pose_->foot[2];
+        const float target=attending && std::hypot(dx,dz)>.001f ? std::atan2(dx,-dz) :
+            bellwether::kKeeperHearthFacingRadians;
+        pose_->yaw=TurnResidentYaw(pose_->yaw,target,seconds,1.5f);
+    }
 
     bool RestoreAtHearth(const simulation::TriangleSupportSurface& terrain) {
         *this = {};

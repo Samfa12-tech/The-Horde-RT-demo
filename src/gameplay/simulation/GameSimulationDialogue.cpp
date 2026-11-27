@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "gameplay/dialogue/ResidentYaw.h"
 #include "gameplay/traversal/BellwetherEastRoute.h"
 #include "gameplay/traversal/BellwetherNorthRoute.h"
 #include "audio/KitAnkleAudio.h"
@@ -680,6 +681,10 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         tavernKeeper_.Step(seconds,arrival==BellwetherArrivalStage::Seated,*terrain);
     EnsureBellwetherResidentPoses();
     auto c=ChapterInteractionContext(input.paused);
+    if(tavernKeeper_.Pose() && c.keeperAtHearth && c.companionSource && !c.paused && c.alive &&
+       !c.traversing && !c.combat &&
+       chapterDialogue_.State().tavernConversationLinesResolved==kTavernConversation.size())
+        tavernKeeper_.TurnAtHearth(seconds,c.tavernFittingInReach,c.player.x,c.player.z);
     if(salvager_ && c.salvagerSource && !c.paused && c.alive && !c.traversing) {
         auto& pose=*salvager_;
         pose.idleSeconds+=seconds;
@@ -689,10 +694,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         const float dx=c.player.x-pose.foot[0],dz=c.player.z-pose.foot[2];
         const float target=attending && std::hypot(dx,dz)>.001f?
             std::atan2(dx,-dz):bellwether::kSalvagerRestYaw;
-        constexpr float fullTurn=6.28318530718f;
-        const float limit=1.5f*seconds;
-        const float turn=std::remainder(target-pose.yaw,fullTurn);
-        pose.yaw=std::remainder(pose.yaw+std::clamp(turn,-limit,limit),fullTurn);
+        pose.yaw=TurnResidentYaw(pose.yaw,target,seconds,1.5f);
     }
     if(recordKeeper_ && !c.paused && c.alive && !c.traversing) {
         auto& keeper=*recordKeeper_;
@@ -702,10 +704,7 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
             ((line==Line::None && c.recordKeeperInReach) || IsRecordKeeperLine(line));
         const float dx=c.player.x-keeper.foot[0],dz=c.player.z-keeper.foot[2];
         const float target=attending && std::hypot(dx,dz)>.001f?std::atan2(dx,-dz):kRecordKeeperRestYaw;
-        constexpr float turnRadiansPerSecond=1.5f,fullTurn=6.28318530718f;
-        const float turnLimit=turnRadiansPerSecond*seconds;
-        const float turn=std::remainder(target-keeper.yaw,fullTurn);
-        keeper.yaw=std::remainder(keeper.yaw+std::clamp(turn,-turnLimit,turnLimit),fullTurn);
+        keeper.yaw=TurnResidentYaw(keeper.yaw,target,seconds,1.5f);
     }
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {
