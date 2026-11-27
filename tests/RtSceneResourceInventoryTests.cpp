@@ -1721,7 +1721,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kBellwetherStockSolidTriangles+
             horde::gameplay::bellwether::kMillBenchLampSolidTriangles+
             horde::gameplay::bellwether::kBellwetherPathGroundTriangles+
-            horde::gameplay::bellwether::kSquareFrontageSolidTriangles &&
+            horde::gameplay::bellwether::kSquareFrontageSolidTriangles+
+            horde::gameplay::bellwether::kWestTradeSolidTriangles &&
             support->NonWalkableTriangleCount()<=support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
         std::cout << "Combined forest and town native support: " << supportTriangles
                   << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';

@@ -1215,3 +1215,10 @@ record the derivation from the mapped town and terrain.
 The [church fork waymarker](assets/models/world/source/bellwether-church-waymarker-v1/README.md)
 repositions the original Horde timber post, arrow and hand-authored CHURCH
 lettering from the same Bellwether master. It uses the existing town finishes.
+
+## Bellwether west trade furnishings - 27 November 2026
+
+Samfa12/Codex authored the dealer's spoked handcart, sealed pottery and
+equal-arm balance in Blender for Horde. They reuse the existing Bellwether
+material rows. The [editable master, recipe and export receipt](assets/models/world/source/bellwether-west-trade-v1/README.md)
+record the original geometry and its integration into the town.

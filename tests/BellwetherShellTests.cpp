@@ -336,6 +336,23 @@ int main(int argc,char** argv) {
                   "the suspended lamp has a clear path to the tankard relief");
             const auto& garden=kBellwetherGardenApproach;
             const auto stall=kBellwetherWestApproach[1];
+            const auto westLane=kBellwetherWestApproach.front();
+            for(float side : {-1.f,1.f}) {
+                const BellwetherStation entry{westLane.x,westLane.z+side*.6f};
+                const BellwetherStation cartSide{65.12f,westLane.z+side*.6f};
+                // The stall's corner pier stands beside the turn into the south opening.
+                const BellwetherStation corner{63.65f,stall.z+side*.38f};
+                const BellwetherStation turn{stall.x,stall.z+side*.38f};
+                check(follow(entry,cartSide) && follow(cartSide,corner) && follow(corner,turn) &&
+                      follow(turn,corner) && follow(corner,cartSide) && follow(cartSide,entry),
+                      "both shoulders pass the handcart and round the corner pier in both directions");
+            }
+            const auto cartGround=support->Query(65.12f,129.36f);
+            check(cartGround.found && !support->NonWalkableVolumeClear(65.12f,130.65f,65.12f,129.36f,
+                    cartGround.worldY+.1f,cartGround.worldY+1.35f,radius),
+                  "the cart has physical contact at the loading bay");
+            check(follow(stall,kBellwetherRelicDealerApproach) && follow(kBellwetherRelicDealerApproach,stall),
+                  "the dealer's counter and the west through-lane remain connected");
             check(follow(stall,garden[0]) && follow(garden[0],garden[1]) && follow(garden[1],garden.back()) &&
                   follow(garden.back(),kBellwetherGardenView) && follow(kBellwetherGardenView,garden.back()) &&
                   follow(garden.back(),kBellwetherGardenAisle) && follow(kBellwetherGardenAisle,garden.back()) &&

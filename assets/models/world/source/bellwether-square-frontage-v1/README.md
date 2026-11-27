@@ -16,7 +16,7 @@ additional collision triangles. The current engine keeps normals on
 ground and step faces and stores static obstacles with their exact vertices
 and bounding-volume hierarchy. At the full forest and town intake, 41,980
 ground faces and 20 step faces leave capacity for 139,587 static obstacle
-faces. The current scene uses 121,788, leaving 17,799 for additional
+faces. The square frontage checkpoint used 121,788, leaving 17,799 for additional
 obstacles. Adding walkable ground or steps changes this allowance.
 
 To regenerate, extract `bellwether-tavern-v1.glb` and its sibling

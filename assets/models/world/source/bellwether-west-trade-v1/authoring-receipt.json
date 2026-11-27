@@ -1,0 +1,18 @@
+{
+  "feature": "Relic dealer's loading cart and counter balance",
+  "originalTownSha256": "f63849a8c080ad3e8ea0457739648d46d02620da4562a41a6f2b864cd9cc2a10",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "35decf1c875b08bbf212a114c7e71fb7d9da87635aaa1333d59bf7aa30fb5337",
+  "addedSolidTriangles": 2360,
+  "townVertices": 69632,
+  "townTriangles": 32864,
+  "recipeSha256": "4b868eae87ac74be663b82f7291eb91ad82e8f9502b805800a857859064939db",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "west-trade.blend": "594a87fd3f712c8961f1b4b87f32d7353d4da2c3b52d3a6a80cab9ebafd94503",
+    "west-trade.glb": "4cbda9235d629cd937943577f10a799198fbb0c6f33cfbd292515131d4f7abc5",
+    "bellwether-tavern-v1.glb": "35decf1c875b08bbf212a114c7e71fb7d9da87635aaa1333d59bf7aa30fb5337",
+    "geometry.generated.h": "63a6dfa110a6b898dea02983799015d5cd08390d880049d7c4076fd6c856ac4b",
+    "asset.manifest.json": "89dc0d72c48dba717739f69ead21f87a54721248fd5534ed0508b038159bf6e5"
+  }
+}
