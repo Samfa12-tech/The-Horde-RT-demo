@@ -229,7 +229,7 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
     bool genericTransmissionActive = genericTransmissionEnabled();
     vec3 localInterfaceTransmittance = localStrength > 0.001
         ? (primaryLocalShadowSamples() > 1
-            ? areaLightTransmittance(h, localPosition, true)
+            ? areaLightTransmittance(h, localPosition, true, false)
             : sceneShadowTransmittanceMask(offsetRayOrigin(h, localDirection),
                                   localDirection, localDistance - 0.02, 0x35u))
         : vec3(0.0);

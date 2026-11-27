@@ -5111,6 +5111,49 @@ records, screenshot hashes, and the frame and GPU clock CSV filenames with
 their uncompressed checksums. Both test packages and the temporary sampler
 were removed after the final control.
 
+### 28 November 2026 — Early exit for direct fire shadow rays
+
+One private ARM64 trial ended binary fire visibility queries on the first
+triangle that the existing material test classifies as an opaque blocker.
+It returned a blocked sample without confirming an intersection. The 33%
+Shipping/Mobile OpaqueFast RayTracingPipeline control and trial used the same
+290 runtime assets, four fire lights, 45 TLAS instances and 38 BLAS owners.
+The dispatch measured 475 × 980 with glass disabled. Their frozen 1440 × 3120
+RGB screenshots matched pixel for pixel.
+
+The table uses simulation ticks 12,546–12,906 from the first staffed-hearth
+hold. Each included row joins submission, completion, GPU stage and present
+serials. The matched subset uses frames bracketed by two device clock
+samples at 1300 MHz and thermal power level 0. The reads occurred at 5 Hz
+and can miss a change between samples.
+
+| Build in run order | Joined frames | RT dispatch median / p95 | Matched clock frames | Matched dispatch median / p95 |
+| --- | ---: | ---: | ---: | ---: |
+| Control | 91 | 76.03 / 157.51 ms | 85 | 75.89 / 77.41 ms |
+| Trial | 90 | 61.59 / 62.79 ms | 90 | 61.59 / 62.79 ms |
+| Control | 91 | 76.01 / 77.43 ms | 91 | 76.01 / 77.43 ms |
+| Trial | 90 | 61.68 / 64.60 ms | 90 | 61.68 / 64.60 ms |
+
+The two trial medians were about 19% lower than the controls at the matched
+clock. Android thermal status started at 0 for the first control and 1 for
+the remaining arms. This is a short dispatch measurement on one handset
+and scene. The candidate RayQueryCompute shader passed Vulkan 1.2 validation.
+Handset timings cover RayTracingPipeline only.
+
+In a separate full-route pair, the trial began at 37.4 °C skin temperature
+and reached the hearth for its second return at 237.99 seconds. The 240-second
+deadline interrupted its final 600-tick hold. The control began at 37.8 °C,
+completed one return and was still on the second inbound leg at the same
+deadline. Both attempts ended at Android thermal status 1 and 40.0 °C skin
+temperature. The full pair provides two incomplete route captures. It still
+leaves sustained route acceptance open. The original playtest APK and all
+15 existing saves were verified after restoration.
+
+The [experiment receipt](evidence/2026-11-28-bellwether-hearth-blocker-exit/receipt.json)
+pins the APKs, shader modules, device temperatures, frame CSVs and clock
+samples. The [shader trial diff](evidence/2026-11-28-bellwether-hearth-blocker-exit/trial-source.diff)
+records the candidate source.
+
 ### 28 November 2026 — Reading the Bellwether fingerpost on foot
 
 The private ARM64 Debug build from `ce32058f` ran on the Galaxy S26 Ultra

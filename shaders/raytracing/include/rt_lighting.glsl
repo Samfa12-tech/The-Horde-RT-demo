@@ -868,7 +868,8 @@ vec3 boundedShadowTransmittanceMask(vec3 origin, vec3 direction,
 }
 #endif
 
-float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask,
+                     bool stopAtOpaqueBlocker)
 {
     rayQueryEXT query;
     rayQueryInitializeEXT(query, topLevelAS, gl_RayFlagsNoOpaqueEXT, mask,
@@ -887,10 +888,24 @@ float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
             transparentWorldPane = material == kMaterialClearGlass ||
                                    material == kMaterialWater;
         }
-        if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);
+        if (!transparentWorldPane)
+        {
+            // Only the binary fire-shadow answer is needed once a blocker is found.
+            if (stopAtOpaqueBlocker)
+            {
+                rayQueryTerminateEXT(query);
+                return 0.0;
+            }
+            rayQueryConfirmIntersectionEXT(query);
+        }
     }
     return rayQueryGetIntersectionTypeEXT(query, true) ==
         gl_RayQueryCommittedIntersectionNoneEXT ? 1.0 : 0.0;
+}
+
+float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
+{
+    return visibilityMask(origin, direction, maxDistance, mask, false);
 }
 
 vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
@@ -900,7 +915,7 @@ vec3 sceneShadowTransmittanceMask(vec3 origin, vec3 direction,
     return boundedShadowTransmittanceMask(
         origin, direction, maxDistance, mask);
 #else
-    return vec3(visibilityMask(origin, direction, maxDistance, mask));
+    return vec3(visibilityMask(origin, direction, maxDistance, mask, false));
 #endif
 }
 
@@ -990,7 +1005,8 @@ vec3 areaShadowOffset(int index)
         vec3(0.070, 0.03, -0.045));
     return offsets[clamp(index, 0, 3)];
 }
-vec3 areaLightTransmittance(HitInfo h, vec3 lightPosition, bool primaryReceiver)
+vec3 areaLightTransmittance(HitInfo h, vec3 lightPosition, bool primaryReceiver,
+                            bool directFire)
 {
     int samples = primaryReceiver ? primaryLocalShadowSamples() : 1;
     int first = samples > 1 ? 0 : areaShadowSampleIndex();
@@ -1001,8 +1017,13 @@ vec3 areaLightTransmittance(HitInfo h, vec3 lightPosition, bool primaryReceiver)
         vec3 vector = lightPosition + areaShadowOffset(samples > 1 ? sampleNumber : first) - h.position;
         float distance = length(vector);
         vec3 direction = vector / max(distance, 0.001);
+#if HORDE_GENERIC_TRANSMISSION_VARIANT
         result += sceneShadowTransmittanceMask(offsetRayOrigin(h, direction),
             direction, distance - 0.02, 0x35u);
+#else
+        result += vec3(visibilityMask(offsetRayOrigin(h, direction),
+            direction, distance - 0.02, 0x35u, directFire));
+#endif
     }
     return result / float(samples);
 }
@@ -1138,7 +1159,7 @@ vec3 fireEmitterDirectLighting(HitInfo h, vec3 rayDirection, bool primaryReceive
         // approximation) and matters for the three orthogonal corridor faces.
         if (diffuse <= 0.0 && specular <= 0.0)
             continue;
-        vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);
+        vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver, true);
         float lightVisibility = lightTransmittance.x;
         if (!genericTransmissionActive)
         {
