@@ -2317,6 +2317,23 @@ void TestBellwetherResidentRosters(
     Check(staged && combined.Snapshot().artificer && combined.Snapshot().tavernKeeper,
           "combined admission keeps authored mill checkpoint staging intact");
     if(!staged)return;
+
+    sim::GameSimulation combinedHandoff(combinedConfig);
+    combinedHandoff.SetDevelopmentRescueJourney(true,true);
+    const auto handoffGeneration=combinedHandoff.Snapshot().worldRoute.generation;
+    const auto* handoffView=gameplay::FindDevelopmentCheckpoint("bellwether-record-keeper-handoff");
+    const bool handoffTerrain=combinedHandoff.PublishChapterTerrain(
+        {handoffGeneration,sim::WorldZoneId::TombExterior},terrain);
+    const bool handoffRoster=combinedHandoff.PublishBellwetherResidents(kTownResidentMask);
+    const bool handoffStaged=handoffTerrain && handoffRoster && handoffView &&
+        gameplay::StageDevelopmentCheckpointSimulation(combinedHandoff,*handoffView);
+    const auto& handoffState=combinedHandoff.Snapshot();
+    Check(handoffStaged && handoffState.playerGrounded && handoffState.recordKeeper &&
+          handoffState.tavernKeeper && !handoffState.artificer &&
+          handoffState.chapterDialogue.line==gameplay::dialogue::Line::RecordKeeperRegister &&
+          handoffState.waysideArchive.registerInterpreted,
+          "combined Artificer profile can stage the church handoff when the published town roster includes the record keeper");
+
     const auto tickBefore=combined.Snapshot().tickIndex;
     Check(combined.PublishBellwetherResidents(kEastResidentMask) &&
           combined.Snapshot().tickIndex==tickBefore && combined.Snapshot().artificer && combined.Snapshot().salvager &&

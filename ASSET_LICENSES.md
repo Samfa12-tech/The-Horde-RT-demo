@@ -1276,3 +1276,15 @@ Samfa12/Codex modeled the four carved destination boards, oil bracket and cooper
 ## Bellwether roadside silver - 27 November 2026
 
 Samfa12/Codex authored an original hollow handled silver cup in Blender for the west opening of the roadside cache. The single opaque metallic `WornSilver` material has no textures or emission. The [source master, recipe and receipt](assets/models/world/source/bellwether-road-silver-v1/README.md) document the local-space runtime export and placement. No external asset or third-party licence is involved.
+
+## Bellwether record keeper's shrine directions — 28 November 2026
+
+The two private church takes are from the 12 October record-keeper session.
+The 4 November recording-coverage inventory identifies the individual cuts
+`hub.first_errand` and `hub.shrine_direction` as owner listening-approved
+on 12 October. Both match the playable scripts. The private playtest uses
+24 kHz mono PCM16 derivatives of the PCM24 masters. The [intake receipt](docs/evidence/2026-11-28-bellwether-church/voice-intake.json)
+records the source and runtime hashes, frame counts and sample comparison.
+The uncut audition for the preceding road-mark inspection contains two lines.
+The inspection uses its existing caption. The masters and playable WAVs stay
+in private storage. Release clearance remains open.

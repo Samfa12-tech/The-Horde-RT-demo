@@ -170,12 +170,21 @@ def bellwetherHearthAuditionWavs = [
     'private_bellwether_voice/hub.kit_stake.wav': '9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82',
     'private_bellwether_voice/kit.personal_stake.key.wav': 'd82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0'
 ]
+// Individually pinned optional Bellwether takes share one generated line-ID
+// selection; each can be staged alone, and later reviewed takes need no new flag.
+def bellwetherOptionalVoiceWavs = [
+    'private_bellwether_voice/hub.first_errand.wav': '7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8',
+    'private_bellwether_voice/hub.shrine_direction.wav': '25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44'
+]
 def bellwetherFollowOnAudition = bellwetherVoiceDirectory && bellwetherFollowOnAuditionWavs.keySet().any {
     new File(bellwetherVoiceDirectory, it).isFile()
 }
 def bellwetherHearthAudition = bellwetherVoiceDirectory && bellwetherHearthAuditionWavs.keySet().any {
     new File(bellwetherVoiceDirectory, it).isFile()
 }
+def bellwetherOptionalVoiceIds = bellwetherVoiceDirectory ? bellwetherOptionalVoiceWavs.findAll { relative, hash ->
+    new File(bellwetherVoiceDirectory, relative).isFile()
+}.keySet().collect { relative -> new File(relative).name.replaceFirst(/\.wav$/, '') } : []
 if (bellwetherVoiceDirectory) {
     if (!bellwetherResidentDirectory)
         throw new GradleException('Bellwether voices require the separate resident Debug package.')
@@ -190,6 +199,9 @@ if (bellwetherVoiceDirectory) {
     if (bellwetherSalvagerAudition) pinned.putAll(bellwetherSalvagerAuditionWavs)
     if (bellwetherFollowOnAudition) pinned.putAll(bellwetherFollowOnAuditionWavs)
     if (bellwetherHearthAudition) pinned.putAll(bellwetherHearthAuditionWavs)
+    bellwetherOptionalVoiceWavs.each { relative, hash ->
+        if (new File(bellwetherVoiceDirectory, relative).isFile()) pinned[relative] = hash
+    }
     verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
 }
 if (bellwetherPlaytest && !(bellwetherCombinedResidents && bellwetherRelicDealer &&
@@ -923,6 +935,7 @@ android {
         buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', 'false'
         buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', 'false'
         buildConfigField 'boolean', 'BELLWETHER_HEARTH_AUDITION', 'false'
+        buildConfigField 'String', 'BELLWETHER_OPTIONAL_VOICE_IDS', '""'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
@@ -975,6 +988,8 @@ android {
             buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', bellwetherFollowOnAudition ? 'true' : 'false'
             buildConfigField 'boolean', 'BELLWETHER_HEARTH_AUDITION', bellwetherHearthAudition ? 'true' : 'false'
+            buildConfigField 'String', 'BELLWETHER_OPTIONAL_VOICE_IDS',
+                '"' + bellwetherOptionalVoiceIds.join(',') + '"'
             if (bellwetherResidentDirectory) {
                 def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
                     bellwetherRelicDealer ? '.debug.bellwether.dealer' :

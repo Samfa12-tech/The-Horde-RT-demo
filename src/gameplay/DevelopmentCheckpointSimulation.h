@@ -211,7 +211,7 @@ inline bool StageDevelopmentCheckpointSimulation(
             dealer?traversal::kBellwetherWestJunction:traversal::kBellwetherChurchJunction;
         const bool returnsToKit=checkpoint.bellwetherBranchView==BellwetherBranchView::KitIntroduction;
         const bool handoff=checkpoint.bellwetherBranchView==BellwetherBranchView::RegisterHandoff || returnsToKit;
-        if(handoff && gameSimulation.config_.bellwetherSpecialist!=Specialist::RecordKeeper)return finalize(false);
+        if(handoff && !gameSimulation.IsBellwetherResidentReady(traversal::kRecordKeeperResident))return finalize(false);
         if(artificer && (gameSimulation.config_.bellwetherSpecialist!=Specialist::Artificer ||
                !gameSimulation.config_.bellwetherTavernKeeperAdmitted))return finalize(false);
         if(salvager && (gameSimulation.config_.bellwetherSpecialist!=Specialist::Salvager ||

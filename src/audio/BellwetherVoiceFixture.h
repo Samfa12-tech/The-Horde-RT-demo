@@ -57,6 +57,12 @@ inline constexpr std::array kBellwetherHearthAuditionCuts{
     BellwetherVoiceCut{gameplay::dialogue::Line::KitTreasureKey, 113744, "d82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0"}
 };
 
+// Private village takes can be admitted one line at a time as they are reviewed.
+inline constexpr std::array kBellwetherOptionalVoiceCuts{
+    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperErrand, 127979, "7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8"},
+    BellwetherVoiceCut{gameplay::dialogue::Line::RecordKeeperDirections, 110730, "25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44"}
+};
+
 inline constexpr bool HasBellwetherVoiceCut(gameplay::dialogue::Line line, bool arrivalAudition = false,
                                             bool salvagerAudition = false, bool followOnAudition = false,
                                             bool hearthAudition = false) {

@@ -23,7 +23,8 @@ public final class ChapterVoiceAssetsTest {
                         + (BuildConfig.BELLWETHER_ARRIVAL_AUDITION ? 5 : 0)
                         + (BuildConfig.BELLWETHER_SALVAGER_AUDITION ? 3 : 0)
                         + (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION ? 6 : 0)
-                        + (BuildConfig.BELLWETHER_HEARTH_AUDITION ? 2 : 0),
+                        + (BuildConfig.BELLWETHER_HEARTH_AUDITION ? 2 : 0)
+                        + selectedOptionalVoiceCount(),
                 ChapterVoiceAssets.all().size());
         final Set<String> keys = new HashSet<>();
         final Set<String> paths = new HashSet<>();
@@ -137,5 +138,41 @@ public final class ChapterVoiceAssetsTest {
             }
             assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
         }
+    }
+
+    @Test public void privateKeeperLeadAuditionSelectsOnlyTheTwoPinnedLines() {
+        final int[] lines = {35, 36};
+        final String[] ids = {"hub.first_errand", "hub.shrine_direction"};
+        for (int i = 0; i < lines.length; ++i) {
+            final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
+            if (optionalVoiceSelected(ids[i])) {
+                assertNotNull(asset);
+                assertEquals(ids[i], asset.stableId);
+                assertEquals("record_keeper_" + ids[i].replace('.', '_'), asset.soundKey);
+                assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
+                assertEquals(Integer.valueOf(31), ChapterVoiceAssets.soundIdForLine(
+                        lines[i], java.util.Collections.singletonMap(asset.soundKey, 31)));
+            } else {
+                assertNull(asset);
+                assertNull(ChapterVoiceAssets.soundIdForLine(
+                        lines[i], java.util.Collections.singletonMap(
+                                "record_keeper_" + ids[i].replace('.', '_'), 31)));
+            }
+            assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
+        }
+        assertNull(ChapterVoiceAssets.forLine(34));
+    }
+
+    private static boolean optionalVoiceSelected(String stableId) {
+        for (String selected : BuildConfig.BELLWETHER_OPTIONAL_VOICE_IDS.split(","))
+            if (stableId.equals(selected)) return true;
+        return false;
+    }
+
+    private static int selectedOptionalVoiceCount() {
+        int count = 0;
+        for (String selected : BuildConfig.BELLWETHER_OPTIONAL_VOICE_IDS.split(","))
+            if (!selected.isEmpty()) ++count;
+        return count;
     }
 }

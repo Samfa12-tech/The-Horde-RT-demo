@@ -1,0 +1,142 @@
+{
+  "model": "SM-S948B",
+  "os": "17",
+  "build": "CP2A.260605.016",
+  "apkSha256": "591a3a50aa7d082c1409d0191bcfaf23d0e5ad547d13e7ce9cd64d10294f98c3",
+  "priorApkSha256": "cdc5c504e41ac9a144670d39de620df9c263f7051c342b1e92ef11a1d58337b8",
+  "sourceCommit": "9a6ef6d8887ecb7f8a96b118d7fa0b42c43032cd",
+  "inputSaveSha256": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b",
+  "windows": {
+    "privateZipSha256": "ad11c0b37dae89feaac431a26ddafeb6bae99dc3ae27054d767978438f7af8e2",
+    "residentFiles": 25,
+    "voiceFiles": 23,
+    "replay": {
+      "pipeline": {
+        "passed": 59,
+        "receiptSha256": "6779935aaa36974f989dc157336ebd47e616f1bf51f90bc8d3a207332f56ac3e"
+      },
+      "query": {
+        "passed": 59,
+        "receiptSha256": "ff972a71c70cdc231b2371336d9467a88932ee052bd7ddc5d99a39feda380118"
+      }
+    },
+    "audioDuringHiddenReplay": "suppressed"
+  },
+  "ordinaryAndroidApk": {
+    "sha256": "48c39e01862985e772af4c3b324b3a7639043f32cc34f12ce961a67c324d3fcb",
+    "privateVoiceFiles": 0
+  },
+  "androidInteraction": {
+    "starts": {
+      "35": {
+        "generation": 5,
+        "stream": 182,
+        "gainLeft": 0.14775817,
+        "gainRight": 0.14694852,
+        "log": "HORDE_CHAPTER_VOICE_START line=35 generation=5 stream=182 gainLeft=0.14775817 gainRight=0.14694852"
+      },
+      "36": {
+        "generation": 7,
+        "stream": 183,
+        "gainLeft": 0.14775817,
+        "gainRight": 0.14694852,
+        "log": "HORDE_CHAPTER_VOICE_START line=36 generation=7 stream=183 gainLeft=0.14775817 gainRight=0.14694852"
+      }
+    },
+    "firstLineCaptionOnly": true,
+    "inputSave": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b",
+    "afterSave": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b"
+  },
+  "afterWalk": {
+    "matching": 24,
+    "originalSaves": 14,
+    "restored": [
+      "files/reports/vulkan_capability_report.txt",
+      "files/reports/vulkan_capability_report.json",
+      "shared_prefs/android.app.ActivityThread.IDS.xml"
+    ]
+  },
+  "captures": {
+    "church-inspect-fallback.png": "bfaf5a2ce73f442e5b3d3fdec746f6634390bfaffefe2645ec385756f604fe3a",
+    "church-voice-35.png": "69c0ea65d9b7c689d7f3aa95bda0236deb1ee5f507fb5de3410367cad9e671c1",
+    "church-voice-36.png": "bcfa9d7fbe5c53c0d926c930e393eee0738c87a5ccb17e490f12d9c55f586364"
+  },
+  "playbackScope": "SoundPool returned nonzero stream IDs and the native source supplied nonzero stereo gains. Device listening was not assessed.",
+  "excludedDeveloperShortcut": {
+    "id": 335,
+    "name": "bellwether-record-keeper-handoff",
+    "stagingFailure": "simulation-state-not-reached",
+    "presentedAtRequestedMark": false
+  },
+  "onFootStationaryObservations": {
+    "seconds": 48,
+    "route": "Play / Continue and walk from the tavern to the record keeper again. Face the keeper, developer overlay off, Show the road mark prompt visible.",
+    "renderExtent": [
+      475,
+      980
+    ],
+    "outputExtent": [
+      1440,
+      2971
+    ],
+    "capture": "Periodic native capability reports; joined GPU submission, completion and successful presentation serials. Each report represents a single frame.",
+    "observations": [
+      {
+        "seconds": 6.766,
+        "serial": 1949,
+        "tick": 8430,
+        "gpuMs": 74.268748,
+        "backend": "RayTracingPipeline",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "tlas": 45,
+        "blas": 37,
+        "fires": 1
+      },
+      {
+        "seconds": 16.531,
+        "serial": 2069,
+        "tick": 9012,
+        "gpuMs": 67.056873,
+        "backend": "RayTracingPipeline",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "tlas": 45,
+        "blas": 37,
+        "fires": 1
+      },
+      {
+        "seconds": 25.813,
+        "serial": 2189,
+        "tick": 9568,
+        "gpuMs": 66.930884,
+        "backend": "RayTracingPipeline",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "tlas": 45,
+        "blas": 37,
+        "fires": 1
+      },
+      {
+        "seconds": 35.078,
+        "serial": 2309,
+        "tick": 10130,
+        "gpuMs": 63.167238,
+        "backend": "RayTracingPipeline",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "tlas": 45,
+        "blas": 37,
+        "fires": 1
+      },
+      {
+        "seconds": 44.844,
+        "serial": 2429,
+        "tick": 10693,
+        "gpuMs": 63.987655,
+        "backend": "RayTracingPipeline",
+        "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+        "tlas": 45,
+        "blas": 37,
+        "fires": 1
+      }
+    ],
+    "wholeRtGpuMedianMs": 66.930884
+  }
+}

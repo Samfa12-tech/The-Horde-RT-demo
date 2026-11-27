@@ -226,6 +226,7 @@ bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
 bool gBellwetherFollowOnAudition = false;
 bool gBellwetherHearthAudition = false;
+std::array<bool, horde::gameplay::dialogue::kLines.size()> gBellwetherOptionalVoices{};
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
@@ -1707,15 +1708,15 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
     const auto pathFor = [&](const auto& cut) {
         return root / (std::string(horde::gameplay::dialogue::Spec(cut.line).stableId) + ".wav");
     };
+    const auto verifyCut = [&](const auto& cut) {
+        const auto path = pathFor(cut);
+        const auto bytes = std::filesystem::file_size(path, error);
+        std::string digest, diagnostic;
+        return !error && bytes == 78u + cut.frames * 2u &&
+            Sha256File(path, digest, diagnostic) && digest == cut.sha256;
+    };
     const auto verify = [&](const auto& cuts) {
-        for (const auto& cut : cuts) {
-            const auto path = pathFor(cut);
-            const auto bytes = std::filesystem::file_size(path, error);
-            std::string digest, diagnostic;
-            if (error || bytes != 78u + cut.frames * 2u || !Sha256File(path, digest, diagnostic) ||
-                digest != cut.sha256) return false;
-        }
-        return true;
+        return std::all_of(cuts.begin(), cuts.end(), verifyCut);
     };
     if (!verify(horde::audio::kBellwetherVoiceCuts)) return false;
     const auto admitOptional = [&](const auto& cuts, bool& admitted) {
@@ -1733,6 +1734,13 @@ bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
         !admitOptional(horde::audio::kBellwetherSalvagerAuditionCuts, gBellwetherSalvagerAudition) ||
         !admitOptional(horde::audio::kBellwetherFollowOnAuditionCuts, gBellwetherFollowOnAudition) ||
         !admitOptional(horde::audio::kBellwetherHearthAuditionCuts, gBellwetherHearthAudition)) return false;
+    decltype(gBellwetherOptionalVoices) optionalVoices{};
+    for (const auto& cut : horde::audio::kBellwetherOptionalVoiceCuts) {
+        const bool present = std::filesystem::exists(pathFor(cut), error);
+        if (error || (present && !verifyCut(cut))) return false;
+        optionalVoices[static_cast<std::size_t>(cut.line)] = present;
+    }
+    gBellwetherOptionalVoices = optionalVoices;
     gBellwetherVoiceDirectory = root;
     std::cerr << "Bellwether private Kit WAVs verified.\n";
     if (gBellwetherArrivalAudition) std::cerr << "Bellwether private arrival audition WAVs verified.\n";
@@ -2668,8 +2676,9 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     std::filesystem::path privateVoice;
 #if defined(_DEBUG)
     if (!gBellwetherVoiceDirectory.empty() &&
-        horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
-            gBellwetherSalvagerAudition, gBellwetherFollowOnAudition, gBellwetherHearthAudition))
+        ((lineId < gBellwetherOptionalVoices.size() && gBellwetherOptionalVoices[lineId]) ||
+         horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
+             gBellwetherSalvagerAudition, gBellwetherFollowOnAudition, gBellwetherHearthAudition)))
         privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
 #endif
     if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))
