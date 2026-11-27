@@ -299,6 +299,14 @@ int main(int argc,char** argv) {
                   support->NonWalkableVolumeClear(lampX,lampZ,approachX,approachZ,
                       lampY-.005f,lampY+.005f,.015f),
                   "the oil cup has solid contact and its light can reach the ramp through the open door");
+            const auto [churchLampX,churchLampY,churchLampZ]=kChurchRecordStationLight;
+            const auto [bookX,bookY,bookZ]=kChurchRecordStationDaybook;
+            const auto [keeperX,keeperZ]=kBellwetherRecordKeeperMark;
+            check(!support->NonWalkableVolumeClear(bookX,bookZ,bookX,bookZ,
+                      bookY-.045f,bookY-.035f,.035f) &&
+                  support->NonWalkableVolumeClear(churchLampX,churchLampZ,keeperX,keeperZ,
+                      churchLampY-.006f,churchLampY+.006f,.015f),
+                  "the wall ledge holds the daybook and the oil cup has a clear light path to its keeper");
             constexpr std::array pathCentres{
                 BellwetherStation{41.f,87.9f},        // Lower road
                 BellwetherStation{45.f,74.75f},       // Church lane
@@ -382,6 +390,12 @@ int main(int argc,char** argv) {
                 const BellwetherStation room{doorX-.75f,doorZ+offset};
                 check(follow(ramp,room) && follow(room,ramp),
                       "an off-centre capsule crosses the House B threshold in both directions");
+            }
+            for (float offset : {0.f,.35f}) {
+                const BellwetherStation churchLane{69.6f,75.28f+offset};
+                const BellwetherStation yardTurn{73.65f,75.35f+offset};
+                check(follow(churchLane,yardTurn) && follow(yardTurn,churchLane),
+                      "the keeper's wall furniture clears the full walking capsule in the church and graveyard lane");
             }
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");

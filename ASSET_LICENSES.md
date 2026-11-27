@@ -1286,6 +1286,15 @@ Samfa12/Codex modeled the tavern's water jug, beakers, trencher, serving dresser
 
 Samfa12/Codex modeled the four carved destination boards, oil bracket and coopered delivery cask for Horde. They use the existing town timber, stone, clay and char finishes. The [Blender master, recipes and receipt](assets/models/world/source/bellwether-square-waymarker-v1/README.md) record their origin.
 
+## Bellwether church record station
+
+The oak ledge, daybook, writing slate, stone corbels and hooded oil cup are
+original geometry authored for the mapped church. The [Blender source and
+receipt](assets/models/world/source/bellwether-church-station-v1/README.md)
+record the input and export hashes. The station reuses the town's admitted
+stone, timber, clay and iron materials and introduces no new texture or
+recording. The combined town GLB is the runtime asset.
+
 ## Bellwether House B
 
 Samfa12/Codex authored the east entry, ramp, stone room, oil cup and store furnishings

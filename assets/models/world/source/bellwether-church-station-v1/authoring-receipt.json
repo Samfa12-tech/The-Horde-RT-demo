@@ -1,0 +1,33 @@
+{
+  "feature": "B02 church record keeper's work ledge and oil cup",
+  "originalTownSha256": "aaa0ff5be10214504986238693f6bac9beaea97a9c92383d9a4ff462e2792d6b",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "addedSolidTriangles": 744,
+  "primitives": 6,
+  "townVertices": 96402,
+  "townTriangles": 45369,
+  "flame": [
+    70.61,
+    -0.9227865600585938,
+    74.11
+  ],
+  "light": [
+    70.648,
+    -0.8427865600585939,
+    74.17999999999999
+  ],
+  "daybook": [
+    72.49,
+    -1.4777865600585938,
+    73.614
+  ],
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "852ff3f4c1ab0b2bf54e236ec8abaadeb2eafb06f29277935adeddeb3cd453ea",
+  "files": {
+    "church-record-station.blend": "a954f548279a545808dce58199aa561acd26aa1e3eeac934f20fb2eb202b4221",
+    "church-record-station.glb": "da49c478351cbb586eb717ca20a7d7b5f339ff429ab4bb735bfe9abf322e9099",
+    "bellwether-tavern-v1.glb": "0ed222271e8eeab9345386ee985a7a446c85eb7399efa9500df7f6f3a0902e01",
+    "asset.manifest.json": "8e61e060a123532e88cfe4d829eadbd3dd560cc0b5fec651cc3aafe91b61edba",
+    "geometry.generated.h": "2229a3260ae9574b916a36fdac7ac77781fcd91d1e486c9fe28e0638c1847240"
+  }
+}

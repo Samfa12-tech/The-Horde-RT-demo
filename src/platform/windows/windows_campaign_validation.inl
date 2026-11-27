@@ -2565,12 +2565,17 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const auto offered = state.recordKeeperAction;
                 const bool presentedLead = reachedKeeper && offered == RecordKeeperAction::ShowRoadMark &&
                     interact() && frame();
+                const auto& churchLights=ctx.rtScene.UploadedFireEmitters().selectedStableIds;
+                const bool churchLampPresented=presentedLead && ctx.rtScene.HasUploadedFireEmitters() &&
+                    std::find(churchLights.begin(),churchLights.end(),
+                              horde::gameplay::effects::kChurchRecordLampEmitterId)!=churchLights.end();
                 constexpr std::array churchLeadCaptions{Line::RecordKeeperInspect};
-                progressed = check(presentedLead && dialogue(kRecordKeeperLead, churchLeadCaptions),
-                    "the staffed church gives the wayside lead and keeps the inspection readable with optional subtitles off");
+                progressed = check(churchLampPresented && dialogue(kRecordKeeperLead, churchLeadCaptions),
+                    "the staffed church presents the wall lamp and gives the wayside lead with readable captions");
                 if (!progressed)
                     std::cerr << "Bellwether church lead reached=" << reachedKeeper
                               << " offered=" << static_cast<int>(offered) << " presented=" << presentedLead
+                              << " lamp=" << churchLampPresented
                               << " currentLine=" << static_cast<int>(state.chapterDialogue.line)
                               << " hearthLines=" << state.chapterDialogue.hearthLinesResolved
                               << " keeperAdmitted=" << state.recordKeeper.has_value()
