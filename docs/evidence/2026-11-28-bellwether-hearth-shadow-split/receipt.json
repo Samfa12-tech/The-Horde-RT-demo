@@ -1,0 +1,174 @@
+{
+  "model": "Samsung Galaxy S26 Ultra (SM-S948B)",
+  "evidenceClass": "Sparse instrumented invocation ticks at the first staffed-hearth hold",
+  "rtBackend": "RayTracingPipeline",
+  "scalePercent": 33,
+  "apps": {
+    "Observer": {
+      "file": "Horde-Bellwether-Hearth-Shadow-Observer-ARM64.apk",
+      "sha256": "e8eca9405757b1422a83a950503408d761dc1bba7aa602cabd466cc4313c5fe7",
+      "bytes": 280127833,
+      "nativeLibrarySha256": "aeaf841bb39a5fe35f1411a6c71c92130c77f726f161359ab72a10fafa179bfb"
+    },
+    "Control": {
+      "file": "Horde-Bellwether-Hearth-Shadow-Control-ARM64.apk",
+      "sha256": "b9573911a430e046b3b3a2beb682452c8a76d809905bc0ec5182a1cf30d70491",
+      "bytes": 279944905,
+      "nativeLibrarySha256": "00edb3fe2f77e412c0d711beeeb74d8c46a091434b4c87eca909da198fc82c40"
+    }
+  },
+  "moduleHashes": {
+    "shipping_mobile_opaque_fast": {
+      "Observer": "24f4abd5ec99ed7ed45b49e9b5186e08c2946e92737ea5e7c17a0d614a5a5dad",
+      "Control": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f"
+    },
+    "rayquery_compute_shipping_mobile_opaque_fast": {
+      "Observer": "a7e2fb1f42333fb411fc62c7f759d094b0dbc902e5c8290003f147c404ee9548",
+      "Control": "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe"
+    },
+    "shipping_mobile_generic_dielectric": {
+      "Observer": "9869928cee0e4a9f43aafab78ad1eb3c4961824de7457236241146fab37205de",
+      "Control": "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    },
+    "rayquery_compute_shipping_mobile_generic_dielectric": {
+      "Observer": "ba106afe314c8c038fe4f35c8e4e6538df53b735729c6f58c7e99f8ed1ca0b11",
+      "Control": "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440"
+    }
+  },
+  "matchedRuntimeAssets": 290,
+  "pictureComparison": {
+    "dimensions": [
+      1440,
+      3120
+    ],
+    "controlRgb": "09d76943718a403bc388a0e017d87134935e8beae92ca33bb804e2426094a1f9",
+    "observerRgb": "09d76943718a403bc388a0e017d87134935e8beae92ca33bb804e2426094a1f9",
+    "differentPixelBounds": null,
+    "controlPngSha256": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32",
+    "observerPngSha256": "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32"
+  },
+  "restore": {
+    "originalPlaytestSha256": "310a2b5eec209f08f925d980a62b5a5a9ba22583187d75cdbcaddd9095531096",
+    "observerRemoved": true
+  },
+  "restoredData": {
+    "matching": 25,
+    "originalSaves": 15,
+    "restored": []
+  },
+  "runs": {
+    "observer-hold": {
+      "samples": [
+        {
+          "submission": 77,
+          "sample": 1,
+          "gridPixels": 465,
+          "worldReceivers": 392,
+          "worldDirectFirePercentOfShadowTicks": 75.03169240776016,
+          "allDirectFirePercentOfShadowTicks": 74.53053001017142,
+          "allDirectFirePercentOfInvocationTicks": 27.42350051895678,
+          "worldShareOfShadowTicksPercent": 79.22800939315586
+        },
+        {
+          "submission": 92,
+          "sample": 2,
+          "gridPixels": 465,
+          "worldReceivers": 392,
+          "worldDirectFirePercentOfShadowTicks": 74.10628603549885,
+          "allDirectFirePercentOfShadowTicks": 73.59283716676768,
+          "allDirectFirePercentOfInvocationTicks": 26.698353536773492,
+          "worldShareOfShadowTicksPercent": 75.9705234950713
+        },
+        {
+          "submission": 107,
+          "sample": 3,
+          "gridPixels": 465,
+          "worldReceivers": 390,
+          "worldDirectFirePercentOfShadowTicks": 75.35835373276957,
+          "allDirectFirePercentOfShadowTicks": 74.27206446676914,
+          "allDirectFirePercentOfInvocationTicks": 26.85008785975207,
+          "worldShareOfShadowTicksPercent": 76.45880366709197
+        }
+      ],
+      "files": {
+        "bellwether-west-roundtrip.csv": "00eb1e2da0951c0179d4136206d2c3152e0f621b8410044ebedd773be10d4ff1",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-1-77.bin": "b058bbad151fca0a72cc30a43cf92454ca8381cd6f925df8958f3b4f1ff7ff48",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-1-77.json": "f26b524ab458c7e528fdb2da2821df75971857628769705e0dab5b8569717e67",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-2-92.bin": "275bec06467f711aad81c2c2c7aef51c6c321f9d3bd4e2c113c6ba1903a540c3",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-2-92.json": "fe129c85fef7fe9e156c120b28f9d76b36368c0ee923f24a989b53b8a68028ff",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-3-107.bin": "e002c774b39261f989fc5deef6179affb977e8315051e400226b01e8bef857ce",
+        "bellwether-westroundtrip-hearth-clock-258556996390584-return-1-sample-3-107.json": "170666a19f8a878e112536ad5d2da9278e6b0c1836e724b2c801f0ed922589ce"
+      }
+    },
+    "observer-repeat": {
+      "samples": [
+        {
+          "submission": 77,
+          "sample": 1,
+          "gridPixels": 465,
+          "worldReceivers": 392,
+          "worldDirectFirePercentOfShadowTicks": 73.44542566152523,
+          "allDirectFirePercentOfShadowTicks": 72.85062775647472,
+          "allDirectFirePercentOfInvocationTicks": 26.41141601372487,
+          "worldShareOfShadowTicksPercent": 78.59849038024225
+        },
+        {
+          "submission": 92,
+          "sample": 2,
+          "gridPixels": 465,
+          "worldReceivers": 392,
+          "worldDirectFirePercentOfShadowTicks": 73.7260427683339,
+          "allDirectFirePercentOfShadowTicks": 73.26365242551562,
+          "allDirectFirePercentOfInvocationTicks": 26.713425012038805,
+          "worldShareOfShadowTicksPercent": 78.16695693377122
+        },
+        {
+          "submission": 107,
+          "sample": 3,
+          "gridPixels": 465,
+          "worldReceivers": 390,
+          "worldDirectFirePercentOfShadowTicks": 74.5538608604298,
+          "allDirectFirePercentOfShadowTicks": 74.32605749558006,
+          "allDirectFirePercentOfInvocationTicks": 26.789502498749915,
+          "worldShareOfShadowTicksPercent": 77.87896465414937
+        }
+      ],
+      "files": {
+        "bellwether-west-roundtrip.csv": "3aca09c4b238041b94f26b1e97eec03f78b797427591687f87b0f29bc4b3154f",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-1-77.bin": "47eddebb30897e59954fe5594a85fead1dd6bcdc450464f46336f779e67c400b",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-1-77.json": "a04dd3d956c14de21022fac252b8707a1e2be964c0242b6e5135efeb103d4603",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-2-92.bin": "d6c606ab29636029a7bd45d73fea8ff37486293ff91a4afe3b0f1537a17fa323",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-2-92.json": "66d297541cd51c8cb96eccde3b22c41cc0d0a851bd13b88428ef4df7e30bbeb0",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-3-107.bin": "6f1082dca5783bb648fcbaf373f253da01dbcc629fe7b3a1771bef8ae2fbc815",
+        "bellwether-westroundtrip-hearth-clock-258602763505566-return-1-sample-3-107.json": "8f3b157658bdf75e75fd2519d2631d9f65c596c200e02ee93fa3f21bed5661f9"
+      }
+    }
+  },
+  "ordinaryCsvSha256": "3be279bb27ae6483a70fbb877aa90754e8f1d39c1bf5e0ecb106818e9ba88348",
+  "worldDirectFirePercentOfShadowTicks": {
+    "minimum": 73.44542566152523,
+    "median": 74.33007344796432,
+    "maximum": 75.35835373276957
+  },
+  "allDirectFirePercentOfShadowTicks": {
+    "minimum": 72.85062775647472,
+    "median": 73.93245081676841,
+    "maximum": 74.53053001017142
+  },
+  "allDirectFirePercentOfInvocationTicks": {
+    "minimum": 26.41141601372487,
+    "median": 26.75146375539436,
+    "maximum": 27.42350051895678
+  },
+  "worldShareOfShadowTicksPercent": {
+    "minimum": 75.9705234950713,
+    "median": 78.0229607939603,
+    "maximum": 79.22800939315586
+  },
+  "androidSdk": 37,
+  "startingFrameworkThermalStatus": {
+    "control-hold": 0,
+    "observer-hold": 0,
+    "observer-repeat": 1
+  }
+}

@@ -43,7 +43,7 @@ temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
 
 **28 November shadow candidate primitive index — closed.** A trial moved the candidate primitive-index read inside the shared-world instance check at the staffed hearth. At the same 33% Pipeline view, trial medians were 76.30 and 76.35 ms for RT dispatch. Both took 0.20 ms longer than their adjacent controls on average. Restricting the analysis to frames bracketed by matching 1300 MHz readings also showed no repeatable gain. The frozen image matched pixel for pixel. Keep the ordinary shader. [Phone comparison and raw captures](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison)
 
-**28 November hearth shadow attribution — ready for device capture.** The private [dispatch observer](AGENT_VALIDATION.md#sampling-the-staffed-hearth-dispatch-on-android) can separate direct fire-emitter visibility from other shadow queries. Use the matched ordinary and observation builds at the same staffed-hearth view. Check the frozen image before collecting the three settled samples. Use the direct-fire share for pixels that hit the shared world to decide whether to investigate those lights further.
+**28 November hearth shadow attribution.** Two private observer runs on the Galaxy S26 Ultra attributed **72.85–74.53% of sampled shadow ticks** to direct fire-emitter visibility. The share was **73.45–75.36%** for pixels whose primary ray hit the shared world. The 33% Pipeline control and observer produced identical frozen RGB. This identifies a target for the next output-preserving experiment. Measure any gain with the ordinary shader and the full route. [Device record and exact samples](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--direct-fire-shadow-attribution-at-the-staffed-hearth)
 
 
 **24 November ordinary Android hearth controls.** At the same position and
@@ -151,6 +151,26 @@ The first attempt reached its second yard visit before the inherited
 30,000-frame limit stopped collection at 182.72 seconds. The verified west
 run uses the 240-second route clock as its bound. Raw reports and exact
 hashes are under `reports/horde-bellwether-west-timing-20261123-130910`.
+
+The 28 November repeat used the House B ledger revision `508cd600` on the
+same RTX 5050 Laptop GPU and hidden optimized Debug Shipping/High route
+at 960 × 540. Each backend completed 14,092 simulation ticks and two
+returns in 234.876 seconds. The current route uses four fire lights in the
+staffed hearth and two in the stock yard. The 23 November runs used three
+and one respectively, with different shader modules. The figures below
+establish a current baseline for the fuller village.
+
+| Windows RT backend | Joined frames | Hearth GPU median / p95 | Stock-yard GPU median / p95 |
+| --- | ---: | ---: | ---: |
+| RayTracingPipeline | 38,242 | 2.58 / 3.90 ms | 1.72 / 3.46 ms |
+| RayQueryCompute | 37,027 | 3.22 / 4.87 ms | 2.22 / 3.88 ms |
+
+The verifier checked all three livestock heads on each yard visit and the
+resident swap in both directions on each lap. The hearth held 45 TLAS
+instances and up to 487,491,392 device-local bytes. Successful present
+records bind the completion samples to their frames. Display pacing and
+physical Android performance require their own captures.
+[Windows receipt](evidence/2026-11-28-bellwether-west-windows/receipt.json)
 
 The signed five-resident ARM64 Debug APK at `542cd184` has SHA-256
 `b4a2bd990d4b942cee31edc96deb52341b1331d77e93141c051b3be6384c66b2`.

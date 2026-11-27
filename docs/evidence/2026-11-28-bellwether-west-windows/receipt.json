@@ -1,0 +1,284 @@
+{
+  "sourceCommit": "508cd600f6fab4f7fd8375313726aa359bf8944b",
+  "evidenceClass": "Hidden Windows RT GPU and resource timing. No display interval or handset result.",
+  "runs": {
+    "RayTracingPipeline": {
+      "hardware": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "renderer": {
+        "instrumentation": "shipping",
+        "dielectricQuality": "high",
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "shaderSha256": "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8"
+      },
+      "run": {
+        "schema": 5,
+        "scope": "Debug CPU with shipping High shaders; hidden Bellwether resident round trip; GPU and resource evidence only",
+        "quietReturns": 2,
+        "recordKeeperIncluded": true,
+        "glassEnabled": true,
+        "packagedPlaytest": false,
+        "durationSeconds": 234.876,
+        "renderedFrames": 38242,
+        "completedSamples": 38242,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 3,
+        "simulationHz": 60,
+        "maximumTicksPerRender": 4,
+        "deadlineSeconds": 240,
+        "warmupSeconds": 5,
+        "unoccludedClientChecks": false,
+        "intervalMeaning": "unavailable for hidden captures",
+        "foregroundRequested": false,
+        "staticDetailUnloads": 0,
+        "staticDetailRestores": 0,
+        "maximumNormalStaticOwnerSavingBytes": 0,
+        "finalStaticDetailSavingBytes": 0,
+        "staticPeakOwnerOverlapBytes": 0,
+        "staticReadinessWaitFrames": 0,
+        "complete": true
+      },
+      "olderShaderSha256": "4b5e1d7068a79a8660ad5cdfc2e924889eb8bb2fe1a5f365b547d887867e103b",
+      "phases": {
+        "room": {
+          "gpuMedianMs": 2.584512,
+          "gpuP95Ms": 3.897152,
+          "olderGpuMedianMs": 2.3804,
+          "olderGpuP95Ms": 3.770944,
+          "currentFireCounts": [
+            4
+          ],
+          "olderFireCounts": [
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 487491392,
+            "host_visible_bytes": 87796784,
+            "tlas_instances": 45,
+            "blas_owners": 38
+          }
+        },
+        "doorway-outbound": {
+          "gpuMedianMs": 2.112208,
+          "gpuP95Ms": 3.485952,
+          "olderGpuMedianMs": 1.724864,
+          "olderGpuP95Ms": 3.140256,
+          "currentFireCounts": [
+            2,
+            3,
+            4
+          ],
+          "olderFireCounts": [
+            1,
+            2,
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 488449472,
+            "host_visible_bytes": 87796784,
+            "tlas_instances": 45,
+            "blas_owners": 39
+          }
+        },
+        "stock-yard": {
+          "gpuMedianMs": 1.721344,
+          "gpuP95Ms": 3.464832,
+          "olderGpuMedianMs": 1.453568,
+          "olderGpuP95Ms": 2.913312,
+          "currentFireCounts": [
+            2
+          ],
+          "olderFireCounts": [
+            1
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 487456448,
+            "host_visible_bytes": 87796784,
+            "tlas_instances": 45,
+            "blas_owners": 37
+          }
+        },
+        "doorway-inbound": {
+          "gpuMedianMs": 2.448576,
+          "gpuP95Ms": 3.727744,
+          "olderGpuMedianMs": 2.04368,
+          "olderGpuP95Ms": 3.480416,
+          "currentFireCounts": [
+            2,
+            3,
+            4
+          ],
+          "olderFireCounts": [
+            1,
+            2,
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 488447552,
+            "host_visible_bytes": 87796784,
+            "tlas_instances": 45,
+            "blas_owners": 39
+          }
+        }
+      },
+      "executableSha256": "d0c85f2cc49488dc7209113c6dcab8a8e73e90478d73b2e63f48564baabadad3",
+      "captureSha256": {
+        "completed-frames.csv": "e270b75c18660ccc297c8423b1c4960f630812eda077d3e89a60f24fe8c9fb82",
+        "analysis-v3.json": "740c8f678e8d110802a6cbc0f1639249574cb6c34a1f1913c9b0c64d5fc2de42",
+        "identities.jsonl": "1a801a26f0923dc6dd458368cfdf651f6e7c153bfd30a5b7ac97afc658b80cd5",
+        "run.json": "63279d85ac2c915b1438ac84ec4f6c538adbeec1d021d500ce5f9de96446a70f",
+        "final-repeat-visit.png": "92843d7ee3664f13616cf6ff2214874bcae3b10a46ea8642cb9f654380b4b7ad",
+        "pipeline.candidate.json": "bbbdffaae563b9e48ebe0f2e97f8fdb31144c94e40023dd0167b1bb3ef77be55"
+      }
+    },
+    "RayQueryCompute": {
+      "hardware": {
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "vendorId": 4318,
+        "deviceId": 11672
+      },
+      "renderer": {
+        "instrumentation": "shipping",
+        "dielectricQuality": "high",
+        "internalExtent": [
+          960,
+          540
+        ],
+        "outputExtent": [
+          960,
+          540
+        ],
+        "shaderSha256": "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+      },
+      "run": {
+        "schema": 5,
+        "scope": "Debug CPU with shipping High shaders; hidden Bellwether resident round trip; GPU and resource evidence only",
+        "quietReturns": 2,
+        "recordKeeperIncluded": true,
+        "glassEnabled": true,
+        "packagedPlaytest": false,
+        "durationSeconds": 234.876,
+        "renderedFrames": 37027,
+        "completedSamples": 37027,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 20,
+        "simulationHz": 60,
+        "maximumTicksPerRender": 4,
+        "deadlineSeconds": 240,
+        "warmupSeconds": 5,
+        "unoccludedClientChecks": false,
+        "intervalMeaning": "unavailable for hidden captures",
+        "foregroundRequested": false,
+        "staticDetailUnloads": 0,
+        "staticDetailRestores": 0,
+        "maximumNormalStaticOwnerSavingBytes": 0,
+        "finalStaticDetailSavingBytes": 0,
+        "staticPeakOwnerOverlapBytes": 0,
+        "staticReadinessWaitFrames": 0,
+        "complete": true
+      },
+      "olderShaderSha256": "a4123657c9b258a016be54889f0e350d07ce56d855db167660bb71730c2c3fac",
+      "phases": {
+        "room": {
+          "gpuMedianMs": 3.2248,
+          "gpuP95Ms": 4.873984,
+          "olderGpuMedianMs": 2.282512,
+          "olderGpuP95Ms": 3.7344,
+          "currentFireCounts": [
+            4
+          ],
+          "olderFireCounts": [
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 487491392,
+            "host_visible_bytes": 87796272,
+            "tlas_instances": 45,
+            "blas_owners": 38
+          }
+        },
+        "doorway-outbound": {
+          "gpuMedianMs": 2.377408,
+          "gpuP95Ms": 4.16544,
+          "olderGpuMedianMs": 1.62848,
+          "olderGpuP95Ms": 3.185568,
+          "currentFireCounts": [
+            2,
+            3,
+            4
+          ],
+          "olderFireCounts": [
+            1,
+            2,
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 488449472,
+            "host_visible_bytes": 87796272,
+            "tlas_instances": 45,
+            "blas_owners": 39
+          }
+        },
+        "stock-yard": {
+          "gpuMedianMs": 2.221984,
+          "gpuP95Ms": 3.87872,
+          "olderGpuMedianMs": 1.311008,
+          "olderGpuP95Ms": 2.778816,
+          "currentFireCounts": [
+            2
+          ],
+          "olderFireCounts": [
+            1
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 487456448,
+            "host_visible_bytes": 87796272,
+            "tlas_instances": 45,
+            "blas_owners": 37
+          }
+        },
+        "doorway-inbound": {
+          "gpuMedianMs": 2.688352,
+          "gpuP95Ms": 4.342336,
+          "olderGpuMedianMs": 1.933856,
+          "olderGpuP95Ms": 3.409088,
+          "currentFireCounts": [
+            2,
+            3,
+            4
+          ],
+          "olderFireCounts": [
+            1,
+            2,
+            3
+          ],
+          "resourcePeaks": {
+            "device_local_bytes": 488447552,
+            "host_visible_bytes": 87796272,
+            "tlas_instances": 45,
+            "blas_owners": 39
+          }
+        }
+      },
+      "executableSha256": "d0c85f2cc49488dc7209113c6dcab8a8e73e90478d73b2e63f48564baabadad3",
+      "captureSha256": {
+        "completed-frames.csv": "4890bfb0209d31ccd3f9650ed79a9ab15e2c824515254a4087137eb058a5fbaf",
+        "analysis-v3.json": "7d041cc718d978c370d3525cfc1865629be2b53878dd22dd6bee8f39572080cd",
+        "identities.jsonl": "87bf51fa42f62d420d20dd42acc40a03ce5e4a6d32fc1df3afd6734bf743dd96",
+        "run.json": "58e4cc1cda05fbd04f3530feaa565a7c580ef5285d05dae29c3a57cfc326b86c",
+        "final-repeat-visit.png": "f58f8d4e7b4be9321ba877960503d83e4ace6639e87436cf247a83efba6023bc",
+        "query.candidate.json": "31dd8cab26c5282039cf65d72d2b30c5fc1bbc717336313c25481f634192186a"
+      }
+    }
+  }
+}
