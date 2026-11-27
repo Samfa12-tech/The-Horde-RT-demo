@@ -11,6 +11,9 @@
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
 #define HORDE_RT_WINDOWS_ACCEPTANCE 0
 #endif
+#ifndef HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+#define HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE 0
+#endif
 #ifndef HORDE_RT_CHAPTER_MEASUREMENT
 #define HORDE_RT_CHAPTER_MEASUREMENT 0
 #endif
@@ -220,7 +223,7 @@ bool gLookoutInspectKitPartials=false;
 bool gLookoutInspectKitPartialsDense=false;
 bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
 std::filesystem::path gBellwetherVoiceDirectory;
 bool gBellwetherArrivalAudition = false;
 bool gBellwetherSalvagerAudition = false;
@@ -230,13 +233,15 @@ std::array<bool, horde::gameplay::dialogue::kLines.size()> gBellwetherOptionalVo
 std::filesystem::path gBellwetherCampaignActors;
 bool gBellwetherCombinedCampaignActors = false;
 bool gBellwetherCombinedRelicDealer = false;
-bool gBellwetherPackagedPlaytest = false;
 horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
+#if defined(_DEBUG)
+bool gBellwetherPackagedPlaytest = false;
 bool gBellwetherEarnTavernValidation = false;
 bool gBellwetherAnkleRestoreValidation = false;
 bool gBellwetherExpeditionValidation = false;
 bool gBellwetherPreparationsValidation = false;
 bool gBellwetherHearthRestValidation = false;
+#endif
 
 bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::PresentableTinyRtScene& scene,
     const std::filesystem::path& root, std::string& diagnostic)
@@ -251,7 +256,7 @@ bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::Presentable
 horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
 {
     auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
     config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
     config.bellwetherCombinedResidents = gBellwetherCombinedCampaignActors;
     config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
@@ -1698,7 +1703,7 @@ bool Sha256File(const std::filesystem::path& path, std::string& hexDigest, std::
     return true;
 }
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
 bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
 {
     if (directory.empty()) return true;
@@ -2674,7 +2679,7 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     const auto lineId = static_cast<std::uint32_t>(line);
     const auto& spec = horde::gameplay::dialogue::Spec(line);
     std::filesystem::path privateVoice;
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
     if (!gBellwetherVoiceDirectory.empty() &&
         ((lineId < gBellwetherOptionalVoices.size() && gBellwetherOptionalVoices[lineId]) ||
          horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
@@ -7181,7 +7186,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
             return false;
         }
         ctx.rtScene.RequestPackagedBellwetherFurniture(true);
-    } else if (!gBellwetherCampaignActors.empty()) {
+    } else
+#endif
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+    if (!gBellwetherCampaignActors.empty()) {
         const bool authoredShowcase = rescueJourney &&
             ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
         if (!SetBellwetherCampaignResidentSources(ctx.rtScene,
@@ -7189,7 +7197,10 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
             ctx.lastRtFrameError = diagnostic;
             return false;
         }
-    } else if (!ctx.chapterResidentFixture.empty()) {
+    }
+#endif
+#if defined(_DEBUG)
+    else if (!ctx.chapterResidentFixture.empty()) {
         using horde::vulkan::raytracing::ChapterResidentActorSource;
         const std::vector<horde::scene::SkinnedClipBinding> clips{
             {"Warden|idle", true, true}, {"Warden|walk", true, true}};
@@ -8080,7 +8091,7 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
         if (gBellwetherCombinedCampaignActors && !previewFrame && !frozenDevelopmentCheckpoint &&
             ctx.simulation.Snapshot().developmentRescueJourney &&
             !horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
@@ -14509,7 +14520,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     std::string windowTitle = sceneMode
         ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
-#if defined(_DEBUG)
+#if HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+    windowTitle += " [Bellwether 1.8 candidate]";
+#elif defined(_DEBUG)
     if (gBellwetherPackagedPlaytest) windowTitle += " [Bellwether 1.8 playtest]";
 #endif
     SetWindowTextA(edit, windowText.c_str());
@@ -14705,6 +14718,25 @@ int RunDiagnosticWindow(const int showCommand)
     }
     if (gBellwetherPackagedPlaytest && (!gBellwetherArrivalAudition || !gBellwetherSalvagerAudition))
         return failPlaytest("The Bellwether playtest requires the complete arrival and shore voice overlays.");
+#elif HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+    const auto packageDirectory = ExecutableDirectory();
+    const auto failCandidate = [](const char* diagnostic) {
+        std::cerr << diagnostic << '\n';
+        GameMessageBoxA(nullptr, diagnostic, "Bellwether 1.8 candidate", MB_OK | MB_ICONERROR);
+        return 2;
+    };
+    std::ifstream marker(packageDirectory / "Bellwether.candidate");
+    std::string packageIdentity;
+    if (!std::getline(marker, packageIdentity) || packageIdentity != "horde-bellwether-optimized-v1")
+        return failCandidate("Extract the whole private Bellwether candidate package before starting the game.");
+    const auto assetRoot = packageDirectory / "assets";
+    if (!ConfigureBellwetherCampaignActors(assetRoot / "private_bellwether") || !gBellwetherCombinedRelicDealer)
+        return failCandidate("The Bellwether candidate requires the five pinned packaged residents.");
+    const auto voices = assetRoot / "private_bellwether_voice";
+    std::error_code voiceError;
+    const bool voiceOverlayExists = std::filesystem::exists(voices, voiceError);
+    if (voiceError || (voiceOverlayExists && !ConfigureBellwetherVoiceDirectory(voices)))
+        return failCandidate("The packaged Bellwether WAVs failed their identity check.");
 #endif
     gShowcaseCaptureHidden=launchOptions.captureHidden;
 #if !defined(_DEBUG)
