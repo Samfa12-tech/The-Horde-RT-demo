@@ -1072,6 +1072,18 @@ Samfa12/Codex. It reuses the admitted Bellwether stone, clay, timber and char
 materials. The editable source and receipt are in
 `assets/models/world/source/bellwether-well-v1/`.
 
+## Bellwether roof tiles and gable fittings - 27 November 2026
+
+Samfa12/Codex authored the clay tile surface, timber gable fittings and ridge
+caps as original Horde assets. The procedural surface uses original colour
+and relief data. The geometry derives from the project's Bellwether building
+shells. Both are covered by the existing project asset terms.
+
+The [material recipe and source maps](assets/models/world/source/bellwether-roof-v1/README.md)
+produce the Android and Windows KTX2 files in `assets/textures/props/runtime/bellwether-roof-v1/`.
+The [editable Blender master and export recipe](assets/models/world/source/bellwether-roofline-v1/README.md)
+supply the eight pitched roofs in the combined Bellwether town GLB.
+
 ## Bellwether west kitchen plots - 23 November 2026
 
 The T02 beds, soil and two crop silhouettes are original Horde geometry

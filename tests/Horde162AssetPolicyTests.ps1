@@ -75,8 +75,11 @@ function Assert-PropsGradleInventory([string]$Text) {
                 'textures/props/runtime/normal.android.ktx2','textures/props/runtime/orm.android.ktx2','textures/props/runtime/emissive.android.ktx2',
                 'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                 'textures/props/runtime/chapter-terrain/normal.android.ktx2',
-                'textures/props/runtime/chapter-terrain/orm.android.ktx2')
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle props assets must be the exact eight-file Android runtime roster.'
+                'textures/props/runtime/chapter-terrain/orm.android.ktx2',
+                'textures/props/runtime/bellwether-roof-v1/base-color.android.ktx2',
+                'textures/props/runtime/bellwether-roof-v1/normal.android.ktx2',
+                'textures/props/runtime/bellwether-roof-v1/orm.android.ktx2')
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle props assets must be the exact eleven-file Android runtime roster.'
 }
 function Assert-RagTorchGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'models/props/runtime/player-rag-torch/*' })
@@ -111,9 +114,10 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/world/runtime/bellwether-tavern-v1/*' -or
                        $_ -like 'models/world/runtime/bellwether-loose-road-stone-v1/*' -or
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
+                       $_ -like 'textures/props/runtime/bellwether-roof-v1/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 48) 'Android equipment and chapter staging require the closed 48-file package roster.'
+    Require ($required.Count -eq 51) 'Android equipment and chapter staging require the closed 51-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -250,8 +254,8 @@ try {
     Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'Gradle world assets must match'
     Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'Gradle world assets must match'
     Assert-PropsGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact eight-file Android runtime roster'
-    Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact eight-file Android runtime roster'
+    Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact eleven-file Android runtime roster'
+    Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact eleven-file Android runtime roster'
     Assert-RagTorchGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle.Replace("        include 'models/props/runtime/player-rag-torch/asset.manifest.json'",''))} 'exact two-file Android runtime roster'
     Expect-Failure {Assert-RagTorchGradleInventory ($gradle+"`ninclude 'models/props/runtime/player-rag-torch/*.glb'`n")} 'exact two-file Android runtime roster'
@@ -293,6 +297,9 @@ try {
                        'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
                        'textures/props/runtime/chapter-terrain/orm.android.ktx2',
+                       'textures/props/runtime/bellwether-roof-v1/base-color.android.ktx2',
+                       'textures/props/runtime/bellwether-roof-v1/normal.android.ktx2',
+                       'textures/props/runtime/bellwether-roof-v1/orm.android.ktx2',
                        'models/characters/runtime/kit-warden-v1/asset.manifest.json',
                        'models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb',
                        'textures/characters/runtime/kit-warden-v1/base-color.android.ktx2',
@@ -311,7 +318,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 48-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 51-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -363,9 +370,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 86 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 87) 'Both base runtime rosters include the Bellwether world assets.'
-    Require ($windows.Count -eq 146 -and $android.Count -eq 147) 'Both platforms have the expected full runtime asset roster.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 89 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 90) 'Both base runtime rosters include the Bellwether world assets.'
+    Require ($windows.Count -eq 149 -and $android.Count -eq 150) 'Both platforms have the expected full runtime asset roster.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name

@@ -8,6 +8,7 @@
 namespace horde::scene {
 namespace {
 using assets::StaticMeshAsset;
+constexpr std::string_view kRoofTiles="HordeVillageRoofTiles";
 constexpr std::string_view kTavernTimber="HordeTavernTimber";
 constexpr std::string_view kTavernRuntimeDirectory="models/world/runtime/bellwether-tavern-v1";
 
@@ -186,8 +187,8 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         return node.name=="BellwetherSolid";})) {
         diagnostic="Bellwether is already admitted to this owner.";return false;
     }
-    constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
-    constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
+    constexpr std::array<std::string_view,5> names{"HordeTownStone","HordeTownRoofClay",kTavernTimber,"HordeHearthChar",kRoofTiles};
+    constexpr std::array<std::string_view,5> families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick",kRoofTiles};
     if(timberMaterialProvider && (timberMaterialProvider->name!="ChestWood" ||
        timberMaterialProvider->baseColorTexture<0 || timberMaterialProvider->normalTexture<0 ||
        timberMaterialProvider->ormTexture<0 || timberMaterialProvider->emissiveTexture>=0 ||
@@ -229,7 +230,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
        })) {
         diagnostic="The wayside register requires two untextured opaque finishes.";return false;
     }
-    if(source.primitives.size()!=5 || source.materials.size()!=names.size() ||
+    if(source.primitives.size()!=6 || source.materials.size()!=names.size() ||
        source.indices.size()!=(kBellwetherSolidTriangles+kBellwetherGroundTriangles)*3 ||
        world.primitives.empty() || world.nodeTransforms.empty() || world.primitives.size()+source.primitives.size()>32 ||
        world.vertices.size()>UINT32_MAX-source.vertices.size() ||
@@ -266,6 +267,9 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     std::array<bool,names.size()> seen{};
     std::array<bool,names.size()> wood{};
     auto stagedMaterials=world.materials;
+    if(std::any_of(stagedMaterials.begin(),stagedMaterials.end(),[](const auto& row){ return row.name==kRoofTiles; })) {
+        diagnostic="Bellwether roof tile material already exists in the world owner.";return false;
+    }
     if(timberMaterialProvider) {
         if(std::any_of(stagedMaterials.begin(),stagedMaterials.end(),[](const auto& material) {
             return material.name==kTavernTimber;
@@ -285,7 +289,16 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
             diagnostic="Bellwether source requests unadmitted material or light features.";return false;
         }
         const auto index=static_cast<std::size_t>(named-names.begin());
-        const auto rowName=index==2u && timberMaterialProvider ? kTavernTimber : families[index];
+        if(m.name==kRoofTiles) {
+            auto tiles=m;
+            // World groups 0–3 are the forest and 4–5 are the road and ground.
+            // The three roof maps append together, before Kit and resident maps.
+            tiles.textureGroup=6;
+            tiles.deferTextureAllocation=true;
+            tiles.baseColorTexture=tiles.normalTexture=tiles.ormTexture=0;
+            stagedMaterials.push_back(std::move(tiles));
+        }
+        const auto rowName=m.name==kTavernTimber && timberMaterialProvider ? kTavernTimber : families[index];
         const auto found=std::find_if(stagedMaterials.begin(),stagedMaterials.end(),
             [&](const auto& material){return material.name==rowName;});
         if(seen[index] || found==stagedMaterials.end()) {
@@ -293,7 +306,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         }
         seen[index]=true;
         mappedRows[i]=static_cast<std::uint32_t>(found-stagedMaterials.begin());
-        wood[i]=index>=2;
+        wood[i]=m.name==kTavernTimber || m.name=="HordeHearthChar";
     }
     using Surface=gameplay::simulation::TriangleSupportSurface;
     std::vector<Surface::Triangle> contact,ground;

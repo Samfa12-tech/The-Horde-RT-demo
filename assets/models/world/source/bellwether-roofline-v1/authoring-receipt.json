@@ -1,0 +1,455 @@
+{
+  "feature": "Mapped Bellwether B01-B08 roof tiles, masonry gables and oak roofline",
+  "parentSourceMasterSha256": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
+  "originalTownSha256": "5c0b850b1159e5417f0d58800e8d38dce9c1a12b80f1ddd4c9e32a229b82e6de",
+  "originalTownManifestSha256": "ac31c5dba4d4e4018fda77662201c2108f6ef42b0f22449770a685a7b826a3f6",
+  "runtimeTownSha256": "71874a3d4b203f84045c1bd807eb3232ba7ba7246493735f12475591056cec58",
+  "sourceMasterSha256": "8133137f73605afc7385331d918d99a6879f19cce6296cca6b9f6be954b022ea",
+  "sourceInventory": {
+    "meshObjects": 156,
+    "hiddenTerrainMeshes": 0,
+    "unusedMeshDatablocks": 0,
+    "packedImages": 0,
+    "materials": 4,
+    "compressedBlend": true
+  },
+  "untouchedGeometrySemanticSha256": {
+    "roof_clay_unselected": "2cb52b31b881d7580d30489bc7b303cbee7b96cf87cd1eaa8e3d23104f6a5798",
+    "stone": "7af5a41134b68377ea451e059b677283124f0455a621e51634a52bad7e84b8a0",
+    "timber": "01fc0a72497956ea225254179d828a8fa6998dc69e03a8a98d9ee10b7c38939a",
+    "hearth_char": "e5c7903419c466998e7370888e838e94c5ee4a2d4abb0d50f0c8f8642cefff66"
+  },
+  "runtimeMaterialOrder": [
+    "HordeTownRoofClay",
+    "HordeTownStone",
+    "HordeTavernTimber",
+    "HordeHearthChar",
+    "HordeVillageRoofTiles"
+  ],
+  "roofFaceCounts": {
+    "B01": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B02": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B03": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B04": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B05": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B06": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B07": {
+      "roof": 4,
+      "gable": 2
+    },
+    "B08": {
+      "roof": 4,
+      "gable": 2
+    }
+  },
+  "slopeTrianglesMoved": 32,
+  "gableTrianglesMovedToStone": 16,
+  "addedSolidTriangles": 1024,
+  "uvValidation": [
+    {
+      "uDeltas": [
+        6.875,
+        0.0
+      ],
+      "vDeltas": [
+        -5.003512,
+        -5.003512
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        0.0
+      ],
+      "vDeltas": [
+        5.003512,
+        5.003512
+      ]
+    },
+    {
+      "uDeltas": [
+        10.208332,
+        0.0
+      ],
+      "vDeltas": [
+        -4.232857,
+        -4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        10.208332,
+        0.0
+      ],
+      "vDeltas": [
+        4.232857,
+        4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        5.208333,
+        0.0
+      ],
+      "vDeltas": [
+        -3.857318,
+        -3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        5.208333,
+        0.0
+      ],
+      "vDeltas": [
+        3.857318,
+        3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        0.0
+      ],
+      "vDeltas": [
+        -3.857318,
+        -3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        0.0
+      ],
+      "vDeltas": [
+        3.857318,
+        3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        0.0
+      ],
+      "vDeltas": [
+        -3.857316,
+        -3.857316
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        0.0
+      ],
+      "vDeltas": [
+        3.857316,
+        3.857316
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        0.0
+      ],
+      "vDeltas": [
+        -4.232857,
+        -4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        0.0
+      ],
+      "vDeltas": [
+        4.232857,
+        4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        4.791667,
+        0.0
+      ],
+      "vDeltas": [
+        -3.170025,
+        -3.170025
+      ]
+    },
+    {
+      "uDeltas": [
+        4.791667,
+        0.0
+      ],
+      "vDeltas": [
+        3.170025,
+        3.170025
+      ]
+    },
+    {
+      "uDeltas": [
+        3.958333,
+        0.0
+      ],
+      "vDeltas": [
+        -2.933287,
+        -2.933287
+      ]
+    },
+    {
+      "uDeltas": [
+        3.958333,
+        0.0
+      ],
+      "vDeltas": [
+        2.933287,
+        2.933287
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        6.875
+      ],
+      "vDeltas": [
+        0.0,
+        -5.003512
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        6.875
+      ],
+      "vDeltas": [
+        0.0,
+        5.003512
+      ]
+    },
+    {
+      "uDeltas": [
+        10.208332,
+        10.208332
+      ],
+      "vDeltas": [
+        0.0,
+        -4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        10.208332,
+        10.208332
+      ],
+      "vDeltas": [
+        0.0,
+        4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        5.208333,
+        5.208333
+      ],
+      "vDeltas": [
+        0.0,
+        -3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        5.208333,
+        5.208333
+      ],
+      "vDeltas": [
+        0.0,
+        3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        6.041667
+      ],
+      "vDeltas": [
+        0.0,
+        -3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        6.041667
+      ],
+      "vDeltas": [
+        0.0,
+        3.857318
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        6.875
+      ],
+      "vDeltas": [
+        0.0,
+        -3.857316
+      ]
+    },
+    {
+      "uDeltas": [
+        6.875,
+        6.875
+      ],
+      "vDeltas": [
+        0.0,
+        3.857316
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        6.041667
+      ],
+      "vDeltas": [
+        0.0,
+        -4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        6.041667,
+        6.041667
+      ],
+      "vDeltas": [
+        0.0,
+        4.232857
+      ]
+    },
+    {
+      "uDeltas": [
+        4.791667,
+        4.791667
+      ],
+      "vDeltas": [
+        0.0,
+        -3.170025
+      ]
+    },
+    {
+      "uDeltas": [
+        4.791667,
+        4.791667
+      ],
+      "vDeltas": [
+        0.0,
+        3.170025
+      ]
+    },
+    {
+      "uDeltas": [
+        3.958333,
+        3.958333
+      ],
+      "vDeltas": [
+        0.0,
+        -2.933287
+      ]
+    },
+    {
+      "uDeltas": [
+        3.958333,
+        3.958333
+      ],
+      "vDeltas": [
+        0.0,
+        2.933287
+      ]
+    }
+  ],
+  "trimTangentValidation": {
+    "HordeTownRoofClay": {
+      "vertices": 768,
+      "minimumTangentLength": 0.9999999841902268,
+      "maximumAbsNormalDot": 1.6444235084733805e-08
+    },
+    "HordeTavernTimber": {
+      "vertices": 2304,
+      "minimumTangentLength": 0.9999999740990188,
+      "maximumAbsNormalDot": 7.075481145424334e-09
+    }
+  },
+  "allSolidTangentValidation": {
+    "HordeTownRoofClay": {
+      "vertices": 16471,
+      "minimumTangentLength": 0.9999317929417922,
+      "maximumAbsNormalDot": 0.00012338701828595866
+    },
+    "HordeTownStone": {
+      "vertices": 24144,
+      "minimumTangentLength": 0.9999343160107607,
+      "maximumAbsNormalDot": 0.9999875002339975
+    },
+    "HordeTavernTimber": {
+      "vertices": 30952,
+      "minimumTangentLength": 0.9999243277880464,
+      "maximumAbsNormalDot": 0.00012349687781479458
+    },
+    "HordeHearthChar": {
+      "vertices": 11596,
+      "minimumTangentLength": 0.9999337718208537,
+      "maximumAbsNormalDot": 0.00011553893217884116
+    },
+    "HordeVillageRoofTiles": {
+      "vertices": 96,
+      "minimumTangentLength": 1.0,
+      "maximumAbsNormalDot": 0.0
+    }
+  },
+  "primitiveCountIncludingWalkable": 6,
+  "materialCount": 5,
+  "runtimeCounts": {
+    "vertices": 90833,
+    "indices": 128295,
+    "triangles": 42765
+  },
+  "affectedViewTitles": [
+    "B01 Tavern - Square South Gable",
+    "B07 Store - Street Gable",
+    "B08 Outbuilding - Street Gable"
+  ],
+  "roofMaterialPbr": {
+    "baseColorFactor": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "metallicFactor": 0,
+    "roughnessFactor": 1.0
+  },
+  "uvConvention": {
+    "U": "along ridge Z, 2.4 metres per repeat",
+    "V": "eave V=0 to ridge, 2.4 metres per repeat",
+    "tangent": "U along +Z; handedness is derived from the outward slope normal on each face"
+  },
+  "collisionNote": "32 existing slope triangles are relabelled with unchanged positions; 16 existing gable triangles are relabelled as masonry with unchanged positions; 1024 new closed solid triangles are in the BellwetherSolid collision source and remain non-walkable. No underside, ancillary roof, pot or church-spire geometry changed."
+}
