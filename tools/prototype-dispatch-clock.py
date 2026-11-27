@@ -28,7 +28,7 @@ def replace(path, old, new):
     path.write_text(text.replace(old, new), encoding="utf-8", newline="\n")
 
 
-def observe_function(path, name, category):
+def observe_function(path, name, category_expression):
     text = path.read_text(encoding="utf-8")
     clean = re.sub(r"/\*.*?\*/|//[^\n]*", lambda m: " " * len(m[0]), text, flags=re.S)
     pattern = rf"\b(\w+)\s+{name}\s*\([^;{{}}]*\)\s*\{{"
@@ -56,7 +56,7 @@ def observe_function(path, name, category):
         body = body[:result.start()] + (
             f"{{ {match[1]} clockResult = {expression}; "
             "rtClockSwitch(clockPreviousCategory); return clockResult; }") + body[result.end():]
-    body = f"\n    uint clockPreviousCategory = rtClockSwitch({category}u);" + body
+    body = f"\n    uint clockPreviousCategory = rtClockSwitch({category_expression});" + body
     if name == "traceScene":
         marker = "    if (rayQueryGetIntersectionTypeEXT(query, true) != gl_RayQueryCommittedIntersectionNoneEXT)"
         if body.count(marker) != 1:
@@ -178,13 +178,15 @@ def shader_metadata_layout(source):
             "controlOffset": capacity * record_bytes}
 
 
-def prepare(source, output):
+def prepare(source, output, *, hearth_shadow_split=False):
     repo = Path(__file__).resolve().parents[1]
     source, output = source.resolve(), output.resolve()
     reports = (repo / "reports").resolve()
     if not output.is_relative_to(reports) or output == reports or output.exists():
         raise RuntimeError("Choose a new, non-existing directory under reports")
     layout = shader_metadata_layout(source)
+    if hearth_shadow_split and layout["layout"] != "ordinary":
+        raise RuntimeError("The hearth shadow split requires the ordinary RT layout")
     generated = source / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
     generated_text = generated.read_text(encoding="utf-8")
     if "clockControl" in generated_text or (source / "dispatch-clock-probe.json").exists():
@@ -236,7 +238,22 @@ def prepare(source, output):
     shutil.copytree(source / "src/vulkan/raytracing/variants", cpp / "variants")
     include = private / "shaders/raytracing/include"
     replace(include / "rt_scene_abi.generated.glsl", expected, replacement)
-    (include / "rt_dispatch_clock.glsl").write_text(CLOCK_GLSL, encoding="utf-8", newline="\n")
+    clock_glsl = CLOCK_GLSL
+    shadow_category = "3u"
+    dust_category = "7u"
+    categories = ["other", "ray traversal/filter", "hit decode/material", "shadow visibility",
+                  "surface/transport", "fire volume", "mist/electricity", "dust"]
+    if hearth_shadow_split:
+        clock_glsl += "\nbool rtClockDirectFireShadow = false;\n"
+        shadow_category = "rtClockDirectFireShadow ? 7u : 3u"
+        dust_category = "6u"
+        categories[3] = "other shadow visibility"
+        categories[6:] = ["mist/electricity/dust", "direct fire-emitter shadow visibility"]
+        fire_shadow_call = "        vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);"
+        replace(include / "rt_lighting.glsl", fire_shadow_call,
+                "        rtClockDirectFireShadow = true;\n" + fire_shadow_call +
+                "\n        rtClockDirectFireShadow = false;")
+    (include / "rt_dispatch_clock.glsl").write_text(clock_glsl, encoding="utf-8", newline="\n")
     replace(include / "rt_frame.glsl", '#include "rt_scene_abi.glsl"',
             '#include "rt_scene_abi.glsl"\n#include "rt_dispatch_clock.glsl"')
     replace(include / "rt_frame.glsl", "    vec2 uv =", "    rtClockBegin();\n    vec2 uv =")
@@ -248,14 +265,14 @@ def prepare(source, output):
                 "#extension GL_EXT_buffer_reference_uvec2 : require\n"
                 "#extension GL_EXT_shader_realtime_clock : require")
     for file, name, category in [
-        ("rt_hit_decode.glsl", "traceScene", 1),
-        ("rt_lighting.glsl", "visibilityMask", 3),
-        ("rt_lighting.glsl", "boundedShadowTransmittanceMask", 3),
-        ("rt_dielectric_common.glsl", "shadePrimary", 4),
-        ("rt_fire.glsl", "integrateFireEmitters", 5),
-        ("rt_atmosphere.glsl", "lichGroundMist", 6),
-        ("rt_atmosphere.glsl", "staffElectricity", 6),
-        ("rt_indoor_dust.glsl", "composeIndoorDust", 7),
+        ("rt_hit_decode.glsl", "traceScene", "1u"),
+        ("rt_lighting.glsl", "visibilityMask", shadow_category),
+        ("rt_lighting.glsl", "boundedShadowTransmittanceMask", shadow_category),
+        ("rt_dielectric_common.glsl", "shadePrimary", "4u"),
+        ("rt_fire.glsl", "integrateFireEmitters", "5u"),
+        ("rt_atmosphere.glsl", "lichGroundMist", "6u"),
+        ("rt_atmosphere.glsl", "staffElectricity", "6u"),
+        ("rt_indoor_dust.glsl", "composeIndoorDust", dust_category),
     ]:
         observe_function(include / file, name, category)
 
@@ -267,13 +284,14 @@ def prepare(source, output):
         "stride": STRIDE,
         "offset": OFFSET,
         "samplesOffset": layout["controlOffset"] + 16,
-        "categories": ["other", "ray traversal/filter", "hit decode/material", "shadow visibility",
-                       "surface/transport", "fire volume", "mist/electricity", "dust"],
+        "categories": categories,
         "baseShaderSourceSha256": base_shader_digest,
         "baseShaderFiles": base_shader_hashes,
         "baseAbiFiles": abi_files,
         "baseShippingModules": base_catalog,
     }
+    if hearth_shadow_split:
+        marker["profile"] = "hearth-shadow-split"
     (private / "dispatch-clock-probe.json").write_text(json.dumps(marker, indent=2) + "\n", encoding="utf-8")
     private_hashes = {p.relative_to(private).as_posix(): sha256(p.read_bytes())
                       for p in (private / "shaders/raytracing").rglob("*") if p.is_file()}
@@ -281,7 +299,7 @@ def prepare(source, output):
         "schema": 2,
         "sourceRoot": str(source),
         "method": "32x32 stratified sparse exclusive device-clock ticks; no effect omissions",
-        "layout": "ordinary",
+        "layout": layout["layout"],
         "baseShaderSourceSha256": base_shader_digest,
         "baseShaderFiles": base_shader_hashes,
         "baseAbiFiles": abi_files,
@@ -298,5 +316,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--hearth-shadow-split", action="store_true",
+                        help="separate direct fire-emitter shadows from other shadow queries")
     args = parser.parse_args()
-    print(prepare(args.source, args.output))
+    print(prepare(args.source, args.output, hearth_shadow_split=args.hearth_shadow_split))

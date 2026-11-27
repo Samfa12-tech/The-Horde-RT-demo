@@ -369,7 +369,11 @@ private:
             << "\"output_height\":" << dimensions.outputHeight << ','
             << "\"pipeline_sha256\":\"" << RtFixedTextView(sample.scene.pipeline.active.sha256) << "\","
             << "\"execution_mode\":\"" << RtExecutionModeName(sample.scene.pipeline.executionMode) << "\","
+#if defined(HORDE_RT_HEARTH_SHADOW_CLOCK)
+            << "\"category_order\":[\"other\",\"trace\",\"material\",\"other_shadow\",\"surface\",\"fire\",\"mist_dust\",\"direct_fire_shadow\"],"
+#else
             << "\"category_order\":[\"other\",\"trace\",\"material\",\"shadow\",\"surface\",\"fire\",\"mist\",\"dust\"],"
+#endif
             << "\"category_ticks\":[";
         for (std::size_t i = 0; i < tag.clockTotals.size(); ++i) {
             if (i) metadata << ',';

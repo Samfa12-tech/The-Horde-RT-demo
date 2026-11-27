@@ -43,6 +43,8 @@ temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
 
 **28 November shadow candidate primitive index — closed.** A trial moved the candidate primitive-index read inside the shared-world instance check at the staffed hearth. At the same 33% Pipeline view, trial medians were 76.30 and 76.35 ms for RT dispatch. Both took 0.20 ms longer than their adjacent controls on average. Restricting the analysis to frames bracketed by matching 1300 MHz readings also showed no repeatable gain. The frozen image matched pixel for pixel. Keep the ordinary shader. [Phone comparison and raw captures](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison)
 
+**28 November hearth shadow attribution — ready for device capture.** The private [dispatch observer](AGENT_VALIDATION.md#sampling-the-staffed-hearth-dispatch-on-android) can separate direct fire-emitter visibility from other shadow queries. Use the matched ordinary and observation builds at the same staffed-hearth view. Check the frozen image before collecting the three settled samples. Use the direct-fire share for pixels that hit the shared world to decide whether to investigate those lights further.
+
 
 **24 November ordinary Android hearth controls.** At the same position and
 graphics settings, the [stationary view comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)

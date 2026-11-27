@@ -7,7 +7,9 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"tools"))
-from analyze_android_dispatch_clock import AnalysisError, CATEGORIES, admit_clock_rows, admit_raw, analyze_hearth
+from analyze_android_dispatch_clock import (
+    AnalysisError, CATEGORIES, HEARTH_SHADOW_CATEGORIES, admit_clock_rows, admit_raw, analyze_hearth,
+)
 
 
 def fixture():
@@ -85,10 +87,35 @@ class ClockAdmissionTests(unittest.TestCase):
             self.assertEqual(result["witnesses"][0]["samples"], 2)
             for key, value in (("completion_serial", 6), ("scene_epoch", 3), ("clock_ticket", 9),
                                ("record_count", 1), ("sample_index", 2), ("room_dwell_ticks", 299),
-                               ("pipeline_sha256", "d"*64), ("raw_file", "../other.bin")):
+                               ("pipeline_sha256", "d"*64), ("raw_file", "../other.bin"),
+                               ("category_order", tuple(reversed(HEARTH_SHADOW_CATEGORIES)))):
                 sidecar.write_text(json.dumps(dict(receipt, **{key: value})))
                 with self.subTest(key=key), self.assertRaises(AnalysisError):
                     analyze_hearth(folder, digest, verify_room, ids)
+
+            split = bytearray(raw)
+            struct.pack_into("<Q", split, 16 + 3*8, 7)
+            struct.pack_into("<Q", split, 16 + 7*8, 11)
+            totals = list(receipt["category_ticks"])
+            totals[3], totals[7] = 7, 11
+            sidecar.write_text(json.dumps(dict(receipt, category_order=HEARTH_SHADOW_CATEGORIES, category_ticks=totals)))
+            sidecar.with_suffix(".bin").write_bytes(split)
+            result = analyze_hearth(folder, digest, verify_room, ids)["witnesses"][0]
+            self.assertEqual(result["sampledClockTicks"]["other_shadow"], 7)
+            self.assertEqual(result["sampledClockTicksByPrimaryClass"][0]["direct_fire_shadow"], 11)
+            self.assertEqual(result["sampledClockTicksByPrimaryClass"][1]["direct_fire_shadow"], 0)
+
+            next_row = dict(row, elapsed_ns=200, present_return_ns=1200, submission_serial=6,
+                            completion_serial=6, present_serial=6, gpu_serial=6, gpu_stage_serial=6, tick=9360)
+            with (folder/"bellwether-west-roundtrip.csv").open("a", newline="") as stream:
+                csv.DictWriter(stream, fieldnames=row).writerow(next_row)
+            next_stem = "bellwether-westroundtrip-hearth-clock-1000-return-1-sample-2-6"
+            next_receipt = dict(receipt, sample_index=2, room_dwell_ticks=360, simulation_tick=9360,
+                                submission_serial=6, completion_serial=6, presented_serial=6,
+                                clock_ticket=8, raw_file=next_stem+".bin")
+            (folder/(next_stem+".json")).write_text(json.dumps(next_receipt))
+            with self.assertRaisesRegex(AnalysisError, "Mixed runs.*clock categories"):
+                analyze_hearth(folder, digest, verify_room, ids)
 
 
 if __name__ == "__main__": unittest.main()
