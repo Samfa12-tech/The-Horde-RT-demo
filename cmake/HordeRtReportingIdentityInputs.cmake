@@ -59,6 +59,11 @@ function(horde_rt_attach_reporting_identity target root platform abi)
     if(HORDE_RT_WINDOWS_ACCEPTANCE)
         set(windows_acceptance 1)
     endif()
+    set(definitions "platform=${platform}" "abi=${abi}" "minimumRenderScale=${minimum_scale}"
+        "actorWorker=${actor_worker}" "windowsAcceptance=${windows_acceptance}")
+    if(HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE)
+        list(APPEND definitions "windowsBellwetherCandidate=1")
+    endif()
     horde_rt_attach_build_identity(TARGET "${target}" REPO_ROOT "${root}" INPUTS ${inputs}
-        DEFINITIONS "platform=${platform}" "abi=${abi}" "minimumRenderScale=${minimum_scale}" "actorWorker=${actor_worker}" "windowsAcceptance=${windows_acceptance}")
+        DEFINITIONS ${definitions})
 endfunction()

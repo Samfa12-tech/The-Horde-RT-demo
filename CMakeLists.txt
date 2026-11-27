@@ -33,8 +33,17 @@ option(HORDE_RT_FLASK_CANDIDATE "Explicit isolated flask application integration
 option(HORDE_RT_PRIVATE_REVIVAL "Private owner game integration; requires pinned local stand/cry package, never a release admission" OFF)
 option(HORDE_RT_SHIPPING17_CONTENT "Explicit 1.7 ordinary-package flask and revival admission; requires pinned local package assets" OFF)
 option(HORDE_RT_WINDOWS_ACCEPTANCE "Require isolated state for an interactive Windows development acceptance package" OFF)
+option(HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE "Enable the isolated private Bellwether package in Windows Release" OFF)
 option(HORDE_RT_ACTOR_WORKER_EXPERIMENT "Opt-in exclusive CPU actor preparation experiment; not admitted for shipping" OFF)
 option(HORDE_RT_FRAME_STAGE_PROBE "Opt-in GPU AS/dispatch/transfer observation; no shader changes" OFF)
+
+if(HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE AND
+   (NOT WIN32 OR NOT HORDE_RT_BUILD_VULKAN_TARGETS OR NOT HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW OR
+    NOT HORDE_RT_SHIPPING17_CONTENT OR HORDE_RT_WINDOWS_ACCEPTANCE OR HORDE_RT_CHAPTER_MEASUREMENT OR
+    HORDE_RT_ACTOR_WORKER_EXPERIMENT OR HORDE_RT_FRAME_STAGE_PROBE OR HORDE_RT_INSTRUMENTATION_OVERRIDE OR
+    HORDE_RT_DIELECTRIC_QUALITY_OVERRIDE OR HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT OR HORDE_RT_STAGED_PRIMARY_SHADER_DIR))
+    message(FATAL_ERROR "The optimized Bellwether candidate requires the Windows Vulkan game, its pinned foundation and standard Shipping/High policy.")
+endif()
 
 include(CTest)
 if(WIN32 AND (BUILD_TESTING OR (HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW)))
@@ -601,6 +610,10 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         HORDE_RT_BUILD_ID="${HORDE_RT_BUILD_ID}"
         $<$<CONFIG:Debug>:HORDE_RT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}">
     )
+    if(HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE)
+        target_compile_definitions(horde_rt_diagnostic_window PRIVATE
+            $<$<CONFIG:Release>:HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=1>)
+    endif()
     include(cmake/HordeRtReportingIdentityInputs.cmake)
     horde_rt_attach_reporting_identity(horde_rt_diagnostic_window "${CMAKE_CURRENT_SOURCE_DIR}" Windows "${CMAKE_GENERATOR_PLATFORM}")
     if(HORDE_RT_PRIVATE_REVIVAL)

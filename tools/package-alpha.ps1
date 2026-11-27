@@ -99,7 +99,7 @@ foreach ($candidateFile in $candidateFiles) {
 }
 New-Item -ItemType Directory -Force -Path $windowsStage | Out-Null
 
-& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF "-DHORDE_RT_SHIPPING17_CONTENT=$(if($Version -eq '1.7.0'){'ON'}else{'OFF'})"
+& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF -DHORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=OFF "-DHORDE_RT_SHIPPING17_CONTENT=$(if($Version -eq '1.7.0'){'ON'}else{'OFF'})"
 if ($LASTEXITCODE -ne 0) { throw "CMake configure failed." }
 & $cmake --build (Join-Path $repoRoot "build") --config $WindowsConfiguration
 if ($LASTEXITCODE -ne 0) { throw "Windows build failed." }

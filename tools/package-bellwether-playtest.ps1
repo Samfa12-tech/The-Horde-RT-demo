@@ -3,7 +3,8 @@ param(
     [Parameter(Mandatory)][string]$WindowsExecutable,
     [Parameter(Mandatory)][string]$BaseWindowsZip,
     [Parameter(Mandatory)][string]$ResidentDirectory,
-    [Parameter(Mandatory)][string]$VoiceDirectory
+    [string]$VoiceDirectory,
+    [switch]$OptimizedCandidate
 )
 
 $ErrorActionPreference = 'Stop'
@@ -23,61 +24,62 @@ if ((Get-FileHash -LiteralPath $base).Hash.ToLowerInvariant() -ne $expectedBase)
 }
 $executable = (Resolve-Path -LiteralPath $WindowsExecutable).Path
 $residents = (Resolve-Path -LiteralPath $ResidentDirectory).Path
-$voices = (Resolve-Path -LiteralPath $VoiceDirectory).Path
+if (!$OptimizedCandidate -and !$VoiceDirectory) { throw 'The Debug playtest requires its prepared voice directory.' }
+$voices = if ($VoiceDirectory) { (Resolve-Path -LiteralPath $VoiceDirectory).Path }
 $revision = (& git -C $repo rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or $revision -notmatch '^[0-9a-f]{40}$') { throw 'Could not identify the playtest source.' }
 $executableIdentity = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($executable))
-if ($executableIdentity -cnotmatch "g:$revision;i:[0-9a-f]{64};c:D;s:C") {
+if ($OptimizedCandidate) {
+    if ($executableIdentity -cnotmatch "g:$revision;i:[0-9a-f]{64};c:R;s:C" -or
+        !$executableIdentity.Contains('horde-bellwether-optimized-v1')) {
+        throw 'Build the optimized Windows candidate in Release from the current clean source commit.'
+    }
+} elseif ($executableIdentity -cnotmatch "g:$revision;i:[0-9a-f]{64};c:D;s:C") {
     throw 'Build the Windows playtest in Debug from the current clean source commit.'
 }
-$voiceLines = @(
-    'kit.accept_base.limit','kit.accept_base.work','kit.accept_base.sit','hub.kit_introduce','hub.hoard_answer',
-    'kit.approach_injury.stop','kit.approach_injury.ankle','kit.approach_injury.slow','hub.arrival_chair','hub.horde_army',
-    'access.body_task','access.body_progress','hub.passing.learned_retreat'
-)
-$followOn = @('hub.two_routes','hub.routes_independent','kit.voice_reaction','kit.first_direct_voice.finish',
-    'kit.royal_claim.help','hub.ordinary_sale')
-$presentFollowOn = @($followOn | Where-Object { Test-Path -LiteralPath (Join-Path $voices "$_.wav") })
-if ($presentFollowOn.Count -gt 0) {
-    if ($presentFollowOn.Count -ne $followOn.Count) { throw 'The follow-on audition needs all six prepared WAVs.' }
-    $voiceLines += $followOn
-}
-$hearth = @('hub.kit_stake','kit.personal_stake.key')
-$presentHearth = @($hearth | Where-Object { Test-Path -LiteralPath (Join-Path $voices "$_.wav") })
-if ($presentHearth.Count -gt 0) {
-    if ($presentHearth.Count -ne $hearth.Count) { throw 'The Kit hearth audition needs both prepared WAVs.' }
-    $hearthHashes = @{
+$voiceLines = @()
+if ($voices) {
+    $voiceLines = @('kit.accept_base.limit','kit.accept_base.work','kit.accept_base.sit','hub.kit_introduce','hub.hoard_answer')
+    $voiceGroups = [ordered]@{
+        arrival = @('kit.approach_injury.stop','kit.approach_injury.ankle','kit.approach_injury.slow','hub.arrival_chair','hub.horde_army')
+        shore = @('access.body_task','access.body_progress','hub.passing.learned_retreat')
+        'follow-on' = @('hub.two_routes','hub.routes_independent','kit.voice_reaction','kit.first_direct_voice.finish',
+            'kit.royal_claim.help','hub.ordinary_sale')
+        hearth = @('hub.kit_stake','kit.personal_stake.key')
+    }
+    foreach ($name in $voiceGroups.Keys) {
+        $group = $voiceGroups[$name]
+        $present = @($group | Where-Object { Test-Path -LiteralPath (Join-Path $voices "$_.wav") -PathType Leaf })
+        if ($present.Count -gt 0 -or (!$OptimizedCandidate -and $name -in 'arrival','shore')) {
+            if ($present.Count -ne $group.Count) { throw "The $name audition needs every prepared WAV in its group." }
+            $voiceLines += $group
+        }
+    }
+
+    $pinnedWavs = [ordered]@{
         'hub.kit_stake' = '9f7c15c99489614579fc6f7e69845a2d3d83d46f5d75845d55464d3795c26b82'
         'kit.personal_stake.key' = 'd82e1198d35124ffb23c25633141597f1c2bb4ee431a1ee300923b124d6caeb0'
+        'hub.first_errand' = '7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8'
+        'hub.shrine_direction' = '25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44'
+        'lantern.first_identity' = '6aae2d8fbc39f78ff6da80c9ef3ebd647822f750673d6c206cdc505b5a8cde6f'
+        'lantern.first_request' = '7865d1ebaf81329338bee3d06961c98750b7f651e86a23ad01c85c9a2dd69083'
+        'lantern.town_seals' = '78580a62a2969870b0820f976753df70e1888e66ac8ab01633585dd4d2e1dd88'
     }
-    foreach ($line in $hearth) {
-        if ((Get-FileHash -LiteralPath (Join-Path $voices "$line.wav")).Hash.ToLowerInvariant() -ne $hearthHashes[$line]) {
-            throw "The Kit hearth audition differs from the exact reviewed take: $line"
+    foreach ($line in $pinnedWavs.Keys) {
+        $path = Join-Path $voices "$line.wav"
+        if (Test-Path -LiteralPath $path) {
+            if ((Get-FileHash -LiteralPath $path).Hash -ne $pinnedWavs[$line]) {
+                throw "The private voice differs from its reviewed take: $line"
+            }
+            if ($line -notin $voiceLines) { $voiceLines += $line }
         }
-    }
-    $voiceLines += $hearth
-}
-
-$optionalVoices = [ordered]@{
-    'hub.first_errand' = '7ddf64e532156ee4d46f50858f18c9362a748b7c98c67d8c564c9fcbe66291d8'
-    'hub.shrine_direction' = '25f310416c92fd6011550960bda57fd4c2070ba92beb18cfd0dc6e17cecb4e44'
-    'lantern.first_identity' = '6aae2d8fbc39f78ff6da80c9ef3ebd647822f750673d6c206cdc505b5a8cde6f'
-    'lantern.first_request' = '7865d1ebaf81329338bee3d06961c98750b7f651e86a23ad01c85c9a2dd69083'
-    'lantern.town_seals' = '78580a62a2969870b0820f976753df70e1888e66ac8ab01633585dd4d2e1dd88'
-}
-foreach ($line in $optionalVoices.Keys) {
-    $path = Join-Path $voices "$line.wav"
-    if (Test-Path -LiteralPath $path) {
-        if ((Get-FileHash -LiteralPath $path).Hash -ne $optionalVoices[$line]) {
-            throw "The private voice differs from its reviewed take: $line"
-        }
-        $voiceLines += $line
     }
 }
 
+$profile = if ($OptimizedCandidate) { 'Candidate' } else { 'Playtest' }
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
-    'reports/horde-bellwether-playtest-' + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
-$package = (New-Item -ItemType Directory -Path (Join-Path $output 'Bellwether Playtest')).FullName
+    "reports/horde-bellwether-$($profile.ToLowerInvariant())-" + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
+$package = (New-Item -ItemType Directory -Path (Join-Path $output "Bellwether $profile")).FullName
 $assetRoot = (New-Item -ItemType Directory -Path (Join-Path $package 'assets')).FullName
 
 function Copy-PlaytestInput([string]$source, [string]$target) {
@@ -126,20 +128,25 @@ foreach ($line in $voiceLines) {
     Copy-PlaytestInput (Join-Path $voices "$line.wav") (Join-Path $assetRoot "private_bellwether_voice/$line.wav")
 }
 Copy-PlaytestInput $executable (Join-Path $package 'HordeLanternRT.exe')
-Set-Content -LiteralPath (Join-Path $package 'Bellwether.playtest') -Value 'Private Bellwether playtest'
-@'
-Horde Lantern RT — private Bellwether 1.8 playtest (Windows x64)
+if ($OptimizedCandidate) {
+    Set-Content -LiteralPath (Join-Path $package 'Bellwether.candidate') -Encoding ascii -Value 'horde-bellwether-optimized-v1'
+    $saveLocation = 'The candidate saves in state/campaign-v1 beside the game.'
+} else {
+    Set-Content -LiteralPath (Join-Path $package 'Bellwether.playtest') -Value 'Private Bellwether playtest'
+    $saveLocation = 'The playtest saves in Local AppData under HordeLanternRT/bellwether-playtest/campaign-v1.'
+}
+@"
+Horde Lantern RT — private Bellwether 1.8 $($profile.ToLowerInvariant()) (Windows x64)
 
 Extract the whole ZIP to a writable folder, then open HordeLanternRT.exe.
-Choose New Game to play from the beginning. Load shows only the Windows
-Bellwether playtest slots. Saves live in Local AppData under
-HordeLanternRT/bellwether-playtest/campaign-v1. Settings live beside the game.
+Choose New Game to play from the beginning. $saveLocation
+Settings live beside the game.
 
 A Vulkan hardware ray-tracing GPU and driver are required.
 This build and its resident and voice assets are for private playtesting.
-'@ | Set-Content -LiteralPath (Join-Path $package 'PLAYTEST.txt') -Encoding utf8
+"@ | Set-Content -LiteralPath (Join-Path $package 'PLAYTEST.txt') -Encoding utf8
 
-$archive = Join-Path $output 'Horde-Bellwether-Private-Playtest-Windows-x64.zip'
+$archive = Join-Path $output "Horde-Bellwether-Private-$profile-Windows-x64.zip"
 [IO.Compression.ZipFile]::CreateFromDirectory($package, $archive, [IO.Compression.CompressionLevel]::Fastest, $false)
 Assert-Horde17ReleasePackage -ArchivePath $archive -Platform Windows
 Assert-Horde162Package -RepositoryRoot $repo -ArchivePath $archive -Platform Windows
@@ -147,6 +154,7 @@ $null = Assert-HordeMusicPackage -RepositoryRoot $repo -ArchivePath $archive
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $archive -Platform Windows
 [ordered]@{
     sourceCommit = $revision
+    profile = $profile.ToLowerInvariant()
     foundationZipSha256 = $expectedBase
     executableSha256 = (Get-FileHash -LiteralPath $executable).Hash.ToLowerInvariant()
     stagingScriptSha256 = (Get-FileHash -LiteralPath $PSCommandPath).Hash.ToLowerInvariant()

@@ -146,6 +146,15 @@ the current runtime roster and existing flask and revival assets in a ZIP under
 detects the local playtest marker, validates the packaged overlays, and uses the
 separate `bellwether-playtest/campaign-v1` save profile.
 
+For a private optimized Windows package, configure a dedicated build with
+`HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=ON` and `HORDE_RT_SHIPPING17_CONTENT=ON`.
+Build `horde_rt_diagnostic_window` in Release with the standard Shipping/High
+policy. Pass that executable to the same packager with `-OptimizedCandidate`.
+The pinned voice overlay is optional. Extract the candidate ZIP to a writable
+folder and start from the ordinary menu. Each extraction keeps its own
+`state/campaign-v1` and settings. The candidate admits only its packaged
+residents and does not enable Debug automation.
+
 For the packaged Windows campaign continuity check, create an empty
 `reports/horde-campaign-fixtures-<label>` directory in the build's source
 checkout. Pass its absolute path to `horde_rt_campaign_play_session_tests.exe

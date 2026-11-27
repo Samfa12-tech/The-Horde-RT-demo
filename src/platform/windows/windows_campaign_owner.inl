@@ -4,6 +4,9 @@ namespace campaign=horde::gameplay::campaign;
 
 std::filesystem::path WindowsCampaignDirectory()
 {
+#if HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+    return ExecutableDirectory()/"state"/"campaign-v1";
+#else
     if(gAcceptanceProfile.Active())return gAcceptanceProfile.CampaignDirectory();
 #if defined(_DEBUG)
     if(gOpeningBenchmarkMenuValidation)return gCampaignValidationDirectory;
@@ -29,6 +32,7 @@ std::filesystem::path WindowsCampaignDirectory()
     }
     if(raw)CoTaskMemFree(raw);
     return root;
+#endif
 }
 
 bool CampaignPreparationFailure(VulkanSurfaceContext& ctx,const char* stage,const std::string& detail)
@@ -68,7 +72,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     using Scene=horde::vulkan::raytracing::PresentableTinyRtScene;
     if(ctx.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
        ctx.simulation.Snapshot().developmentRescueJourney && ctx.rtScene.IsReady() &&
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
        (gBellwetherCampaignActors.empty() || ctx.rtScene.ChapterResidentSourceCount()==horde::vulkan::raytracing::kBellwetherResidentCount) &&
 #endif
        ctx.rtScene.StaticGeometryHasCompleteContributors())return true;
@@ -81,7 +85,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     scene.SetDevelopmentSupportFixture(false);
     const auto root=ResolveAssetRoot();
     std::string diagnostic;
-#if defined(_DEBUG)
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
     if(!gBellwetherCampaignActors.empty() &&
        !SetBellwetherCampaignResidentSources(scene,gBellwetherCampaignActors,diagnostic))
         return CampaignPreparationFailure(ctx,"bellwether-residents",diagnostic);
