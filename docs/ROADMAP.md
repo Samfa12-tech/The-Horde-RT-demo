@@ -168,6 +168,13 @@ The first [square and south tavern dressing pass](../assets/models/world/source/
 
 A [carved fingerpost beside the well](../assets/models/world/source/bellwether-square-waymarker-v1/README.md) points along four public lanes. An oil cup lights the four symbols. The tankard leads up the tavern ramp, the scales to the dealer, the wheel to the mill and the anvil to the smith yard. A coopered delivery cask rests on chocks beside the tavern approach. The church has its own marker at the earlier fork. Face the fingerpost from the lane and choose **Read fingerpost** to read all four arms. Finish reading or turn away to return to the view. **Pause → Bellwether directions** also gives the route back to the church road.
 
+A short stone fork from the lower road leads to the mapped east door of
+[House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
+private store-room candidate gives the village a second walk-in building,
+with grain bins, a sorting table and storage jars. The player can return to
+the road through the same doorway. The interior selection and handset
+playtest remain open.
+
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 
 On the Galaxy S26 Ultra, [the timed west route](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#27-november-2026--church-fork-silver-west-lane-sale-and-hearth-fitting) reached the stock yard twice and the tavern once before the 240-second deadline. The staffed hearth had the highest median GPU time at 95.64 ms, with 95.01 ms in RT dispatch. At the same scale, [two hearth sampling runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--staffed-hearth-shader-sampling-on-the-galaxy-s26-ultra) identified shadow visibility as the largest sampled shader category. [Five ordinary-shader runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison) found no GPU time saving from postponing a primitive-index read. The shipping shaders retain their existing shadow queries.

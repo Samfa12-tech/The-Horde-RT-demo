@@ -280,6 +280,18 @@ int main(int argc,char** argv) {
         {
             using namespace horde::gameplay::traversal;
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
+            for(const auto [x,z]:kHouseBStations) {
+                const auto point=support->Query(x,z);
+                check(point.found && point.walkable &&
+                      point.surface==horde::gameplay::simulation::SupportSurface::Stone &&
+                      support->NonWalkableVolumeClear(x,z,x,z,point.worldY+.12f,point.worldY+1.78f,radius),
+                      "House B has continuous stone support and player clearance from the lane to the room");
+            }
+            const auto [houseX,houseZ]=kHouseBStations.back();
+            check(std::abs(support->Query(houseX,houseZ).worldY-kHouseBFloorY)<.01f &&
+                  !support->NonWalkableVolumeClear(houseX,houseZ,houseX,105.f,
+                      kHouseBFloorY+.12f,kHouseBFloorY+1.78f,radius),
+                  "House B has a real room floor inside its original solid perimeter");
             constexpr std::array pathCentres{
                 BellwetherStation{41.f,87.9f},        // Lower road
                 BellwetherStation{45.f,74.75f},       // Church lane
@@ -351,6 +363,19 @@ int main(int argc,char** argv) {
                 }
                 return contact.grounded;
             };
+            for (std::size_t i=1;i<kHouseBStations.size();++i) {
+                const auto& a=kHouseBStations[i-1];
+                const auto& b=kHouseBStations[i];
+                check(follow({a[0],a[1]},{b[0],b[1]}) && follow({b[0],b[1]},{a[0],a[1]}),
+                      "the walking capsule clears each segment from the lower road into House B and back");
+            }
+            const auto [doorX,doorZ]=kHouseBEastDoorXZ;
+            for (float offset : {-.48f,.48f}) {
+                const BellwetherStation ramp{doorX+1.7f,doorZ+offset};
+                const BellwetherStation room{doorX-.75f,doorZ+offset};
+                check(follow(ramp,room) && follow(room,ramp),
+                      "an off-centre capsule crosses the House B threshold in both directions");
+            }
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");
             const BellwetherStation apronView{horde::gameplay::bellwether::kWellApronView[0],

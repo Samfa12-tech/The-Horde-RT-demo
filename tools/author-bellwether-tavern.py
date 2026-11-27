@@ -959,7 +959,8 @@ for layer in ("bellwether-relic-stall-v1", "bellwether-road-cache-v1", "bellweth
               "bellwether-tally-v1", "bellwether-stock-v1", "bellwether-mill-lamp-v1", "bellwether-paths-v1",
               "bellwether-square-frontage-v1", "bellwether-church-waymarker-v1", "bellwether-west-trade-v1",
               "bellwether-tavern-rail-v1", "bellwether-garden-house-v1", "bellwether-well-apron-v1",
-              "bellwether-hearth-service-v1", "bellwether-square-waymarker-v1", "bellwether-roofline-v1"):
+              "bellwether-hearth-service-v1", "bellwether-square-waymarker-v1", "bellwether-roofline-v1",
+              "bellwether-house-b-v1"):
     receipt_path = WORLD / "source" / layer / "authoring-receipt.json"
     if receipt_path.is_file():
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))

@@ -1770,6 +1770,32 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             readDirections(campaign::PauseObjective::BellwetherShrine,"Anvil - southeast to the smith yard.") &&
                             walkTo(*square);
                     };
+                    const auto presentHouse = [&] {
+                        const auto entranceBranch = kBellwetherTavernRoute.begin() + kBellwetherChurchJunction + 1;
+                        const auto walkStation = [&](const auto& position) {
+                            return walkTo({position[0],position[1]}) && state.playerGrounded;
+                        };
+                        if (!std::all_of(std::make_reverse_iterator(square),
+                                         std::make_reverse_iterator(entranceBranch), walkTo))
+                            return false;
+                        const auto previousPitch = input.pitchRadians;
+                        const auto previousPose = state.interaction.heldLightPose;
+                        const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        input.pitchRadians = -.10f;
+                        const bool visited =
+                            std::all_of(kHouseBStations.begin(), kHouseBStations.begin()+4, walkStation) &&
+                            face(kHouseBEastDoorXZ[0],kHouseBEastDoorXZ[1]) &&
+                            capture("windows-combined-house-b-approach.png",false,true) &&
+                            std::all_of(kHouseBStations.begin()+4, kHouseBStations.end(), walkStation) &&
+                            std::abs(state.playerSupportWorldY-kHouseBFloorY)<.02f &&
+                            setInspectionLight(HeldLightPose::High) &&
+                            face(34.95f,102.15f) && capture("windows-combined-house-b-room.png",false,true) &&
+                            setInspectionLight(previousPose) &&
+                            std::all_of(std::next(kHouseBStations.rbegin()), kHouseBStations.rend(), walkStation);
+                        input.pitchRadians = previousPitch;
+                        return visited && std::all_of(std::next(entranceBranch),std::next(square),walkTo) &&
+                            ctx.simulation.CampaignBoundaryRevision()==boundary;
+                    };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };
                         const auto walkSmith = [&](const auto& point) { return walkTo(station(point)); };
@@ -1969,6 +1995,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
                         check(presentSquareWaymarker() && fork(), "the square fingerpost can be read, dismissed and reread on foot with speech subtitles off, then cleared by looking away") &&
+                        check(presentHouse() && fork(), "the lower lane leads through House B's east doorway to its store room and back to the square") &&
                         check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
