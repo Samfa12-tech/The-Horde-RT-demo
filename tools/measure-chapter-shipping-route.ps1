@@ -136,6 +136,8 @@ if($doorway) {
  if($drive | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$drive }
  $wheel=@('mill-waterwheel.manifest.json','mill-waterwheel.glb')
  if($wheel | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$wheel }
+ $silver=@('road-silver.manifest.json','road-silver.glb')
+ if($silver | Where-Object {Test-Path -LiteralPath (Join-Path $tavernRoot $_)}) { $names+=$silver }
  if($BellwetherWest){
   $names+=@('stock-heads.manifest.json','stock-heads.glb')
   foreach($source in @('src/gameplay/traversal/BellwetherWestRoute.h','src/gameplay/traversal/BellwetherStock.h',

@@ -520,6 +520,25 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::memcmp(instances.data(),before.data(),sizeof(instances))==0;
     }
 
+    static bool CheckMillWheelMaskWithCollectedSilver()
+    {
+        PresentableTinyRtScene scene;
+        scene.ready_=true;
+        scene.millWaterwheelBlas_.address=1u;
+        scene.tlasInstanceDefinitionsValid_=true;
+        scene.tlasInstanceCount_=2u;
+        auto& wheel=scene.tlasBuiltInstances_[0];
+        auto& cup=scene.tlasBuiltInstances_[1];
+        wheel.instanceCustomIndex=PresentableTinyRtScene::kMillWaterwheelMetadataIndex;
+        cup.instanceCustomIndex=PresentableTinyRtScene::kRoadSilverMetadataIndex;
+        wheel.mask=1u;
+        cup.mask=0u;
+        const bool collected=scene.MillWaterwheelInstanceMask()==1u;
+        wheel.mask=0u;
+        cup.mask=1u;
+        return collected && scene.MillWaterwheelInstanceMask()==0u;
+    }
+
     static bool CheckPrivyRagInstancePublication()
     {
         using horde::gameplay::bellwether::PrivyRagState;
@@ -911,8 +930,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==43u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?51u:50u);
+        ok &= materials.size()==44u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?52u:51u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -999,6 +1018,12 @@ struct PresentableTinyRtSceneObservationTestAccess
             scene.tavernDoorBlas_.address=1u;
             scene.millDriveBlas_.address=1u;
             scene.millWaterwheelBlas_.address=1u;
+            const auto& silver=instances[PresentableTinyRtScene::kRoadSilverMetadataIndex];
+            ok &= Require(silver.primitiveCount==1u && silver.stableObjectId==0x42305343u &&
+                silver.assetIndex!=rag.assetIndex && silver.primitiveBase<primitives.size() &&
+                scene.roadSilverAsset_.materials.size()==1u && scene.roadSilverAsset_.materials.front().metallicFactor>=.8f,
+                "the collectible silverware owns its opaque metallic surface and a separate static mesh");
+            scene.roadSilverBlas_.address=1u;
             scene.privyRagBlas_.address=1u;
             scene.dielectricFixtureBlas_.address=1u;
             scene.stockHeadBlas_[0].address=2u;
@@ -1019,7 +1044,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             const auto chapterTail=scene.ChapterTailInstanceCount();
             const std::uint32_t currentProfileTlasCount=PresentableTinyRtScene::kOrdinaryTlasInstanceCount+
                 64u+12u+chapterTail;
-            constexpr std::uint32_t fullBellwetherTailCount=10u+1u+
+            constexpr std::uint32_t fullBellwetherTailCount=11u+1u+
                 static_cast<std::uint32_t>(kAdditionalChapterActorCapacity);
             constexpr std::uint32_t fullBellwetherTlasCount=
                 PresentableTinyRtScene::kOrdinaryTlasInstanceCount+64u+12u+fullBellwetherTailCount;
@@ -1034,14 +1059,14 @@ struct PresentableTinyRtSceneObservationTestAccess
             }
             const auto uniqueAssetCount=std::count(usedAssets.begin(),usedAssets.end(),true);
             const auto baselineAssetCount=std::count(usedAssetsWithoutRag.begin(),usedAssetsWithoutRag.end(),true);
-            ok &= Require(chapterTail==10u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
+            ok &= Require(chapterTail==11u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
                     scene.chapterResidentSources_.size() &&
                 currentProfileTlasCount<=kRtTlasInstanceCapacity &&
-                fullBellwetherTlasCount==120u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
-                kRtTlasInstanceCapacity-fullBellwetherTlasCount==2u,
-                "full Bellwether tail includes three livestock poses and two residents at 120 of 122 TLAS slots");
+                fullBellwetherTlasCount==121u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
+                kRtTlasInstanceCapacity-fullBellwetherTlasCount==1u,
+                "full Bellwether tail includes the silverware, three livestock poses and two residents at 121 of 122 TLAS slots");
             ok &= Require(uniqueAssetCount==baselineAssetCount+1u &&
-                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=24u,
+                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=25u,
                 "the privy rag and shared head source fit the static asset roster");
             scene.roadStoneBlas_.address=0u;
             scene.waysideCoverBlas_.address=0u;
@@ -1050,6 +1075,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             scene.millDriveBlas_.address=0u;
             scene.millWaterwheelBlas_.address=0u;
             scene.privyRagBlas_.address=0u;
+            scene.roadSilverBlas_.address=0u;
             scene.dielectricFixtureBlas_.address=0u;
             scene.stockHeadBlas_={};
         }
@@ -1755,8 +1781,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 50u &&
-                  tomb.staticMeshSlot_.Materials().size() == 43u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 51u &&
+                  tomb.staticMeshSlot_.Materials().size() == 44u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)
@@ -2370,6 +2396,8 @@ int main(int argc, char** argv)
         "chapter residents keep separate GPU references and retry an unsubmitted pose");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMillWheelMaskWithCollectedSilver(),
+        "mill wheel visibility follows its submitted identity independently of the last pickup");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckPrivyRagInstancePublication(),
         "privy rag is a real opaque RT instance at the basket/shelf and hidden only while carried");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();

@@ -59,6 +59,7 @@
 #include "vulkan/raytracing/RegionalWaterRenderData.h"
 #include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
 #include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-road-silver-v1/geometry.generated.h"
 
 #include <algorithm>
 #include <array>
@@ -862,6 +863,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     millDriveBlas_ = std::exchange(other.millDriveBlas_, AccelerationStructure{});
     millWaterwheelBlas_ = std::exchange(other.millWaterwheelBlas_, AccelerationStructure{});
     privyRagBlas_ = std::exchange(other.privyRagBlas_, AccelerationStructure{});
+    roadSilverBlas_ = std::exchange(other.roadSilverBlas_, AccelerationStructure{});
     stockHeadBlas_ = std::exchange(other.stockHeadBlas_, {});
     bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
     bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
@@ -928,6 +930,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     millDriveAsset_ = std::move(other.millDriveAsset_);
     millWaterwheelAsset_ = std::move(other.millWaterwheelAsset_);
     privyRagAsset_ = std::move(other.privyRagAsset_);
+    roadSilverAsset_ = std::move(other.roadSilverAsset_);
     stockHeadAsset_ = std::move(other.stockHeadAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
@@ -2020,6 +2023,7 @@ void PresentableTinyRtScene::Destroy()
         millDriveBlas_ = {};
         millWaterwheelBlas_ = {};
         privyRagBlas_ = {};
+        roadSilverBlas_ = {};
         stockHeadBlas_ = {};
         bellwetherFurnitureBlas_={};
         bellwetherNearCandidate_={};
@@ -2035,6 +2039,7 @@ void PresentableTinyRtScene::Destroy()
         millDriveAsset_ = {};
         millWaterwheelAsset_ = {};
         privyRagAsset_ = {};
+        roadSilverAsset_ = {};
         stockHeadAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
@@ -2096,6 +2101,7 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(millDriveBlas_);
     DestroyAccelerationStructure(millWaterwheelBlas_);
     DestroyAccelerationStructure(privyRagBlas_);
+    DestroyAccelerationStructure(roadSilverBlas_);
     for (auto& owner : stockHeadBlas_) DestroyAccelerationStructure(owner);
     RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
     DestroyAccelerationStructure(bellwetherNearCandidate_);
@@ -2179,6 +2185,7 @@ void PresentableTinyRtScene::Destroy()
     millDriveAsset_ = {};
     millWaterwheelAsset_ = {};
     privyRagAsset_ = {};
+    roadSilverAsset_ = {};
     stockHeadAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
@@ -2294,7 +2301,7 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_, &roadSilverBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
     for (const auto& owner : stockHeadBlas_) append(result.bottomLevelAccelerationStructures, owner.handle);
     for(const auto& owner:bellwetherFurnitureBlas_)
@@ -2364,7 +2371,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_, &roadSilverBlas_})
     {
         accumulateBlas(*blas);
     }
@@ -4134,6 +4141,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     millDriveAsset_ = {};
     millWaterwheelAsset_ = {};
     privyRagAsset_ = {};
+    roadSilverAsset_ = {};
     stockHeadAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
@@ -4300,7 +4308,7 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         const auto millDirectory = root / "models/world/runtime/bellwether-tavern-v1";
         horde::scene::assets::AssetManifest millDriveManifest;
         horde::scene::assets::AssetManifest millWaterwheelManifest;
-        horde::scene::assets::AssetManifest privyRagManifest;
+        horde::scene::assets::AssetManifest privyRagManifest, roadSilverManifest;
         if (!horde::scene::assets::AssetManifest::Load(millDirectory / "mill-bench-drive.manifest.json",
                 millDriveManifest, diagnostic) ||
             !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-bench-drive.glb",
@@ -4312,7 +4320,23 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !horde::scene::assets::AssetManifest::Load(millDirectory / "privy-rag.manifest.json",
                 privyRagManifest, diagnostic) ||
             !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "privy-rag.glb",
-                privyRagManifest, privyRagAsset_, diagnostic)) return false;
+                privyRagManifest, privyRagAsset_, diagnostic) ||
+            !horde::scene::assets::AssetManifest::Load(millDirectory / "road-silver.manifest.json",
+                roadSilverManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "road-silver.glb",
+                roadSilverManifest, roadSilverAsset_, diagnostic)) return false;
+        if (!jointPropAssetAdmitted(roadSilverAsset_) ||
+            roadSilverAsset_.vertices.size() != horde::gameplay::bellwether::kRoadSilverVertices ||
+            roadSilverAsset_.indices.size() != horde::gameplay::bellwether::kRoadSilverTriangles * 3u ||
+            roadSilverAsset_.nodeTransforms.size() != 1u ||
+            roadSilverAsset_.nodeTransforms.front().name != "BellwetherRoadSilver" ||
+            roadSilverAsset_.nodeTransforms.front().world != horde::gameplay::items::IdentityHeldItemTransform() ||
+            roadSilverAsset_.materials.front().name != "WornSilver" ||
+            roadSilverAsset_.materials.front().metallicFactor < .8f ||
+            roadSilverAsset_.materials.front().emissiveFactor != std::array<float,3>{}) {
+            diagnostic = "The road cache requires its opaque silverware mesh and worn metal finish.";
+            return false;
+        }
         if (!jointPropAssetAdmitted(millDriveAsset_) || millDriveAsset_.indices.size() != 384u * 3u) {
             diagnostic = "The mill bench drive requires its bounded, opaque bronze geometry.";
             return false;
@@ -6772,7 +6796,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         (!millWaterwheelAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillWaterwheelMetadataIndex,
             "Bellwether waterwheel", millWaterwheelBlas_, true)) ||
         (!privyRagAsset_.primitives.empty() && !buildRegisteredStaticBlas(kPrivyRagMetadataIndex,
-            "Bellwether privy rag", privyRagBlas_, true)))
+            "Bellwether privy rag", privyRagBlas_, true)) ||
+        (!roadSilverAsset_.primitives.empty() && !buildRegisteredStaticBlas(kRoadSilverMetadataIndex,
+            "Bellwether road silver", roadSilverBlas_, true)))
         return false;
     if (!stockHeadAsset_.primitives.empty()) {
         for (std::uint32_t kind = 0; kind < kStockHeadBlasCount; ++kind)
@@ -7298,7 +7324,7 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         ApplyHingedPropInstance(instances[tlasInstanceCount_++], horde::gameplay::bellwether::ArchivePose{},
             kWaysideCoverMetadataIndex, waysideCoverBlas_.address);
     if (waysideRegisterBlas_.address)
-        ApplyWaysideRegisterInstance(instances[tlasInstanceCount_++], true);
+        ApplyPlacedPropInstance(instances[tlasInstanceCount_++], {}, true, kWaysideRegisterMetadataIndex, waysideRegisterBlas_.address);
     if (tavernDoorBlas_.address)
         ApplyHingedPropInstance(instances[tlasInstanceCount_++], horde::gameplay::bellwether::TavernDoor::PoseAt(1.f),
             kTavernDoorMetadataIndex, tavernDoorBlas_.address);
@@ -7330,6 +7356,14 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         if (!ApplyStockHeadInstances(std::span(instances).subspan(tlasInstanceCount_, stockCount), {}, diagnostic))
             return false;
         tlasInstanceCount_ += stockCount;
+    }
+    if (roadSilverBlas_.address) {
+        if (tlasInstanceCount_ >= instances.size()) {
+            diagnostic = "Bellwether road silver exceeds the instance buffer.";
+            return false;
+        }
+        ApplyPlacedPropInstance(instances[tlasInstanceCount_++], horde::gameplay::bellwether::kRoadSilverPosition,
+            false, kRoadSilverMetadataIndex, roadSilverBlas_.address);
     }
     if(bellwetherFurnitureTransitions_) {
         activeBellwetherFurnitureDetail_=(bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_) ?
@@ -8598,14 +8632,14 @@ void PresentableTinyRtScene::ApplyRoadStoneInstance(VkAccelerationStructureInsta
     instance.accelerationStructureReference = roadStoneBlas_.address;
 }
 
-void PresentableTinyRtScene::ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR& instance,
-    const bool visible) const
+void PresentableTinyRtScene::ApplyPlacedPropInstance(VkAccelerationStructureInstanceKHR& instance,
+    const std::array<float, 3>& position, bool visible, std::uint32_t metadataIndex, VkDeviceAddress address)
 {
-    instance.transform = {{{1.f, 0.f, 0.f, 0.f}, {0.f, 1.f, 0.f, 0.f}, {0.f, 0.f, 1.f, 0.f}}};
-    instance.instanceCustomIndex = kWaysideRegisterMetadataIndex;
+    instance.transform = {{{1.f, 0.f, 0.f, position[0]}, {0.f, 1.f, 0.f, position[1]}, {0.f, 0.f, 1.f, position[2]}}};
+    instance.instanceCustomIndex = metadataIndex;
     instance.mask = visible ? 0x01u : 0u;
     instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    instance.accelerationStructureReference = waysideRegisterBlas_.address;
+    instance.accelerationStructureReference = address;
 }
 
 void PresentableTinyRtScene::ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR& instance,
@@ -8693,13 +8727,7 @@ bool PresentableTinyRtScene::ApplyPrivyRagInstance(VkAccelerationStructureInstan
         diagnostic = "Bellwether privy rag anchors must be finite world coordinates.";
         return false;
     }
-    instance.transform = {{{1.f, 0.f, 0.f, position[0]},
-                           {0.f, 1.f, 0.f, position[1]},
-                           {0.f, 0.f, 1.f, position[2]}}};
-    instance.instanceCustomIndex = kPrivyRagMetadataIndex;
-    instance.mask = visible ? 0x01u : 0u;
-    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
-    instance.accelerationStructureReference = privyRagBlas_.address;
+    ApplyPlacedPropInstance(instance, position, visible, kPrivyRagMetadataIndex, privyRagBlas_.address);
     diagnostic.clear();
     return true;
 }
@@ -9928,7 +9956,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         ApplyHingedPropInstance(instances[chapterPropSlot++], frame.waysideArchivePose,
             kWaysideCoverMetadataIndex, waysideCoverBlas_.address);
     if (waysideRegisterBlas_.address)
-        ApplyWaysideRegisterInstance(instances[chapterPropSlot++], !frame.waysideRegisterRecovered);
+        ApplyPlacedPropInstance(instances[chapterPropSlot++], {}, !frame.waysideRegisterRecovered,
+            kWaysideRegisterMetadataIndex, waysideRegisterBlas_.address);
     if (tavernDoorBlas_.address)
         ApplyHingedPropInstance(instances[chapterPropSlot++], horde::gameplay::bellwether::TavernDoor::PoseAt(frame.tavernDoorOpening),
             kTavernDoorMetadataIndex, tavernDoorBlas_.address);
@@ -9965,6 +9994,14 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             !ApplyStockHeadInstances(std::span(instances).subspan(millPropSlot, stockCount), frame.stockHeadPoses,
                 diagnostic)) return false;
         millPropSlot += stockCount;
+    }
+    if (roadSilverBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_) {
+            diagnostic = "Bellwether road silver exceeds the live chapter tail.";
+            return false;
+        }
+        ApplyPlacedPropInstance(instances[millPropSlot++], horde::gameplay::bellwether::kRoadSilverPosition,
+            frame.roadSilverInCache, kRoadSilverMetadataIndex, roadSilverBlas_.address);
     }
     if (millPropSlot != tlasInstanceCount_) {
         diagnostic = "Bellwether chapter TLAS tail does not match its submitted dynamic owners.";
@@ -10765,7 +10802,8 @@ void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 
 std::uint8_t PresentableTinyRtScene::SubmittedInstanceMask(const std::uint32_t metadataIndex) const noexcept
 {
-    if (!tlasInstanceDefinitionsValid_ || metadataIndex >= kRtInstanceMetadataCapacity) return 0;
+    if (!tlasInstanceDefinitionsValid_ || tlasInstanceCount_ > tlasBuiltInstances_.size() ||
+        metadataIndex >= kRtInstanceMetadataCapacity) return 0;
     std::uint8_t mask = 0;
     for (const auto& instance : std::span(tlasBuiltInstances_).first(tlasInstanceCount_))
         if (instance.instanceCustomIndex == metadataIndex)

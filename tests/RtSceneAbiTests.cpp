@@ -211,17 +211,17 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 42u,
-          "each stock head family has independent metadata after the existing chapter owners");
+    Check(kRtInstanceMetadataCapacity == 43u,
+          "the road silver has its own metadata after both stock head families");
     Check(kRtTlasInstanceCapacity == 122u,
           "storage fits the legacy 31-slot prefix, forest reserves, and appended Bellwether owners");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 25u, "static asset capacity includes one shared stock head source");
-    Check(kRtPrimitiveMetadataCapacity == 56u, "the staffed town fits distinct clay and timber alongside both stock heads");
-    Check(kRtMaterialCapacity == 50u, "material storage covers the three opaque stock finishes before aliases");
+    Check(kRtStaticAssetCapacity == 26u, "static asset capacity includes the stock heads and separate road silver");
+    Check(kRtPrimitiveMetadataCapacity == 57u, "the staffed town fits the stock heads and the road silver");
+    Check(kRtMaterialCapacity == 51u, "material storage covers the worn silver finish alongside the stock finishes");
     Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&

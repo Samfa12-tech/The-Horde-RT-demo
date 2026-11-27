@@ -303,6 +303,7 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.millWaterwheelAngleRadians = simulation.millWaterwheelAngleRadians;
     frame.stockHeadPoses = simulation.stockHeadPoses;
     frame.privyRag = simulation.privyRag;
+    frame.roadSilverInCache = simulation.roadSilverInCache;
     std::size_t residentCount = 0;
     const auto addResident = [&](ChapterResidentActorPose pose) {
         if (residentCount < frame.chapterResidents.size())
