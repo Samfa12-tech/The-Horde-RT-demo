@@ -1757,7 +1757,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kBellwetherGraveyardGroundTriangles;
         constexpr auto smithTriangles=horde::gameplay::bellwether::kBellwetherSmithSolidTriangles+
             horde::gameplay::bellwether::kBellwetherSmithGroundTriangles;
-        const bool supportFits= supportTriangles==143304u+churchyardTriangles+smithTriangles+
+        constexpr auto expectedSupportTriangles=143304u+churchyardTriangles+smithTriangles+
             horde::gameplay::bellwether::kBellwetherGrateSolidTriangles+
             horde::gameplay::bellwether::kMillTallySolidTriangles+
             horde::gameplay::bellwether::kBellwetherStockSolidTriangles+
@@ -1775,10 +1775,13 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kVillageRoofAddedSolidTriangles+
             horde::gameplay::bellwether::kHouseBSolidTriangles+
             horde::gameplay::bellwether::kHouseBGroundTriangles+
-            horde::gameplay::bellwether::kChurchRecordStationTriangles &&
+            horde::gameplay::bellwether::kChurchRecordStationTriangles+
+            horde::gameplay::bellwether::kHouseBLedgerSolidTriangles;
+        const bool supportFits=support && supportTriangles==expectedSupportTriangles &&
             support->NonWalkableTriangleCount()<=support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
         std::cout << "Combined forest and town native support: " << supportTriangles
-                  << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
+                  << " triangles; expected=" << expectedSupportTriangles
+                  << "; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
         if(support)std::cout << "Static obstacle faces=" << support->NonWalkableTriangleCount()
             << " capacity=" << support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount())
             << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';

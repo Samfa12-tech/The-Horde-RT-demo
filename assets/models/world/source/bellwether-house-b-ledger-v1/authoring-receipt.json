@@ -1,0 +1,21 @@
+{
+  "feature": "B04 stock ledger at its occupied sorting table",
+  "originalTownSha256": "0ed222271e8eeab9345386ee985a7a446c85eb7399efa9500df7f6f3a0902e01",
+  "houseLayoutSha256": "0bd1557fa2ab37afe83a17cdd9feff2269219abdbee420df40f1bf78ffae91c5",
+  "addedSolidTriangles": 108,
+  "primitives": 6,
+  "position": [
+    35.43,
+    -5.749609370000001,
+    99.83
+  ],
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "937e3e9758ae8194137d62e8f06b947a3c5efe6b0d3b48b16bb5dff6b173c6b2",
+  "files": {
+    "house-b-stock-ledger.blend": "3be0432bd69765dd7890dc6c764e7b5f021b0122cc0b07c1caae2b623092c61d",
+    "house-b-stock-ledger.glb": "351f87ddcae8a3aef3a46d89399a64758df3ce2fcb46075ed9989ad29a62dd47",
+    "bellwether-tavern-v1.glb": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+    "asset.manifest.json": "a17a5049cda4593a896b7fb920e60183ed6796847782dd375c0fa3d71c8aeb81",
+    "geometry.generated.h": "cbc1f2dea3c15e66a0b9a2f22d1072ccea713407c91ee177160d589c0395a2ea"
+  }
+}

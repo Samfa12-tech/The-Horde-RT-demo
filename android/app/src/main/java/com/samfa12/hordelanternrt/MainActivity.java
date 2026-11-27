@@ -266,7 +266,8 @@ public class MainActivity extends Activity {
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
     private static final int CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION = 1 << 31;
-    private static final int CONTEXTUAL_FINGERPOST_TEXT_VISIBLE = 1 << 28;
+    private static final int CONTEXTUAL_LOCAL_READING_OPEN = 1 << 28;
+    private static final int CONTEXTUAL_STOCK_LEDGER = 1 << 29;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
     private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
     private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
@@ -312,7 +313,7 @@ public class MainActivity extends Activity {
     private ScrollView chapterSubtitleScroll;
     private TextView chapterSubtitleText;
     private long chapterSubtitleGeneration = Long.MIN_VALUE;
-    private boolean chapterSubtitleShowsFingerpost;
+    private boolean chapterSubtitleShowsLocalReading;
     private long chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
     private final ChapterSubtitlePlacement chapterSubtitlePlacement = new ChapterSubtitlePlacement();
     private int latestSubtitleInputMode = SUBTITLE_INPUT_TOUCH;
@@ -4479,7 +4480,7 @@ public class MainActivity extends Activity {
                 final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
                         diagnosticsVisible || graphicsVisible || rtLabVisible || benchmarkRunning ||
                         playtestReportVisible || deathOverlayVisible || endingOverlayVisible || debugMotionActive;
-                if (!chapterSubtitleShowsFingerpost) {
+                if (!chapterSubtitleShowsLocalReading) {
                     chapterSubtitleText.setText(text);
                     chapterSubtitleText.setContentDescription(text.replace('\n', ' '));
                     chapterSubtitleScroll.scrollTo(0, 0);
@@ -4487,13 +4488,13 @@ public class MainActivity extends Activity {
                             preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100));
                     chapterSubtitleText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20.0f * size / 100.0f);
                 }
-                chapterSubtitleShowsFingerpost = true;
+                chapterSubtitleShowsLocalReading = true;
                 chapterSubtitleText.setVisibility(View.VISIBLE);
                 chapterSubtitlePanel.setVisibility(hiddenByUi ? View.GONE : View.VISIBLE);
                 if (!hiddenByUi) reflowChapterDialoguePlacement();
                 return;
             }
-            chapterSubtitleShowsFingerpost = false;
+            chapterSubtitleShowsLocalReading = false;
             chapterSubtitlePanel.setVisibility(View.GONE);
             chapterSubtitleText.setText("");
             chapterSubtitleScroll.scrollTo(0, 0);
@@ -4520,8 +4521,8 @@ public class MainActivity extends Activity {
                 (!voicePlaying || preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) <= 0);
         final boolean subtitles = requiresCaption || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
-        if (chapterSubtitleShowsFingerpost || chapterSubtitleGeneration != generation) {
-            chapterSubtitleShowsFingerpost = false;
+        if (chapterSubtitleShowsLocalReading || chapterSubtitleGeneration != generation) {
+            chapterSubtitleShowsLocalReading = false;
             chapterSubtitleGeneration = generation;
             chapterSubtitlePlacement.beginLine(generation, latestSubtitleInputMode);
             chapterSubtitleOverflowReported = false;
@@ -9237,8 +9238,9 @@ public class MainActivity extends Activity {
                 case 4: return R.string.recover_mill_tally;
                 case 5: return R.string.return_mill_tally;
                 case 6: return R.string.ask_kit_about_treasure;
-                case 7: return (state & CONTEXTUAL_FINGERPOST_TEXT_VISIBLE) != 0
-                        ? R.string.finish_reading_fingerpost : R.string.read_fingerpost;
+                case 7:
+                    if ((state & CONTEXTUAL_LOCAL_READING_OPEN) != 0) return R.string.finish_reading_fingerpost;
+                    return (state & CONTEXTUAL_STOCK_LEDGER) != 0 ? R.string.read_stock_ledger : R.string.read_fingerpost;
                 default: return 0;
             }
         }

@@ -15,6 +15,7 @@
 #include "gameplay/traversal/BellwetherPrivy.h"
 #include "gameplay/traversal/BellwetherStock.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
+#include "gameplay/traversal/BellwetherWaymarker.h"
 #include "gameplay/traversal/BellwetherWestRoute.h"
 
 #include <array>
@@ -83,8 +84,8 @@ struct SimulationSnapshot
     bool tavernConversationAvailable=false;
     bool kitTreasureTalkAvailable=false;
     bool tavernDirectionsAvailable=false;
-    bool squareWaymarkerReadable=false;
-    bool squareWaymarkerTextVisible=false;
+    bellwether::LocalReading localReadingTarget=bellwether::LocalReading::None;
+    bellwether::LocalReading openLocalReading=bellwether::LocalReading::None;
     bool tavernLanternFittingAvailable=false;
     bool tavernLanternAvailable=false;
     dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
@@ -115,7 +116,8 @@ struct SimulationSnapshot
     bellwether::PrivyRagState privyRag=bellwether::PrivyRagState::Available;
     bellwether::PrivyRagAction privyRagAction=bellwether::PrivyRagAction::None;
     [[nodiscard]] bool HasChapterInteractPrompt() const {
-        return tavernConversationAvailable || kitTreasureTalkAvailable || tavernDirectionsAvailable || squareWaymarkerReadable || tavernLanternFittingAvailable ||
+        return tavernConversationAvailable || kitTreasureTalkAvailable || tavernDirectionsAvailable ||
+            localReadingTarget!=bellwether::LocalReading::None || tavernLanternFittingAvailable ||
             recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
             tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
             salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||

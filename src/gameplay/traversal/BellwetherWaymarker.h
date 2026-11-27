@@ -1,11 +1,14 @@
 #pragma once
 
 #include "../../../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-house-b-ledger-v1/geometry.generated.h"
 
 #include <array>
 #include <cmath>
 
 namespace horde::gameplay::bellwether {
+
+enum class LocalReading { None, SquareFingerpost, HouseBStockLedger };
 
 inline constexpr float kSquareWaymarkerReadRange=4.f;
 inline constexpr float kSquareWaymarkerReadFacingCosine=.65f;
@@ -30,11 +33,17 @@ inline bool SquareWaymarkerReadableFrom(float playerX,float eyeY,float playerZ,f
     return false;
 }
 
-// This is a local caption latch only: no dialogue identity, voice or save bit.
-inline bool StepSquareWaymarkerTextVisible(bool readable,bool paused,bool dialogueActive,
-    bool interactPressed,bool previouslyVisible) {
-    if(!readable || paused || dialogueActive)return false;
-    return interactPressed?!previouslyVisible:previouslyVisible;
+inline bool HouseBStockLedgerReadableFrom(float playerX, float eyeY, float playerZ, float yawRadians) {
+    const auto [x, y, z] = kHouseBLedgerPosition;
+    const float dx = x - playerX, dz = z - playerZ;
+    const float distance = std::hypot(dx, dz);
+    return distance > .001f && distance <= 1.55f && std::abs(eyeY-y) <= 1.50f &&
+        std::sin(yawRadians)*dx - std::cos(yawRadians)*dz >= .65f * distance;
+}
+
+inline constexpr LocalReading StepLocalReading(LocalReading target, LocalReading open, bool interactPressed) {
+    if (interactPressed) return target == open ? LocalReading::None : target;
+    return target == open ? open : LocalReading::None;
 }
 
 } // namespace horde::gameplay::bellwether

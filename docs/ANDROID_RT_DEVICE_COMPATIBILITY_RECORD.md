@@ -5039,6 +5039,40 @@ After testing, the temporary observer app was removed. The original
 private playtest APK, eleven saves, nine report files and one preference
 file matched their pre-test hashes. The phone was returned to Home.
 
+### 28 November 2026 — Direct fire-shadow attribution at the staffed hearth
+
+The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the first staffed-hearth
+hold at 33% on RayTracingPipeline with Shipping/Mobile, the ordinary geometry
+layout and glass off. The control and private observer contained the same
+290 runtime assets. Their frozen 1440 × 3120 captures matched pixel for pixel.
+
+Two observer processes recorded three settled frames each. The verifier joined
+all six grids of 465 samples to their completed and presented frames. Direct
+fire-emitter visibility accounted for **72.85–74.53% of sampled shadow ticks**
+and **26.41–27.42% of all sampled invocation ticks**. Between 390 and 392
+primary rays per grid hit the shared static world. On those receiving pixels,
+direct fire accounted for **73.45–75.36%** of sampled shadow ticks. The samples
+identify the receiver and the visibility call. The timing does not identify
+the object that blocked a ray.
+
+Android framework thermal status at the start was 0 for the control, 0 for
+the first observer run and 1 for the second. The captures measure the split
+within instrumented invocations during the first room hold. The next
+performance comparison uses ordinary shaders to measure whole-dispatch and
+display timing through both returns.
+
+The [measurement receipt](evidence/2026-11-28-bellwether-hearth-shadow-split/receipt.json)
+pins both APKs, the shader modules, the matched image and the sampled frames.
+To verify both sets, run the following from the repository root.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-hearth-clock 24f4abd5ec99ed7ed45b49e9b5186e08c2946e92737ea5e7c17a0d614a5a5dad docs/evidence/2026-11-28-bellwether-hearth-shadow-split/observer-hold docs/evidence/2026-11-28-bellwether-hearth-shadow-split/observer-repeat
+```
+
+The observer app was removed and the phone returned to Home. The original
+private playtest APK and all 25 original files matched their pre-test hashes,
+including all 15 campaign saves.
+
 ### 28 November 2026 — Hearth shadow-query comparison
 
 On the Galaxy S26 Ultra (SM-S948B, Android 17), two private ARM64 apps built from

@@ -26,6 +26,7 @@
 #include "../../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-roofline-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-house-b-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-house-b-ledger-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-church-station-v1/geometry.generated.h"
 #include <filesystem>
 
@@ -43,7 +44,7 @@ inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kGardenHouseSolidTriangles+gameplay::bellwether::kWellApronSolidTriangles+
     gameplay::bellwether::kTavernServiceSolidTriangles+gameplay::bellwether::kSquareWaymarkerSolidTriangles+
     gameplay::bellwether::kVillageRoofAddedSolidTriangles+gameplay::bellwether::kHouseBSolidTriangles+
-    gameplay::bellwether::kChurchRecordStationTriangles;
+    gameplay::bellwether::kChurchRecordStationTriangles+gameplay::bellwether::kHouseBLedgerSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=

@@ -68,6 +68,7 @@
     <string name="open_chest">OPEN CHEST</string>
     <string name="take_flask_upgrade">Upgrade flask</string>
     <string name="read_fingerpost">Read fingerpost</string>
+    <string name="read_stock_ledger">Read stock ledger</string>
     <string name="finish_reading_fingerpost">Finish reading</string>
     <string name="talk_to_kit">Talk to Kit</string>
     <string name="directions">Directions</string>

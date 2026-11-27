@@ -1280,12 +1280,9 @@ void PublishSimulationUiState()
                 gGameSimulation.LatestCampaignBoundary()))};
         gLookoutDirections=horde::gameplay::campaign::CurrentBellwetherDirections(simulation);
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
-        const bool squareFingerpostVisible = simulation.squareWaymarkerTextVisible;
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
-            ? (squareFingerpostVisible
-                ? std::string(horde::gameplay::campaign::kSquareFingerpostInscription)
-                : std::string{})
+            ? std::string(horde::gameplay::campaign::LocalReadingText(simulation.openLocalReading))
             : (*line.speaker ? std::string(line.speaker) + "\n" + line.text : std::string(line.text));
     }
     if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
@@ -1466,13 +1463,14 @@ void PublishSimulationUiState()
         contextualControls |= (residentTag << 16) | (tradeDetail << 25) | 1;
     }
     else if ((contextualControls & (1 << 9)) == 0 &&
-             (simulation.squareWaymarkerReadable || simulation.squareWaymarkerTextVisible)) {
-        // Optional-action detail 7 is reserved for the physical fingerpost;
-        // detail 6 remains Kit's treasure topic and quote bits remain scoped
-        // to the selected optional action.
-        constexpr int fingerpostDetail = 7;
-        contextualControls |= INT32_MIN | (fingerpostDetail << 25) |
-            (simulation.squareWaymarkerTextVisible ? (1 << 28) : 0) | 1;
+             simulation.localReadingTarget != horde::gameplay::bellwether::LocalReading::None) {
+        using horde::gameplay::bellwether::LocalReading;
+        // Detail 7 carries the two local reading prompts. The subtype and
+        // open flag use the adjacent bits within this optional action.
+        constexpr int localReadingDetail = 7;
+        contextualControls |= INT32_MIN | (localReadingDetail << 25) |
+            (simulation.openLocalReading != LocalReading::None ? (1 << 28) : 0) |
+            (simulation.localReadingTarget == LocalReading::HouseBStockLedger ? (1 << 29) : 0) | 1;
     }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;

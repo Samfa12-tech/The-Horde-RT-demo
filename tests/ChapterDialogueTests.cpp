@@ -15,7 +15,8 @@ using namespace horde::gameplay::dialogue;
 void Check(bool value,const char* msg) { if(!value) {std::cerr<<msg<<'\n';std::exit(1);} }
 int main() {
     using horde::gameplay::bellwether::SquareWaymarkerReadableFrom;
-    using horde::gameplay::bellwether::StepSquareWaymarkerTextVisible;
+    using horde::gameplay::bellwether::LocalReading;
+    using horde::gameplay::bellwether::StepLocalReading;
     constexpr auto& post=horde::gameplay::bellwether::kSquareWaymarkerPost;
     constexpr auto& witness=horde::gameplay::bellwether::kSquareWaymarkerView;
     const auto yawToPost=[](float x,float z) {
@@ -45,17 +46,21 @@ int main() {
           std::string_view(inscription).find("Wheel - Mill & river fork, east")!=std::string_view::npos &&
           std::string_view(inscription).find("Anvil - Smith yard, southeast")!=std::string_view::npos,
           "the local inscription names the four physical symbols and their authored destinations");
-    Check(StepSquareWaymarkerTextVisible(true,false,false,true,false) &&
-          StepSquareWaymarkerTextVisible(true,false,false,false,true) &&
-          !StepSquareWaymarkerTextVisible(true,false,false,true,true) &&
-          !StepSquareWaymarkerTextVisible(false,false,false,false,true) &&
-          !StepSquareWaymarkerTextVisible(true,true,false,false,true) &&
-          !StepSquareWaymarkerTextVisible(true,false,true,true,false),
-          "reading toggles locally and clears on departure, pause or competing dialogue");
+    constexpr auto sign = LocalReading::SquareFingerpost, ledger = LocalReading::HouseBStockLedger, none = LocalReading::None;
+    Check(StepLocalReading(sign, none, true)==sign && StepLocalReading(sign, sign, false)==sign &&
+          StepLocalReading(sign, sign, true)==none && StepLocalReading(none, sign, false)==none &&
+          StepLocalReading(ledger, sign, false)==none && StepLocalReading(ledger, none, true)==ledger,
+          "local reading follows the current object and clears when no object is available");
     horde::gameplay::simulation::SimulationSnapshot waymarkerPrompt;
-    waymarkerPrompt.squareWaymarkerReadable=true;
+    waymarkerPrompt.localReadingTarget=sign;
     Check(waymarkerPrompt.HasChapterInteractPrompt(),
           "a readable fingerpost participates in the shared interaction prompt");
+    const auto [ledgerX, ledgerY, ledgerZ] = bellwether::kHouseBLedgerPosition;
+    Check(bellwether::HouseBStockLedgerReadableFrom(ledgerX,ledgerY+.7f,ledgerZ-1.2f,3.14159265f) &&
+          !bellwether::HouseBStockLedgerReadableFrom(ledgerX,ledgerY+.7f,ledgerZ-1.2f,0.f) &&
+          !bellwether::HouseBStockLedgerReadableFrom(ledgerX,ledgerY+.7f,ledgerZ-2.5f,3.14159265f) &&
+          std::string_view(campaign::LocalReadingText(ledger)).find("mill's west door")!=std::string_view::npos,
+          "the stock ledger can be read at the table and points to the existing mill board");
     // Current-rule reveal, without the historical checkpoint import which
     // deliberately selects legacy rules and cannot validate current speech.
     auto keeperConfig=simulation::ProductionGameSimulationConfig();
