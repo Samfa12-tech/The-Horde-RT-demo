@@ -1,0 +1,28 @@
+{
+  "mapFeature": "T01",
+  "originalTownSha256": "18674a3693b2122a1a1df95d37a2373eb1ecc28b5f39dd4bccb66d512f197501",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "a3c37483acfee86676fffbdcc5d9c5acc4e1d99c6b168b0b025eb6ce7a16e74f",
+  "townVertices": 17872,
+  "townTriangles": 8452,
+  "addedSolidTriangles": 1244,
+  "centre": [
+    78.3,
+    -11.4891357421875,
+    126.2
+  ],
+  "view": [
+    76.9,
+    130.35
+  ],
+  "roofHeight": 2.82,
+  "recipeSha256": "63e0c26668f75666aaad9ca77e14a0adfed843444f0e0e5ceeea4c3db904b795",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "bellwether-well.blend": "bbba5707bf09763d03061a3f7e53e2dbf4639dbff3acf72e8f48a5adedd175e5",
+    "well.glb": "a890288aeca3c550c3d3985ceefe74ca5f1ff9f042782326ae1b66acc2020265",
+    "asset.manifest.json": "2a6451ca84f7d768952c964adecb5995c250f14aa4b38e6a711de9219093b6d6",
+    "geometry.generated.h": "e13224a39b416abaec81976c14cc67a5778088927682da8b4bdee04627b0ca15",
+    "bellwether-tavern-v1.glb": "a3c37483acfee86676fffbdcc5d9c5acc4e1d99c6b168b0b025eb6ce7a16e74f"
+  }
+}

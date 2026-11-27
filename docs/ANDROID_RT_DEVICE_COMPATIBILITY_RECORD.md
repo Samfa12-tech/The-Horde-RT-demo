@@ -1,5 +1,48 @@
 # Android RT Device Compatibility Record
 
+## 2026-11-21 - Bellwether three-actor Debug checkpoints
+
+Physical SM-S948B / Android 17 / Adreno 840, Vulkan 1.4.295 and driver
+`2150932499` (build `089d643e2a`). Isolated ARM64 Bellwether Debug source
+`e45475b405334313ffbb2364257b19c97c3ce0f2`, APK SHA-256
+`087f1fc07cabc34f571e0d1db967161f8ea5fb3ae7aec2e3e0de871faeaa7a52`.
+The installed `base.apk` matched the local hash, and the package contained
+the seven pinned resident files. The ordinary ARM64 Debug package excluded
+the overlay, and the Release packaging guard refused it.
+
+RayTracingPipeline presented the tavern repeat-visit and record keeper church
+checkpoints as live gameplay with Diagnostic Mobile at 33% (475 × 980 RT,
+1440 × 2971 swapchain). At both checkpoints a completed frame matched its GPU
+and successful present submissions, with 37 TLAS definitions, 28 BLAS owners
+and 231,192,576 bytes of device-local RT allocations. The church view showed
+the textured record keeper and the expedition-routes prompt. At the tavern,
+an injected Android touch swipe moved the player about 2.3 m from the
+threshold into the room, with movement returning to zero when released.
+
+Stationary live windows after the initial startup sample measured 57.992 and
+57.633 ms per native frame at the tavern, and 42.818, 42.751 and 44.722 ms at
+the church. Final cumulative GPU RT averages were 48.559 ms and 32.400 ms,
+respectively. Android thermal status stayed at 0 at the start and end of both
+checks. SurfaceFlinger layer latency returned only a refresh period. These
+short Debug windows provide a performance starting point. Displayed frame
+pacing, sustained thermals, the live church-to-tavern route and owner
+acceptance remain open.
+
+RayQueryCompute also presented the tavern on a separate launch with the same
+resolution, 37 TLAS definitions and 28 BLAS owners. The completed frame joined
+the GPU and successful present at submission 270. Its two post-startup
+windows averaged 59.051 and 86.692 ms per native frame, with cumulative GPU
+averages of 49.158 and 61.160 ms. Framework thermal status was 0 at both
+endpoints. The spread warrants a controlled repeat before ranking backends.
+
+The first build (`be5869ac9c656aa8f49211dd9c6ff60d4746576e82a7a128966859e25c8b11e9`)
+presented the title and failed the transition when the resident guard used
+the retained device handle as evidence of a live scene. The fix uses the
+scene bundle's ownership boundary. The native preflight regression verifies
+roster replacement after retirement and rejection during scene ownership.
+The exact APK, bounded logs, completed-frame reports and screenshots are
+retained locally. The isolated app was stopped after collection.
+
 ## 2026-11-03 - Ordinary signed 1.7 update and retained title-return failure
 
 Physical SM-S948B / Android 17. Ordinary Release source `53d0000d`, version
@@ -4203,3 +4246,555 @@ latest signed package retained. This complements the earlier scoped owner route
 acceptance at `627c6485`; it does not silently transfer every earlier gameplay
 observation to the final binary. See the [published artifact and validation
 receipt](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md).
+
+### 21 November 2026: Bellwether shrine and first lantern recap
+
+**Evidence class: actual-device scripted UI and RT checkpoint evidence.**
+Galaxy S26 Ultra (SM-S948B, Android API 37, Adreno 840) ran the ARM64 test APK
+`com.samfa12.hordelanternrt.debug`. Installed and local APK SHA-256 matched
+`9c7be340b17727b2c5f016e4438bce984652a415a1263cf1b255a0d9a81e4c85`.
+The build used a separate debug package for the `bellwether-wayside-archive-open`
+checkpoint. The production app and its saves were untouched.
+
+RayTracingPipeline reported successful RT presentation at 33% scale
+(475 × 980 internal extent). After 120 warmup frames, the three 120-frame
+windows averaged 55.005, 46.486 and 35.798 ms on the CPU-side draw loop.
+Android thermal status was 1 before and after the test session, with battery
+temperature rising from 36.9 °C to 39.4 °C. These measurements cover the staged
+shrine checkpoint. Sustained gameplay and compositor frame pacing remain
+unmeasured for this APK.
+
+After the opening captions completed, the first live tap on **Recall the
+lantern’s words** displayed the treasury request and exposed its text with the
+**Lantern voice** speaker label in the Android accessibility hierarchy.
+The debug process was stopped after collection. Raw evidence is retained locally
+under `build/phone-shrine-20261121-184741`.
+
+### 23 November 2026 — Bellwether Directions and moving tavern doorway
+
+**Evidence class — actual-device scripted UI, completed RT submissions and
+sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37,
+Adreno 840 driver raw 2150932499, build `089d643e2a`) ran the private combined
+ARM64 Debug candidate with the Directions change recorded in `fc7a40c8`.
+The APK was built before that commit. Its embedded identity records Debug
+and a dirty worktree at `a7104cef2c87f7b88a1893f50f1fa1401dc8f53b` with input
+digest `1c2d94387b3010b7e689ced31880506d9e0be679ef4b50fb9cea470dfe0bcd00`.
+The installed APK hash matched the local artifact
+`f68d6a8de62bbe1b8c9fbbf0f1e7a411b983f8cd04c0ac0b619b9a9dd5af61b3`.
+The test package contained all five resident models and used Bellwether captions.
+
+The `bellwether-doorway-measurement` fixture completed both room-to-square
+returns in 87.25 s with 5,229 simulation ticks and 1,510 frames that joined GPU
+completion to successful native RT present calls. The door stayed fully open
+and its rendered instance remained present. RayTracingPipeline used the default
+33% render scale (475 × 980 internal, 1440 × 2971 output), the Diagnostic
+Mobile opaque-fast shader, and glass off. Battery temperature rose from 29.1 °C
+to 33.8 °C on USB power. Android thermal status was 0 at both readings.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 52.97 / 55.22 | 62.56 / 67.02 |
+| Doorway outbound | 38.43 / 48.04 | 48.63 / 59.05 |
+| Square | 39.21 / 42.54 | 72.38 / 79.36 |
+| Doorway inbound | 44.11 / 49.29 | 55.72 / 61.68 |
+
+The route analyzer excludes the first five seconds. From 33 to 87 s into the
+same run, the game SurfaceView's SurfaceFlinger history yielded 856 distinct,
+adjacent display intervals covering 50.0 s. The median was 58.33 ms and the
+p95 was 75.00 ms. The layer history supplies display pacing for the sampled
+intervals, independently of the native submission IDs. The warm sustained
+route, shipping shader profile, second RT backend and cause of the square's
+longer intervals remain open.
+
+From the staged completed tavern visit, Android Back opened the pause menu
+and **Bellwether directions** showed the northern shrine, the mill breathing
+rig and shore practice. All three leads and both buttons fit on the tested
+display. **Back to pause menu** returned to the menu and **Continue exploring**
+closed Directions and brought the live controls back. The full set of earned
+preparation states still has Windows evidence only. Raw measurements and
+captures are retained locally under `build/bellwether-phone-20261123-080927`.
+
+#### Android Back after benchmark results
+
+The same APK also passed the completed Standard benchmark path for the 1.8
+Back fix in `3caefd67`. From a cold launch into the ordinary entry menu,
+system Back opened **Exit The Horde?**, and **Stay** preserved the menu.
+**More → Standard benchmark (fixed settings)** completed the two-pass course
+and opened its report after the entry surface returned to 1440 × 2971. System
+Back from the report returned to the front menu. The next system Back produced
+the same confirmation. **Stay** preserved the front menu, and reopening the
+confirmation and tapping **Quit Demo** returned focus to Android. The local
+native report recorded `Integrity: COMPLETE`. The test exercised completion
+and dismissal through system Back. The next day's
+[entry-menu check](#24-november-2026--android-back-after-the-standard-benchmark)
+also covered cancellation, both sharing review forms, repeated runs and
+background/resume. The production app and its saves were untouched.
+[Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
+### 23 November 2026 — Bellwether five-resident Shipping/Mobile round trip
+
+**Evidence class — actual-device scripted route, completed RT submissions
+and sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API
+37, Adreno 840) ran the ARM64 private combined Debug APK from `f0fdf289`
+with optimized native code. The installed APK SHA-256 matched
+`94bec5dda41a8ae215e313effe3f052acb56f9b74d49bae668f1f4a48e8c71ca`.
+It contained all five pinned residents and the thirteen audition lines.
+The test updated only the private package in place and preserved its data.
+
+The `bellwether-resident-roundtrip-measurement` checkpoint completed both
+east-fork round trips in 159.40 s with 9,413 simulation ticks and 2,618 GPU
+completions joined to successful native RT presents. Each outbound walk
+replaced the record keeper with the relic dealer, the dealer with the
+salvager, and the tavern keeper with the artificer. The inbound walk
+reversed those swaps. The door instance remained submitted and the three
+fire lights were present in the staffed room. RayTracingPipeline presented
+at 33% scale (475 × 980 internal, 1440 × 2971 output) with glass off and the
+Shipping/Mobile opaque-fast shader
+`8772697daea24068acea25db8ca168c8c2b37f8d7f3e547374d2a75fac8755b1`.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 64.90 / 80.43 | 75.01 / 88.69 |
+| Doorway outbound | 48.99 / 65.85 | 57.68 / 76.78 |
+| East fork | 51.20 / 52.86 | 63.80 / 66.79 |
+| Doorway inbound | 48.01 / 61.74 | 58.12 / 72.18 |
+
+The analysis excludes the first five seconds of the route. The worst native
+present-return interval on a resident swap was 80.32 ms. SurfaceFlinger
+sampled 550 adjacent game-layer display intervals covering 35.1 seconds
+between 123.0 and 159.4 s into the route, with a median of 66.67 ms and p95
+of 87.50 ms. The display intervals have no per-submission join.
+
+Post-warmup room GPU medians across the three visits were 51.06, 64.19 and
+68.97 ms. On USB, the battery warmed from 32.1 °C to 35.7 °C while Android
+thermal status remained 0 at the recorded endpoints. This run establishes
+the five-resident route on Shipping/Mobile Pipeline. The cause of the
+increasing room cost, sustained play, ordinary campaign input and the
+handset's RayQueryCompute route still need separate evidence. The shorter
+Diagnostic route used a different workload and shader profile.
+
+Raw measurements, the exact APK and the previous private APK are retained
+locally under `reports/horde-bellwether-shipping-profile-20261123-100005`.
+The test app was stopped after measurement and the private candidate remains
+installed.
+
+### 23 November 2026 — Bellwether private playtest RayQueryCompute round trip
+
+**Evidence class — actual-device scripted route, completed RT submissions,
+GPU stages and sampled display pacing.** The Galaxy S26 Ultra (SM-S948B,
+Android 17/API 37, Adreno 840) ran the isolated
+`com.samfa12.hordelanternrt.debug.bellwether.playtest` package from `0eab2912`.
+The installed ARM64 Debug APK matched SHA-256
+`dedb9f0775c0157d7a009e57d31b157ac58075f32c8994625231ffd1d0e1c827`.
+It contained five pinned residents, nineteen private WAVs, and the
+Shipping/Mobile shaders with route and GPU-stage instrumentation.
+
+The run explicitly required hardware RayQueryCompute. It completed both
+east-fork returns in 157.00 s with 9,413 simulation ticks and 3,181 GPU
+completions joined to successful native RT presents. All twelve resident
+swaps followed the authored sequence. GPU stage identities matched every
+submission. The route used the fresh private profile at 33% scale
+(475 × 980 internal, 1440 × 2971 output), glass off and shader
+`b16089eca7976725533552509fd1efe085190dde16cab982622d4f2f932f0c1f`.
+
+| Route phase | GPU median / p95 (ms) | Native present-return interval median / p95 (ms) |
+| --- | ---: | ---: |
+| Staffed tavern | 49.95 / 50.86 | 59.79 / 61.90 |
+| Doorway outbound | 36.73 / 45.70 | 46.45 / 55.72 |
+| East fork | 40.58 / 41.39 | 54.03 / 56.34 |
+| Doorway inbound | 38.85 / 47.80 | 48.20 / 57.52 |
+
+The staffed room's three post-warmup GPU medians were 49.63, 50.09 and
+50.04 ms. Median stage durations were 49.47 ms for ray dispatch,
+0.38 ms for acceleration-structure work and 0.11 ms for image transfer.
+The room retained 240,862,400 device-local bytes
+on all three visits. These stage timings direct the next investigation
+toward the room's ray workload.
+
+SurfaceFlinger yielded 2,770 deduplicated adjacent game-layer display
+intervals from 21.47 through 157.00 s, with a 50.00 ms median and a 58.33 ms
+p95. Those intervals have no per-submission join. On USB, battery
+temperature rose from 25.3 °C to 31.0 °C. Android thermal status was 0 at
+both endpoints. The earlier Pipeline run used a different APK and began
+at 32.1 °C. These runs establish each backend individually. Matched
+backend performance, sustained target pacing and hands-on campaign play
+remain open.
+
+The raw route, display samples, installed hash, thermal endpoints and
+final screen are retained locally under
+`reports/horde-bellwether-phone-query-20261123-150817`. The test app was
+stopped after capture and the separate private candidate remains installed.
+
+#### Repeat baseline for the binary shadow traversal trial
+
+The same installed `0eab2912` APK and RayQueryCompute profile completed
+the two east-fork returns in 156.94 s with 9,413 simulation ticks and
+the same twelve resident swaps. All 3,187 completed RT frames had GPU
+stage timings joined to their native presents. Staffed-room GPU median
+was 50.04 ms. Ray dispatch measured 49.54 ms median and 53.64 ms p95,
+with post-warmup visit medians of 49.20, 49.52 and 49.73 ms.
+
+SurfaceFlinger yielded 3,063 deduplicated adjacent game-layer intervals
+with a 50.00 ms median and a 58.33 ms p95. The samples covered 150.66 s
+between 0.07 s and 155.22 s, without a per-submission join. Battery
+temperature rose from 26.2 °C to 32.5 °C on USB. The start was 0.9 °C
+above the previous original-shader run, whose ray dispatch median was
+49.47 ms. Raw evidence is retained under
+`reports/horde-bellwether-binary-shadow-20261123-153321/baseline-query`.
+The phone disconnected after this baseline. The next day's
+[three-run comparison](#24-november-2026--bellwether-binary-shadow-traversal-trial)
+used a fresh pair of controls at matched starting temperatures.
+
+### 23 November 2026 — Bellwether tavern GPU stage timings
+
+**Evidence class — actual-device scripted route, joined GPU stage timing and
+sampled display pacing.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37)
+ran the private combined ARM64 Debug APK from `f2595749`. The installed
+hash matched the local APK SHA-256
+`5a21c5a19a37e4fbf56498e8d7d9c0e6698524586a695f397497cc2ecde25834`.
+It used RayTracingPipeline with Shipping/Mobile opaque-fast shaders at
+33% scale (475 × 980 internal, 1440 × 2971 output), glass off and the
+active shader hash
+`8772697daea24068acea25db8ca168c8c2b37f8d7f3e547374d2a75fac8755b1`.
+
+The five-resident checkpoint completed both returns and all twelve swaps
+in 160.08 s. All 2,460 frames joined acceleration-structure, dispatch
+and transfer timings to the same successful RT submission and native
+present call. Each room visit held the same keeper pair, three fire lights,
+41 TLAS instances, 35 BLAS owners and 239,510,976 device-local bytes.
+The first five seconds are excluded from the phase statistics.
+
+| Staffed room visit | Frames | Whole GPU median / p95 (ms) | AS median / p95 (ms) | Dispatch median / p95 (ms) | Transfer median / p95 (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| First | 84 | 50.83 / 51.78 | 0.39 / 0.41 | 50.32 / 51.20 | 0.11 / 0.13 |
+| First return | 150 | 74.31 / 76.87 | 0.57 / 0.62 | 73.51 / 76.10 | 0.17 / 0.20 |
+| Second return | 150 | 68.16 / 76.62 | 0.52 / 0.61 | 67.50 / 75.84 | 0.16 / 0.19 |
+
+The median per-frame dispatch share was about 99% on each visit. The
+whole-GPU median exceeded the 33.33 ms budget on all three visits, and the
+dispatch spans tracked the extra room time on both returns. The stage
+intervals can overlap. Outside at the east fork, whole GPU median / p95 was
+52.03 / 58.75 ms. Across staffed room frames, the median native present-call
+return interval was 78.85 ms with p95 87.69 ms.
+
+SurfaceFlinger yielded 2,049 adjacent display intervals for the private
+game layer, covering 132.8 seconds between 27.3 and 160.1 s into the route.
+The display median was 62.50 ms with p95 83.33 ms. These display intervals
+have no per-submission join. Battery temperature rose from 33.1 °C to
+35.9 °C on USB power, with Android thermal status 0 at both endpoints.
+The run locates the cost in the dispatch interval. The cause of the
+visit-to-visit drift and sustained ordinary campaign performance remain open.
+
+The installed APK, previous private APK and raw timing evidence are retained
+locally under `reports/horde-bellwether-directions-20261123-104723`. The
+test app was stopped after measurement and the private candidate remains
+installed.
+
+### 23 November 2026 — Bellwether inactive-local-light trial
+
+**Evidence class — actual-device scripted route with per-submission GPU stage
+timing.** On the same Galaxy S26 Ultra (SM-S948B, Android 17/API 37), an
+original–trial–original sequence ran on USB with the same private combined
+Debug campaign, 33% render scale, Shipping/Mobile opaque-fast Pipeline, glass
+off and 475 × 980 internal / 1440 × 2971 output. Both original runs used
+the artifact and active hash recorded above. The trial used source
+`8615d03bf31a70b61694c6e7768647e604e864d1`, installed APK SHA-256
+`9b26d76a4182149b8aede8fb7c48394c6641c7f43d27232e96df4a5876381c42` and
+active shader SHA-256
+`ad5d502109dd1269721af0c6df2b0245f8c82173708a76d14bdd62c9bcf5db68`.
+An earlier install loaded the original frozen bank and was stopped before
+comparison. The trial below uses the regenerated bank, verified in the
+installed app and on every joined frame.
+
+All three runs completed both returns, all twelve resident swaps and 9,413
+simulation ticks. The acceleration-structure, dispatch and transfer samples
+joined every successful measured frame to its matching submission and native
+present call. Roster and recorded resource counts matched at the tavern and
+east fork. The trial took 158.57 s. The original runs took 160.08 s and
+163.80 s.
+
+| Run order | Joined frames | Battery start → end | First tavern visit, dispatch median / p95 (ms) | First return | Second return | All tavern visits, whole GPU median / p95 (ms) |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| Original | 2,460 | 33.1 → 35.9 °C | 50.32 / 51.20 | 73.51 / 76.10 | 67.50 / 75.84 | 67.73 / 76.57 |
+| Trial | 2,543 | 32.0 → 35.5 °C | 49.52 / 50.40 | 65.17 / 66.96 | 65.11 / 66.55 | 65.43 / 67.42 |
+| Original again | 2,391 | 33.5 → 36.0 °C | 50.46 / 51.39 | 80.19 / 95.07 | 74.61 / 76.60 | 75.45 / 91.46 |
+
+The trial dispatch was 1.6% faster than the faster original run on the first
+visit. The two originals differed by 6.69 and 7.11 ms on the returns.
+Thermal Service reported status 0 at all endpoints. Around 153 s, the
+Adreno thermal power level was 4 on the trial and 5 on the closing control.
+A matched GPU clock history was unavailable. The cooler trial and spread
+between original runs leave the shader's performance effect unresolved.
+The whole-GPU room medians remained above 33.33 ms. This was a fixed route
+with native present-call joins, without an exact display cadence measurement
+for the two new runs.
+
+On Windows RTX 5050 Laptop GPU, all eight 960 × 540 Shipping/High
+capture pairs were pixel-identical across a lit passage and the staffed
+tavern, both RT backends, and both opaque-fast and generic-dielectric
+strategies. Both frozen banks passed fresh eight-mode compilation checks.
+The original shader bank was restored on the 1.8 branch. The original
+private APK was hash-verified on the phone and stopped after the closing run.
+Exact APK and Windows executable identities, logs, capture manifests and raw
+timing remain under `reports/horde-bellwether-local-light-20261123-110155`,
+with the opening run under `reports/horde-bellwether-directions-20261123-104723`.
+
+### 24 November 2026 — Bellwether binary shadow traversal trial
+
+**Evidence class — actual-device scripted route with per-submission GPU
+stage timing and sampled display pacing.** The Galaxy S26 Ultra
+(SM-S948B, Android 17/API 37) ran the private five-resident route in
+original–trial–original order on USB power. Each run used hardware
+RayQueryCompute, Shipping/Mobile opaque-fast shaders, glass off and
+33% scale (475 × 980 internal, 1440 × 2971 output). The 283 packaged
+asset files match between APKs.
+
+Both controls used source `0eab2912`, installed APK SHA-256
+`dedb9f0775c0157d7a009e57d31b157ac58075f32c8994625231ffd1d0e1c827`
+and active shader SHA-256
+`b16089eca7976725533552509fd1efe085190dde16cab982622d4f2f932f0c1f`.
+The first-confirmed-blocker trial from `6017810b` used installed APK
+SHA-256 `1c6c4146c99d0d3e47ec6575643110d747f379cb58988b62906827dbf97aaceb`
+and active shader SHA-256
+`eb866881376725f4f97e2a09155a09dd8ab386c3dc2d62cc036c6aa42e34d42b`.
+The installed APK hash matched the local file on each run.
+
+Each run completed both returns, all twelve resident swaps and 9,413
+simulation ticks in 156.95–157.52 s. GPU stage samples joined every
+recorded RT submission to its successful native present call. The
+resident order, open door and allocations matched at the staffed
+tavern and east fork. Staffed-room statistics exclude the first five
+seconds. SurfaceFlinger intervals are adjacent samples from the game
+layer over 153.47–154.71 s per run and have no per-submission join.
+
+| Run order | Joined GPU frames | Battery start → end (°C) | Room GPU median / p95 (ms) | Room dispatch median by visit (ms) | Display samples | Display median / p95 (ms) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Original | 3,056 | 29.4 → 34.9 | 53.90 / 59.13 | 49.17 / 53.28 / 55.48 | 2,984 | 50.00 / 66.67 |
+| Trial | 2,847 | 30.4 → 35.1 | 59.36 / 61.56 | 50.75 / 56.15 / 59.89 | 2,784 | 54.17 / 70.83 |
+| Original again | 3,045 | 30.7 → 37.9 | 50.32 / 60.41 | 49.39 / 50.61 / 49.56 | 2,961 | 50.00 / 62.50 |
+
+The trial had the slowest dispatch median on all three visits, and
+the staffed-room whole-GPU median was 10.1% above the opening control
+and 18.0% above the closing control. Starting battery temperatures
+were within 1.3 °C. Android thermal status ended at 0, 0 and 1
+respectively, and no aligned GPU clock history was available. This
+cohort provides no handset gain to adopt. The 1.8 branch retains the
+original shader bank. Sustained ordinary campaign performance remains
+open. The receipts, raw timings and display samples are retained locally
+under `reports/horde-bellwether-binary-shadow-20261123-153321`.
+
+### 24 November 2026 — Android Back after the Standard benchmark
+
+**Evidence class — actual-device entry-menu navigation.** The Galaxy S26
+Ultra (SM-S948B, Android 17/API 37) ran the private Bellwether lanes
+ARM64 Debug APK from `c3073b2c`, installed SHA-256
+`48240f580c330bbb371d118be5a5e8614095a4a657e4ae9881d59886e92147e2`.
+The package includes the benchmark Back fix from `3caefd67`.
+
+System Back opened **Exit The Horde?** on the cold entry menu. Two
+Standard benchmark runs finished with `Integrity: COMPLETE`. Back
+returned from each completed report to the entry menu, and the next
+Back opened the normal exit confirmation. **Stay** returned to **Play**.
+Between the completed runs, Back cancelled an active Standard after
+it reached the 1280 × 720 benchmark output. The native surface restored
+to 1440 × 2971 and the entry menu again handled Back.
+
+Both the website and developer review forms returned to the report
+with system Back. The forms were opened for local review only. Android
+Home followed by launcher resume kept the completed report. **Quit
+Demo** returned focus to Android. Relaunching opened **Play**, and
+system Back again opened the working exit confirmation. The 32 focused
+host tests for benchmark menu ownership and report review also passed.
+The navigation log and installed-hash receipt are retained locally
+under `reports/horde-android-benchmark-back-20261124-111602`.
+[Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
+### 24 November 2026 — Paused combat lessons in a new Android campaign
+
+**Evidence class — actual-device input and navigation through an ordinary
+New Game.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the private
+Bellwether ARM64 Debug APK from `cdc6991a`, installed SHA-256
+`4b20cd47c050b64122f77f07d1e265adeba323a4bb4dd3dd247417aaa6da63c6`.
+The app's report confirmed hardware RayTracingPipeline presentation at
+475 × 980 internal in the 1440 × 2971 surface.
+
+**Play → New game** selected an empty slot. Touch movement from the opening
+reached the waterfall arena and opened **Block an attack** in front of the
+two live guards. Pressing Android Back, swiping to move and tapping outside
+the card kept it visible. Screen captures before and after those inputs
+were pixel-identical. Android Home followed by launcher resume restored
+the Block card. **Continue** returned control to the protected practice.
+
+Holding Guard completed Block and opened **Parry a guard break**. After
+Continue, actual Guard taps completed Parry and opened **Dodge an
+unblockable strike**. **Skip practice** dismissed that card and let the
+practice exit return to live combat. Android Back then opened the ordinary
+pause menu. The native campaign, gameplay and simulation timing suites
+passed, including the regression for stale Continue and held or queued
+combat input. All 80 focused Android tests passed.
+
+Finishing Dodge and Attack from Guard, controller input and landscape on
+the physical phone, and the subtitle contrast review remain open. The
+navigation log, APK receipt and captures are retained locally under
+`reports/horde-android-combat-cards-20261124-113116`.
+[Issue #35](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
+
+### 24 November 2026 — Android touch walkthrough from the lookout to Bellwether
+
+**Evidence class — ordinary campaign menus and device touch input from a
+seeded lookout.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran
+the isolated private ARM64 Debug APK from `74cd9cf4`, installed SHA-256
+`a3a8e5ef7a4ccd21d026f146242d4b9f0d20e36d371a42fa2f426d91687bad13`.
+The 283 assets matched the preceding private package, including the five
+residents and nineteen audition WAVs. The build used Shipping/Mobile shaders
+and real RayTracingPipeline at 33% (475 × 980 internal, 1440 × 2971 output).
+
+**Play → Continue** loaded a hash-verified lookout fixture in a fresh
+test namespace. ADB sent ordinary touchscreen swipes and taps. The
+developer overlay reported successive poses from the living simulation.
+The pause directions pointed to the south door. The roadside assessment
+updated the lookout autosave at the same anchor and kept both hearts and the
+empty flask. The player then walked the square, ramp and south door to the
+hearth in the same session.
+
+The hearth directions pointed to **Talk**. One **Talk to Kit** tap played
+through the three saved exchange steps. The phone captures show Kit, the
+tavern keeper and Kit as the named speakers in order. Rest took the player
+from two hearts and zero flask charges to three hearts and two charges,
+preserving all three resolved lines. The **Pause → Load checkpoint** menu
+listed **Bellwether tavern | 3 / 3 hearts**. Selecting it presented the
+hearth with the full flask, the completed conversation and identical
+autosave bytes. In-game listening and the remaining town routes are open.
+
+After Rest, the staffed hearth was held stationary with the developer
+overlay hidden. Over 22.19 seconds, SurfaceFlinger exposed 154 deduplicated
+adjacent intervals on the game's layer. Median displayed frame interval was
+141.67 ms and p95 was 166.67 ms. Battery temperature held at 36.5 °C on USB,
+with Android thermal status 0 at both endpoints. SurfaceFlinger recorded
+display cadence independently of Vulkan submission timing. Sustained play and
+a controlled comparison with the scripted room routes remain open.
+
+The isolated saves, exact APK and capture receipts are retained locally.
+The walkthrough evidence is under
+`reports/horde-android-bellwether-walk-20261124-114635`.
+
+The walkthrough found that Android labelled the hearth action **Refill
+flask** even though the hint described resting. The follow-up APK from
+`d01e482b`, installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`,
+loaded a copy of the earned pre-Rest save in a fresh test namespace. Its
+clickable **Rest** action saved three hearts and two charges with the
+talk complete. Android passed 18 focused tests, including a regression
+that moves from the hearth to the basin context and checks both labels.
+The Windows diagnostic executable compiled and its developer-overlay smoke
+test passed. Receipts and captures are under
+`reports/horde-android-hearth-rest-label-20261124-115838`.
+
+### 24 November 2026 — Ordinary Bellwether hearth view and backend timing
+
+**Evidence class — stationary holds loaded through the ordinary Android
+campaign menus.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) used
+the private ARM64 Debug APK from `d01e482b505c14a939b8072486d0db75213152b0`,
+installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`.
+The isolated tavern autosave kept its SHA-256
+`2ed2968160beda048f0d6f2de7e495516142b71e1a02979213081ccf04106f58`
+throughout. It contained three hearts, two flask charges and the completed
+hearth conversation. All holds used 33% (475 × 980 internal, 1440 × 2971
+output), Shipping/Mobile opaque-fast, Current shadows, Mobile fire and water,
+Low dust and mist disabled. The developer overlay was hidden while measuring.
+
+**View comparison.** One RayTracingPipeline session held the same position
+(x 84.52, z 107.68) facing the hearth, then the doorway, then the hearth
+again. Each snapshot confirmed 44 TLAS instances, 37 BLASes and the same
+three active light IDs. Turning also moved the carried lantern.
+
+| View (yaw) | Display intervals / observed span | Display median / p95 (ms) | Native windows of 120 frames | GPU window means (ms) | Battery start / end (°C) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Hearth (−1.30 rad) | 272 / 38.19 s | 141.67 / 150.00 | 2 | 111.51–116.37 | 35.8 / 35.9 |
+| Doorway (−2.96 rad) | 352 / 38.05 s | 108.33 / 116.67 | 2 | 81.73–83.33 | 35.9 / 36.1 |
+| Hearth return (−1.30 rad) | 256 / 36.77 s | 141.67 / 158.33 | 1 | 115.17 | 36.1 / 36.2 |
+
+Native command-record means stayed between 23.93 and 25.43 ms. GPU
+command-buffer means and fence waits fell by roughly 30 ms at the doorway.
+The change localizes most of the difference to the GPU workload associated
+with view and held-light position combined. SurfaceFlinger intervals came
+from the game's layer. GPU means came from consecutive native cumulative
+timestamp reports. Each hold also yielded one native snapshot joining a
+valid GPU interval to the same completed and successfully presented
+submission. The two timing streams have no per-frame join.
+
+The handset stayed on USB with Android thermal status 0. The sampled
+Adreno thermal power limit varied. Live GPU clocks were unavailable.
+Raw timing windows, stills and hash receipts are retained locally under
+`reports/horde-android-hearth-view-cohort-20261124-120754`.
+
+**Same-view backend comparison, excluded from backend selection.** Three
+fresh processes loaded the same autosave through **Play → Continue** and
+held the hearth pose after a 15-second settling period. Each backend exposed
+the same 44 TLAS instances, 37 BLASes and three active light IDs. Each hold
+had a valid native GPU-to-presentation identity join at the endpoint.
+
+| Hardware RT backend | Display intervals / observed span | Display median / p95 (ms) | Native windows of 120 frames | GPU window means (ms) | Battery start / end (°C) | Android thermal status |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| RayTracingPipeline | 242 / 38.85 s | 158.33 / 183.33 | 1 | 126.25 | 37.5 / 36.9 | 0 |
+| RayQueryCompute | 307 / 38.54 s | 129.17 / 141.67 | 1 | 109.15 | 38.0 / 37.7 | 1 |
+| RayTracingPipeline return | 321 / 38.17 s | 116.67 / 133.33 | 2 | 101.82–101.83 | 38.3 / 38.1 | 1 |
+
+The two Pipeline controls differed by 41.67 ms in median display interval,
+with RayQueryCompute between them. Their sampled Adreno thermal power
+limits also differed (6–7 initially, 3–5 in the return). The test leaves the
+relative backend cost unresolved. Both comparisons cover stationary holds.
+Sustained ordinary-play performance and the backend choice remain open.
+The subsequent APK and save hash checks matched. Backend comparison receipts
+and raw captures are retained locally under
+`reports/horde-android-hearth-backend-cohort-20261124-121429`.
+
+### 26 November 2026 — Bellwether wayside archive and register on Android
+
+**Evidence class — ordinary campaign menus and touchscreen input from an
+earned tavern save.** The Galaxy S26 Ultra (SM-S948B, Android 17/API 37)
+used the private ARM64 Debug APK from `d01e482b505c14a939b8072486d0db75213152b0`,
+installed SHA-256
+`bf53be4d5c1185f40b265fcb7c9fa8791d1f23bb948aece474acb4edb4230506`.
+The test used an isolated copy of the tavern autosave. At the shrine, the
+native report joined a completed GPU interval to successful hardware
+RayTracingPipeline presentation at 475 × 980 internal and 1440 × 2971 output.
+
+On 24 November, **Play → Continue** loaded the completed Talk and Rest
+checkpoint. The player walked through the south tavern door to the church,
+saw **Show the road mark** at the record keeper, then took the marked spur
+to the wayside archive. A straight swipe reached the edge of the church
+waymarker and stopped at x 34.29, z 81.27. Walking north around the marker
+rejoined the church lane. The kept capture records the approach friction.
+
+**Inspect archive** displayed the lantern's hinge hint. **Open lower
+stone** opened the stone and displayed three named lantern captions in order,
+from the identity claim through Veyr's request to find the seals. At this
+point the autosave held the open archive, the revealed lantern and an
+uncollected register. It preserved the tavern position, three hearts,
+two flask charges and all three finished tavern lines.
+
+On 26 November, a fresh process used **Play → Continue** to load those
+same save bytes at the hearth. The player walked back to the shrine past
+the north side of the waymarker. The open niche offered **Take the road
+register**. Pickup wrote a separate recovered state at the same tavern
+anchor and displayed the instruction to bring the register back.
+
+The player walked back to the church and selected **Show the road
+register**. Captures show the named record keeper describing the Abbey,
+Foundry and still-sealed Glass Court, then confirming that the first two
+leads can be taken in either order. The reading saved the interpreted
+state with an empty purse. **Collect register reward** saved three coins.
+The next interaction recalled the routes and preserved the rewarded save
+byte for byte. The pause directions listed both leads and the three coins.
+**Pause → Load checkpoint** returned to the original hearth position and
+preserved the rewarded save bytes. The final on-device hashes matched both
+the restored test save and the untouched source save. The restored hearth
+again presented through RayTracingPipeline. This walkthrough covers
+movement, captions and save behavior through the reward. Listening,
+the later exchange with Kit and sustained play need separate checks.
+
+The touchscreen trace, screenshots, exact APK receipt and decoded saves
+are retained locally under
+`reports/horde-android-register-walk-20261124-122154`.

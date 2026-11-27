@@ -83,6 +83,10 @@ int main(int argc,char** argv) {
   ChapterRouteMeasurementClock reset;
   check(reset.Consume(0)==0 && reset.ConsumedTicks()==0 && reset.PendingTicks()==0,
         "new measurement must have no inherited time or input debt");
+  ChapterRouteMeasurementClock longerRoute(240.0);
+  check(longerRoute.Consume(160.0)==4 && longerRoute.PendingTicks()==9596 &&
+        longerRoute.Consume(240.0)==4 && !longerRoute.Consume(240.01),
+        "the longer route has its own deadline and the same per-render catch-up bound");
   using horde::gameplay::validation::MeasureChapterRouteHostPhases;
   const std::array<std::uint64_t,7> marks{{100,110,120,720,730,740,750}};
   const auto host=MeasureChapterRouteHostPhases(marks,5,true);
@@ -100,12 +104,13 @@ int main(int argc,char** argv) {
  if(authored) {
   unsigned chapterSelections=0;
   for(const auto& checkpoint:kDevelopmentCheckpoints) {
-   const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-");
+   const bool expected=checkpoint.id==192 || checkpoint.name.starts_with("chapter-") ||
+       checkpoint.name.starts_with("bellwether-");
    check(DevelopmentCheckpointRequiresAuthoredChapter(checkpoint)==expected,
          "canonical chapter selections must request their actual authored GPU scene");
    chapterSelections+=expected;
   }
-  check(chapterSelections==41,"live journey and all40 chapter views, including F03/F04 directions, both demo-endpoint views and retention views, retain authored-scene admission");
+  check(chapterSelections==69,"the live journey, 40 chapter views and 28 Bellwether views require authored-scene admission");
   for(const auto name:{"chapter-forest-clue-forward","chapter-forest-clue-reverse",
                        "chapter-forest-lookout-left","chapter-forest-lookout-right",
                        "chapter-demo-endpoint","chapter-demo-endpoint-return"}) {

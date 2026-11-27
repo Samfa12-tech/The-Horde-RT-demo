@@ -1,0 +1,36 @@
+{
+  "feature": "Garden-side household and mapped east door",
+  "originalTownSha256": "b38d8e63d2b227ea88c6ada22462ea8c98523827125e71dcc381447f48eb87c4",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "sources": {
+    "assets/models/world/source/bellwether-shell-v4/bellwether-shell-v4.blend": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
+    "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+    "assets/models/world/source/bellwether-shell-v2/authoring-receipt.json": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1"
+  },
+  "runtimeTownSha256": "dbb32505df9666faec7da07c57381a3ea07eedf9a6652ad7f461deec0dfc99f5",
+  "eastEntranceXZ": [
+    43.3,
+    118.2
+  ],
+  "relocatedMasonryTriangles": 48,
+  "addedSolidTriangles": 3080,
+  "addedGroundTriangles": 53,
+  "routeTriangles": {
+    "Garden lane to the wash bench": 33,
+    "Household doorstep": 20
+  },
+  "originalLanesSha256": "45cd57ba867434418278d75002217e83fcb18ee6996be013ae45dce96ad2592b",
+  "houseLanesSha256": "26b009b2162961664171dc0d12880e5575d38fefa3b6205bb977ba3ba6c5fff8",
+  "townVertices": 79245,
+  "townTriangles": 37093,
+  "recipeSha256": "d66f0f0d0be3fea09e3aa48c839fa81852cec21d8ad5ca3cf08b636262873897",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "garden-house.blend": "470012f6546950050eb24fae62d28ab9b893052344f660d0c4615cb236444a29",
+    "garden-house.glb": "da05c11e6cc54c367446fc1bb75049af15e733a567d47d6d2dc786476177606f",
+    "house-paths.glb": "9438d5381fec9569d5562ac2640dca1973b625119ca689cead795cb83ceef60f",
+    "bellwether-tavern-v1.glb": "dbb32505df9666faec7da07c57381a3ea07eedf9a6652ad7f461deec0dfc99f5",
+    "geometry.generated.h": "82bb38cedb8133d5c09a73a1332b9ce2bc309d82528fc90ea818606a131fe9cd",
+    "asset.manifest.json": "d8600817c32618ceb2d43a76420611b51c2e772ba2946ccd5c45d02cf1921f9b"
+  }
+}

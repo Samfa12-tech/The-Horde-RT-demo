@@ -7,6 +7,16 @@ function Get-HordeNightAudioRuntimeFiles {
       'audio/chapter-local-ambience/asset.manifest.json',
       'audio/chapter-local-ambience/runtime/tomb_drip.wav',
       'audio/chapter-local-ambience/runtime/rope_contact.wav',
+      'audio/bellwether-hearth/asset.manifest.json',
+      'audio/bellwether-hearth/runtime/hearth_crackle.wav',
+      'audio/bellwether-stock/asset.manifest.json',
+      'audio/bellwether-stock/runtime/pig_grunt.wav',
+      'audio/bellwether-stock/runtime/hen_cluck.wav',
+      'audio/bellwether-mill/asset.manifest.json',
+      'audio/bellwether-mill/runtime/wheel_creak.wav',
+      'audio/kit-ankle/asset.manifest.json',
+      'audio/kit-ankle/runtime/boot_and_gravel.wav',
+      'audio/kit-ankle/runtime/steady_breath.wav',
       'audio/forest-foliage/asset.manifest.json',
       'audio/forest-foliage/runtime/leaf_rustle.wav')
 }

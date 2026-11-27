@@ -39,6 +39,23 @@ public final class LookoutObjectiveMenuTest {
         static final List<String> order=new ArrayList<>();
         @Implementation protected static void __staticInitializer__() {}
         @Implementation protected static long[] getLookoutObjectiveState(long generation){return objective==null?null:objective.clone();}
+        @Implementation protected static String getLookoutObjectiveText(long surface,long world,int id) {
+            if(objective==null || objective[1]!=surface || objective[2]!=world || objective[3]!=id)return "";
+            switch(id) {
+                case 1: return "Follow the road down to Bellwether. The tavern is across the square.";
+                case 2: return "Ask the record keeper by the northern church about the wayside shrine.\r\n\r\n"
+                        + "For a breathing rig, follow the MILL signs east and inspect the gearing at the artificer's workbench.\r\n\r\n"
+                        + "Shore practice: Meet the salvager at the river fork.";
+                case 3: return "Recover the road register from the opened wayside archive.\r\n\r\n"
+                        + "Purse: 0 coins.\r\nOrdinary silver: sell it at the stall west of the square.";
+                case 4: return "Show the road register to the record keeper by the northern church.";
+                case 5: return "The Abbey lies downstream. The Foundry is east, across the gorge. Both are leads for future expeditions.";
+                case 7: return "Follow the road down to Bellwether. Cross the square and enter the tavern through its south door.";
+                case 8: return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
+                case 9: return "The wayside archive is open. Stand near the opening and choose Listen to the lantern.";
+                default: return "";
+            }
+        }
         @Implementation protected static int getSurfaceRuntimeState(long generation){return 1;}
         @Implementation protected static long[] getEntryMenuState(){return entryState==null?null:entryState.clone();}
         @Implementation protected static int getContextualControlState(){return 0;}
@@ -92,7 +109,7 @@ public final class LookoutObjectiveMenuTest {
     private void open()throws Exception {pause();assertNotNull(find("Lookout objective"));find("Lookout objective").performClick();}
     private int actionCount(){return Bridge.attacks+Bridge.parries+Bridge.dodges+Bridge.interacts+Bridge.lanterns;}
     @Before public void setup()throws Exception {
-        Bridge.objective=new long[]{1,31,81,1};Bridge.entryState=null;Bridge.guardHeld=false;
+        Bridge.objective=new long[]{2,31,81,1};Bridge.entryState=null;Bridge.guardHeld=false;
         Bridge.paused=Bridge.entry=Bridge.crouch=false;
         Bridge.strafe=Bridge.forward=0;Bridge.order.clear();
         Bridge.resets=Bridge.campaignRequests=Bridge.attacks=Bridge.parries=Bridge.dodges=Bridge.interacts=Bridge.lanterns=0;
@@ -107,12 +124,13 @@ public final class LookoutObjectiveMenuTest {
         for(int i=0;i<names.length;i++)set(names[i],a.findViewById(ids[i]));
     }
     @Test public void malformedStaleAndUnavailablePublicationsCannotOfferThePage()throws Exception {
-        for(long[] value:new long[][]{null,new long[4],new long[]{2,31,81,1},new long[]{1,30,81,1},
-                new long[]{1,31,0,1},new long[]{1,31,81,2},new long[]{1,31,81,0}}) {
+        for(long[] value:new long[][]{null,new long[4],new long[]{1,31,81,1},new long[]{2,30,81,1},
+                new long[]{2,31,0,1},new long[]{2,31,81,10},new long[]{2,31,81,0}}) {
             Bridge.objective=value;pause();assertNull(find("Lookout objective"));
+            assertNull(find("Bellwether directions"));
             assertFalse(field("lookoutObjectiveVisible").getBoolean(a));
         }
-        Bridge.objective=new long[]{1,31,81,1};set("deathOverlayVisible",true);pause();assertNull(find("Lookout objective"));
+        Bridge.objective=new long[]{2,31,81,1};set("deathOverlayVisible",true);pause();assertNull(find("Lookout objective"));
     }
     @Test public void arrivalOnlyOffersAnExplicitPauseChoiceAndContinueClearsHeldInput()throws Exception {
         assertFalse(field("lookoutObjectiveVisible").getBoolean(a));pause();
@@ -122,7 +140,7 @@ public final class LookoutObjectiveMenuTest {
         set("parryTouchActive",true);set("crouchControlKeys",1);
         find("Lookout objective").performClick();
         assertTrue(field("lookoutObjectiveVisible").getBoolean(a));assertTrue(Bridge.paused);
-        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("future chapter"));
+        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("The tavern is across the square"));
         assertArrayEquals(new int[]{-1,-1},pointers);assertFalse(field("parryTouchActive").getBoolean(a));
         Bridge.order.clear();find("Continue exploring").performClick();
         assertFalse(Bridge.paused);assertFalse(field("menuVisible").getBoolean(a));
@@ -135,6 +153,56 @@ public final class LookoutObjectiveMenuTest {
         open();assertTrue(Bridge.paused);old.performClick();assertTrue(Bridge.paused);
         assertTrue(field("lookoutObjectiveVisible").getBoolean(a));
         find("Continue exploring").performClick();assertFalse(Bridge.paused);
+    }
+    @Test public void bellwetherDirectionsFollowTheEarnedStageAndBackStaysPaused()throws Exception {
+        Bridge.objective=new long[]{2,31,81,4};pause();
+        assertNull(find("Lookout objective"));
+        find("Bellwether directions").performClick();
+        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("Show the road register"));
+        assertNull(find("Return to menu"));
+        a.onBackPressed();
+        assertTrue(Bridge.paused);assertNotNull(find("Bellwether directions"));
+        find("Bellwether directions").performClick();Button old=find("Continue exploring");
+        Bridge.objective[3]=5;old.performClick();
+        assertTrue(Bridge.paused);assertFalse(field("lookoutObjectiveVisible").getBoolean(a));
+        find("Bellwether directions").performClick();
+        assertTrue(text(a.findViewById(R.id.menu_scrim)).contains("future expeditions"));
+        find("Back to pause menu").performClick();assertTrue(Bridge.paused);
+        find("Bellwether directions").performClick();find("Continue exploring").performClick();
+        assertFalse(Bridge.paused);assertEquals(0,Bridge.campaignRequests);assertEquals(0,actionCount());
+    }
+
+    @Test public void bellwetherMenuReadsPreparationAndTradeDirectionsFromTheCurrentPublication()throws Exception {
+        Bridge.objective[3]=2;
+        pause();
+        find("Bellwether directions").performClick();
+        String opening=text(a.findViewById(R.id.menu_scrim));
+        assertTrue(opening.contains("artificer's workbench"));
+        assertTrue(opening.contains("Meet the salvager at the river fork"));
+        find("Back to pause menu").performClick();
+        assertTrue(Bridge.paused);
+        Bridge.objective[3]=3;
+        pause();
+        find("Bellwether directions").performClick();
+        String archive=text(a.findViewById(R.id.menu_scrim));
+        assertTrue(archive.contains("Recover the road register"));
+        assertTrue(archive.contains("sell it at the stall west of the square"));
+        assertEquals(0,Bridge.campaignRequests);
+        assertEquals(0,actionCount());
+    }
+    @Test public void bellwetherDirectionsOpenForTheRoadHearthAndUnheardLantern()throws Exception {
+        String[] expected={"south door","Choose Talk","Listen to the lantern"};
+        for(int i=0;i<expected.length;i++) {
+            Bridge.objective[3]=7+i;
+            pause();
+            assertNull(find("Lookout objective"));
+            find("Bellwether directions").performClick();
+            assertTrue(text(a.findViewById(R.id.menu_scrim)).contains(expected[i]));
+            find("Back to pause menu").performClick();
+            assertTrue(Bridge.paused);
+        }
+        assertEquals(0,Bridge.campaignRequests);
+        assertEquals(0,actionCount());
     }
     @Test public void changedWorldOrSurfaceCannotBeResumedByTheOldPanel()throws Exception {
         open();Button old=find("Continue exploring");Bridge.objective[2]++;

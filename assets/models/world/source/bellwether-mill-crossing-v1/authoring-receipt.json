@@ -1,0 +1,53 @@
+{
+  "originalTownSha256": "605612b5d65c01d7c20b37a979ee159c0b0aefe4852e13b9a486f1e55dba0c66",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "townVertices": 11967,
+  "solidTriangles": 1038,
+  "groundTriangles": 38,
+  "stations": [
+    [
+      135.3,
+      122.55
+    ],
+    [
+      135.3,
+      114.0
+    ],
+    [
+      135.3,
+      94.0
+    ],
+    [
+      138.8,
+      94.0
+    ],
+    [
+      143.72,
+      94.0
+    ]
+  ],
+  "recipeSha256": "0307197567a5bfcf2b418df3e20247b0fd44fdf44dbb22f7838794d0a0dceb02",
+  "millWorksRecipeSha256": "8b21e118d4910e74aadf4cc19f861fc274ee50c3d9bc7655988e1d3597fd76a8",
+  "outputs": {
+    "bellwether-tavern-v1.glb": {
+      "bytes": 613660,
+      "sha256": "1133a71dbe7ac47b3c306bc687489b10d9036f7b4d6727bfd6115557d1b667b2"
+    },
+    "mill-crossing.glb": {
+      "bytes": 108844,
+      "sha256": "cee307bd9f8688df4c31146be9fbe6382da87d929844dc0d41e90af5d1905c5d"
+    },
+    "mill-crossing.blend": {
+      "bytes": 116819,
+      "sha256": "254883993db6fb760b79c81e7c998c8cfc9e26e0f7d9434944d504abd881edf4"
+    },
+    "asset.manifest.json": {
+      "bytes": 707,
+      "sha256": "202296ce5c6d9836538e47d8c44a14aabb94074128c93f082765f296d7e9f429"
+    },
+    "geometry.generated.h": {
+      "bytes": 484,
+      "sha256": "cf07288ecfc3beb98683d7e241395cc0c425d1383697baa3a646dcabd909d36d"
+    }
+  }
+}

@@ -279,13 +279,13 @@ int main()
                       !ShouldPersistRtLabUnlock({true, false, false, false, true}),
                   "Android RT Lab unlock was not restricted to genuine live finale completion");
 
-    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 23u &&
-                      PresentableTinyRtScene::kBlasCount == 25u &&
+    ok &= Require(PresentableTinyRtScene::kOrdinaryBlasCount == 32u &&
+                      PresentableTinyRtScene::kBlasCount == 34u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount == 31u &&
-                      PresentableTinyRtScene::kTlasInstanceCount == 111u &&
-                      kRtInstanceMetadataCapacity == 30u &&
-                      kRtStaticAssetCapacity == 15u &&
-                      kRtPrimitiveMetadataCapacity == 38u && kRtMaterialCapacity == 34u &&
+                      PresentableTinyRtScene::kTlasInstanceCount == 122u &&
+                      kRtInstanceMetadataCapacity == 42u &&
+                      kRtStaticAssetCapacity == 25u &&
+                      kRtPrimitiveMetadataCapacity == 55u && kRtMaterialCapacity == 50u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&
@@ -302,8 +302,10 @@ int main()
                       PresentableTinyRtScene::kAttackWarningInstanceIndex == 28u &&
                       PresentableTinyRtScene::kHealingFlaskMetadataIndex == 29u &&
                       PresentableTinyRtScene::kHealingFlaskInstanceIndex == 29u &&
-                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u,
-                  "joint ring28/flask29 plus physical pickup30 preserve Keeper27 and every previous metadata/TLAS owner");
+                      PresentableTinyRtScene::kHealingFlaskUpgradeInstanceIndex == 30u &&
+                      PresentableTinyRtScene::kRoadStoneMetadataIndex == 30u &&
+                      PresentableTinyRtScene::kTavernDoorMetadataIndex == 36u,
+                  "the chapter props retain independent metadata and preserve the ordinary prefix");
     ok &= Require(PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 64u == 95u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 76u == 107u &&
                       PresentableTinyRtScene::kOrdinaryTlasInstanceCount + 80u == 111u,
@@ -656,6 +658,22 @@ int main()
     auto chapterInterior = rescueExteriorSnapshot;
     chapterInterior.rescue.exteriorSide = false;
     const auto chapterInteriorFrame = BuildRtSceneFrameInputs(chapterInterior, .75f);
+    {
+        using namespace horde::gameplay::dialogue;
+        auto staffed = rescueExteriorSnapshot;
+        staffed.tavernKeeper = TavernKeeperPose{TavernKeeperStage::Walking, {85.65f,-8.70955f,111.f},
+            .6f, .018f, .8f};
+        const auto moving = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        staffed.tavernKeeper->travelled = 0.f;
+        const auto stopped = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        staffed.tavernKeeper.reset();
+        const auto vacant = BuildRtSceneFrameInputs(staffed, .75f).chapterResidents.front();
+        ok &= Require(moving.stableId == kTavernKeeperActorId && moving.foot == std::array{85.65f,-8.70955f,111.f} &&
+                Near(moving.yaw, 3.14159265359f-.6f) && moving.clip == horde::scene::SkinnedClip::Walking &&
+                Near(moving.time, .8f) && stopped.stableId == moving.stableId &&
+                stopped.clip == horde::scene::SkinnedClip::Idle && stopped.time == 0.f && !vacant.stableId,
+            "keeper presentation uses the immutable foot, facing and admitted walk clock");
+    }
     ok &= Require(Near(chapterInteriorFrame.tuning.fogDensityScale, 0.f) &&
                   chapterInteriorFrame.lich.roomMistDensityScale == chapterInterior.lich.roomMistDensityScale,
                   "chapter tomb removes global distance fog without changing authoritative Keeper mist clearing");
@@ -1093,8 +1111,8 @@ int main()
             ReadTextFile(root / "tools/run-android-showcase-validation.ps1");
         ok &= Require(sceneSource.find(
                           "geometry.flags = transmissive\n"
-                          "                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
-                          "                : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
+                          "            ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR\n"
+                          "            : VK_GEOMETRY_OPAQUE_BIT_KHR;") != std::string::npos,
                       "transmissive BLAS geometry must suppress duplicate candidates without making glass opaque");
         ok &= Require(hitDecodeSource.find("#if HORDE_GENERIC_TRANSMISSION_VARIANT\n") != std::string::npos &&
                       hitDecodeSource.find("if ((h.materialFlags & kRtMaterialFlagTransmission) != 0u)") != std::string::npos &&
@@ -1864,7 +1882,7 @@ int main()
         ok &= Require(
                       CountOccurrences(
                           androidBridgeSource,
-                          "horde::telemetry::RtStage::SimulationStep") == 7u &&
+                          "horde::telemetry::RtStage::SimulationStep") == 8u &&
                       CountOccurrences(
                           windowsSource,
                           "horde::telemetry::RtStage::SimulationStep") == 1u,

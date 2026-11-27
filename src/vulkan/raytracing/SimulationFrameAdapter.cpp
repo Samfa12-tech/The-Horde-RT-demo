@@ -1,4 +1,5 @@
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "scene/CompanionPose.h"
 
 #include <algorithm>
 #include <cmath>
@@ -294,6 +295,48 @@ RtSceneFrameInputs BuildRtSceneFrameInputs(
     frame.developmentRescueJourney = simulation.developmentRescueJourney;
     frame.rescue = simulation.rescue;
     frame.chapterCompanion = simulation.chapterCompanion;
+    frame.waysideArchivePose = simulation.waysideArchive.pose;
+    frame.tavernDoorOpening = simulation.tavernDoor.opening;
+    frame.waysideRegisterRecovered = simulation.waysideArchive.registerRecovered;
+    frame.millDriveInstalled = horde::gameplay::bellwether::HasMillDrive(simulation.millPreparation);
+    frame.millDriveAngleRadians = simulation.millDriveAngleRadians;
+    frame.millWaterwheelAngleRadians = simulation.millWaterwheelAngleRadians;
+    frame.stockHeadPoses = simulation.stockHeadPoses;
+    frame.privyRag = simulation.privyRag;
+    std::size_t residentCount = 0;
+    const auto addResident = [&](ChapterResidentActorPose pose) {
+        if (residentCount < frame.chapterResidents.size())
+            frame.chapterResidents[residentCount++] = pose;
+    };
+    if (simulation.tavernKeeper) {
+        using namespace horde::gameplay::dialogue;
+        const auto& keeper = *simulation.tavernKeeper;
+        const bool moving = keeper.stage == TavernKeeperStage::Walking && keeper.travelled > 0;
+        addResident({kTavernKeeperActorId, keeper.foot,
+            horde::scene::CompanionModelYaw(keeper.yaw),
+            moving ? horde::scene::SkinnedClip::Walking : horde::scene::SkinnedClip::Idle,
+            moving ? keeper.walkSeconds : 0.f});
+    }
+    if (simulation.recordKeeper) {
+        const auto& keeper = *simulation.recordKeeper;
+        addResident({horde::gameplay::dialogue::kRecordKeeperActorId, keeper.foot,
+            horde::scene::CompanionModelYaw(keeper.yaw), horde::scene::SkinnedClip::Idle, keeper.idleSeconds});
+    }
+    if (simulation.artificer) {
+        const auto& artificer = *simulation.artificer;
+        addResident({horde::gameplay::bellwether::kArtificerActorId, artificer.foot,
+            horde::scene::CompanionModelYaw(artificer.yaw), horde::scene::SkinnedClip::Idle, 0.f});
+    }
+    if (simulation.salvager) {
+        const auto& salvager = *simulation.salvager;
+        addResident({horde::gameplay::bellwether::kSalvagerActorId, salvager.foot,
+            horde::scene::CompanionModelYaw(salvager.yaw), horde::scene::SkinnedClip::Idle, salvager.idleSeconds});
+    }
+    if (simulation.relicDealer) {
+        const auto& dealer = *simulation.relicDealer;
+        addResident({horde::gameplay::bellwether::kRelicDealerActorId, dealer.foot,
+            horde::scene::CompanionModelYaw(dealer.yaw), horde::scene::SkinnedClip::Idle, 0.f});
+    }
     frame.cameraYaw = simulation.playerYawRadians;
     frame.cameraPitch = simulation.playerPitchRadians;
     frame.torchLightStrength = simulation.torchLightStrength * simulation.torchFailure.flameStrength;

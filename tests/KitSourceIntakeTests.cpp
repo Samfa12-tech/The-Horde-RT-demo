@@ -22,13 +22,35 @@ bool CheckAnalyticTangentFrames() {
     SkinnedClipSet clips{};
     clips.clips[0]={"rotate",false,true};
     clips.clips[1]={"reflect",false,true};
-    for(std::size_t i=2;i<clips.clips.size();++i) clips.clips[i]={"",false,false};
+    clips.clips[2]={"hold",true,true};
+    for(std::size_t i=3;i<clips.clips.size();++i) clips.clips[i]={"",false,false};
     SkinnedMeshAsset model;std::string diagnostic;
     if(!model.LoadClips(HORDE_SKINNED_PBR_FIXTURE,clips,diagnostic)) {
         std::cerr<<"Analytic skin fixture import failed: "<<diagnostic<<'\n';return false;
     }
+    if (model.HasConstantClipPose(SkinnedClip::Idle) || model.HasConstantClipPose(SkinnedClip::Walking) ||
+        !model.HasConstantClipPose(SkinnedClip::Attack) || model.HasConstantClipPose(SkinnedClip::Dead) ||
+        model.HasConstantClipPose(static_cast<SkinnedClip>(255)))
+    {
+        std::cerr << "Only the mapped identical-key clip should report a constant pose.\n";
+        return false;
+    }
     std::vector<TexturedSkinnedRtVertex> vertices;
     std::vector<SkinnedPbrTangent> tangents;
+    if (!model.SkinUniquePbr(SkinnedClip::Attack, 0.f, vertices, tangents, diagnostic)) return false;
+    const auto heldVertices = vertices;
+    const auto heldTangents = tangents;
+    for (float time : {.5f, 1.f, 1.75f})
+    {
+        if (!model.SkinUniquePbr(SkinnedClip::Attack, time, vertices, tangents, diagnostic) ||
+            vertices.size() != heldVertices.size() || tangents.size() != heldTangents.size() ||
+            std::memcmp(vertices.data(), heldVertices.data(), vertices.size()*sizeof(vertices.front())) != 0 ||
+            std::memcmp(tangents.data(), heldTangents.data(), tangents.size()*sizeof(tangents.front())) != 0)
+        {
+            std::cerr << "The identical-key clip changed its skinned output.\n";
+            return false;
+        }
+    }
     for(const auto clip:{SkinnedClip::Idle,SkinnedClip::Walking}) {
         if(!model.SkinUniquePbr(clip,1,vertices,tangents,diagnostic)||vertices.size()!=3||tangents.size()!=3) return false;
         const bool reflection=clip==SkinnedClip::Walking;
@@ -577,18 +599,97 @@ int ValidateNamedTurnBindings(const std::filesystem::path& path,bool normalRunti
           rejected.ClipDuration(SkinnedClip::TurnRight)==0 && rejected.ClipDuration(SkinnedClip::Attack)==0 &&
           rejected.ClipDuration(SkinnedClip::Dead)==0,"optional missing turn retains its own empty slot");
 
-    std::array<SkinnedClipBinding,7> oversized{};
+    std::array<SkinnedClipBinding,SkinnedMeshAsset::kMaximumClipBindings+1> oversized{};
     std::copy(bindings.begin(),bindings.end(),oversized.begin());
-    const std::string boundsDiagnostic="Skinned clip bindings must contain between one and six semantic slots.";
+    const std::string boundsDiagnostic="Skinned clip bindings must contain between one and seven semantic slots.";
     // Empty paths make precedence observable without creating a test file: an
     // allowed roster reaches the existing open error; invalid rosters do not.
     check(!rejected.LoadClips("",std::span<const SkinnedClipBinding>{},diagnostic) &&
           !rejected.IsLoaded() && diagnostic==boundsDiagnostic,"zero bindings reject before GLB file IO");
     check(!rejected.LoadClips("",oversized,diagnostic) && !rejected.IsLoaded() && diagnostic==boundsDiagnostic,
-          "more than six bindings reject before GLB file IO");
+          "oversized named roster rejects before GLB file IO");
     check(!rejected.LoadClips("",bindings,diagnostic) && !rejected.IsLoaded() &&
           diagnostic.find("Could not open skeleton GLB:")==0,"six bindings reach the existing GLB open diagnostic");
     return finish();
+}
+
+bool CheckAuthoredKitClip(const std::filesystem::path& directory,
+    const std::filesystem::path& reference, horde::scene::SkinnedClip clip, float end, bool loops=false) {
+    using namespace horde::scene;
+    const auto path=directory/kCompanionTurnRuntimeFile;
+    const auto bindings=CompanionChapterClipBindings();
+    SkinnedMeshAsset skin;
+    assets::SkinnedPbrActor actor;
+    std::string diagnostic;
+    if(!skin.LoadClips(path.string(),bindings,diagnostic) ||
+       !actor.Load(directory,kCompanionTurnRuntimeFile,bindings,diagnostic)) {
+        std::cerr<<"Authored Kit clip import: "<<diagnostic<<'\n';return false;
+    }
+    if(std::abs(skin.ClipDuration(clip)-end)>1e-6f)return false;
+
+    std::ifstream input(reference,std::ios::binary);
+    auto read=[&](auto& value){return bool(input.read(reinterpret_cast<char*>(&value),sizeof(value)));};
+    std::array<char,4> magic{};
+    std::uint32_t samples=0;
+    if(!read(magic) || magic!=std::array<char,4>{'K','S','P','1'} || !read(samples) || samples!=8)return false;
+    std::vector<TexturedSkinnedRtVertex> vertices;
+    std::vector<SkinnedPbrTangent> tangents;
+    float maximum=0,previous=-1;
+    unsigned vertexCount=0;
+    for(unsigned sample=0;sample<samples;++sample) {
+        float seconds=0;
+        std::uint32_t count=0;
+        if(!read(seconds) || !read(count) || !std::isfinite(seconds) || seconds<=previous || seconds>end ||
+           count<64 || count>512 || !skin.SkinUniquePbr(clip,seconds,vertices,tangents,diagnostic) ||
+           !actor.Pose(clip,seconds,diagnostic) || actor.Asset().vertices.size()!=vertices.size())return false;
+        previous=seconds;
+        for(unsigned i=0;i<count;++i) {
+            std::uint32_t index=0;
+            std::array<float,3> expected{};
+            if(!read(index) || !read(expected) || index>=vertices.size())return false;
+            const auto& position=vertices[index].position;
+            for(unsigned axis=0;axis<3;++axis) {
+                if(!std::isfinite(expected[axis]) || !std::isfinite(position[axis]) ||
+                   position[axis]!=actor.Asset().vertices[index].position[axis])return false;
+            }
+            maximum=std::max(maximum,std::hypot(position[0]-expected[0],position[1]-expected[1],position[2]-expected[2]));
+            ++vertexCount;
+        }
+    }
+    if(std::abs(previous-end)>1e-6f || input.peek()!=std::char_traits<char>::eof())return false;
+    const auto finalPose=actor.Asset();
+    if(!actor.Pose(clip,loops ? end*2 : end+1,diagnostic) || !SameAdmittedActor(finalPose,actor.Asset()))return false;
+    if(clip==SkinnedClip::Sit) {
+        using namespace horde::gameplay::dialogue;
+        constexpr std::array<std::string_view,2> names{"Head","headfront"};
+        std::array<SkinnedNodeTransform,2> nodes{};
+        if(!skin.NodeTransforms(clip,end,names,nodes,diagnostic))return false;
+        const auto& [head,front]=nodes;
+        const float pitch=std::atan2(head[13]-front[13],std::hypot(front[12]-head[12],front[14]-head[14]));
+        if(std::hypot(head[12]-kTavernSeatedHead.x,head[13]-kTavernSeatedHead.y,
+            head[14]-kTavernSeatedHead.z)>.001f || std::abs(pitch-kTavernSeatedHeadRestPitch)>.002f)return false;
+        CompanionActing seated;
+        Snapshot speech;
+        speech.line=Line::TavernIntroduce;speech.duration=Spec(speech.line).duration;
+        for(int tick=0;tick<126;++tick) {
+            speech.elapsed=tick/60.f;
+            seated.Step(1.f/60.f,speech,true,true,true,false,false,true,Tuple{.4f,-.48f,1.4f});
+        }
+        const auto rotations=CompanionUpperBodyRotations(seated.State());
+        if(!actor.Pose(clip,end,diagnostic,rotations) ||
+           actor.Asset().vertices.size()!=finalPose.vertices.size())return false;
+        std::size_t changedHeadRows=0;
+        for(std::size_t i=0;i<finalPose.vertices.size();++i) {
+            const auto& before=finalPose.vertices[i].position;
+            const auto& after=actor.Asset().vertices[i].position;
+            if(before[1]<1.f && before!=after)return false;
+            if(before[1]>1.33f && before!=after)++changedHeadRows;
+        }
+        if(changedHeadRows==0)return false;
+    }
+    std::cout<<reference.filename().string()<<" native samples="<<samples<<" compared_vertices="<<vertexCount
+        <<" max_blender_error_m="<<maximum<<'\n';
+    return maximum<.00015f;
 }
 
 int main(int argc,char** argv) {
@@ -743,6 +844,17 @@ int main(int argc,char** argv) {
     // runtime additionally has the two named turns; it must pass the shared
     // six-slot roster, optional-hole, endpoint and original Idle/Walk byte gates.
     if(ValidateNamedTurnBindings(runtimeDirectory/kCompanionTurnRuntimeFile,true)!=0)++failures;
+    using namespace horde::gameplay::dialogue;
+    const auto source=runtimeDirectory.parent_path().parent_path()/"source";
+    const auto road=source/"kit-ankle-approach-v1/native";
+    if(!CheckAuthoredKitClip(runtimeDirectory,source/"kit-hearth-sit-study-v1/native/native-sit-reference.bin",
+        SkinnedClip::Sit,kTavernSitDurationSeconds)) { std::cerr<<"Native hearth sit correspondence failed.\n"; ++failures; }
+    if(!CheckAuthoredKitClip(runtimeDirectory,road/"ankle_assess-reference.bin",
+        SkinnedClip::AnkleAssessment,kAnkleAssessmentDurationSeconds) ||
+       !CheckAuthoredKitClip(runtimeDirectory,road/"protective_walk-reference.bin",
+        SkinnedClip::ProtectiveWalk,kProtectiveWalkDurationSeconds,true)) {
+        std::cerr<<"Native Bellwether approach correspondence failed.\n";++failures;
+    }
     std::cout<<"Kit source intake clips=7 sampled_poses="<<poses<<" failures="<<failures
         <<" normal_turn_runtime_contract=CHECKED\n";
     return failures?1:0;

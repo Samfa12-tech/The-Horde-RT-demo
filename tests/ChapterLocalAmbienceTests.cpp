@@ -202,7 +202,7 @@ void Transport() {
     static_assert(static_cast<unsigned>(GameplayEventType::RopeContact) == 33);
     static_assert(static_cast<unsigned>(GameplayEventType::ChapterLocalAmbienceStopped) == 34);
     for (const auto type : {GameplayEventType::TombDrip, GameplayEventType::RopeContact,
-                            GameplayEventType::ChapterLocalAmbienceStopped}) {
+                            GameplayEventType::ChapterLocalAmbienceStopped, GameplayEventType::BellwetherWaterwheelCreak}) {
         GameplayEvent event; event.type = type; event.sequence = 0x12345678; event.worldY = 2.125f; event.listenerY = 3.2f;
         const auto metadata = horde::platform::android::PackGameplayEventMetadata(event);
         const auto vertical = horde::platform::android::PackGameplayEventVerticalMetadata(event);
@@ -214,6 +214,171 @@ void Transport() {
     Check(!IsChapterAmbienceEvent(GameplayEventType::EnemyHit) &&
           IsChapterAmbienceEvent(GameplayEventType::ForestBirdStopped),
           "shared incidental family includes cleanup but cannot absorb combat feedback");
+}
+
+void HearthCadenceAndScope() {
+    auto s=DripState();
+    s.rescue.exteriorSide=true;
+    s.chapterDialogue.proofAccepted=true;
+    s.worldRoute.current=WorldZoneId::Lookout;
+    s.worldRoute.readiness[3]=ZoneReadiness::Ready;
+    s.playerX=bellwether::kConversation[0];
+    s.playerSupportWorldY=bellwether::kConversation[1];
+    s.playerZ=bellwether::kConversation[2];
+    s.fireEmitters[1].stableId=effects::kBellwetherHearthEmitterId;
+    s.fireEmitters[1].strength=1.f;
+    Check(Local::HearthEligible(s) && !ForestBirdAmbience::ExteriorEligible(s),
+          "the mapped room is a hearth habitat even when the route label is exterior");
+    auto extinguished=s;
+    extinguished.fireEmitters[1].strength=0.f;
+    Check(!Local::HearthEligible(extinguished),"an unlit hearth emits no crackle");
+    auto sill=s;
+    sill.playerZ=bellwether::kRoomMax[2]+.01f;
+    Check(!Local::HearthEligible(sill) && ForestBirdAmbience::ExteriorEligible(sill),
+          "the south sill keeps exterior audio and excludes the hearth");
+    auto upstairs=s;
+    upstairs.playerSupportWorldY+=2.f;
+    Check(!Local::HearthEligible(upstairs),"matching XZ on another storey cannot borrow the hearth");
+
+    Local local;
+    const auto advance=[&](unsigned count) {
+        Local::Result result;
+        for(unsigned i=0;i<count;++i) {
+            ++s.tickIndex;
+            result=local.Step(s);
+            if(result.cue!=Cue::None)break;
+        }
+        return result;
+    };
+    Check(advance(Local::kHearthInitialTicks-1).cue==Cue::None,
+          "a fresh room entry has a quiet interval");
+    const auto first=advance(1);
+    Check(first.cue==Cue::Hearth && Same(first.position, Local::kHearthPosition) && Near(first.gain,.42f),
+          "the finite cue uses the actual fire's position and restrained gain");
+    Check(advance(Local::kHearthIntervalTicks-1).cue==Cue::None && advance(1).cue==Cue::Hearth,
+          "the cadence leaves a gap beyond the six-second clip");
+    s.chapterDialogue.line=dialogue::Line::TavernIntroduce;
+    Check(advance(1).cue==Cue::Stop && advance(600).cue==Cue::None,
+          "active dialogue cancels the cue and prevents a backlog");
+    s.chapterDialogue.line=dialogue::Line::None;
+    Check(advance(Local::kHearthInitialTicks-1).cue==Cue::None && advance(1).cue==Cue::Hearth,
+          "after speech ends the hearth earns a fresh quiet interval");
+    s.playerZ=bellwether::kRoomMax[2]+.01f;
+    Check(advance(1).cue==Cue::Stop && advance(600).cue==Cue::None,
+          "walking out of the room stops the outstanding hearth voice once");
+}
+
+void StockCadenceAndScope() {
+    using namespace horde::gameplay::bellwether;
+    auto state=DripState();
+    state.rescue.exteriorSide=true;
+    const auto& [x,z]=kBellwetherStockRoostView;
+    state.playerX=x; state.playerZ=z; state.playerSupportWorldY=kBellwetherStockHeadMounts[0][1];
+    Check(Local::StockEligible(state),"the mapped dry roost approach can hear the stock");
+    auto remote=state;
+    remote.playerSupportWorldY+=4.f;
+    Check(!Local::StockEligible(remote),"the same XZ on another level cannot hear the stock");
+    Local local;
+    BellwetherStockIdle idle;
+    std::array<unsigned,3> heard{};
+    std::uint64_t lastCue=0;
+    GameplayEvent previous;
+    for(unsigned tick=0;tick<48u*60u;++tick) {
+        ++state.tickIndex;
+        idle.Step(x,z,kTick);
+        state.stockHeadPoses=idle.Poses();
+        const auto result=local.Step(state);
+        if(result.cue==Cue::None) continue;
+        std::size_t animal=0;
+        for(;animal<kBellwetherStockHeadMounts.size();++animal) {
+            const auto& mount=kBellwetherStockHeadMounts[animal];
+            if(Same(result.position,{mount[0],mount[1],mount[2]})) break;
+        }
+        const bool aligned=animal<heard.size() && std::abs(state.stockHeadPoses[animal].yawRadians)>.06f;
+        Check(aligned && result.cue==(animal==0 ? Cue::Pig : Cue::Hen),
+              "a cue has the matching animated animal and its exact mount");
+        if(aligned) ++heard[animal];
+        Check(state.tickIndex>=(lastCue?lastCue+Local::kStockMinimumTicks:Local::kStockInitialTicks),
+              "one-shots share a finite quiet gap and never emit from a neutral pose");
+        lastCue=state.tickIndex;
+        previous.type=Local::EventType(result.cue);
+        previous.worldX=result.position.x; previous.worldY=result.position.y; previous.worldZ=result.position.z;
+        previous.listenerX=x; previous.listenerZ=z; previous.intensity=result.gain;
+        Check(IsChapterAmbienceEvent(previous.type) && ChapterAmbienceGains(previous).left>0.f &&
+              !ChapterAmbienceGains(previous).obstructed && local.Step(state).cue==Cue::None,
+              "the event enters the shared exterior voice once per fixed tick");
+    }
+    Check(std::all_of(heard.begin(),heard.end(),[](unsigned count){return count>0;}),
+          "the pig and each individual hen contribute over the real idle schedule");
+    auto boundary=previous;
+    boundary.listenerX=boundary.worldX+Local::kStockRange-.05f; boundary.listenerZ=boundary.worldZ;
+    Check(ChapterAmbienceGains(boundary).right<.02f && Local::StockEventEligible(state,previous) &&
+          !Local::StockEventEligible(remote,previous),"the authored source fades at range and drops stale playback across levels");
+    state.chapterDialogue.line=dialogue::Line::GardenGrateTalk;
+    ++state.tickIndex;
+    Check(local.Step(state).cue==Cue::Stop && !Local::StockEventEligible(state,previous),
+          "a new dialogue sends an ordered stop and invalidates queued animal sound");
+    ++state.tickIndex;
+    Check(local.Step(state).cue==Cue::None,"suppressed sounds never accrue while the player talks");
+}
+
+void WaterwheelContact() {
+    using namespace horde::gameplay::bellwether;
+    Local local;
+    auto state = DripState();
+    state.rescue.exteriorSide = true;
+    state.playerX = Local::kMillAxle.x - 2.f;
+    state.playerZ = Local::kMillAxle.z + 3.f;
+    state.playerSupportWorldY = Local::kMillAxle.y + 1.f;
+    state.millPreparation = MillPreparation::BearingSeated;
+    const auto step = [&] { ++state.tickIndex; return local.Step(state); };
+    Check(!Local::MillEligible(state) && step().cue == Cue::None,
+          "a seated but untested bearing remains silent");
+    state.millPreparation = MillPreparation::GearingVerified;
+    step();
+    std::vector<std::uint64_t> contacts;
+    bool exact = true;
+    for (unsigned i = 0; i < 24 * 60; ++i) {
+        state.millWaterwheelAngleRadians += kMillWaterwheelRadiansPerSecond * kTick;
+        if (state.millWaterwheelAngleRadians >= kMillWaterwheelTwoPi)
+            state.millWaterwheelAngleRadians -= kMillWaterwheelTwoPi;
+        const auto result = step();
+        if (result.cue == Cue::None) continue;
+        const float expectedGain = contacts.size() % 2 == 0 ? .65f : .49f;
+        exact &= result.cue == Cue::Mill && Same(result.position, Local::kMillAxle) &&
+            Near(result.gain, expectedGain) && local.Step(state).cue == Cue::None;
+        contacts.push_back(state.tickIndex);
+    }
+    Check(exact && contacts.size() == 4 && contacts.front() < 35 &&
+          std::adjacent_find(contacts.begin(), contacts.end(), [](auto a, auto b) {
+              return b-a < 376 || b-a > 378;
+          }) == contacts.end(), "two phase-locked axle contacts per revolution survive angle wrap and share one voice");
+    state.paused = true;
+    Check(!Local::MillEligible(state) && step().cue == Cue::Stop, "pause discards the outstanding mill voice");
+    state.paused = false;
+    state.chapterDialogue.line = dialogue::Line::GardenGrateTalk;
+    Check(!Local::MillEligible(state) && step().cue == Cue::None, "speech leaves the wheel contact silent");
+    state.chapterDialogue.line = dialogue::Line::None;
+    state.millWaterwheelAngleRadians = .235f;
+    Check(step().cue == Cue::None, "re-entry samples the current wheel phase");
+    state.millWaterwheelAngleRadians = 3.44f;
+    Check(step().cue == Cue::None, "a discontinuous wheel import cannot enqueue a missed contact");
+    state.playerSupportWorldY += 3.f;
+    Check(!Local::MillEligible(state) && step().cue == Cue::Stop, "same map position on another level drops the previous voice");
+    GameplayEvent event;
+    event.type = GameplayEventType::BellwetherWaterwheelCreak;
+    event.worldX = Local::kMillAxle.x;
+    event.worldY = event.listenerY = Local::kMillAxle.y;
+    event.worldZ = event.listenerZ = Local::kMillAxle.z;
+    event.intensity = .65f;
+    event.listenerX = event.worldX - 2.f;
+    event.listenerZ = event.worldZ + 2.f;
+    const auto near = ChapterAmbienceGains(event);
+    event.listenerX = event.worldX - Local::kMillRange + .05f;
+    event.listenerZ = event.worldZ;
+    const auto edge = ChapterAmbienceGains(event);
+    Check(near.right > near.left && near.left > .05f && !near.obstructed && edge.right < .02f,
+          "the axle contact uses exterior pan and fades to the edge at ten metres");
 }
 
 cp::Checkpoint Record(bool upper) {
@@ -364,7 +529,9 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           audible.find("!campaignMenuVisible") != std::string::npos &&
           audible.find("!menuVisible") != std::string::npos &&
           audible.find("sfx_enabled") != std::string::npos && audible.find("sfx_volume") != std::string::npos &&
-          play.find("stopChapterAmbience();") < play.find("soundPool.play(") &&
+          play.find("chapterAmbienceStream = replaceChapterOneShot(chapterAmbienceStream, packedStereoGains, soundKey)") != std::string::npos &&
+          play.find("soundPool.play(") != std::string::npos &&
+          play.find("soundPool.stop(stream)") < play.find("soundPool.play(") &&
           play.find("packedStereoGains>>>32") != std::string::npos &&
           play.find("0,0,1.f)") != std::string::npos,
           "Android finite single-voice routing retains event gains, focus/dialogue/UI/mute gates and stop-before-play");
@@ -395,7 +562,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           "Windows shares one finite ambient key with current-state/focus/UI/mute cleanup and unchanged SFX gain");
     Check(drain.find("case GameplayEventType::ForestFoliage:") != std::string::npos &&
           drain.find("ForestBirdAmbience::FoliageEligible") != std::string::npos &&
-          drain.find("ChapterAmbienceEmitter(event)") != std::string::npos &&
+          drain.find("ChapterAmbienceGains(event)") != std::string::npos &&
           drain.find("audio/forest-foliage/runtime/leaf_rustle.wav") != std::string::npos,
           "Windows finite foliage uses shared event-time attenuation and current source-range admission");
     const auto bridge=Read(root/"android/app/src/main/cpp/android_probe_bridge.cpp");
@@ -405,6 +572,16 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
           nativeDrain.find("stopped.type=GameplayEventType::ForestBirdStopped") != std::string::npos &&
           nativeDrain.find("EnqueuePlatformGameplayEvent(stopped)") != std::string::npos,
           "Android render owner drops stale foliage starts through an ordered stop without a UI-thread simulation read");
+    Check(nativeDrain.find("!ChapterLocalAmbience::HearthEligible(current)") != std::string::npos &&
+          nativeDrain.find("stopped.type=GameplayEventType::ChapterLocalAmbienceStopped") != std::string::npos &&
+          drain.find("audio/bellwether-hearth/runtime/hearth_crackle.wav") != std::string::npos &&
+          java.find("loadSound(\"bellwether_hearth\", \"audio/bellwether-hearth/runtime/hearth_crackle.wav\")") != std::string::npos,
+          "both platform owners bind the hearth asset and Android converts an out-of-room start to a stop");
+    Check(nativeDrain.find("!ChapterLocalAmbience::MillEligible(current)") != std::string::npos &&
+          drain.find("audio/bellwether-mill/runtime/wheel_creak.wav") != std::string::npos &&
+          java.find("case ChapterAmbienceFeedback.BELLWETHER_WATERWHEEL_CREAK:") != std::string::npos &&
+          java.find("loadSound(\"bellwether_waterwheel_creak\", \"audio/bellwether-mill/runtime/wheel_creak.wav\")") != std::string::npos,
+          "both platform owners bind the wheel asset to the existing finite voice and reject stale starts");
     const auto campaign = Read(root/"src/platform/windows/windows_campaign_owner.inl");
     const auto commit = Section(campaign, "void FinishCampaignCommit(", "\n}");
     Check(commit.find("StopLoop(\"chapter_ambience\")") != std::string::npos,
@@ -414,7 +591,7 @@ void PlatformVoiceWiring(const std::filesystem::path& root) {
 
 int main(int argc, char** argv) {
     if (argc != 2) { std::cerr << "usage: ChapterLocalAmbienceTests <source-root>\n"; return 2; }
-    Eligibility(); DripCadenceAndIdentity(); RopeTravelAndSource(); Transport();
+    Eligibility(); DripCadenceAndIdentity(); HearthCadenceAndScope(); StockCadenceAndScope(); WaterwheelContact(); RopeTravelAndSource(); Transport();
     const auto directory = std::filesystem::path(argv[1]) / "assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json", manifest, diagnostic) ||

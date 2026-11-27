@@ -1,6 +1,7 @@
 #include "scene/TombDressingContact.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
 #include "gameplay/healing/FlaskRestSites.h"
 
 #include <algorithm>
@@ -11,6 +12,7 @@
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/ShowcaseCheckpoints.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
 
 namespace horde::gameplay::simulation
@@ -25,6 +27,8 @@ constexpr float kDodgeDistanceMetres = 0.90f;
 constexpr float kDodgeCooldownSeconds = 0.55f;
 constexpr float kRunSpeedMetresPerSecond = 3.2f;
 constexpr float kMovementAccelerationMetresPerSecondSquared = 8.0f;
+constexpr std::size_t kUndergroundFireEmitterCount=1+effects::kKeeperTorchAnchors.size();
+static_assert(kUndergroundFireEmitterCount<=effects::kFireEmitterCapacity);
 
 float FiniteOr(float value, float fallback)
 {
@@ -86,6 +90,14 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
         const auto& anchor = effects::kKeeperTorchAnchors[index];
         fireEmitters_[index + 1u] = effects::MakeWorldTorchFireEmitter(anchor.stableId, anchor.seed);
     }
+    bellwetherFireEmitters_={effects::MakeBellwetherHearthFireEmitter(),
+                           effects::MakeBellwetherCandleFireEmitter(),
+                           effects::MakeBellwetherRiverForkLampFireEmitter(),
+                           effects::MakeBellwetherRelicStallLampFireEmitter(),
+                           effects::MakeBellwetherSmithLampFireEmitter(),
+                           effects::MakeBellwetherGrateLampFireEmitter(),
+                           effects::MakeBellwetherMillBenchLampFireEmitter(),
+                           effects::MakeBellwetherPorchLampFireEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -115,17 +127,53 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
     RefreshSnapshot(lastInput_);
 }
 
+bool GameSimulation::IsBellwetherResidentReady(traversal::ResidentMask resident) const
+{
+    if(config_.bellwetherCombinedResidents)return (bellwetherResidentMask_&resident)!=0;
+    switch(resident) {
+    case traversal::kRecordKeeperResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::RecordKeeper;
+    case traversal::kArtificerResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::Artificer;
+    case traversal::kSalvagerResident:
+        return config_.bellwetherSpecialist==bellwether::Specialist::Salvager;
+    case traversal::kRelicDealerResident:
+        return config_.bellwetherTavernKeeperAdmitted && config_.bellwetherSpecialist==bellwether::Specialist::RelicDealer;
+    default:return false;
+    }
+}
+
+bool GameSimulation::IsBellwetherTavernKeeperReady() const
+{
+    return config_.bellwetherCombinedResidents ?
+        IsBellwetherResidentReady(traversal::kTavernKeeperResident) : config_.bellwetherTavernKeeperAdmitted;
+}
+
+bool GameSimulation::PublishBellwetherResidents(traversal::ResidentMask residents)
+{
+    if(!config_.bellwetherCombinedResidents || (residents&~traversal::kAllResidentMask)!=0)return false;
+    unsigned count=0;
+    for(auto bits=residents;bits;bits=static_cast<traversal::ResidentMask>(bits&(bits-1u)))++count;
+    if(count>2)return false;
+    if(bellwetherResidentMask_==residents)return true;
+    bellwetherResidentMask_=residents;
+    EnsureBellwetherResidentPoses(true);
+    RefreshSnapshot(lastInput_);
+    return true;
+}
+
 std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
                                            double frameDeltaSeconds,
                                            std::uint64_t inputPublicationSequence,
                                            std::uint64_t ownerAdvanceSteadyNs)
 {
     const auto input=FilterCampaignInput(publishedInput,inputPublicationSequence);
+    const bool teachingCardHold = HoldForCombatTeachingCard(input, true);
     lastInput_ = input;
     inputPublicationSequence_ = inputPublicationSequence;
     if(input.paused) { chapterDialogue_.Pause(); chapterSkipFloor_=std::max(chapterSkipFloor_,input.commands.dialogueSkip); }
     const bool presentationWasActive = combatPresentation_.Snapshot().parrySuccessActive;
-    combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
+    if (!teachingCardHold) combatPresentation_.AdvanceFrame(frameDeltaSeconds, input.paused);
     const std::size_t eventsBeforeFrame = events_.Size();
     snapshot_.eventsEmittedThisTick = 0u;
     snapshot_.eventsEmittedThisFrame = 0u;
@@ -156,6 +204,16 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         snapshot_.simulationTicksThisFrame = 0u;
         snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
         snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();
+        return 0u;
+    }
+    if (teachingCardHold)
+    {
+        DiscardCombatTeachingCardInput(input);
+        lastInput_.paused = true;
+        fixedStepRunner_.ResetAccumulator();
+        RefreshSnapshot(lastInput_);
+        snapshot_.simulationTicksThisFrame = 0u;
+        snapshot_.fixedStepAccumulatorSeconds = 0.0;
         return 0u;
     }
     if (input.paused)
@@ -204,6 +262,11 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         [this, &input, inputPublicationSequence](float fixedDeltaSeconds)
         {
             StepFixedTick(input, fixedDeltaSeconds, inputPublicationSequence);
+            if (input.tutorialCardsEnabled && HoldForCombatTeachingCard(input, false))
+            {
+                DiscardCombatTeachingCardInput(input);
+                fixedStepRunner_.ResetAccumulator();
+            }
         });
     // Ticked frames already resolved the final pose. Refresh only when a
     // zero-tick frame ages or cancels an existing presentation envelope.
@@ -223,6 +286,80 @@ std::uint32_t GameSimulation::AdvanceFrame(const InputSnapshot& publishedInput,
         ? events_.Size() - eventsBeforeFrame
         : 0u;
     return ticks;
+}
+
+bool GameSimulation::HoldForCombatTeachingCard(const InputSnapshot& input, bool acceptResponse)
+{
+    const auto& teaching = combatTeaching_.Snapshot();
+    if (teaching.generation != combatTeachingCardGeneration_)
+    {
+        combatTeachingCardGeneration_ = teaching.generation;
+        combatTeachingCardToken_ = 0;
+        acknowledgedTeachingCards_ = 0;
+        combatTeachingCardAwaitingRelease_ = false;
+    }
+    if (combatTeachingCardAwaitingRelease_ && input.tutorialCardsEnabled)
+    {
+        if (acceptResponse && !input.paused && input.moveForward == 0.f && input.moveStrafe == 0.f &&
+            !input.attackHeld && !input.guardHeld && !input.runHeld && !input.crouchHeld)
+            combatTeachingCardAwaitingRelease_ = false;
+        return true;
+    }
+    combatTeachingCardAwaitingRelease_ = false;
+    const bool eligible = input.tutorialCardsEnabled && input.tutorialEnabled &&
+        config_.sequentialPractice1_7 && config_.waterfallSkeletonEncounter &&
+        CurrentCombatRules() && !teaching.exitPending && HasCombatTeachingCard(teaching.stage) &&
+        activeEnemyKind_ == EnemyKind::Skeleton && combatSnapshot_.aliveCount > 0 &&
+        playerVitals_.Snapshot().phase == PlayerLifePhase::Alive &&
+        SwordDefenseReady() && IsWaterfallSkeletonArena(playerX_, playerZ_);
+    if (!eligible)
+    {
+        combatTeachingCardToken_ = 0;
+        return false;
+    }
+    const auto stage = static_cast<std::uint8_t>(teaching.stage);
+    const auto stageMask = static_cast<std::uint8_t>(1u << stage);
+    if (combatTeachingCardToken_ == 0 && !input.paused && !(acknowledgedTeachingCards_ & stageMask))
+    {
+        combatTeachingCardToken_ = (++combatTeachingCardSerial_ << 3) | stage;
+        combatTeachingCardResponseFloor_ = input.tutorialCardResponseSequence;
+    }
+    if (combatTeachingCardToken_ == 0) return false;
+    if (acceptResponse && !input.paused &&
+        input.tutorialCardResponseSequence > combatTeachingCardResponseFloor_ &&
+        (input.tutorialCardResponse & ~kSkipCombatTeachingCard) == combatTeachingCardToken_)
+    {
+        acknowledgedTeachingCards_ |= stageMask;
+        combatTeachingCardToken_ = 0;
+        combatTeachingCardAwaitingRelease_ = true;
+        if (input.tutorialCardResponse & kSkipCombatTeachingCard) combatTeaching_.Skip();
+    }
+    return true;
+}
+
+void GameSimulation::DiscardCombatTeachingCardInput(const InputSnapshot& input)
+{
+    // Flush edge commands without altering encounter, defense or animation clocks.
+    const auto parrySource = parrySourceCommandSequence_;
+    ClearScheduledCombatEdges(true);
+    parrySourceCommandSequence_ = parrySource;
+    lastConsumedAttackSequence_ = latestAttackSequence_;
+    lastConsumedParrySequence_ = latestParrySequence_;
+    lastConsumedDodgeSequence_ = latestDodgeSequence_;
+    lastConsumedInteractSequence_ = latestInteractSequence_;
+    lastConsumedToggleHeldLightPoseSequence_ = latestToggleHeldLightPoseSequence_;
+    lastConsumedRunToggleSequence_ = latestRunToggleSequence_;
+    lastConsumedClearRunIntentSequence_ = latestClearRunIntentSequence_;
+    lastConsumedCrouchToggleSequence_ = latestCrouchToggleSequence_;
+    lastConsumedClearCrouchIntentSequence_ = latestClearCrouchIntentSequence_;
+    lastConsumedDrinkFlaskSequence_ = latestDrinkFlaskSequence_;
+    lastConsumedRestSequence_ = latestRestSequence_;
+    pendingAttackCommands_ = pendingParryCommands_ = pendingDodgeCommands_ = 0u;
+    pendingInteractCommands_ = pendingToggleHeldLightPoseCommands_ = 0u;
+    pendingRunToggleCommands_ = pendingClearRunIntentCommands_ = 0u;
+    pendingCrouchToggleCommands_ = pendingClearCrouchIntentCommands_ = 0u;
+    pendingDrinkFlaskCommands_ = pendingRestCommands_ = 0u;
+    chapterSkipFloor_ = std::max(chapterSkipFloor_, input.commands.dialogueSkip);
 }
 
 void GameSimulation::StepFixed(const InputSnapshot& publishedInput,
@@ -287,6 +424,18 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     const bool wasAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
     playerVitals_.Update(fixedDeltaSeconds);
     const bool playerAlive = playerVitals_.Snapshot().phase == PlayerLifePhase::Alive;
+    if (config_.developmentRescueJourney && !input.paused && playerAlive)
+        stockIdle_.Step(playerX_, playerZ_, dialogueDeltaSeconds);
+    // The incoming headrace approaches from -Z. A positive rotation about
+    // local +X carries the wheel's top toward +Z, downstream. Keep the
+    // operating wheel tied to active 60 Hz simulation time so pause freezes
+    // it and a restored operating mill starts from the same zero phase.
+    if (!input.paused && bellwether::IsMillWaterwheelOperating(millPreparation_))
+    {
+        millWaterwheelAngleRadians_ += bellwether::kMillWaterwheelRadiansPerSecond * dialogueDeltaSeconds;
+        if (millWaterwheelAngleRadians_ >= bellwether::kMillWaterwheelTwoPi)
+            millWaterwheelAngleRadians_ -= bellwether::kMillWaterwheelTwoPi;
+    }
     if (input.paused || !playerAlive)
     {
         DiscardFlaskRequests();
@@ -349,6 +498,8 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
         UpdateEncounters(input, fixedDeltaSeconds);
         UpdateSwordSheathHold(input,gestureSeconds);
         UpdateRewardSequence(fixedDeltaSeconds, true);
+        AdvanceWaysideArchive(fixedDeltaSeconds);
+        AdvanceTavernDoor(fixedDeltaSeconds);
         ResolveHeldItems();
         RecordSuccessfulHitParticles();
         RecordSwordContactTrace();
@@ -366,7 +517,9 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
             {
                 lanternPendulum_.StepFixed(
                     RescueLanternHinge(), fixedDeltaSeconds,
-                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
+                    heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians,
+                    treasurePurse_.lanternFittingPurchased ? horde::gameplay::interactions::LanternHinge::Fitted
+                                                         : horde::gameplay::interactions::LanternHinge::Standard);
             }
         }
         else
@@ -418,16 +571,23 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
     // Speech duration follows the unscaled active fixed-step clock. Combat,
     // movement and poses still share the teaching time scale; pause freezes both.
     UpdateChapterDialogue(input,dialogueDeltaSeconds);
+    if(!input.paused) {
+        AdvanceMillDriveTest(fixedDeltaSeconds);
+        AdvanceMillLeakTest(fixedDeltaSeconds);
+        AdvanceShorePractice();
+    }
     if(!config_.developmentRescueJourney || playerVitals_.Snapshot().phase!=PlayerLifePhase::Alive)
         dialogueDucking_.Reset();
     else if(!input.paused)
-        dialogueDucking_.Step(chapterDialogue_.State().line!=dialogue::Line::None,dialogueDeltaSeconds);
+        dialogueDucking_.Step(dialogue::Spec(chapterDialogue_.State().line).audio[0]!='\0',dialogueDeltaSeconds);
     RefreshSnapshot(input);
     // Revalidate after damage, death and newly-started dialogue. No further
     // health/action mutation can intervene before this owner snapshot is used.
     StepHealingFlask(input,fixedDeltaSeconds,flaskCompeting,healthBeforeEncounter);
     if(dialogueDeltaSeconds>0) {
-        const auto bird=forestBird_.Step(snapshot_);
+        const bool exteriorContact = ChapterLocalAmbience::StockEligible(snapshot_) ||
+            ChapterLocalAmbience::MillEligible(snapshot_);
+        const auto bird=exteriorContact?forestBird_.Step(false):forestBird_.Step(snapshot_);
         // Preserve a centred ambient
         // source/listener tuple rather than invent a perched gameplay actor.
         if(bird==ForestBirdAmbience::Cue::PlayFoliage)
@@ -442,9 +602,7 @@ void GameSimulation::StepFixedTick(const InputSnapshot& input,
                 EntityId::Invalid,EntityId::Invalid,playerX_,playerZ_,1.f,0,playerSupport_.worldY);
         const auto local=localAmbience_.Step(snapshot_);
         if(local.cue!=ChapterLocalAmbience::Cue::None)
-            Emit(local.cue==ChapterLocalAmbience::Cue::Drip?GameplayEventType::TombDrip:
-                 local.cue==ChapterLocalAmbience::Cue::Rope?GameplayEventType::RopeContact:
-                 GameplayEventType::ChapterLocalAmbienceStopped,
+            Emit(ChapterLocalAmbience::EventType(local.cue),
                 EntityId::Invalid,EntityId::Invalid,local.position.x,local.position.z,local.gain,0,local.position.y);
     }
     if(fixedDeltaSeconds>0 && !input.paused)LatchCampaignBoundary();
@@ -644,6 +802,13 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, 
                 *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,posture_.Height());
             clear=movement.accepted;support=movement.support;
         }
+        const auto hingedContactClear=[&](float destinationY,float height) {
+            const float bottom=std::min(playerSupport_.worldY,destinationY)+.001f;
+            const float top=std::max(playerSupport_.worldY,destinationY)+height;
+            return ArchiveContactClear(previousX,previousZ,playerX_,playerZ_,bottom,top,kPlayerCollisionRadius) &&
+                   TavernDoorContactClear(previousX,previousZ,playerX_,playerZ_,bottom,top,kPlayerCollisionRadius);
+        };
+        clear=clear && hingedContactClear(support.worldY,posture_.Height());
         if(CurrentCombatRules())clear=clear && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
             std::max(playerSupport_.worldY,support.worldY),posture_.Height(),kPlayerCollisionRadius);
         // Reuse ordinary collision admission. Only a failed standing sweep (or
@@ -653,7 +818,8 @@ void GameSimulation::ResolveMovementCollision(float previousX, float previousZ, 
             const auto admitsHeight=[&](float height) {
                 const auto candidate=horde::gameplay::traversal::ResolveChapterStepMovement(
                     *chapterTerrain_,previousX,previousZ,playerX_,playerZ_,playerSupport_.worldY,kPlayerCollisionRadius,height);
-                return candidate.accepted && AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
+                return candidate.accepted && hingedContactClear(candidate.support.worldY,height) &&
+                    AuthoredBodySweepClear(previousX,previousZ,playerX_,playerZ_,
                     std::max(playerSupport_.worldY,candidate.support.worldY),height,kPlayerCollisionRadius);
             };
             const bool standingClear=!posture_.Active()?clear:admitsHeight(kStandingBodyHeight);
@@ -791,6 +957,8 @@ void GameSimulation::SetDevelopmentSupportFixture(bool enabled, std::uint64_t ge
 void GameSimulation::ResetRoute()
 {
     enemyHitParticles_.Clear();
+    stockIdle_ = {};
+    if(config_.bellwetherCombinedResidents)bellwetherResidentMask_=traversal::kTownResidentMask;
     forestBird_.Reset();localAmbience_.Reset();
     ClearCampaignBoundary();
     CancelCampaignRestore();
@@ -803,7 +971,19 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;
+    privyRagState_=bellwether::PrivyRagState::Available;
+    treasurePurse_={};
+    millPreparation_={};
+    millWaterwheelAngleRadians_=0.f;
+    millLeakTestPhase_={};
+    millLeakTestSeconds_=0.f;
+    millDriveTurnSeconds_.reset();
+    salvager_.reset();
+    relicDealer_.reset();
+    shorePracticeStage_={};
+    shorePracticeBreathTicksRemaining_=0;
+    salvagerShorePracticeCompleted_=false;
     if(config_.developmentRescueJourney) { rescueSavedSwordValid_=false;rescueTraversal_.Reset();rescueOpeningSeconds_=0;worldRoute_.Invalidate(); }
     legacyCombatCheckpoint_ = false;
     combatTeaching_.Reset(config_.combatFoundation1_7 && lastInput_.tutorialEnabled);
@@ -854,8 +1034,10 @@ void GameSimulation::ResetRoute()
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
-        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
+    for (std::size_t index = 0u; index < kUndergroundFireEmitterCount; ++index)
+        effects::ResetFireEmitter(fireEmitters_[index]);
+    for (auto& emitter : bellwetherFireEmitters_)
+        effects::ResetFireEmitter(emitter);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
 }
@@ -1691,8 +1873,10 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
         heldItemFixedStepState_.kinematics.rewardLanternPresentationYawRadians);
     lanternPendulumResetPending_ = true;
     ResolvePlayerAnimation(0.0f);
-    for (std::size_t index = 0u; index < fireEmitterCount_; ++index)
-        horde::gameplay::effects::ResetFireEmitter(fireEmitters_[index]);
+    for (std::size_t index = 0u; index < kUndergroundFireEmitterCount; ++index)
+        effects::ResetFireEmitter(fireEmitters_[index]);
+    for (auto& emitter : bellwetherFireEmitters_)
+        effects::ResetFireEmitter(emitter);
     ResolveFireEmitters(0.0f);
     RefreshSnapshot(lastInput_);
     snapshot_.eventsEmittedThisTick = 0u;
@@ -1702,6 +1886,7 @@ bool GameSimulation::ApplyCheckpoint(std::int32_t checkpointId, bool isRetry)
 void GameSimulation::ResolveHeldItems()
 {
     std::string diagnostic;
+    const auto tavernDoorPose=bellwether::TavernDoor::PoseAt(tavernDoor_.opening);
     const PlayerCombatSnapshot presentationCombat =
         combatPresentation_.PlayerCombatForPresentation(combatSnapshot_.player);
     const horde::gameplay::items::HeldItemFixedStepInput input{
@@ -1721,7 +1906,7 @@ void GameSimulation::ResolveHeldItems()
         presentationAspect_,
         playerSupport_.worldY,config_.developmentWorldRoute, false, UsesRescueExterior(),
         config_.authoredChapterTerrain && chapterTerrainGeneration_==worldRoute_.generation
-            ? chapterTerrain_.get() : nullptr,posture_.drop};
+            ? chapterTerrain_.get() : nullptr,posture_.drop,&tavernDoorPose};
     // Simulation owns the transition/visual blend. Kinematics keeps a stable
     // hand-endpoint matrix for gameplay; PlayerRenderSlot composes its single
     // rendered matrix from that endpoint and the animated Hips mount.
@@ -1926,7 +2111,8 @@ void GameSimulation::UpdateRewardSequence(const float deltaSeconds,
             continue;
         }
         if(config_.developmentRescueJourney && chestRewardSequence_.Snapshot().phase == ChestRewardPhase::LanternClaimed) {
-            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction(); continue;
+            InteractWithClaimedChapter();
+            continue;
         }
         const ChestRewardAction action = chestRewardSequence_.TryInteract(query);
         if (action == ChestRewardAction::OpeningStarted)
@@ -2039,6 +2225,30 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
              strength, 1.0f, ShowcaseZone::Finale},
             fixedDeltaSeconds);
     }
+    // The exterior terrain and tavern publish together. The existing renderer
+    // selects nearby outside emitters and traces their visibility through stone
+    // and the doorway. Nothing new is submitted for the underground chapter.
+    bellwetherFireReady_=UsesRescueExterior() && config_.authoredChapterTerrain &&
+        chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation;
+    if(bellwetherFireReady_) {
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[0],
+            effects::BellwetherHearthFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[1],
+            effects::BellwetherCandleFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[2],
+            effects::BellwetherRiverForkLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[3],
+            effects::BellwetherRelicStallLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[4],
+            effects::BellwetherSmithLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[5],
+            effects::BellwetherGrateLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[6],
+            effects::BellwetherMillBenchLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[7],
+            effects::BellwetherFireInput(bellwether::kSquarePorchLampFlame,bellwether::kSquarePorchLampLight,1.25f),
+            fixedDeltaSeconds);
+    }
 }
 
 void GameSimulation::ClearRunIntent()
@@ -2068,7 +2278,11 @@ bool GameSimulation::BodyHeightClear(float height) const
     if(!AuthoredBodySweepClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius))return false;
     if(UsesRescueExterior() && config_.authoredChapterTerrain) {
         if(!chapterTerrain_||chapterTerrainGeneration_!=worldRoute_.generation)return false;
-        return horde::gameplay::traversal::ChapterExteriorObstacleClear(*chapterTerrain_,playerX_,playerZ_,playerX_,playerZ_,
+        return ArchiveContactClear(playerX_,playerZ_,playerX_,playerZ_,
+            playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
+            TavernDoorContactClear(playerX_,playerZ_,playerX_,playerZ_,
+            playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
+            horde::gameplay::traversal::ChapterExteriorObstacleClear(*chapterTerrain_,playerX_,playerZ_,playerX_,playerZ_,
             playerSupport_.worldY+.001f,playerSupport_.worldY+height,kPlayerCollisionRadius) &&
             chapterTerrain_->HorizontalBodyVolumeClear(playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY,height,kPlayerCollisionRadius);
     }
@@ -2308,7 +2522,9 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
                                                 playerSupport_.grounded);
     const auto wetContact = CurrentCombatRules() ? waterContact_.Step(deltaSeconds,
         playerX_,playerSupport_.worldY,playerZ_,playerSupport_.grounded,footstep,
-        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale)
+        deltaSeconds>0 ? travelled/deltaSeconds : 0,lastInput_.waterfallWidthScale,false,
+        UsesRescueExterior() && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation ?
+            effects::WaterContactDomain::RegionalExterior:effects::WaterContactDomain::Tomb)
         : horde::gameplay::effects::WaterContactResult{};
     if(wetContact.streamEntry && config_.combatFoundation1_7 && !legacyCombatCheckpoint_)
         Emit(GameplayEventType::WaterfallContact,EntityId::Player,EntityId::Invalid,
@@ -2322,7 +2538,7 @@ void GameSimulation::UpdateMovement(const InputSnapshot& input, float deltaSecon
              playerX_,
              playerZ_,wetContact.wetStep ? wetContact.intensity : 1.f,
              wetStep ? 0 : dryFootstepCues_.Next(playerSupport_.surface),
-             wetContact.wetStep ? playerSupport_.worldY : 0.f);
+             wetContact.wetStep ? wetContact.sourceY : 0.f);
     }
 }
 
@@ -3240,11 +3456,23 @@ bool GameSimulation::FlaskCompetingIntent(const InputSnapshot& input) const
         pendingRouteResetCommands_ || pendingRetryCommands_;
 }
 
+bool GameSimulation::AtEarnedBellwetherRestSite() const
+{
+    return campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::BellwetherTavern &&
+        campaignBoundary_->dialogue.tavernConversationLinesResolved==dialogue::kTavernConversation.size() &&
+        traversal::IsOnBellwetherTavernRoomFloor(playerX_,playerSupport_.worldY,playerZ_);
+}
+
 std::optional<campaign::CheckpointId> GameSimulation::EligibleFlaskRestAnchor() const
 {
     if(!config_.healingFlask1_7 || !config_.developmentRescueJourney || !chapterTerrain_)return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
     if(!rescueTraversal_.Snapshot().exteriorSide)return std::nullopt;
+    const auto tavern=campaign::CheckpointId::BellwetherTavern;
+    if(AtEarnedBellwetherRestSite() &&
+       healing::FlaskRestReachClear(*chapterTerrain_,{playerX_,playerSupport_.worldY,playerZ_},
+           campaign::kBellwetherCheckpointPosition) &&
+       BuildCampaignCheckpoint(tavern,true,true))return tavern;
     for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
         auto anchor=traversal::kExteriorLanding;
         if(id==campaign::CheckpointId::ForestEndpoint) {
@@ -3270,6 +3498,12 @@ std::uint32_t GameSimulation::NearbyFlaskRestAnchor() const
     // A latched campaign record proves the story was actually earned. Do not
     // rerun usable-now checks here: walking/guarding must not erase discovery.
     const bool exterior=rescueTraversal_.Snapshot().exteriorSide;
+    const auto hearth=campaign::kBellwetherCheckpointPosition;
+    const auto tavern=campaign::CheckpointId::BellwetherTavern;
+    if(exterior && AtEarnedBellwetherRestSite() &&
+       worldRoute_.readiness[static_cast<std::size_t>(campaign::Destination(tavern))]==ZoneReadiness::Ready &&
+       std::hypot(playerX_-hearth.x,playerZ_-hearth.z)<=3.f)
+        return static_cast<std::uint32_t>(tavern);
     for(const auto id:{campaign::CheckpointId::SafeExit,campaign::CheckpointId::ForestEndpoint}) {
         if(!exterior || !rescueTraversal_.Snapshot().firstAscentCompleted ||
            (id==campaign::CheckpointId::ForestEndpoint &&
@@ -3408,6 +3642,50 @@ void GameSimulation::StepHealingFlask(const InputSnapshot& input,float gameplayS
 void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
 {
     snapshot_.chapterDialogue=chapterDialogue_.State();
+    snapshot_.tavernKeeper=IsBellwetherTavernKeeperReady() && chapterTerrain_ &&
+        chapterTerrainGeneration_==worldRoute_.generation ? tavernKeeper_.Pose() : std::nullopt;
+    const auto chapterContext=ChapterInteractionContext(input.paused);
+    const bool currentExterior=chapterContext.exterior && chapterTerrainGeneration_==worldRoute_.generation;
+    snapshot_.recordKeeper=currentExterior && IsBellwetherResidentReady(traversal::kRecordKeeperResident) ? recordKeeper_ : std::nullopt;
+    snapshot_.artificer=currentExterior && IsBellwetherResidentReady(traversal::kArtificerResident) ? artificer_ : std::nullopt;
+    snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
+    snapshot_.relicDealer=currentExterior && IsBellwetherResidentReady(traversal::kRelicDealerResident) ? relicDealer_ : std::nullopt;
+    snapshot_.millTallyAction=CurrentMillTallyAction(chapterContext);
+    snapshot_.ordinarySilverAction=CurrentOrdinarySilverAction(chapterContext);
+    snapshot_.relicDealerTradeAvailable=snapshot_.ordinarySilverAction==campaign::OrdinarySilverAction::None &&
+        chapterDialogue_.CanStartRelicDealer(chapterContext);
+    snapshot_.salvagerAction=CurrentSalvagerAction(chapterContext);
+    snapshot_.shorePracticeStage=shorePracticeStage_;
+    snapshot_.shorePracticeBreathTicksRemaining=shorePracticeBreathTicksRemaining_;
+    snapshot_.salvagerShorePracticeCompleted=salvagerShorePracticeCompleted_;
+    // Services can be advertised while their residents are outside the loaded lanes.
+    snapshot_.millServiceAvailable=config_.bellwetherCombinedResidents ||
+        config_.bellwetherSpecialist==bellwether::Specialist::Artificer;
+    snapshot_.shorePracticeServiceAvailable=config_.bellwetherCombinedResidents ||
+        config_.bellwetherSpecialist==bellwether::Specialist::Salvager;
+    snapshot_.recordKeeperAction=RecordKeeperAction(chapterContext);
+    snapshot_.treasurePurse=treasurePurse_;
+    snapshot_.tavernConversationAvailable=snapshot_.tavernKeeper &&
+        chapterDialogue_.CanStartTavernConversation(chapterContext);
+    snapshot_.tavernDirectionsAvailable=chapterDialogue_.CanShowTavernDirections(chapterContext);
+    snapshot_.tavernLanternFittingAvailable=CanBuyLanternFitting(chapterContext);
+    snapshot_.tavernLanternAvailable=chapterDialogue_.CanOfferTavernLantern(chapterContext);
+    snapshot_.waysideArchive=waysideArchive_;
+    snapshot_.waysideArchiveAction=WaysideArchiveAction(chapterContext);
+    snapshot_.millPreparation=millPreparation_;
+    snapshot_.millAction=CurrentMillAction(chapterContext);
+    snapshot_.millLeakTestPhase=millLeakTestPhase_;
+    snapshot_.millDriveTesting=millDriveTurnSeconds_.has_value();
+    snapshot_.millDriveAngleRadians=bellwether::kMillDriveTestRadians *
+        (millDriveTurnSeconds_ ? *millDriveTurnSeconds_/bellwether::kMillDriveTestSeconds :
+         bellwether::MillProgress(millPreparation_)>=bellwether::MillProgress(bellwether::MillPreparation::GearingVerified) ? 1.f : 0.f);
+    snapshot_.millWaterwheelAngleRadians=millWaterwheelAngleRadians_;
+    snapshot_.stockHeadPoses=stockIdle_.Poses();
+    snapshot_.tavernDoor=tavernDoor_;
+    snapshot_.tavernDoorAction=TavernDoorAction(chapterContext);
+    snapshot_.gardenGrateTalkAvailable=chapterDialogue_.CanStartGardenGrateTalk(chapterContext);
+    snapshot_.privyRag=privyRagState_;
+    snapshot_.privyRagAction=CurrentPrivyRagAction(chapterContext);
     snapshot_.dialogueBedGain=config_.developmentRescueJourney &&
         playerVitals_.Snapshot().phase==PlayerLifePhase::Alive ? dialogueDucking_.Gain():1.f;
     snapshot_.chapterCompanion=chapterCompanion_.State();
@@ -3457,6 +3735,8 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.acceptedDodgeSequence = acceptedDodgeSequence_;
     snapshot_.dodgeProtectedHitCount = dodgeProtectedHitCount_;
     snapshot_.combatTeaching = combatTeaching_.Snapshot();
+    snapshot_.combatTeaching.cardToken = combatTeachingCardGeneration_ == snapshot_.combatTeaching.generation &&
+        !snapshot_.combatTeaching.exitPending ? combatTeachingCardToken_ : 0u;
     snapshot_.combatTeaching.lessonSuppressed = !SwordDefenseReady();
     snapshot_.combatTeaching.naturalContinuation = config_.naturalPracticeRevival1_7 && UsesSkeletonRevival();
     snapshot_.combatTeaching.continuationPhase = static_cast<std::uint8_t>(skeletonRevival_.Snapshot().phase);
@@ -3589,6 +3869,15 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.campaignRetryRequestGeneration=campaignRetryRequestGeneration_;
     snapshot_.completedRestGeneration=completedRestGeneration_;
     snapshot_.fireEmitters = fireEmitters_;
+    snapshot_.fireEmitterCount = kUndergroundFireEmitterCount;
+    // Bellwether and the tomb torches occupy different zones. Keep the shared
+    // renderer's fixed upload capacity and publish only the current roster.
+    if (bellwetherFireReady_) {
+        const auto exteriorLamp=effects::SelectBellwetherExteriorLamp(playerX_,playerZ_);
+        snapshot_.fireEmitters = {fireEmitters_[0],bellwetherFireEmitters_[0],bellwetherFireEmitters_[1],
+                                  bellwetherFireEmitters_[exteriorLamp]};
+        snapshot_.fireEmitterCount = snapshot_.fireEmitters.size();
+    }
     snapshot_.flaskUpgrade={};
     if(UsesFlaskUtility() && flaskUpgradeReady_ && flaskUpgradeSite_ && flaskUpgradeWorldGeneration_==worldRoute_.generation &&
        flaskUpgradeResourceGeneration_ && chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation &&
@@ -3596,7 +3885,6 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
         snapshot_.flaskUpgrade={flaskUpgradeSite_,flaskUpgradeWorldGeneration_,flaskUpgradeResourceGeneration_,
             FlaskUpgradeEligible(input)};
     }
-    snapshot_.fireEmitterCount = fireEmitterCount_;
     snapshot_.playerMountProfile = config_.playerMountProfile;
     snapshot_.fixedStepAccumulatorSeconds = fixedStepRunner_.AccumulatorSeconds();
     snapshot_.catchUpOverrunCount = fixedStepRunner_.OverrunCount();

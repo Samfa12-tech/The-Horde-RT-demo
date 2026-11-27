@@ -28,7 +28,201 @@ cd android
 adb shell am start -n com.samfa12.hordelanternrt.debug/com.samfa12.hordelanternrt.MainActivity
 ```
 
-The debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+The ordinary debug build uses `com.samfa12.hordelanternrt.debug`, so it can be installed beside the stable-key-signed public alpha without uninstalling or changing the release app. Release builds retain `com.samfa12.hordelanternrt`.
+
+### Bellwether three-actor playtest
+
+Build the separate phone playtest with `-PhordeBellwetherResidentDir=<local-root>`.
+The directory contains `private_bellwether/tavern-keeper` with the stand-in
+GLB and manifest, and `private_bellwether/record-keeper` with the prepared GLB,
+manifest, and three Android ASTC KTX2 files. The textured tavern keeper
+candidate supplies its own GLB, manifest and three ASTC KTX2 files in the
+`tavern-keeper` directory. Gradle verifies the exact seven- or ten-file
+overlay. Both variants use `com.samfa12.hordelanternrt.debug.bellwether` and
+share that app's saves and settings, separate from the release app.
+
+Play, New Game, Continue and Load use the ordinary campaign menus in this
+build. Both residents are prepared with the authored chapter scene before a
+save is resumed. The same campaign can continue on foot from the lookout to
+the tavern, where the game can earn and restore the tavern checkpoint.
+
+For the hearth Rest playtest, also pass `-PhordeFlaskCandidateDir=<local-root>`
+with the exact pinned `private_flask/player.glb`. This builds
+`com.samfa12.hordelanternrt.debug.bellwether.flask` with its own saves and
+settings. Complete the first tavern Talk, stand close to the hearth and use
+**Rest**. Verify the flask and health before and after the action, then reload
+the same checkpoint from the campaign menu.
+
+In **Settings → Chapter subtitles**, **Yellow subtitles** switches the
+existing white text to yellow. Both colours use the same black outline on the
+speaker and line. Enable the optional dark backing and set its opacity from
+10% to 100%. Existing enabled backings retain their previous 79% opacity
+until changed. These settings also apply to text-only directions and required
+dialogue captions. The Bellwether phone check should review both colours
+against the outdoor route, firelight and dark tavern at normal and enlarged
+text sizes.
+
+```powershell
+.\gradlew.bat :app:assembleDebug "-PhordeBellwetherResidentDir=<local-root>" '-Pandroid.injected.build.abi=arm64-v8a'
+```
+
+The existing Debug checkpoint intent accepts `bellwether-repeat-visit` for
+the staffed tavern threshold and `bellwether-record-keeper-handoff` for the
+church and return to Kit. With capture disabled, both enter normal live
+control after staging. The variant uses the same hardware RT backend selection
+and authored chapter simulation as the other builds. The explicit ARM64 build
+is marked test-only. Install that APK with `adb install -r -t` when the phone
+is available for testing.
+
+Set the package name to match the APK receipt. Use the `.flask` suffix
+for the combined keeper and hearth Rest playtest. From a fresh launch, the
+live church start uses:
+
+```powershell
+$bellwetherPackage = 'com.samfa12.hordelanternrt.debug.bellwether.flask'
+adb shell am start -n "${bellwetherPackage}/com.samfa12.hordelanternrt.MainActivity" --ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-record-keeper-handoff
+```
+
+For a repeatable moving baseline, launch the same activity with
+`--ez horde.debug.autostart true --es horde.debug.checkpoint bellwether-doorway-measurement`.
+This runs the Windows proof's two room-to-square returns using the shared player
+motor at 60 Hz. It begins after the staffed pose has reached hardware RT
+presentation. Use a fresh launch with GPU timing enabled and keep it in the
+foreground until the `HORDE_BELLWETHER_DOORWAY complete returns=2` log marker
+from that launch. Record the installed APK hash, backend, actual internal and
+output extents, and thermal readings. Check that the CSV was written by the
+same launch before recording a result.
+The CSV joins the route phase, instance masks, GPU timing and accepted present
+for each submitted frame. The run requires the tavern door to stay fully open
+and the rendered leaf to remain present. `present_return_ns` records the native
+present call, while actual display timing requires a display capture.
+
+```powershell
+adb exec-out run-as $bellwetherPackage cat files/reports/bellwether-doorway.csv
+```
+
+Save that output as `bellwether-doorway.csv` in the local run directory. From
+the repository root, verify and summarize it with
+`python tools/analyze-chapter-route-measurement.py --android-bellwether-doorway <run-directory>`.
+For the hinged-door build, the analysis must report `openDoorWitness: true`.
+New doorway and resident round-trip reports also summarize CPU stage medians
+and tails by route phase. Fence and acquire waits can reflect GPU or surface
+backpressure. Each duration belongs to the frame's recording cycle, so fence
+wait can cover the previous submission. Stage durations are measured spans
+which can overlap. Compare them individually with the whole cycle and GPU
+interval. Older CSVs remain readable.
+
+#### Combined resident round trip
+
+The combined Debug campaign also accepts the five pinned files under
+`private_bellwether/relic-dealer/` alongside the four existing residents.
+It uses the same `.debug.bellwether.combined` package ID and campaign saves.
+After the tavern conversation, walk south to the square and turn west for
+**Ask about trade**. The separate `.debug.bellwether.dealer` package keeps
+the focused `bellwether-relic-dealer` checkpoint.
+
+The `.debug.bellwether.combined` package also accepts
+`bellwether-resident-roundtrip-measurement`. It starts from the same completed
+tavern visit, walks through the south door to the salvager's talk mark, and
+returns to the staffed room twice. The walk uses the shared player motor and
+the normal resident replacement path. The longer route allows four minutes
+for the same 60 Hz simulation and four-tick catch-up limit. The completed-frame
+CSV records both resident source IDs beside the instance masks, GPU interval
+and present-call return for that submission.
+
+```powershell
+$bellwetherPackage = 'com.samfa12.hordelanternrt.debug.bellwether.combined'
+adb shell am start -n "${bellwetherPackage}/com.samfa12.hordelanternrt.MainActivity" --ez horde.debug.autostart true --ez horde.debug.gpu_timing true --es horde.debug.checkpoint bellwether-resident-roundtrip-measurement
+```
+
+For an optimized private Debug run with the Shipping/Mobile shaders, add
+`-PhordeRtInstrumentationOverride=Shipping`,
+`-PhordeRtDielectricQualityOverride=Mobile` and `-PhordeRtRouteTiming=true`
+to the resident Debug build. Record the active shader name and SHA-256 from
+the launch log. Start from a fresh launch and keep the private app in the
+foreground.
+Wait for that launch's `HORDE_BELLWETHER_RESIDENT_ROUNDTRIP complete returns=2`
+marker. Record the APK hash, render settings, backend and device temperatures
+with the fresh `files/reports/bellwether-resident-roundtrip.csv` retrieved via
+`adb exec-out run-as`. Save it as `bellwether-resident-roundtrip.csv` in the run
+directory and verify it from the repository root.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-resident-roundtrip --expect-relic-dealer <run-directory>
+```
+
+Use `--expect-relic-dealer` for the five-resident package. The four-resident
+fixture uses the same command without that flag. The verifier checks the
+exact sequence for the installed roster on both returns.
+
+To attribute tavern GPU time, add `-PhordeFrameStageProbe=true` to the same
+Shipping/Mobile Debug build and `--require-gpu-stages` to the verifier command.
+Launch the same checkpoint with the same settings. The verifier requires
+acceleration-structure, RT dispatch and image-transfer timestamps from each
+completed submission that passed the RT present check. It reports the three
+GPU spans by route phase and for each staffed tavern visit. These spans can
+overlap. Keep the device temperature and shader, room workload and camera
+state with the recording when comparing runs.
+
+The report measures native present-return intervals. Display timing requires
+separate display evidence. The shorter doorway check remains available under
+its existing checkpoint and report name.
+
+#### West village round trip
+
+The five-resident package also accepts `bellwether-west-roundtrip-measurement`.
+Use the same launch command with that checkpoint name. It leaves the staffed
+tavern by the south door, passes the relic stall and gardens, and holds the
+ordinary player view at the dry stock yard for 24 simulation seconds on each
+of two visits. The route walks back into the same room after each visit.
+
+After the launch logs `HORDE_BELLWETHER_WEST_ROUNDTRIP complete returns=2`,
+retrieve that run's `files/reports/bellwether-west-roundtrip.csv`. Verify it
+from the repository root. Use `--require-gpu-stages` with a stage-probe build.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --android-bellwether-west-roundtrip <run-directory>
+```
+
+The verifier checks the dealer handoff in each direction, the three submitted
+stock head instances and the settled pose and each gesture during both holds.
+It uses the same completed-submission and present-return joins as the east route.
+
+The five privately approved Kit takes can be enabled by adding
+`-PhordeBellwetherVoiceDir=<local-voice-root>` to the resident Debug build.
+Use the same property with the ten-file overlay to audition the three
+roadside pickups, the doorway welcome and the keeper's hearth reply. All
+files go under `private_bellwether_voice/`. Gradle checks the exact rosters.
+The arrival and salvager groups can be combined with the five Kit takes in
+the same thirteen-file overlay. Keep receipts and review files outside the
+overlay root. Both audition groups are restricted to the resident Debug app
+and await owner listening approval.
+
+Stored WAVs load into SoundPool directly from the APK. Compressed assets
+and rejected direct loads use the existing cache fallback. The shared
+dialogue clock uses the measured durations. It preserves the required
+caption if a cue is unavailable or muted.
+
+For the shore lesson, stage the salvager's pinned GLB, manifest and three
+ASTC KTX2 files in `private_bellwether/salvager/` alongside the textured
+tavern keeper. The package is `com.samfa12.hordelanternrt.debug.bellwether.shore`.
+The live Debug checkpoint `bellwether-salvager-shore` stages the river fork
+with the opening tavern conversation already complete. Talk to the salvager
+and walk to the last dry stone. Enter the shallows to start the eight-second
+breath cue, reach the rail, and return to the dry mark before it expires.
+Recover on dry stone to retry, then go back to the salvager to report a
+successful return. Load the tavern autosave to check that practice was saved.
+The optional eight-file voice overlay contains the five Kit takes and
+`access.body_task.wav`, `access.body_progress.wav` and
+`hub.passing.learned_retreat.wav`.
+
+The post-benchmark Back fix from `3caefd67` is in this build. The opening
+benchmark, Android controller and campaign menu suites passed all 115 host
+tests. The Galaxy S26 Ultra also passed results → system Back → main menu →
+Stay/Quit after completing the Standard benchmark. Cancellation, sharing and
+background/resume remain separate checks. [Device record](../docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#android-back-after-benchmark-results) · [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
+
+### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
 

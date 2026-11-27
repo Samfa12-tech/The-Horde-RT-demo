@@ -20,7 +20,8 @@ std::string RecordLabel(const cp::CatalogueEntry& entry) {
     case cp::CatalogueStatus::ReadError:return "Could not open save";
     case cp::CatalogueStatus::Valid:
         if(entry.checkpoint && cp::Validate(*entry.checkpoint))
-            return std::string(entry.checkpoint->id==cp::CheckpointId::ForestEndpoint?"Forest lookout":
+            return std::string(entry.checkpoint->id==cp::CheckpointId::BellwetherTavern?"Bellwether tavern":
+                entry.checkpoint->id==cp::CheckpointId::ForestEndpoint?"Forest lookout":
                 entry.checkpoint->id==cp::CheckpointId::SafeExit?"Safe exit":"Lower chamber")+
                 " | "+std::to_string(entry.checkpoint->vitality)+" / 3 hearts\n"+WindowsSaveDate(entry.checkpoint->savedAtUnixSeconds);
         return "Save unavailable";

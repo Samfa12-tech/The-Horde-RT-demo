@@ -35,11 +35,176 @@ public final class ContextualControlsLayoutTest {
     @Test
     public void flaskPickupReusesContextActionAndRopeKeepsPriority() {
         assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 12) | 1));
+        assertEquals(R.string.talk_to_kit, MainActivity.contextualInteractLabel((1 << 14) | 1));
+        assertEquals(R.string.directions, MainActivity.contextualInteractLabel((1 << 15) | 1));
+        assertEquals(R.string.inspect_archive, MainActivity.contextualInteractLabel((1 << 16) | 1));
+        assertEquals(R.string.open_lower_stone, MainActivity.contextualInteractLabel((2 << 16) | 1));
+        assertEquals(R.string.listen_to_lantern, MainActivity.contextualInteractLabel((3 << 16) | 1));
+        assertEquals(R.string.recall_lantern_words, MainActivity.contextualInteractLabel((4 << 16) | 1));
+        assertEquals(R.string.take_road_register, MainActivity.contextualInteractLabel((5 << 16) | 1));
+        assertEquals(R.string.restore_shrine_binding, MainActivity.contextualInteractLabel((6 << 16) | 1));
+        assertEquals(R.string.show_road_mark, MainActivity.contextualInteractLabel((1 << 19) | 1));
+        assertEquals(R.string.show_road_register, MainActivity.contextualInteractLabel((2 << 19) | 1));
+        assertEquals(R.string.recall_expedition_routes, MainActivity.contextualInteractLabel((3 << 19) | 1));
+        assertEquals(R.string.collect_register_reward, MainActivity.contextualInteractLabel((1 << 24) | 1));
+        assertEquals(R.string.learn_air_ward, MainActivity.contextualInteractLabel((1 << 24) | (1 << 19) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((1 << 24) | (1 << 9) | 1));
+        assertEquals(R.string.fit_lantern_hinge, MainActivity.contextualInteractLabel((2 << 25) | 1));
+        assertEquals(2, MainActivity.lanternFittingPrice((2 << 25) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((2 << 25) | (1 << 9) | 1));
+        assertEquals(R.string.take_flask_upgrade, MainActivity.contextualInteractLabel((1 << 15) | (1 << 12) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((1 << 15) | (1 << 9) | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel((1 << 14) | (1 << 9) | 1));
         assertEquals(0, MainActivity.contextualInteractLabel((1 << 12) | (1 << 9) | 1));
         assertEquals(R.string.open_chest, MainActivity.contextualInteractLabel((2 << 3) | 1));
         assertEquals(R.string.take_lantern, MainActivity.contextualInteractLabel((4 << 3) | 1));
+        final int gardenGrate = 1 << 31;
+        assertEquals(R.string.talk_through_grate, MainActivity.contextualInteractLabel(gardenGrate | 1));
+        assertEquals(0, MainActivity.contextualInteractLabel(gardenGrate | (1 << 9) | 1));
+        assertEquals(0, MainActivity.lanternFittingPrice(gardenGrate | 1));
         assertEquals(0, MainActivity.contextualInteractLabel(0));
     }
+
+    @Test
+    public void tallyActionsUseTheirOwnNativeQuoteAndPreserveRopePriority() {
+        final int tag = (1 << 31) | 1;
+        final int sale = tag | (2 << 25) | (2 << 28);
+        assertEquals(R.string.take_mill_tally, MainActivity.contextualInteractLabel(tag | (1 << 25)));
+        assertEquals("Sell tally stamp (+2 coins)",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), sale));
+        assertEquals(R.string.record_mill_tally_claim, MainActivity.contextualInteractLabel(tag | (3 << 25)));
+        assertEquals(R.string.recover_mill_tally, MainActivity.contextualInteractLabel(tag | (4 << 25)));
+        assertEquals(R.string.return_mill_tally, MainActivity.contextualInteractLabel(tag | (5 << 25)));
+        assertEquals(0, MainActivity.lanternFittingPrice(sale));
+        assertEquals(0, MainActivity.contextualInteractLabel(sale | (1 << 9)));
+    }
+
+    @Test
+    public void millWorkbenchActionsShareTheContextControlWithoutQuotingAPrice() {
+        final int workbench = (7 << 16) | 1;
+        assertEquals(R.string.inspect_mill_gearing, MainActivity.contextualInteractLabel(workbench | (1 << 25)));
+        assertEquals(R.string.take_spare_bearing, MainActivity.contextualInteractLabel(workbench | (2 << 25)));
+        assertEquals(R.string.check_mill_bearing_fit, MainActivity.contextualInteractLabel(workbench | (3 << 25)));
+        assertEquals(0, MainActivity.contextualInteractLabel(workbench | (3 << 25) | (1 << 9)));
+        assertEquals(0, MainActivity.lanternFittingPrice(workbench | (2 << 25)));
+    }
+    @Test
+    public void rigTrialShowsActionsAndReadOnlyCuesInTheMillLane() {
+        final int mill = 7 << 16;
+        assertEquals(R.string.start_rig_leak_test, MainActivity.contextualInteractLabel(mill | (4 << 25) | 1));
+        assertEquals(R.string.confirm_rig_seal, MainActivity.contextualInteractLabel(mill | (5 << 25) | 1));
+        assertEquals(R.string.rig_leak_test_in_progress, MainActivity.contextualInteractLabel(mill | (6 << 25)));
+        assertEquals(R.string.rig_leak_test_return_to_dry, MainActivity.contextualInteractLabel(mill | (7 << 25)));
+        assertEquals(R.string.salvager_start_shore_practice, MainActivity.contextualInteractLabel(mill | (12 << 25) | 1));
+        assertEquals(R.string.salvager_report_shore_practice, MainActivity.contextualInteractLabel(mill | (13 << 25) | 1));
+        assertEquals(R.string.salvager_enter_shallows, MainActivity.contextualInteractLabel(mill | (16 << 25)));
+        assertEquals(R.string.salvager_report_back, MainActivity.contextualInteractLabel(mill | (18 << 25)));
+        assertEquals(R.string.seat_mill_bearing, MainActivity.contextualInteractLabel(mill | (8 << 25) | 1));
+        assertEquals(R.string.turn_mill_drive, MainActivity.contextualInteractLabel(mill | (9 << 25) | 1));
+        assertEquals(R.string.take_breathing_rig, MainActivity.contextualInteractLabel(mill | (10 << 25) | 1));
+        assertEquals(R.string.mill_drive_turning, MainActivity.contextualInteractLabel(mill | (11 << 25)));
+        assertEquals(0, MainActivity.lanternFittingPrice(mill | (11 << 25)));
+    }
+
+    @Test
+    public void relicDealerShowsTheTradeConversationAction() {
+        final int tradePrompt = (7 << 16) | (52 << 25) | 1;
+        assertEquals(R.string.ask_relic_dealer_trade, MainActivity.contextualInteractLabel(tradePrompt));
+        assertEquals("Ask about trade", MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tradePrompt));
+        assertEquals(0, MainActivity.contextualRiverSeconds(tradePrompt));
+    }
+
+    @Test
+    public void ordinarySilverUsesReadOnlySoldAndNativePriceDetails() {
+        final int tag = 7 << 16;
+        assertEquals(R.string.take_ordinary_silver,
+                MainActivity.contextualInteractLabel(tag | (53 << 25) | 1));
+        assertEquals("Take ordinary silver",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (53 << 25) | 1));
+        assertEquals(R.string.ordinary_silver_sold,
+                MainActivity.contextualInteractLabel(tag | (54 << 25)));
+        assertEquals("Ordinary silver sold",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (54 << 25)));
+        assertEquals(R.string.sell_ordinary_silver,
+                MainActivity.contextualInteractLabel(tag | (56 << 25) | 1));
+        assertEquals(2, MainActivity.contextualOrdinarySilverPrice(tag | (56 << 25) | 1));
+        assertEquals("Sell ordinary silver (+2 coins)",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), tag | (56 << 25) | 1));
+        assertEquals(0, MainActivity.contextualOrdinarySilverPrice(tag | (54 << 25)));
+    }
+
+    @Test
+    public void privyRagLabelsRequireTheirActionBitAndUseNoPriceOrCountdown() {
+        final int take = 7 << 16;
+        final int pass = take | (63 << 25);
+        assertEquals(0, MainActivity.contextualInteractLabel(take));
+        assertEquals(0, MainActivity.contextualInteractLabel(pass));
+        assertEquals("Take a clean rag",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), take | 1));
+        assertEquals("Pass the rag",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), pass | 1));
+        assertEquals(0, MainActivity.contextualRiverSeconds(take | 1));
+        assertEquals(0, MainActivity.contextualOrdinarySilverPrice(pass | 1));
+    }
+
+    @Test
+    public void shoreBreathDetailsKeepUntimedApproachAndExposeCeilingCountdowns() {
+        final int mill = 7 << 16;
+        assertEquals(R.string.salvager_enter_shallows,
+                MainActivity.contextualInteractLabel(mill | (16 << 25)));
+        assertEquals(R.string.salvager_recover_breath,
+                MainActivity.contextualInteractLabel(mill | (19 << 25)));
+        assertEquals(R.string.salvager_enter_shallows_timed,
+                MainActivity.contextualInteractLabel(mill | (20 << 25)));
+        assertEquals(1, MainActivity.contextualRiverSeconds(mill | (20 << 25)));
+        assertEquals(R.string.salvager_enter_shallows_timed,
+                MainActivity.contextualInteractLabel(mill | (27 << 25)));
+        assertEquals(8, MainActivity.contextualRiverSeconds(mill | (27 << 25)));
+        assertEquals(R.string.salvager_retreat_timed,
+                MainActivity.contextualInteractLabel(mill | (36 << 25)));
+        assertEquals(16, MainActivity.contextualRiverSeconds(mill | (51 << 25)));
+        assertEquals(0, MainActivity.contextualRiverSeconds(mill | (19 << 25)));
+        assertEquals(0, MainActivity.contextualRiverSeconds(20 << 25));
+        assertEquals("Wade to rail · 8 s",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (27 << 25)));
+        assertEquals("Return to dry · 4 s",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (39 << 25)));
+        assertEquals("Back to dry stone",
+                MainActivity.contextualInteractText(RuntimeEnvironment.getApplication(), mill | (19 << 25)));
+    }
+
+    @Test
+    public void timedShoreLabelsFitTheCompactTouchSlotAtMaximumFontScale() {
+        final Configuration maximumFont = new Configuration(
+                RuntimeEnvironment.getApplication().getResources().getConfiguration());
+        maximumFont.fontScale = 2.0f;
+        maximumFont.densityDpi = DisplayMetrics.DENSITY_MEDIUM;
+        final Context context = RuntimeEnvironment.getApplication().createConfigurationContext(maximumFont);
+        final FrameLayout root = (FrameLayout) LayoutInflater.from(context)
+                .inflate(R.layout.activity_main, null, false);
+        root.findViewById(R.id.menu_scrim).setVisibility(View.GONE);
+        root.findViewById(R.id.diagnostics_panel).setVisibility(View.GONE);
+        final Button interact = root.findViewById(R.id.interact_button);
+        interact.setVisibility(View.VISIBLE);
+        final int width = 320;
+        final int height = 568;
+        root.measure(View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
+        root.layout(0, 0, width, height);
+        final int mill = 7 << 16;
+        for (final int detail : new int[] {19, 20, 27, 36, 43}) {
+            interact.setText(MainActivity.contextualInteractText(context, mill | (detail << 25)));
+            interact.measure(View.MeasureSpec.makeMeasureSpec(interact.getWidth(), View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(interact.getHeight(), View.MeasureSpec.EXACTLY));
+            assertNotNull("timed action must produce a text layout", interact.getLayout());
+            assertTrue("timed action must remain at most two compact lines",
+                    interact.getLayout().getLineCount() <= 2);
+            for (int line = 0; line < interact.getLayout().getLineCount(); ++line)
+                assertEquals("timed action must not be ellipsized", 0,
+                        interact.getLayout().getEllipsisCount(line));
+        }
+    }
+
     private static Rect bounds(final View view) {
         return new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
     }

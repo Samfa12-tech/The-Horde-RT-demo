@@ -69,8 +69,15 @@ int main()
           "torch development proof does not enter the release checkpoint lookup");
     Check(FindShowcaseCheckpoint("player-body-grips") == nullptr,
           "player-body proof does not enter the release checkpoint lookup");
-    Check(kDevelopmentCheckpoints.size() == 118u,
-          "development registry retains prior views and adds authoritative ring and accepted-hit views");
+    Check(kDevelopmentCheckpoints.size() == 146u &&
+          FindDevelopmentCheckpoint("bellwether-square-frontage") != nullptr &&
+          FindShowcaseCheckpoint("bellwether-square-frontage") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-keeper-reply") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-staffed-room") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-kit-lantern-glance") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-repeat-visit") == nullptr &&
+          FindShowcaseCheckpoint("bellwether-church-waymarker") == nullptr,
+          "Bellwether scene views are restricted to the development registry");
     {
         simulation::GameSimulation staged(simulation::ProductionGameSimulationConfig());
         const auto* hit=FindDevelopmentCheckpoint(238);
@@ -93,6 +100,29 @@ int main()
               std::abs(view->cameraZ-simulation::kPrivateChapterDemoEndpoint.z)<.00001f,
               "endpoint views walk from F04 to the mapped turnaround through simulation");
     }
+    for(const auto name : {"bellwether-south-approach","bellwether-tavern-hearth","bellwether-tavern-window"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        const auto& route=traversal::kBellwetherTavernRoute;
+        Check(view && view->stagesRescueExterior && view->exteriorRouteStation==7u &&
+              DevelopmentCheckpointRequiresAuthoredChapter(*view) &&
+              view->bellwetherStations>0 && view->bellwetherStations<=route.size() &&
+              view->cameraX==route[view->bellwetherStations-1].x &&
+              view->cameraZ==route[view->bellwetherStations-1].z &&
+              FindShowcaseCheckpoint(name)==nullptr,
+              "tavern inspections use the mapped, authored movement route and remain development views");
+    }
+    for(const auto name : {"bellwether-kit-lowering","bellwether-kit-seated"}) {
+        const auto* view=FindDevelopmentCheckpoint(name);
+        Check(view && DevelopmentCheckpointRequiresAuthoredChapter(*view) && view->bellwetherSitTicks!=0 &&
+              view->bellwetherStations==traversal::kBellwetherTavernRoute.size() && FindShowcaseCheckpoint(name)==nullptr,
+              "Kit sit inspections require the full authored player route and explicit fixed-step actor staging");
+    }
+    constexpr auto ankleView="bellwether-kit-ankle-catch";
+    const auto* ankle=FindDevelopmentCheckpoint(ankleView);
+    Check(ankle && DevelopmentCheckpointRequiresAuthoredChapter(*ankle) && ankle->bellwetherAnkleTicks==20 &&
+          ankle->bellwetherStations==traversal::kBellwetherAnkleStation+1 && !ankle->bellwetherSitTicks &&
+          FindShowcaseCheckpoint(ankleView)==nullptr,
+          "Kit ankle inspection walks the authored route up to the fixed-step catch");
     for(const auto name : {"chapter-forest-retention-west", "chapter-forest-retention-east"}) {
         const auto* view=FindDevelopmentCheckpoint(name);
         Check(view && view->id>=230 && view->id<=231 &&
@@ -391,8 +421,9 @@ int main()
         }
     }
     for (const auto& capture : kDevelopmentCheckpoints)
-        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) || (capture.id >= 180 && capture.id <= 183)),
-              "only explicit upper/lower level inspection views declare cropped primary arms");
+        Check(capture.primaryArmsMayBeOutsideFrame == (capture.id == 152 || (capture.id >= 161 && capture.id <= 163) ||
+              (capture.id >= 180 && capture.id <= 183) || capture.id == 346 || capture.id == 348),
+              "only the designated inspection and close resident views declare cropped primary arms");
     Check(!HasExpectedPlayerCaptureVisibility(true, true, true, 0u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, true, 1u, false) &&
               HasExpectedPlayerCaptureVisibility(true, true, false, 0u, false) &&

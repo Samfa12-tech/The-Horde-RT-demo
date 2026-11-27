@@ -1,6 +1,8 @@
 #pragma once
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
+#include <array>
+#include <cstddef>
 
 namespace horde::gameplay::traversal
 {
@@ -14,30 +16,64 @@ inline simulation::PlayerSupportResolution ChapterExteriorSupport(
     return {ground.worldY,static_cast<PlayerSupportId>(1000+ground.triangle),
             ground.found&&ground.walkable,ground.surface};
 }
+// Reuse root heights across a batch of sweeps on the same immutable terrain.
+// Held equipment can test many candidate reaches from one camera position.
+class ChapterExteriorObstacleQuery
+{
+public:
+    explicit ChapterExteriorObstacleQuery(const simulation::TriangleSupportSurface& terrain) : terrain_(terrain) {}
+
+    bool Clear(float fromX,float fromZ,float toX,float toZ,float minimumY,float maximumY,float radius,
+               bool includeSteps=true)
+    {
+        if(!RescueExteriorVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
+        if(!(includeSteps?terrain_.NonWalkableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius):
+                         terrain_.UnsteppableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius)))return false;
+        // Keep the measured bark bounds and the same terrain sample used for
+        // rendering. Later roots are still checked after an early collision.
+        const auto& trees=simulation::kForestTreePlacementContract;
+        for(std::size_t index=0;index<trees.size();++index) {
+            const auto& tree=trees[index];
+            if(index==sampledRoots_) {
+                const auto ground=terrain_.Query(tree.x,tree.z);
+                if(!ground.found)return false;
+                rootHeights_[sampledRoots_++]=ground.worldY;
+            }
+            const float groundY=rootHeights_[index];
+            if(groundY+2<=minimumY || groundY>=maximumY)continue;
+            float enter=0,leave=1;
+            const auto axis=[&](float a,float b,float low,float high) {
+                const float d=b-a;
+                if(std::abs(d)<1e-7f)return a>=low&&a<=high;
+                float t0=(low-a)/d,t1=(high-a)/d;if(t0>t1)std::swap(t0,t1);
+                enter=std::max(enter,t0);leave=std::min(leave,t1);return enter<=leave;
+            };
+            if(axis(fromX,toX,tree.trunkMinX-radius,tree.trunkMaxX+radius)&&
+               axis(fromZ,toZ,tree.trunkMinZ-radius,tree.trunkMaxZ+radius))return false;
+        }
+        return true;
+    }
+
+    bool CarryClear(float fromX,float fromZ,float toX,float toZ,float supportY,float radius)
+    {
+        // The carry band clears coping and the slope beneath the held item.
+        // Imported solids, trunks and shaft fittings retain their fixed band.
+        constexpr float bottom=.25f,top=2.30f;
+        return Clear(fromX,fromZ,toX,toZ,supportY+bottom,supportY+top,radius) &&
+            terrain_.HorizontalCarryVolumeClear(fromX,fromZ,toX,toZ,supportY+bottom,supportY+top,radius);
+    }
+
+private:
+    const simulation::TriangleSupportSurface& terrain_;
+    std::array<float,simulation::kForestTreePlacementContract.size()> rootHeights_{};
+    std::size_t sampledRoots_=0;
+};
+
 inline bool ChapterExteriorObstacleClear(const simulation::TriangleSupportSurface& terrain,
     float fromX,float fromZ,float toX,float toZ,float minimumY,float maximumY,float radius,
     bool includeSteps=true)
 {
-    if(!RescueExteriorVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
-    if(!(includeSteps?terrain.NonWalkableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius):
-                     terrain.UnsteppableVolumeClear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius)))return false;
-    // Trunk horizontal bounds remain the measured admitted bark bounds. The
-    // vertical origin follows the very same terrain sample used for rendering.
-    for(const auto& tree:simulation::kForestTreePlacementContract) {
-        const auto ground=terrain.Query(tree.x,tree.z);
-        if(!ground.found)return false;
-        if(ground.worldY+2<=minimumY || ground.worldY>=maximumY)continue;
-        float enter=0,leave=1;
-        const auto axis=[&](float a,float b,float low,float high) {
-            const float d=b-a;
-            if(std::abs(d)<1e-7f)return a>=low&&a<=high;
-            float t0=(low-a)/d,t1=(high-a)/d;if(t0>t1)std::swap(t0,t1);
-            enter=std::max(enter,t0);leave=std::min(leave,t1);return enter<=leave;
-        };
-        if(axis(fromX,toX,tree.trunkMinX-radius,tree.trunkMaxX+radius)&&
-           axis(fromZ,toZ,tree.trunkMinZ-radius,tree.trunkMaxZ+radius))return false;
-    }
-    return true;
+    return ChapterExteriorObstacleQuery(terrain).Clear(fromX,fromZ,toX,toZ,minimumY,maximumY,radius,includeSteps);
 }
 // Separate opt-in step support: bare ground remains the terrain/tree-placement
 // authority. This footprint maximum is deliberately conservative around roots.
@@ -101,12 +137,6 @@ inline bool ChapterExteriorMovementClear(const simulation::TriangleSupportSurfac
 inline bool ChapterExteriorCarryClear(const simulation::TriangleSupportSurface& terrain,
     float fromX,float fromZ,float toX,float toZ,float supportY,float radius)
 {
-    // Bounded conservative upright carry band. It clears the 18cm coping and
-    // the ground beneath the cage, while retaining raised banks and real
-    // trunks/shaft fittings. Body movement still requires continuous support.
-    constexpr float bottom=.25f,top=2.30f;
-    return ChapterExteriorObstacleClear(terrain,fromX,fromZ,toX,toZ,supportY+bottom,
-        supportY+top,radius)&&terrain.HorizontalVolumeClear(fromX,fromZ,toX,toZ,
-        supportY+bottom,supportY+top,radius);
+    return ChapterExteriorObstacleQuery(terrain).CarryClear(fromX,fromZ,toX,toZ,supportY,radius);
 }
 }

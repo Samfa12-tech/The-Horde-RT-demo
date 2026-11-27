@@ -54,7 +54,8 @@ public:
     // Consume the simulation's fixed-tick authored-boundary latch. Strict
     // actual-position capture remains a separate simulation API. Movement and
     // crouching retain the last admitted immutable record.
-    // Autosave only on a new boundary and only with an explicit active slot.
+    // Autosave at a new boundary, an eligible rest, or tavern story progress
+    // while an explicit active slot is selected.
     bool ObserveSafeBoundary();
     // Manual choice does not change the current game's active autosave slot.
     bool SaveManual(unsigned slot);

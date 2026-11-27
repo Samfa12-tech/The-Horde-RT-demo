@@ -93,6 +93,8 @@ std::string BuildDeveloperOverlayText(const DeveloperOverlaySnapshot& snapshot)
         << snapshot.playerVitality << '/' << snapshot.playerMaxVitality
         << "  |  damage " << (snapshot.playerDamageEnabled && !snapshot.playerSafePractice ? "ON" : "OFF")
         << (snapshot.playerSafePractice ? " (lesson)" : "") << '\n';
+    out << std::setprecision(2) << "POSE x " << snapshot.playerX << " z " << snapshot.playerZ
+        << " yaw " << snapshot.playerYawRadians << " rad\n" << std::setprecision(1);
     out << "SIM " << snapshot.simulationTicksThisFrame << " ticks  |  accum "
         << snapshot.fixedStepAccumulatorSeconds * 1000.0 << " ms  |  overruns "
         << snapshot.catchUpOverrunCount << '\n';

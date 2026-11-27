@@ -27,7 +27,8 @@ finally {
 }
 $c = $definition.capacities
 foreach ($name in @('instanceMetadata', 'tlasInstances', 'staticAssets', 'primitives',
-                    'materials', 'textureLayers', 'fireEmitters', 'activeFireEmitters')) {
+                    'materials', 'textureLayers', 'fireEmitters', 'activeFireEmitters',
+                    'regionalWaterSurfaces')) {
     $value = $c.$name
     if (($value -isnot [int] -and $value -isnot [long]) -or $value -lt 1 -or $value -gt 256) {
         throw "RT scene ABI capacity '$name' must be an integer in [1,256]."
@@ -142,6 +143,7 @@ inline constexpr std::uint32_t kRtMaterialCapacity = $($c.materials)u;
 inline constexpr std::uint32_t kRtTextureLayerCapacity = $($c.textureLayers)u;
 inline constexpr std::uint32_t kRtFireEmitterCapacity = $($c.fireEmitters)u;
 inline constexpr std::uint32_t kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
+inline constexpr std::uint32_t kRtRegionalWaterSurfaceCapacity = $($c.regionalWaterSurfaces)u;
 
 inline constexpr std::uint32_t kRtBindingInstanceMetadata = $($b.instanceMetadata)u;
 inline constexpr std::uint32_t kRtBindingPrimitiveMetadata = $($b.primitiveMetadata)u;
@@ -215,6 +217,7 @@ const uint kRtMaterialCapacity = $($c.materials)u;
 const uint kRtTextureLayerCapacity = $($c.textureLayers)u;
 const uint kRtFireEmitterCapacity = $($c.fireEmitters)u;
 const uint kRtActiveFireEmitterCapacity = $($c.activeFireEmitters)u;
+const uint kRtRegionalWaterSurfaceCapacity = $($c.regionalWaterSurfaces)u;
 const uint kRtGeometryRoleStatic = $($g.static)u;
 const uint kRtGeometryRolePlayerWorldBody = $($g.playerWorldBody)u;
 const uint kRtGeometryRolePlayerViewmodel = $($g.playerViewmodel)u;
@@ -293,7 +296,7 @@ layout(std430, set = 0, binding = $($b.waterContactRipple)) readonly buffer RtWa
     // Preserve the original ripple prefix. Immutable authored water profiles
     // follow it; per-frame writes touch only the first 16 bytes.
     uvec4 surfaceMetadata;
-    RtWaterSurfaceGpu surfaces[42];
+    RtWaterSurfaceGpu surfaces[$($c.regionalWaterSurfaces)];
 } rtWaterContactRipple;
 #if !defined(HORDE_RT_VARIANT_INSTRUMENTATION) || HORDE_RT_VARIANT_INSTRUMENTATION == 1
 layout(std430, set = 0, binding = $($b.dielectricDiagnostics)) restrict buffer RtDielectricDiagnosticsBuffer

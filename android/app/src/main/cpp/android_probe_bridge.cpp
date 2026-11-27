@@ -16,6 +16,7 @@
 #include <cstring>
 #include <ctime>
 #include <exception>
+#include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <locale>
@@ -47,6 +48,10 @@
 #include "gameplay/validation/KeeperMistFixture.h"
 #include "vulkan/raytracing/EnvironmentSurveyFrame.h"
 #include "graphics/GraphicsPreviewPerformance.h"
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+#include "BellwetherDoorwayMeasurement.h"
+#include "vulkan/raytracing/BellwetherResidents.h"
+#endif
 #if (defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)) || HORDE_RT_ANDROID_MOTION_VALIDATION
 #include "platform/android/AndroidMotionEvidencePolicy.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
@@ -134,6 +139,36 @@ constexpr const char* kShowcaseDebugStateFilename = "showcase_debug_state.json";
 constexpr float kDefaultAndroidRtRenderScale = 0.50f;
 // One frame in flight keeps the dynamically refit held-torch TLAS safely synchronized with its host-written instance buffer.
 constexpr uint32_t kMaxFramesInFlight = 1u;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+constexpr std::int32_t kBellwetherDoorwayMeasurementCheckpoint = 337;
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+constexpr std::int32_t kBellwetherResidentRoundtripMeasurementCheckpoint = 347;
+constexpr std::int32_t kBellwetherWestRoundtripMeasurementCheckpoint = 349;
+#endif
+#endif
+
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+using BellwetherMeasurementRoute = horde::gameplay::validation::BellwetherMeasurementRoute;
+
+std::optional<BellwetherMeasurementRoute> BellwetherMeasurementForCheckpoint(std::int32_t id) {
+    if (id == kBellwetherDoorwayMeasurementCheckpoint) return BellwetherMeasurementRoute::Doorway;
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if (id == kBellwetherResidentRoundtripMeasurementCheckpoint) return BellwetherMeasurementRoute::EastRoundTrip;
+#if HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE
+    if (id == kBellwetherWestRoundtripMeasurementCheckpoint) return BellwetherMeasurementRoute::WestRoundTrip;
+#endif
+#endif
+    return std::nullopt;
+}
+
+const char* BellwetherMeasurementLogTag(BellwetherMeasurementRoute route) {
+    switch (route) {
+    case BellwetherMeasurementRoute::EastRoundTrip: return "HORDE_BELLWETHER_RESIDENT_ROUNDTRIP";
+    case BellwetherMeasurementRoute::WestRoundTrip: return "HORDE_BELLWETHER_WEST_ROUNDTRIP";
+    default: return "HORDE_BELLWETHER_DOORWAY";
+    }
+}
+#endif
 
 std::string JsonUtf8String(const std::string_view value)
 {
@@ -414,6 +449,17 @@ struct SwapchainContext
     horde::vulkan::GpuFrameTimer gpuFrameTimer;
 #if HORDE_RT_FRAME_STAGE_PROBE
     std::array<horde::vulkan::GpuFrameTimer,3> frameStageTimers;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    std::array<horde::telemetry::RtSubmittedFrameIdentity, kMaxFramesInFlight> bellwetherGpuStageOwners{};
+#endif
+
+    void ResetFrameStageTimingAfterIdle()
+    {
+        for (auto& timer : frameStageTimers) timer.ResetAfterDeviceIdle();
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        bellwetherGpuStageOwners = {};
+#endif
+    }
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryTiming stagedPassTimer;
@@ -424,6 +470,10 @@ struct SwapchainContext
     double gpuFrameTimingTotalMs = 0.0;
     std::uint64_t gpuFrameTimingSampleCount = 0u;
     bool rtFrameEvidenceInitialised = false;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    std::optional<BellwetherMeasurementRoute> bellwetherMeasurementRequested;
+    std::optional<horde::platform::android::BellwetherDoorwayMeasurement> bellwetherDoorway;
+#endif
     float outputExposure = 0.92f;
     std::int32_t activeBenchmarkCheckpoint = -1;
     std::string activeBenchmarkName;
@@ -648,8 +698,33 @@ void InvalidateBenchmarkSummaryLocked()
 }
 horde::gameplay::BenchmarkWorkload gRequestedBenchmarkWorkload =
     horde::gameplay::BenchmarkWorkload::ShowcaseRoute;
+
+constexpr auto AndroidBellwetherSpecialist() {
+    using horde::gameplay::bellwether::Specialist;
+    if constexpr (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS)
+        return Specialist::RelicDealer;
+    if constexpr (HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE) return Specialist::Salvager;
+    return HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE ? Specialist::Artificer : Specialist::RecordKeeper;
+}
+
+horde::gameplay::simulation::GameSimulationConfig AndroidApplicationSimulationConfig()
+{
+    auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    config.bellwetherTavernKeeperAdmitted = true;
+    config.bellwetherSpecialist = AndroidBellwetherSpecialist();
+#if HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE
+    config.bellwetherTrade = true;
+#endif
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    config.bellwetherCombinedResidents = true;
+#endif
+#endif
+    return config;
+}
+
 horde::gameplay::simulation::GameSimulation gGameSimulation =
-    horde::gameplay::simulation::CreateApplicationGameSimulation();
+    horde::gameplay::simulation::GameSimulation(AndroidApplicationSimulationConfig());
 horde::gameplay::simulation::InputMailbox gInputMailbox;
 std::uint64_t gPrivateRevivalResourceGeneration=1;
 std::mutex gInputPublisherMutex;
@@ -929,6 +1004,7 @@ std::atomic<int> gFinaleEndingPhase{static_cast<int>(horde::gameplay::FinaleEndi
 std::atomic<int> gContextualControlState{0};
 std::atomic<std::uint64_t> gWaterfallStereoGains{0u};
 std::atomic<std::uint64_t> gCombatTeachingUiState{0u};
+std::atomic<std::uint64_t> gCombatTeachingCard{0u};
 std::atomic<float> gSfxDialogueBedGain{1.f};
 std::mutex gChapterDialogueUiMutex;
 horde::gameplay::dialogue::Snapshot gChapterDialogueUiSnapshot{};
@@ -936,6 +1012,7 @@ horde::gameplay::SpatialAudioDomain gChapterDialogueUiAudioDomain =
     horde::gameplay::SpatialAudioDomain::DungeonRoute; // guarded by gChapterDialogueUiMutex
 std::string gChapterDialogueUiText;
 std::array<jlong,4> gLookoutObjectiveUiState{}; // guarded by gChapterDialogueUiMutex
+horde::gameplay::campaign::BellwetherDirections gLookoutDirections{}; // guarded by gChapterDialogueUiMutex
 std::mutex gDebugRequestAdmissionMutex;
 
 horde::platform::android::DebugRequestAdmissionState ReadDebugRequestAdmissionStateLocked()
@@ -1090,9 +1167,8 @@ std::uint64_t PlatformGameplayEventOverflowCount()
 
 void EnqueuePlatformGameplayEvent(const horde::gameplay::simulation::GameplayEvent& event)
 {
-    const horde::gameplay::SpatialAudioGains gains = horde::gameplay::CalculateSpatialAudio(
-        horde::gameplay::simulation::ChapterAmbienceEmitter(event),
-        {event.listenerX, event.listenerZ, event.listenerYawRadians, event.listenerY});
+    const auto gains = event.type==horde::gameplay::simulation::GameplayEventType::KitAnkleFoley ?
+        horde::audio::KitAnkleGains(event) : horde::gameplay::simulation::ChapterAmbienceGains(event);
     const std::uint64_t metadata = horde::platform::android::PackGameplayEventMetadata(event);
     const std::uint64_t verticalMetadata =
         horde::platform::android::PackGameplayEventVerticalMetadata(event);
@@ -1129,6 +1205,15 @@ void DrainSimulationEventsToPlatform()
            (!ForestBirdAmbience::FoliageEligible(current) || ForestBirdAmbience::FoliageRangeGain(current)<=0.f)) {
             auto stopped=event;
             stopped.type=GameplayEventType::ForestBirdStopped;
+            stopped.intensity=0.f;
+            EnqueuePlatformGameplayEvent(stopped);
+            continue;
+        }
+        if((event.type==GameplayEventType::BellwetherHearth && !ChapterLocalAmbience::HearthEligible(current)) ||
+           (IsStockAmbienceEvent(event.type) && !ChapterLocalAmbience::StockEventEligible(current,event)) ||
+           (event.type==GameplayEventType::BellwetherWaterwheelCreak && !ChapterLocalAmbience::MillEligible(current))) {
+            auto stopped=event;
+            stopped.type=GameplayEventType::ChapterLocalAmbienceStopped;
             stopped.intensity=0.f;
             EnqueuePlatformGameplayEvent(stopped);
             continue;
@@ -1172,25 +1257,28 @@ void PublishSimulationUiState()
         ((static_cast<std::uint64_t>(teaching.continuationPhase)&7u) << 36u) |
         (static_cast<std::uint64_t>(teaching.naturalContinuation) << 39u) |
         (static_cast<std::uint64_t>(teaching.liveFightNotice) << 58u) |
+        (static_cast<std::uint64_t>(teaching.cardToken != 0) << 59u) |
         ((static_cast<std::uint64_t>(std::clamp(simulation.swordSheathHoldProgress,0.f,1.f)*100.f)&0x7fu) << 50u) |
         (static_cast<std::uint64_t>(simulation.swordIntentionallyStowed) << 57u) |
         (clampByte(teaching.promptOpacity) << 40u) |
         ((static_cast<std::uint64_t>(teaching.attackReadability) & 0x3u) << 48u);
+    gCombatTeachingCard.store(teaching.cardToken, std::memory_order_release);
     gCombatTeachingUiState.store(teachingState, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         gChapterDialogueUiSnapshot = simulation.chapterDialogue;
         gChapterDialogueUiAudioDomain = horde::gameplay::ResolveSpatialAudioDomain(
             simulation.developmentRescueJourney, simulation.worldRoute.current);
-        gLookoutObjectiveUiState={1,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
+        gLookoutObjectiveUiState={2,static_cast<jlong>(gSwapchainContext.surfaceGeneration),
             static_cast<jlong>(simulation.worldRoute.generation),
-            horde::gameplay::campaign::LookoutObjectiveAvailable(simulation,
-                gGameSimulation.LatestCampaignBoundary())?1:0};
+            static_cast<jlong>(horde::gameplay::campaign::CurrentPauseObjective(simulation,
+                gGameSimulation.LatestCampaignBoundary()))};
+        gLookoutDirections=horde::gameplay::campaign::CurrentBellwetherDirections(simulation);
         const auto& line = horde::gameplay::dialogue::Spec(simulation.chapterDialogue.line);
         gChapterDialogueUiText = simulation.chapterDialogue.line ==
                 horde::gameplay::dialogue::Line::None
             ? std::string{}
-            : std::string(line.speaker) + "\n" + line.text;
+            : (*line.speaker ? std::string(line.speaker) + "\n" + line.text : std::string(line.text));
     }
     if ((teaching.stage == horde::gameplay::simulation::TutorialStage::Complete ||
          teaching.stage == horde::gameplay::simulation::TutorialStage::Skipped) &&
@@ -1222,6 +1310,10 @@ void PublishSimulationUiState()
         static_cast<int>(simulation.EndingPhaseForUi()),
         std::memory_order_release);
     int contextualControls = 0;
+    using horde::gameplay::bellwether::MillAction;
+    using horde::gameplay::bellwether::MillLeakTestPhase;
+    using horde::gameplay::bellwether::SalvagerAction;
+    using horde::gameplay::bellwether::ShorePracticeStage;
     using horde::gameplay::interactions::ChestRewardPrompt;
     using horde::gameplay::interactions::HeldLightKind;
     using horde::gameplay::interactions::HeldLightPose;
@@ -1251,8 +1343,119 @@ void PublishSimulationUiState()
     }
     if ((contextualControls & (1 << 9)) == 0 && simulation.flaskUpgrade.interactEligible)
         contextualControls |= (1 << 12) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.tavernDoorAction != horde::gameplay::bellwether::DoorAction::None)
+        contextualControls |= (static_cast<int>(simulation.tavernDoorAction) << 22) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernConversationAvailable)
+        contextualControls |= (1 << 14) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernDirectionsAvailable)
+        contextualControls |= (1 << 15) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.tavernLanternFittingAvailable) {
+        constexpr auto price=horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice;
+        static_assert(price>0 && price<64); // Bits 25-30 carry the quoted price.
+        contextualControls |= static_cast<int>(price << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.millTallyAction != horde::gameplay::campaign::MillTallyAction::None) {
+        using horde::gameplay::campaign::MillTallyAction;
+        constexpr int optionalActionTag=INT32_MIN;
+        constexpr auto price=horde::gameplay::campaign::TreasurePurse::kMillTallySaleCoins;
+        static_assert(static_cast<int>(MillTallyAction::Return)<8 && price>0u && price<8u);
+        const int action=static_cast<int>(simulation.millTallyAction);
+        const int quote=simulation.millTallyAction==MillTallyAction::Sell ? static_cast<int>(price) : 0;
+        contextualControls |= optionalActionTag | (action << 25) | (quote << 28) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             (simulation.millAction != MillAction::None || simulation.millLeakTestPhase != MillLeakTestPhase::Idle ||
+              simulation.millDriveTesting)) {
+        // Tag 7 shares the archive/fitting lanes. Details 6, 7 and 11 are read-only cues.
+        constexpr int millTag=7, detailShift=25;
+        static_assert(static_cast<int>(horde::gameplay::bellwether::ArchiveAction::RestoreBinding)<millTag);
+        static_assert(static_cast<int>(MillAction::ConfirmSeal)==5 && static_cast<int>(MillAction::SeatBearing)==8 &&
+                      static_cast<int>(MillAction::TakeRig)==10);
+        const bool actionable=simulation.millAction!=MillAction::None;
+        const int detail=actionable ? static_cast<int>(simulation.millAction) :
+            simulation.millDriveTesting ? 11 : simulation.millLeakTestPhase==MillLeakTestPhase::Testing ? 6 : 7;
+        contextualControls |= (millTag << 16) | (detail << detailShift) | (actionable ? 1 : 0);
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.waysideArchiveAction != horde::gameplay::bellwether::ArchiveAction::None)
+        contextualControls |= (static_cast<int>(simulation.waysideArchiveAction) << 16) | 1;
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.recordKeeperAction != horde::gameplay::dialogue::RecordKeeperAction::None) {
+        const int action=static_cast<int>(simulation.recordKeeperAction);
+        // The third action bit lives above the tavern door fields.
+        contextualControls |= ((action & 3) << 19) | ((action & 4) << 22) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.privyRagAction != horde::gameplay::bellwether::PrivyRagAction::None) {
+        constexpr int residentTag=7;
+        // Details zero and 63 are the free codes around the existing 1–62 roster.
+        const int detail=simulation.privyRagAction==horde::gameplay::bellwether::PrivyRagAction::Take ? 0 : 63;
+        contextualControls |= (residentTag << 16) | (detail << 25) | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.gardenGrateTalkAvailable) {
+        constexpr int gardenGrateTalk=INT32_MIN; // Bit 31, outside the resident detail field.
+        contextualControls |= gardenGrateTalk | 1;
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             (simulation.salvagerAction != SalvagerAction::None ||
+              (simulation.shorePracticeStage != ShorePracticeStage::Idle &&
+               simulation.ordinarySilverAction == horde::gameplay::campaign::OrdinarySilverAction::None))) {
+        // Shared river context uses details 12–14 for actions, 15–18 for
+        // untimed cues, 19 for dry recovery, 20–35 for an EnterShallows
+        // breath countdown, and 36–51 for a Retreat countdown. The complete
+        // snapshot remains in this one release-published atomic; Java never
+        // invents a timer or submits an input action for it.
+        constexpr int riverTag=7;
+        static_assert(static_cast<int>(SalvagerAction::RecallPractice)==3 &&
+                      static_cast<int>(ShorePracticeStage::ReportBack)==4 &&
+                      static_cast<int>(ShorePracticeStage::RecoverBreath)==5 &&
+                      horde::gameplay::bellwether::kShorePracticeBreathSeconds<=16);
+        const bool actionable=simulation.salvagerAction!=SalvagerAction::None;
+        int detail=actionable ? 11+static_cast<int>(simulation.salvagerAction)
+            : 14+static_cast<int>(simulation.shorePracticeStage);
+        if (!actionable) {
+            const auto seconds = horde::gameplay::bellwether::ShorePracticeSecondsRemaining(
+                simulation.shorePracticeBreathTicksRemaining);
+            if (seconds > 0u && simulation.shorePracticeStage == ShorePracticeStage::EnterShallows)
+                detail = 19 + static_cast<int>(seconds);
+            else if (seconds > 0u && simulation.shorePracticeStage == ShorePracticeStage::Retreat)
+                detail = 35 + static_cast<int>(seconds);
+        }
+        contextualControls |= (riverTag << 16) | (detail << 25) | (actionable ? 1 : 0);
+    }
+    else if ((contextualControls & (1 << 9)) == 0 &&
+             simulation.ordinarySilverAction != horde::gameplay::campaign::OrdinarySilverAction::None) {
+        using horde::gameplay::campaign::OrdinarySilverAction;
+        constexpr int residentTag=7;
+        const auto action=simulation.ordinarySilverAction;
+        int detail=54;
+        bool actionable=false;
+        if (action==OrdinarySilverAction::Take) {
+            detail=53;
+            actionable=true;
+        } else if (action==OrdinarySilverAction::Sell) {
+            constexpr auto price=horde::gameplay::campaign::TreasurePurse::kOrdinarySilverSaleCoins;
+            static_assert(price>=1 && price<=8);
+            detail=54+static_cast<int>(price);
+            actionable=true;
+        } else if (action==OrdinarySilverAction::Sold) {
+            detail=54;
+        } else {
+            detail=52;
+            actionable=true;
+        }
+        contextualControls |= (residentTag << 16) | (detail << 25) | (actionable ? 1 : 0);
+    }
+    else if ((contextualControls & (1 << 9)) == 0 && simulation.relicDealerTradeAvailable) {
+        constexpr int residentTag = 7, tradeDetail = 52;
+        contextualControls |= (residentTag << 16) | (tradeDetail << 25) | 1;
+    }
     // Keep the grounded reunion action available beside the return-rope prompt.
     if (simulation.NeedsRaiseLanternPrompt()) contextualControls |= (1 << 13) | 2;
+    if (simulation.tavernLanternAvailable && (contextualControls & 4)) contextualControls |= 1 << 21;
     if (simulation.crouchActive) contextualControls |= 1 << 10;
     if (simulation.crouchStandingBlocked) contextualControls |= 1 << 11;
     gContextualControlState.store(contextualControls, std::memory_order_release);
@@ -1359,6 +1562,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(const Swapchai
     snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         simulation.zone);
+    snapshot.playerX = simulation.playerX;
+    snapshot.playerZ = simulation.playerZ;
+    snapshot.playerYawRadians = simulation.playerYawRadians;
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
     snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(simulation.torchFailure.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
@@ -1560,7 +1766,7 @@ void ResetShowcaseSimulation()
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile !=
         horde::gameplay::items::PlayerMountProfile::AnatomicalBody;
     if (replacedQueue)
-        gGameSimulation = horde::gameplay::simulation::CreateApplicationGameSimulation();
+        gGameSimulation = horde::gameplay::simulation::GameSimulation(AndroidApplicationSimulationConfig());
     else
         gGameSimulation.ResetRoute();
     horde::platform::android::ResetMusicSession(replacedQueue);
@@ -2023,6 +2229,20 @@ struct DebugCheckpointSelection
 
 bool ResolveDebugCheckpoint(const std::int32_t id, DebugCheckpointSelection& selection)
 {
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    if (const auto route = BellwetherMeasurementForCheckpoint(id)) {
+        if (!ResolveDebugCheckpoint(329, selection)) return false;
+        selection.checkpoint.id = id;
+        switch (*route) {
+        case BellwetherMeasurementRoute::EastRoundTrip:
+            selection.checkpoint.name = "bellwether-resident-roundtrip-measurement"; break;
+        case BellwetherMeasurementRoute::WestRoundTrip:
+            selection.checkpoint.name = "bellwether-west-roundtrip-measurement"; break;
+        default: selection.checkpoint.name = "bellwether-doorway-measurement"; break;
+        }
+        return true;
+    }
+#endif
     if (const auto* showcase = horde::gameplay::FindShowcaseCheckpoint(id))
     {
         selection = {horde::gameplay::ShowcaseCheckpointForEncounter(*showcase,
@@ -2054,7 +2274,7 @@ bool ApplyDebugCheckpointSimulation(
 {
     // Owning-thread, explicit full checkpoint import; not JNI or a fallback.
     const auto config = selection.playerRoute == kDefaultPlayerPresentationRoute
-        ? horde::gameplay::simulation::PrivateRevivalApplicationConfig()
+        ? AndroidApplicationSimulationConfig()
         : horde::gameplay::simulation::GameSimulationConfig{};
     const bool replacedQueue = gGameSimulation.Snapshot().playerMountProfile != config.playerMountProfile;
     if (replacedQueue)
@@ -2416,13 +2636,38 @@ void WriteChapterStartAcknowledgement(
 }
 #endif
 
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+void CancelBellwetherDoorwayMeasurement(SwapchainContext& context, const char* reason)
+{
+    if (!context.bellwetherDoorway && !context.bellwetherMeasurementRequested) return;
+    const auto route = context.bellwetherDoorway ? context.bellwetherDoorway->MeasurementRoute()
+        : *context.bellwetherMeasurementRequested;
+    context.bellwetherMeasurementRequested.reset();
+    context.bellwetherDoorway.reset();
+    context.lastInputOwnerSteadyNs = 0u;
+    gGameSimulation.ResetTiming();
+    __android_log_print(ANDROID_LOG_ERROR, kTag, "%s failed reason=%s", BellwetherMeasurementLogTag(route), reason);
+}
+#endif
+
 bool ApplyBenchmarkCheckpoint(
     SwapchainContext& context,
     const DebugCheckpointSelection& selection,
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
-    const bool liveJourney = selection.development != nullptr && selection.development->id == 192;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    CancelBellwetherDoorwayMeasurement(context, "checkpoint changed");
+    const auto measurement = BellwetherMeasurementForCheckpoint(checkpoint.id);
+    if (measurement &&
+        (!context.gpuFrameTimingEnabled || kMaxFramesInFlight != 1u)) return false;
+#endif
+    const bool liveJourney = selection.development != nullptr && (checkpoint.id == 192
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        || checkpoint.id == 329 || checkpoint.id == 335 ||
+        (HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE && !HORDE_RT_BELLWETHER_COMBINED_RESIDENTS && checkpoint.id == 348) || measurement
+#endif
+        );
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS) && !defined(NDEBUG)
     // Retire the preceding receipt before trying a repeated import. A failed
     // replacement must not retain a ready=true receipt from the prior run.
@@ -2472,6 +2717,9 @@ bool ApplyBenchmarkCheckpoint(
     context.benchmarkSampling = !liveJourney;
     if (liveJourney)
     {
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        context.bellwetherMeasurementRequested = measurement;
+#endif
         // This owner playtest route is not a benchmark: retain ordinary damage,
         // teaching and dialogue timing from its first live fixed step.
         __android_log_print(ANDROID_LOG_INFO, kTag,
@@ -2502,6 +2750,10 @@ bool ApplyCaptureCheckpoint(
     horde::vulkan::raytracing::RtSceneRecordObservation* observation)
 {
     const auto& checkpoint = selection.checkpoint;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    CancelBellwetherDoorwayMeasurement(context, "capture requested");
+    if (BellwetherMeasurementForCheckpoint(checkpoint.id)) return false;
+#endif
     context.combatFeedbackCaptureSnapshot.reset();
     if (!ApplyDebugCheckpointSimulation(context, selection, observation))
     {
@@ -2677,54 +2929,8 @@ horde::vulkan::DeviceCapabilities RunProbe(const std::uint64_t generation=0u,
     const bool confirmedNoDevice=initialised && context.HasConfirmedNoPhysicalDevices();
     snapshot.probe=confirmedNoDevice?CompatibilityProbe::NoDevice:CompatibilityProbe::Unavailable;
     snapshot.outcome=confirmedNoDevice?CompatibilityOutcome::Unsupported:CompatibilityOutcome::ProbeUnavailable;
-    const auto physicalDevice=context.GetSelectedPhysicalDevice();
-    if (initialised && physicalDevice!=VK_NULL_HANDLE) {
-        snapshot.probe=CompatibilityProbe::DeviceChecked;
-        snapshot.outcome=CompatibilityOutcome::CapabilityOnly;
-        snapshot.gpu=capabilities.identity.gpuName;
-        snapshot.rawDriverVersion=capabilities.identity.driverVersion;
-        snapshot.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
-        // Existing capability booleans have no "query completed" marker.
-        // Confirm extension enumeration before treating a false value as Absent.
-        std::uint32_t count=0u;
-        bool extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,nullptr)==VK_SUCCESS;
-        std::vector<VkExtensionProperties> extensions;
-        if (extensionsChecked && count<=4096u) {
-            extensions.resize(count);
-            if (count!=0u) {
-                const auto capacity=count;
-                extensionsChecked=vkEnumerateDeviceExtensionProperties(physicalDevice,nullptr,&count,extensions.data())==VK_SUCCESS &&
-                    count<=capacity;
-                if (extensionsChecked) extensions.resize(count);
-            }
-        } else extensionsChecked=false;
-        const auto extension=[&](bool observed,const char* name) {
-            if (!extensionsChecked) return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
-            return std::any_of(extensions.begin(),extensions.end(),[name](const auto& item) {
-                return std::strncmp(item.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;
-            })?CompatibilityCheck::Present:CompatibilityCheck::Absent;
-        };
-        const auto& e=capabilities.extensions;
-        snapshot.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),
-            extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
-            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),
-            extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),
-            extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
-        const auto feature=[](bool observed) { return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown; };
-        const auto& f=capabilities.features;
-        // Do not guess Absent when the original core/KHR Features2 entrypoint
-        // may have been unavailable. Positive queried values remain evidence.
-        snapshot.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),
-            feature(f.rayQuery),feature(f.bufferDeviceAddress)};
-        const auto& x=snapshot.extensions;
-        const bool commonBlocked=x.accelerationStructure==CompatibilityCheck::Absent ||
-            x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent;
-        const auto api=capabilities.identity.vulkanApiVersion;
-        const bool apiBlocked=api!=0u && api<VK_API_VERSION_1_2;
-        if (commonBlocked || apiBlocked ||
-            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))
-            snapshot.outcome=CompatibilityOutcome::Unsupported;
-    }
+    if (initialised && context.GetSelectedPhysicalDevice()!=VK_NULL_HANDLE)
+        CaptureCompatibilityDeviceEvidence(snapshot, capabilities);
     PublishCompatibilityProbe(std::move(snapshot),generation,startupAttempt);
     return capabilities;
 }
@@ -3324,7 +3530,7 @@ bool ReleaseSwapchainResources(SwapchainContext& context)
             CurrentInitialGpuEvidenceStatus(context));
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     if (idleResult == VK_SUCCESS) context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -3603,6 +3809,13 @@ void DestroyRtEvidenceOnOwnerThread(SwapchainContext& context)
     context.rtFrameEvidenceInitialised = false;
 }
 
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+std::filesystem::path AndroidBellwetherResidentRoot(const SwapchainContext& context)
+{
+    return std::filesystem::path(context.reportDirectory).parent_path() / "private_bellwether";
+}
+#endif
+
 bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
 {
     if (!context.useRtPath)
@@ -3624,6 +3837,27 @@ bool InitialiseRtSceneForSwapchain(SwapchainContext& context)
     context.rtScene.SetDevelopmentWorldRoute(context.developmentWorldRoute,context.stagedWorldPreparation);
     context.rtScene.SetDevelopmentRescueJourney(context.developmentRescueJourney);
     context.rtScene.SetDevelopmentSupportFixture(context.developmentSupportFixture);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    const bool authoredShowcase = context.developmentRescueJourney &&
+        context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    if (!context.rtScene.SetBellwetherFurnitureTransitions(false) ||
+        !context.rtScene.SetBellwetherFurnitureResidency(false)) {
+        __android_log_print(ANDROID_LOG_ERROR,kTag,"Bellwether furniture setup must precede scene initialization.");
+        return false;
+    }
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+    if (!horde::vulkan::raytracing::SetBellwetherCombinedResidentSources(context.rtScene,
+            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
+            diagnostic, HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE)) {
+#else
+    if (!horde::vulkan::raytracing::SetBellwetherResidentSources(context.rtScene,
+            authoredShowcase ? AndroidBellwetherResidentRoot(context) : std::filesystem::path{},
+            diagnostic, AndroidBellwetherSpecialist())) {
+#endif
+        __android_log_print(ANDROID_LOG_ERROR, kTag, "Bellwether resident setup failed: %s", diagnostic.c_str());
+        return false;
+    }
+#endif
 #if defined(HORDE_RT_DEBUG_CHECKPOINTS)
     if(context.environmentSurvey && !context.keeperMistSnapshot && !context.rtScene.SetRegionalWaterDiagnosticEnabled(
             !context.environmentSurveyWaterDisabled))return false;
@@ -3866,7 +4100,7 @@ bool RebuildDevelopmentSupportFixtureOnOwner(
     CancelActiveInAppBenchmark(context);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -4275,6 +4509,38 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context,
             completion.gpuCollectionAttempted ? &completion.gpuCollection : nullptr);
         DeliverCompletedBenchmarkEvidence(context, completion, completedSnapshot);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+#if HORDE_RT_FRAME_STAGE_PROBE
+        horde::vulkan::raytracing::RtSceneGpuStageCompletedObservation bellwetherGpuStages;
+        auto& stageOwner = context.bellwetherGpuStageOwners[context.currentFrame];
+        // Each submitted stage query must be collected even if the route was
+        // canceled after submission and before its presentation was bound.
+        if (stageOwner.submissionSerial && completion.ownedGraphicsSubmission) {
+            bellwetherGpuStages.submitted = stageOwner;
+            stageOwner = {};
+            for (std::size_t i = 0; i < context.frameStageTimers.size(); ++i) {
+                auto& timer = context.frameStageTimers[i];
+                if (timer.Supported())
+                    bellwetherGpuStages.collections[i] = timer.CollectCompleted(context.currentFrame);
+            }
+        }
+#endif
+        if (context.bellwetherDoorway && context.bellwetherDoorway->AwaitingFrame()) {
+            if (!completion.completedEvidence || !context.bellwetherDoorway->CompleteFence(completedSnapshot
+#if HORDE_RT_FRAME_STAGE_PROBE
+                    , bellwetherGpuStages
+#endif
+                    )) {
+                CancelBellwetherDoorwayMeasurement(context, "owning GPU/present evidence or scene workload changed");
+            } else if (context.bellwetherDoorway->probe.Complete()) {
+                const auto route = context.bellwetherDoorway->MeasurementRoute();
+                context.bellwetherDoorway.reset();
+                context.lastInputOwnerSteadyNs = 0u;
+                gGameSimulation.ResetTiming();
+                __android_log_print(ANDROID_LOG_INFO, kTag, "%s complete returns=2", BellwetherMeasurementLogTag(route));
+            }
+        }
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         ObserveAndroidMotionCompletion(context, completion.completedEvidence);
 #endif
@@ -4350,10 +4616,33 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         return false;
     }
 
+    // The sole graphics fence completed above. This command has not bound
+    // scene descriptors yet; discard other completed recorded references.
+    struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
+    ActorRetirementOwner actorOwner{&context, imageIndex};
+    const auto retireResourceReferences=[](void* user, std::string& error) {
+        auto& owner = *static_cast<ActorRetirementOwner*>(user);
+        auto& ctx = *owner.context;
+        if (kMaxFramesInFlight != 1u ||
+            !gSurfaceSessions.IsCurrent(ctx.surfaceGeneration)) {
+            error = "Character retirement requires the current completed graphics owner.";
+            return false;
+        }
+        for (std::size_t i = 0; i < ctx.commandBuffers.size(); ++i)
+            if (i != owner.image && vkResetCommandBuffer(ctx.commandBuffers[i], 0u) != VK_SUCCESS) {
+                error = "Prior character command references could not be reset.";
+                return false;
+            }
+        return true;
+    };
+
     bool gpuTimingRecording = false;
 #if HORDE_RT_FRAME_STAGE_PROBE
     horde::vulkan::raytracing::RtSceneGpuStageProbe frameStageProbe(
         {{&context.frameStageTimers[0],&context.frameStageTimers[1],&context.frameStageTimers[2]}},context.currentFrame);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    bool recordingBellwetherGpuStages = false;
+#endif
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     horde::vulkan::raytracing::experimental::StagedPrimaryRecordingGuard stagedRecordingGuard(context.stagedPassTimer, context.currentFrame);
@@ -4527,6 +4816,10 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationInput.commands.routeReset > beforeCommands.lastConsumedRouteResetSequence;
             const bool retryPending =
                 simulationInput.commands.retry > beforeCommands.lastConsumedRetrySequence;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            if (simulationInput.paused || routeResetPending || retryPending)
+                CancelBellwetherDoorwayMeasurement(context, "gameplay paused or reset");
+#endif
             if (routeResetPending)
             {
                 if(gCampaignSession) {
@@ -4704,6 +4997,27 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                     PublishBenchmarkProgress(context);
                 }
             }
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            else if (!worldCommandsDeferred && context.bellwetherDoorway)
+            {
+                auto& run = *context.bellwetherDoorway;
+                const auto steps = run.StepsDue(std::chrono::steady_clock::now());
+                horde::vulkan::raytracing::RtSceneStageScope simulationScope(
+                    evidenceFrame ? &observation : nullptr, horde::telemetry::RtStage::SimulationStep);
+                unsigned simulated = 0;
+                for (; steps && simulated < *steps && !run.probe.Complete(); ++simulated) {
+                    const auto& state = gGameSimulation.Snapshot();
+                    simulationInput = run.probe.Next(state);
+                    if (run.probe.Failed()) break;
+                    gGameSimulation.StepFixed(simulationInput,
+                        static_cast<float>(horde::gameplay::simulation::FixedStepRunner::kFixedDeltaSeconds),
+                        publishedInput.publicationSequence);
+                }
+                simulationScope.Complete(simulated);
+                if (!steps || run.probe.Failed())
+                    CancelBellwetherDoorwayMeasurement(context, "route readiness, walk or deadline failed");
+            }
+#endif
             else if (!worldCommandsDeferred && context.routeReplayActive)
             {
                 // Debug route replay owns an authoritative pose and fixed step. It
@@ -4771,6 +5085,9 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             else if (!worldCommandsDeferred && !inAppBenchmarkFrame && !context.routeReplayActive)
             {
                 simulationInput.hasAuthoritativePlayerPose = false;
+                simulationInput.tutorialCardsEnabled = context.developmentRescueJourney &&
+                    context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+                    !context.environmentSurvey;
                 const double rawInputDeltaSeconds = context.lastInputOwnerSteadyNs != 0u &&
                     inputOwnerSteadyNs >= context.lastInputOwnerSteadyNs
                     ? static_cast<double>(inputOwnerSteadyNs - context.lastInputOwnerSteadyNs) * 1.0e-9
@@ -4788,6 +5105,23 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 simulationScope.Complete(1u);
             }
 
+#if HORDE_RT_BELLWETHER_COMBINED_RESIDENTS
+            if (!context.environmentSurvey && context.developmentRescueJourney &&
+                context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+                !context.captureActive && !context.routeReplayActive &&
+                !context.inAppBenchmark.IsRunning() && !context.benchmarkSampling) {
+                std::string residentDiagnostic;
+                if (!horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
+                        context.rtScene, gGameSimulation, AndroidBellwetherResidentRoot(context),
+                        retireResourceReferences, &actorOwner, residentDiagnostic,
+                        HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE)) {
+                    __android_log_print(ANDROID_LOG_ERROR, kTag,
+                        "Bellwether combined residents: %s", residentDiagnostic.c_str());
+                    if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
+                    return false;
+                }
+            }
+#endif
             // Immutable copy before the established SFX transport is drained. Music
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
             ObserveAndroidMotionAdvance(context, simulationInput, inputOwnerSteadyNs);
@@ -4922,29 +5256,15 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         {
             (void)context.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
-        // The sole graphics fence completed above. This command has not bound
-        // scene descriptors yet; discard other completed recorded references.
-        struct ActorRetirementOwner { SwapchainContext* context; std::uint32_t image; };
-        ActorRetirementOwner actorOwner{&context, imageIndex};
-        const auto retireResourceReferences=[](void* user, std::string& error) {
-                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
-                    auto& ctx = *owner.context;
-                    if (kMaxFramesInFlight != 1u ||
-                        !gSurfaceSessions.IsCurrent(ctx.surfaceGeneration)) {
-                        error = "Character retirement requires the current completed graphics owner.";
-                        return false;
-                    }
-                    for (std::size_t i = 0; i < ctx.commandBuffers.size(); ++i)
-                        if (i != owner.image && vkResetCommandBuffer(ctx.commandBuffers[i], 0u) != VK_SUCCESS) {
-                            error = "Prior character command references could not be reset.";
-                            return false;
-                        }
-                    return true;
-                };
         if (!context.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             if (evidenceFrame) context.rtFrameEvidence.FailRecord(observation);
             __android_log_print(ANDROID_LOG_ERROR, kTag, "%s", diagnostic.c_str());
+            return false;
+        }
+        if(!context.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
+            if(evidenceFrame)context.rtFrameEvidence.FailRecord(observation);
+            __android_log_print(ANDROID_LOG_ERROR,kTag,"Bellwether furniture: %s",diagnostic.c_str());
             return false;
         }
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
@@ -4980,6 +5300,16 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             context.gpuFrameTimer.RecordBegin(context.commandBuffers[imageIndex], context.currentFrame);
         context.rtScene.SetMistEnabled(context.graphicsSettings.mistEnabled);
         context.rtScene.SetDustQuality(context.graphicsSettings.dustQuality);
+#if HORDE_RT_FRAME_STAGE_PROBE
+        const bool recordingMotionGpuStages =
+            gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished;
+        auto* activeGpuStageProbe = recordingMotionGpuStages ? &frameStageProbe : nullptr;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        recordingBellwetherGpuStages = gpuTimingRecording && !recordingMotionGpuStages &&
+            context.bellwetherDoorway && context.bellwetherDoorway->ResidentRoundTrip();
+        if (recordingBellwetherGpuStages) activeGpuStageProbe = &frameStageProbe;
+#endif
+#endif
         const bool recorded=detail==DetailFrame::Cutover
             ? context.rtScene.RecordTraceAndCopyWithStaticReplacement(context.rtScene.StaticGeometryGeneration(),
                 retireResourceReferences,&actorOwner,context.commandBuffers[imageIndex],context.swapchainImages[imageIndex],
@@ -4989,7 +5319,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                 ,gpuTimingRecording?&context.stagedPassTimer:nullptr,context.currentFrame
 #endif
 #if HORDE_RT_FRAME_STAGE_PROBE
-                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
+                , activeGpuStageProbe
 #endif
               )
             : context.rtScene.RecordTraceAndCopy(context.commandBuffers[imageIndex],
@@ -5003,7 +5333,7 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
                                                 , gpuTimingRecording ? &context.stagedPassTimer : nullptr, context.currentFrame
 #endif
 #if HORDE_RT_FRAME_STAGE_PROBE
-                                                ,gpuTimingRecording && context.motion && context.motion->armed && !context.motion->finished?&frameStageProbe:nullptr
+                                                , activeGpuStageProbe
 #endif
                                                 );
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
@@ -5151,6 +5481,18 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
             gpuTimingRecording,
             horde::vulkan::raytracing::MakeRtGpuFrameTimerIo(
                 context.gpuFrameTimer));
+#if HORDE_RT_FRAME_STAGE_PROBE && HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        if (recordingBellwetherGpuStages) {
+            horde::telemetry::RtSubmittedFrameIdentity owner{};
+            if (context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner)) {
+                context.bellwetherGpuStageOwners[context.currentFrame] = owner;
+                for (std::size_t i = 0; i < context.frameStageTimers.size(); ++i) {
+                    if (frameStageProbe.recorded[i])
+                        (void)context.frameStageTimers[i].MarkSubmitted(context.currentFrame, owner.submissionSerial);
+                }
+            }
+        }
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         if (context.motion && context.motion->armed && !context.motion->finished)
         {
@@ -5317,6 +5659,29 @@ bool RenderFrame(SwapchainContext& context, bool& rtFramePresented, bool& resour
         (void)context.rtFrameEvidence.AttachPresentation(outcome);
         context.rtFrameEvidence.FinalizeSubmittedFrame(observation);
     }
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+    if (context.bellwetherDoorway || context.bellwetherMeasurementRequested) {
+        horde::telemetry::RtSubmittedFrameIdentity owner{};
+        const auto& state = gGameSimulation.Snapshot();
+        if (!evidenceFrame || acquireResult != VK_SUCCESS || presentResult != VK_SUCCESS ||
+            !context.rtFrameEvidence.TryGetCommittedIdentity(context.currentFrame, owner) ||
+            owner.frame.simulationTick != state.tickIndex) {
+            CancelBellwetherDoorwayMeasurement(context, "no stable RT submission for the staged pose");
+        } else if (context.bellwetherMeasurementRequested) {
+            const auto route = *context.bellwetherMeasurementRequested;
+            context.bellwetherMeasurementRequested.reset();
+            auto& run = context.bellwetherDoorway.emplace();
+            const std::string report = std::string(horde::gameplay::validation::BellwetherMeasurementName(route)) + ".csv";
+            if (!run.Start(state, std::filesystem::path(context.reportDirectory) /
+                    report, presentDone, route))
+                CancelBellwetherDoorwayMeasurement(context, "staffed repeat visit or report unavailable");
+            else
+                __android_log_print(ANDROID_LOG_INFO, kTag, "%s started", BellwetherMeasurementLogTag(route));
+        } else if (!context.bellwetherDoorway->Bind(owner, presentDone, context.rtScene, state)) {
+            CancelBellwetherDoorwayMeasurement(context, "submission sequence or resource generation changed");
+        }
+    }
+#endif
     if (presentResult == VK_ERROR_OUT_OF_DATE_KHR || presentResult == VK_SUBOPTIMAL_KHR ||
         (presentResult == VK_SUCCESS && acquireResult == VK_SUBOPTIMAL_KHR))
     {
@@ -5500,7 +5865,7 @@ GlassGeometryApplyResult ApplyGlassGeometryOnOwner(
     PublishGraphicsApplied(context, true, false);
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -5582,7 +5947,7 @@ bool ApplySceneProfileOnOwner(SwapchainContext& context, const PreviewControls c
     if (vkResetCommandPool(context.device, context.commandPool, 0) != VK_SUCCESS) return false;
     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -5713,6 +6078,9 @@ void SwapchainRenderLoop()
             }
             SuspendCampaignOnOwner(gSwapchainContext);
             CancelActiveInAppBenchmark(gSwapchainContext);
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            CancelBellwetherDoorwayMeasurement(gSwapchainContext, "surface suspended");
+#endif
             ClearPlatformGameplayEvents();
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
             FailAndroidMotion(gSwapchainContext, "Motion interrupted by lifecycle suspension.");
@@ -5744,6 +6112,10 @@ void SwapchainRenderLoop()
         }
         bool sceneTransition = DesiredProfile(gSwapchainContext, previewControls) != gSwapchainContext.sceneProfile ||
             previewControls.resetSerial != gSwapchainContext.previewResetSerial;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+        if (sceneTransition || measurementPaused)
+            CancelBellwetherDoorwayMeasurement(gSwapchainContext, "foreground pause or scene transition");
+#endif
 #if HORDE_RT_ANDROID_MOTION_EVIDENCE
         if (sceneTransition || measurementPaused)
             FailAndroidMotion(gSwapchainContext, "Motion interrupted by foreground pause or scene transition.");
@@ -5777,6 +6149,9 @@ void SwapchainRenderLoop()
              graphicsCommand.lifecycleGeneration == gSwapchainContext.surfaceGeneration))
         {
             auto& context = gSwapchainContext;
+#if HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE
+            CancelBellwetherDoorwayMeasurement(context, "graphics settings changed");
+#endif
             sceneTransition = true;
             if (context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::GraphicsPreview)
             {
@@ -5833,7 +6208,7 @@ void SwapchainRenderLoop()
                     }
                     context.gpuFrameTimer.ResetAfterDeviceIdle();
 #if HORDE_RT_FRAME_STAGE_PROBE
-    for(auto& timer:context.frameStageTimers)timer.ResetAfterDeviceIdle();
+                    context.ResetFrameStageTimingAfterIdle();
 #endif
 #if HORDE_RT_STAGED_PRIMARY_TIMING
                     context.stagedPassTimer.ResetAfterDeviceIdle();
@@ -7161,10 +7536,33 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingState(JNIEnv*, jcla
     return static_cast<jlong>(gCombatTeachingUiState.load(std::memory_order_acquire));
 }
 
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getCombatTeachingCard(JNIEnv*, jclass)
+{
+    return static_cast<jlong>(gCombatTeachingCard.load(std::memory_order_acquire));
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_respondToCombatTeachingCard(
+    JNIEnv*, jclass, jlong token, jboolean skip)
+{
+    if (token <= 0) return JNI_FALSE;
+    std::lock_guard<std::mutex> lock(gInputPublisherMutex);
+    const auto id = static_cast<std::uint64_t>(token);
+    if (gInputPublisherState.paused || id != gCombatTeachingCard.load(std::memory_order_acquire))
+        return JNI_FALSE;
+    if (gInputPublisherState.tutorialCardResponseSequence == UINT64_MAX) return JNI_FALSE;
+    gInputPublisherState.tutorialCardResponse = id |
+        (skip == JNI_TRUE ? horde::gameplay::simulation::kSkipCombatTeachingCard : 0u);
+    ++gInputPublisherState.tutorialCardResponseSequence;
+    PublishInputLocked();
+    return JNI_TRUE;
+}
+
 extern "C" JNIEXPORT jlongArray JNICALL
 Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env, jclass)
 {
-    jlong state[5]{};
+    jlong state[6]{};
     {
         std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
         const auto& snapshot = gChapterDialogueUiSnapshot;
@@ -7173,9 +7571,10 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getChapterDialogueState(JNIEnv* env,
         state[2] = static_cast<jlong>(std::max(0.0f, snapshot.elapsed) * 1000.0f + 0.5f);
         state[3] = static_cast<jlong>(std::max(0.0f, snapshot.duration) * 1000.0f + 0.5f);
         state[4] = snapshot.paused ? 1 : 0;
+        state[5] = horde::gameplay::dialogue::RequiresChapterCaption(snapshot.line) ? 1 : 0;
     }
-    jlongArray result = env->NewLongArray(5);
-    if (result != nullptr) env->SetLongArrayRegion(result, 0, 5, state);
+    jlongArray result = env->NewLongArray(6);
+    if (result != nullptr) env->SetLongArrayRegion(result, 0, 6, state);
     return result;
 }
 
@@ -7200,6 +7599,21 @@ Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveState(JNIEnv* env
     const auto result=env->NewLongArray(static_cast<jsize>(state.size()));
     if(result)env->SetLongArrayRegion(result,0,static_cast<jsize>(state.size()),state.data());
     return result;
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_samfa12_hordelanternrt_ProbeBridge_getLookoutObjectiveText(
+    JNIEnv* env, jclass, jlong surface, jlong world, jint objective)
+{
+    std::lock_guard<std::mutex> lock(gChapterDialogueUiMutex);
+    if (surface<=0 || world<=0 || objective<=0 ||
+        gSurfaceSessions.State(static_cast<std::uint64_t>(surface))!=1 ||
+        gLookoutObjectiveUiState[1]!=surface || gLookoutObjectiveUiState[2]!=world ||
+        gLookoutObjectiveUiState[3]!=objective)
+        return env->NewStringUTF("");
+    using namespace horde::gameplay::campaign;
+    const auto text=PauseObjectiveText(static_cast<PauseObjective>(objective),gLookoutDirections);
+    return env->NewStringUTF(text.c_str());
 }
 
 extern "C" JNIEXPORT jlong JNICALL

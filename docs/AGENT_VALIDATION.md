@@ -134,6 +134,87 @@ same-package relaunch checks, and close owned processes after validation.
 
 For a requested broad candidate gate, `tools/run-foundation-validation.ps1 -Mode Host` runs the foundation's host-side programme; it is not the lightweight portable CI lane. `-Mode Full` includes device work. Inspect current parameters and choose the intended device explicitly rather than trusting a historical default serial. The runner writes evidence beneath ignored `reports/` and labels its staged artefacts as unpublishable/unsigned; its success does not authorise release publication.
 
+### Private Bellwether playtest packages
+
+Build the Windows Debug executable from a clean commit with
+`HORDE_RT_SHIPPING17_CONTENT=ON` and Shipping/High shaders. Pass it to
+`tools/package-bellwether-playtest.ps1` with the hash-pinned Windows 1.7 ZIP,
+the five Windows resident folders and the thirteen base audition WAVs. The
+six follow-on takes can be supplied together as a further private group. It stages
+the current runtime roster and existing flask and revival assets in a ZIP under
+`reports/`. Extract the entire ZIP and open `HordeLanternRT.exe`. The executable
+detects the local playtest marker, validates the packaged overlays, and uses the
+separate `bellwether-playtest/campaign-v1` save profile.
+
+For the packaged Windows campaign continuity check, create an empty
+`reports/horde-campaign-fixtures-<label>` directory in the build's source
+checkout. Pass its absolute path to `horde_rt_campaign_play_session_tests.exe
+--export-route-fixture`. Run the extracted executable with
+`--route-validate-hidden --campaign-test-root <fixture directory>`. Use a second
+fresh fixture and add `--require-rayquery-compute` to check the other hardware
+backend. The fixture seeds the two tomb victories and lantern claim. The replay
+uses the live rope, lantern raise, flask guide, forest route and campaign menus
+to earn the lookout, return to the tomb and reload the lookout saved in that run.
+It checks that Kit's ankle assessment updates the lookout boundary, follows
+the south entrance to the tavern, earns the three-line Talk exchange and reloads
+its autosave. Keep `windows-route-validation.json`,
+`route-frames.csv`, the backend capability report and milestone PNGs together
+with the ZIP receipt. Unseeded New Game evidence, physical-device performance
+and listening checks are separate.
+
+To include the tomb opening, leave the isolated directory free of save
+files. Write only the following line to `manifest.json` as UTF-8, with one
+final LF and no byte-order mark.
+
+```json
+{"evidenceClass":"empty profile for the scripted New Game route"}
+```
+
+Add `--route-from-new-game` to the packaged Windows validation command.
+This mode chooses an empty slot from the native New Game menu, defeats both
+guards and the Keeper with damage enabled, claims the lantern and earns the
+first on-disk checkpoint. It then continues the same route with the health
+left over from combat. The replay uses scripted inputs with tutorials off
+and muted audio. Repeat with a fresh directory for the other RT backend.
+
+For the packaged Windows stress routes, pass the stager's
+`windows-package.json` to the existing measurement launcher.
+
+```powershell
+$receipt = 'reports/<packaged-build>/windows-package.json'
+./tools/measure-chapter-shipping-route.ps1 -Output reports/bellwether-east-pipeline -Configuration Debug -BellwetherPackageReceipt $receipt
+python tools/analyze-chapter-route-measurement.py --bellwether-resident-roundtrip reports/bellwether-east-pipeline
+```
+
+Use a fresh output prefix for each run. Add `-Query` for RayQueryCompute.
+Add `-BellwetherWest` and analyze with `--bellwether-west-roundtrip` for the
+stock-yard route. The launcher verifies the ZIP and executable hashes,
+extracts a fresh settings profile and uses the packaged roster and voices
+with Shipping/High shaders at the regular Windows client size. The
+analyzer checks both returns and reports timings and RT allocations for
+each staffed room visit. The hidden RT results cover GPU and native
+frame-cycle durations. Visible display pacing needs its own capture.
+
+On Android, build `:app:assembleDebug` with `-PhordeBellwetherPlaytest=true` and the
+`hordeBellwetherResidentDir`, `hordeBellwetherVoiceDir`, `hordeFlaskCandidateDir`
+and `hordePrivateRevivalDir` inputs. The full profile uses
+`com.samfa12.hordelanternrt.debug.bellwether.playtest` and opens the ordinary
+campaign menu. Use Shipping/Mobile shaders for cross-platform acceptance.
+The unseeded New Game entry and seeded lookout walkthroughs establish separate
+evidence. Keep these packages and their private inputs in local storage.
+
+For an Android touch walkthrough from a seeded lookout, use the host test
+executable's `--export-lookout-fixture` with a fresh fixture directory. Import
+the exact `slot-1-auto.hrd` under `files/campaign-tests/<unique-name>` in the
+isolated Debug app. Launch with `--es campaign_test_namespace <unique-name>`
+and load the slot from the ordinary menu. The optional
+`--ez horde.debug.overlay true` shows the player's X/Z position and heading.
+With the test namespace and overlay active, `HordeCampaignWalk` in logcat
+mirrors changed poses from the simulation. This lets a touch walkthrough
+verify its route without authoring a forced camera path. Keep the seed hash,
+walkthrough captures and resulting autosave together, and use an unseeded
+entry separately when checking the full campaign.
+
 ## Android device evidence
 
 Use `tools/run-android-showcase-validation.ps1` after meaningful Android renderer or gameplay-route changes when an authorised device is available. `ANDROID_SHOWCASE_AUTOMATION_2026-07-17.md` explains checkpoints/replay; inspect the current runner rather than freezing old checkpoint counts into new instructions. Preserve coverage of the two-enemy encounter where the changed route requires it.

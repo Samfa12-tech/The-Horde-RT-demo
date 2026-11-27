@@ -224,6 +224,99 @@ void RevivalRestoreProfile(const std::shared_ptr<const TriangleSupportSurface>& 
 }
 }
 int main(int argc,char** argv) {
+    using cp::PauseObjective;
+    {
+        using dlg::BellwetherArrivalStage;
+        using bellwether::ArchiveStage;
+        auto boundary=Record(true);
+        boundary.contentRevision=cp::kForestContentRevision;
+        SimulationSnapshot state{};
+        state.developmentRescueJourney=true;
+        state.playerAlive=true;
+        state.rescue.exteriorSide=true;
+        state.chapterCompanion.bellwetherArrival=BellwetherArrivalStage::OnRoad;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArrival &&
+              cp::CurrentPauseObjective(state,std::nullopt)==PauseObjective::None,
+              "the road directions follow Kit's departure from an earned lookout, not an unearned world");
+        state.rescue.equipmentStowed=true;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::None,
+              "the Bellwether path stays hidden while rope traversal owns the player");
+        state.rescue.equipmentStowed=false;
+        state.chapterCompanion.bellwetherArrival=BellwetherArrivalStage::Seated;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArrival,
+              "directions do not promise Talk when the keeper is unavailable");
+        state.tavernKeeper.emplace();
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherHearth,
+              "the first tavern visit points to the hearth before the conversation is earned");
+        boundary.contentRevision=cp::kBellwetherContentRevision;
+        state.chapterDialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherShrine,
+              "finishing Talk advances the page to the shrine");
+        state.waysideArchive.stage=ArchiveStage::Inspected;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherLowerStone,
+              "the inspected shrine still calls for opening the lower stone");
+        state.waysideArchive.stage=ArchiveStage::Open;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherLantern &&
+              std::string_view(cp::PauseObjectiveText(PauseObjective::BellwetherLantern)).find(
+                  "Listen to the lantern")!=std::string_view::npos,
+              "an open shrine with an unheard claim points to the existing Listen action");
+        state.waysideArchive.lanternRevealStarted=true;
+        Check(cp::CurrentPauseObjective(state,boundary)==PauseObjective::BellwetherArchive,
+              "hearing the lantern advances the page to recovering the register");
+    }
+    const auto noServices=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,cp::BellwetherDirections{});
+    auto directions=[] {
+        SimulationSnapshot snapshot{};
+        snapshot.millServiceAvailable=true;
+        snapshot.shorePracticeServiceAvailable=true;
+        return cp::CurrentBellwetherDirections(snapshot);
+    }();
+    const auto opening=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+    for(const auto objective:{PauseObjective::BellwetherArrival,PauseObjective::BellwetherHearth}) {
+        Check(cp::PauseObjectiveText(objective,directions)==cp::PauseObjectiveText(objective),
+              "arrival guidance keeps services hidden until after Talk");
+    }
+    Check(noServices.find("Shore practice:")==std::string::npos &&
+          noServices.find("MILL signs")==std::string::npos &&
+          opening.find("Shore practice: Meet the salvager at the river fork.")!=std::string::npos &&
+          opening.find("For a breathing rig, follow the MILL signs east")!=std::string::npos,
+          "a staffed hub advertises both eastern preparations before the first shrine visit");
+    const auto shoreOnly=cp::PauseObjectiveText(PauseObjective::BellwetherExpeditions,{.shorePracticeAvailable=true});
+    const auto millOnly=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,{.millServiceAvailable=true});
+    Check(shoreOnly.find("MILL signs")==std::string::npos &&
+          millOnly.find("Shore practice:")==std::string::npos &&
+          shoreOnly.find("Meet the salvager")!=std::string::npos && millOnly.find("artificer's workbench")!=std::string::npos,
+          "single-specialist builds advertise the service they can complete");
+    for(const auto& [stage,expected]:std::array{
+            std::pair{bellwether::ShorePracticeStage::FindDryMark,"Follow the causeway to the dry mark"},
+            std::pair{bellwether::ShorePracticeStage::EnterShallows,"From the dry mark, wade to the river rail"},
+            std::pair{bellwether::ShorePracticeStage::Retreat,"Return from the shallows to the dry mark"},
+            std::pair{bellwether::ShorePracticeStage::ReportBack,"Return to the salvager at the river fork"},
+            std::pair{bellwether::ShorePracticeStage::RecoverBreath,"Catch your breath on the dry mark"}}) {
+        directions.shorePracticeStage=stage;
+        const auto text=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+        Check(text.find(expected)!=std::string::npos,"directions follow the current shore-practice stage");
+    }
+    directions.shorePracticeStage=bellwether::ShorePracticeStage::Idle;
+    directions.shorePracticeCompleted=true;
+    const auto completedShore=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+    Check(completedShore.find("Shore practice: Complete. Breath control learned.")!=std::string::npos,
+          "directions report saved shore-practice completion");
+    directions.purse.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+    for(const auto objective:{PauseObjective::BellwetherLowerStone,PauseObjective::BellwetherLantern,PauseObjective::BellwetherArchive,
+                              PauseObjective::BellwetherRegister}) {
+        Check(cp::PauseObjectiveText(objective,directions).find("sell it at the stall west of the square")!=std::string::npos,
+              "carried silver keeps its sale directions through the church objectives");
+    }
+    const cp::BellwetherDirections completedWithoutServices{
+        .ward=cp::AirWardDirections::Learned,.mill=bellwether::MillPreparation::RigTested,.shorePracticeCompleted=true};
+    const auto completed=cp::PauseObjectiveText(PauseObjective::BellwetherExpeditions,completedWithoutServices);
+    Check(completed.find("Air ward learned")!=std::string::npos &&
+          completed.find("Breathing rig passed")!=std::string::npos &&
+          completed.find("Breath control learned")!=std::string::npos &&
+          completed.find("Visit the salvager")==std::string::npos &&
+          cp::PauseObjectiveText(PauseObjective::Lookout,directions)==cp::kLookoutObjectiveText,
+          "earned preparations remain visible without their resident packs and the forest page remains spoiler-free");
     const auto directory=std::filesystem::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest;horde::scene::assets::StaticMeshAsset mesh;std::string error;
     if(!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,error) ||
@@ -488,7 +581,7 @@ int main(int argc,char** argv) {
         auto dated=good;dated.schema=4;dated.savedAtUnixSeconds=1767225600;
         GameSimulation datedGame(ProductionGameSimulationConfig());
         Check(cp::Validate(dated) && Restore(datedGame,dated,terrain),"ordinary dated save restores without gated flask ownership");
-        auto bad=good;bad.schema=6;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
+        auto bad=good;bad.schema=cp::kMillTallySchema+1;reject(bad);bad=good;bad.contentRevision=2;reject(bad);
         bad=good;bad.id=static_cast<cp::CheckpointId>(9);reject(bad);
         bad=good;bad.zone=WorldZoneId::ForestApproach;reject(bad);
         for(int vitality:{0,4,-1}) {bad=good;bad.vitality=vitality;reject(bad);}
@@ -766,7 +859,7 @@ int main(int argc,char** argv) {
             Check(SameSession(original,sim.Snapshot()),"rejected forest record preserves live gameplay");
         };
         auto bad=c;bad.contentRevision=1;reject(bad);
-        bad=c;bad.contentRevision=3;reject(bad);
+        bad=c;bad.contentRevision=4;reject(bad);
         bad=c;bad.zone=WorldZoneId::TombExterior;reject(bad);
         bad=c;bad.firstAscentCompleted=false;reject(bad);
         bad=c;bad.dialogue.proofAccepted=false;reject(bad);

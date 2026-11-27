@@ -23,6 +23,11 @@
 #include "vulkan/raytracing/RtGpuWorkLease.h"
 #include "scene/atmosphere/IndoorDust.h"
 #include "gameplay/effects/EnemyHitParticles.h"
+#include "gameplay/traversal/WaysideArchive.h"
+#include "gameplay/traversal/BellwetherTavernDoor.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
+#include "gameplay/traversal/BellwetherStock.h"
+#include "scene/BellwetherShell.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "scene/ChapterRegionalWater.h"
 #include "scene/ForestDressing.h"
@@ -36,6 +41,7 @@
 #include <optional>
 #include <memory>
 #include <string>
+#include <future>
 #include <string_view>
 #include <vector>
 #include <span>
@@ -139,6 +145,28 @@ struct ChapterActorInspectionPose {
     bool operator==(const ChapterActorInspectionPose&) const=default;
 };
 #endif
+inline constexpr std::size_t kAdditionalChapterActorCapacity = 2;
+class RtIndexedActorGeometry;
+
+struct ChapterResidentActorSource
+{
+    std::uint32_t stableId = 0;
+    std::filesystem::path directory;
+    std::string fileName;
+    std::vector<horde::scene::SkinnedClipBinding> clips;
+    // Optional reservation derived from the authored replacement roster.
+    RtResidentPayloadCapacity replacementCapacity{};
+};
+
+struct ChapterResidentActorPose
+{
+    std::uint32_t stableId = 0;
+    std::array<float, 3> foot{};
+    float yaw = 0;
+    horde::scene::SkinnedClip clip = horde::scene::SkinnedClip::Idle;
+    float time = 0;
+};
+
 struct RtSceneFrameInputs
 {
     // CPU experiment selection only; ignored when its compile gate is OFF.
@@ -154,6 +182,16 @@ struct RtSceneFrameInputs
     bool developmentRescueJourney = false;
     horde::gameplay::traversal::RescueTraversalSnapshot rescue{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    horde::gameplay::bellwether::ArchivePose waysideArchivePose{};
+    float tavernDoorOpening=1.f;
+    bool waysideRegisterRecovered=false;
+    bool millDriveInstalled=false;
+    float millDriveAngleRadians=0.f;
+    float millWaterwheelAngleRadians=0.f;
+    horde::gameplay::bellwether::StockHeadPoses stockHeadPoses{};
+    horde::gameplay::bellwether::PrivyRagState privyRag=
+        horde::gameplay::bellwether::PrivyRagState::Available;
+    std::array<ChapterResidentActorPose, kAdditionalChapterActorCapacity> chapterResidents{};
     float playerSupportWorldY = horde::gameplay::kRouteFloorWorldY;
     horde::gameplay::effects::EnemyHitParticles enemyHitParticles{};
     float playerCrouchDropMetres=0;
@@ -287,7 +325,8 @@ public:
     };
 
     // Owner maxima, not live counts. The explicit forest proof adds two masters.
-    static constexpr std::uint32_t kOrdinaryBlasCount = 23u;
+    static constexpr std::uint32_t kStockHeadBlasCount = 2u;
+    static constexpr std::uint32_t kOrdinaryBlasCount = 28u + kAdditionalChapterActorCapacity + kStockHeadBlasCount;
     static constexpr std::uint32_t kBlasCount = kOrdinaryBlasCount + 2u;
     static constexpr std::uint32_t kCollapseInstanceIndex = 21u;
     static constexpr std::uint32_t kPlayerTorchInstanceIndex = 22u;
@@ -303,6 +342,19 @@ public:
     static constexpr std::uint32_t kHealingFlaskInstanceIndex = 29u;
     // Separate physical pickup, shared immutable metadata/mesh/material/BLAS.
     static constexpr std::uint32_t kHealingFlaskUpgradeInstanceIndex = 30u;
+    static constexpr std::uint32_t kRoadStoneMetadataIndex = 30u;
+    static constexpr std::uint32_t kChapterWindowMetadataIndex = 31u;
+    static constexpr std::uint32_t kFirstResidentMetadataIndex = 32u;
+    static constexpr std::uint32_t kWaysideCoverMetadataIndex = kFirstResidentMetadataIndex + kAdditionalChapterActorCapacity;
+    static constexpr std::uint32_t kWaysideRegisterMetadataIndex = kWaysideCoverMetadataIndex + 1u;
+    static constexpr std::uint32_t kTavernDoorMetadataIndex = kWaysideRegisterMetadataIndex + 1u;
+    static constexpr std::uint32_t kMillDriveMetadataIndex = kTavernDoorMetadataIndex + 1u;
+    static constexpr std::uint32_t kMillWaterwheelMetadataIndex = kMillDriveMetadataIndex + 1u;
+    static constexpr std::uint32_t kPrivyRagMetadataIndex = kMillWaterwheelMetadataIndex + 1u;
+    static constexpr std::uint32_t kFirstStockHeadMetadataIndex = kPrivyRagMetadataIndex + 1u;
+    static constexpr std::uint32_t kMillDrivePrimitiveCount = 1u;
+    static constexpr std::uint32_t kMillWaterwheelPrimitiveOffset = kMillDrivePrimitiveCount;
+    static constexpr std::uint32_t kMillWaterwheelPrimitiveCount = 2u;
     static constexpr std::uint32_t kTlasCount = 1u;
     static constexpr std::uint32_t kOrdinaryTlasInstanceCount = kRtOrdinaryShowcaseInstanceCount;
     // Storage capacity; builds and updates use the separate live count.
@@ -318,13 +370,20 @@ public:
     static_assert(kKeeperMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningMetadataIndex < kRtInstanceMetadataCapacity);
     static_assert(kHealingFlaskMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kRoadStoneMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kChapterWindowMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kMillDriveMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kMillWaterwheelMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kPrivyRagMetadataIndex < kRtInstanceMetadataCapacity);
+    static_assert(kFirstStockHeadMetadataIndex + kStockHeadBlasCount <= kRtInstanceMetadataCapacity);
     static_assert(kAttackWarningInstanceIndex == kKeeperInstanceIndex + 1u);
     static_assert(kHealingFlaskInstanceIndex == kAttackWarningInstanceIndex + 1u);
     static_assert(kHealingFlaskUpgradeInstanceIndex == kHealingFlaskInstanceIndex + 1u);
     static_assert(kOrdinaryTlasInstanceCount == 31u);
     static_assert(kOrdinaryTlasInstanceCount == kHealingFlaskUpgradeInstanceIndex + 1u);
     static_assert(kTlasInstanceCount == kOrdinaryTlasInstanceCount +
-                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u);
+                  horde::gameplay::simulation::kForestTreePlacementContract.size() + 4u + 12u + 6u +
+                  kAdditionalChapterActorCapacity + horde::gameplay::bellwether::kStockHeadKinds.size());
 
     PresentableTinyRtScene() = default;
     ~PresentableTinyRtScene();
@@ -397,6 +456,69 @@ public:
     // Set before Initialise; geometry admission is explicit and development-only.
     void SetDevelopmentSupportFixture(bool enabled) { developmentSupportFixture_ = enabled; }
     void SetDevelopmentRescueJourney(bool enabled) { developmentRescueJourney_=enabled; }
+    bool SetBellwetherFurnitureDetail(horde::scene::BellwetherFurnitureDetail detail) {
+        if(detail==bellwetherFurnitureDetail_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureDetail_=detail;return true;
+    }
+    bool SetBellwetherFurnitureTransitions(bool enabled) {
+        if(enabled==bellwetherFurnitureTransitions_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureTransitions_=enabled;return true;
+    }
+    bool SetBellwetherFurnitureResidency(bool enabled) {
+        if(enabled==bellwetherFurnitureResidency_)return true;
+        if(ready_ || device_!=VK_NULL_HANDLE)return false;
+        bellwetherFurnitureResidency_=enabled;return true;
+    }
+    void RequestPackagedBellwetherFurniture(bool requested) { bellwetherFurniturePackaged_=requested; }
+    bool PackagedBellwetherFurnitureActive() const noexcept { return bellwetherFurnitureWarmStart_; }
+    struct BellwetherFurnitureLifetime {
+        std::uint64_t retirements=0, restorations=0, deferredNearFrames=0, preparationFailures=0;
+        VkDeviceSize retiredAllocationBytes=0, preparationPeakBytes=0;
+    };
+    const BellwetherFurnitureLifetime& BellwetherFurnitureLifetimeEvidence() const noexcept {
+        return bellwetherFurnitureLifetime_;
+    }
+    VkDeviceSize BellwetherNearBlasBytes() const noexcept;
+    VkDeviceSize BellwetherNearGeometryBytes() const noexcept;
+    VkDeviceSize BellwetherNearOwnerBytes() const noexcept {
+        return BellwetherNearBlasBytes()+BellwetherNearGeometryBytes();
+    }
+    bool PrepareBellwetherFurnitureLifetime(const RtSceneFrameInputs&,
+        bool (*retireReferences)(void*,std::string&), void*, std::string&);
+    horde::scene::BellwetherFurnitureDetail ActiveBellwetherFurnitureDetail() const noexcept {
+        return activeBellwetherFurnitureDetail_;
+    }
+#if defined(_DEBUG)
+    bool DebugHasRecordedInstance(std::uint32_t customIndex) const noexcept;
+    std::optional<horde::scene::BellwetherFurnitureDetail> DebugRecordedBellwetherFurnitureDetail() const noexcept;
+#endif
+    bool SetChapterResidentActors(std::span<const ChapterResidentActorSource>, std::string& diagnostic);
+    [[nodiscard]] std::size_t ChapterResidentSourceCount() const { return chapterResidentSources_.size(); }
+    [[nodiscard]] auto ChapterResidentSourceIds() const noexcept {
+        std::array<std::uint32_t, kAdditionalChapterActorCapacity> ids{};
+        for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+            ids[lane] = chapterResidentSources_[lane].stableId;
+        return ids;
+    }
+    // The caller must own the frame boundary and prove all prior sampling complete.
+    // Only the actor's three existing atlas layers are changed.
+    bool ReplaceChapterResidentTextureLayers(std::uint32_t stableId,
+        const std::filesystem::path& directory, bool (*retireReferences)(void*, std::string&),
+        void* user, std::string& diagnostic);
+    bool ReplaceChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    // Import the model and prepare atlas payloads off the frame thread. The job
+    // owns only CPU data. The live lane changes after publication proves completion.
+    [[nodiscard]] std::uint32_t PrefetchedChapterResidentId(std::size_t lane) const noexcept;
+    // A running import retains its lane. Poll its source ID before publication
+    // and retry with the new target after an obsolete import has completed.
+    bool PrefetchChapterResidentActor(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        std::string& diagnostic);
+    enum class ResidentPublication { Pending, Published, Failed };
+    ResidentPublication PublishPrefetchedChapterResidentActor(std::uint32_t activeId, std::uint32_t incomingId,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
     // Candidate source binding only, chosen before resource creation. Empty
     // retains the original runtime asset; no platform selects this normally.
     bool SetPlayerUtilityCandidateAsset(std::string path) {
@@ -621,6 +743,14 @@ public:
     {
         return lastInstanceMasks_;
     }
+    [[nodiscard]] std::uint8_t MillWaterwheelInstanceMask() const noexcept
+    {
+        return ready_ && millWaterwheelBlas_.address != 0u && tlasInstanceCount_ != 0u &&
+            tlasInstanceCount_ <= kTlasInstanceCount
+            ? lastInstanceMasks_[tlasInstanceCount_ - 1u] : 0u;
+    }
+    [[nodiscard]] std::uint8_t SubmittedInstanceMask(std::uint32_t metadataIndex) const noexcept;
+    [[nodiscard]] unsigned SubmittedStockHeadCount() const noexcept;
     bool LastPlayerPrimaryVisible() const { return lastPlayerPrimaryVisible_; }
     std::uint32_t LastPlayerWorldBodyInstanceFlags() const { return lastPlayerWorldBodyInstanceFlags_; }
     const PlayerGripAgreement& RewardLanternGripAgreement() const
@@ -1060,8 +1190,7 @@ private:
     std::shared_ptr<const RtStaticMeshSlot> fullStaticGeometrySource_;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     friend struct PresentableTinyRtSceneRegionPageTestAccess;
-    // Chapter packing retires the legacy glass-fixture registration when Kit
-    // owns its atlas family. Metadata9 is free and outside legacy player10-13.
+    // Chapter packing leaves the lab fixture's metadata slot free for pages.
     static constexpr std::uint32_t kRegionPageTlasSlot=9,kRegionPageMetadataSlot=9;
     std::shared_ptr<const horde::world::streaming::GeometryPayload> regionPageSource_;
     RtRegionGeometryOwner regionPageOwner_;
@@ -1073,7 +1202,10 @@ private:
     bool regionPageVisible_=true,regionRetirementAwaitingFrame_=false;
     RtRegionPreparationRecovery regionPreparationRecovery_;
     std::uint64_t regionPreparationPeakBytes_=0;
-    bool PrepareRegionPageSource(std::string&);
+    bool SplitBellwetherNearPage(horde::world::streaming::GeometryPayload&,std::string&);
+    bool PrepareRegionPageSource(std::unique_ptr<horde::world::streaming::GeometryPayload>,std::string&);
+    bool AdvanceBellwetherNearPage(bool prepare,bool retire,std::uint64_t tick,
+        bool (*retireReferences)(void*,std::string&),void*,std::string&);
     bool CreateInitialRegionPage(std::string&);
     bool ApplyRegionPage(std::array<VkAccelerationStructureInstanceKHR,kTlasInstanceCount>&,
         std::array<RtInstanceMetadata,kRtInstanceMetadataCapacity>&,
@@ -1143,6 +1275,9 @@ private:
         VkDeviceSize allocationSize = 0u;
         VkMemoryPropertyFlags memoryPropertyFlags = 0u;
         std::uint32_t mipLevels = 0u;
+        VkFormat format = VK_FORMAT_UNDEFINED;
+        VkExtent2D extent{};
+        std::uint32_t layers = 0u;
     };
     struct TextureUploadRecovery {
         Buffer staging;
@@ -1204,6 +1339,10 @@ private:
                     std::string& diagnostic) const;
     bool CreateStorageImage(std::string& diagnostic);
     bool CreateTextureArray(const std::string& path, VkFormat format, TextureArray& texture, std::string& diagnostic);
+    struct TextureArrayAddition {
+        std::string path;
+        std::uint32_t layers;
+    };
     bool CreateTexture(const std::string& path,
                        VkFormat format,
                        std::uint32_t width,
@@ -1214,10 +1353,9 @@ private:
                        std::span<const std::uint32_t> sourceLayers = {},
                        VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY,
                        std::span<const RtTextureLayerAlias> sourceAliases = {},
-                       std::span<const std::string> appendedArrayPaths = {},
+                       std::span<const TextureArrayAddition> additions = {},
                        TextureUploadRecovery* recovery = nullptr,
                        RtSceneRecordObservation* observation = nullptr);
-    VkAccelerationStructureGeometryKHR ChapterActorGeometry() const;
     bool SupportsTextureArrayFormat(VkFormat format) const;
     bool CreateMaterialTextures(const std::string& directory, std::string& diagnostic);
     bool CreateEnvironmentTexture(const std::string& productionRoot, std::string& diagnostic);
@@ -1233,6 +1371,10 @@ private:
                                  std::string& diagnostic);
     bool ResolvePreviewPropTransforms(std::string& diagnostic);
     bool BuildPreviewAccelerationStructures(std::string& diagnostic);
+    bool AppendRegisteredStaticGeometries(std::uint32_t instanceCustomIndex,
+        std::vector<VkAccelerationStructureGeometryKHR>&, std::vector<VkAccelerationStructureBuildRangeInfoKHR>&,
+        std::vector<std::uint32_t>& primitiveCounts, std::string& diagnostic,
+        std::optional<std::uint32_t> onePrimitive = {});
     bool BuildProfileAccelerationStructure(
         std::span<const VkAccelerationStructureGeometryKHR> geometries,
         std::span<const VkAccelerationStructureBuildRangeInfoKHR> ranges,
@@ -1248,6 +1390,69 @@ private:
         const RtSceneFrameInputs& frame,
         const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,
         std::string& diagnostic) const;
+    void ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
+        const horde::gameplay::dialogue::CompanionSnapshot& companion) const;
+    void ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
+    void ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR&, bool visible) const;
+    static void ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR&,
+        const horde::gameplay::traversal::HingedYawPose&, std::uint32_t metadataIndex, VkDeviceAddress);
+    static void ApplyRigidPropInstance(VkAccelerationStructureInstanceKHR&,
+        const std::array<float, 12>& worldFromModel, std::uint32_t metadataIndex, VkDeviceAddress);
+    bool ApplyStockHeadInstances(std::span<VkAccelerationStructureInstanceKHR>,
+        const horde::gameplay::bellwether::StockHeadPoses&, std::string&) const;
+    bool ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR&, float angleRadians,
+        std::string& diagnostic) const;
+    bool ApplyPrivyRagInstance(VkAccelerationStructureInstanceKHR&,
+        horde::gameplay::bellwether::PrivyRagState state, std::string& diagnostic) const;
+    // Showcase chapter's unused fixture/legacy arm lane, shared with no other trial.
+    static constexpr std::uint32_t kBellwetherFurnitureLane=9u;
+    bool UsesBellwetherNearPage() const noexcept {
+        return HORDE_RT_REGION_PAGE_PROTOTYPE && bellwetherFurnitureResidency_;
+    }
+    VkDeviceAddress BellwetherFurnitureBlasAddress(std::size_t tier) const noexcept;
+    void ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR&,
+        horde::scene::BellwetherFurnitureDetail) const noexcept;
+    std::uint32_t ChapterTailInstanceCount() const noexcept {
+        return (roadStoneBlas_.address ? 1u : 0u) + (waysideCoverBlas_.address ? 1u : 0u) +
+            (waysideRegisterBlas_.address ? 1u : 0u) + (tavernDoorBlas_.address ? 1u : 0u) +
+            (millDriveBlas_.address ? 1u : 0u) +
+            (millWaterwheelBlas_.address ? 1u : 0u) +
+            (privyRagBlas_.address ? 1u : 0u) +
+            StockHeadInstanceCount() +
+            (chapterActorReady_ && dielectricFixtureBlas_.address ? 1u : 0u) +
+            static_cast<std::uint32_t>(chapterResidentSources_.size());
+    }
+    std::uint32_t StockHeadInstanceCount() const noexcept {
+        return stockHeadBlas_[0].address
+            ? static_cast<std::uint32_t>(horde::gameplay::bellwether::kStockHeadKinds.size()) : 0u;
+    }
+    bool LoadChapterResidents(std::string&);
+    struct ResidentTextureLayout {
+        VkFormat format;
+        std::uint32_t width, height, mipLevels;
+        bool operator==(const ResidentTextureLayout&) const = default;
+    };
+    using ResidentTextureLayouts = std::array<ResidentTextureLayout, 3>;
+    struct ResidentTexturePayload {
+        ResidentTextureLayouts layouts{};
+        std::vector<std::uint8_t> pixels;
+        std::array<std::array<VkDeviceSize, 16>, 3> mipOffsets{};
+    };
+    [[nodiscard]] ResidentTextureLayouts ChapterResidentTextureLayouts() const noexcept;
+    static bool PrepareChapterResidentTexturePayload(const ResidentTextureLayouts&,
+        const std::filesystem::path& activeDirectory, const std::filesystem::path& incomingDirectory,
+        ResidentTexturePayload&, std::string& diagnostic);
+    bool PublishChapterResidentTexturePayload(std::uint32_t activeId, const std::filesystem::path& directory,
+        const ResidentTexturePayload* prepared, bool (*retireReferences)(void*, std::string&),
+        void* user, std::string& diagnostic);
+    struct ChapterResidentImport;
+    bool CommitChapterResidentReplacement(std::uint32_t activeId, ChapterResidentActorSource replacement,
+        ChapterResidentImport* imported,
+        bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    bool RetireReplacedChapterResidents(bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic);
+    bool BuildChapterResidentStructures(std::string&);
+    bool PrepareChapterResidents(const RtSceneFrameInputs&, std::span<VkAccelerationStructureInstanceKHR>,
+        std::span<RtIndexedActorGeometry>, std::string&, RtSceneRecordObservation*);
     const Buffer& VertexBufferForRole(RtGeometryRole role) const;
     bool BuildAccelerationStructures(std::string& diagnostic);
     bool CreateScratchBuffer(VkDeviceSize usableSize, Buffer& out,
@@ -1289,8 +1494,6 @@ private:
                                  Buffer& out,
                                  std::array<VkStridedDeviceAddressRegionKHR, 4u>& regions,
                                  std::string& diagnostic);
-    bool PackPlayerWorldBodyPoseUpload(std::string& diagnostic,
-                                      RtSceneRecordObservation* observation = nullptr);
     bool UpdateDynamicInstances(VkCommandBuffer commandBuffer,
                                 const RtSceneFrameInputs& frame,
                                 std::string& diagnostic,
@@ -1334,7 +1537,7 @@ private:
     TextureArray lichEmissive_;
     KeeperTextureLifetimeEvidence keeperTextureLifetime_{};
     std::array<TextureArray,2> keeperTextureRestoreQuarantine_{};
-    TextureUploadRecovery keeperTextureUploadRecovery_{};
+    TextureUploadRecovery textureUploadRecovery_{};
     std::string keeperTextureDirectory_;
     TextureArray staticBaseColor_;
     TextureArray staticNormal_;
@@ -1387,6 +1590,26 @@ private:
     AccelerationStructure waterDropletBlas_;
     AccelerationStructure attackWarningRingBlas_;
     AccelerationStructure healingFlaskBlas_;
+    AccelerationStructure roadStoneBlas_;
+    AccelerationStructure waysideCoverBlas_;
+    AccelerationStructure waysideRegisterBlas_;
+    AccelerationStructure tavernDoorBlas_;
+    AccelerationStructure millDriveBlas_;
+    AccelerationStructure millWaterwheelBlas_;
+    AccelerationStructure privyRagBlas_;
+    std::array<AccelerationStructure, kStockHeadBlasCount> stockHeadBlas_{};
+    std::array<AccelerationStructure,horde::scene::kBellwetherFurnitureTriangles.size()> bellwetherFurnitureBlas_{};
+    horde::scene::assets::StaticMeshAsset bellwetherFurnitureAsset_;
+    horde::scene::BellwetherFurnitureDetail activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
+    bool bellwetherFurnitureTransitions_=false;
+    bool bellwetherFurnitureResidency_=false;
+    bool bellwetherFurniturePackaged_=false;
+    bool bellwetherFurnitureWarmStart_=false;
+    BellwetherFurnitureLifetime bellwetherFurnitureLifetime_{};
+    AccelerationStructure bellwetherNearCandidate_{};
+    Buffer bellwetherNearBuildScratch_{};
+    RtGpuWorkLease bellwetherNearBuild_{};
+    std::uint64_t bellwetherNearRetryTick_=0;
     Buffer waterDropletBlasUpdateScratch_;
     AccelerationStructure playerBodyBlas_;
     AccelerationStructure playerLimbBlas_;
@@ -1401,6 +1624,7 @@ private:
     bool developmentWorldRoute_ = false;
     bool stagedWorldPreparation_ = false;
     bool developmentRescueJourney_ = false;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Near;
     std::string playerUtilityCandidateAsset_;
     bool jointPropPresentationActive_ = false;
     bool regionalWaterDiagnosticEnabled_ = true;
@@ -1478,6 +1702,35 @@ private:
     VkDeviceSize scratchAddressAlignment_ = 0u;
     CharacterRenderSlot characterSlot_;
     horde::scene::assets::SkinnedPbrActor chapterActor_;
+    struct ChapterResidentImport {
+        horde::scene::assets::SkinnedPbrActor actor;
+        ResidentTexturePayload textures;
+        std::string diagnostic;
+        bool ready = false;
+    };
+    struct ChapterResidentPrefetch {
+        ChapterResidentActorSource source;
+        std::future<ChapterResidentImport> import;
+    };
+    struct ChapterResidentActor {
+        horde::scene::assets::SkinnedPbrActor actor;
+        ChapterResidentPrefetch prefetch;
+        AccelerationStructure blas;
+        Buffer scratch;
+        AccelerationStructure retiredBlas;
+        AccelerationStructure replacementBlas;
+        Buffer replacementScratch;
+        RtGpuWorkLease replacementWork;
+        std::array<RtResidentPayloadRange, 2> replacementRanges{};
+        std::size_t nextReplacementRange = 0;
+        horde::scene::SkinnedClip uploadedClip = horde::scene::SkinnedClip::Idle;
+        float uploadedTime = -1;
+        bool hasPbrMaps = false;
+        bool needsRefit = false;
+        bool refitRecorded = false;
+    };
+    std::vector<ChapterResidentActorSource> chapterResidentSources_;
+    std::array<ChapterResidentActor, kAdditionalChapterActorCapacity> chapterResidents_{};
 #if defined(_DEBUG)
     std::unique_ptr<horde::scene::assets::SkinnedPbrActor> chapterInspectionActor_;
     std::optional<ChapterActorInspectionPose> chapterInspectionLast_;
@@ -1510,8 +1763,6 @@ private:
     horde::scene::assets::StaticMeshAsset productionPlayerAsset_;
     horde::scene::assets::StaticMeshAsset viewmodelAsset_;
     horde::scene::SkinnedMeshAsset viewmodelSkin_;
-    std::vector<horde::scene::TexturedSkinnedRtVertex> viewmodelPoseVertices_;
-    std::vector<horde::scene::SkinnedPbrTangent> viewmodelPoseTangents_;
     std::vector<horde::scene::assets::StaticRtVertex> viewmodelUpload_;
     bool viewmodelAvailable_ = false;
     bool playerBodyRemainderAvailable_ = false;
@@ -1529,6 +1780,14 @@ private:
     horde::scene::assets::StaticMeshAsset waterDropletAsset_;
     horde::scene::assets::StaticMeshAsset attackWarningRingAsset_;
     horde::scene::assets::StaticMeshAsset healingFlaskAsset_;
+    horde::scene::assets::StaticMeshAsset roadStoneAsset_;
+    horde::scene::assets::StaticMeshAsset waysideCoverAsset_;
+    horde::scene::assets::StaticMeshAsset waysideRegisterAsset_;
+    horde::scene::assets::StaticMeshAsset tavernDoorAsset_;
+    horde::scene::assets::StaticMeshAsset millDriveAsset_;
+    horde::scene::assets::StaticMeshAsset millWaterwheelAsset_;
+    horde::scene::assets::StaticMeshAsset privyRagAsset_;
+    horde::scene::assets::StaticMeshAsset stockHeadAsset_;
     std::optional<horde::gameplay::healing::FlaskUpgradeSite> healingFlaskUpgradeSite_;
     bool waterDropletGeometryVisible_ = false;
     std::vector<horde::scene::assets::StaticRtVertex> skinnedPlayerUpload_;

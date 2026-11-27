@@ -13,15 +13,17 @@ struct WaterContactSnapshot {
     bool inStream=false,wetGround=false;
     std::uint64_t stepCount=0,entryCount=0,sprayCount=0,droppedEmissions=0;
 };
-struct WaterContactResult { bool wetStep=false,streamEntry=false; float intensity=0; };
+enum class WaterContactDomain { Tomb, RegionalExterior };
+struct WaterContactResult { bool wetStep=false,streamEntry=false; float intensity=0,sourceY=0; };
 class WaterContact {
 public:
-    WaterContactResult Step(float dt,float x,float y,float z,bool grounded,bool step,float speed,float width,bool paused=false);
+    WaterContactResult Step(float dt,float x,float y,float z,bool grounded,bool step,float speed,float width,
+                            bool paused=false,WaterContactDomain domain=WaterContactDomain::Tomb);
     void Reset() { state_={};sprayClock_=0;serial_=0; }
     const WaterContactSnapshot& Snapshot() const { return state_; }
 private:
     void EmitDrops(float x,float y,float z,std::size_t count,float speed);
-    void Ripple(float x,float z,float strength);
+    void Ripple(float x,float y,float z,float strength);
     WaterContactSnapshot state_{}; float sprayClock_=0;std::uint32_t serial_=0;
 };
 }

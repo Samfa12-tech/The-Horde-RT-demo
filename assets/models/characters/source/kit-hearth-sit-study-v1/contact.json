@@ -1,0 +1,1261 @@
+{
+  "kitSourceSha256": "47e249840ed9dd438da386137257050a5bd463e7fe54bf94873e1fd21715835e",
+  "tavernMasterSha256": "847aa5f8036d994727b0763d6e2a9dfb75fc91f3e722d08c6c1b02ff20db59f4",
+  "furnitureRuntimeSha256": "a5400dd34e4a19a2a54fdee6aa99f78364e0ef594c75e019b70e905f976442f1",
+  "chairSeat": [
+    82.0,
+    -8.21955078125,
+    107.3
+  ],
+  "fps": 60,
+  "finalFrame": 83,
+  "seatedClearanceMetres": 0.004000663757324219,
+  "hipDropMetres": 0.26979512786865234,
+  "samples": [
+    {
+      "frame": 1,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009917449951171164,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 0.0
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 2,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009917449951171164,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 0.0
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 3,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009917449951171164,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 0.0
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 4,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009917449951171164,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 0.0
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 5,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009926986694335227,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0021027755737303977,
+          "maxTravelMetres": 0.0
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 6,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.000993652343749929,
+          "maxTravelMetres": 0.0
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 7.62939453125e-06
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 7,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009965133666991477,
+          "maxTravelMetres": 1.52587890625e-05
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002103729248046804,
+          "maxTravelMetres": 7.62939453125e-06
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 8,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0009984207153319602,
+          "maxTravelMetres": 1.52587890625e-05
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00210468292236321,
+          "maxTravelMetres": 1.52587890625e-05
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 9,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0010031890869139914,
+          "maxTravelMetres": 3.0517578125e-05
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0021056365966796164,
+          "maxTravelMetres": 1.52587890625e-05
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 10,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.001024169921874929,
+          "maxTravelMetres": 8.426941694021043e-05
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002118988037109304,
+          "maxTravelMetres": 6.151014517439689e-05
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 11,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0010918807983397727,
+          "maxTravelMetres": 0.00026702880859375
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0021676254272460227,
+          "maxTravelMetres": 0.0002442598051999225
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 12,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0012005996704100852,
+          "maxTravelMetres": 0.00054931640625
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002248687744140554,
+          "maxTravelMetres": 0.0005421703492565878
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 13,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0013465118408202414,
+          "maxTravelMetres": 0.00092315673828125
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00231830596923821,
+          "maxTravelMetres": 0.0009315675051003473
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 14,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.001523895263671804,
+          "maxTravelMetres": 0.00136566162109375
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002336425781249929,
+          "maxTravelMetres": 0.0013895764590271579
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 15,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.001722259521484304,
+          "maxTravelMetres": 0.00185394287109375
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023621749877928977,
+          "maxTravelMetres": 0.001886004228723011
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 16,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.001874847412109304,
+          "maxTravelMetres": 0.00237274169921875
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002393646240234304,
+          "maxTravelMetres": 0.002405305021994753
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 17,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002039833068847585,
+          "maxTravelMetres": 0.002914438697038888
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00243274688720696,
+          "maxTravelMetres": 0.0029474751579371856
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 18,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0022134017944335227,
+          "maxTravelMetres": 0.003463778726691978
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002477569580078054,
+          "maxTravelMetres": 0.0034896453601629086
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 19,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00239459991455071,
+          "maxTravelMetres": 0.0040131775581786966
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002528114318847585,
+          "maxTravelMetres": 0.004032140423239662
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 20,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002584381103515554,
+          "maxTravelMetres": 0.004570166532516715
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002584381103515554,
+          "maxTravelMetres": 0.004574310365748101
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 21,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00277606964111321,
+          "maxTravelMetres": 0.005096641125216093
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002645416259765554,
+          "maxTravelMetres": 0.005101235921448772
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 22,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002970619201660085,
+          "maxTravelMetres": 0.0056308239681997704
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002711219787597585,
+          "maxTravelMetres": 0.005613254115013206
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 23,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003145141601562429,
+          "maxTravelMetres": 0.0061346072787107145
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0027817916870116477,
+          "maxTravelMetres": 0.00610969230920535
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 24,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003126068115234304,
+          "maxTravelMetres": 0.0066306856747827625
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002855224609374929,
+          "maxTravelMetres": 0.0065988573479596685
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 25,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003106994628906179,
+          "maxTravelMetres": 0.007104015170466049
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0029296112060546164,
+          "maxTravelMetres": 0.007057548720029145
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 26,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030907821655272727,
+          "maxTravelMetres": 0.007546863485311724
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003007812499999929,
+          "maxTravelMetres": 0.007500641647597651
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 27,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003076477050781179,
+          "maxTravelMetres": 0.007959564895755344
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003085060119628835,
+          "maxTravelMetres": 0.00791325273070844
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 28,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030631256103514914,
+          "maxTravelMetres": 0.008341664025167226
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0031623077392577414,
+          "maxTravelMetres": 0.008303378904824736
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 29,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030516815185546164,
+          "maxTravelMetres": 0.00870093562600699
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0032395553588866477,
+          "maxTravelMetres": 0.00867027569749425
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 30,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003042144775390554,
+          "maxTravelMetres": 0.009022603388624942
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0033110809326171164,
+          "maxTravelMetres": 0.00900631201166476
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 31,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030335617065428977,
+          "maxTravelMetres": 0.00929076704366736
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0033806991577147727,
+          "maxTravelMetres": 0.009304633909915112
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 32,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030259323120116477,
+          "maxTravelMetres": 0.009536444087107274
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003419799804687429,
+          "maxTravelMetres": 0.00957248551163445
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 33,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00302021026611321,
+          "maxTravelMetres": 0.009729234125531755
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003423614501953054,
+          "maxTravelMetres": 0.009809470097859214
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 34,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030144882202147727,
+          "maxTravelMetres": 0.009876884036457102
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034264755249022727,
+          "maxTravelMetres": 0.010008361182891555
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 35,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030106735229491477,
+          "maxTravelMetres": 0.009979119722900328
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034293365478514914,
+          "maxTravelMetres": 0.010161139155050899
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 36,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030068588256835227,
+          "maxTravelMetres": 0.0100288238757436
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00343219757080071,
+          "maxTravelMetres": 0.010283846513522016
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 37,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00300495147705071,
+          "maxTravelMetres": 0.01002620301075537
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034331512451171164,
+          "maxTravelMetres": 0.010360439673218182
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 38,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030030441284178977,
+          "maxTravelMetres": 0.009978527661374342
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034341049194335227,
+          "maxTravelMetres": 0.010398531689421479
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 39,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030030441284178977,
+          "maxTravelMetres": 0.009872006107717385
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034341049194335227,
+          "maxTravelMetres": 0.010390913253923217
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 40,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0030030441284178977,
+          "maxTravelMetres": 0.009720965430568496
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034331512451171164,
+          "maxTravelMetres": 0.01034520298013733
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 41,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00300495147705071,
+          "maxTravelMetres": 0.009510431231906778
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003431243896484304,
+          "maxTravelMetres": 0.01025337263262861
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 42,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003008766174316335,
+          "maxTravelMetres": 0.009265320918045175
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003428382873535085,
+          "maxTravelMetres": 0.010123450474510704
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 43,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00301258087158196,
+          "maxTravelMetres": 0.00895428659753601
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034255218505858664,
+          "maxTravelMetres": 0.009947817707901044
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 44,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003019256591796804,
+          "maxTravelMetres": 0.008616910551511014
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034217071533202414,
+          "maxTravelMetres": 0.009741302838764399
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 45,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00302783966064446,
+          "maxTravelMetres": 0.008230366489859612
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0034178924560546164,
+          "maxTravelMetres": 0.00949669631280431
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 46,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.003038330078124929,
+          "maxTravelMetres": 0.007821350002396728
+        },
+        "Right": {
+          "minimumHeightMetres": 0.003362579345703054,
+          "maxTravelMetres": 0.009213996748829546
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 47,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00305072784423821,
+          "maxTravelMetres": 0.00737957696809685
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0032929611206053977,
+          "maxTravelMetres": 0.00890042039959573
+        }
+      },
+      "sampledSeatClearanceMetres": null
+    },
+    {
+      "frame": 48,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002984924316406179,
+          "maxTravelMetres": 0.006915721054558534
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0032204818725585227,
+          "maxTravelMetres": 0.008564388716400043
+        }
+      },
+      "sampledSeatClearanceMetres": 0.24625015258789062
+    },
+    {
+      "frame": 49,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002741737365722585,
+          "maxTravelMetres": 0.006444255604931889
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0031470489501952414,
+          "maxTravelMetres": 0.00820510079794559
+        }
+      },
+      "sampledSeatClearanceMetres": 0.2093667984008789
+    },
+    {
+      "frame": 50,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0024995040893553977,
+          "maxTravelMetres": 0.0059667767479115365
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00307361602783196,
+          "maxTravelMetres": 0.007830576547529411
+        }
+      },
+      "sampledSeatClearanceMetres": 0.18465709686279297
+    },
+    {
+      "frame": 51,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.002261085510253835,
+          "maxTravelMetres": 0.005497745087236371
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0030020904541014914,
+          "maxTravelMetres": 0.0074331957973155635
+        }
+      },
+      "sampledSeatClearanceMetres": 0.15211868286132812
+    },
+    {
+      "frame": 52,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0020293426513671164,
+          "maxTravelMetres": 0.00503499578526561
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002931518554687429,
+          "maxTravelMetres": 0.007036208847926924
+        }
+      },
+      "sampledSeatClearanceMetres": 0.13534259796142578
+    },
+    {
+      "frame": 53,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0018071365356444602,
+          "maxTravelMetres": 0.004608912121435723
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0028657150268553977,
+          "maxTravelMetres": 0.0066235888261374715
+        }
+      },
+      "sampledSeatClearanceMetres": 0.12895679473876953
+    },
+    {
+      "frame": 54,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0015954208374022727,
+          "maxTravelMetres": 0.004227490124559091
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0028037261962889914,
+          "maxTravelMetres": 0.00621858839323453
+        }
+      },
+      "sampledSeatClearanceMetres": 0.10763931274414062
+    },
+    {
+      "frame": 55,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0013970565795897727,
+          "maxTravelMetres": 0.003895102927663822
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00274555206298821,
+          "maxTravelMetres": 0.005813588620475097
+        }
+      },
+      "sampledSeatClearanceMetres": 0.0775003433227539
+    },
+    {
+      "frame": 56,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0012101364135741477,
+          "maxTravelMetres": 0.0036316639227877367
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00269214630126946,
+          "maxTravelMetres": 0.005423828813211454
+        }
+      },
+      "sampledSeatClearanceMetres": 0.07210636138916016
+    },
+    {
+      "frame": 57,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0010375213623046164,
+          "maxTravelMetres": 0.0034391310057387808
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0026444625854491477,
+          "maxTravelMetres": 0.005034458187846783
+        }
+      },
+      "sampledSeatClearanceMetres": 0.06064796447753906
+    },
+    {
+      "frame": 58,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0008801651000975852,
+          "maxTravelMetres": 0.0033342898211597524
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0026015472412108664,
+          "maxTravelMetres": 0.0046603299529836524
+        }
+      },
+      "sampledSeatClearanceMetres": 0.0557861328125
+    },
+    {
+      "frame": 59,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0007352066040038352,
+          "maxTravelMetres": 0.0033026819709983278
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0025634002685546164,
+          "maxTravelMetres": 0.004309061498836197
+        }
+      },
+      "sampledSeatClearanceMetres": 0.04313850402832031
+    },
+    {
+      "frame": 60,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0006045532226561789,
+          "maxTravelMetres": 0.003328322817739535
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002530975341796804,
+          "maxTravelMetres": 0.003980650762396604
+        }
+      },
+      "sampledSeatClearanceMetres": 0.038928985595703125
+    },
+    {
+      "frame": 61,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.0004567337036132102,
+          "maxTravelMetres": 0.003421373034374058
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00250141143798821,
+          "maxTravelMetres": 0.0036750960552587243
+        }
+      },
+      "sampledSeatClearanceMetres": 0.03503990173339844
+    },
+    {
+      "frame": 62,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00031082153320305395,
+          "maxTravelMetres": 0.0035412391733006744
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0024766159057616477,
+          "maxTravelMetres": 0.003384778110791492
+        }
+      },
+      "sampledSeatClearanceMetres": 0.03148078918457031
+    },
+    {
+      "frame": 63,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 0.00018302917480461645,
+          "maxTravelMetres": 0.0036823745142799675
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00245563507080071,
+          "maxTravelMetres": 0.0031329697815614334
+        }
+      },
+      "sampledSeatClearanceMetres": 0.01577472686767578
+    },
+    {
+      "frame": 64,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": 7.14492797850852e-05,
+          "maxTravelMetres": 0.0038363794210127646
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0024375152587889914,
+          "maxTravelMetres": 0.0029040245769942808
+        }
+      },
+      "sampledSeatClearanceMetres": 0.013001441955566406
+    },
+    {
+      "frame": 65,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -2.4871826171946054e-05,
+          "maxTravelMetres": 0.003982755867299895
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0024232101440428977,
+          "maxTravelMetres": 0.0027055536981355445
+        }
+      },
+      "sampledSeatClearanceMetres": 0.010580062866210938
+    },
+    {
+      "frame": 66,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0001040267944336648,
+          "maxTravelMetres": 0.004109532129344119
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0024117660522460227,
+          "maxTravelMetres": 0.0025299352959524063
+        }
+      },
+      "sampledSeatClearanceMetres": 0.008519172668457031
+    },
+    {
+      "frame": 67,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.00016792297363288355,
+          "maxTravelMetres": 0.004234698853741781
+        },
+        "Right": {
+          "minimumHeightMetres": 0.00240222930908196,
+          "maxTravelMetres": 0.002392870534817309
+        }
+      },
+      "sampledSeatClearanceMetres": 0.006829261779785156
+    },
+    {
+      "frame": 68,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002165603637696023,
+          "maxTravelMetres": 0.004323228573222985
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023955535888671164,
+          "maxTravelMetres": 0.0022857900294897303
+        }
+      },
+      "sampledSeatClearanceMetres": 0.0055217742919921875
+    },
+    {
+      "frame": 69,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002489852905274148,
+          "maxTravelMetres": 0.0043860061394498575
+        },
+        "Right": {
+          "minimumHeightMetres": 0.002390785217285085,
+          "maxTravelMetres": 0.0022172679694643068
+        }
+      },
+      "sampledSeatClearanceMetres": 0.0046100616455078125
+    },
+    {
+      "frame": 70,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.00026901245117194605,
+          "maxTravelMetres": 0.004421791982798181
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023888778686522727,
+          "maxTravelMetres": 0.0021715915970150533
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004103660583496094
+    },
+    {
+      "frame": 71,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 72,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 73,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 74,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 75,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 76,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 77,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 78,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 79,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 80,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 81,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 82,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    },
+    {
+      "frame": 83,
+      "maxLegTargetErrorMetres": 0,
+      "sole": {
+        "Left": {
+          "minimumHeightMetres": -0.0002718734741211648,
+          "maxTravelMetres": 0.004432152932011472
+        },
+        "Right": {
+          "minimumHeightMetres": 0.0023879241943358664,
+          "maxTravelMetres": 0.002163481600807979
+        }
+      },
+      "sampledSeatClearanceMetres": 0.004000663757324219
+    }
+  ]
+}

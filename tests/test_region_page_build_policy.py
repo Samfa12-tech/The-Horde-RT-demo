@@ -1,11 +1,13 @@
 """Exercise experimental CMake admission without Vulkan or an Android device."""
 import pathlib
+import json
 import subprocess
 import sys
 import tempfile
 
 cmake = sys.argv[1]
 repo = pathlib.Path(__file__).resolve().parents[1]
+instance_capacity = json.loads((repo / "src/vulkan/raytracing/RtSceneAbi.def").read_text())["capacities"]["instanceMetadata"]
 with tempfile.TemporaryDirectory(prefix="horde-region-policy-") as temporary:
     base = pathlib.Path(temporary)
     source = base / "fixture"
@@ -38,7 +40,7 @@ message(STATUS "admitted-definitions=${{defs}}")
         (headers / name).write_text("// fixture presence only; native preflight tests validate real catalogs\n")
     abi = private / "shaders/raytracing/include/rt_scene_abi.generated.glsl"
     abi.parent.mkdir(parents=True)
-    abi.write_text("uvec4 pages[8];\n")
+    abi.write_text(f"uvec4 pages[8];\nRtInstanceMetadata values[{instance_capacity}];\n")
     def case(name, args, success, witness):
         result = subprocess.run([cmake, "-S", str(source), "-B", str(base / name), *args],
             capture_output=True, text=True, timeout=20)
@@ -54,9 +56,9 @@ message(STATUS "admitted-definitions=${{defs}}")
     case("android-no-checkpoints", [root, "-DANDROID=ON", "-DCMAKE_BUILD_TYPE=Debug"],
         False, "requires Debug checkpoint-enabled builds")
     case("relative", ["-DHORDE_RT_REGION_PAGE_PROTOTYPE_ROOT=relative"], False, "absolute private root")
-    abi.write_text("uvec4 pages[16];\n")
+    abi.write_text(f"uvec4 pages[16];\nRtInstanceMetadata values[{instance_capacity}];\n")
     case("wrong-abi", [root], False, "admitted region address table")
-    abi.write_text("uvec4 pages[8];\n")
+    abi.write_text(f"uvec4 pages[8];\nRtInstanceMetadata values[{instance_capacity}];\n")
     (headers / "RtRayQueryVariantCatalog.generated.h").unlink()
     case("missing-compute", [root], False, "missing RtRayQueryVariantCatalog.generated.h")
 print("Production isolation and private Windows/Android build admission:8/8 passed; no device claim.")

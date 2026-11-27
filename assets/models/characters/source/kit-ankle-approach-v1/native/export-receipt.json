@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "sourceBlendSha256": "9e19eb14e08c3d1527e0eba15d88971513b56b6b7706749dacb89bce74f27330",
+  "baseGlbSha256": "799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d",
+  "outputGlbSha256": "f91851d7dba80d66294551f997c5b2b8a0d48de2632ba692f7dcab484b23eca4",
+  "outputBytes": 2545820,
+  "originalBinaryPrefixBytes": 2204812,
+  "clips": [
+    {
+      "name": "Kit|ankle_assess",
+      "frames": 97
+    },
+    {
+      "name": "Kit|protective_walk",
+      "frames": 53
+    }
+  ],
+  "fps": 60,
+  "jointCount": 24,
+  "calibrationJointOriginMaxErrorM": 1.0076945375541727e-05,
+  "idleGeometryMaxErrorM": 1.4657627493337796e-05,
+  "roadFitBlendSha256": "8251db5570375684e66f36ef7e563c7e3431bf35bb65c2bd8ba5320f41e35500"
+}

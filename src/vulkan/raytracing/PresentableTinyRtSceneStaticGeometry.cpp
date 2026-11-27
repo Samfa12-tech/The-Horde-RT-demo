@@ -321,7 +321,7 @@ void PresentableTinyRtScene::ApplySharedForestRetentionProof(
     constexpr std::size_t forestBegin=kOrdinaryTlasInstanceCount;
     constexpr std::size_t forestEnd=forestBegin+64u;
     for(std::size_t i=forestBegin;i<forestEnd && i<instances.size();++i)instances[i].mask=1u;
-    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd || !ready_ ||
+    if(instances.size()<forestEnd || tlasInstanceCount_!=forestEnd+ChapterTailInstanceCount() || !ready_ ||
        !ForestRetentionIdentityMatches() || !ordinaryStaticFacesVerified_ ||
        !StaticGeometryHasCompleteContributors() || ordinaryStaticReduced_ || ordinaryStaticOmissions_ || preparedStaticGeometry_ ||
        !tlasInstanceDefinitionsValid_ || tlasPendingDefinitionsValid_ ||
@@ -371,6 +371,8 @@ bool PresentableTinyRtScene::AdvanceOrdinaryStaticDetail(
     // Current input must force full restoration before any new presentation.
     jointPropPresentationActive_=frame.attackWarningRingVisible || frame.healingFlaskVisible || frame.healingFlaskUpgradeVisible || frame.playerUtilityHand.has_value();
     decision=StaticDetailFrame::Render;
+    // Both Bellwether paths pin the shared geometry behind queued near preparation.
+    if(bellwetherFurnitureResidency_){diagnostic.clear();return true;}
 #if defined(_DEBUG)
     if(forestRouteProofMode_!=ForestRouteProofMode::Disabled){diagnostic.clear();return true;}
 #endif
@@ -488,10 +490,54 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         diagnostic="Forest route proof retains every contributor; filtered packing is not admitted.";return false;
     }
 #endif
-    horde::scene::assets::StaticMeshAsset regionSelectedWorld;
+    using horde::scene::assets::StaticMeshAsset;
+    StaticMeshAsset regionSelectedWorld;
     if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions &&
        !horde::scene::assets::SelectStaticTriangleRegions(collapseStaticAsset_,retainedTriangleRegions,
             regionSelectedWorld,diagnostic))return false;
+    const auto* world = retainedTriangleRegions==horde::scene::assets::kAllStaticTriangleRegions ?
+        &collapseStaticAsset_ : &regionSelectedWorld;
+    const auto* furniture = &bellwetherFurnitureAsset_;
+    const StaticMeshAsset* furnitureOwner = furniture;
+    StaticMeshAsset worldWithFurniture;
+    std::uint32_t furnitureOffset = 0;
+    if (bellwetherFurnitureWarmStart_) {
+        // The authored tiers use the existing world timber. Keep their own
+        // BLAS ranges and instance identity while sharing that source and row.
+        if (furniture->materials.size() != 1u) {
+            diagnostic = "Bellwether tiers must use one authored timber finish.";
+            return false;
+        }
+        const auto timber = std::find_if(world->materials.begin(), world->materials.end(),
+            [&](const auto& material) { return material.name == furniture->materials.front().name; });
+        if (timber == world->materials.end() ||
+            world->vertices.size() > UINT32_MAX - furniture->vertices.size() ||
+            world->indices.size() > UINT32_MAX - furniture->indices.size() ||
+            world->nodeTransforms.size() > UINT32_MAX - furniture->nodeTransforms.size() ||
+            (!retainedWorldFamilies.empty() && retainedWorldFamilies.back() >= world->primitives.size())) {
+            diagnostic = "Bellwether tiers require bounded geometry and the existing world timber.";
+            return false;
+        }
+        worldWithFurniture = *world;
+        furnitureOffset = static_cast<std::uint32_t>(world->primitives.size());
+        const auto vertexOffset = static_cast<std::uint32_t>(world->vertices.size());
+        const auto indexOffset = static_cast<std::uint32_t>(world->indices.size());
+        const auto transformOffset = static_cast<std::uint32_t>(world->nodeTransforms.size());
+        const auto materialIndex = static_cast<std::uint32_t>(timber - world->materials.begin());
+        for (auto primitive : furniture->primitives) {
+            primitive.vertexOffset += vertexOffset;
+            primitive.indexOffset += indexOffset;
+            primitive.nodeTransformIndex += transformOffset;
+            primitive.materialIndex = materialIndex;
+            worldWithFurniture.primitives.push_back(primitive);
+        }
+        worldWithFurniture.vertices.insert(worldWithFurniture.vertices.end(), furniture->vertices.begin(), furniture->vertices.end());
+        worldWithFurniture.indices.insert(worldWithFurniture.indices.end(), furniture->indices.begin(), furniture->indices.end());
+        worldWithFurniture.nodeTransforms.insert(worldWithFurniture.nodeTransforms.end(),
+            furniture->nodeTransforms.begin(), furniture->nodeTransforms.end());
+        world = &worldWithFurniture;
+        furnitureOwner = world;
+    }
     std::vector<StaticRtAssetRegistration> registrations{
         {3u, 0x53574f52u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),
          0u, &developmentStaticAsset_},
@@ -520,7 +566,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             &viewmodelAsset_, &productionPlayerAsset_, RtGeometryRole::PlayerViewmodel});
     registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
-        &collapseStaticAsset_});
+        world});
     // Player Rag torch gets its own metadata/material route. The original
     // production torch remains layer1 for permanent Keeper/world instances.
     registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
@@ -535,6 +581,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
                 static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u,
             &waterDropletAsset_});
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
+        // The chapter uses its own window registration instead of the lab fixture.
         std::erase_if(registrations, [](const auto& row) { return row.instanceCustomIndex == 9u; });
         if (!chapterActorReady_) { diagnostic = "Loaded chapter actor is required for candidate packing."; return false; }
         registrations.push_back({CharacterRenderSlot::kKeeperMetadataIndex, 0x4b495431u,
@@ -543,7 +590,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     for (auto& row : registrations)
         if (row.instanceCustomIndex == kCollapseInstanceIndex) {
             row.primitiveSelection = retainedWorldFamilies;
-            if(retainedTriangleRegions!=horde::scene::assets::kAllStaticTriangleRegions)row.asset=&regionSelectedWorld;
+            if (retainedWorldFamilies.empty()) row.primitiveCount = furnitureOffset;
         }
     if(UsesSharedForestGeometry()) {
         if(!forestSharedLayout_.prepared || !forestSharedLayout_.commonPrimitiveCount ||
@@ -557,7 +604,7 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             row.primitiveCount=static_cast<std::uint32_t>(forestSharedLayout_.commonPrimitiveCount);
         for(unsigned m=0;m<2;++m) {
             StaticRtAssetRegistration row{26u+m,m==0?0x50494e45u:0x414c4452u,
-                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&collapseStaticAsset_};
+                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,world};
             row.primitiveOffset=static_cast<std::uint32_t>(forestSharedLayout_.masters[m].primitiveOffset);
             row.primitiveCount=3u;registrations.push_back(row);
         }
@@ -568,6 +615,57 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &attackWarningRingAsset_});
     registrations.push_back({kHealingFlaskMetadataIndex, 0x464c4153u,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &healingFlaskAsset_});
+    if (!roadStoneAsset_.primitives.empty())
+        registrations.push_back({kRoadStoneMetadataIndex, 0x53544f4eu,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &roadStoneAsset_});
+    if (chapterActorReady_)
+        registrations.push_back({kChapterWindowMetadataIndex, 0x42303157u, static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) |
+            static_cast<std::uint32_t>(RtInstanceFlag::Transmissive), 0u, &productionDielectricFixtureAsset_});
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+        registrations.push_back({kFirstResidentMetadataIndex + lane, chapterResidentSources_[lane].stableId,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &chapterResidents_[lane].actor.Asset()});
+    if (!waysideCoverAsset_.primitives.empty())
+        registrations.push_back({kWaysideCoverMetadataIndex, 0x4230394cu,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &waysideCoverAsset_});
+    if (!waysideRegisterAsset_.primitives.empty())
+        registrations.push_back({kWaysideRegisterMetadataIndex, 0x42303952u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &waysideRegisterAsset_});
+    if (!tavernDoorAsset_.primitives.empty())
+        registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
+    if (!millDriveAsset_.primitives.empty()) {
+        StaticRtAssetRegistration drive{kMillDriveMetadataIndex, 0x42303547u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+            &millDriveAsset_, &gothicChestBaseAsset_};
+        drive.primitiveCount = kMillDrivePrimitiveCount;
+        registrations.push_back(drive);
+        StaticRtAssetRegistration waterwheel{kMillWaterwheelMetadataIndex, 0x42303557u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
+            &millDriveAsset_, &gothicChestBaseAsset_};
+        waterwheel.primitiveOffset = kMillWaterwheelPrimitiveOffset;
+        waterwheel.primitiveCount = kMillWaterwheelPrimitiveCount;
+        registrations.push_back(waterwheel);
+    }
+    if (!furniture->primitives.empty()) {
+        StaticRtAssetRegistration tiers{kBellwetherFurnitureLane, 0x42303146u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, furnitureOwner};
+        tiers.primitiveOffset = furnitureOffset;
+        if (furnitureOffset) tiers.primitiveCount = static_cast<std::uint32_t>(furniture->primitives.size());
+        registrations.push_back(tiers);
+    }
+    if (!privyRagAsset_.primitives.empty())
+        registrations.push_back({kPrivyRagMetadataIndex, 0x42303752u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &privyRagAsset_});
+    if (!stockHeadAsset_.primitives.empty()) {
+        for (std::uint32_t kind = 0; kind < kStockHeadBlasCount; ++kind) {
+            const auto& [first, count] = horde::gameplay::bellwether::kBellwetherStockHeadGeometry[kind];
+            StaticRtAssetRegistration row{kFirstStockHeadMetadataIndex + kind, 0x42305350u + kind,
+                static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &stockHeadAsset_};
+            row.primitiveOffset = first;
+            row.primitiveCount = count;
+            registrations.push_back(row);
+        }
+    }
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)
@@ -576,12 +674,16 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     {
         // Only these immutable opaque chest families opt in. The separately
         // mutable dielectric fixture keeps its own row, as do all other assets.
-        std::array<RtImmutableMaterialAlias, 2> aliases{};
+        std::array<RtImmutableMaterialAlias, 4> aliases{};
         const auto materialRow = [&](const auto& asset, std::uint32_t instance,
+                                     std::uint32_t assetPrimitiveOffset,
                                      const char* name, std::uint32_t& row) {
             const auto& metadata = out.InstanceMetadata()[instance];
-            for (std::size_t i = 0; i < asset.primitives.size(); ++i)
-                if (asset.materials[asset.primitives[i].materialIndex].name == name)
+            if (assetPrimitiveOffset > asset.primitives.size() ||
+                metadata.primitiveCount > asset.primitives.size() - assetPrimitiveOffset)
+                return false;
+            for (std::size_t i = 0; i < metadata.primitiveCount; ++i)
+                if (asset.materials[asset.primitives[assetPrimitiveOffset + i].materialIndex].name == name)
                 {
                     row = out.PrimitiveMetadata()[metadata.primitiveBase + i].materialIndex;
                     return true;
@@ -590,13 +692,32 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         };
         constexpr std::array<const char*, 2> families{{"ChestWood", "BlackIron"}};
         for (std::size_t i = 0; i < families.size(); ++i)
-            if (!materialRow(gothicChestBaseAsset_, 5u, families[i], aliases[i].provider) ||
-                !materialRow(gothicChestLidAsset_, 6u, families[i], aliases[i].consumer))
+            if (!materialRow(gothicChestBaseAsset_, 5u, 0u, families[i], aliases[i].provider) ||
+                !materialRow(gothicChestLidAsset_, 6u, 0u, families[i], aliases[i].consumer))
             {
                 diagnostic = "Chapter immutable chest material roster changed.";
                 return false;
             }
+        for (std::size_t i = 0; i < families.size(); ++i)
+            if (!materialRow(millDriveAsset_, kMillWaterwheelMetadataIndex,
+                    kMillWaterwheelPrimitiveOffset, families[i], aliases[families.size() + i].consumer))
+            {
+                diagnostic = "Bellwether waterwheel immutable material roster changed.";
+                return false;
+            }
+        aliases[2].provider = aliases[0].provider;
+        aliases[3].provider = aliases[1].provider;
         if (!out.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
+        if(!furnitureOffset && !furniture->primitives.empty()) {
+            RtImmutableMaterialAlias furniture;
+            const auto& metadata=out.InstanceMetadata()[kBellwetherFurnitureLane];
+            furniture.consumer=out.PrimitiveMetadata()[metadata.primitiveBase].materialIndex;
+            if(!materialRow(collapseStaticAsset_,kCollapseInstanceIndex,0u,
+                bellwetherFurnitureAsset_.materials.front().name.c_str(),furniture.provider)) {
+                diagnostic="Bellwether furniture requires the existing world timber finish.";return false;
+            }
+            if(!out.ShareImmutableMaterialRows(std::span{&furniture,1u},diagnostic))return false;
+        }
     }
     return true;
 }
@@ -1086,6 +1207,10 @@ bool PresentableTinyRtScene::CommitStaticGeometryWithApi(const std::uint64_t exp
     for (std::size_t i=0; i<lastInstanceMasks_.size(); ++i) lastInstanceMasks_[i] = static_cast<std::uint8_t>(tlasBuiltInstances_[i].mask);
     chapterActorPoseGeneration_ = UINT64_MAX; chapterActorPoseSeconds_ = -1.0f;
     chapterActorNeedsRefit_ = thirdActorIsCompanion_;
+    for (auto& resident : chapterResidents_) {
+        resident.uploadedTime = -1;
+        resident.needsRefit = false;
+    }
     waterDropletGeometryVisible_ = true; // Forces one write/refit, also for a now-empty pool.
     if (api.recordCurrentFrame) {
         bool recorded = false;

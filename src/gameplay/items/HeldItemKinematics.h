@@ -13,6 +13,7 @@
 #include <string_view>
 
 namespace horde::gameplay::simulation { class TriangleSupportSurface; }
+namespace horde::gameplay::traversal { struct HingedYawPose; }
 
 namespace horde::gameplay::items
 {
@@ -21,6 +22,8 @@ namespace horde::gameplay::items
 // dielectric geometry and authored Flame/Light sockets share this scale;
 // the gameplay-owned hand Grip remains fixed.
 inline constexpr float kClaimedRewardLanternScale = 0.44f;
+// Unscaled Y distance from the body hinge to its authored Light socket.
+inline constexpr float kRewardLanternLightBelowHinge = .515f;
 
 // Native glass radius .736322*.44, ring socket separation .097*.44,
 // final skinned Grip tolerance .015, and dielectric spawn .006 fit below .40.
@@ -81,6 +84,7 @@ struct HeldItemKinematicsInput
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
     float playerCrouchDropMetres=0;
+    const traversal::HingedYawPose* tavernDoorPose=nullptr;
 };
 
 struct HeldSwordPose
@@ -157,6 +161,7 @@ struct HeldItemFixedStepInput
     // in a snapshot. The simulation supplies its generation-validated owner.
     const simulation::TriangleSupportSurface* chapterTerrain = nullptr;
     float playerCrouchDropMetres=0;
+    const traversal::HingedYawPose* tavernDoorPose=nullptr;
 };
 
 inline constexpr float kHeldItemSpreadStartAspect = 1.0f;
@@ -245,7 +250,8 @@ float ComputeRewardLanternForwardClearance(float cameraX,
                                            float forwardZ, bool developmentWorldRoute = false,
                                            bool rescueExterior = false,
                                            float supportWorldY = kRouteFloorWorldY,
-                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr);
+                                           const simulation::TriangleSupportSurface* chapterTerrain = nullptr,
+                                           const traversal::HingedYawPose* tavernDoorPose = nullptr);
 
 HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput& input);
 

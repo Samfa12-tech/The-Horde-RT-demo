@@ -10,19 +10,37 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
     struct Row {unsigned index=0;float seconds=0;double renderMs=0,readbackMs=0;
         std::string completed,file,sha256;};
     std::vector<Row> rows;rows.reserve(kEnvironmentSurveyFrames);
-    std::string error,executableSha256,terrainSha256,diagnostic;
+    std::string error,executableSha256,terrainSha256,townSha256,diagnostic;
     unsigned attemptedFrames=0;
     std::array<char,32768> executablePath{};
     const auto started=std::chrono::steady_clock::now();
     // Publish the ordinary output aspect once before freezing the snapshot.
     // Survey frames then consume that same immutable publication.
     SynchronizeSimulationViewportAspect(context);
+    const bool wheel=context.environmentSurveyProfile=="mill-wheel";
+    const bool testedWheel=wheel && !context.developmentCheckpoint.empty();
+    if(testedWheel) {
+        horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
+        const auto* repair=horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
+        if(!repair || !horde::gameplay::StageDevelopmentCheckpointSimulation(context.simulation,*repair)) {
+            std::cerr<<"Mill wheel survey could not stage the tested mill drive.\n";return 1;
+        }
+        MirrorSimulationSnapshot(context);
+    }
     const auto initial=context.simulation.Snapshot();
     std::array<unsigned char,sizeof(initial)> initialSnapshotBytes{};
     std::memcpy(initialSnapshotBytes.data(),&context.simulation.Snapshot(),initialSnapshotBytes.size());
     bool snapshotBytesUnchanged=true;
     const bool tomb=context.environmentSurveyProfile=="tomb-debris";
-    auto camera=tomb?TombDebrisSurveyCamera(0):RiverBendSurveyCamera();
+    const bool millrace=context.environmentSurveyProfile=="millrace";
+    const bool crossing=context.environmentSurveyProfile=="mill-crossing";
+    const bool riverBend=!tomb && !millrace && !wheel && !crossing;
+    auto camera=RiverBendSurveyCamera();
+    if(tomb)camera=TombDebrisSurveyCamera(0);
+    if(millrace)camera=MillraceSurveyCamera();
+    if(wheel)camera=MillWheelSurveyCamera();
+    if(crossing)camera=MillCrossingSurveyCamera(0);
+    auto crossingEntry=MillCrossingSurveyCamera(60);
     horde::gameplay::simulation::TriangleSupportSurface::Sample shore{};
     const auto terrain=context.rtScene.ChapterTerrainSurface();
     const auto width=context.rtScene.DispatchExtent().width,height=context.rtScene.DispatchExtent().height;
@@ -49,7 +67,7 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             <<"\",\"renderScale\":"<<context.renderScale<<",\"dispatchWidth\":"<<width<<",\"dispatchHeight\":"<<height
             <<",\"surfaceWidth\":"<<context.swapchainExtent.width<<",\"surfaceHeight\":"<<context.swapchainExtent.height
             <<",\"outputExposure\":"<<context.outputExposure<<",\"waterQuality\":"<<unsigned(context.waterQuality)
-            <<",\"surveyFogDensityScale\":"<<(tomb?"null":"0.004")
+            <<",\"surveyFogDensityScale\":"<<(riverBend?"0.004":"null")
             <<",\"shaderPair\":{\"opaque\":{\"key\":\""<<opaqueKey<<"\",\"sha256\":\""<<opaqueSha
             <<"\"},\"generic\":{\"key\":\""<<genericKey<<"\",\"sha256\":\""<<genericSha<<"\"}}"
             ;
@@ -62,20 +80,29 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             }
             json<<']';
         } else {
-            json
-            <<",\"camera\":{\"atlasEast\":56,\"atlasNorth\":-5,\"x\":"<<camera.x<<",\"z\":"<<camera.z
+            json<<",\"camera\":{";
+            if(riverBend)json<<"\"atlasEast\":56,\"atlasNorth\":-5,";
+            json<<"\"x\":"<<camera.x<<",\"z\":"<<camera.z
             <<",\"supportY\":"<<camera.supportY<<",\"yaw\":"<<camera.yaw<<",\"pitch\":"<<camera.pitch
-            <<",\"eyeY\":"<<horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres
-            <<",\"targetAtlasEast\":58,\"targetAtlasNorth\":-25,\"targetAtlasUp\":6"
-            <<",\"terrainFound\":"<<(shore.found?"true":"false")<<",\"terrainWalkable\":"<<(shore.walkable?"true":"false")
+            <<",\"eyeY\":"<<horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres;
+            if(riverBend)json<<",\"targetAtlasEast\":58,\"targetAtlasNorth\":-25,\"targetAtlasUp\":6";
+            json<<",\"terrainFound\":"<<(shore.found?"true":"false")<<",\"terrainWalkable\":"<<(shore.walkable?"true":"false")
             <<",\"terrainTriangle\":"<<shore.triangle<<",\"testedTriangles\":"<<shore.testedTriangles
             <<",\"terrainNormal\":["<<shore.normal[0]<<','<<shore.normal[1]<<','<<shore.normal[2]
             <<"]}";
         }
+        if(wheel)json<<",\"millPreparation\":"<<static_cast<unsigned>(initial.millPreparation)
+                     <<",\"millWaterwheelAngleRadians\":"<<initial.millWaterwheelAngleRadians
+                     <<",\"millWaterwheelSubmittedMask\":"<<unsigned(context.rtScene.MillWaterwheelInstanceMask());
+        if(crossing)json<<",\"townSha256\":\""<<townSha256
+                        <<"\",\"crossingEntry\":{\"x\":"<<crossingEntry.x<<",\"z\":"<<crossingEntry.z
+                        <<",\"supportY\":"<<crossingEntry.supportY<<"}";
         json<<",\"error\":"<<(error.empty()?"null":"\""+JsonEscape(error)+"\"")<<",\"frames\":[";
         for(std::size_t i=0;i<rows.size();++i) {
             const auto& row=rows[i];if(i)json<<',';
-            json<<"{\"index\":"<<row.index<<",\"view\":\""<<(tomb?(row.index<60?"opening":"debris"):"river")<<"\",\"renderTimeSeconds\":"<<row.seconds
+            const auto view=crossing?(row.index<60?"wheel-footway":"crossing-entry"):
+                tomb?(row.index<60?"opening":"debris"):"river";
+            json<<"{\"index\":"<<row.index<<",\"view\":\""<<view<<"\",\"renderTimeSeconds\":"<<row.seconds
                 <<",\"renderCallCpuMs\":"<<row.renderMs<<",\"readbackCpuMs\":"<<row.readbackMs
                 <<",\"file\":"<<(row.file.empty()?"null":"\""+row.file+"\"")
                 <<",\"pngSha256\":"<<(row.sha256.empty()?"null":"\""+row.sha256+"\"")
@@ -90,6 +117,14 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
         return fail("Environment survey requires an unshown, unfocused capture window.");
     if(!context.useRtPath || !context.rtScene.IsReady() || !context.rtFrameEvidenceInitialised || !terrain)
         return fail("A ready native terrain and hardware RT owner are required.");
+    if(wheel) {
+        using horde::gameplay::bellwether::MillPreparation;
+        if(testedWheel ? (initial.millPreparation!=MillPreparation::GearingVerified ||
+                             !(initial.millWaterwheelAngleRadians>0.f))
+                       : (initial.millPreparation!=MillPreparation::Unexamined ||
+                             initial.millWaterwheelAngleRadians!=0.f))
+            return fail("Mill wheel survey did not reach its requested repair state.");
+    }
     if(!GetModuleFileNameA(nullptr,executablePath.data(),static_cast<DWORD>(executablePath.size())) ||
        !Sha256File(executablePath.data(),executableSha256,diagnostic))
         return fail("Executable identity is unavailable: "+diagnostic);
@@ -103,16 +138,29 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             return fail("Tomb survey cameras require legal shared-floor opening positions.");
     } else {
         shore=terrain->Query(camera.x,camera.z);
-        if(!shore.found || !std::isfinite(shore.worldY))return fail("Actual imported terrain does not support the planned shore camera.");
+        if(!shore.found || !std::isfinite(shore.worldY) || ((millrace || wheel || crossing) && !shore.walkable))
+            return fail("Actual imported terrain does not support the planned shore camera.");
         camera.supportY=shore.worldY;
-        const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
-        camera.pitch=.05f+(target[1]-(horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres))/
-            std::hypot(target[0]-camera.x,target[2]-camera.z);
+        if(riverBend) {
+            const auto target=horde::scene::ChapterWaterFromAtlas(58,-25,6);
+            camera.pitch=.05f+(target[1]-(horde::gameplay::simulation::PlayerEyeWorldY(camera.supportY)-initial.playerCrouchDropMetres))/
+                std::hypot(target[0]-camera.x,target[2]-camera.z);
+        }
         if(!std::isfinite(camera.pitch) || camera.pitch<-.32f || camera.pitch>.28f)
             return fail("Native queried survey aim exceeds existing production pitch limits.");
     }
+    if(crossing) {
+        const auto approach=terrain->Query(crossingEntry.x,crossingEntry.z);
+        constexpr float heightTolerance=.02f;
+        if(!approach.found || !approach.walkable || std::abs(approach.worldY+14.65f)>heightTolerance ||
+           std::abs(camera.supportY+20.77f)>heightTolerance)
+            return fail("The authored mill footway and crossing entry must support both survey views.");
+        crossingEntry.supportY=approach.worldY;
+        if(!Sha256File(ResolveAssetRoot()/"models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb",
+                townSha256,diagnostic))return fail("Town identity is unavailable: "+diagnostic);
+    }
     context.environmentSurveyCamera=camera;
-    // Do not call StageDevelopmentCheckpointSimulation, AdvanceFrame, BuildInput,
+    // Keep the initial survey state fixed. Do not call AdvanceFrame, BuildInput,
     // campaign commands or a modelled-equipment exception. Only render inputs
     // below change; the normal full-capture equipment gates remain untouched.
     context.frameDeltaSeconds=0;context.simulationPaused=true;
@@ -128,10 +176,13 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             return fail("Hidden window/input ownership changed.");
         context.environmentSurveyTime=EnvironmentSurveyTime(frame);
         if(tomb)context.environmentSurveyCamera=TombDebrisSurveyCamera(frame);
+        if(crossing && frame==60)context.environmentSurveyCamera=crossingEntry;
         const auto begin=std::chrono::steady_clock::now();bool presented=false;
         if(!RenderFrame(context,clear,presented) || !presented ||
            context.lastFramePresentation!=horde::telemetry::RtPresentationOutcome::Presented)
             return fail("A survey frame did not reach an actual successful RT presentation: "+context.lastRtFrameError);
+        if(wheel && context.rtScene.MillWaterwheelInstanceMask()==0u)
+            return fail("A mill wheel survey frame lost the wheel TLAS instance.");
         const auto renderEnd=std::chrono::steady_clock::now();
         const VkResult idle=vkDeviceWaitIdle(context.device);
         if(idle!=VK_SUCCESS || !CompleteRtEvidenceAfterDeviceIdle(context,idle))
@@ -177,7 +228,7 @@ int RunEnvironmentSurveyCapture(VulkanSurfaceContext& context,
             const auto readbackStart=std::chrono::steady_clock::now();
             horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
             if(!context.rtScene.CaptureStorageImage(image,diagnostic))return fail("Actual survey readback failed: "+diagnostic);
-            std::ostringstream name;name<<(tomb?"tomb-debris-":"river-bend-")<<std::setw(3)<<std::setfill('0')<<frame<<".png";row.file=name.str();
+            std::ostringstream name;name<<context.environmentSurveyProfile<<'-'<<std::setw(3)<<std::setfill('0')<<frame<<".png";row.file=name.str();
             if(!WriteRgbaPng(directory/row.file,image,diagnostic) || !Sha256File(directory/row.file,row.sha256,diagnostic))
                 return fail("Survey PNG/identity failed: "+diagnostic);
             row.readbackMs=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-readbackStart).count();

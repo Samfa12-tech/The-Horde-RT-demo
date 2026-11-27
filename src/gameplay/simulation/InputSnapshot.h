@@ -94,6 +94,9 @@ struct InputSnapshot
     bool revivalAudioReady = false; // Coherent decoded SoundPool ownership, independent of mute.
     bool tutorialEnabled = true;
     bool tutorialSlowdownEnabled = false;
+    bool tutorialCardsEnabled = false;
+    std::uint64_t tutorialCardResponse = 0;
+    std::uint64_t tutorialCardResponseSequence = 0;
     std::uint32_t dialogueCompletionLine = 0;
     std::uint64_t dialogueCompletionGeneration = 0;
     SimulationCommandSequences commands{};

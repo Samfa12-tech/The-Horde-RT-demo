@@ -55,11 +55,17 @@ std::vector<std::byte> Encode(const cp::Checkpoint& c) {
 void Reject(std::span<const std::byte> bytes,codec::Error expected) {
     auto output=Upper();output.schema=3;output.flask={true,3};output.vitality=2;output.yaw=.33f;output.swordStowed=true;
     const auto original=Encode(output);codec::Error error=codec::Error::None;
-    Check(!codec::Decode(bytes,output,error) && error==expected,"invalid bytes reject with the expected typed error");
+    const bool decoded=codec::Decode(bytes,output,error);
+    if(decoded || error!=expected)
+        std::cerr<<"Decode rejection expected "<<static_cast<int>(expected)<<", got "<<static_cast<int>(error)
+            <<" for "<<bytes.size()<<" bytes\n";
+    Check(!decoded && error==expected,"invalid bytes reject with the expected typed error");
     Check(Encode(output)==original,"decode failure preserves every destination field");
 }
 void RoundTrip(const cp::Checkpoint& c) {
-    const auto bytes=Encode(c);Check(bytes.size()==(c.schema==5?185u:(c.schema==4?177u:(c.schema==3?168u:(c.schema==2?163u:162u)))) && bytes.size()<=codec::kMaxFileBytes,"canonical format has a fixed bounded length");
+    constexpr std::array<std::size_t,cp::kMillTallySchema+1> lengths{0,162,163,168,177,185,186,187,188,189,190,191,192,197,198,199,200,201,202,203,204,205};
+    const auto bytes=Encode(c);Check(bytes.size()==lengths[c.schema] && bytes.size()<=codec::kMaxFileBytes,
+        "canonical format has a fixed bounded length");
     Check(bytes==Encode(c),"repeated encoding is deterministic");
     auto output=Upper();output.vitality=2;codec::Error error=codec::Error::Malformed;
     Check(codec::Decode(bytes,output,error) && error==codec::Error::None,"encoded checkpoint decodes successfully");
@@ -67,6 +73,207 @@ void RoundTrip(const cp::Checkpoint& c) {
 }
 }
 int main() {
+    {
+        cp::TreasurePurse purse;
+        Check(!purse.HasEarnedCoins() && purse.CanCollectOrdinarySilver() && purse.CollectOrdinarySilver() &&
+            !purse.CanCollectOrdinarySilver() && purse.ordinarySilver==cp::OrdinarySilverProgress::Carried,
+            "ordinary silver can be collected once and remains carried until sold");
+        Check(!purse.HasEarnedCoins() && purse.CanSellOrdinarySilver(),
+            "carried silver can be sold but does not count as earned coins");
+        Check(purse.SellOrdinarySilver() && purse.coins==cp::TreasurePurse::kOrdinarySilverSaleCoins && purse.HasEarnedCoins() &&
+            !purse.CanSellOrdinarySilver() && !purse.CanCollectOrdinarySilver(),
+            "selling ordinary silver grants its fixed coins once");
+        Check(purse.CanBuyLanternFitting() && purse.BuyLanternFitting() && purse.coins==0 &&
+            purse.lanternFittingPurchased && !purse.BuyLanternFitting(),
+            "sold silver can buy the shared fitting and spend the exact balance");
+        auto boundary=cp::TreasurePurse{};
+        boundary.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+        boundary.coins=cp::TreasurePurse::kMaximumCoins-cp::TreasurePurse::kOrdinarySilverSaleCoins;
+        Check(boundary.CanSellOrdinarySilver() && boundary.SellOrdinarySilver() &&
+            boundary.coins==cp::TreasurePurse::kMaximumCoins,
+            "silver sale arithmetic permits the exact wallet maximum");
+        boundary.ordinarySilver=cp::OrdinarySilverProgress::Carried;
+        --boundary.coins;
+        const auto before=boundary;
+        Check(!boundary.CanSellOrdinarySilver() && !boundary.SellOrdinarySilver() && boundary==before,
+            "silver sale arithmetic rejects overflow without changing state");
+        cp::TreasurePurse registerReward;
+        Check(registerReward.ClaimRegisterReward() && registerReward.HasEarnedCoins() &&
+            registerReward.CanBuyLanternFitting(),
+            "the existing register reward remains eligible for the same fitting");
+    }
+    auto tavern=Endpoint();
+    tavern.contentRevision=cp::kBellwetherContentRevision;tavern.id=cp::CheckpointId::BellwetherTavern;
+    tavern.zone=cp::Destination(tavern.id);
+    tavern.position=cp::kBellwetherCheckpointPosition;tavern.yaw=-1.40f;tavern.pitch=-.22f;
+    RoundTrip(tavern);
+    auto deliveredPrivy=tavern;
+    deliveredPrivy.schema=cp::kPrivyRagSchema;
+    deliveredPrivy.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+    deliveredPrivy.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+    deliveredPrivy.privyRagDelivered=true;
+    RoundTrip(deliveredPrivy);
+    auto deliveredBytes=Encode(deliveredPrivy);
+    Check(deliveredBytes.size()==203 && deliveredBytes.back()==std::byte{1},
+          "schema19 appends one delivered bit after the complete schema18 payload");
+    using cp::MillTallyAction;
+    using cp::MillTallyProgress;
+    auto tally=deliveredPrivy;
+    tally.schema=cp::kMillTallySchema;
+    const auto apply=[&](MillTallyAction action,MillTallyProgress progress) {
+        Check(tally.treasurePurse.ApplyMillTallyAction(action) && tally.treasurePurse.millTally==progress,
+              "the tally transition changes ownership exactly once");
+        RoundTrip(tally);
+        const auto before=tally.treasurePurse;
+        Check(!tally.treasurePurse.ApplyMillTallyAction(action) && tally.treasurePurse==before,
+              "the same tally input cannot repeat a transition");
+    };
+    apply(MillTallyAction::Take,MillTallyProgress::Carried);
+    auto direct=tally;
+    Check(direct.treasurePurse.ApplyMillTallyAction(MillTallyAction::Return) &&
+          direct.treasurePurse.millTally==MillTallyProgress::Returned &&
+          direct.treasurePurse.coins==0 && !direct.treasurePurse.HasEarnedCoins(),
+          "the stamp can be returned directly without sale or a reward");
+    RoundTrip(direct);
+    apply(MillTallyAction::Sell,MillTallyProgress::Sold);
+    Check(tally.treasurePurse.coins==cp::TreasurePurse::kMillTallySaleCoins &&
+          !tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Return) &&
+          !tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Recover),
+          "the sale credits exactly the quote and retains the stamp at the dealer until claimed");
+    Check(tally.treasurePurse.BuyLanternFitting() && tally.treasurePurse.coins==0,
+          "buying the ordinary fitting can spend every coin from the tally sale");
+    apply(MillTallyAction::RecordClaim,MillTallyProgress::ClaimRecorded);
+    apply(MillTallyAction::Recover,MillTallyProgress::Recovered);
+    Check(!tally.treasurePurse.ApplyMillTallyAction(MillTallyAction::Sell),
+          "recovered items cannot earn the sale again");
+    apply(MillTallyAction::Return,MillTallyProgress::ReturnedAfterSale);
+    Check(tally.treasurePurse.coins==0 && tally.treasurePurse.lanternFittingPurchased,
+          "recovering and returning never reverses the spent unrelated purchase");
+    auto invalidTally=Encode(tally);
+    invalidTally.back()=std::byte{7};Rechecksum(invalidTally);
+    Reject(invalidTally,codec::Error::InvalidCheckpoint);
+    auto legacyTally=tally;legacyTally.schema=cp::kBellwetherAnkleSchema;
+    Check(!cp::Validate(legacyTally),"legacy layouts cannot silently drop named ownership");
+    auto inflated=tally;
+    inflated.treasurePurse.coins=cp::TreasurePurse::kMillTallySaleCoins+1u;
+    Check(!cp::Validate(inflated),"the named sale cannot create more coins than its quote");
+    cp::Checkpoint legacyReader;
+    codec::Error tallyError{};
+    Check(codec::Decode(deliveredBytes,legacyReader,tallyError) &&
+          legacyReader.treasurePurse.millTally==MillTallyProgress::Unfound &&
+          Encode(legacyReader)==deliveredBytes,
+          "existing tavern saves open with the stamp unfound and preserve their bytes");
+
+    auto availablePrivy=deliveredPrivy;availablePrivy.privyRagDelivered=false;
+    const auto availableBytes=Encode(availablePrivy);
+    Check(availableBytes.back()==std::byte{0},"schema19 encodes Available with a canonical false byte");
+    auto badDeliveredBool=deliveredBytes;badDeliveredBool.back()=std::byte{2};Rechecksum(badDeliveredBool);
+    Reject(badDeliveredBool,codec::Error::Malformed);
+    auto unearnedPrivy=deliveredPrivy;unearnedPrivy.dialogue.tavernConversationLinesResolved--;
+    Check(!cp::Validate(unearnedPrivy),"the delivered fact requires completed Bellwether Talk");
+    unearnedPrivy=deliveredPrivy;unearnedPrivy.schema=cp::kOrdinarySilverSchema;
+    Check(!cp::Validate(unearnedPrivy),"schema18 cannot carry a delivered privy fact");
+    unearnedPrivy=deliveredPrivy;unearnedPrivy.contentRevision=cp::kForestContentRevision;
+    Check(!cp::Validate(unearnedPrivy),"the delivered fact requires Bellwether content revision");
+    auto assessed=Endpoint();
+    assessed.schema=cp::kBellwetherAnkleSchema;
+    assessed.bellwetherAnkleAssessed=true;
+    RoundTrip(assessed);
+    auto badAnkle=Encode(assessed);
+    Check(badAnkle.size()==204 && badAnkle.back()==std::byte{1},"schema20 appends the roadside fact");
+    badAnkle.back()=std::byte{2};Rechecksum(badAnkle);
+    Reject(badAnkle,codec::Error::Malformed);
+    auto unearnedAnkle=assessed;unearnedAnkle.dialogue.forestVillageConsumed=false;
+    Check(!cp::Validate(unearnedAnkle),"the roadside fact requires the completed lookout story");
+    unearnedAnkle=assessed;unearnedAnkle.schema=cp::kPrivyRagSchema;
+    Check(!cp::Validate(unearnedAnkle),"schema19 cannot silently drop the roadside fact");
+    auto oldLookout=Endpoint();oldLookout.schema=cp::kPrivyRagSchema;
+    const auto oldBytes=Encode(oldLookout);
+    codec::Error oldError{};
+    Check(codec::Decode(oldBytes,assessed,oldError) && !assessed.bellwetherAnkleAssessed &&
+          Encode(assessed)==oldBytes,"earlier lookout saves still begin before the assessment");
+    for(unsigned line=1;line<=3;++line) {
+        auto spoken=tavern;spoken.dialogue.hearthLinesResolved=line;
+        Check(!cp::Validate(spoken),"old schema cannot silently drop hearth progress");
+        spoken.schema=cp::kHearthSpeechSchema;RoundTrip(spoken);
+        auto bad=Encode(spoken);bad.back()=std::byte{4};Rechecksum(bad);
+        Reject(bad,codec::Error::InvalidCheckpoint);
+        spoken.dialogue.activeLine=dlg::Line::TavernWork;
+        Check(!cp::Validate(spoken),"an active local caption cannot become saved playback");
+    }
+    for(unsigned line=1;line<=3;++line) {
+        auto exchange=tavern;
+        exchange.schema=cp::kHearthSpeechSchema;
+        exchange.dialogue.hearthLinesResolved=3;
+        exchange.dialogue.tavernConversationLinesResolved=line;
+        Check(!cp::Validate(exchange),"old schemas cannot silently drop conversation progress");
+        exchange.schema=cp::kTavernConversationSchema;
+        RoundTrip(exchange);
+        auto bad=Encode(exchange);bad.back()=std::byte{4};Rechecksum(bad);
+        Reject(bad,codec::Error::InvalidCheckpoint);
+        exchange.dialogue.hearthLinesResolved=2;
+        Check(!cp::Validate(exchange),"the tavern conversation follows the settled hearth sequence");
+    }
+    auto wrongChair=tavern;wrongChair.position.y+=.05f;
+    Check(!cp::Validate(wrongChair),"the tavern record pins the real safe floor height");
+    auto earlyTavern=tavern;earlyTavern.dialogue.forestVillageConsumed=false;
+    Check(!cp::Validate(earlyTavern),"the tavern record requires completed lookout progress");
+    auto revisit=tavern;revisit.id=cp::CheckpointId::SafeExit;revisit.zone=sim::WorldZoneId::TombExterior;
+    revisit.position=tr::kExteriorLanding;
+    RoundTrip(revisit);
+    {
+        using horde::gameplay::bellwether::MillPreparation;
+        auto mill=tavern;
+        mill.schema=cp::kTavernConversationSchema;
+        mill.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+        mill.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        cp::Checkpoint decoded;
+        codec::Error error{};
+        Check(codec::Decode(Encode(mill),decoded,error) && decoded.millPreparation==MillPreparation::Unexamined,
+            "a completed tavern save from before the mill can start mill preparation");
+        for(auto progress:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked,
+                           MillPreparation::RigTrialReady,MillPreparation::RigTested,
+                           MillPreparation::BearingSeated,MillPreparation::GearingVerified}) {
+            mill.millPreparation=progress;
+            mill.schema=cp::kTavernConversationSchema;
+            Check(!cp::Validate(mill),"an older schema never silently discards mill preparation");
+            mill.schema=cp::kMillPreparationSchema;
+            RoundTrip(mill);
+        }
+        auto corrupt=Encode(mill);corrupt.back()=std::byte{8};Rechecksum(corrupt);
+        Reject(corrupt,codec::Error::InvalidCheckpoint);
+        --mill.dialogue.tavernConversationLinesResolved;
+        Check(!cp::Validate(mill),"mill preparation requires the earned tavern conversation");
+    }
+    {
+        auto salvager=tavern;
+        salvager.schema=cp::kSalvagerShorePracticeSchema;
+        salvager.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+        salvager.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        salvager.salvagerShorePracticeCompleted=true;
+        RoundTrip(salvager);
+
+        auto old=salvager;
+        old.schema=cp::kMillPreparationSchema;
+        old.salvagerShorePracticeCompleted=false;
+        const auto oldBytes=Encode(old);
+        auto fallback=salvager;
+        codec::Error error{};
+        Check(codec::Decode(oldBytes,fallback,error) && error==codec::Error::None &&
+              !fallback.salvagerShorePracticeCompleted && Encode(fallback)==oldBytes,
+              "old schema records default the absent salvager shore practice flag");
+
+        auto malformed=Encode(salvager);
+        malformed.back()=std::byte{2};
+        Rechecksum(malformed);
+        Reject(malformed,codec::Error::Malformed);
+
+        auto truncated=Encode(salvager);
+        truncated.pop_back();
+        Put(truncated,12,180);
+        Rechecksum(truncated);
+        Reject(truncated,codec::Error::Malformed);
+    }
     // Schema5 is used only when a safe exterior save must retain bypassed
     // guards. Their health and defeated bits are independent authoritative data.
     for(int a:{0,1,2})for(int b:{0,1,2}) {
@@ -159,7 +366,7 @@ int main() {
         for(std::uint32_t schema:{1u,2u}) {
             auto bad=bytes;Put(bad,20,schema);Rechecksum(bad);Reject(bad,codec::Error::Malformed);
         }
-        auto future=bytes;Put(future,20,6);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
+        auto future=bytes;Put(future,20,cp::kMillTallySchema+1);Rechecksum(future);Reject(future,codec::Error::UnsupportedSchema);
         for(std::uint32_t shortLength:{142u,143u,147u}) {
             auto bad=bytes;bad.resize(20+shortLength);Put(bad,12,shortLength);Rechecksum(bad);
             Reject(bad,codec::Error::Malformed);
@@ -280,10 +487,10 @@ int main() {
     }
     // Corruption with a recomputed checksum still must pass the typed schema,
     // closed enum set, finite floats, strict bools and story invariants.
-    for(std::uint32_t version:{0u,6u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,cp::kMillTallySchema+1,0xffffffffu}) {
         auto bad=baseline;Put(bad,20,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedSchema);
     }
-    for(std::uint32_t version:{0u,3u,0xffffffffu}) {
+    for(std::uint32_t version:{0u,4u,0xffffffffu}) {
         auto bad=baseline;
         Put(bad,24,version);Rechecksum(bad);Reject(bad,codec::Error::UnsupportedContent);
     }
@@ -325,8 +532,160 @@ int main() {
         Check(!codec::Encode(c,output,error) && error==expected && output==original,
             "invalid encode leaves the caller's complete byte output untouched");
     };
-    auto invalid=cp::Checkpoint{};invalid.schema=6;invalidEncode(invalid,codec::Error::UnsupportedSchema);
-    invalid=cp::Checkpoint{};invalid.contentRevision=3;invalidEncode(invalid,codec::Error::UnsupportedContent);
+    auto invalid=cp::Checkpoint{};invalid.schema=cp::kMillTallySchema+1;invalidEncode(invalid,codec::Error::UnsupportedSchema);
+    {
+        auto archive=Endpoint();
+        archive.schema=cp::kWaysideArchiveSchema;
+        archive.contentRevision=cp::kBellwetherContentRevision;
+        archive.id=cp::CheckpointId::BellwetherTavern;
+        archive.zone=cp::Destination(archive.id);
+        archive.position=cp::kBellwetherCheckpointPosition;
+        archive.dialogue.hearthLinesResolved=dlg::kHearthLines.size();
+        archive.waysideArchive=cp::WaysideArchiveProgress::Open;
+        RoundTrip(archive);
+        auto encoded=Encode(archive);
+        Check(encoded.size()==188 && encoded.back()==std::byte{2},"schema8 appends only the archive progress byte");
+        if(encoded.size()==188) {
+            encoded.back()=std::byte{3};Rechecksum(encoded);Reject(encoded,codec::Error::InvalidCheckpoint);
+        }
+        archive.waysideLanternRevealStarted=true;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.schema=cp::kShrineLanternSchema;
+        RoundTrip(archive);
+        auto reveal=Encode(archive);
+        reveal.back()=std::byte{2};Rechecksum(reveal);Reject(reveal,codec::Error::Malformed);
+        cp::Checkpoint legacy;
+        codec::Error error{};
+        Check(codec::Decode(Encode(archive),legacy,error) && !legacy.waysideRegisterRecovered,
+            "an older open archive still contains the unclaimed register");
+        archive.waysideRegisterRecovered=true;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.schema=cp::kWaysideRegisterSchema;
+        RoundTrip(archive);
+        auto recovered=Encode(archive);
+        recovered.back()=std::byte{2};Rechecksum(recovered);Reject(recovered,codec::Error::Malformed);
+        Check(codec::Decode(Encode(archive),legacy,error) && legacy.waysideRegisterRecovered && !legacy.waysideRegisterInterpreted,
+            "older collected registers still require presenting to the keeper");
+        archive.waysideRegisterInterpreted=true;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.schema=cp::kRegisterInterpretationSchema;
+        RoundTrip(archive);
+        auto interpreted=Encode(archive);
+        Check(codec::Decode(interpreted,legacy,error) && legacy.treasurePurse==cp::TreasurePurse{},
+            "legacy interpretation starts with an empty purse and an uncollected reward");
+        auto paid=archive;
+        Check(paid.treasurePurse.ClaimRegisterReward() && !paid.treasurePurse.ClaimRegisterReward(),
+            "the purse accepts its one-time payment exactly once");
+        invalidEncode(paid,codec::Error::InvalidCheckpoint);
+        paid.schema=cp::kTreasurePurseSchema;
+        RoundTrip(paid);
+        Check(codec::Decode(Encode(paid),legacy,error) && legacy.treasurePurse==paid.treasurePurse &&
+            !legacy.treasurePurse.lanternFittingPurchased,"a legacy purse preserves funds and grants no fitting");
+        auto fitted=paid;
+        Check(fitted.treasurePurse.BuyLanternFitting() && !fitted.treasurePurse.BuyLanternFitting() &&
+            fitted.treasurePurse.coins==cp::TreasurePurse::kRegisterRewardCoins-cp::TreasurePurse::kLanternFittingPrice,
+            "the fitting deducts its price only once");
+        invalidEncode(fitted,codec::Error::InvalidCheckpoint);
+        fitted.schema=cp::kLanternFittingSchema;
+        RoundTrip(fitted);
+        Check(codec::Decode(Encode(fitted),legacy,error) && !legacy.airWardLearned &&
+            legacy.waysideArchive==cp::WaysideArchiveProgress::Open,"legacy equipped saves leave ward preparation available");
+        auto ward=archive;
+        ward.schema=cp::kAirWardSchema;
+        ward.waysideArchive=cp::WaysideArchiveProgress::Restored;
+        RoundTrip(ward);
+        ward.airWardLearned=true;
+        RoundTrip(ward);
+        auto badWard=Encode(ward);badWard.back()=std::byte{2};Rechecksum(badWard);
+        Reject(badWard,codec::Error::Malformed);
+        ward.schema=cp::kLanternFittingSchema;invalidEncode(ward,codec::Error::InvalidCheckpoint);
+        ward.schema=cp::kAirWardSchema;
+        ward.waysideArchive=cp::WaysideArchiveProgress::Open;invalidEncode(ward,codec::Error::InvalidCheckpoint);
+        ward.waysideArchive=cp::WaysideArchiveProgress::Restored;
+        ward.waysideRegisterInterpreted=false;invalidEncode(ward,codec::Error::InvalidCheckpoint);
+        auto badFitting=Encode(fitted);badFitting.back()=std::byte{2};Rechecksum(badFitting);
+        Reject(badFitting,codec::Error::Malformed);
+        auto shortFunds=paid.treasurePurse;
+        shortFunds.coins=cp::TreasurePurse::kLanternFittingPrice-1;
+        const auto beforePurchase=shortFunds;
+        Check(!shortFunds.BuyLanternFitting() && shortFunds==beforePurchase,"insufficient funds preserve the purse and equipment");
+        auto badReward=Encode(paid);badReward.back()=std::byte{2};Rechecksum(badReward);
+        Reject(badReward,codec::Error::Malformed);
+        auto tampered=paid;tampered.waysideRegisterInterpreted=false;invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        tampered=paid;tampered.treasurePurse.registerRewardClaimed=false;invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        tampered=paid;tampered.treasurePurse.coins=cp::TreasurePurse::kMaximumCoins+1;
+        invalidEncode(tampered,codec::Error::InvalidCheckpoint);
+        paid.treasurePurse.coins=0;
+        Check(!paid.treasurePurse.CanClaimRegisterReward(),"an empty purse must not erase prior collection");
+        RoundTrip(paid);
+        interpreted.back()=std::byte{2};Rechecksum(interpreted);Reject(interpreted,codec::Error::Malformed);
+        archive.waysideRegisterRecovered=false;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.waysideRegisterRecovered=true;
+        archive.waysideLanternRevealStarted=false;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.waysideLanternRevealStarted=true;
+        archive.dialogue.tavernLanternLinesStarted=1;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.schema=cp::kTavernLanternExchangeSchema;
+        archive.waysideRegisterInterpreted=archive.waysideRegisterRecovered=false;
+        for(unsigned line=1;line<=dlg::kTavernLanternExchange.size();++line) {
+            archive.dialogue.tavernLanternLinesStarted=line;
+            RoundTrip(archive);
+        }
+        archive.dialogue.tavernLanternLinesStarted=dlg::kTavernLanternExchange.size()+1;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+        archive.dialogue.tavernLanternLinesStarted=1;
+        archive.waysideArchive=cp::WaysideArchiveProgress::Inspected;
+        invalidEncode(archive,codec::Error::InvalidCheckpoint);
+
+        auto silver=archive;
+        silver.schema=cp::kOrdinarySilverSchema;
+        silver.waysideArchive=cp::WaysideArchiveProgress::Open;
+        silver.dialogue.tavernConversationLinesResolved=dlg::kTavernConversation.size();
+        Check(cp::Validate(silver) && silver.treasurePurse.CollectOrdinarySilver() &&
+            silver.treasurePurse.ordinarySilver==cp::OrdinarySilverProgress::Carried,
+            "schema18 admits collected silver only after the complete Bellwether exchange");
+        RoundTrip(silver);
+        auto incompleteSilver=silver;
+        incompleteSilver.dialogue.tavernConversationLinesResolved--;
+        invalidEncode(incompleteSilver,codec::Error::InvalidCheckpoint);
+        incompleteSilver=silver;incompleteSilver.contentRevision=cp::kForestContentRevision;
+        invalidEncode(incompleteSilver,codec::Error::InvalidCheckpoint);
+
+        auto soldSilver=silver;
+        Check(soldSilver.treasurePurse.SellOrdinarySilver() &&
+            soldSilver.treasurePurse.coins==cp::TreasurePurse::kOrdinarySilverSaleCoins &&
+            soldSilver.treasurePurse.HasEarnedCoins(),
+            "sold silver is an independent persistent source of earned coins");
+        RoundTrip(soldSilver);
+        auto overpaidSilver=soldSilver;
+        ++overpaidSilver.treasurePurse.coins;
+        invalidEncode(overpaidSilver,codec::Error::InvalidCheckpoint);
+        auto soldAndFitted=soldSilver;
+        Check(soldAndFitted.treasurePurse.BuyLanternFitting() && soldAndFitted.treasurePurse.coins==0,
+            "silver-only funds can purchase the existing fitting and leave a zero balance");
+        RoundTrip(soldAndFitted);
+
+        auto downgrade=soldSilver;
+        downgrade.schema=cp::kSalvagerShorePracticeSchema;
+        invalidEncode(downgrade,codec::Error::InvalidCheckpoint);
+        auto invalidProgress=soldSilver;
+        invalidProgress.treasurePurse.ordinarySilver=static_cast<cp::OrdinarySilverProgress>(3);
+        invalidEncode(invalidProgress,codec::Error::InvalidCheckpoint);
+        auto invalidBytes=Encode(soldSilver);invalidBytes.back()=std::byte{3};Rechecksum(invalidBytes);
+        Reject(invalidBytes,codec::Error::InvalidCheckpoint);
+
+        auto oldSeventeen=silver;oldSeventeen.schema=cp::kSalvagerShorePracticeSchema;
+        oldSeventeen.treasurePurse.ordinarySilver=cp::OrdinarySilverProgress::Unfound;
+        const auto legacyBytes=Encode(oldSeventeen);
+        cp::Checkpoint migratedLegacy;
+        Check(codec::Decode(legacyBytes,migratedLegacy,error) &&
+            migratedLegacy.treasurePurse.ordinarySilver==cp::OrdinarySilverProgress::Unfound &&
+            Encode(migratedLegacy)==legacyBytes,
+            "schema17 bytes remain unchanged and migrate with ordinary silver unfound");
+    }
+    invalid=cp::Checkpoint{};invalid.contentRevision=4;invalidEncode(invalid,codec::Error::UnsupportedContent);
     invalid=cp::Checkpoint{};invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Upper();invalid.contentRevision=2;invalidEncode(invalid,codec::Error::InvalidCheckpoint);
     invalid=Endpoint();invalid.contentRevision=1;invalidEncode(invalid,codec::Error::InvalidCheckpoint);

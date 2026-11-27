@@ -1,0 +1,31 @@
+{
+  "basket": [
+    75.82,
+    -9.819768676757812,
+    113.09
+  ],
+  "shelf": [
+    76.207,
+    -9.75268927001953,
+    111.394
+  ],
+  "originalTownSha256": "0cf8cf09bb73164b7ecb254fda5c4bc0c9bbbc6ecc72e74a2f9629b21561d1a8",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "6dc0cb41da5c670e169220f401bcc050f3b9b6e12bdf71a7e9e727589f4b2a9a",
+  "addedSolidTriangles": 248,
+  "townVertices": 21481,
+  "townTriangles": 10020,
+  "ragTriangles": 56,
+  "ragVertices": 122,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "222f631accae067a7dc919e2ef4fff208b6b72ecbacbfc88a9666785d554bdec",
+  "files": {
+    "bellwether-privy-rag.blend": "568dfa4eee2baed9d12d51cf1c4fab99f9f94aa51f3c6d6933da64365547b8f3",
+    "rag-basket.glb": "c304ba533ffd4742d50e20a213360018834d3d2fb46e5de0f5f52a6534c069c7",
+    "privy-rag.glb": "ba755185839b5dad0f4ef0423049f70f92b7bdb932f2c12ea965d482c814b776",
+    "bellwether-tavern-v1.glb": "6dc0cb41da5c670e169220f401bcc050f3b9b6e12bdf71a7e9e727589f4b2a9a",
+    "asset.manifest.json": "df749444021470b753c4d3d8a226f07050e5e34ee5edc767266d6075c092a040",
+    "privy-rag.manifest.json": "053a136c1c0f0ec97056fdc9c1ba7985a3a5ed35d6af0c9209e54f0505f7974c",
+    "geometry.generated.h": "bae307d07264b85accf30a8828b551ce5bdafa27b61d6196c7a75934c645fc84"
+  }
+}

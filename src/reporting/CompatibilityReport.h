@@ -6,6 +6,12 @@
 #include <string>
 #include <string_view>
 
+// Windows headers may alias their unrelated DeviceCapabilities API to A/W.
+#pragma push_macro("DeviceCapabilities")
+#undef DeviceCapabilities
+
+namespace horde::vulkan { struct DeviceCapabilities; }
+
 namespace horde::reporting
 {
 inline constexpr std::size_t kCompatibilityReportMaxBytes = 8u * 1024u;
@@ -61,6 +67,10 @@ struct CompatibilityReportSnapshot
     bool rtPresented = false;
 };
 
+// Copy one completed physical-device inspection into the owning startup report.
+void CaptureCompatibilityDeviceEvidence(CompatibilityReportSnapshot&,
+    const horde::vulkan::DeviceCapabilities&);
+
 struct CompatibilityReportApproval
 {
     // Local review/export only. No remote or public-board consent is implied.
@@ -94,3 +104,5 @@ private:
     std::string reportId_, json_;
 };
 } // namespace horde::reporting
+
+#pragma pop_macro("DeviceCapabilities")

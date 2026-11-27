@@ -1,0 +1,16 @@
+{
+  "terrainSourceSha256": "c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774",
+  "layoutSha256": "8c98a8df1885fae56b77b7ba69fe0d8a9d5ee54e7389d760dd7bf72b2646ff2a",
+  "runtimeSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeBytes": 18484552,
+  "triangles": 39266,
+  "vertices": 20196,
+  "trianglesIntersectingRaceBeforeSubdivision": 49,
+  "patchBoundsXZ": [
+    135.38,
+    145.18344037824446,
+    73.1027171189948,
+    119.74686371273842
+  ],
+  "minimumNewProjectedDoubleArea": 2.232030965387821e-06
+}

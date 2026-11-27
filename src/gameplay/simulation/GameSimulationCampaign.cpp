@@ -14,7 +14,7 @@ bool SafeSupport(const campaign::Checkpoint& c, const TriangleSupportSurface& te
         return IsShowcasePlayerPositionWalkable(c.position.x,c.position.z) &&
             scene::TombDressingMovementClear(c.position.x,c.position.z,c.position.x,c.position.z);
     const auto support=traversal::ChapterExteriorSupport(&terrain,c.position.x,c.position.z);
-    if(c.id==campaign::CheckpointId::ForestEndpoint &&
+    if((c.id==campaign::CheckpointId::ForestEndpoint || c.id==campaign::CheckpointId::BellwetherTavern) &&
        (!terrain.HorizontalBodyVolumeClear(c.position.x,c.position.z,c.position.x,c.position.z,
             c.position.y,kStandingBodyHeight,kPlayerCollisionRadius) ||
         !traversal::ChapterExteriorObstacleClear(terrain,c.position.x,c.position.z,c.position.x,c.position.z,
@@ -31,9 +31,68 @@ bool SameBoundary(const campaign::Checkpoint& a,const campaign::Checkpoint& b) {
         c.dialogue.activeLine,c.dialogue.continuations,c.dialogue.continuationCount,
         c.dialogue.grateConsumed,c.dialogue.rescueConsumed,c.dialogue.reunionStarted,c.dialogue.waitingForRaise,
         c.dialogue.proofAccepted,c.dialogue.reminderConsumed,c.dialogue.forestNightConsumed,
-        c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed);};
+        c.dialogue.forestWaystoneConsumed,c.dialogue.forestClueConsumed,c.dialogue.forestVillageConsumed,
+        c.dialogue.hearthLinesResolved,c.dialogue.tavernConversationLinesResolved,c.dialogue.tavernLanternLinesStarted,c.waysideArchive,
+        c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.treasurePurse,
+        c.airWardLearned,c.millPreparation,c.salvagerShorePracticeCompleted,c.privyRagDelivered,
+        c.bellwetherAnkleAssessed);};
     return facts(a)==facts(b);
 }
+}
+
+static campaign::WaysideArchiveProgress WaysideArchiveProgressForSave(const bellwether::WaysideArchive& archive) {
+    using bellwether::ArchiveStage;
+    using campaign::WaysideArchiveProgress;
+    if(archive.stage==ArchiveStage::Closed)return WaysideArchiveProgress::Closed;
+    if(archive.stage==ArchiveStage::Restored)return WaysideArchiveProgress::Restored;
+    return archive.stage==ArchiveStage::Open || archive.stage==ArchiveStage::Closing ?
+        WaysideArchiveProgress::Open:WaysideArchiveProgress::Inspected;
+}
+
+static void RecordWaysideArchive(campaign::Checkpoint& checkpoint,const bellwether::WaysideArchive& archive) {
+    checkpoint.waysideArchive=WaysideArchiveProgressForSave(archive);
+    checkpoint.waysideLanternRevealStarted=archive.lanternRevealStarted;
+    checkpoint.waysideRegisterRecovered=archive.registerRecovered;
+    checkpoint.waysideRegisterInterpreted=archive.registerInterpreted;
+    checkpoint.airWardLearned=archive.airWardLearned;
+    if(checkpoint.waysideArchive!=campaign::WaysideArchiveProgress::Closed)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideArchiveSchema);
+    if(checkpoint.waysideLanternRevealStarted)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kShrineLanternSchema);
+    if(checkpoint.waysideRegisterRecovered)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kWaysideRegisterSchema);
+    if(checkpoint.waysideRegisterInterpreted)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kRegisterInterpretationSchema);
+    if(checkpoint.waysideArchive==campaign::WaysideArchiveProgress::Restored)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kAirWardSchema);
+}
+
+static void RecordTreasurePurse(campaign::Checkpoint& checkpoint,campaign::TreasurePurse purse) {
+    if(purse==campaign::TreasurePurse{})return;
+    checkpoint.treasurePurse=purse;
+    checkpoint.schema=std::max(checkpoint.schema,purse.lanternFittingPurchased?
+        campaign::kLanternFittingSchema:campaign::kTreasurePurseSchema);
+    if(purse.ordinarySilver!=campaign::OrdinarySilverProgress::Unfound)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kOrdinarySilverSchema);
+    if(purse.millTally!=campaign::MillTallyProgress::Unfound)
+        checkpoint.schema=std::max(checkpoint.schema,campaign::kMillTallySchema);
+}
+
+static void RecordMillPreparation(campaign::Checkpoint& checkpoint,bellwether::MillPreparation preparation) {
+    if(preparation==bellwether::MillPreparation::Unexamined)return;
+    checkpoint.millPreparation=preparation;
+    checkpoint.schema=std::max(checkpoint.schema,campaign::kMillPreparationSchema);
+}
+
+static bool BellwetherAssessmentFinished(const dialogue::CompanionSnapshot& kit,const dialogue::Snapshot& speech) {
+    return kit.bellwetherArrival>=dialogue::BellwetherArrivalStage::ProtectiveApproach &&
+        !dialogue::IsRoadLine(speech.line);
+}
+
+static void RecordBellwetherAssessment(campaign::Checkpoint& checkpoint) {
+    checkpoint.flaskRecorded=campaign::HasFlaskResources(checkpoint);
+    checkpoint.schema=campaign::kBellwetherAnkleSchema;
+    checkpoint.bellwetherAnkleAssessed=true;
 }
 
 std::optional<campaign::Checkpoint> GameSimulation::CaptureCampaignCheckpoint(campaign::CheckpointId id) const {
@@ -58,7 +117,8 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
         (healingFlask_.Snapshot().action!=healing::FlaskAction::Idle || FlaskUtilityBusy() ||
         pendingDrinkFlaskCommands_ || pendingRestCommands_))return std::nullopt;
     const bool forest=id==campaign::CheckpointId::ForestEndpoint;
-    const bool upper=id==campaign::CheckpointId::SafeExit || forest;
+    const bool tavern=id==campaign::CheckpointId::BellwetherTavern;
+    const bool upper=id==campaign::CheckpointId::SafeExit || forest || tavern;
     if (!config_.combatFoundation1_7 || !config_.waterfallSkeletonEncounter ||
         !config_.developmentRescueJourney || !config_.authoredChapterTerrain || legacyCombatCheckpoint_ ||
         !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation ||
@@ -85,22 +145,35 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     const auto zone=campaign::Destination(id);
     if(worldRoute_.readiness[static_cast<std::size_t>(zone)]!=ZoneReadiness::Ready) return std::nullopt;
     const auto progress=chapterDialogue_.ExportProgress();
-    if(forest && !campaign::CompletedForestProgress(progress))return std::nullopt;
+    if((forest || tavern) && !campaign::CompletedForestProgress(progress))return std::nullopt;
+    const auto& kit=chapterCompanion_.State();
+    const auto tavernAnchor=campaign::kBellwetherCheckpointPosition;
+    if(tavern && (worldRoute_.current!=zone || !kit.grounded || kit.walking ||
+       kit.bellwetherArrival!=dialogue::BellwetherArrivalStage::Seated ||
+       kit.motion.mode!=dialogue::CompanionMotionMode::Seated ||
+       std::hypot(s.playerX-tavernAnchor.x,s.playerZ-tavernAnchor.z)>1.75f ||
+       std::abs(s.playerSupportWorldY-tavernAnchor.y)>.001f))return std::nullopt;
     const auto endpoint=kWorldRoutePoints.back();
+    const auto retainedRevision=campaignBoundary_?campaignBoundary_->contentRevision:1u;
     if(forest) {
-        const auto& kit=chapterCompanion_.State();
+        const bool kitAtLookout=kit.grounded && !kit.walking && kit.waypoint==kWorldRoutePoints.size() &&
+           std::hypot(kit.x-(endpoint.x+1.0f),kit.z-endpoint.z)<=.07f;
+        // The already-earned basin still works after Kit has left the lookout.
+        const bool kitDeparted=retainedRevision>=campaign::kForestContentRevision &&
+            kit.bellwetherArrival!=dialogue::BellwetherArrivalStage::AtLookout;
         if(worldRoute_.current!=WorldZoneId::Lookout ||
            std::hypot(s.playerX-endpoint.x,s.playerZ-endpoint.z)>2.0f ||
-           !kit.grounded || kit.walking || kit.waypoint!=kWorldRoutePoints.size() ||
-           std::hypot(kit.x-(endpoint.x+1.0f),kit.z-endpoint.z)>.07f)return std::nullopt;
-        dialogue::CompanionRouteFixture restoredKit;
-        restoredKit.RestoreCampaignLookout(endpoint.x,endpoint.z,chapterTerrain_.get(),0);
-        if(!restoredKit.State().grounded)return std::nullopt;
+           (!kitAtLookout && !kitDeparted))return std::nullopt;
+        if(retainedRevision<campaign::kBellwetherContentRevision) {
+            dialogue::CompanionRouteFixture restoredKit;
+            restoredKit.RestoreCampaignLookout(endpoint.x,endpoint.z,chapterTerrain_.get(),0);
+            if(!restoredKit.State().grounded)return std::nullopt;
+        }
     }
     campaign::Checkpoint c;
-    // Speech flags alone can finish before Kit reaches the lookout. Only the
-    // admitted endpoint (or its retained later safe side) establishes content 2.
-    c.contentRevision=forest || (campaignBoundary_ && campaignBoundary_->contentRevision==2)?2u:1u;
+    // Later safe-side saves carry the last earned chapter milestone with them.
+    c.contentRevision=tavern ? campaign::kBellwetherContentRevision :
+        forest ? std::max(retainedRevision,campaign::kForestContentRevision) : retainedRevision;
     c.id=id;c.zone=zone;c.position={s.playerX,s.playerSupportWorldY,s.playerZ};
     c.yaw=s.playerYawRadians;c.pitch=s.playerPitchRadians;c.vitality=s.playerVitals.vitality;
     c.halfHeart=s.playerVitals.halfHeart;c.schema=c.halfHeart?2u:1u;
@@ -112,6 +185,9 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
             const auto support=traversal::ChapterExteriorSupport(chapterTerrain_.get(),endpoint.x,endpoint.z);
             if(!support.grounded)return std::nullopt;
             c.position={endpoint.x,support.worldY,endpoint.z};c.yaw=2.51f;c.pitch=-.15f;
+        }
+        if(tavern) {
+            c.position=tavernAnchor;c.yaw=-1.40f;c.pitch=-.22f;
         }
         // Respawn standing at the authored anchor must itself be safe. Live
         // pose/velocity is discarded; geometry/readiness and durable facts are
@@ -129,6 +205,11 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     c.torchDropX=s.torchFailure.droppedX;c.torchDropZ=s.torchFailure.droppedZ;
     c.torchDropYaw=s.torchFailure.droppedYawRadians;c.torchDropPitch=s.torchFailure.droppedViewPitchRadians;
     c.dialogue=progress;
+    if(c.contentRevision<campaign::kBellwetherContentRevision) {
+        c.dialogue.hearthLinesResolved=0;
+        c.dialogue.tavernConversationLinesResolved=0;
+        c.dialogue.tavernLanternLinesStarted=0;
+    }
     c.defeatedGuards=0;
     for(std::size_t i=0;i<c.guards.size();++i) {
         const auto& actor=s.skeletonEnemies[i];
@@ -140,8 +221,92 @@ std::optional<campaign::Checkpoint> GameSimulation::BuildCampaignCheckpoint(camp
     }
     if(c.defeatedGuards!=3) {c.schema=5;c.flaskRecorded=config_.healingFlask1_7;}
     else c.guardHealth={};
+    if(c.dialogue.hearthLinesResolved) {
+        c.schema=c.dialogue.tavernConversationLinesResolved?campaign::kTavernConversationSchema:campaign::kHearthSpeechSchema;
+        c.flaskRecorded=config_.healingFlask1_7;
+    }
+    if(c.contentRevision>=campaign::kBellwetherContentRevision && c.dialogue.hearthLinesResolved==dialogue::kHearthLines.size())
+        RecordWaysideArchive(c,waysideArchive_);
+    if(c.dialogue.tavernLanternLinesStarted)c.schema=std::max(c.schema,campaign::kTavernLanternExchangeSchema);
+    RecordTreasurePurse(c,treasurePurse_);
+    RecordMillPreparation(c,millPreparation_);
+    if(salvagerShorePracticeCompleted_) {
+        c.salvagerShorePracticeCompleted=true;
+        c.schema=std::max(c.schema,campaign::kSalvagerShorePracticeSchema);
+    }
+    if(privyRagState_==bellwether::PrivyRagState::Delivered) {
+        c.privyRagDelivered=true;
+        c.schema=std::max(c.schema,campaign::kPrivyRagSchema);
+    }
+    if(c.contentRevision==campaign::kForestContentRevision &&
+       BellwetherAssessmentFinished(kit,chapterDialogue_.State()))RecordBellwetherAssessment(c);
     if(!campaign::Validate(c) || !SafeSupport(c,*chapterTerrain_)) return std::nullopt;
     return c;
+}
+void GameSimulation::ClaimRegisterReward(const dialogue::Context& context) {
+    auto purse=treasurePurse_;
+    if(RecordKeeperAction(context)!=dialogue::RecordKeeperAction::CollectReward || !purse.ClaimRegisterReward())return;
+    const auto updated=PrepareTreasureCheckpoint(purse);
+    if(updated && chapterDialogue_.TryStartRecordKeeper(dialogue::RecordKeeperAction::CollectReward,context))
+        CommitTreasureCheckpoint(*updated);
+}
+bool GameSimulation::CanBuyLanternFitting(const dialogue::Context& context) const {
+    return treasurePurse_.CanBuyLanternFitting() && campaignBoundary_ &&
+        campaignBoundaryRevision_!=UINT64_MAX && chapterDialogue_.CanFitTavernLantern(context);
+}
+void GameSimulation::BuyLanternFitting(const dialogue::Context& context) {
+    auto purse=treasurePurse_;
+    if(!CanBuyLanternFitting(context) || !purse.BuyLanternFitting())return;
+    const auto updated=PrepareTreasureCheckpoint(purse);
+    if(updated && chapterDialogue_.TryStartTavernLanternFitting(context))CommitTreasureCheckpoint(*updated);
+}
+void GameSimulation::InteractWithOrdinarySilver(campaign::OrdinarySilverAction action) {
+    using campaign::OrdinarySilverAction;
+    auto purse=treasurePurse_;
+    const bool changed=action==OrdinarySilverAction::Take ? purse.CollectOrdinarySilver() :
+        action==OrdinarySilverAction::Sell && purse.SellOrdinarySilver();
+    if(changed) {
+        if(const auto updated=PrepareTreasureCheckpoint(purse))CommitTreasureCheckpoint(*updated);
+    }
+}
+void GameSimulation::InteractWithMillTally(campaign::MillTallyAction action) {
+    auto purse=treasurePurse_;
+    if(!purse.ApplyMillTallyAction(action))return;
+    if(const auto updated=PrepareTreasureCheckpoint(purse))CommitTreasureCheckpoint(*updated);
+}
+std::optional<campaign::Checkpoint> GameSimulation::PrepareTreasureCheckpoint(campaign::TreasurePurse purse) const {
+    if(!campaignBoundary_ || campaignBoundaryRevision_==UINT64_MAX ||
+       !chapterTerrain_ || chapterTerrainGeneration_!=worldRoute_.generation)return std::nullopt;
+    auto updated=*campaignBoundary_;
+    RecordTreasurePurse(updated,purse);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return std::nullopt;
+    return updated;
+}
+std::optional<campaign::Checkpoint> GameSimulation::PreparePrivyRagDeliveredCheckpoint() const {
+    if(privyRagState_!=bellwether::PrivyRagState::Carried || !campaignBoundary_ ||
+       campaignBoundaryRevision_==UINT64_MAX || campaignBoundary_->privyRagDelivered || !chapterTerrain_ ||
+       chapterTerrainGeneration_!=worldRoute_.generation ||
+       campaignBoundary_->contentRevision<campaign::kBellwetherContentRevision ||
+       campaignBoundary_->dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())
+        return std::nullopt;
+    auto updated=*campaignBoundary_;
+    updated.privyRagDelivered=true;
+    updated.schema=std::max(updated.schema,campaign::kPrivyRagSchema);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return std::nullopt;
+    return updated;
+}
+void GameSimulation::CommitPrivyRagDeliveredCheckpoint(const campaign::Checkpoint& updated) {
+    if(privyRagState_!=bellwether::PrivyRagState::Carried || !updated.privyRagDelivered ||
+       !campaignBoundary_ || campaignBoundary_->privyRagDelivered || campaignBoundaryRevision_==UINT64_MAX)
+        return;
+    campaignBoundary_=updated;
+    privyRagState_=bellwether::PrivyRagState::Delivered;
+    ++campaignBoundaryRevision_;
+}
+void GameSimulation::CommitTreasureCheckpoint(const campaign::Checkpoint& updated) {
+    treasurePurse_=updated.treasurePurse;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
 }
 void GameSimulation::ClearCampaignBoundary() {
     campaignBoundary_.reset();
@@ -152,7 +317,62 @@ void GameSimulation::LatchCampaignBoundary() {
     // The last earned exterior boundary survives exploration away from its
     // arrival radius. A completed return descent may still earn the lower side.
     if(snapshot_.rescue.exteriorSide) {
+        const auto tavern=campaign::CheckpointId::BellwetherTavern;
+        const bool atTavernBoundary=campaignBoundary_ && campaignBoundary_->id==tavern;
+        if(chapterCompanion_.State().bellwetherArrival==dialogue::BellwetherArrivalStage::Seated) {
+            const auto& speech=chapterDialogue_.State();
+            const bool hasRegisterBoundary=campaignBoundary_ && campaignBoundary_->waysideRegisterInterpreted;
+            const bool waysideProgressAdvanced=(atTavernBoundary || hasRegisterBoundary) &&
+                (WaysideArchiveProgressForSave(waysideArchive_)>campaignBoundary_->waysideArchive ||
+                 (waysideArchive_.lanternRevealStarted && !campaignBoundary_->waysideLanternRevealStarted) ||
+                 (waysideArchive_.registerRecovered && !campaignBoundary_->waysideRegisterRecovered) ||
+                 (waysideArchive_.registerInterpreted && !campaignBoundary_->waysideRegisterInterpreted) ||
+                 (waysideArchive_.airWardLearned && !campaignBoundary_->airWardLearned));
+            const bool lanternExchangeAdvanced=atTavernBoundary &&
+                speech.tavernLanternLinesStarted>campaignBoundary_->dialogue.tavernLanternLinesStarted;
+            if((waysideProgressAdvanced || lanternExchangeAdvanced) && chapterTerrain_ &&
+               chapterTerrainGeneration_==worldRoute_.generation) {
+                // Record the discovery in the existing tavern save. The distant
+                // interaction does not replace the player's saved pose or resources.
+                auto updated=*campaignBoundary_;
+                RecordWaysideArchive(updated,waysideArchive_);
+                if(lanternExchangeAdvanced) {
+                    updated.dialogue.tavernLanternLinesStarted=speech.tavernLanternLinesStarted;
+                    updated.schema=std::max(updated.schema,campaign::kTavernLanternExchangeSchema);
+                }
+                if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_)) {
+                    campaignBoundary_=updated;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
+            const bool hearthAdvanced=atTavernBoundary &&
+                (speech.hearthLinesResolved>campaignBoundary_->dialogue.hearthLinesResolved ||
+                 speech.tavernConversationLinesResolved>campaignBoundary_->dialogue.tavernConversationLinesResolved);
+            if(!atTavernBoundary || config_.healingFlask1_7 || hearthAdvanced) {
+                const auto arrived=CaptureAuthoredCampaignBoundary(tavern);
+                if(arrived && (!campaignBoundary_ || !SameBoundary(*arrived,*campaignBoundary_))) {
+                    campaignBoundary_=*arrived;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
+            if(atTavernBoundary)return;
+        }
         if(campaignBoundary_ && campaignBoundary_->id==campaign::CheckpointId::ForestEndpoint) {
+            if(campaignBoundary_->contentRevision==campaign::kForestContentRevision &&
+               !campaignBoundary_->bellwetherAnkleAssessed && chapterTerrain_ &&
+               chapterTerrainGeneration_==worldRoute_.generation &&
+               BellwetherAssessmentFinished(chapterCompanion_.State(),chapterDialogue_.State())) {
+                // Keep the earned safe anchor and its resources while recording
+                // the completed story beat before the tavern save is available.
+                auto updated=*campaignBoundary_;
+                RecordBellwetherAssessment(updated);
+                dialogue::CompanionRouteFixture restoredKit;
+                if(campaign::Validate(updated) && SafeSupport(updated,*chapterTerrain_) &&
+                   restoredKit.RestoreCampaignBellwetherApproach(*chapterTerrain_,0)) {
+                    campaignBoundary_=updated;++campaignBoundaryRevision_;
+                    return;
+                }
+            }
             // Preserve endpoint ownership away from it, but an eligible Rest or
             // resource change at that earned anchor must refresh logical state.
             if(config_.healingFlask1_7) {
@@ -176,6 +396,53 @@ void GameSimulation::LatchCampaignBoundary() {
     if(candidate && (!campaignBoundary_ || !SameBoundary(*candidate,*campaignBoundary_))) {
         campaignBoundary_=*candidate;++campaignBoundaryRevision_;
     }
+}
+
+void GameSimulation::InteractWithMill(bellwether::MillAction action) {
+    using namespace bellwether;
+    MillPreparation preparation;
+    switch(action) {
+    case MillAction::InspectGearing: preparation=MillPreparation::BearingNeeded;break;
+    case MillAction::RecoverBearing: preparation=MillPreparation::BearingRecovered;break;
+    case MillAction::CheckFit: preparation=MillPreparation::FitChecked;break;
+    case MillAction::StartLeakTest:
+        millLeakTestPhase_=MillLeakTestPhase::Testing;
+        millLeakTestSeconds_=0.f;
+        return;
+    case MillAction::ConfirmSeal: preparation=MillPreparation::RigTested;break;
+    case MillAction::SeatBearing: preparation=MillPreparation::BearingSeated;break;
+    case MillAction::TurnDrive: millDriveTurnSeconds_=0.f;return;
+    case MillAction::TakeRig: preparation=MillPreparation::RigTrialReady;break;
+    default: return;
+    }
+    CommitMillPreparation(preparation);
+}
+
+bool GameSimulation::CommitMillPreparation(bellwether::MillPreparation preparation) {
+    auto updated=*campaignBoundary_;
+    RecordMillPreparation(updated,preparation);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return false;
+    millPreparation_=preparation;
+    millLeakTestPhase_=bellwether::MillLeakTestPhase::Idle;
+    millLeakTestSeconds_=0.f;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
+    return true;
+}
+
+bool GameSimulation::CommitShorePractice() {
+    if(!campaignBoundary_ || !chapterTerrain_ || campaignBoundaryRevision_==UINT64_MAX ||
+       shorePracticeStage_!=bellwether::ShorePracticeStage::ReportBack || salvagerShorePracticeCompleted_)
+        return false;
+    auto updated=*campaignBoundary_;
+    updated.salvagerShorePracticeCompleted=true;
+    updated.schema=std::max(updated.schema,campaign::kSalvagerShorePracticeSchema);
+    if(!campaign::Validate(updated) || !SafeSupport(updated,*chapterTerrain_))return false;
+    salvagerShorePracticeCompleted_=true;
+    shorePracticeStage_=bellwether::ShorePracticeStage::Idle;
+    campaignBoundary_=updated;
+    ++campaignBoundaryRevision_;
+    return true;
 }
 
 std::optional<campaign::RestoreToken> GameSimulation::BeginCampaignRestore(const campaign::Checkpoint& c) {
@@ -205,17 +472,28 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
        chapterCompanion_.State().generation==UINT64_MAX || rescueTraversal_.Snapshot().generation==UINT64_MAX)
         return false;
     const auto c=pendingCampaignRestore_->checkpoint;
-    if(!campaign::Validate(c) || (campaign::HasFlaskResources(c) && !config_.healingFlask1_7) || !SafeSupport(c,*terrain)) return false;
-    const bool completedForest=c.contentRevision==2;
-    const bool upper=c.id==campaign::CheckpointId::SafeExit || c.id==campaign::CheckpointId::ForestEndpoint;
+    if(!campaign::Validate(c) || (campaign::HasFlaskResources(c) && !config_.healingFlask1_7) ||
+       (c.waysideArchive!=campaign::WaysideArchiveProgress::Closed && !terrain->HingedContact()) ||
+       !SafeSupport(c,*terrain)) return false;
+    const bool completedForest=c.contentRevision>=campaign::kForestContentRevision;
+    const bool upper=c.id!=campaign::CheckpointId::LowerClaimed;
     auto config=config_;
     config.developmentRescueJourney=true;config.authoredChapterTerrain=true;
     config.developmentWorldRoute=false;config.developmentSupportFixture=false;
     config.swordStartsStowed=c.swordStowed;
     GameSimulation next(config);
+    next.combatTeachingCardSerial_ = combatTeachingCardSerial_;
     next.worldRoute_.generation=token.worldGeneration;
     next.worldRoute_.current=c.zone;
     next.chapterTerrain_=std::move(terrain);next.chapterTerrainGeneration_=token.worldGeneration;
+    if(c.waysideArchive==campaign::WaysideArchiveProgress::Inspected)
+        next.waysideArchive_.stage=bellwether::ArchiveStage::Inspected;
+    else if(c.waysideArchive==campaign::WaysideArchiveProgress::Open)
+        next.waysideArchive_={bellwether::ArchiveStage::Open,1.f,bellwether::ArchivePose::AtOpening(1.f),
+            c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted};
+    else if(c.waysideArchive==campaign::WaysideArchiveProgress::Restored)
+        next.waysideArchive_={bellwether::ArchiveStage::Restored,0.f,bellwether::ArchivePose::AtOpening(0.f),
+            c.waysideLanternRevealStarted,c.waysideRegisterRecovered,c.waysideRegisterInterpreted,c.airWardLearned};
     if(!next.worldRoute_.Publish(readyDestination,ZoneReadiness::Ready)) return false;
     next.playerX_=c.position.x;next.playerZ_=c.position.z;
     next.playerYawRadians_=c.yaw;next.playerPitchRadians_=c.pitch;
@@ -256,6 +534,11 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     next.enemyDirector_.Update(c.position.x,c.position.z,EnemyKind::Lich);next.enemyDirector_.MarkSelectedDead();
     next.activeEnemyKind_=EnemyKind::Lich;
     next.playerVitals_.RestoreCampaignVitality(c.vitality,c.halfHeart);
+    next.treasurePurse_=c.treasurePurse;
+    next.privyRagState_=c.privyRagDelivered?bellwether::PrivyRagState::Delivered:
+        bellwether::PrivyRagState::Available;
+    next.millPreparation_=c.millPreparation;
+    next.salvagerShorePracticeCompleted_=c.salvagerShorePracticeCompleted;
     if(config_.healingFlask1_7 && !next.healingFlask_.Restore(c.flask))return false;
     interactions::ChestRewardSnapshot chest;
     chest.phase=interactions::ChestRewardPhase::LanternClaimed;chest.lidOpenProgress=1;
@@ -272,7 +555,13 @@ bool GameSimulation::CommitCampaignRestore(campaign::RestoreToken token, WorldZo
     // Saved equipment belongs to this session. A later New Game/reset keeps
     // the caller's configured opening equipment policy.
     next.config_.swordStartsStowed=config_.swordStartsStowed;
-    if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
+    if(c.contentRevision==campaign::kBellwetherContentRevision) {
+        if(!next.chapterCompanion_.RestoreCampaignTavernSeat(*next.chapterTerrain_,chapterCompanion_.State().generation))return false;
+        if(next.IsBellwetherTavernKeeperReady())next.tavernKeeper_.RestoreAtHearth(*next.chapterTerrain_);
+    } else if(c.bellwetherAnkleAssessed) {
+        if(!next.chapterCompanion_.RestoreCampaignBellwetherApproach(*next.chapterTerrain_,
+                chapterCompanion_.State().generation))return false;
+    } else if(completedForest)next.chapterCompanion_.RestoreCampaignLookout(c.position.x,c.position.z,
         next.chapterTerrain_.get(),chapterCompanion_.State().generation);
     else if(upper && config_.healingFlask1_7 &&
             (c.dialogue.activeLine==dialogue::Line::FlaskEmpty ||

@@ -3,12 +3,14 @@
 #include <array>
 #include <cmath>
 namespace horde::gameplay::dialogue {
-enum class CompanionMotionMode { Idle, Turning, Starting, Walking };
+enum class CompanionMotionMode { Idle, Turning, Starting, Walking, Sitting, Seated };
 struct CompanionMotionPose {
     bool turnStartEnabled=false;
     CompanionMotionMode mode=CompanionMotionMode::Idle;
     float speed=0,turnPhase=0,turnAngleRadians=0,entryWeight=0,idleZeroWeight=0;
     float turnPlaybackSeconds=0; // Latched per supported exchange; transient, never saved.
+    float sitPlaybackSeconds=0;
+    float anklePlaybackSeconds=0;
     bool operator==(const CompanionMotionPose&) const=default;
 };
 // Exact owned joint-only take's external asset-space yaw. Logical yaw is its

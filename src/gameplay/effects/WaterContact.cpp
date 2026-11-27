@@ -1,11 +1,14 @@
 #include "gameplay/effects/WaterContact.h"
+#include "scene/ChapterRegionalWater.h"
 namespace horde::gameplay::effects
 {
-WaterContactResult WaterContact::Step(float dt,float x,float y,float z,bool grounded,bool step,float speed,float width,bool paused)
+WaterContactResult WaterContact::Step(float dt,float x,float y,float z,bool grounded,bool step,float speed,float width,
+                                     bool paused,WaterContactDomain domain)
 {
     WaterContactResult result{};
     if(paused || !std::isfinite(dt) || dt<=0) return result;
     dt=std::min(dt,.05f);
+    const bool exterior=domain==WaterContactDomain::RegionalExterior;
     for(auto& r:state_.ripples) if(r.active) { r.age+=dt;if(r.age>=.90f) r.active=false; }
     for(auto& d:state_.droplets) if(d.active) {
         d.age+=dt;
@@ -13,20 +16,31 @@ WaterContactResult WaterContact::Step(float dt,float x,float y,float z,bool grou
         for(std::size_t i=0;i<3;++i) d.position[i]+=d.velocity[i]*dt;
         float surface=kRouteFloorWorldY;
         const bool water=WaterSurfaceAt(d.position[0],d.position[2],surface);
+        const auto regional=exterior && !water ?
+            scene::ChapterRegionalWaterSurfaceAt(d.position[0],d.position[2]):std::nullopt;
         bool inside=false;
         for(const auto& rect:kShowcaseWalkableRects) inside|=Contains(rect,d.position[0],d.position[2]);
         bool masonry=false;
         for(const auto& rect:kShowcaseMasonryObstacles)
             masonry|=Contains(rect,d.position[0],d.position[2]);
-        if(d.position[1]<=surface) {
-            if(water) Ripple(d.position[0],d.position[2],.25f);
+        if(d.position[1]<=regional.value_or(surface)) {
+            if(water) Ripple(d.position[0],surface,d.position[2],.25f);
             d.active=false;
         }
-        if(d.age>=d.lifetime || !inside || masonry) d.active=false;
+        if(d.age>=d.lifetime || (!inside && !regional) || masonry) d.active=false;
     }
     float surface=0;
-    state_.wetGround=grounded && WaterSurfaceAt(x,z,surface) && std::abs(surface-y)<.06f;
-    const bool stream=BodyTouchesWaterfall(x,y,z,width);
+    state_.wetGround=false;
+    if(grounded && exterior) {
+        if(const auto regional=scene::ChapterRegionalWaterSurfaceAt(x,z)) {
+            surface=*regional;
+            const float depth=surface-y;
+            state_.wetGround=depth>.01f && depth<=.55f;
+        }
+    } else if(grounded) {
+        state_.wetGround=WaterSurfaceAt(x,z,surface) && std::abs(surface-y)<.06f;
+    }
+    const bool stream=!exterior && BodyTouchesWaterfall(x,y,z,width);
     result.streamEntry=stream&&!state_.inStream;
     state_.inStream=stream;
     if(result.streamEntry) {
@@ -39,8 +53,9 @@ WaterContactResult WaterContact::Step(float dt,float x,float y,float z,bool grou
     if(state_.wetGround && step && std::isfinite(speed) && speed>.01f) {
         result.wetStep=true;
         result.intensity=std::clamp(.35f+.08f*speed,.35f,.70f);
+        result.sourceY=exterior?surface:y;
         ++state_.stepCount;
-        Ripple(x,z,result.intensity);
+        if(!exterior)Ripple(x,surface,z,result.intensity);
         EmitDrops(x,surface+.04f,z,3,result.intensity);
     }
     return result;
@@ -58,9 +73,8 @@ void WaterContact::EmitDrops(float x,float y,float z,std::size_t count,float spe
              0,.45f+.20f*fraction,true};
     }
 }
-void WaterContact::Ripple(float x,float z,float strength)
+void WaterContact::Ripple(float x,float y,float z,float strength)
 {
-    float y=0;if(!WaterSurfaceAt(x,z,y)) return;
     auto it=std::find_if(state_.ripples.begin(),state_.ripples.end(),[](const auto& r){return !r.active;});
     if(it==state_.ripples.end()) it=std::max_element(state_.ripples.begin(),state_.ripples.end(),
         [](const auto& a,const auto& b){return a.age<b.age;});

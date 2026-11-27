@@ -6,9 +6,11 @@
 #include "scene/ShowcaseOverheadGeometry.h"
 #include "scene/DevelopmentWorldGeometry.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/HingedYawPose.h"
 
 #include <algorithm>
 #include <cmath>
+#include <optional>
 
 namespace horde::gameplay::items
 {
@@ -359,13 +361,28 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
                                            const float forwardX,
                                            const float forwardZ, const bool developmentWorldRoute,
                                            const bool rescueExterior, const float supportWorldY,
-                                           const simulation::TriangleSupportSurface* chapterTerrain)
+                                           const simulation::TriangleSupportSurface* chapterTerrain,
+                                           const traversal::HingedYawPose* tavernDoorPose)
 {
+    if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
+        !std::isfinite(forwardX) || !std::isfinite(forwardZ))
+        return 0.0f;
+    const float forwardLength = std::hypot(forwardX, forwardZ);
+    if (forwardLength <= 0.000001f) return 0.0f;
+
+    std::optional<traversal::ChapterExteriorObstacleQuery> chapterObstacles;
+    if (rescueExterior && chapterTerrain) {
+        if (!traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded) return 0.0f;
+        chapterObstacles.emplace(*chapterTerrain);
+    }
+    const auto* doorContact=chapterTerrain && tavernDoorPose ? chapterTerrain->HingedContact(
+        simulation::TriangleSupportSurface::HingedPart::TavernDoor) : nullptr;
     const auto walkable=[&](float x,float z) {
-        if (rescueExterior && chapterTerrain)
-            return traversal::ChapterExteriorSupport(chapterTerrain,cameraX,cameraZ).grounded &&
-                traversal::ChapterExteriorCarryClear(*chapterTerrain,
-                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius);
+        if (chapterObstacles)
+            return chapterObstacles->CarryClear(
+                    cameraX,cameraZ,x,z,supportWorldY,kPlayerCollisionRadius) &&
+                (!doorContact || tavernDoorPose->VolumeClear(*doorContact,cameraX,cameraZ,x,z,
+                    supportWorldY+.25f,supportWorldY+2.30f,kPlayerCollisionRadius));
         if (rescueExterior)
             return horde::gameplay::traversal::RescueExteriorSupport(x,z).grounded &&
                 horde::gameplay::traversal::RescueExteriorMovementClear(
@@ -373,12 +390,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
         return developmentWorldRoute ?
         horde::gameplay::simulation::ProjectWorldRoute(x,z).distance <=
             horde::gameplay::simulation::kWorldRouteHalfWidth-horde::gameplay::kPlayerCollisionRadius : IsShowcaseHeldPropPositionWalkable(x,z); };
-    if (!std::isfinite(cameraX) || !std::isfinite(cameraZ) ||
-        !std::isfinite(forwardX) || !std::isfinite(forwardZ))
-        return 0.0f;
-    const float forwardLength = std::hypot(forwardX, forwardZ);
-    if (forwardLength <= 0.000001f ||
-        !walkable(cameraX, cameraZ))
+    if (!walkable(cameraX, cameraZ))
         return 0.0f;
     const float unitForwardX = forwardX / forwardLength;
     const float unitForwardZ = forwardZ / forwardLength;
@@ -388,7 +400,7 @@ float ComputeRewardLanternForwardClearance(const float cameraX,
     // unobstructed full reach needs one sweep, not 108. Empty holes underneath
     // the carried item are not walls. The
     // historical point predicate must retain its incremental search.
-    if (rescueExterior && chapterTerrain && walkable(
+    if (chapterObstacles && walkable(
             cameraX + unitForwardX*kMaximumClearance,
             cameraZ + unitForwardZ*kMaximumClearance)) return kMaximumClearance;
     float lastWalkable = 0.0f;
@@ -739,7 +751,7 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
     const float forwardZ = -std::cos(input.cameraYawRadians);
     const float forwardClearance = ComputeRewardLanternForwardClearance(
         input.cameraX, input.cameraZ, forwardX, forwardZ, input.developmentWorldRoute,
-        input.rescueExterior, input.playerSupportWorldY, input.chapterTerrain);
+        input.rescueExterior, input.playerSupportWorldY, input.chapterTerrain,input.tavernDoorPose);
     // All rigid hand props share the continuous collision clearance. The
     // legacy 7.5 cm sampled helper produced a visible one-tick sword/forearm
     // jump while approaching a wall and could feed a discontinuous pose into
@@ -1138,9 +1150,10 @@ HeldItemKinematicsState EvaluateHeldItemKinematics(const HeldItemKinematicsInput
             for(float z:{-.213827f,.213827f})
                 include({{x*kClaimedRewardLanternScale,y*kClaimedRewardLanternScale,z*kClaimedRewardLanternScale}},
                     .736323f*kClaimedRewardLanternScale,0,0);
+        constexpr float lightBelowHinge=kRewardLanternLightBelowHinge*kClaimedRewardLanternScale;
         for(const auto offset:std::array{std::array{-.075f,-.045f},std::array{.070f,.060f},
              std::array{-.075f,.060f},std::array{.070f,-.045f}})
-            include({{0,-.515f*kClaimedRewardLanternScale,0}},.515f*kClaimedRewardLanternScale,offset[0],offset[1]);
+            include({{0,-lightBelowHinge,0}},lightBelowHinge,offset[0],offset[1]);
         const float radial=kRewardLanternHorizontalOriginEnvelope;
         offsets.minX=std::max(offsets.minX,-radial);offsets.maxX=std::min(offsets.maxX,radial);
         offsets.minZ=std::max(offsets.minZ,-radial);offsets.maxZ=std::min(offsets.maxZ,radial);
@@ -1269,7 +1282,8 @@ bool ResolveHeldItemsFixedStep(HeldItemStates& items,
         input.playerMountProfile,
         input.playerPitchRadians,
         input.logicalViewAspect,
-        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,input.chapterTerrain,input.playerCrouchDropMetres});
+        input.playerSupportWorldY,input.developmentWorldRoute,input.readableCombatPose,input.rescueExterior,
+        input.chapterTerrain,input.playerCrouchDropMetres,input.tavernDoorPose});
     if (input.swordItemState != nullptr &&
         input.swordItemState->id == HeldItemId::Sword)
     {

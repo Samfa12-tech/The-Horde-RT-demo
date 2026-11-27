@@ -1,0 +1,18 @@
+{
+  "feature": "Square water bench and tavern south frontage",
+  "originalTownSha256": "6263a6e735397bdc9fb3ca261c66ba4af8e6a2e69f8c7999a678797058987dc7",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "22e26474135dbb4ff95a548015ac9c34c4fd91dfa3e5de493edaf144288e8ad8",
+  "addedSolidTriangles": 2068,
+  "townVertices": 63198,
+  "townTriangles": 30504,
+  "recipeSha256": "b4a5e41a40c15c30659d0ee96664d8e9f8cfb25a66e6c63ac673d9377b3f0382",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "square-frontage.blend": "f46c5b5680a23bb7a6c606475f32ae1cbeb38093e542e96f93795f060c37df2c",
+    "square-frontage.glb": "2bd8d58823f045a56405ed80b0470a80036b1357671dc975d9b422f5d08baf36",
+    "bellwether-tavern-v1.glb": "22e26474135dbb4ff95a548015ac9c34c4fd91dfa3e5de493edaf144288e8ad8",
+    "geometry.generated.h": "b118b1917f51ab65f01334324c94ecd67979e3ea1e6b9b2671c429dc1972b907",
+    "asset.manifest.json": "97c82f2c7d87e0d5af407fc241ec4759b4a6ad713ebc2112f5bfbb9a83e5b957"
+  }
+}

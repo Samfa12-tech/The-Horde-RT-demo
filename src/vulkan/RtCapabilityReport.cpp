@@ -111,6 +111,7 @@ std::string BuildCapabilityTextReport(const DeviceCapabilities& capabilities,
     out << "Driver info: " << (driver.available ? driver.info : "N/A") << '\n';
     out << "Driver conformance version: " << (driver.available ? FormatConformanceVersion(driver) : "N/A") << '\n';
     out << "Vulkan API version: " << FormatVkPackedVersion(capabilities.identity.vulkanApiVersion) << '\n';
+    out << "Device extension enumeration complete: " << YesNo(capabilities.extensionsEnumerated) << '\n';
     out << "VK_KHR_acceleration_structure: " << YesNo(capabilities.extensions.accelerationStructure) << '\n';
     out << "VK_KHR_ray_tracing_pipeline: " << YesNo(capabilities.extensions.rayTracingPipeline) << '\n';
     out << "VK_KHR_ray_query: " << YesNo(capabilities.extensions.rayQuery) << '\n';
@@ -219,6 +220,16 @@ std::string BuildCapabilityJsonReport(const DeviceCapabilities& capabilities,
     out << "    \"rayTracingPipeline\": " << (capabilities.features.rayTracingPipeline ? "true" : "false") << ",\n";
     out << "    \"rayQuery\": " << (capabilities.features.rayQuery ? "true" : "false") << ",\n";
     out << "    \"bufferDeviceAddress\": " << (capabilities.features.bufferDeviceAddress ? "true" : "false") << "\n";
+    out << "  },\n";
+    const auto& queried = capabilities.featuresQueried;
+    out << "  \"probeEvidence\": {\n";
+    out << "    \"extensionsEnumerated\": " << (capabilities.extensionsEnumerated ? "true" : "false") << ",\n";
+    out << "    \"featuresQueried\": {\n";
+    out << "      \"accelerationStructure\": " << (queried.accelerationStructure ? "true" : "false") << ",\n";
+    out << "      \"rayTracingPipeline\": " << (queried.rayTracingPipeline ? "true" : "false") << ",\n";
+    out << "      \"rayQuery\": " << (queried.rayQuery ? "true" : "false") << ",\n";
+    out << "      \"bufferDeviceAddress\": " << (queried.bufferDeviceAddress ? "true" : "false") << "\n";
+    out << "    }\n";
     out << "  },\n";
     out << "  \"internalRenderResolution\": {\n";
     out << "    \"width\": " << capabilities.performance.internalRenderWidth << ",\n";

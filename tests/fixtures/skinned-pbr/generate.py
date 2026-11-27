@@ -29,6 +29,7 @@ bind = add([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1], '16f', 'MAT4', 1)
 times = add([0,1], '2f', 'SCALAR', 2)
 rotation = add([0,0,0,1, 0,0,math.sqrt(.5),math.sqrt(.5)], '8f', 'VEC4', 2)
 reflection = add([1,1,1, -1,1,1], '6f', 'VEC3', 2)
+hold = add([0,0,math.sqrt(.5),math.sqrt(.5)]*2, '8f', 'VEC4', 2)
 document = {'asset': {'version': '2.0'}, 'scene': 0, 'scenes': [{'nodes': [0,1]}],
     'nodes': [{'name': 'Joint'}, {'name': 'Mesh', 'mesh': 0, 'skin': 0}],
     'meshes': [{'primitives': [{'attributes': attrs, 'indices': indices}]}],
@@ -38,7 +39,8 @@ document = {'asset': {'version': '2.0'}, 'scene': 0, 'scenes': [{'nodes': [0,1]}
                     'interpolation': 'LINEAR'}], 'channels': [{'sampler': 0,
                     'target': {'node': 0, 'path': path}}]}
                    for name, output, path in [('rotate',rotation,'rotation'),
-                                               ('reflect',reflection,'scale')]]}
+                                               ('reflect',reflection,'scale'),
+                                               ('hold',hold,'rotation')]]}
 text = json.dumps(document,separators=(',',':')).encode()
 text += b' '*((-len(text)) % 4)
 binary.extend(bytes((-len(binary)) % 4))

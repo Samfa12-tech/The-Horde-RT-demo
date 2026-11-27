@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "sourceBlendSha256": "74833c7727fbf319b9f0701b8b62d20d422df5ad018f82838e7aa19f5856006c",
+  "baseGlbSha256": "a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11",
+  "outputGlbSha256": "799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d",
+  "outputBytes": 2368844,
+  "originalBinaryPrefixBytes": 2124800,
+  "clip": "Kit|hearth_sit",
+  "frames": 83,
+  "fps": 60,
+  "jointCount": 24,
+  "modelRoot": [
+    82.45999908447266,
+    -8.709550857543945,
+    107.30000305175781
+  ],
+  "rootYawRadians": 1.5707963705062866,
+  "calibrationJointOriginMaxErrorM": 1.1107696902255304e-05,
+  "idleGeometryMaxErrorM": 2.20714719942727e-05
+}

@@ -4,7 +4,9 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <optional>
 #include <string_view>
+#include "scene/BellwetherMillrace.generated.h"
 
 namespace horde::scene {
 using ChapterWaterPoint = std::array<float,3>; // engine X/Y/Z metres
@@ -20,7 +22,11 @@ inline constexpr std::string_view kChapterWaterAtlasSha256 =
 inline constexpr float kChapterRiverHalfWidth = 5.f;
 inline constexpr float kChapterLakeWorldY = -31.55f; // atlas Up=0 lake datum
 inline constexpr std::size_t kChapterLakeWaterTriangles = 14;
-inline constexpr std::size_t kChapterRegionalWaterTriangleCount = 42;
+inline constexpr std::size_t kChapterOriginalRegionalWaterTriangleCount = 42;
+inline constexpr std::size_t kChapterBellwetherMillraceTriangleCount = 18;
+inline constexpr std::size_t kChapterRegionalWaterTriangleCount =
+    kChapterOriginalRegionalWaterTriangleCount + kChapterBellwetherMillraceTriangleCount;
+inline constexpr std::array<std::size_t,4> kChapterRegionalWaterBodyStarts{0,14,38,42};
 inline constexpr ChapterWaterPoint ChapterWaterFromAtlas(float east,float north,float up) {
     return {east+78.3f,up-31.55f,126.2f-north};
 }
@@ -39,30 +45,44 @@ inline constexpr std::array<ChapterWaterPoint,3> kChapterOutflowAtlas{{
     {0,-448,0},{-28,-478,-.4f},{-55,-510,-1.2f}}};
 
 namespace chapter_water_detail {
-template<std::size_t N>
-inline void AppendRibbon(const std::array<ChapterWaterPoint,N>& atlas,
-    std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>& out,std::size_t& next) {
+template<std::size_t N,class CentreAt,class DirectionAt>
+inline void AppendRibbon(std::size_t count,std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>& out,
+    std::size_t& next,float halfWidth,CentreAt centreAt,DirectionAt directionAt) {
     std::array<ChapterWaterPoint,N> left{},right{};
-    for(std::size_t i=0;i<N;++i) {
-        const auto centre=ChapterWaterFromAtlas(atlas[i][0],atlas[i][1],atlas[i][2]);
+    for(std::size_t i=0;i<count;++i) {
+        const auto centre=centreAt(i);
         const auto normal=[&](std::size_t a,std::size_t b) {
-            const float dx=atlas[b][0]-atlas[a][0],dz=atlas[a][1]-atlas[b][1];
+            const auto [dx,dz]=directionAt(a,b);
             const float length=std::hypot(dx,dz);
             return std::array<float,2>{-dz/length,dx/length};
         };
         const auto before=normal(i?i-1:0,i?i:1);
-        const auto after=normal(i+1<N?i:N-2,i+1<N?i+1:N-1);
+        const auto after=normal(i+1<count?i:count-2,i+1<count?i+1:count-1);
         // Shared miter vertices close every bend without separate overlapping
         // segment strips. These fixed gentle bends stay inside the carved bed.
         const float mx=before[0]+after[0],mz=before[1]+after[1];
-        const float scale=kChapterRiverHalfWidth/(mx*before[0]+mz*before[1]);
+        const float scale=halfWidth/(mx*before[0]+mz*before[1]);
         left[i]={centre[0]+mx*scale,centre[1],centre[2]+mz*scale};
         right[i]={centre[0]-mx*scale,centre[1],centre[2]-mz*scale};
     }
-    for(std::size_t i=0;i+1<N;++i) {
+    for(std::size_t i=0;i+1<count;++i) {
         out[next++]={left[i],right[i+1],right[i]};
         out[next++]={left[i],left[i+1],right[i+1]};
     }
+}
+template<std::size_t N>
+inline void AppendAtlasRibbon(const std::array<ChapterWaterPoint,N>& atlas,
+    std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>& out,std::size_t& next,float halfWidth) {
+    AppendRibbon<N>(N,out,next,halfWidth,
+        [&](std::size_t i){return ChapterWaterFromAtlas(atlas[i][0],atlas[i][1],atlas[i][2]);},
+        [&](std::size_t a,std::size_t b){return std::array<float,2>{atlas[b][0]-atlas[a][0],atlas[a][1]-atlas[b][1]};});
+}
+template<std::size_t N>
+inline void AppendEngineRibbon(const std::array<ChapterWaterPoint,N>& stations,
+    std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>& out,std::size_t& next,float halfWidth) {
+    AppendRibbon<N>(N,out,next,halfWidth,
+        [&](std::size_t i){return stations[i];},
+        [&](std::size_t a,std::size_t b){return std::array<float,2>{stations[b][0]-stations[a][0],stations[b][2]-stations[a][2]};});
 }
 using DPoint=std::array<double,3>;
 inline DPoint Sub(const ChapterWaterPoint& a,const ChapterWaterPoint& b) {
@@ -92,6 +112,17 @@ inline double TriangleDistanceSquared(const ChapterWaterPoint& p,const ChapterWa
     return std::min({SegmentDistanceSquared(p,t[0],t[1]),SegmentDistanceSquared(p,t[1],t[2]),
                      SegmentDistanceSquared(p,t[2],t[0])});
 }
+inline std::optional<float> TriangleHeightAt(const ChapterWaterTriangle& t,float x,float z) {
+    const auto& [a,b,c]=t;
+    const double bx=double(b[0])-a[0],bz=double(b[2])-a[2];
+    const double cx=double(c[0])-a[0],cz=double(c[2])-a[2];
+    const double px=double(x)-a[0],pz=double(z)-a[2];
+    const double area=bx*cz-bz*cx;
+    if(area==0.)return std::nullopt;
+    const double beta=(px*cz-pz*cx)/area,gamma=(bx*pz-bz*px)/area;
+    if(beta<0. || gamma<0. || beta+gamma>1.)return std::nullopt;
+    return static_cast<float>(a[1]+beta*(double(b[1])-a[1])+gamma*(double(c[1])-a[1]));
+}
 } // namespace chapter_water_detail
 
 inline const std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>& ChapterRegionalWaterTriangles() {
@@ -111,8 +142,10 @@ inline const std::array<ChapterWaterTriangle,kChapterRegionalWaterTriangleCount>
             }
             result[next++]=triangle;
         }
-        chapter_water_detail::AppendRibbon(kChapterRiverAtlas,result,next);
-        chapter_water_detail::AppendRibbon(kChapterOutflowAtlas,result,next);
+        chapter_water_detail::AppendAtlasRibbon(kChapterRiverAtlas,result,next,kChapterRiverHalfWidth);
+        chapter_water_detail::AppendAtlasRibbon(kChapterOutflowAtlas,result,next,kChapterRiverHalfWidth);
+        chapter_water_detail::AppendEngineRibbon(kBellwetherMillraceStations,result,next,
+            kBellwetherMillraceChannelWidth*.5f);
         return result;
     }();
     return triangles;
@@ -123,7 +156,7 @@ struct ChapterWaterBounds { ChapterWaterPoint minimum{},maximum{}; };
 inline const std::array<ChapterWaterBounds,3>& ChapterRegionalWaterBounds() {
     static const auto bounds=[] {
         std::array<ChapterWaterBounds,3> result{};
-        constexpr std::array<std::size_t,4> starts{0,14,38,42};
+        constexpr auto& starts=kChapterRegionalWaterBodyStarts;
         const auto& triangles=ChapterRegionalWaterTriangles();
         for(std::size_t body=0;body<3;++body) {
             result[body]={triangles[starts[body]][0],triangles[starts[body]][0]};
@@ -137,6 +170,48 @@ inline const std::array<ChapterWaterBounds,3>& ChapterRegionalWaterBounds() {
     }();
     return bounds;
 }
+
+// The Bellwether millrace is a separate CPU range. It is intentionally absent
+// from the three legacy broadphase bounds above; its full face bounds fit the
+// existing main-river shader box and are checked in ChapterRegionalWaterTests.
+inline const ChapterWaterBounds& ChapterBellwetherMillraceBounds() {
+    static const auto bounds=[] {
+        const auto& triangles=ChapterRegionalWaterTriangles();
+        ChapterWaterBounds result{triangles[kChapterOriginalRegionalWaterTriangleCount][0],
+                                  triangles[kChapterOriginalRegionalWaterTriangleCount][0]};
+        for(std::size_t i=kChapterOriginalRegionalWaterTriangleCount;i<triangles.size();++i)
+            for(const auto& p:triangles[i])for(std::size_t axis=0;axis<3;++axis) {
+                result.minimum[axis]=std::min(result.minimum[axis],p[axis]);
+                result.maximum[axis]=std::max(result.maximum[axis],p[axis]);
+            }
+        return result;
+    }();
+    return bounds;
+}
+
+// Vertical intersection against the same finite, sloped faces uploaded for RT.
+inline std::optional<float> ChapterRegionalWaterSurfaceAt(float x,float z) {
+    if(!std::isfinite(x) || !std::isfinite(z))return std::nullopt;
+    const auto& bounds=ChapterRegionalWaterBounds();
+    const auto& triangles=ChapterRegionalWaterTriangles();
+    std::optional<float> surface;
+    for(std::size_t body=0;body<bounds.size();++body) {
+        const auto& box=bounds[body];
+        if(x<box.minimum[0] || x>box.maximum[0] || z<box.minimum[2] || z>box.maximum[2])continue;
+        for(std::size_t i=kChapterRegionalWaterBodyStarts[body];i<kChapterRegionalWaterBodyStarts[body+1];++i) {
+            if(const auto y=chapter_water_detail::TriangleHeightAt(triangles[i],x,z);
+                y && (!surface || *y>*surface))surface=*y;
+        }
+    }
+    const auto& millrace=ChapterBellwetherMillraceBounds();
+    if(x>=millrace.minimum[0] && x<=millrace.maximum[0] && z>=millrace.minimum[2] && z<=millrace.maximum[2])
+        for(std::size_t i=kChapterOriginalRegionalWaterTriangleCount;i<triangles.size();++i) {
+            if(const auto y=chapter_water_detail::TriangleHeightAt(triangles[i],x,z);
+                y && (!surface || *y>*surface))surface=*y;
+        }
+    return surface;
+}
+
 // Euclidean distance to the actual triangulated faces (including shore edges),
 // not lake AABB, terrain depression, infinite river line or tomb runoff.
 // Does not establish renderer residency/visibility or automatically enable audio.

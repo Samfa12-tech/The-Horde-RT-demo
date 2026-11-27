@@ -94,6 +94,8 @@ struct DeviceCapabilities
     DeviceIdentity identity;
     ExtensionSupport extensions;
     FeatureSupport features;
+    bool extensionsEnumerated = false;
+    FeatureSupport featuresQueried;
     PerformanceSnapshot performance;
     RtSceneSnapshot rtScene;
     std::vector<std::string> diagnostics;

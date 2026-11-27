@@ -1,0 +1,69 @@
+{
+  "mapService": "S6",
+  "originalTownSha256": "4a970dc48d0d7028310ddc0cf4dd26c00c1325a77136ce52470f9287e784a4d6",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "bcd753a6286b57997a87e1f36ce21af5c6b7704949812a066c83b0ae3dace368",
+  "townVertices": 14862,
+  "townTriangles": 7040,
+  "addedSolidTriangles": 1176,
+  "westTurn": [
+    62.1,
+    131.7
+  ],
+  "talkMark": [
+    62.1,
+    129.2
+  ],
+  "dealerMark": [
+    60.3,
+    129.2
+  ],
+  "stockWingXZ": [
+    63.34,
+    63.49,
+    128.27,
+    130.43
+  ],
+  "lampFlame": [
+    61.04,
+    -10.098888366699219,
+    128.25
+  ],
+  "lampLight": [
+    61.089999999999996,
+    -9.945888366699219,
+    128.35
+  ],
+  "visibility": {
+    "talk": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "square": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "eastLane": [
+      false,
+      false,
+      false,
+      false
+    ],
+    "lightToFace": true
+  },
+  "recipeSha256": "a0ec11c41cb50171bf68837eb8951c0c7800107bd5cffa13b3f9bebb3cf5e106",
+  "workshopRecipeSha256": "8b21e118d4910e74aadf4cc19f861fc274ee50c3d9bc7655988e1d3597fd76a8",
+  "crossingRecipeSha256": "0307197567a5bfcf2b418df3e20247b0fd44fdf44dbb22f7838794d0a0dceb02",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "bellwether-relic-stall.blend": "c64a54bb21925adea6d3e922bc34882f625e29c0f7f83c27b0868ab561d82e2c",
+    "relic-stall.glb": "ee992c467e4930b2299e5bb7b44a7dba78cd39fe21c439934f73277f93280166",
+    "asset.manifest.json": "df34454543705e9057b38e2d72672bd3639a79dc14d538f72481d9d2124182dc",
+    "geometry.generated.h": "c131bd774061d4fdaecbe4c87276af06bc3d2b3906ff120be295eb3bb2020d93",
+    "bellwether-tavern-v1.glb": "bcd753a6286b57997a87e1f36ce21af5c6b7704949812a066c83b0ae3dace368"
+  }
+}

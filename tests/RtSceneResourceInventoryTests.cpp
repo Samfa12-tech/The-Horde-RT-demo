@@ -6,10 +6,15 @@
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "gameplay/effects/KeeperTorchLighting.h"
+#include "scene/BellwetherShell.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "scene/ForestSurroundings.h"
 #include "vulkan/raytracing/RtWorldMaterialPalette.h"
 #include "vulkan/raytracing/RtStaticTextureSelection.h"
+#include "vulkan/raytracing/RtIndexedActorGeometry.h"
+#include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
+#include "vulkan/raytracing/SimulationFrameAdapter.h"
+#include "../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -69,6 +74,63 @@ bool Require(const bool condition, const std::string_view message)
         std::cerr << "FAIL: " << message << '\n';
     }
     return condition;
+}
+
+bool CheckIndexedActorGeometry()
+{
+    using namespace horde::vulkan::raytracing;
+    using namespace horde::scene::assets;
+    constexpr auto opaque = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    constexpr auto stride = sizeof(StaticRtVertex);
+    StaticMeshAsset actor;
+    actor.vertices.resize(7);
+    actor.indices = {0, 1, 2, 0, 1, 2, 0, 2, 3};
+    actor.primitives = {{0, 0, 3, 0, 0}, {3, 3, 6, 1, 0}};
+    actor.materials.resize(2);
+    actor.nodeTransforms.resize(1);
+    auto precedingAsset = actor;
+    constexpr std::uint32_t actorSlot = 4;
+    std::array registrations{
+        StaticRtAssetRegistration{3, 1001, opaque, 0, &precedingAsset},
+        StaticRtAssetRegistration{actorSlot, 1002, opaque, 0, &actor},
+    };
+    RtStaticMeshSlot full;
+    std::string diagnostic;
+    if (!Require(full.InitializeSelectedGeometry(registrations, diagnostic), diagnostic)) return false;
+    RtGpuBuffer vertices, indices;
+    vertices.address = 0x10000;
+    vertices.size = full.Measurements().vertexBytes;
+    indices.address = 0x20000;
+    indices.size = full.Measurements().indexBytes;
+    RtIndexedActorGeometry binding;
+    if (!Require(binding.Resolve(full, actorSlot, actor, vertices, indices, diagnostic), diagnostic)) return false;
+    const auto ranges = binding.Geometries();
+    const auto counts = binding.TriangleCounts();
+    bool ok = Require(ranges.size() == 2 && counts[0] == 1 && counts[1] == 2 &&
+        ranges[0].geometry.triangles.vertexData.deviceAddress == vertices.address + 7 * stride &&
+        ranges[1].geometry.triangles.vertexData.deviceAddress == vertices.address + 10 * stride &&
+        ranges[0].geometry.triangles.indexData.deviceAddress == indices.address + 9 * sizeof(std::uint32_t) &&
+        ranges[1].geometry.triangles.indexData.deviceAddress == indices.address + 12 * sizeof(std::uint32_t) &&
+        ranges[0].geometry.triangles.maxVertex == 2 && ranges[1].geometry.triangles.maxVertex == 3 &&
+        binding.VertexOffset() == 7 * stride && binding.VertexBytes() == 7 * stride,
+        "each actor primitive keeps its own index, vertex and triangle range even with an earlier GPU asset");
+    registrations.front().primitiveCount = 1;
+    RtStaticMeshSlot compact;
+    if (!Require(compact.InitializeSelectedGeometry(registrations, diagnostic), diagnostic)) return false;
+    vertices.address += 0x10000;
+    vertices.size = compact.Measurements().vertexBytes;
+    indices.address += 0x10000;
+    indices.size = compact.Measurements().indexBytes;
+    ok &= Require(binding.Resolve(compact, actorSlot, actor, vertices, indices, diagnostic) &&
+        binding.VertexOffset() == 3 * stride &&
+        binding.Geometries().back().geometry.triangles.indexData.deviceAddress ==
+            indices.address + 6 * sizeof(std::uint32_t),
+        "actor binding follows the newly packed owner after a static world cutover");
+    --vertices.size;
+    ok &= Require(!binding.Resolve(compact, actorSlot, actor, vertices, indices, diagnostic) &&
+        binding.Geometries().empty() && binding.VertexBytes() == 0,
+        "an incomplete owner cannot leave a previous actor binding usable");
+    return ok;
 }
 
 bool CheckTlasInstanceRefresh()
@@ -379,6 +441,41 @@ namespace horde::vulkan::raytracing
 
 struct PresentableTinyRtSceneObservationTestAccess
 {
+    static bool CheckChapterResidentPublication()
+    {
+        PresentableTinyRtScene scene;
+        std::string diagnostic;
+        const std::vector<horde::scene::SkinnedClipBinding> clips{{"idle", true, true}};
+        const std::array sources{
+            ChapterResidentActorSource{100, "fixture", "one.glb", clips},
+            ChapterResidentActorSource{200, "fixture", "two.glb", clips}};
+        if (!scene.SetChapterResidentActors(sources, diagnostic)) return false;
+        auto duplicates = sources;
+        duplicates[1].stableId = duplicates[0].stableId;
+        if (scene.SetChapterResidentActors(duplicates, diagnostic) ||
+            scene.chapterResidentSources_[1].stableId != 200) return false;
+        scene.chapterResidents_[0].blas.address = 0x11000;
+        scene.chapterResidents_[1].blas.address = 0x22000;
+        std::array<VkAccelerationStructureInstanceKHR, 2> instances{};
+        RtSceneFrameInputs frame;
+        if (!scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr) ||
+            instances[0].mask || instances[1].mask ||
+            instances[0].instanceCustomIndex != PresentableTinyRtScene::kFirstResidentMetadataIndex ||
+            instances[1].instanceCustomIndex != PresentableTinyRtScene::kFirstResidentMetadataIndex + 1 ||
+            instances[0].accelerationStructureReference != 0x11000 ||
+            instances[1].accelerationStructureReference != 0x22000) return false;
+        frame.chapterResidents[0].stableId = 100;
+        frame.chapterResidents[1].stableId = 100;
+        if (scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr)) return false;
+        frame.chapterResidents[1].stableId = 300;
+        if (scene.PrepareChapterResidents(frame, instances, {}, diagnostic, nullptr)) return false;
+        scene.chapterResidents_[0].needsRefit = true;
+        scene.chapterResidents_[1].needsRefit = true;
+        scene.chapterResidents_[0].refitRecorded = true;
+        scene.NotifyFrameSubmitted();
+        return !scene.chapterResidents_[0].needsRefit && scene.chapterResidents_[1].needsRefit;
+    }
+
     static bool CheckFlaskPhysicalAliases()
     {
         PresentableTinyRtScene scene;scene.healingFlaskBlas_.address=0x129000u;
@@ -421,6 +518,58 @@ struct PresentableTinyRtSceneObservationTestAccess
         scene.healingFlaskBlas_.address=0;
         return !scene.ApplyHealingFlaskInstances(instances,frame,hand,error) &&
             std::memcmp(instances.data(),before.data(),sizeof(instances))==0;
+    }
+
+    static bool CheckPrivyRagInstancePublication()
+    {
+        using horde::gameplay::bellwether::PrivyRagState;
+        PresentableTinyRtScene scene;
+        scene.privyRagBlas_.address=0xA11CEu;
+        std::string diagnostic;
+        std::array<VkAccelerationStructureInstanceKHR,3u> instances{};
+        const std::array<PrivyRagState,3u> states{{
+            PrivyRagState::Available,PrivyRagState::Carried,PrivyRagState::Delivered}};
+        bool ok=true;
+        for(std::size_t i=0;i<states.size();++i) {
+            if(!scene.ApplyPrivyRagInstance(instances[i],states[i],diagnostic)) {
+                std::cerr<<"Privy rag instance: "<<diagnostic<<'\n';
+                return false;
+            }
+            const auto& anchor=states[i]==PrivyRagState::Delivered
+                ? horde::gameplay::bellwether::kPrivyRagShelf
+                : horde::gameplay::bellwether::kPrivyRagBasket;
+            const std::uint8_t expectedMask=states[i]==PrivyRagState::Carried?0u:1u;
+            const auto& instance=instances[i];
+            const auto& matrix=instance.transform.matrix;
+            ok &= Require(instance.instanceCustomIndex==PresentableTinyRtScene::kPrivyRagMetadataIndex &&
+                instance.accelerationStructureReference==scene.privyRagBlas_.address &&
+                instance.mask==expectedMask && matrix[0][0]==1.f && matrix[0][1]==0.f &&
+                matrix[0][2]==0.f && matrix[0][3]==anchor[0] && matrix[1][0]==0.f &&
+                matrix[1][1]==1.f && matrix[1][2]==0.f && matrix[1][3]==anchor[1] &&
+                matrix[2][0]==0.f && matrix[2][1]==0.f && matrix[2][2]==1.f &&
+                matrix[2][3]==anchor[2],
+                "privy rag follows the exact basket/shelf bottom anchor and masks only while carried");
+
+            horde::gameplay::simulation::SimulationSnapshot snapshot{};
+            snapshot.privyRag=states[i];
+            const auto frame=BuildRtSceneFrameInputs(snapshot,1.f);
+            ok &= Require(frame.privyRag==states[i],
+                "simulation frame adapter preserves the privy rag's shared state");
+
+            scene.ready_=true;
+            scene.tlasInstanceCount_=1u;
+            scene.tlasInstanceDefinitionsValid_=true;
+            scene.tlasBuiltInstances_={};
+            scene.tlasBuiltInstances_[0]=instance;
+            ok &= Require(scene.SubmittedInstanceMask(PresentableTinyRtScene::kPrivyRagMetadataIndex)==expectedMask,
+                "submitted rag mask is queryable through the existing metadata-indexed RT evidence API");
+        }
+        const auto before=instances[0];
+        if(scene.ApplyPrivyRagInstance(instances[0],static_cast<PrivyRagState>(255u),diagnostic) ||
+            std::memcmp(&before,&instances[0],sizeof(before))!=0)
+            return Require(false,"invalid privy rag state must reject publication atomically");
+        scene.privyRagBlas_.address=0u;
+        return ok;
     }
 #if HORDE_RT_ACTOR_WORKER_EXPERIMENT
     static bool CheckActorWorkerRetirement()
@@ -489,7 +638,24 @@ struct PresentableTinyRtSceneObservationTestAccess
         horde::scene::SkinnedMeshAsset reference;
         if (!reference.LoadClips((root / "models/player/runtime/gothic-traveller-lod0.runtime.glb").string(),
                                  horde::scene::PlayerLocomotionClipSet(), diagnostic)) return false;
-        std::vector<StaticRtVertex> legacy;
+        if (!scene.viewmodelAvailable_) return false;
+        std::vector<horde::scene::TexturedSkinnedRtVertex> vertices;
+        std::vector<horde::scene::SkinnedPbrTangent> tangents;
+        const auto repack = [](std::vector<StaticRtVertex>& upload, const auto& source, const auto& sourceTangents) {
+            for (std::size_t vertex = 0; vertex < upload.size(); ++vertex)
+            {
+                std::copy_n(source[vertex].position, 4, upload[vertex].position.begin());
+                std::copy_n(source[vertex].normal, 4, upload[vertex].normal.begin());
+                std::copy_n(sourceTangents[vertex].tangent, 4, upload[vertex].tangent.begin());
+            }
+        };
+        const auto matchesBytes = [](const std::vector<StaticRtVertex>& left, const std::vector<StaticRtVertex>& right) {
+            return left.size() == right.size() &&
+                std::memcmp(left.data(), right.data(), left.size() * sizeof(StaticRtVertex)) == 0;
+        };
+        auto legacy = scene.productionPlayerAsset_.vertices;
+        auto viewmodel = scene.viewmodelAsset_.vertices;
+        auto legacyViewmodel = viewmodel;
         for (std::uint64_t tick = 1; tick <= 12; ++tick)
         {
             PlayerAnimationSnapshot animation;
@@ -515,31 +681,50 @@ struct PresentableTinyRtSceneObservationTestAccess
             animation.rightIk.target = {{-.16f,1.10f,.35f}}; animation.rightIk.pole = {{-1,0,1}};
             bool updated = false;
             if (!scene.playerRenderSlot_.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
-                                                    updated, diagnostic) || !updated) return false;
-            legacy = scene.productionPlayerAsset_.vertices;
-            const auto& vertices = scene.playerRenderSlot_.UniqueVertices();
-            const auto& tangents = scene.playerRenderSlot_.UniqueTangents();
-            for (std::size_t v = 0; v < vertices.size(); ++v) {
-                std::copy_n(vertices[v].position, 4, legacy[v].position.begin());
-                std::copy_n(vertices[v].normal, 4, legacy[v].normal.begin());
-                std::copy_n(tangents[v].tangent, 4, legacy[v].tangent.begin());
-            }
-            if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic) ||
-                std::memcmp(legacy.data(), scene.skinnedPlayerUpload_.data(), legacy.size()*sizeof(StaticRtVertex)))
+                                                    updated, diagnostic, nullptr, &scene.skinnedPlayerUpload_) ||
+                !updated) return false;
+            const auto& pose = scene.playerRenderSlot_.SolvedPose();
+            if (!reference.SkinPlayerPoseUniqueTextured(pose, vertices, tangents, diagnostic) ||
+                vertices.size() != legacy.size() || tangents.size() != legacy.size()) return false;
+            repack(legacy, vertices, tangents);
+            if (!matchesBytes(legacy, scene.skinnedPlayerUpload_))
             { std::cerr << "Player upload byte parity failed at pose " << tick << '\n'; return false; }
+
+            if (!scene.viewmodelSkin_.SkinPlayerPoseStaticPbr(pose, viewmodel, diagnostic) ||
+                !scene.viewmodelSkin_.SkinPlayerPoseUniqueTextured(pose, vertices, tangents, diagnostic) ||
+                vertices.size() != legacyViewmodel.size() || tangents.size() != legacyViewmodel.size()) return false;
+            repack(legacyViewmodel, vertices, tangents);
+            if (!matchesBytes(legacyViewmodel, viewmodel))
+            { std::cerr << "Viewmodel upload byte parity failed at pose " << tick << '\n'; return false; }
+
+            if (tick == 12)
+            {
+                const auto prepare = [&](std::vector<StaticRtVertex>& upload) {
+                    return scene.playerRenderSlot_.PreparePose(animation, tick, PlayerCpuSkinCadence::Hz60,
+                                                               updated, diagnostic, nullptr, &upload);
+                };
+                auto separateUpload = scene.productionPlayerAsset_.vertices;
+                if (!prepare(scene.skinnedPlayerUpload_) || updated ||
+                    !prepare(separateUpload) || !updated || !matchesBytes(legacy, separateUpload)) return false;
+                separateUpload.pop_back();
+                if (prepare(separateUpload) || updated ||
+                    scene.viewmodelSkin_.SkinPlayerPoseStaticPbr(pose, {}, diagnostic)) return false;
+            }
         }
         if (benchmark)
         {
-            // Actual production packing seam, already solved pose. No skinning,
-            // Vulkan upload or GPU work is timed. Both builds use this same caller.
+            // Keep the previous repack measurement available as a reference.
+            if (!reference.SkinPlayerPoseUniqueTextured(scene.playerRenderSlot_.SolvedPose(),
+                    vertices, tangents, diagnostic) || vertices.size() != legacy.size() ||
+                tangents.size() != legacy.size()) return false;
             constexpr unsigned inner = 16, samples = 301;
             for (unsigned i = 0; i < 64; ++i)
-                if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+                repack(legacy, vertices, tangents);
             std::cout << "player_upload_copy_us=[";
             for (unsigned i = 0; i < samples; ++i) {
                 const auto begin = std::chrono::steady_clock::now();
                 for (unsigned j = 0; j < inner; ++j)
-                    if (!scene.PackPlayerWorldBodyPoseUpload(diagnostic)) return false;
+                    repack(legacy, vertices, tangents);
                 const double us = std::chrono::duration<double,std::micro>(
                     std::chrono::steady_clock::now()-begin).count() / inner;
                 std::cout << (i ? "," : "") << us;
@@ -547,8 +732,6 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::cout << "]\nvertices=" << legacy.size() << " bytes=" << legacy.size()*sizeof(StaticRtVertex)
                       << " calls_per_sample=" << inner << '\n';
         }
-        scene.skinnedPlayerUpload_.pop_back();
-        if (scene.PackPlayerWorldBodyPoseUpload(diagnostic)) { std::cerr << "Short upload accepted\n"; return false; }
         // Same-count reload must replace all static fields, not trust size/empty.
         scene.skinnedPlayerUpload_ = legacy;
         for (auto& v : scene.skinnedPlayerUpload_) v.uv0 = {{91,92,93,94}};
@@ -695,11 +878,32 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::cerr<<"Real development static admission: "<<diagnostic<<'\n';
             return false;
         }
+        const auto idleWaterwheel=BellwetherWaterwheelWorldFromModel(0.f);
+        const auto quarterTurnWaterwheel=BellwetherWaterwheelWorldFromModel(1.57079632679f);
+        bool ok=Require(idleWaterwheel.has_value() && quarterTurnWaterwheel.has_value() &&
+            !BellwetherWaterwheelWorldFromModel(std::numeric_limits<float>::infinity()).has_value(),
+            "waterwheel pivot transform rejects nonfinite input and builds finite idle/rotated frames");
+        if(idleWaterwheel && quarterTurnWaterwheel) {
+            ok &= Require(std::abs((*idleWaterwheel)[3]-137.2f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[7]+21.10f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[11]-109.35f)<1.e-5f &&
+                std::abs((*idleWaterwheel)[5]-1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[5])<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[6]+1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[9]-1.f)<1.e-5f &&
+                std::abs((*quarterTurnWaterwheel)[10])<1.e-5f,
+                "waterwheel TLAS transform rotates rigidly around the surveyed X-axis centre");
+        }
+        horde::gameplay::simulation::SimulationSnapshot angleSnapshot{};
+        angleSnapshot.millWaterwheelAngleRadians=.625f;
+        const auto adaptedWheelFrame=BuildRtSceneFrameInputs(angleSnapshot,1.f);
+        ok &= Require(std::abs(adaptedWheelFrame.millWaterwheelAngleRadians-.625f)<1.e-6f,
+            "simulation frame adapter carries the authoritative waterwheel angle");
         const auto counts=scene.staticMeshSlot_.TextureArrayCounts();
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
         // The admitted Kit maps append one family after the terrain maps;
         // Kit is the sole mapped emissive owner, replacing the unused fallback.
-        bool ok=layers==std::array<std::uint32_t,4>{{18,15,15,1}};
+        ok &= layers==std::array<std::uint32_t,4>{{18,15,15,1}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
@@ -707,17 +911,222 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==32u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?34u:33u);
-        ok &= scene.chapterTerrainSurface_ && scene.chapterTerrainSurface_->TriangleCount()==37846u;
+        ok &= materials.size()==44u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?50u:49u);
+        ok &= scene.chapterTerrainSurface_ &&
+            scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
-        ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u;
+        const auto& window=instances[PresentableTinyRtScene::kChapterWindowMetadataIndex];
+        ok &= instances[9u].primitiveCount==0u && instances[25u].primitiveCount==1u &&
+            window.primitiveCount==1u && window.stableObjectId==0x42303157u &&
+            window.primitiveBase<primitives.size() &&
+            primitives[window.primitiveBase].materialIndex<materials.size() &&
+            (materials[primitives[window.primitiveBase].materialIndex].materialFlags[0] &
+                static_cast<std::uint32_t>(RtMaterialFlag::CertifiedClosedVolume));
+        const auto& drive=instances[PresentableTinyRtScene::kMillDriveMetadataIndex];
+        ok &= Require(drive.primitiveCount==1u && drive.assetIndex!=window.assetIndex &&
+              drive.primitiveBase<primitives.size() &&
+              scene.millDriveAsset_.primitives.size()==3u &&
+              scene.millDriveAsset_.indices.size()==(384u+2180u)*3u,
+              "drive source remains primitive zero in a three-primitive shared owner");
+        const auto& waterwheel=instances[PresentableTinyRtScene::kMillWaterwheelMetadataIndex];
+        ok &= Require(waterwheel.primitiveCount==PresentableTinyRtScene::kMillWaterwheelPrimitiveCount &&
+              waterwheel.primitiveBase==drive.primitiveBase+drive.primitiveCount &&
+              waterwheel.assetIndex==drive.assetIndex && waterwheel.stableObjectId==0x42303557u &&
+              scene.millWaterwheelAsset_.primitives.size()==2u &&
+              scene.millWaterwheelAsset_.indices.size()==2180u*3u &&
+              scene.millWaterwheelAsset_.vertices.size()==4252u,
+              "waterwheel retains two separate packed primitive ranges and its admitted GLB contract");
+        const auto& rag=instances[PresentableTinyRtScene::kPrivyRagMetadataIndex];
+        ok &= Require(rag.primitiveCount==1u && rag.assetIndex!=drive.assetIndex &&
+              rag.assetIndex<kRtStaticAssetCapacity && rag.stableObjectId==0x42303752u &&
+              rag.flags==static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) &&
+              rag.primitiveBase<primitives.size() && scene.privyRagAsset_.primitives.size()==1u &&
+              scene.privyRagAsset_.materials.size()==1u && scene.privyRagAsset_.vertices.size()==122u &&
+              scene.privyRagAsset_.indices.size()==horde::gameplay::bellwether::kPrivyRagTriangles*3u &&
+              scene.privyRagAsset_.materials.front().name=="HordePrivyLinen",
+              "privy rag owns one appended static asset and its exact 56-triangle linen source");
+        if(rag.primitiveBase<primitives.size()) {
+            const auto materialIndex=primitives[rag.primitiveBase].materialIndex;
+            const auto opaqueUntexturedFlags=static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+                static_cast<std::uint32_t>(RtMaterialFlag::Transmission) |
+                static_cast<std::uint32_t>(RtMaterialFlag::BaseColorTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::NormalTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::OrmTexture) |
+                static_cast<std::uint32_t>(RtMaterialFlag::EmissiveTexture);
+            ok &= Require(materialIndex<materials.size() &&
+                (materials[materialIndex].materialFlags[0]&opaqueUntexturedFlags)==0u,
+                "HordePrivyLinen uses an opaque untextured material row without a shader-special flag");
+        } else ok=false;
+        {
+            using namespace horde::scene::assets;
+            const auto millDirectory=std::filesystem::path(root)/"models/world/runtime/bellwether-tavern-v1";
+            AssetManifest ragManifest;StaticMeshAsset originalRag;
+            if(!AssetManifest::Load(millDirectory/"privy-rag.manifest.json",ragManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"privy-rag.glb",ragManifest,originalRag,diagnostic)) return false;
+            if(originalRag.primitives.size()!=1u || originalRag.nodeTransforms.empty() ||
+               originalRag.primitives.front().nodeTransformIndex>=originalRag.nodeTransforms.size() ||
+               originalRag.materials.size()!=1u)return false;
+            const auto& sourcePrimitive=originalRag.primitives.front();
+            const auto& sourceNode=originalRag.nodeTransforms[sourcePrimitive.nodeTransformIndex];
+            bool identity=sourceNode.name=="BellwetherCleanRag";
+            for(std::size_t row=0;row<4u;++row)for(std::size_t column=0;column<4u;++column)
+                identity &= std::abs(sourceNode.world[row*4u+column]-(row==column?1.f:0.f))<1.e-6f;
+            ok &= Require(identity &&
+                sourcePrimitive.indexCount==horde::gameplay::bellwether::kPrivyRagTriangles*3u &&
+                std::memcmp(scene.privyRagAsset_.vertices.data(),originalRag.vertices.data(),
+                    originalRag.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(scene.privyRagAsset_.indices.data(),originalRag.indices.data(),
+                    originalRag.indices.size()*sizeof(std::uint32_t))==0,
+                "runtime rag source preserves its identity node and all authored vertex/index bytes");
+            const auto& sourceMaterial=originalRag.materials.front();
+            ok &= Require(sourceMaterial.name=="HordePrivyLinen" && sourceMaterial.baseColorTexture<0 &&
+                sourceMaterial.normalTexture<0 && sourceMaterial.ormTexture<0 && sourceMaterial.emissiveTexture<0 &&
+                sourceMaterial.transmissionFactor==0.f && sourceMaterial.metallicFactor==0.f &&
+                std::abs(sourceMaterial.baseColorFactor[0]-.82f)<.001f &&
+                std::abs(sourceMaterial.baseColorFactor[1]-.74f)<.001f &&
+                std::abs(sourceMaterial.baseColorFactor[2]-.58f)<.001f &&
+                std::abs(sourceMaterial.roughnessFactor-.94f)<.001f,
+                "HordePrivyLinen retains its light opaque linen factors without texture maps");
+        }
+        {
+            // Model the complete accepted Bellwether tail without creating GPU
+            // objects. Drive and wheel remain separate BLAS/TLAS identities,
+            // while their packed CPU source shares one static-asset owner.
+            scene.roadStoneBlas_.address=1u;
+            scene.waysideCoverBlas_.address=1u;
+            scene.waysideRegisterBlas_.address=1u;
+            scene.tavernDoorBlas_.address=1u;
+            scene.millDriveBlas_.address=1u;
+            scene.millWaterwheelBlas_.address=1u;
+            scene.privyRagBlas_.address=1u;
+            scene.dielectricFixtureBlas_.address=1u;
+            scene.stockHeadBlas_[0].address=2u;
+            scene.stockHeadBlas_[1].address=3u;
+            const auto& pig = instances[PresentableTinyRtScene::kFirstStockHeadMetadataIndex];
+            const auto& hen = instances[PresentableTinyRtScene::kFirstStockHeadMetadataIndex+1u];
+            horde::gameplay::bellwether::StockHeadPoses poses{};
+            poses[2].pitchRadians = -.2f;
+            std::array<VkAccelerationStructureInstanceKHR, 3> stock{};
+            ok &= Require(pig.primitiveCount==2u && hen.primitiveCount==3u && pig.assetIndex==hen.assetIndex &&
+                scene.ApplyStockHeadInstances(stock, poses, diagnostic) &&
+                stock[0].accelerationStructureReference==2u && stock[1].accelerationStructureReference==3u &&
+                stock[2].accelerationStructureReference==3u && stock[0].instanceCustomIndex!=stock[1].instanceCustomIndex &&
+                stock[1].instanceCustomIndex==stock[2].instanceCustomIndex &&
+                stock[0].mask==1u && stock[1].mask==1u && stock[2].mask==1u &&
+                stock[1].transform.matrix[1][0]==0.f && stock[2].transform.matrix[1][0]<-.19f,
+                "both hens share the same visible BLAS but use independent fixed-tick poses");
+            const auto chapterTail=scene.ChapterTailInstanceCount();
+            const std::uint32_t currentProfileTlasCount=PresentableTinyRtScene::kOrdinaryTlasInstanceCount+
+                64u+12u+chapterTail;
+            constexpr std::uint32_t fullBellwetherTailCount=10u+1u+
+                static_cast<std::uint32_t>(kAdditionalChapterActorCapacity);
+            constexpr std::uint32_t fullBellwetherTlasCount=
+                PresentableTinyRtScene::kOrdinaryTlasInstanceCount+64u+12u+fullBellwetherTailCount;
+            std::array<bool,kRtStaticAssetCapacity> usedAssets{},usedAssetsWithoutRag{};
+            for(std::size_t index=0;index<instances.size();++index) {
+                const auto& row=instances[index];
+                if(!row.primitiveCount)continue;
+                if(row.assetIndex>=usedAssets.size()) {ok=false;continue;}
+                usedAssets[row.assetIndex]=true;
+                if(index!=PresentableTinyRtScene::kPrivyRagMetadataIndex)
+                    usedAssetsWithoutRag[row.assetIndex]=true;
+            }
+            const auto uniqueAssetCount=std::count(usedAssets.begin(),usedAssets.end(),true);
+            const auto baselineAssetCount=std::count(usedAssetsWithoutRag.begin(),usedAssetsWithoutRag.end(),true);
+            ok &= Require(chapterTail==10u+(scene.chapterActorReady_ && scene.dielectricFixtureBlas_.address?1u:0u)+
+                    scene.chapterResidentSources_.size() &&
+                currentProfileTlasCount<=kRtTlasInstanceCapacity &&
+                fullBellwetherTlasCount==120u && fullBellwetherTlasCount<=kRtTlasInstanceCapacity &&
+                kRtTlasInstanceCapacity-fullBellwetherTlasCount==2u,
+                "full Bellwether tail includes three livestock poses and two residents at 120 of 122 TLAS slots");
+            ok &= Require(uniqueAssetCount==baselineAssetCount+1u &&
+                uniqueAssetCount<=kRtStaticAssetCapacity && baselineAssetCount<=24u,
+                "the privy rag and shared head source fit the static asset roster");
+            scene.roadStoneBlas_.address=0u;
+            scene.waysideCoverBlas_.address=0u;
+            scene.waysideRegisterBlas_.address=0u;
+            scene.tavernDoorBlas_.address=0u;
+            scene.millDriveBlas_.address=0u;
+            scene.millWaterwheelBlas_.address=0u;
+            scene.privyRagBlas_.address=0u;
+            scene.dielectricFixtureBlas_.address=0u;
+            scene.stockHeadBlas_={};
+        }
         const auto& ring=instances[PresentableTinyRtScene::kAttackWarningMetadataIndex];
         const auto& flask=instances[PresentableTinyRtScene::kHealingFlaskMetadataIndex];
+        const auto& stone=instances[PresentableTinyRtScene::kRoadStoneMetadataIndex];
+        const auto& cover=instances[PresentableTinyRtScene::kWaysideCoverMetadataIndex];
+        ok &= cover.primitiveCount==1u && cover.assetIndex!=stone.assetIndex && cover.stableObjectId==0x4230394cu &&
+              scene.waysideCoverAsset_.indices.size()==horde::scene::kWaysideCoverTriangles*3;
+        const auto& ledger=instances[PresentableTinyRtScene::kWaysideRegisterMetadataIndex];
+        ok &= ledger.primitiveCount==2u && ledger.assetIndex!=cover.assetIndex &&
+              ledger.stableObjectId==0x42303952u &&
+              scene.waysideRegisterAsset_.indices.size()==horde::scene::kWaysideRegisterTriangles*3;
+        const auto& door=instances[PresentableTinyRtScene::kTavernDoorMetadataIndex];
+        ok &= door.primitiveCount==2u && door.assetIndex!=ledger.assetIndex &&
+              door.stableObjectId==0x42303144u &&
+              scene.tavernDoorAsset_.indices.size()==horde::gameplay::bellwether::kSouthDoorTriangles*3;
+        {
+            using namespace horde::scene::assets;
+            const auto millDirectory=std::filesystem::path(root)/"models/world/runtime/bellwether-tavern-v1";
+            AssetManifest driveManifest,waterwheelManifest;
+            StaticMeshAsset originalDrive,originalWaterwheel;
+            if(!AssetManifest::Load(millDirectory/"mill-bench-drive.manifest.json",driveManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"mill-bench-drive.glb",driveManifest,originalDrive,diagnostic) ||
+               !AssetManifest::Load(millDirectory/"mill-waterwheel.manifest.json",waterwheelManifest,diagnostic) ||
+               !StaticMeshAsset::Load(millDirectory/"mill-waterwheel.glb",waterwheelManifest,originalWaterwheel,diagnostic)) return false;
+            const auto& combined=scene.millDriveAsset_;
+            ok &= Require(originalDrive.primitives.size()==PresentableTinyRtScene::kMillDrivePrimitiveCount &&
+                originalWaterwheel.primitives.size()==PresentableTinyRtScene::kMillWaterwheelPrimitiveCount &&
+                combined.vertices.size()==originalDrive.vertices.size()+originalWaterwheel.vertices.size() &&
+                combined.indices.size()==originalDrive.indices.size()+originalWaterwheel.indices.size() &&
+                combined.nodeTransforms.size()==originalDrive.nodeTransforms.size()+originalWaterwheel.nodeTransforms.size() &&
+                combined.materials.size()==originalDrive.materials.size()+originalWaterwheel.materials.size(),
+                "runtime wheel and drive sources keep bounded GLB counts after range composition");
+            ok &= Require(std::memcmp(combined.vertices.data(),originalDrive.vertices.data(),
+                    originalDrive.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(combined.indices.data(),originalDrive.indices.data(),
+                    originalDrive.indices.size()*sizeof(std::uint32_t))==0 &&
+                std::memcmp(combined.vertices.data()+originalDrive.vertices.size(),originalWaterwheel.vertices.data(),
+                    originalWaterwheel.vertices.size()*sizeof(StaticRtVertex))==0 &&
+                std::memcmp(combined.indices.data()+originalDrive.indices.size(),originalWaterwheel.indices.data(),
+                    originalWaterwheel.indices.size()*sizeof(std::uint32_t))==0,
+                "range composition preserves every source vertex and index byte");
+            const auto& drivePrimitive=combined.primitives.front();
+            const auto& originalDrivePrimitive=originalDrive.primitives.front();
+            ok &= Require(drivePrimitive.vertexOffset==originalDrivePrimitive.vertexOffset &&
+                drivePrimitive.indexOffset==originalDrivePrimitive.indexOffset &&
+                drivePrimitive.indexCount==originalDrivePrimitive.indexCount &&
+                drivePrimitive.materialIndex==originalDrivePrimitive.materialIndex &&
+                drivePrimitive.nodeTransformIndex==originalDrivePrimitive.nodeTransformIndex,
+                "original drive primitive and node range remain unchanged at source index zero");
+            for(std::size_t i=0;i<originalWaterwheel.primitives.size();++i) {
+                const auto& source=originalWaterwheel.primitives[i];
+                const auto& packed=combined.primitives[PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset+i];
+                ok &= Require(packed.vertexOffset==originalDrive.vertices.size()+source.vertexOffset &&
+                    packed.indexOffset==originalDrive.indices.size()+source.indexOffset &&
+                    packed.indexCount==source.indexCount &&
+                    packed.materialIndex==originalDrive.materials.size()+source.materialIndex &&
+                    packed.nodeTransformIndex==originalDrive.nodeTransforms.size()+source.nodeTransformIndex,
+                    "waterwheel primitive offsets remain disjoint from the existing drive BLAS range");
+            }
+            for(std::size_t i=0;i<originalDrive.nodeTransforms.size();++i)
+                ok &= combined.nodeTransforms[i].name==originalDrive.nodeTransforms[i].name &&
+                    combined.nodeTransforms[i].world==originalDrive.nodeTransforms[i].world;
+            for(std::size_t i=0;i<originalWaterwheel.nodeTransforms.size();++i) {
+                const auto& packed=combined.nodeTransforms[originalDrive.nodeTransforms.size()+i];
+                ok &= packed.name==originalWaterwheel.nodeTransforms[i].name &&
+                    packed.world==originalWaterwheel.nodeTransforms[i].world;
+            }
+        }
         ok &= ring.primitiveCount==1u && flask.primitiveCount==1u && ring.assetIndex!=flask.assetIndex &&
               ring.primitiveBase!=flask.primitiveBase &&
               scene.attackWarningRingAsset_.vertices.size()==32u && scene.attackWarningRingAsset_.indices.size()==96u &&
               scene.healingFlaskAsset_.vertices.size()==242u && scene.healingFlaskAsset_.indices.size()==1152u;
+        ok &= stone.primitiveCount==1u && stone.assetIndex!=ring.assetIndex && stone.assetIndex!=flask.assetIndex &&
+              stone.flags==static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr) &&
+              scene.roadStoneAsset_.vertices.size()==113u && scene.roadStoneAsset_.indices.size()==126u;
         if(ring.primitiveBase<primitives.size() && flask.primitiveBase<primitives.size()) {
             const auto ringMaterial=primitives[ring.primitiveBase].materialIndex;
             const auto flaskMaterial=primitives[flask.primitiveBase].materialIndex;
@@ -733,15 +1142,20 @@ struct PresentableTinyRtSceneObservationTestAccess
         }
         ok &= emissiveOwners==1u;
         for(const char* family:{"ChestWood","BlackIron"}) {
-            const auto row=[&](const auto& asset,std::uint32_t owner) {
-                for(std::size_t i=0;i<asset.primitives.size();++i)
-                    if(asset.materials[asset.primitives[i].materialIndex].name==family)
+            const auto row=[&](const auto& asset,std::uint32_t owner,std::size_t primitiveOffset) {
+                const auto& metadata=instances[owner];
+                for(std::size_t i=0;i<metadata.primitiveCount;++i)
+                    if(asset.materials[asset.primitives[primitiveOffset+i].materialIndex].name==family)
                         return primitives[instances[owner].primitiveBase+i].materialIndex;
                 return kRtMaterialCapacity;
             };
-            const auto base=row(scene.gothicChestBaseAsset_,5u);
-            const auto lid=row(scene.gothicChestLidAsset_,6u);
-            ok &= base<materials.size() && base==lid && base!=scene.dielectricFixtureMaterialIndex_;
+            const auto base=row(scene.gothicChestBaseAsset_,5u,0u);
+            const auto lid=row(scene.gothicChestLidAsset_,6u,0u);
+            const auto wheel=row(scene.millDriveAsset_,PresentableTinyRtScene::kMillWaterwheelMetadataIndex,
+                PresentableTinyRtScene::kMillWaterwheelPrimitiveOffset);
+            ok &= Require(base<materials.size() && base==lid && base==wheel &&
+                base!=scene.dielectricFixtureMaterialIndex_,
+                "waterwheel ChestWood and BlackIron reuse the admitted immutable atlas/material rows");
         }
         // These are separately owned rigid props. Grouping their baked node
         // geometry must preserve every vertex/triangle and every grip/latch
@@ -1286,22 +1700,50 @@ struct PresentableTinyRtSceneObservationTestAccess
         // in the existing bark primitive, without expanding either row capacity.
         // Eight original F03 kerbs and one marked waystone add 144 triangles
         // in the existing consolidated masonry owner, without a new row.
-        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 37846u + 656u + 6184u + 17712u + 966u + 6168u + 11904u + 72u + 144u)*3u;
-        // Normal private480 adds the unchanged middle/far trees, low ferns and
-        // the admitted closed boundary, all within existing material families.
-        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1188u)*3u;
+        constexpr auto townTriangles=horde::scene::kBellwetherSolidTriangles+horde::scene::kBellwetherGroundTriangles;
+        // The separate crop GLB is appended to the shared world owner after the town shell.
+        constexpr auto cropTriangles=horde::gameplay::bellwether::kBellwetherGardenCropTriangles;
+        constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 39266u + 656u + 6184u + 17712u + townTriangles + cropTriangles + 6168u + 11904u + 72u + 144u)*3u;
+        // The full woodland retains the same trees/ferns/rocks and opens two
+        // rail spans, keeping the end post of the adjoining retained span.
+        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
         const auto& woodland=tomb.forestSurroundingsPrototype_;
-        bool ok = woodland && woodland->report.extraTrees==416u &&
+        const auto& support=tomb.chapterTerrainSurface_;
+        const auto supportTriangles=support ? support->TriangleCount()+
+            support->NonWalkableTriangleCount()+support->StepTriangleCount() : 0u;
+        constexpr auto churchyardTriangles=horde::gameplay::bellwether::kBellwetherGraveyardSolidTriangles+
+            horde::gameplay::bellwether::kBellwetherGraveyardGroundTriangles;
+        constexpr auto smithTriangles=horde::gameplay::bellwether::kBellwetherSmithSolidTriangles+
+            horde::gameplay::bellwether::kBellwetherSmithGroundTriangles;
+        const bool supportFits= supportTriangles==143304u+churchyardTriangles+smithTriangles+
+            horde::gameplay::bellwether::kBellwetherGrateSolidTriangles+
+            horde::gameplay::bellwether::kMillTallySolidTriangles+
+            horde::gameplay::bellwether::kBellwetherStockSolidTriangles+
+            horde::gameplay::bellwether::kMillBenchLampSolidTriangles+
+            horde::gameplay::bellwether::kBellwetherPathGroundTriangles+
+            horde::gameplay::bellwether::kSquareFrontageSolidTriangles+
+            horde::gameplay::bellwether::kWestTradeSolidTriangles+
+            horde::gameplay::bellwether::kTavernRailSolidTriangles+
+            horde::gameplay::bellwether::kGardenHouseSolidTriangles+
+            horde::gameplay::bellwether::kGardenHousePathTriangles &&
+            support->NonWalkableTriangleCount()<=support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
+        std::cout << "Combined forest and town native support: " << supportTriangles
+                  << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
+        if(support)std::cout << "Static obstacle faces=" << support->NonWalkableTriangleCount()
+            << " capacity=" << support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount())
+            << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';
+        bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
                   woodland->report.addedIndices==woodlandIndices &&
-                  woodland->report.boundaryContained &&
+                  woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&
+                  woodland->report.bellwetherRoadRuns==2u &&
                   oldIndices == 8422u * 3u &&
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 33u &&
-                  tomb.staticMeshSlot_.Materials().size() == 32u &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= 38u &&
-                  tomb.staticMeshSlot_.Materials().size() <= 34u;
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 49u &&
+                  tomb.staticMeshSlot_.Materials().size() == 44u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
+                  tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)
             std::cerr << "Integrated intake invariants: baseline indices=" << oldIndices
                       << " expected=" << 8422u*3u
@@ -1908,8 +2350,13 @@ int main(int argc, char** argv)
         "player upload must preserve exact pose bytes and asset lifetime across reload/move/failure");
     std::cerr << "Resource integration: existing readback/mist/torch contracts\n";
     bool ok = playerUploadOk;
+    ok &= CheckIndexedActorGeometry();
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckChapterResidentPublication(),
+        "chapter residents keep separate GPU references and retry an unsubmitted pose");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckPrivyRagInstancePublication(),
+        "privy rag is a real opaque RT instance at the basket/shelf and hidden only while carried");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckProceduralSurfaceReadiness(),
                   "chapter readiness must admit the complete world/lid code buffer and reject missing/misaligned ranges");
@@ -1918,7 +2365,7 @@ int main(int argc, char** argv)
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWorldMaterialPaletteSemantics(),
                   "shared authored palette must retain byte-identical material values and every surface/normal classification");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckDevelopmentStaticAdmission(),
-                  "real dressed tomb/forest production registration exceeds its unchanged resource contracts");
+                  "real dressed tomb/forest production registration fits the reviewed resource contracts");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMistControlsAndLifetime(),
                   "mist control must preserve default-On/shadow policy and distinguish requested from owned uploaded state");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckKeeperTorchBodyAliases(),
@@ -1960,7 +2407,7 @@ int main(int argc, char** argv)
     ok &= CheckBoundedWaterDropletGeometry();
     std::cerr << "Resource integration: actual tomb intake\n";
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckIntegratedTombIntake(),
-                  "actual combined native tomb asset intake retains the frozen primitive/material capacities");
+                  "actual combined native tomb asset intake retains the reviewed primitive/material capacities");
     std::cerr << "Resource integration: water owner lifetime\n";
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckWaterDropletOwnerLifetime(),
                   "water droplet CPU/GPU owner must transfer and clear through scene move/destroy");

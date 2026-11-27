@@ -16,6 +16,36 @@ contact in the existing consolidated world owner. No new material, texture
 layer, light, transparency, instance, save field or road interaction is added.
 Native image/grounding and physical-device acceptance remain separate.
 
+## Kit's roadside ankle foley (1.8 development)
+
+`assets/audio/kit-ankle/runtime/boot_and_gravel.wav` is a short in-game blend
+of `footstep dirt 7.wav` and `rock 19.wav` from the existing private FilmCow
+Recorded SFX archive. The FilmCow project-use terms documented below apply.
+`steady_breath.wav` is original unvoiced Horde foley by Samfa12/Codex,
+made from locally synthesized filtered noise. The
+[asset manifest](assets/audio/kit-ankle/asset.manifest.json) pins the licensed
+sources, crop frames and exact WAVs. Packages carry the bounded derivatives
+and manifest. The archive originals stay private.
+
+## Bellwether tavern hearth (1.8 development)
+
+The quiet hearth cue uses [Fireplace burning by giddster](https://freesound.org/people/giddster/sounds/414482/)
+under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/).
+The six-second in-game WAV is trimmed, downmixed, filtered and faded from the
+author's public high-quality playback copy. The [asset manifest](assets/audio/bellwether-hearth/asset.manifest.json)
+pins the source, exact processing recipe and output. The game packages the
+finite WAV and manifest. The source copy remains in the local archive.
+
+## Bellwether loose road stone (1.8 development)
+
+`assets/models/world/source/bellwether-loose-road-stone-v1/` contains original
+Samfa12/Codex stone geometry, a single opaque material, and an editable fit to
+the existing Kit rig and chapter terrain. The source Blend includes the
+previously documented Kit rig and a cut of the admitted terrain for review.
+The packaged asset in `assets/models/world/runtime/bellwether-loose-road-stone-v1/`
+contains only the original 42-triangle stone and its untextured material. The GLB
+matches the source export at SHA-256 `9b127782e788cef0b8c5a911ba74939250b9df37b298e30a567c1452f3a194d3`.
+
 ## Original tomb-floor masonry chips (1.7 development)
 
 `src/scene/TombFloorDebris.h` authors six small closed fractured-stone meshes in
@@ -85,6 +115,43 @@ source iterations and v2 export stay intact outside new runtime packages.
 Revision4 adds bounded solid portal/step/tower/shutter detail to the same
 nine closed footprints; no building interior, new light or texture is admitted. This asset notice
 does not apply the code licence to third-party texture/audio/model sources.
+
+The 1.8 runtime candidate in `assets/models/world/runtime/bellwether-tavern-v1/`
+is original Horde geometry derived from the editable v4 master. The room adds
+an original bevelled timber chair and side table with three charred hearth
+billets. The original untextured furniture colour reuses the existing
+TombEarthenware roughness and colour row. The billets reuse TombCharredWick.
+MedievalWall02 and TombEarthenware still supply the architecture. The editable
+master, recipe and hashes are retained with the tavern authoring records.
+The south-window frame and closed glass volume are original Horde geometry
+from the same Blender source. The untextured window has no third-party inputs.
+The south door leaf, jambs, straps and pulls are original meshes in that
+Blender source. The moving leaf has two untextured finishes in its hinge-local
+export. The fixed frame and pintles use the existing town material rows.
+The B01 furniture detail tiers are original derivatives of that same editable master.
+They reuse the existing finishes and are stored with the source assets under
+`assets/models/world/source/bellwether-tavern-lods-v1/`.
+The three runtime GLBs and their manifests are byte-identical copies under
+`assets/models/world/runtime/bellwether-tavern-v1/`.
+The floor-standing candlestick, wax and wick are original Horde geometry in that source.
+They reuse the existing TombEarthenware and TombCharredWick material rows.
+The west mill entrance, stone landing, timber workbench, reference bearing,
+spare parts bin and two mill arrows are original Horde geometry in the same
+Blender master. They reuse the existing town material rows.
+The stone river landing and its timber rail are original meshes in that master
+and use the same stone and timber material rows.
+The hooded river-fork lamp and its post are original Horde meshes in the same
+Blender master. They use the admitted town material rows.
+The church approach's stone deck and retaining sides are original Horde geometry
+from the same editable town master. They reuse MedievalWall02.
+The church arrow, post and chisel-stroke lettering are original Horde meshes.
+They reuse the existing timber and char material rows from the same export.
+The wayside archive, lower stone, hinge and stylised roots are original Horde
+meshes in the same Blender source. They reuse MedievalWall02, TombEarthenware
+and TombCharredWick. The separately exported hinged cover uses its original
+opaque Blender stone finish without a new texture layer. The separately exported
+road register uses original leather and parchment finishes from the same master.
+Its geometry and materials use no third-party inputs.
 
 ## Generic closed dielectric fixture
 
@@ -467,6 +534,16 @@ terrain/collision and save-restore tests; rendered staging, runtime voice
 balance and physical Windows/Android listening remain acceptance gates.
 
 
+### Bellwether Kit dialogue for private playtesting (21 November 2026)
+
+Five owner-listened performances from the private 4 November intake supply
+Kit's hearth and first-conversation lines in the optional local Windows and
+Android Debug overlays. The native cut roster and Android build pin their
+SHA-256 identities. The byte-exact WAVs use mono PCM16 at 24 kHz, with no
+resampling or gain changes. The private intake preserves the masters and
+review receipt. The ordinary packages use captions for these lines. Public
+game and repository distribution clearance for the five takes remains open.
+
 ### Kit visual source intake (11 October 2026)
 
 The owner expressly confirmed that public Horde repository and game-package
@@ -489,14 +566,29 @@ remain the provenance; no new provider generation or blanket MIT/CC0 claim.
 This editable turn study and its studio previews are unadmitted and excluded from
 runtime packages. See `docs/evidence/2026-10-23-kit-step-turn-proof/README.md`.
 
+The editable `assets/models/characters/source/kit-hearth-sit-study-v1/` take uses
+the same owner-approved source rig and original Horde tavern furniture.
+Blender motion authoring is by Samfa12/Codex. The Blender study and sampled
+references stay outside runtime packages. The intermediate hearth export appends
+its 83-frame joint animation to the preserved 1.7 payload described below. Its
+SHA-256 is `799c699e0a7f454d9b4131c6fb9bf133866045f7c8f9ef6fe05d1fbed7370d9d`.
+
+The editable `assets/models/characters/source/kit-ankle-approach-v1/` takes use
+the same owner-approved Kit rig. Samfa12/Codex authored the joint motion in
+Blender. The 1.8 runtime appends the road-fitted ankle assessment from the stone
+study and the original protective walk to the intermediate hearth export.
+The runtime is 2,545,820 bytes with SHA-256
+`f91851d7dba80d66294551f997c5b2b8a0d48de2632ba692f7dcab484b23eca4`.
+Editable source, measurements and reference samples remain outside packages.
+
 ### Kit same-rig turn runtime promotion (24 October 2026)
 
-`assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
-is a byte-identical promotion of the owned native export
+For 1.7, `assets/models/characters/runtime/kit-warden-v1/kit-warden-turn.runtime.glb`
+was a byte-identical promotion of the owned native export
 `assets/models/characters/source/kit-step-turn-proof-v1/native/kit-turn-proof.glb`:
 2,272,652 bytes, SHA-256
 `a72091cac1768f66353178247bde804af7e4b41dd482ccaad813215131583c11`.
-It retains the original seven animations, mesh, materials, skin/bind hierarchy,
+That payload retains the original seven animations, mesh, materials, skin/bind hierarchy,
 accessors and original binary payload, appending only the two offline-authored
 joint-only turn takes. The shared runtime applies the exported yaw separately
 and controls playback timing; no root yaw is embedded in those joint clips.
@@ -891,3 +983,254 @@ The compact dynamic gauge follow-up uses original code-authored bottle paths in
 actual owned charge fraction and persistent outline/divisions. The static icon
 above remains source artwork, not the current charge indicator. No imported
 asset, new rights claim or rendering-material ownership is introduced.
+
+## Bellwether tavern keeper candidate - 22 November 2026
+
+The keeper uses an original project concept (OpenAI image generation) and
+Meshy T2.5 geometry, Meshy 7 PBR textures, and Meshy auto-rig and stock walk.
+Blender authoring by Samfa12/Codex adapts the standing pose and walk to the
+authored tavern blocking. The 15,421-triangle runtime GLB
+(`61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827`)
+and its platform texture arrays are pinned for local Debug only. The private
+keeper source archive retains the concept, prompt, project provider receipts,
+source models, editable Blender assembly, and byte inventories.
+
+The paid Meshy account charged 20 credits. Exact distribution rights are still
+pending. Keep the source models, derived textures, and APK outside public
+source and published packages until the asset's rights are recorded.
+
+## Bellwether artificer candidate - 22 November 2026
+
+The artificer uses an original project reference created with built-in OpenAI
+image generation, Meshy T2.5 geometry, Meshy 7 PBR textures and the Meshy
+humanoid rig with its stock walk and run. Blender authoring by Samfa12/Codex
+grounds the standing pose and retimes the walk. The private source archive
+holds the prompt, provider originals, editable assembly, local previews and
+verification receipts. The prepared resident GLB has SHA-256
+`58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f`
+and 15,360 triangles.
+
+The paid Meshy account charged 20 credits. Exact redistribution rights remain
+pending. The public repository records the preparation tools and provenance.
+The private archive retains the model, textures and review images.
+
+## Bellwether salvager candidate - 22 November 2026
+
+The intake records an earlier salvager rig whose files could not be recovered
+for this build. The replacement uses an original project reference made with
+built-in OpenAI image generation, Meshy T2.5 geometry, Meshy 7 PBR textures
+and Meshy's humanoid rig and walk. Blender authoring by Samfa12/Codex adjusts
+the standing arms and grounds the retimed walk. The 15,725-triangle runtime GLB
+has SHA-256 `26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa`.
+The local source archive retains the reference, prompt, original models,
+editable Blender file, platform textures and provider receipts.
+
+Meshy charged 15 credits for the textured model and five for the rig. The
+paid output and its derivatives are for private Debug testing while exact
+distribution rights are confirmed. The optional voice overlay uses three
+existing Salvager takes from the private Bellwether audio archive, cast as
+Wise Animation Mentor. The code pins the PCM WAVs and their sample counts.
+Owner listening acceptance and distribution clearance for these takes remain
+open.
+
+## Bellwether relic dealer candidate - 23 November 2026
+
+The private west visit reuses the November 7 source study, its original
+project-generated reference, Meshy T2.5 geometry, Meshy 7 PBR textures and
+Meshy's humanoid rig and walk. The original rigged, walking and running GLBs
+retain their source receipt hashes. The local Blender assembly grounds the
+1.73 m idle and brings the upper arms inward 12 degrees. The runtime GLB has
+15,800 triangles and SHA-256
+`588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe`.
+
+The earlier source study consumed 20 Meshy credits. Preparing this candidate
+used zero additional credits. The private archive retains the source files,
+editable Blender assembly, exact platform texture hashes and review images.
+The shared Blender recipe accepts the rig and walk under `rigged.glb` and
+`walking.glb` with their source receipt hashes, the asset ID
+`bellwether-relic-dealer`, a 12-degree idle adjustment and zero walk offset.
+One tangent component varied by 0.0001 on re-export. The platform overlays
+use the exact archived and validated GLB.
+The candidate remains private pending distribution clearance. Its trade line
+is caption-only. The existing dealer recordings remain in the audio archive.
+
+The S6 stall, weighing sign, counter, stock props and wick stand are original
+Horde geometry authored in Blender by Samfa12/Codex. They reuse the admitted
+town stone, clay, wood and char materials. The stall adds zero textures or
+material rows. The source and receipt are under
+`assets/models/world/source/bellwether-relic-stall-v1/`.
+
+The CHURCH waymarker's split-lid road cache is original Horde geometry by
+Samfa12/Codex. It uses the same admitted timber and char material rows.
+The editable source and receipt are in
+`assets/models/world/source/bellwether-road-cache-v1/`.
+
+## Bellwether square well - 23 November 2026
+
+The covered T01 well is original Horde geometry authored in Blender by
+Samfa12/Codex. It reuses the admitted Bellwether stone, clay, timber and char
+materials. The editable source and receipt are in
+`assets/models/world/source/bellwether-well-v1/`.
+
+## Bellwether west kitchen plots - 23 November 2026
+
+The T02 beds, soil and two crop silhouettes are original Horde geometry
+authored in Blender by Samfa12/Codex. The beds use the admitted town finishes.
+The crop foliage uses the existing original alder material and packed platform
+layers. The editable source and receipt are in
+`assets/models/world/source/bellwether-garden-v1/`.
+
+## Bellwether west service yard - 23 November 2026
+
+The closed privy, latch, washstand, basin and jug are original Horde geometry
+authored in Blender by Samfa12/Codex. They reuse the existing town materials.
+The editable source and receipt are in
+`assets/models/world/source/bellwether-privy-v1/`.
+
+The nearby clean-rag basket, stand and folded linen are also original Horde
+geometry. The basket shares town materials. The linen uses a single untextured
+opaque finish. Their editable source is in
+`assets/models/world/source/bellwether-privy-rag-v1/`.
+
+## Bellwether active churchyard - 23 November 2026
+
+The T03 churchyard walls, footstones and path are original Horde geometry
+authored in Blender by Samfa12/Codex. The nine headstones reuse the original
+Horde grave-marker r03 geometry. The churchyard shares the existing
+MedievalWall02 masonry family and its recorded CC0 attribution. Editable
+geometry and exact source digests are in
+`assets/models/world/source/bellwether-graveyard-v1/`.
+
+## Bellwether smith yard - 23 November 2026
+
+The B06 exterior canopy, forge, work furniture and stone hardstand are original
+Horde geometry authored by Samfa12/Codex in Blender. They reuse the admitted
+town palette and its existing texture credits. The editable master and exact
+geometry receipt are in `assets/models/world/source/bellwether-smith-v1/`.
+
+## Bellwether garden-edge grate - 23 November 2026
+
+The stone recess, locked grate, shelter and household goods are original
+Horde geometry authored by Samfa12/Codex in Blender. They share the admitted
+town materials and their existing texture credits. The editable model and
+exact asset receipt are in `assets/models/world/source/bellwether-grate-v1/`.
+
+## Bellwether settled livestock - 23 November 2026
+
+The resting pig, two hens, gate, roost and care props are original Horde
+geometry authored by Samfa12/Codex in Blender. They use the admitted town
+palette and its existing texture credits. The rigid head meshes use three
+untextured finishes from that palette. The editable objects and exact source
+receipt are in `assets/models/world/source/bellwether-stock-v1/`.
+
+The positional pig grunt uses a short crop from JarredGibb's field recording.
+The hen cluck uses a short crop from D4XX's recording. Both source pages grant
+CC0 1.0. The audio manifest records the public playback copies, exact hashes,
+and FFmpeg filters and fades. The runtime ships the cropped mono WAVs and their
+manifest. [Pig recording](https://freesound.org/people/JarredGibb/sounds/233173/)
+[Hen recording](https://freesound.org/people/D4XX/sounds/607245/)
+[CC0](https://creativecommons.org/publicdomain/zero/1.0/)
+
+## Bellwether mill tally props - 23 November 2026
+
+The banded case, dealer's tray and mill tally board are original Horde
+geometry authored by Samfa12/Codex in Blender. They use the admitted town
+materials and their existing texture credits. The editable model and exact
+source receipt are in `assets/models/world/source/bellwether-tally-v1/`.
+
+## Bellwether mill workbench drive - 22 November 2026
+
+The untextured bronze gear is original Horde geometry authored in Blender by
+Samfa12/Codex. The editable source and authoring script are retained alongside
+the checked-in runtime GLB. The model uses one opaque material and no external
+textures or third-party asset inputs.
+
+## Bellwether mill bench oil lamp - 23 November 2026
+
+The iron clamp, clay oil cup, wick and hood are original Horde Blender geometry
+by Samfa12/Codex. They reuse existing Bellwether materials. The editable master
+and receipt are in assets/models/world/source/bellwether-mill-lamp-v1/.
+
+## Bellwether waterwheel source - 22 November 2026
+
+The rigid wheel is original Horde geometry authored in Blender by Samfa12/Codex.
+Its oak finish reuses the three original chest-wood textures produced by
+tools/generate-production-prop-textures.py. The iron is a local PBR material.
+The editable master packs the existing wood maps. No external model, textures
+or provider assets were used. The source and receipt are stored under
+assets/models/world/source/bellwether-waterwheel-v1/. The GLB candidate is
+reproducible from the recipe and remains outside game packages.
+
+The millrace terrain and water are also original Horde authoring. The terrain cut derives from the pinned r23 chapter mesh and retains the original embedded material images and texture mapping policy. Its source receipt is in assets/models/world/source/bellwether-millrace-v1/.
+
+The runtime wheel and its original stone and timber support geometry are
+documented under assets/models/world/source/bellwether-millworks-v1/. The wheel
+reuses the existing Horde chest wood and iron texture sources and exact
+platform material rows. The sluice and piers reuse the existing Bellwether
+timber and masonry materials.
+
+The footway, crossing, rails and turnout are original Horde geometry using
+those same Bellwether timber and masonry materials. The editable source and
+receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
+
+## Bellwether waterwheel contact audio - 23 November 2026
+
+The finite oak journal cue in assets/audio/bellwether-mill/ is original Horde
+foley by Samfa12/Codex. Its synthesis recipe at
+tools/prepare-bellwether-mill-audio.py uses seeded noise and resonances without
+external recordings. The manifest identifies the packaged 48 kHz mono PCM.
+
+## Bellwether lanes and paths - 23 November 2026
+
+Original Horde geometry authored by Samfa12/Codex. The finished layer
+reuses the admitted town stone finish documented above. The editable layout,
+Blender master and export receipt are in
+`assets/models/world/source/bellwether-paths-v1/`.
+
+## Bellwether arrival voice audition - 22 November 2026
+
+The three Kit roadside pickups, tavern welcome and `hub.horde_army` reply
+reuse the exact Mureka takes from the private Horde audio archive. The
+five 24 kHz mono PCM16 WAVs are byte-pinned for local Debug audition.
+The private archive retains the original files, scripts, voices, receipts,
+and review copies. Owner listening approval and wider distribution rights
+for these five takes remain open.
+
+## Bellwether follow-on voice audition - 23 November 2026
+
+The private overlay reuses three Kit and two Record keeper takes from the
+approved 4 November review reels, and the 29 October Relic dealer trade
+audition. The six runtime audition WAVs are exact 24 kHz mono PCM16 copies
+of the archived takes. Private build admission keeps their stable line IDs
+and existing captions. Public distribution clearance remains open.
+
+## Bellwether square and tavern frontage - 26 November 2026
+
+Samfa12/Codex authored the water bench, fetching vessels, tiled entrance
+hood, tankard sign, oil cup and split-wood rack for Horde in Blender. They
+use the existing town stone, clay, timber and char material rows. The
+[editable source and recipe](assets/models/world/source/bellwether-square-frontage-v1/README.md)
+record the derivation from the mapped town and terrain.
+
+The [church fork waymarker](assets/models/world/source/bellwether-church-waymarker-v1/README.md)
+repositions the original Horde timber post, arrow and hand-authored CHURCH
+lettering from the same Bellwether master. It uses the existing town finishes.
+
+## Bellwether west trade furnishings - 27 November 2026
+
+Samfa12/Codex authored the dealer's spoked handcart, sealed pottery and
+equal-arm balance in Blender for Horde. They reuse the existing Bellwether
+material rows. The [editable master, recipe and export receipt](assets/models/world/source/bellwether-west-trade-v1/README.md)
+record the original geometry and its integration into the town.
+
+Samfa12/Codex also authored the [south tavern handrail](assets/models/world/source/bellwether-tavern-rail-v1/README.md)
+from the original ramp survey. Its planed rails, pegged uprights and socket
+stones use the same town timber, char and stone finishes.
+
+## Bellwether garden house - 27 November 2026
+
+Samfa12/Codex authored the boarded door, shutter pair, wash shelter, vessels
+and rain barrel for House A in Blender. Its stone entrance reuses four
+pieces from the original Bellwether v4 master. The [recipe and export
+receipt](assets/models/world/source/bellwether-garden-house-v1/README.md)
+record the mapped placement and the source and runtime hashes.

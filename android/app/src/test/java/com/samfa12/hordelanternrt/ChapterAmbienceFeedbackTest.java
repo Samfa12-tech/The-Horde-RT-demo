@@ -11,6 +11,8 @@ public class ChapterAmbienceFeedbackTest {
         assertEquals("pond_frogs_crickets", ChapterAmbienceFeedback.soundKey(31));
         assertEquals(35, ChapterAmbienceFeedback.FOREST_FOLIAGE);
         assertEquals("forest_leaf_rustle", ChapterAmbienceFeedback.soundKey(35));
+        assertEquals(39, ChapterAmbienceFeedback.BELLWETHER_HEARTH);
+        assertEquals("bellwether_hearth", ChapterAmbienceFeedback.soundKey(39));
     }
     @Test public void stopAndUnknownEventsCannotSelectAudio() {
         for(int type: new int[]{-1,0,27,29,34,36,255})
@@ -31,12 +33,29 @@ public class ChapterAmbienceFeedbackTest {
         }
         return result;
     }
+    @Test public void stockSharesTheOrderedFiniteVoice() {
+        assertEquals(40, ChapterAmbienceFeedback.BELLWETHER_PIG_GRUNT);
+        assertEquals(41, ChapterAmbienceFeedback.BELLWETHER_HEN_CLUCK);
+        assertEquals("bellwether_pig_grunt", ChapterAmbienceFeedback.soundKey(40));
+        assertEquals("bellwether_hen_cluck", ChapterAmbienceFeedback.soundKey(41));
+        assertEquals(3, ChapterAmbienceFeedback.latestSignalIndex(batch(40,41,38)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(41,40,34)));
+        assertFalse(ChapterAmbienceFeedback.isSignal(43));
+    }
+    @Test public void wheelContactUsesTheSameOrderedFiniteVoice() {
+        final int wheel=ChapterAmbienceFeedback.BELLWETHER_WATERWHEEL_CREAK;
+        assertEquals(42, wheel);
+        assertEquals("bellwether_waterwheel_creak", ChapterAmbienceFeedback.soundKey(wheel));
+        assertEquals(3, ChapterAmbienceFeedback.latestSignalIndex(batch(41,wheel,38)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(41,wheel,34)));
+    }
     @Test public void laterStopsSuppressOlderFoliageAcrossTheCombinedFamily() {
         long[] forestStop=batch(35,0,29);
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(forestStop));
         assertNull(ChapterAmbienceFeedback.soundKey((int)(forestStop[6]&255)));
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(35,32,34)));
         assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(33,35,34)));
+        assertEquals(6, ChapterAmbienceFeedback.latestSignalIndex(batch(39,38,34)));
     }
     @Test public void laterEligibleStartsReplaceOldStopsAndOtherFamilyStarts() {
         long[] foliage=batch(29,0,35);
@@ -51,5 +70,13 @@ public class ChapterAmbienceFeedbackTest {
         assertEquals(-1, ChapterAmbienceFeedback.latestSignalIndex(new long[0]));
         assertEquals(-1, ChapterAmbienceFeedback.latestSignalIndex(new long[]{35,0}));
         assertEquals(0, ChapterAmbienceFeedback.latestSignalIndex(new long[]{35,0,0,29,0}));
+    }
+    @Test public void kitAnkleFoleyUsesItsOwnClosedCueRoster() {
+        assertEquals(38, KitAnkleFeedback.EVENT_TYPE);
+        assertFalse(ChapterAmbienceFeedback.isSignal(KitAnkleFeedback.EVENT_TYPE));
+        assertEquals(0, ChapterAmbienceFeedback.latestSignalIndex(batch(35, KitAnkleFeedback.EVENT_TYPE)));
+        assertEquals("kit_boot_and_gravel", KitAnkleFeedback.soundKey(1));
+        assertEquals("kit_steady_breath", KitAnkleFeedback.soundKey(2));
+        for (int cue : new int[]{0, 3, 255}) assertNull(KitAnkleFeedback.soundKey(cue));
     }
 }

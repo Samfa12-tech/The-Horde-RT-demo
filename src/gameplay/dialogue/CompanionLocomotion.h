@@ -11,16 +11,16 @@ class CompanionLocomotion {
 public:
     const CompanionLocomotionPose& State() const {return state_;}
     void Reset() {state_={};}
-    void Step(float seconds,float distance,bool walking) {
-        StepWeighted(seconds,distance,walking?1.f:0.f);
+    void Step(float seconds,float distance,bool walking,float stride=kWalkCycleDistanceMetres) {
+        StepWeighted(seconds,distance,walking?1.f:0.f,stride);
     }
-    void StepWeighted(float seconds,float distance,float target) {
+    void StepWeighted(float seconds,float distance,float target,float stride=kWalkCycleDistanceMetres) {
         if(!std::isfinite(seconds) || seconds<=0 || !std::isfinite(distance) || distance<0)return;
-        if(!std::isfinite(target))return;
+        if(!std::isfinite(target) || !std::isfinite(stride) || stride<=0)return;
         seconds=std::min(seconds,.05f);
         target=std::clamp(target,0.f,1.f);
         state_.walkWeight+=std::clamp(target-state_.walkWeight,-seconds/.18f,seconds/.18f);
-        state_.walkPhase=std::fmod(state_.walkPhase+distance/kWalkCycleDistanceMetres,1.f);
+        state_.walkPhase=std::fmod(state_.walkPhase+distance/stride,1.f);
     }
     // Pinned to measured stance travel of the admitted Warden walk, rather than
     // changing the route motor to fit an arbitrary one-second clip playback.

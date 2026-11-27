@@ -1,4 +1,5 @@
 #include "gameplay/simulation/GameSimulation.h"
+#include "audio/BellwetherVoiceFixture.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsChapterDialogue.h"
 #include "gameplay/SpatialAudio.h"
@@ -60,10 +61,52 @@ int main() {
     for (const auto& spec : kLines) {
         if (spec.id == Line::None) continue;
         const auto path = horde::platform::windows::WindowsDialogueAudioPath(assetRoot, spec.audio);
+        if(IsBellwetherLine(spec.id)) {
+            Check(path.empty() && spec.text[0]!='\0' && RequiresChapterCaption(spec.id),
+                "Bellwether retains timed captions when the local voice is unavailable");
+            continue;
+        }
+        Check(!RequiresChapterCaption(spec.id), "existing voiced chapter lines respect the subtitle preference");
         Check(!path.empty() && std::filesystem::is_regular_file(path),
-            "every Kit and Keeper voice resolves to actual bytes from the Windows assets root");
+            "every admitted Kit and Keeper voice resolves to actual bytes from the Windows assets root");
         Check(path.lexically_relative(assetRoot).generic_string().starts_with("audio/"),
             "dialogue root is joined once rather than duplicating assets/assets");
+    }
+    const auto& privySpec=Spec(Line::PrivyRagRequest);
+    Check(static_cast<std::uint32_t>(Line::PrivyRagRequest)==static_cast<std::uint32_t>(Line::RelicDealerOrdinarySale)+1u &&
+          std::string_view(privySpec.stableId)=="hub.privy_request" &&
+          std::string_view(privySpec.speaker)=="Privy occupant" &&
+          std::string_view(privySpec.text)=="Can someone PLEASE get me some rag?!" &&
+          privySpec.audio[0]=='\0' && std::abs(privySpec.duration-3.6f)<.000001f &&
+          RequiresChapterCaption(Line::PrivyRagRequest) && IsBellwetherLine(Line::PrivyRagRequest),
+          "the appended privy request is an exact timed local caption with a stable project identity");
+    const auto& privyThanks=Spec(Line::PrivyRagThanks);
+    Check(static_cast<std::uint32_t>(Line::PrivyRagThanks)==static_cast<std::uint32_t>(Line::PrivyRagRequest)+1u &&
+          std::string_view(privyThanks.text)=="Thank you." && privyThanks.audio[0]=='\0' &&
+          RequiresChapterCaption(Line::PrivyRagThanks),
+          "the provisional local thanks stays caption-only and follows the need cue in the stable line table");
+    for (const auto& cut : horde::audio::kBellwetherVoiceCuts) {
+        const auto& spec = Spec(cut.line);
+        Check(std::string_view(spec.speaker) == "Kit" &&
+            std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
+            "the shared clock covers the exact five approved Kit waveforms");
+    }
+    for (const auto& cut : horde::audio::kBellwetherArrivalAuditionCuts) {
+        const auto& spec = Spec(cut.line);
+        Check(!horde::audio::HasBellwetherVoiceCut(cut.line) &&
+            horde::audio::HasBellwetherVoiceCut(cut.line, true) && RequiresChapterCaption(cut.line) &&
+            std::abs(spec.duration - static_cast<float>(cut.frames) / 24000.f) < .000001f,
+            "arrival audition uses the measured WAV and keeps the required timed caption");
+    }
+    constexpr std::array<std::uint32_t, 6> followOnLineIds{38, 39, 44, 45, 47, 55};
+    for (std::size_t i = 0; i < followOnLineIds.size(); ++i) {
+        const auto& cut = horde::audio::kBellwetherFollowOnAuditionCuts[i];
+        const auto& spec = Spec(cut.line);
+        Check(static_cast<std::uint32_t>(cut.line) == followOnLineIds[i] &&
+            !horde::audio::HasBellwetherVoiceCut(cut.line, true, true) &&
+            horde::audio::HasBellwetherVoiceCut(cut.line, false, false, true) &&
+            RequiresChapterCaption(cut.line) && static_cast<float>(cut.frames) / 24000.f <= spec.duration,
+            "the private follow-on cut fits the existing caption window and agrees with the Android line ID");
     }
     Check(horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"assets/../private.wav").empty() &&
           horde::platform::windows::WindowsDialogueAudioPath(assetRoot,"C:/private.wav").empty(),
@@ -334,6 +377,8 @@ int main() {
     using namespace horde::platform::windows;
     Check(WindowsSfxSourceGain(.5f,0)==0&&WindowsDialogueSourceGain(70)>.69f,"SFX mute leaves voice independent");
     Check(WindowsDialogueSourceGain(0)==0&&WindowsSfxSourceGain(.5f,70)>0,"voice mute leaves effects independent");
+    Check(WindowsSubtitleCaption("",Spec(Line::TavernDirections).text)==Spec(Line::TavernDirections).text,
+          "a directions note has no speaker label");
     Check(WindowsSubtitleCaption("Keeper","Come closer")=="Keeper: Come closer",
         "normal subtitle contains only speaker and spoken words, no modal/footer paragraphs");
     request={};request.lines=1;request.bottomReserved=WindowsSubtitleBottomReserved(false,100);request.margin=12;
@@ -455,5 +500,418 @@ int main() {
     forest.Reset();Check(!forest.State().forestNightConsumed&&!forest.State().forestWaystoneConsumed&&
         !forest.State().forestClueConsumed&&!forest.State().forestVillageConsumed,
         "new route clears outdoor once flags");
+    {
+        Director road;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context trail;
+        trail.exterior=trail.claimed=trail.roadInReach=true;
+        trail.companionSource=Tuple{59.3f,-8.45f,108.2f};
+        Check(road.RestoreProgress(progress,trail,1,0),"completed lookout can start the roadside scene");
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::None,"Kit cannot speak before the ankle catch");
+        trail.kitCaughtAnkle=true;
+        road.Step(.05f,trail);
+        const auto stop=road.State();
+        auto forged=road.ExportProgress();
+        forged.activeLine=Line::RoadStop;
+        Check(stop.line==Line::RoadStop && road.HoldingAnkleAssessment() &&
+              Spec(stop.line).audio[0]=='\0' && road.ExportProgress().activeLine==Line::None &&
+              !Director::ValidateProgress(forged),"the roadside beat is a transient positional caption");
+        road.Step(.05f,trail);
+        const auto beforePause=road.State();
+        trail.paused=true;
+        road.Step(.05f,trail);
+        Check(road.State().elapsed==beforePause.elapsed,"pause freezes the roadside cadence");
+        trail.paused=false;
+        road.Skip();road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadAnkle && !road.Complete(stop.line,stop.generation),
+              "skip advances once and rejects a stale completion");
+        road.Skip();road.Step(.05f,trail);
+        Check(road.State().line==Line::None && road.HoldingAnkleAssessment(),
+              "rapid skips still leave time for the authored weight test");
+        trail.kitReadyForProtectiveWalk=true;
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadSlow && !road.HoldingAnkleAssessment(),
+              "the last line releases Kit into his protective walk");
+        trail.kitCaughtAnkle=trail.kitReadyForProtectiveWalk=false;
+        trail.companionSource->x+=.5f;
+        road.Step(.05f,trail);
+        Check(road.State().line==Line::RoadSlow && road.State().source.x==trail.companionSource->x,
+              "the last caption follows Kit onto the road");
+
+        Check(road.RestoreProgress(progress,trail,1,0),"an old lookout save starts before the incident");
+        trail.kitCaughtAnkle=true;
+        road.Step(.05f,trail);
+        const auto departed=road.State();
+        trail.roadInReach=false;
+        road.Step(.05f,trail);
+        trail.roadInReach=true;
+        road.Step(.05f,trail);
+        Check(departed.line==Line::RoadStop && road.State().line==Line::None &&
+              !road.HoldingAnkleAssessment() && !road.Complete(departed.line,departed.generation),
+              "leaving mid-line releases the route and doubling back never repeats the injury speech");
+    }
+    {
+        Director door;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context entrance;
+        entrance.exterior=entrance.claimed=entrance.kitAtSouthDoor=true;
+        entrance.tavernKeeperSource=Tuple{83.78f,-7.31f,118.2f};
+        Check(door.RestoreProgress(progress,entrance,1,0),"lookout progress permits the later doorway cue");
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None,"the keeper stays quiet when the player is out of earshot");
+        entrance.tavernDoorInReach=true;entrance.paused=true;
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None,"the doorway cue does not start while paused");
+        entrance.paused=false;
+        door.Step(.05f,entrance);
+        const auto greeting=door.State();
+        auto fabricated=door.ExportProgress();
+        fabricated.activeLine=Line::TavernWelcome;
+        Check(greeting.line==Line::TavernWelcome && greeting.source.x==83.78f &&
+              door.ExportProgress().activeLine==Line::None && !Director::ValidateProgress(fabricated),
+              "the doorway cue originates at the keeper and stays out of saves");
+        entrance.tavernDoorInReach=false;
+        door.Step(.05f,entrance);
+        entrance.tavernDoorInReach=true;
+        door.Step(.05f,entrance);
+        Check(door.State().line==Line::None && !door.Complete(greeting.line,greeting.generation),
+              "walking out of earshot clears playback and returning never repeats the greeting");
+    }
+    {
+        Director hearth;
+        Progress progress;
+        progress.grateConsumed=progress.rescueConsumed=progress.reunionStarted=progress.proofAccepted=true;
+        progress.forestNightConsumed=progress.forestWaystoneConsumed=
+            progress.forestClueConsumed=progress.forestVillageConsumed=true;
+        Context room;
+        room.exterior=room.claimed=room.kitAtChair=true;
+        room.companionSource=Tuple{82.46f,-7.31f,107.3f};
+        Check(hearth.RestoreProgress(progress,room,1,0),"completed lookout prepares the hearth story");
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None,"room dialogue cannot reach a player outside the hearth area");
+        room.tavernInReach=true;
+        hearth.Step(.05f,room);const auto sit=hearth.State();
+        Check(sit.line==Line::TavernSit && sit.source.x==82.46f && Spec(sit.line).audio[0]=='\0' &&
+              hearth.ExportProgress().activeLine==Line::None,
+              "the chair starts the named caption from Kit without serializing its playback state");
+        room.kitSeated=room.paused=true;
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernSit && hearth.State().elapsed==sit.elapsed,"pause freezes the hearth line");
+        room.paused=false;
+        room.companionSource->y-=.27f;
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernSit && hearth.State().source.y==room.companionSource->y &&
+              hearth.Complete(sit.line,sit.generation),"the settling caption follows Kit down into the chair");
+        hearth.Step(.05f,room);const auto limit=hearth.State();
+        Check(limit.line==Line::TavernLimit && hearth.ExportProgress().hearthLinesResolved==1,
+              "the seated line follows the sit without repeating it");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.Complete(limit.line,limit.generation),
+              "leaving cancels the incomplete caption and rejects its stale completion");
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernLimit,"return begins at the unresolved line");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.ExportProgress().hearthLinesResolved==2,
+              "the last line leaves a short pause after Kit explains his limits");
+        for(int i=0;i<12;++i)hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernWork,"Kit offers practical help after the pause");
+        for(int i=0;i<110;++i)hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.ExportProgress().hearthLinesResolved==3,
+              "natural subtitle completion resolves the last beat without a voice callback");
+        hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None,"the resolved hearth sequence remains quiet");
+        Check(!hearth.TryStartTavernConversation(room),"a missing tavern keeper cannot offer the exchange");
+        Check(!hearth.CanShowTavernDirections(room),"directions require the completed exchange");
+        room.tavernKeeperSource=Tuple{85.5f,-7.31f,109.0f};
+        room.keeperAtHearth=true;
+        hearth.Step(.05f,room);
+        Check(hearth.CanStartTavernConversation(room) && hearth.State().line==Line::None &&
+              hearth.TryStartTavernConversation(room),"after settling, only deliberate interaction starts the exchange");
+        Check(hearth.State().line==Line::TavernIntroduce && hearth.State().source.x==room.companionSource->x &&
+              !hearth.TryStartTavernConversation(room),"the first line belongs to Kit and cannot restart on a second interact");
+        hearth.Skip();hearth.Step(.05f,room);
+        const auto keeper=hearth.State();
+        Check(keeper.line==Line::TavernHordeArmy && keeper.source.x==room.tavernKeeperSource->x &&
+              hearth.ExportProgress().activeLine==Line::None && hearth.ExportProgress().tavernConversationLinesResolved==1,
+              "the keeper has a distinct source and the save carries only resolved lines");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.Complete(keeper.line,keeper.generation) &&
+              hearth.TryStartTavernConversation(room) && hearth.State().line==keeper.line,
+              "leaving cancels playback and deliberate return resumes the unfinished reply");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::TavernHoardAnswer && hearth.State().source.x==room.companionSource->x,
+              "Kit owns the final response");
+        hearth.Skip();hearth.Step(.05f,room);
+        Check(!hearth.CanStartTavernConversation(room) && hearth.ExportProgress().tavernConversationLinesResolved==3,
+              "the completed exchange cannot replay");
+        Check(hearth.State().line==Line::None && hearth.CanShowTavernDirections(room),
+              "directions are offered after the exchange without starting another line");
+        hearth.ShowTavernDirections(room);
+        const auto directions=hearth.State();
+        const auto directionsProgress=hearth.ExportProgress();
+        Check(IsGuidanceLine(directions.line) && directionsProgress.activeLine==Line::None &&
+              directionsProgress.tavernConversationLinesResolved==kTavernConversation.size(),
+              "directions are a temporary note rather than a fourth conversation line");
+        room.tavernInReach=false;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && !hearth.CanShowTavernDirections(room) &&
+              !hearth.Complete(directions.line,directions.generation),
+              "moving away dismisses the note and invalidates its generation");
+        room.tavernInReach=true;hearth.Step(.05f,room);
+        Check(hearth.State().line==Line::None && hearth.CanShowTavernDirections(room),
+              "returning allows rereading without automatically replaying anything");
+    }
+    {
+        Director shrine;
+        Context site;
+        site.claimed=site.exterior=site.kitSeated=true;
+        Progress arrived;
+        arrived.grateConsumed=arrived.rescueConsumed=true;
+        Check(shrine.RestoreProgress(arrived,site,1,0),"the fixture has passed the rescue scene");
+        Check(!shrine.TryStartShrineSpeech(ShrineSpeech::Help,site),"shrine speech requires the held lantern in reach");
+        site.shrineLanternSource=Tuple{103.f,-2.7f,33.f};
+        site.companionSource=Tuple{85.f,-8.f,108.f};
+        Check(shrine.TryStartShrineSpeech(ShrineSpeech::Reveal,site) &&
+              shrine.State().line==Line::LanternFirstIdentity && shrine.State().source.x==103.f &&
+              WindowsSubtitleCaption(Spec(shrine.State().line).speaker,Spec(shrine.State().line).text)
+                  .starts_with("Lantern voice:"),
+              "the reveal uses the held lantern's source and labels the speaker without endorsing the claim");
+        const auto identity=shrine.State();
+        site.paused=true;shrine.Step(.05f,site);
+        Check(shrine.State().generation==identity.generation && shrine.State().elapsed==identity.elapsed,
+              "pausing keeps the shrine line and its place");
+        site.paused=false;site.shrineLanternSource.reset();shrine.Step(.05f,site);
+        Check(shrine.State().line==Line::None && !shrine.Complete(identity.line,identity.generation),
+              "leaving the shrine cancels its queued story and invalidates stale callbacks");
+        site.shrineLanternSource=Tuple{103.f,-2.7f,33.f};shrine.Step(.05f,site);
+        Check(shrine.State().line==Line::None && shrine.TryStartShrineSpeech(ShrineSpeech::Recap,site) &&
+              shrine.State().line==Line::LanternFirstRequest,
+              "a return stays quiet until a deliberate practical recap");
+    }
+    {
+        Director records;
+        Context church;
+        church.claimed=church.exterior=church.kitSeated=true;
+        church.recordKeeperInReach=true;
+        Progress arrival;
+        arrival.grateConsumed=arrival.rescueConsumed=arrival.reunionStarted=arrival.proofAccepted=true;
+        arrival.forestNightConsumed=arrival.forestWaystoneConsumed=arrival.forestClueConsumed=arrival.forestVillageConsumed=true;
+        arrival.hearthLinesResolved=kHearthLines.size();
+        Check(records.RestoreProgress(arrival,church,1,0),"record keeper fixture restores completed hearth progress");
+        Check(!records.TryStartRecordKeeper(RecordKeeperAction::ShowRegister,church),"an absent keeper cannot read the register");
+        church.recordKeeperSource=Tuple{71.3f,-1.3f,75.2f};
+        Check(records.TryStartRecordKeeper(RecordKeeperAction::ShowRegister,church) &&
+              records.State().line==Line::RecordKeeperRegister &&
+              records.State().source.x==church.recordKeeperSource->x &&
+              RequiresChapterCaption(records.State().line),
+              "the reading starts at the physical keeper and displays an essential caption");
+        const auto before=records.State();
+        church.recordKeeperInReach=false;
+        records.Skip();records.Step(.05f,church);
+        Check(records.State().line==Line::RecordKeeperTwoRoads,
+              "turning away ends interaction reach while the audible reading continues");
+        church.paused=true;records.Step(.05f,church);
+        Check(records.State().elapsed==0.f,"pausing holds the next record keeper caption");
+        church.paused=false;church.recordKeeperSource.reset();records.Step(.05f,church);
+        Check(records.State().line==Line::None && records.ExportProgress().activeLine==Line::None &&
+              !records.Complete(before.line,before.generation),
+              "leaving earshot cancels the remaining reading and its stale callbacks");
+    }
+    {
+        Director tavern;
+        Context room;
+        room.claimed=room.exterior=room.kitSeated=room.tavernInReach=true;
+        room.companionSource=Tuple{2,1,0};
+        Progress arrival;
+        arrival.grateConsumed=arrival.rescueConsumed=arrival.reunionStarted=arrival.proofAccepted=true;
+        arrival.forestNightConsumed=arrival.forestWaystoneConsumed=arrival.forestClueConsumed=arrival.forestVillageConsumed=true;
+        arrival.hearthLinesResolved=kHearthLines.size();
+        Check(tavern.RestoreProgress(arrival,room,1,0),"the seated scene restores without Kit's new evidence");
+        room.lanternHigh=true;room.manualRaiseSequence=room.visibleRaiseSequence=1;
+        tavern.Step(.02f,room);
+        room.tavernLanternSource=Tuple{.25f,1.4f,0};
+        tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::None,"a lantern already held high cannot introduce itself on return");
+        room.lanternHigh=false;room.lanternLow=true;room.manualRaiseSequence=2;
+        tavern.Step(.02f,room);
+        room.lanternHigh=true;room.lanternLow=false;room.manualRaiseSequence=3;
+        tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::None,"the new raise must reach a presented frame");
+        room.visibleRaiseSequence=3;tavern.Step(.02f,room);
+        Check(tavern.State().line==Line::TavernLanternIdentity && tavern.State().source.x==.25f &&
+              RequiresChapterCaption(tavern.State().line),"the claim comes from the raised lantern in hearing range");
+        const auto identity=tavern.State();
+        room.tavernInReach=false;tavern.Step(.02f,room);
+        Check(!tavern.Complete(identity.line,identity.generation) && tavern.State().line==Line::None &&
+              tavern.ExportProgress().tavernLanternLinesStarted==1,
+              "leaving after the claim retains just the witnessed utterance");
+        Director restored;
+        room.tavernInReach=true;
+        Check(restored.RestoreProgress(tavern.ExportProgress(),room,20,3),"the first utterance survives reload");
+        restored.Step(.02f,room);
+        Check(restored.State().line==Line::None,"loading a raised lantern never resumes the exchange");
+        room.lanternHigh=false;room.lanternLow=true;room.manualRaiseSequence=4;
+        restored.Step(.02f,room);
+        room.lanternHigh=true;room.lanternLow=false;room.manualRaiseSequence=room.visibleRaiseSequence=5;
+        restored.Step(.02f,room);
+        for(std::size_t i=1;i<kTavernLanternExchange.size();++i) {
+            const auto line=kTavernLanternExchange[i];
+            Check(restored.State().line==line && restored.State().source.x==(i==1?.25f:2.f) &&
+                  RequiresChapterCaption(line),"the seals and Kit's replies use their own sources in order");
+            restored.Skip();restored.Step(.02f,room);
+        }
+        Check(restored.State().line==Line::None && !restored.CanOfferTavernLantern(room) &&
+              restored.ExportProgress().tavernLanternLinesStarted==kTavernLanternExchange.size(),
+              "the witnessed exchange completes once without automatic repetition");
+    }
+    {
+        Progress arrived;
+        arrived.grateConsumed=arrived.rescueConsumed=arrived.reunionStarted=arrived.proofAccepted=true;
+        arrived.forestNightConsumed=arrived.forestWaystoneConsumed=arrived.forestClueConsumed=arrived.forestVillageConsumed=true;
+        arrived.hearthLinesResolved=kHearthLines.size();
+        arrived.tavernConversationLinesResolved=kTavernConversation.size();
+        Context local;
+        local.claimed=local.exterior=local.kitSeated=local.tavernInReach=local.privyInReach=true;
+        local.companionSource=Tuple{2.f,1.f,0.f};
+        local.privySource=Tuple{76.65f,-9.37f,112.f};
+        local.listener=Tuple{75.5f,-8.f,112.f};
+
+        auto grate=local;
+        grate.privySource.reset();
+        grate.gardenGrateInReach=true;
+        grate.gardenGrateSource=Tuple{39.31f,-10.96f,130.18f};
+        Director visitor;
+        Check(visitor.RestoreProgress(arrived,grate,1,0) &&
+              RequiresChapterCaption(Line::GardenGrateTalk) && visitor.CanStartGardenGrateTalk(grate),
+              "the completed tavern opens the direct garden conversation");
+        visitor.Step(.02f,grate);
+        Check(visitor.State().line==Line::None,"standing near the grate does not start the optional line");
+        grate.gardenGrateInReach=false;
+        Check(!visitor.TryStartGardenGrateTalk(grate),"the direct conversation requires facing the grate in range");
+        grate.gardenGrateInReach=true;
+        Check(visitor.TryStartGardenGrateTalk(grate) &&
+              visitor.State().source.x==grate.gardenGrateSource->x &&
+              visitor.ExportProgress().activeLine==Line::None &&
+              !visitor.TryStartGardenGrateTalk(grate),
+              "a direct line uses its authored source, stays out of saves and cannot stack");
+        const auto elapsed=visitor.State().elapsed;
+        grate.paused=true;
+        visitor.Step(.04f,grate);
+        Check(visitor.State().line==Line::GardenGrateTalk && visitor.State().elapsed==elapsed,
+              "pause holds the conversation in place");
+        grate.paused=false;
+        grate.gardenGrateSource.reset();
+        visitor.Step(.02f,grate);
+        Check(visitor.State().line==Line::None,"leaving earshot ends the local caption");
+        Director beforeExchange;
+        Progress unfinished=arrived;unfinished.tavernConversationLinesResolved=0;
+        Check(beforeExchange.RestoreProgress(unfinished,local,1,0) &&
+              !beforeExchange.CanStartPrivyRagRequest(local),
+              "the local request is ineligible until the first regular tavern conversation resolves");
+        for(const auto disqualifier:{0,1,2,3,4,5}) {
+            Director gated;Check(gated.RestoreProgress(arrived,local,1,0),"privy gate fixture restores");
+            auto context=local;
+            switch(disqualifier) {
+            case 0: context.claimed=false;break;
+            case 1: context.alive=false;break;
+            case 2: context.exterior=false;break;
+            case 3: context.kitSeated=false;break;
+            case 4: context.combat=true;break;
+            default: context.traversing=true;break;
+            }
+            Check(!gated.CanStartPrivyRagRequest(context),
+                  "the local request requires the live claimed seated exterior and traversal-safe session");
+        }
+
+        Director queued;
+        Progress ordered=arrived;
+        ordered.activeLine=Line::ReunionProof;
+        ordered.continuations[0]=Line::ReunionFirstPiece;
+        ordered.continuations[1]=Line::ReunionDepart;
+        ordered.continuationCount=2;
+        Check(queued.RestoreProgress(ordered,local,1,0) && !queued.CanStartPrivyRagRequest(local),
+              "an active proof and its ordered response queue keep the optional local call silent");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::ReunionFirstPiece,"proof retains its first required response");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::ReunionDepart,"proof retains its departure response");
+        queued.Skip();queued.Step(.01f,local);
+        Check(queued.State().line==Line::PrivyRagRequest && queued.State().source.x==local.privySource->x,
+              "the fixed privy source starts only after all current and queued speech has ended");
+        const auto request=queued.State();
+        Check(queued.ExportProgress().activeLine==Line::None && queued.ExportProgress().continuationCount==0,
+              "the optional caption is excluded from campaign dialogue progress");
+        local.paused=true;queued.Step(.05f,local);
+        Check(queued.State().line==request.line && queued.State().generation==request.generation,
+              "pause freezes the local request without consuming or rearming it");
+        local.paused=false;
+        auto lookingAway=local;lookingAway.privyInReach=false;
+        queued.Step(.05f,lookingAway);
+        Check(queued.State().line==request.line && queued.State().elapsed>.04f,
+              "looking away within the same clear front pocket does not cancel the active local caption");
+        local.traversing=true;queued.Step(.01f,local);
+        Check(queued.State().line==Line::None && !queued.Complete(request.line,request.generation),
+              "traversal cancels the local request and rejects its stale completion");
+        local.traversing=false;queued.Step(.01f,local);
+        Check(queued.State().line==Line::None,"returning to range does not repeat the request within one session");
+        queued.Reset(true);queued.Step(.01f,local);
+        Check(queued.State().line==Line::None,"ordinary preserving refresh does not rearm the local request");
+
+        const auto saved=queued.ExportProgress();
+        Director newSession;
+        Check(newSession.RestoreProgress(saved,local,100,0),"fresh loaded session restores ordinary story progress");
+        newSession.Step(.01f,local);
+        Check(newSession.State().line==Line::PrivyRagRequest,
+              "the optional local call is session-scoped and does not add a campaign save field");
+        for(int tick=0;tick<80;++tick)newSession.Step(.05f,local);
+        Check(newSession.State().line==Line::None,"the local request finishes on its measured caption clock");
+        newSession.Step(.01f,local);newSession.Reset(true);newSession.Step(.01f,local);
+        Check(newSession.State().line==Line::None,
+              "completion and a preserving refresh keep the request consumed for the loaded session");
+
+        Director thanks;
+        Check(thanks.RestoreProgress(arrived,local,1,0),"privy thanks fixture restores");
+        thanks.Step(.01f,local);const auto requestCue=thanks.State();
+        Check(requestCue.line==Line::PrivyRagRequest && thanks.TryStartPrivyRagThanks(local,*local.privySource) &&
+              thanks.State().line==Line::PrivyRagThanks && !thanks.Complete(requestCue.line,requestCue.generation),
+              "delivery replaces only the active need cue with the local thanks and invalidates its callback");
+        auto nearShelf=local;nearShelf.privyInReach=false;
+        thanks.Step(.05f,nearShelf);
+        Check(thanks.State().line==Line::PrivyRagThanks && thanks.State().source.x==local.privySource->x &&
+              thanks.State().elapsed>.04f,
+              "the local feedback stays bound and advances when the player looks away in the same clear pocket");
+        auto leftPocket=nearShelf;leftPocket.privySource.reset();thanks.Step(.01f,leftPocket);
+        Check(thanks.State().line==Line::None,"leaving the clear privy pocket cancels the provisional thanks");
+        thanks.Step(.01f,local);
+        Check(thanks.State().line==Line::None,"a delivered need cue stays quiet when the player returns");
+
+        Director unrelated;
+        Check(unrelated.RestoreProgress(arrived,local,1,0),"unrelated speech fixture restores");
+        unrelated.ShowTavernDirections(local);
+        const auto directions=unrelated.State();
+        Check(!unrelated.CanInteractPrivyRag(local) &&
+              !unrelated.TryStartPrivyRagThanks(local,*local.privySource) &&
+              unrelated.State().line==directions.line && unrelated.State().generation==directions.generation,
+              "the provisional response never interrupts unrelated dialogue");
+
+        for(int interruption=0;interruption<2;++interruption) {
+            Director canceled;Check(canceled.RestoreProgress(arrived,local,1,0),"privy interruption fixture restores");
+            canceled.Step(.01f,local);const auto active=canceled.State();
+            auto away=local;
+            if(interruption==0)away.combat=true;else away.alive=false;
+            canceled.Step(.01f,away);
+            Check(canceled.State().line==Line::None && !canceled.Complete(active.line,active.generation),
+                  "combat or death cancels the local request and invalidates its callback");
+            canceled.Step(.01f,local);
+            Check(canceled.State().line==Line::None,"an interrupted local request does not repeat this session");
+        }
+    }
     std::cout<<"chapter dialogue: local/ordered/once/fallback/stale/manual-presented/real-simulation/layout cases passed\n";
 }

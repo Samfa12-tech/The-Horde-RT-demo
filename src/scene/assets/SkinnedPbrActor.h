@@ -25,6 +25,9 @@ public:
             !StaticMeshAsset::Load(directory / filename, manifest, asset_, diagnostic) ||
             !skin_.LoadClips((directory / filename).string(), clips, diagnostic) ||
             !skin_.ValidateStaticVertexLayout(asset_, diagnostic)) return false;
+        authoredHeight_.fill(false);
+        for (std::size_t index = 0; index < clips.size(); ++index)
+            authoredHeight_[index] = clips[index].preserveAuthoredHeight;
         for (auto& node : asset_.nodeTransforms)
             node.world = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
         return Pose(SkinnedClip::Idle, 0, diagnostic);
@@ -36,8 +39,11 @@ public:
         if (!skin_.SkinUniquePbr(clip, time, posed_, tangents_, diagnostic, additiveNodeRotations, blend, work) ||
             posed_.size() != asset_.vertices.size()) return false;
         SkinWorkScope copyScope(work?&work->copyNanoseconds:nullptr);
-        float floor = std::numeric_limits<float>::infinity();
-        for (const auto& vertex : posed_) floor = std::min(floor, vertex.position[1]);
+        float floor = 0;
+        if (!authoredHeight_[static_cast<std::size_t>(clip)]) {
+            floor = std::numeric_limits<float>::infinity();
+            for (const auto& vertex : posed_) floor = std::min(floor, vertex.position[1]);
+        }
         asset_.bounds.minimum.fill(std::numeric_limits<float>::infinity());
         asset_.bounds.maximum.fill(-std::numeric_limits<float>::infinity());
         for (std::size_t i = 0; i < posed_.size(); ++i)
@@ -59,10 +65,12 @@ public:
     StaticMeshAsset& Asset() { return asset_; }
     const StaticMeshAsset& Asset() const { return asset_; }
     float Duration(SkinnedClip clip) const { return skin_.ClipDuration(clip); }
+    bool HasConstantClipPose(SkinnedClip clip) const { return skin_.HasConstantClipPose(clip); }
 private:
     SkinnedMeshAsset skin_;
     StaticMeshAsset asset_;
     std::vector<TexturedSkinnedRtVertex> posed_;
     std::vector<SkinnedPbrTangent> tangents_;
+    std::array<bool,SkinnedMeshAsset::kMaximumClipBindings> authoredHeight_{};
 };
 }

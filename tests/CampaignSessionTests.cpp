@@ -1,7 +1,13 @@
 #include "gameplay/campaign/CampaignSession.h"
+#include "gameplay/campaign/CampaignCheckpointCodec.h"
+#include "gameplay/campaign/CampaignPlaySession.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "gameplay/simulation/InputMailbox.h"
+#include "gameplay/DevelopmentCheckpointSimulation.h"
 #include "scene/ChapterTerrainSurface.h"
+#include "scene/BellwetherShell.h"
 #include "scene/assets/AssetManifest.h"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -50,6 +56,364 @@ io::StoredCheckpoint Read(const fs::path& root,unsigned slot,cp::SaveKind kind){
     Check(io::Read(root,cp::SaveBasename(*cp::SaveTarget(slot,kind)),record).status==io::Status::Read,"real slot file reads");return record;}
 std::vector<std::byte> Raw(const fs::path& path){std::ifstream f(path,std::ios::binary);
     std::vector<std::byte> bytes;char c;while(f.get(c))bytes.push_back(std::byte(static_cast<unsigned char>(c)));return bytes;}
+
+void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurface>& base,
+                          horde::scene::assets::StaticMeshAsset world) {
+    using namespace horde::gameplay::dialogue;
+    for(const auto* name:{"MedievalWall02","TombEarthenware","TombCharredWick"}) {
+        if(std::none_of(world.materials.begin(),world.materials.end(),[&](const auto& material){return material.name==name;})) {
+            horde::scene::assets::StaticMaterial material;material.name=name;world.materials.push_back(material);
+        }
+    }
+    auto terrain=base;
+    std::string diagnostic;
+    const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets";
+    const bool admitted=horde::scene::AppendBellwetherShell(assets,world,terrain,diagnostic);
+    Check(admitted,"tavern restore uses the real imported chair and floor");
+    if(!admitted)return;
+    auto record=ForestRecord(*terrain);
+    record.id=cp::CheckpointId::BellwetherTavern;record.contentRevision=cp::kBellwetherContentRevision;
+    record.zone=cp::Destination(record.id);
+    record.position=cp::kBellwetherCheckpointPosition;record.yaw=-1.40f;record.pitch=-.22f;
+    record.vitality=2;record.swordStowed=true;
+    Directory directory;
+    {
+        sim::GameSimulation game(sim::ProductionGameSimulationConfig());
+        cp::Session session(game,directory.path);
+        const bool saved=Seed(game,record,terrain) && session.SelectSlot(0) &&
+            session.Save(cp::SaveKind::Autosave,record.id) && Finish(session) && session.State().phase==cp::SessionPhase::Idle;
+        Check(saved,"the ordinary autosave worker writes the admitted tavern checkpoint");
+        if(!saved)return;
+    }
+    const auto stored=Read(directory.path,0,cp::SaveKind::Autosave);
+    Check(stored.checkpoint.id==record.id && stored.checkpoint.schema==record.schema &&
+          stored.checkpoint.contentRevision==record.contentRevision,
+          "disk records the new boundary and keeps its original save schema");
+    sim::GameSimulation fresh(sim::ProductionGameSimulationConfig());
+    cp::Session session(fresh,directory.path);
+    sim::InputSnapshot input;
+    if(!session.SelectSlot(0) || !session.Load(cp::SaveKind::Autosave) || !Finish(session)) {
+        Check(false,"fresh session reads the tavern file");return;
+    }
+    const auto plan=session.PrepareLoad();
+    Check(plan && !session.CommitLoad(*plan,plan->destination,base,input,0) && !fresh.LatestCampaignBoundary(),
+          "bare terrain cannot admit a tavern reload or mutate the old game");
+    using Terrain=sim::TriangleSupportSurface;
+    const float floor=record.position.y;
+    const Terrain::Point nw{80.f,floor,106.f},sw{80.f,floor,111.f},ne{88.f,floor,106.f},se{88.f,floor,111.f};
+    const std::array floorOnly{Terrain::Triangle{{nw,sw,ne},sim::SupportSurface::Stone},
+                               Terrain::Triangle{{sw,se,ne},sim::SupportSurface::Stone}};
+    const auto withoutChair=Terrain::WithAdditionalGroundGeometry(*base,floorOnly,diagnostic);
+    Check(plan && withoutChair && std::abs(withoutChair->Query(record.position.x,record.position.z).worldY-floor)<.001f &&
+          !session.CommitLoad(*plan,plan->destination,withoutChair,input,0) && !fresh.LatestCampaignBoundary(),
+          "a valid room floor still cannot restore Kit without his chair");
+    if(!plan || !session.CommitLoad(*plan,plan->destination,terrain,input,0)) {
+        Check(false,"loaded tavern commits through ordinary readiness and input rebasing");return;
+    }
+    const auto seated=[&] {
+        const auto& kit=fresh.Snapshot().chapterCompanion;
+        return kit.bellwetherArrival==BellwetherArrivalStage::Seated && kit.grounded &&
+            kit.motion.mode==CompanionMotionMode::Seated && kit.motion.sitPlaybackSeconds==kTavernSitDurationSeconds;
+    };
+    Check(seated() && fresh.Snapshot().playerX==record.position.x && fresh.Snapshot().playerZ==record.position.z &&
+          BellwetherRoadStoneWorldFromModel(fresh.Snapshot().chapterCompanion)==kBellwetherRoadStoneTrack.back() &&
+          fresh.Snapshot().chapterDialogue.forestVillageConsumed,
+          "fresh game restores the tavern position, settled Kit and road stone, and completed lookout");
+    for(unsigned tick=0;tick<120;++tick)fresh.StepFixed(input,1.f/60.f,tick+1);
+    Check(seated() && fresh.Snapshot().worldRoute.current==record.zone &&
+          fresh.CaptureAuthoredCampaignBoundary(record.id).has_value() &&
+          fresh.Snapshot().chapterDialogue.line==Line::TavernLimit &&
+          fresh.Snapshot().dialogueBedGain==1.f &&
+          fresh.Snapshot().chapterDialogue.hearthLinesResolved==1 && stored.encoded==
+          Read(directory.path,0,cp::SaveKind::Autosave).encoded,
+          "legacy tavern load keeps Kit seated and starts with his first seated line without rewriting the source save");
+
+    cp::PlaySession play(fresh,directory.path);
+    Check(play.BeginNewGame(1),"test owner activates a separate autosave slot");
+    std::uint64_t publication=120;
+    const auto awaitSave=[](cp::PlaySession& session,std::uint64_t operation) {
+        const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+        do {
+            session.Poll();
+            const auto state=session.State();
+            if(state.operationRevision>operation && state.outcome==cp::PlayOutcome::Succeeded)return true;
+            std::this_thread::yield();
+        } while(std::chrono::steady_clock::now()<deadline);
+        return false;
+    };
+    ++input.commands.dialogueSkip;
+    fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(play.ObserveSafeBoundary() && awaitSave(play,0),"advancing at the hearth writes the same tavern boundary");
+    const auto partial=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
+    Check(partial.schema==cp::kHearthSpeechSchema && partial.dialogue.hearthLinesResolved==2 &&
+          partial.dialogue.activeLine==Line::None,"dated autosave retains only the resolved hearth beats");
+    for(unsigned tick=0;tick<50;++tick)fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(fresh.Snapshot().chapterDialogue.line==Line::TavernWork,"Kit's offer follows the seated pause");
+    const auto previousSave=play.State().operationRevision;
+    ++input.commands.dialogueSkip;
+    fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(play.ObserveSafeBoundary() && awaitSave(play,previousSave),"another resolved line refreshes the existing autosave");
+    const auto complete=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
+    sim::GameSimulation resumed(sim::ProductionGameSimulationConfig());
+    Check(Seed(resumed,partial,terrain),"partial dialogue can restore from the saved hearth boundary");
+    sim::InputSnapshot resumedInput;resumedInput.yawRadians=record.yaw;resumedInput.pitchRadians=record.pitch;
+    resumed.StepFixed(resumedInput,1.f/60.f,1);
+    Check(resumed.Snapshot().chapterDialogue.line==Line::TavernWork,"partial restore resumes the first unresolved caption");
+    Check(complete.dialogue.hearthLinesResolved==3 && Seed(resumed,complete,terrain),"completed dialogue restores from disk");
+    resumed.StepFixed(resumedInput,1.f/60.f,2);
+    Check(resumed.Snapshot().chapterDialogue.line==Line::None,"completed hearth captions remain quiet on reload");
+    ++resumedInput.commands.interact;
+    resumed.StepFixed(resumedInput,1.f/60.f,3);
+    Check(!resumed.Snapshot().tavernConversationAvailable && resumed.Snapshot().chapterDialogue.line==Line::None,
+          "the real tavern remains quiet on Interact until a keeper is admitted");
+
+    // Model the same-boundary update published by the simulation after the hand-over.
+    auto afterTalk=complete;
+    afterTalk.schema=cp::kTavernConversationSchema;
+    afterTalk.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+    const auto beforeTalkSave=play.State().operationRevision;
+    const bool savedTalk=Seed(fresh,afterTalk,terrain) && play.ObserveSafeBoundary() && awaitSave(play,beforeTalkSave);
+    Check(savedTalk,"the completed Talk is the baseline autosave for the rag favour");
+    if(savedTalk) {
+        auto delivered=afterTalk;
+        delivered.schema=cp::kPrivyRagSchema;
+        delivered.privyRagDelivered=true;
+        const auto beforeDeliverySave=play.State().operationRevision;
+        const bool savedDelivery=Seed(fresh,delivered,terrain) && play.ObserveSafeBoundary() &&
+            awaitSave(play,beforeDeliverySave);
+        Check(savedDelivery,"rag delivery alone refreshes the existing tavern autosave");
+        if(savedDelivery) {
+            const auto saved=Read(directory.path,1,cp::SaveKind::Autosave);
+            Check(saved.checkpoint.schema==cp::kPrivyRagSchema && saved.checkpoint.privyRagDelivered &&
+                  saved.checkpoint.id==afterTalk.id && saved.checkpoint.treasurePurse==afterTalk.treasurePurse &&
+                  saved.checkpoint.flask==afterTalk.flask,
+                  "the exact new disk record retains the tavern boundary and resources");
+            const auto operation=play.State().operationRevision;
+            for(unsigned tick=0;tick<16;++tick){play.ObserveSafeBoundary();play.Poll();}
+            Check(play.State().operationRevision==operation,
+                  "observing a delivered rag again does not queue another autosave");
+        }
+    }
+
+    auto staffedConfig=sim::ProductionGameSimulationConfig();
+    staffedConfig.bellwetherTavernKeeperAdmitted=true;
+    for (const auto& [name,expected] : std::array{
+            std::pair{"bellwether-keeper-reply",Line::TavernHordeArmy},
+            std::pair{"bellwether-staffed-room",Line::None},
+            std::pair{"bellwether-kit-lantern-glance",Line::TavernIntroduce}}) {
+        sim::GameSimulation capture(staffedConfig);
+        capture.SetDevelopmentRescueJourney(true, true);
+        const auto generation = capture.Snapshot().worldRoute.generation;
+        const bool ready = capture.PublishChapterTerrain({generation, sim::WorldZoneId::TombExterior}, terrain);
+        const auto* view = horde::gameplay::FindDevelopmentCheckpoint(name);
+        const bool staged = ready && view && horde::gameplay::StageDevelopmentCheckpointSimulation(capture, *view);
+        Check(staged, "the staffed diagnostic uses the authored terrain, restore and fixed-step Talk interaction");
+        if (staged) {
+            const auto& frame = capture.Snapshot();
+            Check(frame.tavernKeeper && frame.chapterDialogue.line == expected &&
+                  std::hypot(frame.playerX - view->cameraX, frame.playerZ - view->cameraZ) < .01f,
+                "each view holds its own speaker or the quiet room at the authored camera mark");
+        }
+    }
+    sim::GameSimulation staffed(staffedConfig);
+    Check(Seed(staffed,complete,terrain),"staffed tavern uses the same real room and campaign transaction");
+    cp::PlaySession staffedPlay(staffed,directory.path);
+    Check(staffedPlay.BeginNewGame(2),"the exchange test uses a separate autosave slot");
+    sim::InputSnapshot talk;talk.yawRadians=record.yaw;talk.pitchRadians=record.pitch;
+    staffed.StepFixed(talk);
+    const auto& keeper=staffed.Snapshot().tavernKeeper;
+    Check(keeper && keeper->stage==TavernKeeperStage::AtHearth &&
+          keeper->foot[0]==horde::gameplay::bellwether::kKeeperHearth[0] &&
+          staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::None,
+          "restored hearth offers Talk and waits for the player");
+    ++talk.commands.interact;staffed.StepFixed(talk);
+    Check(!staffed.Snapshot().tavernConversationAvailable && staffed.Snapshot().chapterDialogue.line==Line::TavernIntroduce,
+          "normal fixed-step Interact starts Kit's introduction");
+    ++talk.commands.dialogueSkip;staffed.StepFixed(talk);
+    Check(staffed.Snapshot().chapterDialogue.line==Line::TavernHordeArmy &&
+          staffed.Snapshot().chapterDialogue.source.x==horde::gameplay::bellwether::kKeeperHearth[0],
+          "the keeper speaks from her admitted position");
+    const auto beforeReply=staffed.LatestCampaignBoundary();
+    Check(beforeReply && beforeReply->schema==cp::kTavernConversationSchema &&
+          beforeReply->dialogue.tavernConversationLinesResolved==1 && beforeReply->dialogue.activeLine==Line::None,
+          "the ordinary autosave boundary includes only the resolved introduction");
+    Check(staffedPlay.ObserveSafeBoundary() && awaitSave(staffedPlay,0),"the conversation boundary reaches the save worker");
+    const auto savedReply=Read(directory.path,2,cp::SaveKind::Autosave).checkpoint;
+    Check(staffedPlay.TryEndActiveGame(),"the original session leaves the partial save available to reopen");
+    sim::GameSimulation reopened(staffedConfig);
+    cp::PlaySession reopenedPlay(reopened,directory.path);
+    sim::InputSnapshot again;
+    const auto loadReply=[&] {
+        if(!reopenedPlay.Load(2,cp::SaveKind::Autosave))return false;
+        const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(5);
+        do {
+            reopenedPlay.Poll();
+            if(const auto preparation=reopenedPlay.PrepareLoad())
+                return reopenedPlay.CommitLoad(*preparation,preparation->destination,terrain,again,0);
+            if(reopenedPlay.State().outcome==cp::PlayOutcome::Failed)return false;
+            std::this_thread::yield();
+        } while(std::chrono::steady_clock::now()<deadline);
+        return false;
+    };
+    if(savedReply.dialogue.tavernConversationLinesResolved==1 && loadReply()) {
+        reopened.StepFixed(again);
+        Check(reopened.Snapshot().tavernConversationAvailable && reopened.Snapshot().chapterDialogue.line==Line::None,
+              "reloading mid-exchange does not resume without the player's action");
+        ++again.commands.interact;reopened.StepFixed(again);
+        Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHordeArmy,"Talk resumes the unfinished keeper reply");
+        ++again.commands.dialogueSkip;reopened.StepFixed(again);
+        Check(reopened.Snapshot().chapterDialogue.line==Line::TavernHoardAnswer,"the last line returns to Kit");
+        const auto loadedRevision=reopenedPlay.State().operationRevision;
+        Check(reopenedPlay.ObserveSafeBoundary(),"the restored slot observes a newly resolved keeper reply");
+        ++again.commands.dialogueSkip;reopened.StepFixed(again);
+        const auto done=reopened.LatestCampaignBoundary();
+        const bool written=done && done->dialogue.tavernConversationLinesResolved==3 &&
+            reopenedPlay.ObserveSafeBoundary() && !reopenedPlay.TryEndActiveGame() && awaitSave(reopenedPlay,loadedRevision);
+        Check(written,"the same tavern autosave coalesces the remaining lines and finishes before quit");
+        if(written) {
+            const auto savedDone=Read(directory.path,2,cp::SaveKind::Autosave).checkpoint;
+            sim::InputSnapshot idle;idle.yawRadians=record.yaw;idle.pitchRadians=record.pitch;
+            const bool restored=Seed(staffed,savedDone,terrain);
+            if(restored)staffed.StepFixed(idle);
+            Check(restored && staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3 &&
+                  staffed.Snapshot().chapterDialogue.line==Line::None && !staffed.Snapshot().tavernConversationAvailable &&
+                  staffed.Snapshot().tavernDirectionsAvailable,
+                  "reopening the completed autosave keeps Talk quiet and restores the Directions action");
+            idle.commands.interact=staffed.Snapshot().lastConsumedInteractSequence+1;
+            staffed.StepFixed(idle);
+            Check(staffed.Snapshot().chapterDialogue.line==Line::TavernDirections &&
+                  staffed.Snapshot().chapterDialogue.tavernConversationLinesResolved==3,
+                  "the restored Directions action opens the lead without changing the saved exchange");
+        }
+    } else Check(false,"the partial exchange is restorable");
+    {
+        using namespace horde::gameplay::bellwether;
+        auto archive=complete;
+        archive.schema=cp::kWaysideArchiveSchema;
+        archive.dialogue.hearthLinesResolved=3;
+        archive.waysideArchive=cp::WaysideArchiveProgress::Open;
+        cp::Checkpoint decoded;
+        std::vector<std::byte> bytes;
+        cp::codec::Error error{};
+        sim::GameSimulation restoredArchive(staffedConfig);
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              decoded.waysideArchive==cp::WaysideArchiveProgress::Open && Seed(restoredArchive,decoded,terrain) &&
+              restoredArchive.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
+              restoredArchive.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel,
+              "a saved open archive restores the matching hinge and contact pose without replay");
+        archive.schema=cp::kShrineLanternSchema;
+        archive.waysideLanternRevealStarted=true;
+        Check(Seed(restoredArchive,archive,terrain) && restoredArchive.Snapshot().waysideArchive.lanternRevealStarted &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "a started shrine reveal restores as consumed without restarting active speech");
+        archive.schema=cp::kWaysideRegisterSchema;
+        archive.waysideRegisterRecovered=true;
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              Seed(restoredArchive,decoded,terrain) && restoredArchive.Snapshot().waysideArchive.registerRecovered &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "the recovered register stays collected on reload without replaying its pickup caption");
+        archive.schema=cp::kRegisterInterpretationSchema;
+        archive.waysideRegisterInterpreted=true;
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              Seed(restoredArchive,decoded,terrain) && restoredArchive.Snapshot().waysideArchive.registerInterpreted &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "the expedition directions survive reload without replaying the church reading");
+        Check(restoredArchive.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
+              "an older interpreted register restores with Kit still awaiting the lantern");
+        archive.schema=cp::kTavernLanternExchangeSchema;
+        archive.dialogue.tavernLanternLinesStarted=1;
+        Check(cp::codec::Encode(archive,bytes,error) && cp::codec::Decode(bytes,decoded,error) &&
+              Seed(restoredArchive,decoded,terrain) &&
+              restoredArchive.Snapshot().chapterDialogue.tavernLanternLinesStarted==1 &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "Kit keeps the first witnessed line on load without replaying speech");
+        archive.schema=cp::kAirWardSchema;
+        archive.waysideArchive=cp::WaysideArchiveProgress::Restored;
+        Check(Seed(restoredArchive,archive,terrain) &&
+              restoredArchive.Snapshot().waysideArchive.stage==ArchiveStage::Restored &&
+              restoredArchive.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(0.f).worldFromModel &&
+              !restoredArchive.Snapshot().waysideArchive.airWardLearned,
+              "restored binding loads closed and still requires the keeper's lesson");
+        archive.airWardLearned=true;
+        Check(Seed(restoredArchive,archive,terrain) && restoredArchive.Snapshot().waysideArchive.airWardLearned &&
+              restoredArchive.Snapshot().waysideArchive.registerRecovered &&
+              restoredArchive.Snapshot().chapterDialogue.line==Line::None,
+              "the ward lesson survives reload without replaying speech or putting the register back");
+        archive.schema=cp::kTavernConversationSchema;
+        Check(!cp::Validate(archive),"an older schema cannot silently discard earned archive progress");
+    }
+    {
+        using horde::gameplay::bellwether::MillPreparation;
+        Directory millDirectory;
+        sim::GameSimulation millGame(staffedConfig);
+        cp::PlaySession millPlay(millGame,millDirectory.path);
+        auto mill=complete;
+        mill.schema=cp::kTavernConversationSchema;
+        mill.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+        Check(millPlay.BeginNewGame(0) && Seed(millGame,mill,terrain) &&
+              millPlay.ObserveSafeBoundary() && awaitSave(millPlay,0),
+              "the mill autosave check starts with an ordinary completed tavern record");
+        mill.schema=cp::kMillPreparationSchema;
+        for(auto stage:{MillPreparation::BearingNeeded,MillPreparation::BearingRecovered,MillPreparation::FitChecked,
+                        MillPreparation::BearingSeated,MillPreparation::GearingVerified,
+                        MillPreparation::RigTrialReady,MillPreparation::RigTested}) {
+            const auto previous=millPlay.State().operationRevision;
+            mill.millPreparation=stage;
+            Check(Seed(millGame,mill,terrain) && millPlay.ObserveSafeBoundary() && awaitSave(millPlay,previous),
+                  "each mill step refreshes the same earned autosave");
+            const auto saved=Read(millDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+            Check(saved.millPreparation==stage && saved.position.x==complete.position.x &&
+                  saved.position.z==complete.position.z && saved.flask==complete.flask &&
+                  saved.treasurePurse==complete.treasurePurse,
+                  "the actual save file contains the mill step with unchanged return point and resources");
+        }
+    }
+    {
+        Directory salvagerDirectory;
+        sim::GameSimulation salvagerGame(staffedConfig);
+        cp::PlaySession salvagerPlay(salvagerGame,salvagerDirectory.path);
+        auto salvager=complete;
+        salvager.schema=cp::kTavernConversationSchema;
+        salvager.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+        salvager.salvagerShorePracticeCompleted=false;
+        Check(salvagerPlay.BeginNewGame(0) && Seed(salvagerGame,salvager,terrain) &&
+              salvagerPlay.ObserveSafeBoundary() && awaitSave(salvagerPlay,0),
+              "the salvager autosave check starts with a completed tavern record");
+        salvager.schema=cp::kSalvagerShorePracticeSchema;
+        salvager.salvagerShorePracticeCompleted=true;
+        const auto previous=salvagerPlay.State().operationRevision;
+        Check(Seed(salvagerGame,salvager,terrain) && salvagerPlay.ObserveSafeBoundary() &&
+              awaitSave(salvagerPlay,previous),
+              "completing shore practice refreshes the ordinary autosave");
+        auto saved=Read(salvagerDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+        Check(saved.schema==cp::kSalvagerShorePracticeSchema && saved.salvagerShorePracticeCompleted,
+              "the shore completion byte is retained in the autosave");
+
+        auto later=salvager;
+        later.id=cp::CheckpointId::SafeExit;
+        later.zone=cp::Destination(later.id);
+        later.position=horde::gameplay::traversal::kExteriorLanding;
+        const auto laterRevision=salvagerPlay.State().operationRevision;
+        Check(Seed(salvagerGame,later,terrain) && salvagerPlay.ObserveSafeBoundary() &&
+              awaitSave(salvagerPlay,laterRevision),
+              "a later safe-region boundary still autosaves the shore completion");
+        saved=Read(salvagerDirectory.path,0,cp::SaveKind::Autosave).checkpoint;
+        Check(saved.id==cp::CheckpointId::SafeExit && saved.salvagerShorePracticeCompleted,
+              "the later safe-region autosave preserves shore completion");
+    }
+    auto returned=complete;returned.id=cp::CheckpointId::SafeExit;returned.zone=cp::Destination(returned.id);
+    returned.position=horde::gameplay::traversal::kExteriorLanding;
+    Check(Seed(fresh,returned,terrain) && seated() && fresh.Snapshot().chapterDialogue.hearthLinesResolved==3,
+          "a later safe-side save keeps completed hearth progress and Kit settled back at the tavern");
+    auto lookout=ForestRecord(*terrain);lookout.contentRevision=cp::kBellwetherContentRevision;
+    Check(Seed(fresh,lookout,terrain) && seated(),"returning to the old lookout anchor keeps the earned tavern state");
+    const auto atLookout=fresh.CaptureCampaignCheckpoint(cp::CheckpointId::ForestEndpoint);
+    Check(atLookout && atLookout->contentRevision==cp::kBellwetherContentRevision,
+          "the lookout safe boundary remains available after Kit moves to town");
+    Check(Seed(fresh,ForestRecord(*terrain),terrain) &&
+          fresh.Snapshot().chapterCompanion.bellwetherArrival==BellwetherArrivalStage::AtLookout,
+          "loading a genuine old lookout record still starts before the town journey");
+}
 }
 int main(){
     const auto assets=fs::path(HORDE_RT_SOURCE_DIR)/"assets/models/world/runtime/chapter-terrain-v1";
@@ -58,6 +422,7 @@ int main(){
        !horde::scene::assets::StaticMeshAsset::Load(assets/"chapter-terrain-lod0.runtime.glb",manifest,mesh,error)){
         std::cerr<<error;return 1;}
     const auto terrain=horde::scene::PrepareChapterTerrainSurface(mesh,error);if(!terrain){std::cerr<<error;return 1;}
+    CheckTavernRoundTrip(terrain,mesh);
     Directory directory;
     auto config=sim::ProductionGameSimulationConfig();config.movementSpeedMetresPerSecond=1.4f;
     sim::GameSimulation game(config);sim::InputSnapshot controls;sim::InputMailbox mailbox;

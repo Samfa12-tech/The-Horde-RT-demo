@@ -1,4 +1,5 @@
 #include "gameplay/effects/WaterContact.h"
+#include "scene/ChapterRegionalWater.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include <iostream>
 #include <cmath>
@@ -76,6 +77,27 @@ int main() {
     check(contact.Snapshot().droplets[0].velocity[1]<dropBefore.velocity[1],"actual drop velocity is pulled down by gravity");
     for(const auto& ripple:contact.Snapshot().ripples) if(ripple.active)
         check(WaterSurfaceAt(ripple.position[0],ripple.position[2],y),"disturbances are clipped to real water membership");
+
+    {
+        constexpr float x=138.11f,z=122.55f;
+        const auto surface=horde::scene::ChapterRegionalWaterSurfaceAt(x,z);
+        check(surface.has_value(),"the authored river landing lies under the existing sloped river");
+        if(surface) {
+            WaterContact shore;
+            const auto at=[&](float footY,bool grounded=true) {
+                return shore.Step(1.f/60,x,footY,z,grounded,true,1.5f,1.f,false,WaterContactDomain::RegionalExterior);
+            };
+            check(!at(*surface+.02f).wetStep && !at(*surface-.8f).wetStep && !at(*surface-.20f,false).wetStep,
+                  "dry, deep and airborne positions cannot emit shallow shore contact");
+            const auto shallow=at(*surface-.20f);
+            check(shallow.wetStep && !shallow.streamEntry && shallow.sourceY==*surface &&
+                  std::abs(shore.Snapshot().droplets.front().position[1]-(*surface+.04f))<.001f,
+                  "shallow footsteps and droplets use the actual regional water height");
+            shore.Step(1.f/60,x,*surface-.20f,z,true,false,0.f,1.f,false,WaterContactDomain::RegionalExterior);
+            check(shore.Snapshot().droplets.front().active && shore.Snapshot().stepCount==1,
+                  "shore droplets survive in the finite exterior water without repeated steps");
+        }
+    }
 
     using namespace horde::gameplay::simulation;
     auto config=ProductionGameSimulationConfig();

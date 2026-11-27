@@ -76,6 +76,51 @@ int main()
     check(!ParseWindowsChapterShippingLaunch(ordinary,true).requested &&
         ParseWindowsChapterShippingLaunch(ordinary,true).error.empty(),
         "ordinary launches must not gain a measurement owner");
+    const std::array<std::wstring_view,8> doorwayArgs{L"--measure-bellwether-doorway",L"--capture-hidden",
+        L"--capture-showcase",L"C:\\reports\\bellwether",L"--development-checkpoint",L"bellwether-repeat-visit",
+        L"--chapter-resident-fixture",L"C:\\fixtures\\resident"};
+    const auto doorway=ParseWindowsChapterShippingLaunch(doorwayArgs,true);
+    check(doorway.requested && doorway.bellwetherDoorway && doorway.error.empty() &&
+        !ParseWindowsChapterShippingLaunch(doorwayArgs,false,true).error.empty(),
+        "Bellwether measurement requires the hidden Debug repeat-visit fixture");
+    auto visibleDoorway=doorwayArgs;
+    visibleDoorway[1]=L"--measure-chapter-foreground";
+    check(!ParseWindowsChapterShippingLaunch(visibleDoorway,true).error.empty(),
+        "hidden fixture timing cannot claim a visible or foreground route");
+    auto wrongDoorway=doorwayArgs;
+    wrongDoorway[5]=L"bellwether-staffed-room";
+    check(!ParseWindowsChapterShippingLaunch(wrongDoorway,true).error.empty(),
+        "doorway measurement must start from a completed visit");
+    auto residentRoundTrip=doorwayArgs;
+    residentRoundTrip[0]=L"--measure-bellwether-resident-roundtrip";
+    residentRoundTrip[6]=L"--bellwether-campaign-dir";
+    const auto residentLaunch=ParseWindowsChapterShippingLaunch(residentRoundTrip,true);
+    check(residentLaunch.requested && residentLaunch.bellwetherDoorway &&
+        residentLaunch.bellwetherResidentRoundTrip && !residentLaunch.bellwetherWestRoundTrip && residentLaunch.error.empty() &&
+        !ParseWindowsChapterShippingLaunch(residentRoundTrip,false,true).error.empty(),
+        "resident round trip uses the hidden Debug measurement and campaign resident directory");
+    auto westRoundTrip=residentRoundTrip;
+    westRoundTrip[0]=L"--measure-bellwether-west-roundtrip";
+    const auto westLaunch=ParseWindowsChapterShippingLaunch(westRoundTrip,true);
+    check(westLaunch.bellwetherResidentRoundTrip && westLaunch.bellwetherWestRoundTrip && westLaunch.error.empty(),
+        "west measurement has its own explicit hidden Debug launch");
+    std::vector<std::wstring_view> packagedArgs(westRoundTrip.begin(),westRoundTrip.begin()+6);
+    packagedArgs.push_back(L"--measure-bellwether-from-package");
+    const auto packageLaunch=ParseWindowsChapterShippingLaunch(packagedArgs,true);
+    check(packageLaunch.bellwetherFromPackage && packageLaunch.bellwetherWestRoundTrip &&
+        packageLaunch.error.empty() && !ParseWindowsChapterShippingLaunch(packagedArgs,false,true).error.empty(),
+        "packaged stress route accepts the marker-owned roster in hidden Debug only");
+    packagedArgs.push_back(L"--bellwether-campaign-dir");
+    packagedArgs.push_back(L"C:\\roster");
+    check(!ParseWindowsChapterShippingLaunch(packagedArgs,true).error.empty(),
+        "packaged stress route rejects a separately supplied roster");
+    auto conflictingRoundTrips=std::vector<std::wstring_view>(westRoundTrip.begin(),westRoundTrip.end());
+    conflictingRoundTrips.push_back(residentRoundTrip[0]);
+    check(!ParseWindowsChapterShippingLaunch(conflictingRoundTrips,true).error.empty(),
+        "west and east cannot share one timing session");
+    residentRoundTrip[6]=L"--chapter-resident-fixture";
+    check(!ParseWindowsChapterShippingLaunch(residentRoundTrip,true).error.empty(),
+        "resident round trip cannot use the stationary doorway fixtures");
     for(const auto conflict:{L"--validate-chapter-roundtrip",L"--validate-static-zone-cutover",
         L"--validate-static-triangle-cutover",L"--capture-graphics-preview",L"--benchmark-showcase",
         L"--validate-output-resize",L"--validate-native-motion",L"--capture-sky-attribution",L"--mist-off",
@@ -483,6 +528,29 @@ int main()
     check(!ParseWindowsEnvironmentSurveyLaunch(duplicateSurveyProfile,true).error.empty(),"duplicate environment profiles reject");
     auto unknown=survey;unknown.back()=L"arbitrary-camera";
     check(!ParseWindowsEnvironmentSurveyLaunch(unknown,true).error.empty(),"unknown survey profile rejects");
+    auto millraceSurvey=survey;millraceSurvey.back()=L"millrace";
+    const auto millraceLaunch=ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,true);
+    check(millraceLaunch.requested && millraceLaunch.profile=="millrace" && millraceLaunch.error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(millraceSurvey,false).error.empty(),
+          "millrace survey uses the bounded hidden Debug camera path");
+    auto crossingSurvey=survey;crossingSurvey.back()=L"mill-crossing";
+    const auto crossingLaunch=ParseWindowsEnvironmentSurveyLaunch(crossingSurvey,true);
+    check(crossingLaunch.requested && crossingLaunch.profile=="mill-crossing" &&
+          crossingLaunch.error.empty() && !ParseWindowsEnvironmentSurveyLaunch(crossingSurvey,false).error.empty() &&
+          MillCrossingSurveyCamera(0).z>MillCrossingSurveyCamera(60).z,
+          "mill crossing survey admits the two fixed hidden terrain views only in Debug");
+    auto wheelSurvey=std::vector<std::wstring_view>(survey.begin(),survey.end());
+    wheelSurvey.back()=L"mill-wheel";
+    check(ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty(),
+          "mill wheel terrain view admits its fixed station without staging a repair");
+    wheelSurvey.insert(wheelSurvey.end(),{L"--development-checkpoint",L"bellwether-mill-drive-tested",
+                                         L"--chapter-resident-fixture",L"review-fixture"});
+    check(ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty() &&
+          !ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,false).error.empty(),
+          "the isolated completed repair may be viewed from the wheel bank in Debug");
+    wheelSurvey[5]=L"millrace";
+    check(!ParseWindowsEnvironmentSurveyLaunch(wheelSurvey,true).error.empty(),
+          "the tested repair may not change another survey's starting state");
     auto tombSurvey=survey;tombSurvey.back()=L"tomb-debris";
     const auto tombLaunch=ParseWindowsEnvironmentSurveyLaunch(tombSurvey,true);
     check(tombLaunch.requested && tombLaunch.profile=="tomb-debris" && !tombLaunch.debrisDisabled &&

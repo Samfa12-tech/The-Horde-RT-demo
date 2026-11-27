@@ -383,6 +383,7 @@ struct SkinnedMeshAsset::Clip
     std::vector<Channel> channels;
     float duration = 0.0f;
     bool loops = false;
+    bool constantPose = false;
 };
 
 struct SkinnedPlayerRigLayout
@@ -633,7 +634,7 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
     vertices_.clear(); expandedIndices_.clear(); primitiveRanges_.clear(); nodes_.clear(); joints_.clear(); inverseBindMatrices_.clear(); clips_.clear(); idleBootMinimumY_.clear(); walkingBootMinimumY_.clear(); bootGroundingVertexIndices_.clear(); skinnedUniqueVertices_.clear(); texturedSkinScratch_.clear();
     if (bindings.empty() || bindings.size() > kMaximumClipBindings)
     {
-        diagnostic = "Skinned clip bindings must contain between one and six semantic slots.";
+        diagnostic = "Skinned clip bindings must contain between one and seven semantic slots.";
         return false;
     }
     std::ifstream stream(glbPath, std::ios::binary);
@@ -1037,6 +1038,12 @@ bool SkinnedMeshAsset::LoadClips(const std::string& glbPath,
             diagnostic = "Skinned clip contains no usable animation channels: " + binding.name;
             return false;
         }
+        clip.constantPose = std::all_of(clip.channels.begin(), clip.channels.end(), [](const Channel& channel) {
+            return std::all_of(channel.values.begin() + 1, channel.values.end(),
+                [&](const auto& key) {
+                    return std::memcmp(key.data(), channel.values.front().data(), key.size() * sizeof(float)) == 0;
+                });
+        });
         clips_.push_back(std::move(clip));
     }
     auto rig = std::make_shared<SkinnedPlayerRigLayout>();
@@ -1060,6 +1067,12 @@ float SkinnedMeshAsset::ClipDuration(SkinnedClip clip) const
 {
     const std::size_t index = static_cast<std::size_t>(clip);
     return index < clips_.size() ? clips_[index].duration : 0.0f;
+}
+
+bool SkinnedMeshAsset::HasConstantClipPose(SkinnedClip clip) const
+{
+    const auto index = static_cast<std::size_t>(clip);
+    return loaded_ && index < clips_.size() && clips_[index].constantPose;
 }
 
 bool SkinnedMeshAsset::BootGroundingMinimumY(
@@ -2170,17 +2183,14 @@ bool SkinnedMeshAsset::EvaluatePlayerPose(
     return true;
 }
 
-bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
-    const SkinnedPlayerPose& pose, std::vector<TexturedSkinnedRtVertex>& output,
-    std::vector<SkinnedPbrTangent>& outputTangents, std::string& diagnostic) const
+bool SkinnedMeshAsset::ValidatePlayerSkinPose(const SkinnedPlayerPose& pose,
+                                            std::string& diagnostic) const
 {
     if (!loaded_ || !playerRigLayout_ || !hasTexcoords_ || !hasTangents_ || !pose.IsValid() ||
         pose.data_->skinMatrices.size() != joints_.size() ||
         pose.data_->normalTransports.size() != joints_.size())
     {
         diagnostic = "Player mesh or shared pose is not ready for skinning.";
-        output.clear();
-        outputTangents.clear();
         return false;
     }
     const auto& sourceRig = pose.data_->rig;
@@ -2190,15 +2200,18 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
             sourceRig->inverseBindMatrices != playerRigLayout_->inverseBindMatrices)
         {
             diagnostic = "Shared player pose requires exact joint order and inverse-bind agreement.";
-            output.clear();
-            outputTangents.clear();
             return false;
         }
         compatiblePoseRig_ = sourceRig;
     }
+    return true;
+}
+
+template<class WriteVertex>
+bool SkinnedMeshAsset::SkinBoundPlayerVertices(const SkinnedPlayerPose& pose, WriteVertex write,
+                                              std::string& diagnostic) const
+{
     const auto& skinMatrices = pose.data_->skinMatrices;
-    output.resize(vertices_.size());
-    outputTangents.resize(vertices_.size());
     for (std::size_t sourceIndex = 0u; sourceIndex < vertices_.size(); ++sourceIndex)
     {
         const SourceVertex& source = vertices_[sourceIndex];
@@ -2217,8 +2230,6 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
                     transformedNormal.x, transformedNormal.y, transformedNormal.z))
             {
                 diagnostic = "Player IK produced a non-invertible normal transform.";
-                output.clear();
-                outputTangents.clear();
                 return false;
             }
             normal = Add(normal, Scale(transformedNormal, weight));
@@ -2242,33 +2253,54 @@ bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
             if (!std::isfinite(value))
             {
                 diagnostic = "Shared player skinning produced a non-finite vertex.";
-                output.clear();
-                outputTangents.clear();
                 return false;
             }
         }
-        TexturedSkinnedRtVertex& destination = output[sourceIndex];
-        destination.position[0] = position.x;
-        destination.position[1] = position.y;
-        destination.position[2] = position.z;
-        destination.position[3] = 1.0f;
-        destination.normal[0] = normal.x;
-        destination.normal[1] = normal.y;
-        destination.normal[2] = normal.z;
-        destination.normal[3] = 0.0f;
-        destination.texcoord[0] = source.texcoord[0];
-        destination.texcoord[1] = source.texcoord[1];
-        destination.texcoord[2] = 0.0f;
-        destination.texcoord[3] = 0.0f;
-        SkinnedPbrTangent& destinationTangent = outputTangents[sourceIndex];
-        destinationTangent.tangent[0] = tangent.x;
-        destinationTangent.tangent[1] = tangent.y;
-        destinationTangent.tangent[2] = tangent.z;
-        destinationTangent.tangent[3] = source.tangentSign;
+        write(sourceIndex, source, position, normal, tangent);
     }
 
     diagnostic.clear();
     return true;
+}
+
+bool SkinnedMeshAsset::SkinPlayerPoseUniqueTextured(
+    const SkinnedPlayerPose& pose, std::vector<TexturedSkinnedRtVertex>& output,
+    std::vector<SkinnedPbrTangent>& outputTangents, std::string& diagnostic) const
+{
+    if (ValidatePlayerSkinPose(pose, diagnostic))
+    {
+        output.resize(vertices_.size());
+        outputTangents.resize(vertices_.size());
+        if (SkinBoundPlayerVertices(pose, [&](std::size_t index, const SourceVertex& source,
+                                            const Vec3& position, const Vec3& normal, const Vec3& tangent) {
+            output[index] = {{position.x, position.y, position.z, 1.0f},
+                             {normal.x, normal.y, normal.z, 0.0f},
+                             {source.texcoord[0], source.texcoord[1], 0.0f, 0.0f}};
+            outputTangents[index] = {{tangent.x, tangent.y, tangent.z, source.tangentSign}};
+        }, diagnostic)) return true;
+    }
+    output.clear();
+    outputTangents.clear();
+    return false;
+}
+
+bool SkinnedMeshAsset::SkinPlayerPoseStaticPbr(const SkinnedPlayerPose& pose,
+                                             std::span<horde::vulkan::raytracing::StaticRtVertex> output,
+                                             std::string& diagnostic) const
+{
+    if (!ValidatePlayerSkinPose(pose, diagnostic)) return false;
+    if (output.size() != vertices_.size())
+    {
+        diagnostic = "Shared player pose does not match the static-PBR vertex count.";
+        return false;
+    }
+    return SkinBoundPlayerVertices(pose, [&](std::size_t index, const SourceVertex& source,
+                                            const Vec3& position, const Vec3& normal, const Vec3& tangent) {
+        auto& vertex = output[index];
+        vertex.position = {{position.x, position.y, position.z, 1.0f}};
+        vertex.normal = {{normal.x, normal.y, normal.z, 0.0f}};
+        vertex.tangent = {{tangent.x, tangent.y, tangent.z, source.tangentSign}};
+    }, diagnostic);
 }
 
 } // namespace horde::scene

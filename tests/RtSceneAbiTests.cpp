@@ -211,18 +211,18 @@ void TestGeneratedConstants()
           "topology-certified closed volume is an append-only material ABI flag");
     Check(static_cast<std::uint32_t>(RtMaterialFlag::CertifiedRectangularVolume) == 4096u,
           "rectangular geometry certification has a distinct append-only material flag");
-    Check(kRtInstanceMetadataCapacity == 30u,
-          "joint ring28/flask29 append after unchanged metadata0..27");
-    Check(kRtTlasInstanceCapacity == 111u,
-          "storage fits the31-role prefix,64 original trees,4 prototype reserve and12 older-trial reserve; active rosters remain exclusive");
+    Check(kRtInstanceMetadataCapacity == 42u,
+          "each stock head family has independent metadata after the existing chapter owners");
+    Check(kRtTlasInstanceCapacity == 122u,
+          "storage fits the legacy 31-slot prefix, forest reserves, and appended Bellwether owners");
     Check(kRtOrdinaryShowcaseInstanceCount == 31u,
           "ordinary live count is independent of diagnostic storage and metadata aliases");
     Check(kRtActiveFireEmitterCapacity == 4u && kRtFireEmitterCapacity == 4u && sizeof(RtFireEmitterGpu) == 160u,
           "all four important lights are active within the unchanged 640-byte fire storage buffer");
-    Check(kRtStaticAssetCapacity == 15u, "static asset capacity admits both independent ring/flask assets while preserving all thirteen previous owners");
-    Check(kRtPrimitiveMetadataCapacity == 38u, "primitive storage fits the High route bank and both independent joint props");
-    Check(kRtMaterialCapacity == 34u, "material capacity is 34 for simultaneous joint props and the shared world palette");
-    Check(kRtTextureLayerCapacity == 18u, "each PBR texture category has 18 layers");
+    Check(kRtStaticAssetCapacity == 25u, "static asset capacity includes one shared stock head source");
+    Check(kRtPrimitiveMetadataCapacity == 55u, "primitive storage includes both stock head families");
+    Check(kRtMaterialCapacity == 50u, "material storage covers the three opaque stock finishes before aliases");
+    Check(kRtTextureLayerCapacity == 20u, "each PBR texture category has room for both textured resident actors");
     Check(kRtBindingInstanceMetadata == 11u && kRtBindingPrimitiveMetadata == 12u &&
               kRtBindingMaterials == 13u && kRtBindingStaticVertices == 14u &&
               kRtBindingStaticIndices == 15u && kRtBindingBaseColorTextures == 16u &&
@@ -313,7 +313,7 @@ void TestGenericRegistrationAndMeasurements()
     Check(slot.Measurements().vertexBytes == 6u * 64u &&
               slot.Measurements().indexBytes == 6u * 4u &&
               slot.Measurements().materialBytes == 2u * 128u &&
-               slot.Measurements().instanceMetadataBytes == 30u * 32u &&
+              slot.Measurements().instanceMetadataBytes == kRtInstanceMetadataCapacity * sizeof(RtInstanceMetadata) &&
               slot.Measurements().primitiveMetadataBytes == 2u * 16u &&
               slot.Measurements().descriptorCount == 9u,
           "resource measurements use literal ABI sizes and descriptor count");
@@ -343,21 +343,21 @@ void TestExplicitTextureGroups()
               diagnostic == "RtStaticMeshSlot texture group has conflicting texture presence.",
           "grouped materials cannot silently disagree on texture presence");
     asset.materials[2].normalTexture = 6;
-    auto preceding = MakeAsset(1u, 17u);
+    auto preceding = MakeAsset(1u, kRtTextureLayerCapacity - 1u);
     for (std::size_t i = 0; i < preceding.materials.size(); ++i)
         preceding.materials[i].baseColorTexture = static_cast<std::int32_t>(i);
     const std::array<StaticRtAssetRegistration, 2> registrations{{{1u, 2u, 1u, 0u, &preceding}, request}};
     Check(!slot.Initialize(registrations, diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 20.",
           "canonical groups still enforce bounded texture capacity");
 }
 
 void TestDeferredTextureGroups()
 {
     using namespace horde::vulkan::raytracing;
-    auto combined=MakeAsset(6u,6u);
+    auto combined=MakeAsset(6u,8u);
     for(std::size_t i=0;i<2;++i) combined.materials[i].baseColorTexture=static_cast<std::int32_t>(i);
-    for(std::size_t i=2;i<6;++i) {
+    for(std::size_t i=2;i<8;++i) {
         auto& material=combined.materials[i];
         material.baseColorTexture=static_cast<std::int32_t>(i);
         material.textureGroup=static_cast<std::int32_t>(i-2);
@@ -368,16 +368,16 @@ void TestDeferredTextureGroups()
     const std::array<StaticRtAssetRegistration,2> registrations{{
         {1u,1u,1u,0u,&combined},{3u,2u,1u,0u,&later}}};
     RtStaticMeshSlot slot;std::string diagnostic;
-    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the18-layer boundary");
+    Check(slot.Initialize(registrations,diagnostic),"deferred groups fit exactly at the 20-layer boundary");
     bool legacy=true,newGroups=true;
-    if(slot.Materials().size()==18) {
+    if(slot.Materials().size()==20) {
         for(std::size_t i=0;i<2;++i) legacy&=slot.Materials()[i].textureLayers[0]==i;
-        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[6+i].textureLayers[0]==i+2;
-        for(std::size_t i=0;i<4;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
+        for(std::size_t i=0;i<12;++i) legacy&=slot.Materials()[8+i].textureLayers[0]==i+2;
+        for(std::size_t i=0;i<6;++i) newGroups&=slot.Materials()[2+i].textureLayers[0]==14+i;
     } else legacy=newGroups=false;
-    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==18,
-          "sharing geometry owner preserves all14 legacy layers and routes tail families14..17");
-    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==6,
+    Check(legacy&&newGroups&&slot.TextureArrayCounts().baseColor==20,
+          "sharing geometry owner preserves all 14 legacy layers and routes tail families 14 through 19");
+    Check(slot.PrimitiveMetadata().size()==7&&slot.PrimitiveMetadata()[6].materialIndex==8,
           "deferred textures do not reorder primitive/material geometry");
     later.materials.push_back(later.materials.back());
     later.materials.back().baseColorTexture=12;
@@ -425,22 +425,24 @@ void TestNamedCapacityFailures()
     StaticRtAssetRegistration primitiveRequest{3u, 1u, 1u, 0u, &primitiveOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&primitiveRequest, 1u), diagnostic) &&
               diagnostic == "RtStaticMeshSlot capacity overflow: primitives exceed " +
-                  std::to_string(kRtPrimitiveMetadataCapacity) + ".",
+                  std::to_string(kRtPrimitiveMetadataCapacity) + ". Complete roster requires " +
+                  std::to_string(kRtPrimitiveMetadataCapacity + 1u) + " primitives and 1 materials before aliasing.",
           "primitive overflow fails initialization by name");
 
     auto materialOverflow = MakeAsset(1u, kRtMaterialCapacity + 1u);
     StaticRtAssetRegistration materialRequest{3u, 1u, 1u, 0u, &materialOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&materialRequest, 1u), diagnostic) &&
               diagnostic == "RtStaticMeshSlot capacity overflow: materials exceed " +
-                  std::to_string(kRtMaterialCapacity) + ".",
+                  std::to_string(kRtMaterialCapacity) + ". Complete roster requires 1 primitives and " +
+                  std::to_string(kRtMaterialCapacity + 1u) + " materials before aliasing.",
           "material overflow fails initialization by name");
 
-    auto textureOverflow = MakeAsset(1u, 19u);
+    auto textureOverflow = MakeAsset(1u, kRtTextureLayerCapacity + 1u);
     for (std::size_t materialIndex = 0u; materialIndex < textureOverflow.materials.size(); ++materialIndex)
         textureOverflow.materials[materialIndex].baseColorTexture = static_cast<std::int32_t>(materialIndex);
     StaticRtAssetRegistration textureRequest{3u, 1u, 1u, 0u, &textureOverflow};
     Check(!slot.Initialize(std::span<const StaticRtAssetRegistration>(&textureRequest, 1u), diagnostic) &&
-              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 18.",
+              diagnostic == "RtStaticMeshSlot capacity overflow: baseColor texture layers exceed 20.",
           "metadata cannot assign a texture layer outside the fixed Vulkan array");
 }
 
@@ -526,6 +528,101 @@ void TestFrameMaterialAppearance()
           "a second metadata owner of the same primitive cannot silently share a mutable appearance");
 }
 
+void TestResidentGeometryReplacement()
+{
+    using namespace horde::vulkan::raytracing;
+    auto fallback=MakeAsset(1u,1u); fallback.materials[0].baseColorTexture=2;
+    StaticRtAssetRegistration registration{8u,108u,static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&fallback};
+    RtStaticMeshSlot slot;std::string diagnostic;
+    Check(slot.Initialize(std::span(&registration,1),diagnostic),"resident fallback lane initializes");
+    const auto primitiveRows=slot.PrimitiveMetadata().size(), materialRows=slot.Materials().size();
+    std::array<RtResidentPayloadRange,2u> ranges{};
+    Check(slot.ReserveResidentPayloads(8u,{6u,9u},ranges,diagnostic),"resident lane reserves two payload ranges");
+    Check(ranges[0].vertexOffset==3u && ranges[0].indexOffset==3u && ranges[1].vertexOffset==9u && ranges[1].indexOffset==12u &&
+          slot.Vertices().size()==15u && slot.Indices().size()==21u && slot.TriangleRegions().size()==7u &&
+          slot.Measurements().vertexBytes==15u*sizeof(StaticRtVertex) && slot.Measurements().indexBytes==21u*sizeof(std::uint32_t),
+          "reservation appends padded payload and triangle storage without moving existing geometry");
+    auto aliasA=MakeAsset(1u,1u),aliasB=MakeAsset(1u,1u);
+    std::array<StaticRtAssetRegistration,2u> aliasRegs{{
+        {1u,301u,1u,0u,&aliasA},{2u,302u,1u,0u,&aliasB}}};
+    RtStaticMeshSlot aliased;std::array<RtResidentPayloadRange,2u> aliasRanges{};
+    Check(aliased.Initialize(aliasRegs,diagnostic),"resident material alias fixture initializes");
+    const std::array<RtImmutableMaterialAlias,1u> alias{{{1u,0u}}};
+    Check(aliased.ShareImmutableMaterialRows(alias,diagnostic),"fixture shares an immutable material row before reservation");
+    Check(!aliased.ReserveResidentPayloads(2u,{6u,9u},aliasRanges,diagnostic) &&
+          aliased.InstanceMetadata()[2].stableObjectId==302u,
+          "resident lane rejects a successful material alias and retains the existing owner");
+    auto candidate=MakeAsset(1u,1u);candidate.materials[0].baseColorTexture=9;
+    candidate.vertices[0].position[0]=42.f;candidate.indices[1]=2u;
+    RtResidentReplacement prepared{};
+    Check(slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic),
+          "same-presence textured opaque candidate prepares for existing rows");
+    Check(prepared.primitiveRow==0u && prepared.instance.primitiveBase==0u && prepared.instance.stableObjectId==208u &&
+          prepared.primitive.vertexOffset==ranges[0].vertexOffset && prepared.primitive.indexOffset==ranges[0].indexOffset &&
+          prepared.primitive.indexCount==3u && prepared.primitive.materialIndex==0u &&
+          prepared.material.textureLayers==slot.Materials()[0].textureLayers,
+          "prepared replacement maps candidate to existing ABI rows and current texture layers");
+    auto bad=candidate;bad.materials[0].transmissionFactor=0.2f;
+    Check(!slot.PrepareResidentReplacement(8u,209u,bad,ranges[0],prepared,diagnostic) &&
+          slot.InstanceMetadata()[8].stableObjectId==108u && slot.PrimitiveMetadata()[0].vertexOffset==0u,
+          "rejected transmissive candidate leaves the fallback metadata and geometry active");
+    Check(!slot.PrepareResidentReplacement(8u,208u,candidate,
+          {ranges[0].vertexOffset+1u,ranges[0].indexOffset,ranges[0].capacity},prepared,diagnostic),
+          "forged payload offsets fail reservation ownership check");
+    auto tooLarge=candidate;tooLarge.vertices.resize(7u);
+    Check(!slot.PrepareResidentReplacement(8u,210u,tooLarge,ranges[0],prepared,diagnostic),
+          "candidate exceeding reserved vertices is rejected");
+    Check(slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic),"valid resident candidate remains preparable after rejects");
+    slot.PublishResidentReplacement(prepared,candidate);
+    Check(slot.InstanceMetadata()[8].stableObjectId==208u && slot.PrimitiveMetadata()[0].vertexOffset==ranges[0].vertexOffset &&
+          slot.PrimitiveMetadata()[0].indexOffset==ranges[0].indexOffset && slot.Vertices()[ranges[0].vertexOffset].position[0]==42.f &&
+          slot.Indices()[ranges[0].indexOffset+1u]==2u && slot.PrimitiveMetadata().size()==primitiveRows && slot.Materials().size()==materialRows,
+          "publish copies candidate payload and updates only its retained instance, primitive and material rows");
+    Check(slot.Initialize(std::span(&registration,1),diagnostic) &&
+          !slot.PrepareResidentReplacement(8u,208u,candidate,ranges[0],prepared,diagnostic) &&
+          slot.ReserveResidentPayloads(8u,{6u,9u},ranges,diagnostic),
+          "reinitializing the static slot discards reservations from its old geometry");
+
+    auto overlapping=MakeAsset(2u,2u);overlapping.materials[1].baseColorTexture=5;
+    std::array<StaticRtAssetRegistration,2u> overlappingOwners{{
+        {6u,206u,1u,0u,&overlapping},{7u,207u,1u,0u,&overlapping}}};
+    overlappingOwners[1].primitiveOffset=1u;
+    overlappingOwners[1].primitiveCount=1u;
+    RtStaticMeshSlot overlappingSlot;
+    std::array<RtResidentPayloadRange,2u> overlappingRanges{};
+    Check(overlappingSlot.Initialize(overlappingOwners,diagnostic) &&
+          !overlappingSlot.ReserveResidentPayloads(7u,{6u,9u},overlappingRanges,diagnostic),
+          "an owner spanning several rows prevents reservation of its shared interior row");
+
+    auto prefixA=MakeAsset(1u,1u),prefixB=MakeAsset(1u,1u),resident=MakeAsset(1u,1u);
+    resident.materials[0].baseColorTexture=4;
+    std::array<StaticRtAssetRegistration,3u> rows{{
+        {1u,401u,1u,0u,&prefixA},{2u,402u,1u,0u,&prefixB},{3u,403u,1u,0u,&resident}}};
+    RtStaticMeshSlot rowSlot;std::array<RtResidentPayloadRange,2u> rowRanges{};
+    Check(rowSlot.Initialize(rows,diagnostic),"resident row-index fixture initializes");
+    const std::array<RtImmutableMaterialAlias,1u> rowAlias{{{1u,0u}}};
+    Check(rowSlot.ShareImmutableMaterialRows(rowAlias,diagnostic),"unrelated prior materials alias without involving resident lane");
+    Check(rowSlot.PrimitiveMetadata()[2].materialIndex==1u &&
+          rowSlot.ReserveResidentPayloads(3u,{3u,3u},rowRanges,diagnostic),
+          "resident primitive row remains distinct from its compacted material row");
+    auto fullCandidate=MakeAsset(1u,1u);fullCandidate.materials[0].baseColorTexture=8;
+    RtResidentReplacement rowPlan{};
+    Check(rowSlot.PrepareResidentReplacement(3u,503u,fullCandidate,rowRanges[0],rowPlan,diagnostic) &&
+          rowPlan.primitiveRow==2u && rowPlan.primitive.materialIndex==1u,
+          "replacement plan keeps primitive and material row indices distinct");
+    auto subrange=fullCandidate;subrange.vertices.insert(subrange.vertices.begin(),StaticRtVertex{});
+    subrange.primitives[0].vertexOffset=1u;
+    Check(!rowSlot.PrepareResidentReplacement(3u,504u,subrange,rowRanges[0],rowPlan,diagnostic),
+          "resident candidate with a nonzero source vertex offset is rejected");
+    Check(rowSlot.PrepareResidentReplacement(3u,503u,fullCandidate,rowRanges[0],rowPlan,diagnostic),
+          "full contiguous source candidate remains preparable after subrange rejection");
+    rowSlot.PublishResidentReplacement(rowPlan,fullCandidate);
+    Check(rowSlot.PrimitiveMetadata()[2].vertexOffset==rowRanges[0].vertexOffset &&
+          rowSlot.PrimitiveMetadata()[2].materialIndex==1u &&
+          rowSlot.Materials()[1].baseColorFactor==fullCandidate.materials[0].baseColorFactor,
+          "publish writes the primitive row and its distinct material row correctly");
+}
+
 void TestMaterialAuthoringValidation()
 {
     using namespace horde::vulkan::raytracing;
@@ -551,19 +648,19 @@ void TestTextureArrayCapacities()
 {
     using namespace horde::vulkan::raytracing;
     std::string diagnostic;
-    Check(RtTextureArrays::Validate({18u, 18u, 18u, 18u}, diagnostic),
-          "all four arrays accept the exact 18-layer boundary");
-    Check(!RtTextureArrays::Validate({19u, 1u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 18.",
+    Check(RtTextureArrays::Validate({20u, 20u, 20u, 20u}, diagnostic),
+          "all four arrays accept the exact 20-layer boundary");
+    Check(!RtTextureArrays::Validate({21u, 1u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: baseColor layers exceed 20.",
           "base colour overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 19u, 1u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 21u, 1u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: normal layers exceed 20.",
           "normal overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 19u, 1u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 21u, 1u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: ORM layers exceed 20.",
           "ORM overflow is named");
-    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 19u}, diagnostic) &&
-              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 18.",
+    Check(!RtTextureArrays::Validate({1u, 1u, 1u, 21u}, diagnostic) &&
+              diagnostic == "RtTextureArrays capacity overflow: emissive layers exceed 20.",
           "emissive overflow is named");
 }
 
@@ -751,6 +848,7 @@ int main()
     TestNamedCapacityFailures();
     TestJointPresentationCapacity();
     TestFrameMaterialAppearance();
+    TestResidentGeometryReplacement();
     TestMaterialAuthoringValidation();
     TestTextureArrayCapacities();
     TestPrimaryShadowPolicy();

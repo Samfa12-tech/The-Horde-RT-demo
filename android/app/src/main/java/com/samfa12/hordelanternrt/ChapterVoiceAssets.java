@@ -1,6 +1,7 @@
 package com.samfa12.hordelanternrt;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,39 @@ final class ChapterVoiceAssets {
             kit(16, "flask.empty"),
             kit(17, "flask.topup")
     };
-    private static final List<Asset> ALL = Collections.unmodifiableList(Arrays.asList(ASSETS));
+    private static final List<Asset> ALL = admittedAssets();
+
+    private static List<Asset> admittedAssets() {
+        final List<Asset> assets = new ArrayList<>(Arrays.asList(ASSETS));
+        if (BuildConfig.BELLWETHER_VOICE_CANDIDATE) {
+            assets.add(bellwether(18, "kit.accept_base.sit", "kit_"));
+            assets.add(bellwether(19, "kit.accept_base.limit", "kit_"));
+            assets.add(bellwether(20, "kit.accept_base.work", "kit_"));
+            assets.add(bellwether(24, "hub.kit_introduce", "kit_"));
+            assets.add(bellwether(26, "hub.hoard_answer", "kit_"));
+        }
+        if (BuildConfig.BELLWETHER_ARRIVAL_AUDITION) {
+            assets.add(bellwether(21, "kit.approach_injury.stop", "kit_"));
+            assets.add(bellwether(22, "kit.approach_injury.ankle", "kit_"));
+            assets.add(bellwether(23, "kit.approach_injury.slow", "kit_"));
+            assets.add(bellwether(25, "hub.horde_army", "keeper_"));
+            assets.add(bellwether(27, "hub.arrival_chair", "keeper_"));
+        }
+        if (BuildConfig.BELLWETHER_SALVAGER_AUDITION) {
+            assets.add(bellwether(52, "access.body_task", "salvager_"));
+            assets.add(bellwether(53, "access.body_progress", "salvager_"));
+            assets.add(bellwether(54, "hub.passing.learned_retreat", "salvager_"));
+        }
+        if (BuildConfig.BELLWETHER_FOLLOW_ON_AUDITION) {
+            assets.add(bellwether(38, "hub.two_routes", "record_keeper_"));
+            assets.add(bellwether(39, "hub.routes_independent", "record_keeper_"));
+            assets.add(bellwether(44, "kit.voice_reaction", "kit_"));
+            assets.add(bellwether(45, "kit.first_direct_voice.finish", "kit_"));
+            assets.add(bellwether(47, "kit.royal_claim.help", "kit_"));
+            assets.add(bellwether(55, "hub.ordinary_sale", "relic_dealer_"));
+        }
+        return Collections.unmodifiableList(assets);
+    }
 
     private ChapterVoiceAssets() {}
 
@@ -48,9 +81,8 @@ final class ChapterVoiceAssets {
 
     /** Returns null for None, out-of-range lines, and every unadmitted ID. */
     static Asset forLine(int line) {
-        if (line < 1 || line > ASSETS.length) return null;
-        final Asset asset = ASSETS[line - 1];
-        return asset.line == line ? asset : null;
+        for (Asset asset : ALL) if (asset.line == line) return asset;
+        return null;
     }
 
     /** A missing or unadmitted cue returns null so callers can keep subtitle fallback. */
@@ -62,6 +94,11 @@ final class ChapterVoiceAssets {
     private static Asset kit(int line, String stableId) {
         final String key = "kit_" + stableId.replace('.', '_');
         return asset(line, stableId, key, "audio/kit/runtime/" + stableId + ".wav");
+    }
+
+    private static Asset bellwether(int line, String stableId, String keyPrefix) {
+        return asset(line, stableId, keyPrefix + stableId.replace('.', '_'),
+                "private_bellwether_voice/" + stableId + ".wav");
     }
 
     private static Asset asset(int line, String stableId, String key, String path) {

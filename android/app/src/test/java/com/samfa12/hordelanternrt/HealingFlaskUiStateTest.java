@@ -28,4 +28,20 @@ public final class HealingFlaskUiStateTest {
         assertNull(HealingFlaskUiState.decode(new long[]{2,31,1,1,1,2,2,0},31));
         v[5]=2;assertTrue(HealingFlaskUiState.decode(v,31).full());
     }
+    @Test public void earnedHearthUsesCurrentPublicationAndRequiresEligibleAnchor() {
+        long[] v={2,31,1,0,0,0,2,0,4,5};
+        HealingFlaskUiState nearby=HealingFlaskUiState.decode(v,31);
+        assertNotNull(nearby);
+        assertTrue(nearby.hearthNearby());
+        assertFalse(nearby.allows(true));
+        v[4]=4;
+        HealingFlaskUiState eligible=HealingFlaskUiState.decode(v,31);
+        assertNotNull(eligible);
+        assertTrue(eligible.hearthNearby());
+        assertTrue(eligible.allows(true));
+        assertFalse(eligible.allows(false));
+        v[8]=5;
+        assertNull(HealingFlaskUiState.decode(v,31));
+        assertNull(HealingFlaskUiState.decode(new long[]{1,31,1,0,4,0,2,0},31));
+    }
 }

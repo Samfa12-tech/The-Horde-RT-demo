@@ -27,6 +27,9 @@ struct DeveloperOverlaySnapshot
     std::string selectedEnemy;
     std::string encounterPhase;
     std::string playerLifePhase = "alive";
+    float playerX = 0.0f;
+    float playerZ = 0.0f;
+    float playerYawRadians = 0.0f;
     std::uint32_t internalWidth = 0;
     std::uint32_t internalHeight = 0;
     std::uint32_t presentationWidth = 0;

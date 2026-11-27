@@ -47,7 +47,9 @@ void Click(HWND parent,int id) {
 void CheckBounds(HWND parent,RECT bounds) {
     int bottom=bounds.top;
     for(int id=Panel::TitleId;id<=Panel::BackId;++id) {
-        RECT r{};GetWindowRect(GetDlgItem(parent,id),&r);MapWindowPoints(HWND_DESKTOP,parent,reinterpret_cast<POINT*>(&r),2);
+        const auto control=GetDlgItem(parent,id);
+        if(!control)continue;
+        RECT r{};GetWindowRect(control,&r);MapWindowPoints(HWND_DESKTOP,parent,reinterpret_cast<POINT*>(&r),2);
         Check(r.left>=bounds.left && r.right<=bounds.right && r.top>=bottom && r.bottom<=bounds.bottom && r.right>r.left && r.bottom>r.top,
             "real panel controls fit their bounded client area without overlap");bottom=r.bottom;
     }
@@ -81,8 +83,8 @@ int main() {
         }
         Check(open(h.view) && !IsWindowVisible(parent),"explicit open creates native controls without showing owner");
         Check(Text(parent,Panel::TitleId)==Panel::Title && Text(parent,Panel::BodyId)==Panel::Body &&
-            Text(parent,Panel::BodyId).find("future chapter")!=std::string::npos,
-            "native objective labels preserve the truthful continuing chapter scope");
+            Text(parent,Panel::BodyId).find("The tavern is across the square")!=std::string::npos,
+            "native objective directs the player to the open Bellwether road");
         Check(Text(parent,Panel::ContinueId)=="CONTINUE EXPLORING" && Text(parent,Panel::MenuId)=="RETURN TO MENU" &&
             Text(parent,Panel::BackId)=="BACK","all explicit native actions have accessible text");
         auto actions=h.panel.ActionControls();
@@ -121,6 +123,118 @@ int main() {
         Check(open(h.view),"final explicit opening remains available");Click(parent,Panel::MenuId);
         Check(h.actions.size()==3 && h.actions.back()==Panel::Action::ReturnToMenu && !h.panel.Visible(),
             "only current native Return to menu emits its distinct action");
+        h.view.objective=Panel::Objective::BellwetherRegister;
+        Check(open(h.view) && Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" &&
+            Text(parent,Panel::BodyId)==horde::gameplay::campaign::PauseObjectiveText(h.view.objective) &&
+            !GetDlgItem(parent,Panel::MenuId),"the Bellwether page shows earned directions and offers pause navigation");
+        Click(parent,Panel::BackId);
+        Check(h.actions.size()==4 && h.actions.back()==Panel::Action::BackToPause && !h.panel.Visible(),
+            "Bellwether Back preserves the pause menu");
+        Check(open(h.view),"the directions can reopen without changing progress");
+        const HWND oldDirections=GetDlgItem(parent,Panel::ContinueId);
+        h.view.objective=Panel::Objective::BellwetherExpeditions;
+        SendMessageA(parent,WM_COMMAND,MAKEWPARAM(Panel::ContinueId,BN_CLICKED),reinterpret_cast<LPARAM>(oldDirections));
+        Check(h.actions.size()==4 && !h.panel.Visible(),"new earned directions revoke the previous page's controls");
+        h.view.directions.purse={3,true,false};
+        Check(open(h.view) && Text(parent,Panel::BodyId).find("future expeditions")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("Purse: 3 coins.")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("Lantern fitting at the tavern: 2 coins.")!=std::string::npos &&
+            Text(parent,Panel::BodyId).find("restore its binding")!=std::string::npos,
+            "expedition directions show the purse, fitting price and first ward step");
+        h.view.directions.ward=horde::gameplay::campaign::AirWardDirections::Learned;
+        Check(!h.panel.Refresh(h.view) && open(h.view) &&
+              Text(parent,Panel::BodyId).find("Air ward learned")!=std::string::npos,
+            "the reopened directions reflect the earned ward lesson");
+        Click(parent,Panel::ContinueId);
+        h.view.objective=Panel::Objective::BellwetherShrine;
+        h.view.directions.millServiceAvailable=true;
+        h.view.directions.shorePracticeAvailable=true;
+        Check(open(h.view) && Text(parent,Panel::BodyId).find("For a breathing rig, follow the MILL signs east")!=std::string::npos &&
+              Text(parent,Panel::BodyId).find("Meet the salvager at the river fork")!=std::string::npos,
+            "early directions show both available eastern services");
+        h.view.directions.millServiceAvailable=false;
+        Check(!h.panel.Refresh(h.view) && open(h.view) &&
+              Text(parent,Panel::BodyId).find("MILL signs")==std::string::npos,
+            "a change in the admitted services revokes the old panel and hides the unavailable route");
+        h.panel.Close();
+        h.view.objective=Panel::Objective::BellwetherExpeditions;
+        h.view.directions.purse.ordinarySilver=horde::gameplay::campaign::OrdinarySilverProgress::Sold;
+        h.view.directions.ward=horde::gameplay::campaign::AirWardDirections::RestoreBinding;
+        h.view.directions.mill=horde::gameplay::bellwether::MillPreparation::RigTrialReady;
+        h.view.directions.millServiceAvailable=true;
+        h.view.directions.shorePracticeCompleted=true;
+        const auto font=CreateFontA(18,0,0,0,FW_SEMIBOLD,FALSE,FALSE,FALSE,
+            ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,
+            DEFAULT_PITCH|FF_DONTCARE,"Segoe UI");
+        Check(font && h.panel.Open(parent,h.view,font),"combined directions open with the native menu font");
+        RECT narrow{16,16,480,504};
+        h.panel.Layout(narrow,96);
+        CheckBounds(parent,narrow);
+        const auto body=GetDlgItem(parent,Panel::BodyId);
+        RECT bodyBounds{};
+        GetClientRect(body,&bodyBounds);
+        const auto dc=GetDC(body);
+        const auto previous=SelectObject(dc,font);
+        auto measured=bodyBounds;
+        const auto text=Text(parent,Panel::BodyId);
+        const auto required=DrawTextA(dc,text.c_str(),static_cast<int>(text.size()),&measured,
+            DT_CALCRECT|DT_WORDBREAK|DT_CENTER|DT_NOPREFIX);
+        SelectObject(dc,previous);
+        ReleaseDC(body,dc);
+        Check(required>0 && bodyBounds.bottom>=required && text.find("Shore practice: Complete.")!=std::string::npos,
+            "combined directions fit the complete shore, rig and ward text in a narrow window");
+        h.panel.Close();
+        DeleteObject(font);
+
+        h.view.directions.purse.ordinarySilver=horde::gameplay::campaign::OrdinarySilverProgress::Carried;
+        h.view.directions.purse.millTally=horde::gameplay::campaign::MillTallyProgress::Carried;
+        const auto scaledFont=CreateFontA(36,0,0,0,FW_SEMIBOLD,FALSE,FALSE,FALSE,
+            ANSI_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,
+            DEFAULT_PITCH|FF_DONTCARE,"Segoe UI");
+        Check(scaledFont && h.panel.Open(parent,h.view,scaledFont),"the longest mixed directions open at 200% DPI");
+        RECT shortWorkArea{32,32,1120,652};
+        h.panel.Layout(shortWorkArea,192);
+        CheckBounds(parent,shortWorkArea);
+        const auto scrollBody=GetDlgItem(parent,Panel::BodyId);
+        const auto firstLine=[&]{return SendMessageA(scrollBody,EM_GETFIRSTVISIBLELINE,0,0);};
+        Check((GetWindowLongPtrA(scrollBody,GWL_STYLE)&(ES_READONLY|WS_VSCROLL))==(ES_READONLY|WS_VSCROLL) &&
+            Text(parent,Panel::TitleId).find("Left / right to scroll")!=std::string::npos && firstLine()==0,
+            "the overflowing directions start at the top with native scrolling and a visible hint");
+        Check(h.panel.ScrollPage(true) && firstLine()>0 && h.panel.ScrollPage(false) && firstLine()==0,
+            "paging moves the text in both directions and leaves the action controls in place");
+        UINT wheelLines=3;
+        SystemParametersInfoA(SPI_GETWHEELSCROLLLINES,0,&wheelLines,0);
+        Check(h.panel.ScrollWheel(-WHEEL_DELTA/2) && firstLine()==0 &&
+            h.panel.ScrollWheel(-WHEEL_DELTA/2) && (wheelLines==0 ? firstLine()==0 : firstLine()>0),
+            "high-resolution wheel movement follows the system scroll setting");
+        for(int page=0;page<12;++page)h.panel.ScrollPage(true);
+        RECT visibleText{};
+        SendMessageA(scrollBody,EM_GETRECT,0,reinterpret_cast<LPARAM>(&visibleText));
+        const int textEnd=GetWindowTextLengthA(scrollBody)-1;
+        const auto lastChar=SendMessageA(scrollBody,EM_POSFROMCHAR,textEnd,0);
+        const auto lastY=static_cast<short>(HIWORD(lastChar));
+        Check(lastChar!=-1 && lastY>=visibleText.top && lastY<visibleText.bottom &&
+            Text(parent,Panel::BodyId).find("Shore practice: Complete.")!=std::string::npos,
+            "scrolling reaches the final shore note within the text viewport");
+        CheckBounds(parent,shortWorkArea);
+        RECT tallWorkArea{32,32,1120,1140};
+        h.panel.Layout(tallWorkArea,192);
+        CheckBounds(parent,tallWorkArea);
+        Check(Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" && !h.panel.ScrollPage(true) && firstLine()==0,
+            "when the whole page fits again the scrolling hint clears and the first line is readable");
+        h.panel.Close();
+        DeleteObject(scaledFont);
+        h.view.directions={};
+        for(const auto objective:{Panel::Objective::BellwetherArrival,Panel::Objective::BellwetherHearth,
+                                  Panel::Objective::BellwetherLantern}) {
+            h.view.objective=objective;
+            Check(open(h.view) && Text(parent,Panel::TitleId)=="BELLWETHER DIRECTIONS" &&
+                  Text(parent,Panel::BodyId)==horde::gameplay::campaign::PauseObjectiveText(objective) &&
+                  !GetDlgItem(parent,Panel::MenuId),"the new Bellwether stages use the native directions panel");
+            Click(parent,Panel::BackId);
+            Check(!h.panel.Visible() && h.actions.back()==Panel::Action::BackToPause,
+                  "leaving a new directions stage keeps the parent paused");
+        }
         SetWindowLongPtrA(parent,GWLP_USERDATA,0);
     }
     foreground.Observe("before-destroy");

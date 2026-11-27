@@ -19,6 +19,15 @@ constexpr std::array<std::string_view,4> kSourceFamilies{
     "Original charcoal-gray ridged bark","Original opaque pine needle sprays",
     "Original opaque hanging woodland moss","Original opaque alder leaves"};
 constexpr std::array<float,16> kIdentity{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
+// The mapped road passes between the two retained end posts on the old
+// turnaround. Select both adjoining rails so the centre post is gone too.
+constexpr std::array<std::size_t,2> kBellwetherRoadEdges{123,124};
+static_assert(surroundings_layout::edges[kBellwetherRoadEdges.front()].a[0]==23.6f &&
+              surroundings_layout::edges[kBellwetherRoadEdges.back()].b[0]==20.8f &&
+              surroundings_layout::edges[kBellwetherRoadEdges.front()].a[2]==54.f &&
+              surroundings_layout::edges[kBellwetherRoadEdges.back()].b[2]==54.f &&
+              surroundings_layout::edges[kBellwetherRoadEdges.front()].fenceRequested &&
+              surroundings_layout::edges[kBellwetherRoadEdges.back()].fenceRequested);
 Point Normalize(Point p) {
     const float n=std::sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
     if(!(n>1e-8f))return {};
@@ -53,7 +62,8 @@ bool EdgeHasContact(const Surface& ground,const surroundings_layout::Edge& e,
 bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     const PreparedForestDressing& original,Asset& owner,
     std::shared_ptr<const Surface>& terrain,
-    std::shared_ptr<const PreparedForestSurroundings>& result,std::string& diagnostic) {
+    std::shared_ptr<const PreparedForestSurroundings>& result,std::string& diagnostic,
+    ForestRoadEnd roadEnd) {
     const auto fail=[&](const std::string& why){diagnostic="Forest surroundings: "+why;return false;};
     if(!terrain || !owner.HasValidTriangleProvenance() || owner.vertices.empty() ||
        original.placements.size()!=64 || owner.materials.size()>32 || owner.primitives.size()>32)
@@ -202,9 +212,14 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     }
     std::array<bool,surroundings_layout::edges.size()> fences{};
     std::array<bool,surroundings_layout::edges.size()> crags{};
+    const auto opensRoad=[roadEnd](std::size_t i) {
+        return roadEnd==ForestRoadEnd::Bellwether &&
+            std::find(kBellwetherRoadEdges.begin(),kBellwetherRoadEdges.end(),i)!=kBellwetherRoadEdges.end();
+    };
     for(std::size_t i=0;i<fences.size();++i) {
         const auto& e=surroundings_layout::edges[i];
         if(e.arrivalPortal) {++report.arrivalPortalRuns;continue;}
+        if(opensRoad(i)) {++report.bellwetherRoadRuns;continue;}
         std::size_t probes=0;
         if(e.terrainBoundaryApproved) {
             if(!EdgeHasContact(*terrain,e,probes,true))return fail("authored natural boundary lost its terrain/contact identity");
@@ -263,16 +278,20 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     }
     report.fenceTriangles=report.fenceRuns*48+report.terminalFencePosts*12;
     report.boundaryCollisionTriangles=collision.size()-report.treeContactTriangles;
-    if(terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()+collision.size()>Surface::kMaximumTriangles)
+    const auto contactCapacity=Surface::NonWalkableCapacity(terrain->TriangleCount()+terrain->StepTriangleCount());
+    if(terrain->NonWalkableTriangleCount()+collision.size()>contactCapacity)
         return fail("boundary exceeds immutable support intake: ground="+std::to_string(terrain->TriangleCount())+
             " existingSolid="+std::to_string(terrain->NonWalkableTriangleCount())+" step="+std::to_string(terrain->StepTriangleCount())+
-            " newFence="+std::to_string(collision.size())+" limit="+std::to_string(Surface::kMaximumTriangles)+".");
+            " newContact="+std::to_string(collision.size())+" solidLimit="+std::to_string(contactCapacity)+".");
     auto combined=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
     if(!combined)return false;
-    for(const auto& e:surroundings_layout::edges)if(!e.arrivalPortal && !EdgeHasContact(*combined,e,report.boundaryProbes,false))
-        return fail("actual rendered boundary lacks authored contact at "+std::to_string(&e-surroundings_layout::edges.data())+".");
+    for(std::size_t i=0;i<surroundings_layout::edges.size();++i) {
+        const auto& e=surroundings_layout::edges[i];
+        if(!e.arrivalPortal && !opensRoad(i) && !EdgeHasContact(*combined,e,report.boundaryProbes,false))
+            return fail("actual rendered boundary lacks authored contact at "+std::to_string(i)+".");
+    }
     report.boundarySectionsContained=true;
-    report.boundaryContained=report.arrivalPortalRuns==0 && report.openWoodlandRuns==0;
+    report.boundaryContained=report.arrivalPortalRuns==0 && report.openWoodlandRuns==0 && report.bellwetherRoadRuns==0;
     Asset staged=owner;
     staged.triangleRegions.resize(staged.indices.size()/3,assets::StaticTriangleRegion::Shared);
     for(std::size_t f=0;f<5;++f)if(!indices[f].empty()) {

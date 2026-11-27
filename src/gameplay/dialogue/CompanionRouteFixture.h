@@ -4,10 +4,19 @@
 #include "gameplay/dialogue/CompanionTurnProfile.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include <algorithm>
 #include <cmath>
 namespace horde::gameplay::dialogue {
-enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing };
+enum class CompanionWait { Reunion,PlayerLagging,PlayerInTomb,Obstacle,Lookout,Paused,Preparing,Tavern };
+enum class BellwetherArrivalStage { AtLookout, OnRoad, AnkleAssessment, ProtectiveApproach, ChairTurn, Lowering, Seated };
+inline constexpr float kTavernSitDurationSeconds=82.f/60.f;
+// Native Head transform at the last frame of Kit|hearth_sit, in model metres.
+inline constexpr Tuple kTavernSeatedHead{-.022f,1.321f,-.319f};
+inline constexpr float kAnkleAssessmentDurationSeconds=96.f/60.f;
+inline constexpr float kProtectiveWalkDurationSeconds=52.f/60.f;
+inline constexpr float kProtectiveWalkStrideMetres=.76f;
 struct CompanionSnapshot {
     // Logical engineering fixture only. No admitted mesh, enemy slot or GPU
     // skinning allocation is implied by this reusable route contract.
@@ -20,14 +29,28 @@ struct CompanionSnapshot {
     CompanionActingPose acting{};
     CompanionLocomotionPose locomotion{};
     CompanionMotionPose motion{}; // Transient shared recipe, never serialized.
+    BellwetherArrivalStage bellwetherArrival=BellwetherArrivalStage::AtLookout;
+    std::size_t bellwetherStation=1;
 };
 class CompanionRouteFixture {
 public:
     explicit CompanionRouteFixture(bool turnStartEnabled=false):turnStartEnabled_(turnStartEnabled) {ClearMotion();}
     const CompanionSnapshot& State() const {return state_;}
     void Reset() { const auto gen=state_.generation;state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=gen==UINT64_MAX?gen:gen+1; }
-    void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof) {
-        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof);
+    void AdvanceActing(float seconds,const Snapshot& speech,bool exterior,bool alive,bool freshVisibleProof,
+                       std::optional<Tuple> lantern={}) {
+        if(state_.motion.mode==CompanionMotionMode::Sitting || state_.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment ||
+           state_.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach)return;
+        const bool seated=state_.bellwetherArrival==BellwetherArrivalStage::Seated;
+        std::optional<Tuple> lanternFromHead;
+        if(seated && lantern) {
+            const float dx=lantern->x-state_.x,dz=lantern->z-state_.z;
+            const float s=std::sin(state_.yaw),c=std::cos(state_.yaw);
+            // Imported +Z faces forward and imported +X faces to Kit's left.
+            lanternFromHead=Tuple{-c*dx-s*dz-kTavernSeatedHead.x,lantern->y-state_.y-kTavernSeatedHead.y,
+                                  s*dx-c*dz-kTavernSeatedHead.z};
+        }
+        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof,seated,lanternFromHead);
         state_.acting=acting_.State();
     }
     void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,
@@ -50,6 +73,28 @@ public:
         state_.y=support.worldY;state_.wait=state_.grounded?CompanionWait::Lookout:CompanionWait::Obstacle;
         state_.yaw=std::atan2(playerX-state_.x,state_.z-playerZ);
     }
+    bool RestoreCampaignBellwetherApproach(const simulation::TriangleSupportSurface& terrain,
+                                           std::uint64_t generationFloor) {
+        using namespace traversal;
+        if(generationFloor==UINT64_MAX || !BellwetherRoadAdmitted(terrain))return false;
+        const auto mark=kBellwetherTavernRoute[kBellwetherAnkleStation];
+        const auto next=kBellwetherTavernRoute[kBellwetherAnkleStation+1];
+        constexpr float radius=.24f;
+        const auto support=ChapterExteriorStepSupport(terrain,mark.x,mark.z,radius);
+        if(!support.grounded || !ResolveChapterStepMovement(terrain,mark.x,mark.z,mark.x,mark.z,
+                support.worldY,radius).accepted)return false;
+        Reset();
+        state_.generation=generationFloor+1;
+        state_.x=mark.x;state_.y=support.worldY;state_.z=mark.z;
+        state_.yaw=std::atan2(next.x-mark.x,mark.z-next.z);
+        state_.grounded=true;
+        state_.waypoint=simulation::kWorldRoutePoints.size();
+        state_.bellwetherArrival=BellwetherArrivalStage::ProtectiveApproach;
+        state_.bellwetherStation=kBellwetherAnkleStation+1;
+        state_.motion.anklePlaybackSeconds=kAnkleAssessmentDurationSeconds;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
     void RestoreCampaignBasin(float playerX,float playerZ,
         const simulation::TriangleSupportSurface* terrain,std::uint64_t generationFloor) {
         state_={};acting_.Reset();locomotion_.Reset();ClearMotion();state_.generation=generationFloor+1;
@@ -63,9 +108,56 @@ public:
         state_.y=support.worldY;state_.wait=state_.grounded?CompanionWait::Reunion:CompanionWait::Obstacle;
         state_.yaw=std::atan2(playerX-state_.x,state_.z-playerZ);
     }
+    bool BeginTavernSit() {
+        using namespace bellwether;
+        if(TavernSitActive() || !state_.grounded || state_.walking ||
+           std::hypot(state_.x-kChairSitRoot[0],state_.z-kChairSitRoot[2])>.015f ||
+           std::abs(state_.y-kChairSitRoot[1])>.01f ||
+           std::abs(std::remainder(state_.yaw-kChairFacingRadians,6.28318530718f))>.02f)return false;
+        locomotion_.Reset();acting_.Reset();ClearMotion();
+        state_.locomotion=locomotion_.State();state_.acting=acting_.State();
+        state_.motion.mode=CompanionMotionMode::Sitting;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
+    // Explicit diagnostic seed for the arrival handoff. The placement is
+    // validated against the same scene as travel, before fixed-step playback.
+    bool PlaceForTavernSitInspection(const simulation::TriangleSupportSurface& terrain) {
+        return BindTavernChair(terrain) && BeginTavernSit();
+    }
+    bool RestoreCampaignTavernSeat(const simulation::TriangleSupportSurface& terrain,std::uint64_t generationFloor) {
+        if(generationFloor==UINT64_MAX || !BindTavernChair(terrain))return false;
+        state_.generation=generationFloor+1;
+        state_.waypoint=simulation::kWorldRoutePoints.size();
+        state_.wait=CompanionWait::Tavern;
+        state_.motion.mode=CompanionMotionMode::Seated;
+        state_.motion.sitPlaybackSeconds=kTavernSitDurationSeconds;
+        state_.bellwetherArrival=BellwetherArrivalStage::Seated;
+        state_.bellwetherStation=kKitBellwetherRoute.size();
+        return true;
+    }
     void Step(float dt,float playerX,float playerZ,bool exterior,bool proof,bool paused,
               const simulation::TriangleSupportSurface* terrain=nullptr,bool requireTerrain=false,bool active=true,
-              bool guideBasin=false) {
+              bool guideBasin=false,bool holdAnkleAssessment=false) {
+        if(TavernSitActive()) {
+            if(exterior && active && !paused && std::isfinite(dt) && dt>0 &&
+               state_.motion.mode==CompanionMotionMode::Sitting) {
+                auto& seconds=state_.motion.sitPlaybackSeconds;
+                seconds+=std::min(dt,.05f);
+                if(seconds>=kTavernSitDurationSeconds-.00001f) {
+                    seconds=kTavernSitDurationSeconds;
+                    state_.motion.mode=CompanionMotionMode::Seated;
+                    if(state_.bellwetherArrival==BellwetherArrivalStage::Lowering)
+                        state_.bellwetherArrival=BellwetherArrivalStage::Seated;
+                }
+            }
+            return;
+        }
+        if(state_.bellwetherArrival!=BellwetherArrivalStage::AtLookout) {
+            if(exterior && active && !paused && terrain && std::isfinite(dt) && dt>0)
+                StepBellwetherArrival(std::min(dt,.05f),*terrain,holdAnkleAssessment);
+            return;
+        }
         if(guideBasin && active && exterior && proof) {
             StepBasinGuide(dt,playerX,playerZ,paused,terrain,requireTerrain);return;
         }
@@ -99,8 +191,54 @@ public:
         locomotion_.Step(dt,std::hypot(state_.x-oldX,state_.z-oldZ),state_.walking);
         state_.locomotion=locomotion_.State();
     }
+    bool TryStartBellwetherArrival(float playerX,float playerZ,const simulation::TriangleSupportSurface& terrain) {
+        using namespace traversal;
+        if(state_.bellwetherArrival!=BellwetherArrivalStage::AtLookout ||
+           !state_.grounded || state_.waypoint!=simulation::kWorldRoutePoints.size() ||
+           !std::isfinite(playerX) || !std::isfinite(playerZ))return false;
+        const auto lookout=kBellwetherTavernRoute[0];
+        const auto turnaround=kBellwetherTavernRoute[1];
+        const float dx=turnaround.x-lookout.x,dz=turnaround.z-lookout.z;
+        const float along=((playerX-lookout.x)*dx+(playerZ-lookout.z)*dz)/(dx*dx+dz*dz);
+        if(along<.16f || along>1.12f || std::hypot(playerX-(lookout.x+dx*along),
+            playerZ-(lookout.z+dz*along))>2.0f)return false;
+
+        if(!BellwetherRoadAdmitted(terrain))return false;
+        state_.bellwetherArrival=BellwetherArrivalStage::OnRoad;
+        state_.wait=CompanionWait::Tavern;
+        return true;
+    }
 private:
+    static bool BellwetherRoadAdmitted(const simulation::TriangleSupportSurface& terrain) {
+        using namespace traversal;
+        // Historical scenes retain the turnaround rails across the road.
+        const auto turnaround=kBellwetherTavernRoute[1];
+        const auto road=kBellwetherTavernRoute[2];
+        const auto roadX=[&](float z){return std::lerp(turnaround.x,road.x,(z-turnaround.z)/(road.z-turnaround.z));};
+        constexpr float beforeRails=52.8f,afterRails=55.6f;
+        const auto support=ChapterExteriorSupport(&terrain,roadX(beforeRails),beforeRails);
+        return support.grounded && ChapterExteriorMovementClear(terrain,roadX(beforeRails),beforeRails,
+                roadX(afterRails),afterRails,support.worldY,.24f);
+    }
+    bool BindTavernChair(const simulation::TriangleSupportSurface& terrain) {
+        using namespace bellwether;
+        const auto [x,y,z]=kChairSitRoot;
+        constexpr float radius=.24f;
+        const auto support=traversal::ChapterExteriorStepSupport(terrain,x,z,radius);
+        if(!support.grounded || std::abs(support.worldY-y)>.001f ||
+           !traversal::ResolveChapterStepMovement(terrain,x,z,x,z,support.worldY,radius).accepted ||
+           terrain.NonWalkableVolumeClear(kChairSeat[0],kChairSeat[2],kChairSeat[0],kChairSeat[2],
+               kChairSeat[1]-.001f,kChairSeat[1]+.001f,.025f))return false;
+        Reset();
+        state_.x=x;state_.y=support.worldY;state_.z=z;
+        state_.yaw=kChairFacingRadians;state_.grounded=true;
+        return true;
+    }
+    bool TavernSitActive() const {
+        return state_.motion.mode==CompanionMotionMode::Sitting || state_.motion.mode==CompanionMotionMode::Seated;
+    }
 #include "gameplay/dialogue/CompanionTurnPrototype.inl"
+#include "gameplay/dialogue/CompanionBellwetherArrival.inl"
     void StepBasinGuide(float dt,float playerX,float playerZ,bool paused,
                         const simulation::TriangleSupportSurface* terrain,bool requireTerrain) {
         state_.basinGuide=true;state_.walking=false;

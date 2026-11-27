@@ -26,6 +26,17 @@ void GameSimulation::SetDevelopmentRescueJourney(bool enabled, bool authoredTerr
     config_.developmentRescueJourney=enabled;
     dialogueDucking_.Reset();
     config_.authoredChapterTerrain=enabled&&authoredTerrain;chapterTerrain_.reset();
+    tavernKeeper_={};
+    recordKeeper_.reset();
+    artificer_.reset();
+    salvager_.reset();
+    relicDealer_.reset();
+    shorePracticeStage_={};
+    shorePracticeBreathTicksRemaining_=0;
+    millDriveTurnSeconds_.reset();
+    waysideArchive_={};
+    treasurePurse_={};
+    tavernDoor_={};
     rescueTraversal_.Reset(); rescueOpeningSeconds_=0;worldRoute_.Invalidate();
     worldRoute_.current=WorldZoneId::Dungeon;
     if(enabled) {
@@ -70,7 +81,7 @@ void GameSimulation::StepRescueJourney(bool paused) {
         // combat, so simultaneous edges cannot act before traversal ownership.
         while(pendingInteractCommands_>0) {
             --pendingInteractCommands_;++lastConsumedInteractSequence_;
-            if(!TryRescueInteraction())(void)TryFlaskUpgradeInteraction();
+            InteractWithClaimedChapter();
         }
     }
     if(rescueTraversal_.IsActive() && !ValidRescueCapsulePath(rescueTraversal_.Snapshot()))

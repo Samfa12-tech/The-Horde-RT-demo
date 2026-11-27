@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
+#include <span>
 
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 
@@ -13,12 +14,22 @@ namespace horde::gameplay::dialogue {
 enum class Line : std::uint32_t { None, KeeperSense, KeeperCloser, Grate, RescueFound,
     RescueRope, ReunionQuestion, ReunionHint, ReunionProof, ReunionFirstPiece,
     ReunionDepart, ForestNight, ForestWaystone, ForestClue, ForestWait, ForestVillage,
-    FlaskEmpty, FlaskTopup };
+    FlaskEmpty, FlaskTopup, TavernSit, TavernLimit, TavernWork, RoadStop, RoadAnkle, RoadSlow,
+    TavernIntroduce, TavernHordeArmy, TavernHoardAnswer, TavernWelcome, TavernDirections,
+    LanternFirstHelp, LanternFirstIdentity, LanternKingName, LanternFirstRequest, LanternRegisterReturn,
+    RecordKeeperInspect, RecordKeeperErrand, RecordKeeperDirections,
+    RecordKeeperRegister, RecordKeeperTwoRoads, RecordKeeperRoadOrder, TavernRegisterDirections, TavernExpeditionDirections,
+    TavernLanternIdentity, TavernLanternSeals, KitVoiceReaction, KitVoiceListen, KitRoyalClaim, KitRoadHelp,
+    RecordKeeperReward, TavernLanternFitting, RecordKeeperWardOffer, RecordKeeperWardLesson,
+    SalvagerShoreTask, SalvagerShoreReminder, SalvagerShoreReturn, RelicDealerOrdinarySale,
+    PrivyRagRequest, PrivyRagThanks, GardenGrateTalk };
 struct LineSpec { Line id; const char* stableId; const char* speaker; const char* text;
     const char* audio; float duration; unsigned priority; };
+inline constexpr char kExpeditionDirections[]=
+    "You can take either road first. The Abbey lies downstream. The Foundry is east, across the gorge.";
 // The original thirteen Kit cuts retain their 11 October distribution grant.
 // The later two flask-guidance cuts are separately pinned in their manifest.
-inline constexpr std::array<LineSpec,18> kLines{{
+inline constexpr std::array<LineSpec,59> kLines{{
     {Line::None,"","","","",0,0},
     {Line::KeeperSense,"keeper.sense","Keeper","I sense you","assets/audio/pixabay/keeper_i_sense_you.wav",2.590000f,3},
     {Line::KeeperCloser,"keeper.closer","Keeper","Come closer","assets/audio/pixabay/keeper_come_closer.wav",2.868479f,3},
@@ -36,10 +47,102 @@ inline constexpr std::array<LineSpec,18> kLines{{
     {Line::ForestWait,"forest.wait","Kit","I'll wait here.","assets/audio/kit/runtime/forest.wait.wav",1.589208f,1},
     {Line::ForestVillage,"forest.village","Kit","There. Chimney smoke.","assets/audio/kit/runtime/forest.village.wav",2.173792f,1},
     {Line::FlaskEmpty,"flask.empty","Kit","Is your flask empty? Fill it here.","assets/audio/kit/runtime/flask.empty.wav",2.419333f,1},
-    {Line::FlaskTopup,"flask.topup","Kit","Don't forget to top your flask up here if you need it.","assets/audio/kit/runtime/flask.topup.wav",2.939333f,1}
+    {Line::FlaskTopup,"flask.topup","Kit","Don't forget to top your flask up here if you need it.","assets/audio/kit/runtime/flask.topup.wav",2.939333f,1},
+    {Line::TavernSit,"kit.accept_base.sit","Kit","Right. I'm sitting down before I make this worse.","",3.379333f,1},
+    {Line::TavernLimit,"kit.accept_base.limit","Kit","I won't get far along those roads like this. You'll have to go without me.","",4.739333f,1},
+    {Line::TavernWork,"kit.accept_base.work","Kit","Bring what you find back here. I can still make myself useful.","",4.259333f,1},
+    {Line::RoadStop,"kit.approach_injury.stop","Kit","Ah. Wait a moment.","",53264.f/24000.f,1},
+    {Line::RoadAnkle,"kit.approach_injury.ankle","Kit","Loose ground. Turned my ankle. I can stand, but give me a moment.","",122384.f/24000.f,1},
+    {Line::RoadSlow,"kit.approach_injury.slow","Kit","Stay close a moment. I can manage if we go slowly.","",85904.f/24000.f,1},
+    {Line::TavernIntroduce,"hub.kit_introduce","Kit","The tomb was there. So was something worth the climb.","",4.099333f,1},
+    {Line::TavernHordeArmy,"hub.horde_army","Tavern keeper","My grandfather called the Horde an army. You treasure hunters always hear the other word.","",133904.f/24000.f,1},
+    {Line::TavernHoardAnswer,"hub.hoard_answer","Kit","Armies need paying. I'm hoping we're both right.","",3.939333f,1},
+    {Line::TavernWelcome,"hub.arrival_chair","Tavern keeper","Easy. There's a chair just inside.","",88784.f/24000.f,1},
+    {Line::TavernDirections,"hub.record_keeper_lead","","Ask the record keeper by the northern church about the wayside shrine.","",7.0f,1},
+    {Line::LanternFirstHelp,"lantern.first_help","Lantern voice","The lower stone. Its hinge is hidden under the roots.","",4.6f,2},
+    {Line::LanternFirstIdentity,"lantern.first_identity","Lantern voice","I was king here. My keepers sealed me away.","",4.5f,2},
+    {Line::LanternKingName,"lantern.king_name","Lantern voice","Veyr. If the name still means anything.","",3.8f,2},
+    {Line::LanternFirstRequest,"lantern.first_request","Lantern voice","Three seals guard the treasury. Find them, and I can put an end to this.","",6.1f,2},
+    {Line::LanternRegisterReturn,"shrine.recap_register","Lantern voice","Take the register back to Bellwether. It will help you find the seals.","",5.8f,2},
+    {Line::RecordKeeperInspect,"hub.record_inspect","Record keeper","Bring the light closer. This mark belongs to the old treasury road.","",5.8f,1},
+    {Line::RecordKeeperErrand,"hub.first_errand","Record keeper","The wayside shrine kept a road register. If it survived, it may name the next stops.","",6.6f,1},
+    {Line::RecordKeeperDirections,"hub.shrine_direction","Record keeper","Take the northern path out of Bellwether. The shrine is on a short spur beyond it.","",6.4f,1},
+    {Line::RecordKeeperRegister,"shrine.register","Record keeper","The Abbey. The royal Foundry. Then the Glass Court.","",5.0f,1},
+    {Line::RecordKeeperTwoRoads,"hub.two_routes","Record keeper","We can trace the first two roads. The Court's route is still sealed.","",5.5f,1},
+    {Line::RecordKeeperRoadOrder,"hub.routes_independent","Record keeper",kExpeditionDirections,"",7.4f,1},
+    {Line::TavernRegisterDirections,"hub.show_register_note","","Show the road register to the record keeper by the northern church.","",6.0f,1},
+    {Line::TavernExpeditionDirections,"hub.expedition_routes_note","",kExpeditionDirections,"",7.4f,1},
+    {Line::TavernLanternIdentity,"lantern.town_identity","Lantern voice","I am Veyr. Your friend has found the road to my treasury.","",5.8f,2},
+    {Line::TavernLanternSeals,"lantern.town_seals","Lantern voice","Three seals. The Abbey, the Foundry, and the Glass Court. Bring them together, and the road opens.","",8.0f,2},
+    {Line::KitVoiceReaction,"kit.voice_reaction","Kit","Next time, a little warning before the lamp starts talking.","",5.3f,2},
+    {Line::KitVoiceListen,"kit.first_direct_voice.finish","Kit","Go on, then. I'm listening.","",3.3f,2},
+    {Line::KitRoyalClaim,"kit.royal_claim.king","Kit","King Veyr. That's quite a claim to make from inside a lamp.","",5.5f,2},
+    {Line::KitRoadHelp,"kit.royal_claim.help","Kit","If you know the roads, help us get there and back. We can start with that.","",6.8f,2},
+    {Line::RecordKeeperReward,"hub.register_reward","Record keeper","Here, for bringing the register back.","",2.6f,1},
+    {Line::TavernLanternFitting,"hub.lantern_fitting","Tavern keeper","Try that. The hinge should swing less when you walk.","",3.2f,1},
+    {Line::RecordKeeperWardOffer,"access.magic_offer","Record keeper","Restore the shrine's binding, and I can teach you a ward for the crossing. Close the lower stone again.","",6.2f,1},
+    {Line::RecordKeeperWardLesson,"access.magic_limit","Record keeper","It will buy you breath. It will not last forever.","",4.2f,1},
+    {Line::SalvagerShoreTask,"access.body_task","Salvager","We practise near a way out. Getting across is only half the lesson.","",126704.f/24000.f,1},
+    {Line::SalvagerShoreReminder,"access.body_progress","Salvager","Find your way back before you leave the edge. Show me.","",113264.f/24000.f,1},
+    {Line::SalvagerShoreReturn,"hub.passing.learned_retreat","Salvager","Coming back was part of the lesson. Good to see you remembered.","",111344.f/24000.f,1},
+    {Line::RelicDealerOrdinarySale,"hub.ordinary_sale","Relic dealer","Common coin, ordinary silver. I can give you a price for those.","",4.8f,1},
+    {Line::PrivyRagRequest,"hub.privy_request","Privy occupant","Can someone PLEASE get me some rag?!","",3.6f,1},
+    {Line::PrivyRagThanks,"hub.privy_thanks","Privy occupant","Thank you.","",1.2f,1},
+    {Line::GardenGrateTalk,"hub.garden_grate_talk","Man below the grate",
+        "One says I fell in. Another says I live here. If you've brought supper, the shelf's on the left.","",6.4f,1}
 }};
+inline constexpr std::array kHearthLines{Line::TavernSit,Line::TavernLimit,Line::TavernWork};
+inline constexpr float kHearthWorkPauseSeconds=.55f;
+inline constexpr bool IsHearthLine(Line line) {return line>=Line::TavernSit && line<=Line::TavernWork;}
+inline constexpr bool IsRoadLine(Line line) {return line>=Line::RoadStop && line<=Line::RoadSlow;}
+inline constexpr std::array kRoadLines{Line::RoadStop,Line::RoadAnkle,Line::RoadSlow};
+inline constexpr std::array kTavernConversation{Line::TavernIntroduce,Line::TavernHordeArmy,Line::TavernHoardAnswer};
+inline constexpr bool IsTavernConversationLine(Line line) {
+    return line>=kTavernConversation.front() && line<=kTavernConversation.back();
+}
+inline constexpr bool IsGuidanceLine(Line line) {
+    return line==Line::TavernDirections || line==Line::TavernRegisterDirections || line==Line::TavernExpeditionDirections;
+}
+enum class TavernGuidance { Shrine, Register, Expeditions };
+inline constexpr std::array kShrineReveal{Line::LanternFirstIdentity,Line::LanternKingName,Line::LanternFirstRequest};
+enum class ShrineSpeech { Help, Reveal, Recap, RegisterReturn };
+inline constexpr bool IsShrineLanternLine(Line line) {
+    return line>=Line::LanternFirstHelp && line<=Line::LanternRegisterReturn;
+}
+inline constexpr std::array kRecordKeeperLead{Line::RecordKeeperInspect,Line::RecordKeeperErrand,Line::RecordKeeperDirections};
+inline constexpr std::array kRecordKeeperReading{Line::RecordKeeperRegister,Line::RecordKeeperTwoRoads,Line::RecordKeeperRoadOrder};
+inline constexpr std::array kRecordKeeperFirstReading{Line::RecordKeeperRegister,Line::RecordKeeperTwoRoads,
+    Line::RecordKeeperRoadOrder,Line::RecordKeeperWardOffer};
+inline constexpr std::array kRecordKeeperReward{Line::RecordKeeperReward};
+inline constexpr std::array kRecordKeeperWard{Line::RecordKeeperWardLesson};
+enum class RecordKeeperAction : std::uint8_t { None, ShowRoadMark, ShowRegister, RecallRoutes, CollectReward, LearnAirWard };
+inline constexpr bool IsRecordKeeperLine(Line line) {
+    return (line>=kRecordKeeperLead.front() && line<=kRecordKeeperReading.back()) ||
+        line==Line::RecordKeeperReward || line==Line::RecordKeeperWardOffer || line==Line::RecordKeeperWardLesson;
+}
+inline constexpr std::array kTavernLanternExchange{Line::TavernLanternIdentity,Line::TavernLanternSeals,
+    Line::KitVoiceReaction,Line::KitVoiceListen,Line::KitRoyalClaim,Line::KitRoadHelp};
+inline constexpr bool IsTavernLanternLine(Line line) {
+    return line>=kTavernLanternExchange.front() && line<=kTavernLanternExchange.back();
+}
+inline constexpr bool IsTavernLanternVoice(Line line) {
+    return line==Line::TavernLanternIdentity || line==Line::TavernLanternSeals;
+}
+inline constexpr bool IsSalvagerLine(Line line) {
+    return line>=Line::SalvagerShoreTask && line<=Line::SalvagerShoreReturn;
+}
+inline constexpr bool IsBellwetherLine(Line line) {
+    return IsHearthLine(line) || IsRoadLine(line) || IsTavernConversationLine(line) ||
+        line==Line::TavernWelcome || IsGuidanceLine(line) || IsShrineLanternLine(line) ||
+        IsRecordKeeperLine(line) || IsTavernLanternLine(line) || IsSalvagerLine(line) ||
+        line==Line::TavernLanternFitting || line==Line::RelicDealerOrdinarySale ||
+        line==Line::PrivyRagRequest || line==Line::PrivyRagThanks || line==Line::GardenGrateTalk;
+}
 inline const LineSpec& Spec(Line line) { const auto n=static_cast<unsigned>(line);
     return kLines[n<kLines.size()?n:0]; }
+inline bool RequiresChapterCaption(Line line) {
+    return IsBellwetherLine(line) && Spec(line).audio[0]=='\0';
+}
 struct Tuple { float x=0,y=0,z=0; };
 inline constexpr float kCompanionSpeechHeight=1.4f;
 struct Snapshot {
@@ -49,6 +152,8 @@ struct Snapshot {
     bool waitingForRaise=false,proofAccepted=false,reminderConsumed=false;
     bool forestNightConsumed=false,forestWaystoneConsumed=false;
     bool forestClueConsumed=false,forestVillageConsumed=false;
+    unsigned hearthLinesResolved=0,tavernConversationLinesResolved=0;
+    unsigned tavernLanternLinesStarted=0;
     // A labelled companion fixture contract, not a rendered/admitted Kit actor.
     bool companionVisualAdmitted=false;
 };
@@ -57,10 +162,26 @@ struct Context {
     // Current grounded companion root plus speech height, owned by simulation.
     // Absence retains the last valid source while the actor is unavailable.
     std::optional<Tuple> companionSource;
+    std::optional<Tuple> tavernKeeperSource;
+    std::optional<Tuple> shrineLanternSource;
+    std::optional<Tuple> recordKeeperSource;
+    std::optional<Tuple> salvagerSource;
+    std::optional<Tuple> relicDealerSource;
+    std::optional<Tuple> tavernLanternSource;
+    std::optional<Tuple> privySource;
+    std::optional<Tuple> gardenGrateSource;
+    bool recordKeeperInReach=false,privyInReach=false;
+    bool gardenGrateInReach=false;
+    bool salvagerInReach=false;
+    bool relicDealerInReach=false;
     bool paused=false,alive=true,combat=false,claimed=false,exterior=false,traversing=false;
     bool lanternLow=false,lanternHigh=false;
     bool flaskGuideEnabled=false; unsigned flaskCharges=0;
     bool companionAtBasin=false,playerNearBasin=false;
+    bool tavernInReach=false, kitAtChair=false, kitSeated=false;
+    bool keeperAtHearth=false, tavernDoorInReach=false, kitAtSouthDoor=false;
+    bool tavernFittingInReach=false;
+    bool roadInReach=false, kitCaughtAnkle=false, kitReadyForProtectiveWalk=false;
     std::uint64_t manualRaiseSequence=0,visibleRaiseSequence=0;
 };
 // Logical story recovery only: active speech restarts, with no audio clock,
@@ -73,10 +194,136 @@ struct Progress {
     bool waitingForRaise=false,proofAccepted=false,reminderConsumed=false;
     bool forestNightConsumed=false,forestWaystoneConsumed=false;
     bool forestClueConsumed=false,forestVillageConsumed=false;
+    unsigned hearthLinesResolved=0,tavernConversationLinesResolved=0;
+    unsigned tavernLanternLinesStarted=0;
 };
 class Director {
 public:
     const Snapshot& State() const { return state_; }
+    bool CanOfferTavernLantern(const Context& c) const {
+        return state_.hearthLinesResolved==kHearthLines.size() &&
+            state_.tavernLanternLinesStarted<kTavernLanternExchange.size() &&
+            state_.line==Line::None && continuationCount_==0 && !tavernConversationActive_ &&
+            CanHearTavernLantern(c);
+    }
+    bool CanStartTavernConversation(const Context& c) const {
+        return !tavernConversationActive_ && state_.line==Line::None && continuationCount_==0 &&
+            state_.hearthLinesResolved==kHearthLines.size() &&
+            state_.tavernConversationLinesResolved<kTavernConversation.size() && CanHearTavernConversation(c);
+    }
+    bool TryStartTavernConversation(const Context& c) {
+        if(!CanStartTavernConversation(c))return false;
+        tavernConversationActive_=true;
+        StartNextTavernLine(c);
+        return true;
+    }
+    bool CanShowTavernDirections(const Context& c) const {
+        return state_.line==Line::None && continuationCount_==0 &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() && AtTavernHearth(c);
+    }
+    void ShowTavernDirections(const Context& c,TavernGuidance guidance=TavernGuidance::Shrine) {
+        if(!CanShowTavernDirections(c))return;
+        constexpr std::array notes{Line::TavernDirections,Line::TavernRegisterDirections,Line::TavernExpeditionDirections};
+        Start(notes[static_cast<std::size_t>(guidance)],*c.companionSource,c);
+    }
+    bool CanFitTavernLantern(const Context& c) const {
+        return c.claimed && c.alive && c.exterior && !c.paused && !c.combat && !c.traversing &&
+            c.tavernFittingInReach && c.tavernKeeperSource && Finite(*c.tavernKeeperSource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0;
+    }
+    bool TryStartTavernLanternFitting(const Context& c) {
+        if(!CanFitTavernLantern(c))return false;
+        Start(Line::TavernLanternFitting,*c.tavernKeeperSource,c);
+        return true;
+    }
+    bool TryStartShrineSpeech(ShrineSpeech speech,const Context& c) {
+        if(state_.line!=Line::None || continuationCount_!=0 || shrineRevealIndex_<kShrineReveal.size() ||
+           !CanHearShrineLantern(c))return false;
+        constexpr std::array starts{Line::LanternFirstHelp,Line::LanternFirstIdentity,Line::LanternFirstRequest,
+            Line::LanternRegisterReturn};
+        Start(starts[static_cast<std::size_t>(speech)],*c.shrineLanternSource,c);
+        if(speech==ShrineSpeech::Reveal)shrineRevealIndex_=1;
+        return true;
+    }
+    bool CanStartRecordKeeper(const Context& c) const {
+        return c.recordKeeperInReach && CanHearRecordKeeper(c) && state_.forestClueConsumed &&
+            state_.hearthLinesResolved==kHearthLines.size() && state_.line==Line::None &&
+            continuationCount_==0 && recordKeeperPending_.empty();
+    }
+    bool TryStartRecordKeeper(RecordKeeperAction action,const Context& c) {
+        if(action==RecordKeeperAction::None || !CanStartRecordKeeper(c))return false;
+        switch(action) {
+        case RecordKeeperAction::ShowRoadMark: recordKeeperPending_=kRecordKeeperLead;break;
+        case RecordKeeperAction::ShowRegister: recordKeeperPending_=kRecordKeeperFirstReading;break;
+        case RecordKeeperAction::RecallRoutes: recordKeeperPending_=kRecordKeeperReading;break;
+        case RecordKeeperAction::CollectReward: recordKeeperPending_=kRecordKeeperReward;break;
+        case RecordKeeperAction::LearnAirWard: recordKeeperPending_=kRecordKeeperWard;break;
+        case RecordKeeperAction::None: return false;
+        }
+        StartNextRecordKeeperLine(c);
+        return true;
+    }
+    bool CanStartSalvager(const Context& c) const {
+        return c.salvagerInReach && CanHearSalvager(c) && state_.line==Line::None &&
+            continuationCount_==0 && state_.tavernConversationLinesResolved==kTavernConversation.size();
+    }
+    bool TryStartSalvager(Line line,const Context& c) {
+        if(!IsSalvagerLine(line) || !CanStartSalvager(c))return false;
+        Start(line,*c.salvagerSource,c);
+        return true;
+    }
+    bool CanStartRelicDealer(const Context& c) const {
+        return c.relicDealerInReach && CanHearResident(c,c.relicDealerSource) &&
+            state_.line==Line::None && continuationCount_==0 &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size();
+    }
+    bool TryStartRelicDealer(const Context& c) {
+        if(!CanStartRelicDealer(c))return false;
+        Start(Line::RelicDealerOrdinarySale,*c.relicDealerSource,c);
+        return true;
+    }
+    bool CanStartGardenGrateTalk(const Context& c) const {
+        return c.gardenGrateInReach && CanHearResident(c,c.gardenGrateSource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0 && !tavernConversationActive_ &&
+            recordKeeperPending_.empty() && shrineRevealIndex_>=kShrineReveal.size() && !tavernLanternActive_;
+    }
+    bool TryStartGardenGrateTalk(const Context& c) {
+        if(!CanStartGardenGrateTalk(c))return false;
+        Start(Line::GardenGrateTalk,*c.gardenGrateSource,c);
+        return true;
+    }
+    bool CanStartPrivyRagRequest(const Context& c) const {
+        return !privyRagRequestShown_ && c.privyInReach && CanHearResident(c,c.privySource) &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            state_.line==Line::None && continuationCount_==0 && !tavernConversationActive_ &&
+            recordKeeperPending_.empty() && shrineRevealIndex_>=kShrineReveal.size() && !tavernLanternActive_;
+    }
+    bool CanInteractPrivyRag(const Context& c) const {
+        return c.claimed && c.alive && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
+            state_.tavernConversationLinesResolved==kTavernConversation.size() &&
+            (state_.line==Line::None || state_.line==Line::PrivyRagRequest) &&
+            continuationCount_==0 && !tavernConversationActive_ && recordKeeperPending_.empty() &&
+            shrineRevealIndex_>=kShrineReveal.size() && !tavernLanternActive_;
+    }
+    bool TryStartPrivyRagThanks(const Context& c,Tuple source) {
+        if(!CanInteractPrivyRag(c))return false;
+        privyRagRequestShown_=true;
+        if(state_.line==Line::PrivyRagRequest)Cancel(false);
+        Start(Line::PrivyRagThanks,source,c);
+        return true;
+    }
+    bool TryStartPrivyRagRequest(const Context& c) {
+        if(!CanStartPrivyRagRequest(c))return false;
+        privyRagRequestShown_=true;
+        Start(Line::PrivyRagRequest,*c.privySource,c);
+        return true;
+    }
+    bool HoldingAnkleAssessment() const {
+        return state_.line==Line::RoadStop || state_.line==Line::RoadAnkle ||
+            (roadLinesResolved_==kRoadLines.size()-1 && state_.line!=Line::RoadSlow);
+    }
     bool BasinGuidePending() const {
         if(state_.line==Line::FlaskEmpty || state_.line==Line::FlaskTopup)return true;
         for(std::size_t i=0;i<continuationCount_;++i)
@@ -91,13 +338,17 @@ public:
     }
     Progress ExportProgress() const {
         Progress p;
-        p.activeLine=state_.line;p.continuations=continuations_;p.continuationCount=continuationCount_;
+        p.activeLine=IsBellwetherLine(state_.line) ? Line::None : state_.line;
+        p.continuations=continuations_;p.continuationCount=continuationCount_;
         p.grateConsumed=state_.grateConsumed;p.rescueConsumed=state_.rescueConsumed;
         p.reunionStarted=state_.reunionStarted;p.waitingForRaise=state_.waitingForRaise;
         p.proofAccepted=state_.proofAccepted;p.reminderConsumed=state_.reminderConsumed;
         p.forestNightConsumed=state_.forestNightConsumed;
         p.forestWaystoneConsumed=state_.forestWaystoneConsumed;
         p.forestClueConsumed=state_.forestClueConsumed;p.forestVillageConsumed=state_.forestVillageConsumed;
+        p.hearthLinesResolved=state_.hearthLinesResolved;
+        p.tavernConversationLinesResolved=state_.tavernConversationLinesResolved;
+        p.tavernLanternLinesStarted=state_.tavernLanternLinesStarted;
         return p;
     }
     static bool ValidateProgress(const Progress& p) {
@@ -105,9 +356,15 @@ public:
             // Keeper speech belongs to a live combat emitter, not either safe
             // campaign boundary. ForestWait currently has no logical trigger.
             return static_cast<std::uint32_t>(line)<kLines.size() &&
-                line!=Line::KeeperSense && line!=Line::KeeperCloser && line!=Line::ForestWait;
+                line!=Line::KeeperSense && line!=Line::KeeperCloser && line!=Line::ForestWait &&
+                !IsBellwetherLine(line);
         };
         if(!recoverable(p.activeLine) || p.continuationCount>p.continuations.size() ||
+           p.hearthLinesResolved>kHearthLines.size() || (p.hearthLinesResolved && !p.forestVillageConsumed) ||
+           p.tavernConversationLinesResolved>kTavernConversation.size() ||
+           p.tavernLanternLinesStarted>kTavernLanternExchange.size() ||
+           (p.tavernLanternLinesStarted && p.hearthLinesResolved!=kHearthLines.size()) ||
+           (p.tavernConversationLinesResolved && p.hearthLinesResolved!=kHearthLines.size()) ||
            (p.waitingForRaise && (!p.reunionStarted || p.proofAccepted)) ||
            (p.reunionStarted && !p.waitingForRaise && !p.proofAccepted) ||
            (p.proofAccepted && !p.reunionStarted) ||
@@ -182,6 +439,15 @@ public:
         state_.forestNightConsumed=p.forestNightConsumed;
         state_.forestWaystoneConsumed=p.forestWaystoneConsumed;
         state_.forestClueConsumed=p.forestClueConsumed;state_.forestVillageConsumed=p.forestVillageConsumed;
+        state_.hearthLinesResolved=p.hearthLinesResolved;hearthPauseSeconds_=0;roadLinesResolved_=0;
+        state_.tavernConversationLinesResolved=p.tavernConversationLinesResolved;
+        state_.tavernLanternLinesStarted=p.tavernLanternLinesStarted;
+        tavernLanternActive_=false;
+        privyRagRequestShown_=false;
+        tavernLanternRaiseFloor_=c.manualRaiseSequence;
+        tavernConversationActive_=tavernWelcomeStarted_=false;
+        shrineRevealIndex_=kShrineReveal.size();
+        recordKeeperPending_={};
         pending_=Line::None;continuations_=p.continuations;continuationCount_=p.continuationCount;
         raiseFloor_=std::max(raiseFloor,c.manualRaiseSequence);waitingSeconds_=0;
         if(p.activeLine!=Line::None) {
@@ -198,6 +464,7 @@ public:
     void Reset(bool preserveOnce=false) {
         const auto old=state_;const auto oldRaiseFloor=raiseFloor_;
         const auto oldContinuations=continuations_;const auto oldContinuationCount=continuationCount_;
+        const auto oldPrivyRagRequestShown=privyRagRequestShown_;
         state_={}; state_.generation=Next(old.generation);
         if(preserveOnce) { state_.grateConsumed=old.grateConsumed;state_.rescueConsumed=old.rescueConsumed;
             state_.proofAccepted=old.proofAccepted;state_.reminderConsumed=old.reminderConsumed;
@@ -205,13 +472,26 @@ public:
             state_.forestNightConsumed=old.forestNightConsumed;
             state_.forestWaystoneConsumed=old.forestWaystoneConsumed;
             state_.forestClueConsumed=old.forestClueConsumed;
-            state_.forestVillageConsumed=old.forestVillageConsumed; }
+            state_.forestVillageConsumed=old.forestVillageConsumed;
+            state_.hearthLinesResolved=old.hearthLinesResolved;
+            state_.tavernConversationLinesResolved=old.tavernConversationLinesResolved;
+            state_.tavernLanternLinesStarted=old.tavernLanternLinesStarted; }
+        privyRagRequestShown_=preserveOnce&&oldPrivyRagRequestShown;
+        tavernLanternActive_=false;
+        tavernLanternRaiseFloor_=0;
+        tavernConversationActive_=false;
+        shrineRevealIndex_=kShrineReveal.size();
+        recordKeeperPending_={};
+        if(!preserveOnce)tavernWelcomeStarted_=false;
         pending_=Line::None; continuations_={}; continuationCount_=0;
         if(preserveOnce) { continuations_=oldContinuations;continuationCount_=oldContinuationCount; }
-        raiseFloor_=preserveOnce?oldRaiseFloor:0; waitingSeconds_=0;
+        if(!preserveOnce)roadLinesResolved_=0;
+        else if(IsRoadLine(old.line))roadLinesResolved_=kRoadLines.size();
+        raiseFloor_=preserveOnce?oldRaiseFloor:0; waitingSeconds_=hearthPauseSeconds_=0;
     }
     // Lifecycle cancellation invalidates callbacks but retains logical once state.
     void Suspend() { if(state_.line==Line::Grate) state_.grateConsumed=true;
+        if(IsRoadLine(state_.line))roadLinesResolved_=kRoadLines.size();
         Cancel(); pending_=Line::None; }
     bool Complete(Line line,std::uint64_t generation) {
         if(line==Line::None || state_.line!=line || state_.generation!=generation) return false;
@@ -219,7 +499,7 @@ public:
     }
     void Skip() { if(state_.line!=Line::None) Finish(); }
     void Request(Line line,Tuple source,const Context& c) {
-        if(line==Line::None || static_cast<std::uint32_t>(line)>=kLines.size()) return;
+        if(line==Line::None || static_cast<std::uint32_t>(line)>=kLines.size() || IsBellwetherLine(line)) return;
         if(state_.line!=Line::None && Spec(line).priority<=Spec(state_.line).priority &&
             !(line==Line::ReunionProof && (state_.line==Line::ReunionQuestion||state_.line==Line::ReunionHint))) {
             if(line==Line::RescueRope) Queue(line);
@@ -232,6 +512,34 @@ public:
         state_.paused=c.paused; if(c.paused) return;
         const float dt=std::isfinite(seconds)?std::clamp(seconds,0.0f,0.05f):0;
         if(!c.alive) { Suspend(); return; }
+        const bool hearsHearth=c.tavernInReach && c.exterior && !c.traversing && !c.combat && c.companionSource.has_value();
+        const bool hearsRoad=c.roadInReach && c.exterior && !c.traversing && !c.combat && c.companionSource.has_value();
+        const bool hearsWelcome=c.tavernDoorInReach && c.exterior && !c.traversing && !c.combat &&
+            c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
+        if(state_.line==Line::TavernWelcome && !hearsWelcome)Cancel(false);
+        if((state_.line==Line::PrivyRagRequest || state_.line==Line::PrivyRagThanks) &&
+           !CanHearResident(c,c.privySource))Cancel(false);
+        if(state_.line==Line::GardenGrateTalk && !CanHearResident(c,c.gardenGrateSource))Cancel(false);
+        if(state_.line==Line::TavernLanternFitting && (!c.tavernFittingInReach || c.combat))Cancel(false);
+        if(IsGuidanceLine(state_.line) && !AtTavernHearth(c))Cancel(false);
+        const bool hearsShrine=CanHearShrineLantern(c);
+        if(!hearsShrine && (IsShrineLanternLine(state_.line) || shrineRevealIndex_<kShrineReveal.size()))
+            Cancel(false);
+        const bool hearsRecordKeeper=CanHearRecordKeeper(c);
+        if(!hearsRecordKeeper && (IsRecordKeeperLine(state_.line) || !recordKeeperPending_.empty()))
+            Cancel(false);
+        if(IsSalvagerLine(state_.line) && !CanHearSalvager(c))Cancel(false);
+        if(state_.line==Line::RelicDealerOrdinarySale && !CanHearResident(c,c.relicDealerSource))Cancel(false);
+        if(tavernLanternActive_ && (!CanHearTavernLantern(c) || !c.lanternHigh))Cancel(false);
+        if(tavernConversationActive_ && !CanHearTavernConversation(c)) {
+            if(IsTavernConversationLine(state_.line))Cancel(false);
+            tavernConversationActive_=false;
+        }
+        if(IsHearthLine(state_.line) && !hearsHearth) Cancel(false);
+        if(!hearsRoad) {
+            if(IsRoadLine(state_.line)) Cancel(false);
+            if(roadLinesResolved_ || c.kitCaughtAnkle)roadLinesResolved_=kRoadLines.size();
+        }
         const float dx=c.player.x-2.6f,dz=c.player.z+8.6f;
         const bool audible=dx*dx+dz*dz<=16.0f && !c.exterior;
         if((c.combat || !audible) && state_.line==Line::Grate) {
@@ -287,16 +595,88 @@ public:
                 Start(line,SourceFor(line),c);
             }
         }
+        StepRoad(c,hearsRoad);
+        if(!tavernWelcomeStarted_ && state_.forestVillageConsumed && hearsWelcome && c.kitAtSouthDoor &&
+           state_.line==Line::None && continuationCount_==0) {
+            tavernWelcomeStarted_=true;
+            Start(Line::TavernWelcome,*c.tavernKeeperSource,c);
+        }
+        StepHearth(c,hearsHearth,dt);
+        if(tavernConversationActive_ && state_.line==Line::None)StartNextTavernLine(c);
+        if(hearsShrine && state_.line==Line::None && continuationCount_==0 && shrineRevealIndex_<kShrineReveal.size())
+            Start(kShrineReveal[shrineRevealIndex_++],*c.shrineLanternSource,c);
+        if(hearsRecordKeeper && state_.line==Line::None && continuationCount_==0 && !recordKeeperPending_.empty())
+            StartNextRecordKeeperLine(c);
+        StepTavernLantern(c);
+        TryStartPrivyRagRequest(c);
         RefreshCompanionSpatial(c);
     }
 private:
+    static bool Finite(Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);}
+    static bool CanHearShrineLantern(const Context& c) {
+        return c.alive && c.claimed && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
+            c.shrineLanternSource && Finite(*c.shrineLanternSource) && Finite(c.listener) && std::isfinite(c.yaw);
+    }
+    static bool CanHearResident(const Context& c,const std::optional<Tuple>& source) {
+        return c.alive && c.claimed && c.exterior && !c.paused && !c.combat && !c.traversing && c.kitSeated &&
+            source && Finite(*source) && Finite(c.listener) && std::isfinite(c.yaw);
+    }
+    static bool CanHearRecordKeeper(const Context& c) {return CanHearResident(c,c.recordKeeperSource);}
+    static bool CanHearSalvager(const Context& c) {
+        return CanHearResident(c,c.salvagerSource);
+    }
+    void StartNextRecordKeeperLine(const Context& c) {
+        const auto line=recordKeeperPending_.front();
+        recordKeeperPending_=recordKeeperPending_.subspan(1);
+        Start(line,*c.recordKeeperSource,c);
+    }
+    static bool AtTavernHearth(const Context& c) {
+        return c.alive && c.exterior && !c.paused && !c.combat && !c.traversing && c.tavernInReach &&
+            c.kitSeated && c.companionSource && Finite(*c.companionSource) && Finite(c.listener) && std::isfinite(c.yaw);
+    }
+    static bool CanHearTavernLantern(const Context& c) {
+        return c.claimed && AtTavernHearth(c) && c.tavernLanternSource && Finite(*c.tavernLanternSource);
+    }
+    void StepTavernLantern(const Context& c) {
+        if(!tavernLanternActive_) {
+            if(!CanOfferTavernLantern(c) || c.lanternLow) {
+                tavernLanternRaiseFloor_=c.manualRaiseSequence;
+                return;
+            }
+            if(!c.lanternHigh || c.manualRaiseSequence<=tavernLanternRaiseFloor_ ||
+               c.visibleRaiseSequence!=c.manualRaiseSequence)return;
+            tavernLanternRaiseFloor_=c.manualRaiseSequence;
+            tavernLanternActive_=true;
+        }
+        if(state_.line!=Line::None)return;
+        if(state_.tavernLanternLinesStarted==kTavernLanternExchange.size()) {
+            tavernLanternActive_=false;
+            return;
+        }
+        const auto line=kTavernLanternExchange[state_.tavernLanternLinesStarted++];
+        Start(line,IsTavernLanternVoice(line)?*c.tavernLanternSource:*c.companionSource,c);
+    }
+    static bool CanHearTavernConversation(const Context& c) {
+        return AtTavernHearth(c) && c.keeperAtHearth && c.tavernKeeperSource && Finite(*c.tavernKeeperSource);
+    }
+    void StartNextTavernLine(const Context& c) {
+        const auto line=kTavernConversation[state_.tavernConversationLinesResolved];
+        Start(line,line==Line::TavernHordeArmy?*c.tavernKeeperSource:*c.companionSource,c);
+    }
     void BindCompanionSpatial(const Context& c) {
-        if(state_.line<Line::ReunionQuestion || state_.line>Line::FlaskTopup) return;
-        const auto finite=[](Tuple t) {return std::isfinite(t.x)&&std::isfinite(t.y)&&std::isfinite(t.z);};
-        if(!finite(c.listener) || !std::isfinite(c.yaw) ||
-           (c.companionSource && !finite(*c.companionSource))) return;
+        if(state_.line<Line::ReunionQuestion || (state_.line>Line::FlaskTopup && !IsBellwetherLine(state_.line))) return;
+        const bool fromKeeper=state_.line==Line::TavernHordeArmy || state_.line==Line::TavernWelcome ||
+            state_.line==Line::TavernLanternFitting;
+        const auto& source=IsShrineLanternLine(state_.line)?c.shrineLanternSource:
+            IsTavernLanternVoice(state_.line)?c.tavernLanternSource:
+            (state_.line==Line::PrivyRagRequest || state_.line==Line::PrivyRagThanks)?c.privySource:
+            state_.line==Line::GardenGrateTalk?c.gardenGrateSource:
+            IsSalvagerLine(state_.line)?c.salvagerSource:
+            state_.line==Line::RelicDealerOrdinarySale?c.relicDealerSource:
+            IsRecordKeeperLine(state_.line)?c.recordKeeperSource:(fromKeeper?c.tavernKeeperSource:c.companionSource);
+        if(!Finite(c.listener) || !std::isfinite(c.yaw) || (source && !Finite(*source))) return;
         state_.listener=c.listener;state_.listenerYaw=c.yaw;
-        if(c.companionSource) state_.source=*c.companionSource;
+        if(source) state_.source=*source;
     }
     static std::uint64_t Next(std::uint64_t x) { return x==UINT64_MAX?x:x+1; }
     static Tuple AtRoutePoint(std::size_t index,float heightOffset=1.4f) {
@@ -347,6 +727,24 @@ private:
         if(clueReached && !state_.forestVillageConsumed && fromF04<=3.0f)
             Queue(Line::ForestVillage);
     }
+    void StepRoad(const Context& c,bool hearsRoad) {
+        if(!state_.forestVillageConsumed || !hearsRoad || !c.kitCaughtAnkle ||
+           state_.line!=Line::None || continuationCount_ || roadLinesResolved_>=kRoadLines.size())return;
+        const auto line=kRoadLines[roadLinesResolved_];
+        if(line==Line::RoadSlow && !c.kitReadyForProtectiveWalk)return;
+        Start(line,*c.companionSource,c);
+    }
+    void StepHearth(const Context& c,bool hearsHearth,float dt) {
+        if(!state_.forestVillageConsumed) return;
+        auto& resolved=state_.hearthLinesResolved;
+        // Arriving after the chair is occupied still permits the two seated
+        // lines. The earlier sit remark expires with the act of sitting.
+        if(c.kitSeated && resolved==0 && state_.line!=Line::TavernSit)resolved=1;
+        if(!hearsHearth || state_.line!=Line::None || continuationCount_ || resolved>=kHearthLines.size())return;
+        if(resolved==0 ? !c.kitAtChair : !c.kitSeated)return;
+        hearthPauseSeconds_=std::max(0.f,hearthPauseSeconds_-dt);
+        if(hearthPauseSeconds_==0)Start(kHearthLines[resolved],*c.companionSource,c);
+    }
     void MarkOnce(Line line) {
         switch(line) {
         case Line::ForestNight: state_.forestNightConsumed=true;break;
@@ -357,12 +755,23 @@ private:
         }
     }
     void Cancel(bool clearContinuations=true) { state_.line=Line::None;state_.elapsed=0;state_.duration=0;
+        tavernConversationActive_=false;
+        tavernLanternActive_=false;
+        shrineRevealIndex_=kShrineReveal.size();
+        recordKeeperPending_={};
         state_.generation=Next(state_.generation);
         // A priority interruption invalidates only the active callback. Preserve
         // the ordered once-only story responses; lifecycle/local cancellation
         // still discards its queue explicitly.
         if(clearContinuations) { continuations_={};continuationCount_=0; } }
     void Finish() { if(state_.line==Line::Grate) state_.grateConsumed=true;
+        if(IsRoadLine(state_.line))++roadLinesResolved_;
+        if(IsTavernConversationLine(state_.line) && ++state_.tavernConversationLinesResolved==kTavernConversation.size())
+            tavernConversationActive_=false;
+        if(IsHearthLine(state_.line)) {
+            ++state_.hearthLinesResolved;
+            if(state_.line==Line::TavernLimit)hearthPauseSeconds_=kHearthWorkPauseSeconds;
+        }
         state_.line=Line::None;state_.generation=Next(state_.generation);state_.elapsed=0; }
     void Start(Line line,Tuple source,const Context& c) {
         state_.generation=Next(state_.generation);state_.line=line;state_.duration=Spec(line).duration;
@@ -373,6 +782,14 @@ private:
     }
     Snapshot state_{};Line pending_=Line::None;
     std::array<Line,8> continuations_{};std::size_t continuationCount_=0;
-    std::uint64_t raiseFloor_=0;float waitingSeconds_=0;
+    std::size_t roadLinesResolved_=0;
+    std::size_t shrineRevealIndex_=kShrineReveal.size();
+    std::span<const Line> recordKeeperPending_;
+    bool tavernConversationActive_=false;
+    bool tavernWelcomeStarted_=false;
+    bool tavernLanternActive_=false;
+    bool privyRagRequestShown_=false;
+    std::uint64_t tavernLanternRaiseFloor_=0;
+    std::uint64_t raiseFloor_=0;float waitingSeconds_=0,hearthPauseSeconds_=0;
 };
 } // namespace horde::gameplay::dialogue

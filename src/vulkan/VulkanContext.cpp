@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -17,6 +18,24 @@ namespace
 {
 
 constexpr char kNoProbeResultMessage[] = "No Vulkan physical devices could be enumerated.";
+
+std::optional<std::vector<VkExtensionProperties>> EnumerateExtensions(VkPhysicalDevice device)
+{
+    for (unsigned attempt = 0; attempt < 3u; ++attempt)
+    {
+        std::uint32_t count = 0;
+        if (vkEnumerateDeviceExtensionProperties(device, nullptr, &count, nullptr) != VK_SUCCESS || count > 4096u)
+            return std::nullopt;
+        if (!count) return std::vector<VkExtensionProperties>{};
+        std::vector<VkExtensionProperties> extensions(count);
+        const auto result = vkEnumerateDeviceExtensionProperties(device, nullptr, &count, extensions.data());
+        if (result == VK_INCOMPLETE) continue;
+        if (result != VK_SUCCESS || count > extensions.size()) return std::nullopt;
+        extensions.resize(count);
+        return extensions;
+    }
+    return std::nullopt;
+}
 
 std::string ToHex(std::uint32_t value)
 {
@@ -147,6 +166,45 @@ bool IsBetterMode(const RtMode candidateMode, const RtMode currentMode)
 
 } // namespace
 
+void QueryRtDeviceFeatures(VkPhysicalDevice physicalDevice,
+    PFN_vkGetPhysicalDeviceFeatures2 query, DeviceCapabilities& capabilities)
+{
+    capabilities.features = {};
+    capabilities.featuresQueried = {};
+    if (!query) return;
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR acceleration{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR pipeline{
+        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQuery{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
+    VkPhysicalDeviceBufferDeviceAddressFeatures address{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES};
+    VkPhysicalDeviceFeatures2 features2{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2};
+
+    const auto& e = capabilities.extensions;
+    const bool enumerated = capabilities.extensionsEnumerated;
+    const auto add = [&](auto& feature, bool available) {
+        if (!available) return;
+        feature.pNext = features2.pNext;
+        features2.pNext = &feature;
+    };
+    auto& queried = capabilities.featuresQueried;
+    queried.accelerationStructure = enumerated && e.accelerationStructure;
+    queried.rayTracingPipeline = enumerated && e.rayTracingPipeline;
+    queried.rayQuery = enumerated && e.rayQuery;
+    queried.bufferDeviceAddress = capabilities.identity.vulkanApiVersion >= VK_API_VERSION_1_2 ||
+        (enumerated && e.bufferDeviceAddress);
+    add(address, queried.bufferDeviceAddress);
+    add(rayQuery, queried.rayQuery);
+    add(pipeline, queried.rayTracingPipeline);
+    add(acceleration, queried.accelerationStructure);
+    if (!features2.pNext) return;
+
+    query(physicalDevice, &features2);
+    capabilities.features = {acceleration.accelerationStructure == VK_TRUE,
+        pipeline.rayTracingPipeline == VK_TRUE, rayQuery.rayQuery == VK_TRUE, address.bufferDeviceAddress == VK_TRUE};
+}
+
 VulkanContext::~VulkanContext()
 {
     if (instance_ != VK_NULL_HANDLE)
@@ -181,13 +239,12 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.diagnostics.push_back("Driver version: " + FormatDriverVersionText(capabilities.identity.driverVersion));
     capabilities.diagnostics.push_back("Vulkan API version: " + VersionTextFromPacked(capabilities.identity.vulkanApiVersion));
 
-    std::uint32_t extensionCount = 0;
-    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-    vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, extensions.data());
-
+    const auto extensions = EnumerateExtensions(physicalDevice);
+    capabilities.extensionsEnumerated = extensions.has_value();
+    if (!extensions)
+        capabilities.diagnostics.push_back("Device extension enumeration did not complete.");
     bool driverPropertiesExtension = false;
-    for (const auto& extension : extensions)
+    if (extensions) for (const auto& extension : *extensions)
     {
         if (extension.extensionName == std::string(VK_KHR_DRIVER_PROPERTIES_EXTENSION_NAME))
         {
@@ -242,50 +299,13 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.diagnostics.push_back(std::string("Driver properties: ") +
         (capabilities.identity.driverProperties.available ? "available" : "unavailable"));
 
-    VkPhysicalDeviceFeatures2 features2{};
-    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures{
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR};
-    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures{
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR};
-    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR};
-    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures{
-        VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES_KHR};
-
-    features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-    features2.pNext = &accelerationStructureFeatures;
-    accelerationStructureFeatures.pNext = &rayTracingPipelineFeatures;
-    rayTracingPipelineFeatures.pNext = &rayQueryFeatures;
-    rayQueryFeatures.pNext = &bufferDeviceAddressFeatures;
-
-    bool features2Retrieved = false;
-
-    const auto getPhysicalDeviceFeatures2 = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2>(
+    // The probe creates a core Vulkan 1.2 instance with no KHR properties2 extension.
+    const auto queryFeatures = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2>(
         vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceFeatures2"));
-    if (getPhysicalDeviceFeatures2 != nullptr)
-    {
-        getPhysicalDeviceFeatures2(physicalDevice, &features2);
-        features2Retrieved = true;
-    }
-    else
-    {
-        const auto getPhysicalDeviceFeatures2KHR = reinterpret_cast<PFN_vkGetPhysicalDeviceFeatures2KHR>(
-            vkGetInstanceProcAddr(instance_, "vkGetPhysicalDeviceFeatures2KHR"));
-        if (getPhysicalDeviceFeatures2KHR != nullptr)
-        {
-            getPhysicalDeviceFeatures2KHR(physicalDevice, &features2);
-            features2Retrieved = true;
-        }
-    }
-
-    if (!features2Retrieved)
-    {
-        capabilities.diagnostics.push_back("vkGetPhysicalDeviceFeatures2 unavailable on this platform; assuming RT extension features unavailable.");
-    }
-
-    capabilities.features.accelerationStructure = accelerationStructureFeatures.accelerationStructure == VK_TRUE;
-    capabilities.features.rayTracingPipeline = rayTracingPipelineFeatures.rayTracingPipeline == VK_TRUE;
-    capabilities.features.rayQuery = rayQueryFeatures.rayQuery == VK_TRUE;
-    capabilities.features.bufferDeviceAddress = bufferDeviceAddressFeatures.bufferDeviceAddress == VK_TRUE;
+    if (!queryFeatures)
+        capabilities.diagnostics.push_back("vkGetPhysicalDeviceFeatures2 unavailable; RT features were not queried.");
+    if (properties.apiVersion >= VK_API_VERSION_1_1)
+        QueryRtDeviceFeatures(physicalDevice, queryFeatures, capabilities);
     const auto presentation = QueryPresentDeviceSupport(physicalDevice, instance_);
     capabilities.diagnostics.push_back(std::string("Optional VK_KHR_swapchain_maintenance1 advertised: ") +
         (presentation.khr ? "yes" : "no"));
@@ -297,7 +317,7 @@ DeviceCapabilities VulkanContext::ProbePhysicalDevice(const VkPhysicalDevice phy
     capabilities.rtMode = raytracing::EvaluateRtMode(
         capabilities.extensions, capabilities.features, capabilities.identity.vulkanApiVersion);
 
-    if (capabilities.rtMode == RtMode::Unsupported)
+    if (capabilities.rtMode == RtMode::Unsupported && capabilities.extensionsEnumerated)
     {
         std::vector<std::string> missing;
         ExtensionSupport effectiveRequirements = capabilities.extensions;

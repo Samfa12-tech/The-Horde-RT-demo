@@ -1,14 +1,15 @@
 // Included inside the Debug-only hidden campaign validator. This is a scoped
-// native input/persistence harness, not a natural victory or physical playtest.
+// native input/persistence harness for scripted controls.
 bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
 {
     unsigned sources=0,workingAuto=0;std::error_code error;
     for(const auto& item:std::filesystem::directory_iterator(directory,error)) {
         if(error || item.is_symlink(error) || error || !item.is_regular_file(error) || error)return false;
         const auto name=item.path().filename().string();
-        if(name=="manifest.json" || name=="slot-1-manual.hrd"){++sources;continue;}
+        if(name=="manifest.json" || (!gRouteNewGame && name=="slot-1-manual.hrd")){++sources;continue;}
         if(gRouteReturnRecovery && name=="slot-1-auto.hrd"){++workingAuto;continue;}
-        if(name==".slot-1-manual.hrd.lock" || ((after || gRouteReturnRecovery) && name==".slot-1-auto.hrd.lock") || (after && name==".slot-2-manual.hrd.lock")) {
+        if(name==".slot-1-manual.hrd.lock" || ((after || gRouteReturnRecovery) && name==".slot-1-auto.hrd.lock") ||
+            (after && (name==".slot-2-manual.hrd.lock" || (gBellwetherPackagedPlaytest && name==".slot-2-auto.hrd.lock")))) {
             if(item.file_size(error)!=0 || error)return false;continue;
         }
         if(after && (name=="slot-1-auto.hrd" || name=="slot-2-manual.hrd" || name==kTextReportFilename ||
@@ -16,18 +17,24 @@ bool HiddenRouteFilesAllowed(const std::filesystem::path& directory,bool after)
             name=="route-lower.png" || name=="route-lookout.png" || name=="route-return.png" || name=="route-recovered.png"))continue;
         if(after && (gRouteKitTurnStartValidation || gRouteNaturalWalkValidation || horde::gameplay::simulation::ProductionGameSimulationConfig().companionTurnStart) && (name=="route-kit-depart-turn.png" || name=="route-kit-depart-walk.png" ||
             name=="route-kit-corner-turn.png" || name=="route-kit-corner-walk.png"))continue;
+        if (after && gBellwetherPackagedPlaytest &&
+            (name=="slot-2-auto.hrd" || name=="route-bellwether-tavern.png" || name=="route-bellwether-reloaded.png")) continue;
+        if(after && gRouteNewGame && (name=="route-opening.png" || name=="route-keeper-defeated.png"))continue;
         return false;
     }
-    return !error && sources==2 && (!gRouteReturnRecovery || workingAuto==1);
+    return !error && sources==(gRouteNewGame?1u:2u) && (!gRouteReturnRecovery || workingAuto==1);
 }
 
 bool PrepareHiddenRouteFixture(const std::filesystem::path& directory)
 {
-    const std::string_view manifest=gRouteReturnRecovery?
+    const std::string_view manifest=gRouteNewGame?
+        "{\"evidenceClass\":\"empty profile for the scripted New Game route\"}\n":gRouteReturnRecovery?
         "{\"evidenceClass\":\"recovery of actual R3 lower-return autosave; original post-Keeper seed remains explicit\",\"record\":\"slot-1-auto.hrd\",\"sourceSha256\":\"031ced0a83a136861833ab4e9930ae6ea28c7c6e86d47c61c80ba24e8778472b\"}\n":
         "{\"evidenceClass\":\"seeded post-Keeper lower start; subsequent input-driven progression\",\"record\":\"slot-1-manual.hrd\",\"checkpoint\":\"LowerClaimed\",\"contentRevision\":1,\"hearts\":2}\n";
     if(!HiddenRouteFilesAllowed(directory,false) || !ReadHiddenLookoutManifest(directory/"manifest.json",gHiddenLookout.manifest) ||
-        gHiddenLookout.manifest!=manifest || campaign::storage::Read(directory,"slot-1-manual.hrd",gHiddenLookout.source).status!=campaign::storage::Status::Read)return false;
+        gHiddenLookout.manifest!=manifest)return false;
+    if(!gRouteNewGame && campaign::storage::Read(directory,"slot-1-manual.hrd",gHiddenLookout.source).status!=
+        campaign::storage::Status::Read)return false;
     if(gRouteReturnRecovery) {
         campaign::storage::StoredCheckpoint working;
         const auto& c=gHiddenLookout.source.checkpoint;
@@ -35,7 +42,7 @@ bool PrepareHiddenRouteFixture(const std::filesystem::path& directory)
             campaign::storage::Read(directory,"slot-1-auto.hrd",working).status!=campaign::storage::Status::Read ||
             working.encoded!=gHiddenLookout.source.encoded || !campaign::Validate(c) || c.schema!=1 || c.contentRevision!=2 ||
             c.id!=campaign::CheckpointId::LowerClaimed || c.vitality!=2 || !c.firstAscentCompleted || !campaign::CompletedForestProgress(c.dialogue))return false;
-    } else {
+    } else if(!gRouteNewGame) {
     // Exact exporter value: two hearts, both victories and the claim seeded;
     // ascent, reunion, proof and every forest completion flag remain unset.
     campaign::Checkpoint expected;expected.vitality=2;
@@ -56,7 +63,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     const bool turnStartConfigured=ctx.simulation.Snapshot().chapterCompanion.motion.turnStartEnabled;
     std::ostringstream milestones;bool hasMilestone=false;
     auto& receipt=gHiddenLookout.receipt;
-    receipt<<"{\"schema\":1,\"evidenceClass\":\""<<(gRouteReturnRecovery?
+    receipt<<"{\"schema\":1,\"evidenceClass\":\""<<(gRouteNewGame?
+        "hidden native RT scripted New Game with ordinary combat inputs and damage enabled":gRouteReturnRecovery?
         "hidden native RT recovery and repeat ascent from actual R3 lower-return autosave; original post-Keeper seed remains explicit":
         "hidden native RT input-driven continuation from seeded post-Keeper lower checkpoint; not natural victory or physical play")<<"\",\"checks\":[";
     const auto check=[&](bool ok,const char* name){
@@ -80,7 +88,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     struct Restore {VulkanSurfaceContext& c;bool active;~Restore(){c.chapterRoundTripCaptureActive=active;}} restore{ctx,ctx.chapterRoundTripCaptureActive};
     ctx.chapterRoundTripCaptureActive=true;
     std::ofstream rows(gCampaignValidationDirectory/"route-frames.csv");
-    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village,hearts,lantern_high,saw_ascent,saw_pull_up,kit_turn_start,kit_motion_mode,kit_turn_phase,kit_walk_weight,player_yaw,kit_yaw\n";
+    rows<<"frame,tick,world_generation,x,y,z,grounded,modern_rules,rope_phase,exterior,stowed,proof,line,kit_grounded,kit_waypoint,boundary,boundary_revision,operation_revision,outcome,kit_x,kit_z,kit_wait,forest_night,forest_waystone,forest_clue,forest_village,hearts,lantern_high,saw_ascent,saw_pull_up,kit_turn_start,kit_motion_mode,kit_turn_phase,kit_walk_weight,player_yaw,kit_yaw,half_heart,first_guard_health,second_guard_health,keeper_health,keeper_phase,attacks,parries,dodges\n";
     const auto render=[&]{
         if(++frames>6000 || !safe("route-before-frame",false))return false;
         const auto tick=ctx.simulation.Snapshot().tickIndex;
@@ -99,7 +107,10 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             <<','<<(s.interaction.heldLightPose==interactions::HeldLightPose::High)<<','<<s.rescue.sawAscent<<','<<s.rescue.sawPullUp
             <<','<<s.chapterCompanion.motion.turnStartEnabled<<','<<unsigned(s.chapterCompanion.motion.mode)
             <<','<<s.chapterCompanion.motion.turnPhase<<','<<s.chapterCompanion.locomotion.walkWeight
-            <<','<<s.playerYawRadians<<','<<s.chapterCompanion.yaw<<'\n';
+            <<','<<s.playerYawRadians<<','<<s.chapterCompanion.yaw<<','<<s.playerVitals.halfHeart
+            <<','<<s.skeletonEnemies[0].health<<','<<s.skeletonEnemies[1].health<<','<<s.lich.health
+            <<','<<unsigned(s.lich.phase)<<','<<s.lastConsumedAttackSequence
+            <<','<<s.lastConsumedParrySequence<<','<<s.lastConsumedDodgeSequence<<'\n';
         if(frames%120==0)rows.flush();
         return presented && ctx.lastFramePresentation==horde::telemetry::RtPresentationOutcome::Presented &&
             s.chapterCompanion.motion.turnStartEnabled==turnStartConfigured &&
@@ -118,8 +129,11 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     };
     const auto catalogue=[&]{for(const auto& e:ctx.campaign->Catalogue())if(e.status==campaign::CatalogueStatus::Checking)return false;return true;};
     const auto loadComplete=[&]{return ctx.campaignBarrier.State().phase==campaign::CampaignLoadBarrier::Phase::Complete;};
+    const auto playing=[&]{return !ctx.campaignPause && !ctx.simulationPaused && !ctx.campaignMenu->Visible();};
     const auto step=[&](simulation::InputSnapshot input){
-        if(input.hasAuthoritativePlayerPose || input.damageEnabled || input.commands.attack || input.commands.parry || input.commands.dodge)return false;
+        if(input.hasAuthoritativePlayerPose ||
+            (!gRouteNewGame && (input.damageEnabled || input.commands.attack || input.commands.parry || input.commands.dodge)))return false;
+        input.damageEnabled=gRouteNewGame;
         input.paused=false;ctx.simulationInput=input;
         ctx.inputPublicationSequence=std::max(ctx.inputPublicationSequence,ctx.simulation.Snapshot().inputPublicationSequence)+1;
         ctx.simulation.StepFixed(input,1.f/60.f,ctx.inputPublicationSequence);
@@ -127,7 +141,7 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             ctx.campaignPhase!=CampaignMenu::Phase::Failed;
     };
     const auto neutral=[&]{auto i=ctx.simulationInput;i.moveForward=i.moveStrafe=0;i.runHeld=i.crouchHeld=false;
-        i.damageEnabled=i.tutorialEnabled=false;i.hasAuthoritativePlayerPose=false;return i;};
+        i.damageEnabled=gRouteNewGame;i.tutorialEnabled=false;i.hasAuthoritativePlayerPose=false;return i;};
     const auto capture=[&](const char* name){
         if(!safe("route-before-readback") || !DrainCampaignResources(ctx))return false;
         const auto p=ctx.rtFrameEvidence.PublishedStateByValue();const auto& e=p.completedEvidence;
@@ -144,9 +158,20 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
     };
     bool proceed=check(ctx.campaign && ctx.campaignMenu && ctx.campaignIsolated &&
         (GetWindowLongPtrA(ctx.windowHandle,GWL_EXSTYLE)&(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW))==(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW) && safe("route-entered"),
-        "isolated exported seed and hidden nonactivating native owner");
-    if(proceed){ApplyOverlayState(ctx);proceed=check(click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) && until(catalogue,false) &&
-        click(CampaignMenu::FirstChoiceId+(gRouteReturnRecovery?1:0)) && until(loadComplete,true),"admitted record loads through ordinary native commands input rebase and fresh RT barrier");}
+        "isolated campaign profile and hidden nonactivating native owner");
+    if(proceed) {
+        ApplyOverlayState(ctx);
+        if(gRouteNewGame) {
+            proceed=check(click(kResumeButtonId) && until(catalogue,false) &&
+                click(CampaignMenu::FirstChoiceId) && until(loadComplete,true) && playing() &&
+                ctx.campaign->State().activeSlot==0,
+                "ordinary New Game selects an empty slot and presents the playable opening");
+        } else {
+            proceed=check(click(kEntryMoreButtonId) && click(kCampaignLoadButtonId) && until(catalogue,false) &&
+                click(CampaignMenu::FirstChoiceId) && until(loadComplete,true) && playing(),
+                "the selected slot loads and resumes through the current native menu after fresh RT presentation");
+        }
+    }
     if(gRouteReturnRecovery) {
         const auto& original=gHiddenLookout.source.checkpoint;
         const auto coherent=[&](bool upper){const auto& s=ctx.simulation.Snapshot();
@@ -159,8 +184,8 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
                 s.chapterCompanion.grounded && s.chapterCompanion.waypoint==simulation::kWorldRoutePoints.size() &&
                 (s.heldItems[1].parentMode==items::HeldItemParentMode::BodyStow)==original.swordStowed;};
         const auto originalPose=[&]{return (ctx.simulation.Snapshot().interaction.heldLightPose==interactions::HeldLightPose::High)==original.lanternHigh;};
-        if(proceed)proceed=check(coherent(false) && originalPose() && ctx.campaignPause && ctx.simulationPaused &&
-            capture("route-lower.png") && click(CampaignMenu::ResumeId),"actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership");
+        if(proceed)proceed=check(coherent(false) && originalPose() &&
+            capture("route-lower.png"),"actual lower-return auto restores saved health held pose completed story grounded Kit and single ownership");
         PumpCampaign(ctx);
         const auto initialOperation=ctx.campaign->State().operationRevision;
         for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
@@ -189,9 +214,9 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             campaign::CompletedForestProgress(upper.checkpoint.dialogue) && upper.encoded!=gHiddenLookout.source.encoded,
             "actual repeat ascent durably replaces only working auto with coherent upper revision two and unchanged health equipment story");
         if(proceed){const auto generation=ctx.simulation.Snapshot().worldRoute.generation;
-            ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) && click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true);
+            ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) && click(CampaignMenu::FirstChoiceId) && until(loadComplete,true);
             proceed=check(proceed && coherent(true) && originalPose() && ctx.simulation.Snapshot().worldRoute.generation>generation &&
-                capture("route-recovered.png") && click(CampaignMenu::ResumeId),"this-run upper autosave recovers through native Load fresh RT and explicit Resume");PumpCampaign(ctx);
+                playing() && capture("route-recovered.png"),"this-run upper autosave recovers through native Load and resumes after fresh RT presentation");PumpCampaign(ctx);
         }
         if(proceed){const auto operation=ctx.campaign->State().operationRevision;
             for(unsigned tick=0;tick<120 && proceed;++tick){proceed=step(neutral());if(tick%4==3 && proceed)proceed=render();}
@@ -204,9 +229,50 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             <<",\"stagesComplete\":"<<(!failures?"true":"false")<<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";
         return failures?1:0;
     }
-    if(proceed){const auto& s=ctx.simulation.Snapshot();proceed=check(s.modernCombatRules && s.playerVitals.vitality==2 &&
-        !s.rescue.firstAscentCompleted && !s.rescue.exteriorSide && !s.chapterDialogue.proofAccepted && !s.chapterDialogue.forestVillageConsumed &&
-        capture("route-lower.png") && click(CampaignMenu::ResumeId),"current rules two hearts and genuinely unset post-seed progression");PumpCampaign(ctx);}
+    if(proceed && gRouteNewGame) {
+        const auto& state=ctx.simulation.Snapshot();
+        auto input=neutral();
+        unsigned ticks=0;
+        const auto openingStep=[&]{
+            return step(input) && (++ticks%4!=0 || render());
+        };
+        const auto tomb=CampaignTombInput{state,input,openingStep};
+        proceed=check(state.modernCombatRules && state.playerVitals.vitality==3 &&
+            state.skeletonEnemyCount==2 && !state.skeletonEnemies[0].dead && !state.skeletonEnemies[1].dead &&
+            !state.lich.revealStarted && !state.rescue.claimCount && !ctx.simulation.LatestCampaignBoundary() &&
+            capture("route-opening.png"),"fresh opening has two living guards and no earned campaign milestones");
+        if(proceed)proceed=check(tomb.ReachGuards() && tomb.DefeatGuards() && !ctx.simulation.LatestCampaignBoundary(),
+            "ordinary movement and combat defeat both waterfall guards");
+        if(proceed)proceed=check(tomb.WalkTo(-31.2f,-15.2f) && tomb.DefeatKeeper() && render() &&
+            state.lich.revealComplete && !ctx.simulation.LatestCampaignBoundary() && capture("route-keeper-defeated.png"),
+            "ordinary combat defeats the revealed Keeper before claiming any reward");
+        if(proceed)proceed=check(tomb.WalkTo(-34.f,-17.55f) && tomb.ClaimLantern(),
+            "ordinary context interaction opens the chest and claims the lantern");
+        // The claim starts Kit's rescue sequence. Keep ticking in the chamber
+        // so the actual rope and safe boundary can become ready before loading.
+        for(unsigned tick=0;proceed && !ctx.simulation.LatestCampaignBoundary() && tick<900;++tick)
+            proceed=openingStep();
+        campaign::storage::StoredCheckpoint lower;
+        if(proceed)proceed=check(state.rescue.ropeReady && ctx.simulation.LatestCampaignBoundary() && until([&]{
+                return campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",lower).status==
+                    campaign::storage::Status::Read && lower.checkpoint.id==campaign::CheckpointId::LowerClaimed &&
+                    ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded;
+            },false) && lower.checkpoint.defeatedGuards==3 && lower.checkpoint.keeperDefeated &&
+            lower.checkpoint.lanternClaimed && lower.checkpoint.vitality==state.playerVitals.vitality &&
+            lower.checkpoint.halfHeart==state.playerVitals.halfHeart && !lower.checkpoint.firstAscentCompleted,
+            "the unseeded opening earns an on-disk lower checkpoint with the live combat results");
+        if(proceed)proceed=check(tomb.WalkTo(-33.7f,-15.9f) && state.rescuePrompt==traversal::RescuePrompt::Climb,
+            "ordinary walking reaches the deployed rope");
+    }
+    const auto journeyHealth=ctx.simulation.Snapshot().playerVitals;
+    const auto sameHealth=[&](const auto& vitals){
+        return vitals.vitality==journeyHealth.vitality && vitals.halfHeart==journeyHealth.halfHeart;
+    };
+    if(proceed){const auto& s=ctx.simulation.Snapshot();proceed=check(s.modernCombatRules &&
+        (gRouteNewGame || (journeyHealth.vitality==2 && !journeyHealth.halfHeart)) &&
+        !s.rescue.firstAscentCompleted && !s.rescue.exteriorSide && !s.chapterDialogue.proofAccepted &&
+        !s.chapterDialogue.forestVillageConsumed && render() && capture("route-lower.png"),
+        "lower chamber presents before the first ascent and forest progression");PumpCampaign(ctx);}
     if(proceed){
         bool issued=false;unsigned ticks=0;
         while(proceed && ticks<1800 && !(ctx.simulation.Snapshot().rescue.exteriorSide && !ctx.simulation.Snapshot().rescue.equipmentStowed)) {
@@ -220,19 +286,34 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             ctx.simulation.Snapshot().rescue.exteriorSide && !ctx.simulation.Snapshot().rescue.equipmentStowed,
             "ordinary context interaction and current fixed steps finish first rope ascent");
     }
-    ChapterRoundTripProbe probe;bool endpoint=false,endpointSaved=false;unsigned quietTicks=0;
+    ChapterRoundTripProbe probe;bool endpoint=false,endpointSaved=false,returningFromBasin=false;unsigned quietTicks=0;
     std::array<bool,4> kitViews{};
     if(proceed)proceed=check(probe.Start(ctx.simulation.Snapshot()),"existing input-only route driver admits the actually reached low-lantern upper state");
     while(proceed && probe.Phase()!=ChapterProbePhase::Lower) {
         for(unsigned n=0;n<4 && probe.Phase()!=ChapterProbePhase::Lower;++n){
             auto input=neutral();
-            const bool quietOutbound=!gRouteNaturalWalkValidation && probe.Phase()==ChapterProbePhase::Outbound && ctx.simulation.Snapshot().chapterDialogue.line!=dialogue::Line::None;
+            const auto& snapshot=ctx.simulation.Snapshot();
+            const bool outbound=probe.Phase()==ChapterProbePhase::Outbound;
+            const bool followingBasin=outbound && snapshot.chapterCompanion.basinGuide;
+            returningFromBasin |= followingBasin;
+            const bool quietOutbound=!gRouteNaturalWalkValidation && outbound && snapshot.chapterDialogue.line!=dialogue::Line::None;
             const auto& boundary=ctx.simulation.LatestCampaignBoundary();
             endpoint=boundary && boundary->id==campaign::CheckpointId::ForestEndpoint;
             const bool waitEndpoint=probe.Phase()==ChapterProbePhase::Lookout && !endpoint;
-            if(quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
-            else {quietTicks=0;input=probe.Next(ctx.simulation.Snapshot());}
-            if(probe.Phase()==ChapterProbePhase::Outbound) {
+            if(returningFromBasin || quietOutbound || waitEndpoint){if(++quietTicks>3000){proceed=false;break;}}
+            else {quietTicks=0;input=probe.Next(snapshot,false,1,endpointSaved);}
+            if(returningFromBasin) {
+                // Hear the flask line at the landing, then rejoin the forest
+                // path at the reunion so we do not cut across the steep bank.
+                const auto mark=simulation::kWorldRoutePoints[followingBasin?2:3];
+                const float dx=mark.x-snapshot.playerX,dz=mark.z-snapshot.playerZ;
+                const float distance=std::hypot(dx,dz);
+                input.yawRadians=std::atan2(dx,-dz);
+                if(followingBasin) {
+                    if(distance>2.4f)input.moveForward=std::min(distance-2.4f,1.f);
+                } else if(distance>.10f)input.moveForward=std::min(distance/.20f,1.f);
+                else returningFromBasin=false;
+            } else if(probe.Phase()==ChapterProbePhase::Outbound) {
                 // Obey the current escort rule. The generic optimization probe
                 // runs ahead; here ordinary walking waits for Kit within 3 m.
                 const auto& s=ctx.simulation.Snapshot();
@@ -274,23 +355,34 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             campaign::storage::StoredCheckpoint stored;
             proceed=check(until([&]{return ctx.campaign->State().outcome!=campaign::PlayOutcome::Pending;},false) &&
                 campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status==campaign::storage::Status::Read &&
-                stored.checkpoint.id==campaign::CheckpointId::ForestEndpoint && stored.checkpoint.vitality==2 &&
+                stored.checkpoint.id==campaign::CheckpointId::ForestEndpoint && sameHealth(stored.checkpoint) &&
                 campaign::CompletedForestProgress(stored.checkpoint.dialogue) && capture("route-lookout.png"),
                 "actual movement fresh presented raise and quiet Kit story produce durable endpoint autosave");
             if(proceed){ShowPauseMenu(ctx,true);proceed=click(kCampaignSaveButtonId) && until(catalogue,false) &&
                 click(CampaignMenu::FirstChoiceId+1) && until([&]{return ctx.campaign->State().outcome!=campaign::PlayOutcome::Pending;},false);
-                campaign::storage::StoredCheckpoint manual;
+                campaign::storage::StoredCheckpoint manual,unchangedAuto;
                 proceed=check(proceed && ctx.campaign->State().operation==campaign::PlayOperation::ManualSave &&
                     ctx.campaign->State().outcome==campaign::PlayOutcome::Succeeded && ctx.campaign->State().activeSlot==0 &&
                     campaign::storage::Read(gCampaignValidationDirectory,"slot-2-manual.hrd",manual).status==campaign::storage::Status::Read &&
-                    manual.encoded==stored.encoded,"ordinary native Save creates endpoint manual in empty slot two without retargeting slot one auto");
+                    campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",unchangedAuto).status==
+                        campaign::storage::Status::Read && unchangedAuto.encoded==stored.encoded,
+                    "ordinary native Save creates endpoint manual in empty slot two and preserves slot one auto");
+                if(proceed){
+                    // The independent Save operation stamps its own UTC second.
+                    // Normalize that field alone before comparing checkpoint bytes.
+                    manual.checkpoint.savedAtUnixSeconds=stored.checkpoint.savedAtUnixSeconds;
+                    std::vector<std::byte> normalized;
+                    campaign::codec::Error error{};
+                    proceed=check(campaign::codec::Encode(manual.checkpoint,normalized,error) && normalized==stored.encoded,
+                        "manual and automatic lookout records preserve identical gameplay state");
+                }
                 if(proceed){proceed=click(CampaignMenu::BackId);PumpCampaign(ctx);proceed=proceed && click(kResumeButtonId);PumpCampaign(ctx);}
             }
             endpointSaved=proceed;
         }
     }
     if(proceed){const auto& s=ctx.simulation.Snapshot();
-        proceed=check(endpointSaved && s.modernCombatRules && s.playerVitals.vitality==2 && !s.rescue.exteriorSide &&
+        proceed=check(endpointSaved && s.modernCombatRules && sameHealth(s.playerVitals) && !s.rescue.exteriorSide &&
             !s.rescue.equipmentStowed && s.rescue.sawDescent && s.rescue.sawLanding && s.rescue.claimCount==1 && s.rescue.deploymentCount==1 &&
             render() && capture("route-return.png"),"input-only forest return and real descent restore lower support and equipment without duplicate claim");
     }
@@ -305,18 +397,104 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
             campaign::CompletedForestProgress(returned.checkpoint.dialogue),"actual lower return commits revision two autosave retaining completed forest story");
         const auto generation=ctx.simulation.Snapshot().worldRoute.generation;
         if(proceed){ShowPauseMenu(ctx,true);proceed=click(kCampaignLoadButtonId) && until(catalogue,false) &&
-            click(CampaignMenu::FirstChoiceId+2) && until(loadComplete,true);
+            click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true);
             const auto& s=ctx.simulation.Snapshot();
-            proceed=check(proceed && s.worldRoute.generation>generation && s.modernCombatRules && s.playerVitals.vitality==2 &&
+            proceed=check(proceed && s.worldRoute.generation>generation && s.modernCombatRules && sameHealth(s.playerVitals) &&
                 s.playerGrounded && s.rescue.exteriorSide && s.chapterCompanion.grounded &&
                 s.chapterDialogue.line==dialogue::Line::None && s.chapterDialogue.forestVillageConsumed &&
-                ctx.campaignPause && ctx.simulationPaused && capture("route-recovered.png") && click(CampaignMenu::ResumeId),
-                "this-run endpoint manual recovers through native load fresh generation matching RT and explicit Resume");PumpCampaign(ctx);
+                ctx.campaign->State().activeSlot==1 && playing() && capture("route-recovered.png"),
+                "this-run endpoint manual recovers through native Load and resumes after fresh RT presentation");PumpCampaign(ctx);
         }
         if(proceed){const auto operation=ctx.campaign->State().operationRevision;
             for(unsigned n=0;n<120 && proceed;++n){proceed=step(neutral());if(n%4==3 && proceed)proceed=render();}
             proceed=check(proceed && ctx.campaign->State().operationRevision==operation && !ctx.campaignPause && !ctx.simulationPaused &&
                 ctx.simulation.Snapshot().chapterDialogue.line==dialogue::Line::None,"resumed endpoint stays quiet without repeated autosave or story restart");
+        }
+    }
+    if (proceed && gBellwetherPackagedPlaytest) {
+        using namespace traversal;
+        const auto& state = ctx.simulation.Snapshot();
+        const auto playerMark = campaign::kBellwetherCheckpointPosition;
+        const auto atHearth = [&] {
+            return state.playerGrounded && IsOnBellwetherTavernRoomFloor(
+                state.playerX, state.playerSupportWorldY, state.playerZ) &&
+                state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::Seated &&
+                state.tavernKeeper && state.tavernKeeper->stage == dialogue::TavernKeeperStage::AtHearth;
+        };
+        unsigned arrivalTicks = 0;
+        bool assessedOnRoad = false;
+        const auto arrivalStep = [&](simulation::InputSnapshot input) {
+            if (!step(input)) return false;
+            const auto& boundary = ctx.simulation.LatestCampaignBoundary();
+            assessedOnRoad |= boundary && boundary->id == campaign::CheckpointId::ForestEndpoint &&
+                boundary->bellwetherAnkleAssessed;
+            return ++arrivalTicks % 10 != 0 || render();
+        };
+        const auto walkTo = [&](BellwetherStation target) {
+            for (unsigned tick = 0; tick < 1200; ++tick) {
+                const float dx = target.x - state.playerX, dz = target.z - state.playerZ;
+                const float distance = std::hypot(dx,dz);
+                if (distance < .135f) return true;
+                auto input = neutral();
+                input.yawRadians = std::atan2(dx,-dz);
+                input.moveForward = std::min(distance/.20f,1.f);
+                input.runHeld = true;
+                if (!arrivalStep(input)) return false;
+            }
+            std::cerr << "Bellwether continuity walk stopped at " << state.playerX << ',' << state.playerZ
+                      << " en route to " << target.x << ',' << target.z << '\n';
+            return false;
+        };
+        const auto waitFor = [&](auto ready, unsigned ticks) {
+            for (unsigned tick=0; tick<ticks && !ready(); ++tick)
+                if (!arrivalStep(neutral())) return false;
+            return ready();
+        };
+        const auto captureSeatedKit = [&](const char* name) {
+            auto input=neutral();
+            input.yawRadians=std::atan2(state.chapterCompanion.x-state.playerX,
+                                        state.playerZ-state.chapterCompanion.z);
+            input.pitchRadians=-.22f;
+            return step(input) && render() && capture(name);
+        };
+        proceed = check(state.chapterCompanion.bellwetherArrival == dialogue::BellwetherArrivalStage::AtLookout &&
+            std::all_of(kBellwetherTavernRoute.begin(),kBellwetherTavernRoute.end(),walkTo) &&
+            walkTo({playerMark.x,playerMark.z}) && waitFor([&]{return state.tavernConversationAvailable;},120*60) &&
+            assessedOnRoad && atHearth() && captureSeatedKit("route-bellwether-tavern.png"),
+            "the earned lookout leads through Kit's ankle assessment and the south door to the staffed hearth");
+        campaign::storage::StoredCheckpoint tavern;
+        if (proceed) {
+            auto input = neutral();
+            input.commands.interact = state.lastConsumedInteractSequence + 1;
+            proceed = check(arrivalStep(input) && waitFor([&]{
+                return state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
+                    state.chapterDialogue.line == dialogue::Line::None;
+            },1800), "one ordinary Talk interaction completes the three-line exchange");
+        }
+        if (proceed) {
+            proceed = check(until([&]{
+                return campaign::storage::Read(gCampaignValidationDirectory,"slot-2-auto.hrd",tavern).status ==
+                    campaign::storage::Status::Read && tavern.checkpoint.id == campaign::CheckpointId::BellwetherTavern &&
+                    tavern.checkpoint.dialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
+                    ctx.campaign->State().outcome == campaign::PlayOutcome::Succeeded;
+            },false) && sameHealth(tavern.checkpoint) && tavern.checkpoint.firstAscentCompleted &&
+                campaign::CompletedForestProgress(tavern.checkpoint.dialogue),
+                "the earned tavern autosave preserves health and completed forest story in the same slot");
+        }
+        if (proceed) {
+            const auto generation = state.worldRoute.generation;
+            ShowPauseMenu(ctx,true);
+            const bool resumed = click(kCampaignLoadButtonId) && until(catalogue,false) &&
+                click(CampaignMenu::FirstChoiceId+1) && until(loadComplete,true) && playing() &&
+                state.worldRoute.generation > generation && ctx.campaign->State().activeSlot == 1;
+            // The resumed simulation publishes its live interaction candidates
+            // on the first ordinary fixed tick after the presentation barrier.
+            proceed = check(resumed && step(neutral()) && atHearth() && sameHealth(state.playerVitals) &&
+                state.tavernDirectionsAvailable && !state.tavernConversationAvailable &&
+                state.chapterDialogue.line == dialogue::Line::None &&
+                state.chapterDialogue.tavernConversationLinesResolved == dialogue::kTavernConversation.size() &&
+                captureSeatedKit("route-bellwether-reloaded.png"),
+                "choosing the same slot resumes the earned Bellwether visit with Talk completed and directions available");
         }
     }
     if(!proceed && !failures)check(false,"bounded route stopped before completing all stages");
@@ -329,6 +507,9 @@ int RunHiddenRouteValidation(VulkanSurfaceContext& ctx)
         <<",\"kitTurnStartConfigured\":"<<(turnStartConfigured?"true":"false")
         <<",\"naturalWalkWithoutScriptedEscortOrSpeechStops\":"<<(gRouteNaturalWalkValidation?"true":"false")
         <<",\"ordinaryLookAtKitPreservingWorldWalk\":"<<(gRouteNaturalWalkValidation?"true":"false")
+        <<",\"packagedBellwetherContinuation\":"<<(gBellwetherPackagedPlaytest?"true":"false")
+        <<",\"startedFromNewGame\":"<<(gRouteNewGame?"true":"false")
+        <<",\"postTombVitality\":"<<journeyHealth.vitality<<",\"postTombHalfHeart\":"<<(journeyHealth.halfHeart?"true":"false")
         <<",\"deathRecoveryTested\":false,\"physicalPlayTested\":false,\"audioListened\":false";
     return failures?1:0;
 }
@@ -338,8 +519,8 @@ int FinishHiddenRouteValidation(HWND owner,int result)
     campaign::storage::StoredCheckpoint source;std::string manifest;
     const bool preserved=HiddenRouteFilesAllowed(gCampaignValidationDirectory,true) &&
         ReadHiddenLookoutManifest(gCampaignValidationDirectory/"manifest.json",manifest) && manifest==gHiddenLookout.manifest &&
-        campaign::storage::Read(gCampaignValidationDirectory,"slot-1-manual.hrd",source).status==campaign::storage::Status::Read &&
-        source.encoded==gHiddenLookout.source.encoded;
+        (gRouteNewGame || (campaign::storage::Read(gCampaignValidationDirectory,"slot-1-manual.hrd",source).status==
+            campaign::storage::Status::Read && source.encoded==gHiddenLookout.source.encoded));
     if(!preserved || !ObserveHiddenLookoutForeground(owner,"route-owner-destroyed") || gHiddenLookout.receipt.str().empty())result=1;
     auto& receipt=gHiddenLookout.receipt;
     if(receipt.str().empty())receipt<<"{\"schema\":1,\"stagesComplete\":false";

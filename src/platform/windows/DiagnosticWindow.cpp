@@ -2,6 +2,10 @@
 #include "platform/windows/WindowsFlaskGauge.h"
 #include "gameplay/simulation/PrivateRevivalApplication.h"
 #include "audio/ChapterDialogueSpatial.h"
+#include "audio/BellwetherVoiceFixture.h"
+#include "vulkan/raytracing/BellwetherResidents.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
+#include "gameplay/effects/BellwetherHearth.h"
 #include "platform/windows/DiagnosticWindow.h"
 #include "platform/windows/WindowsAcceptanceProfile.h"
 #ifndef HORDE_RT_WINDOWS_ACCEPTANCE
@@ -110,6 +114,7 @@
 #include "gameplay/LanternBenchmarkScenario.h"
 #include "gameplay/ShowcaseGameplay.h"
 #include "gameplay/SpatialAudio.h"
+#include "audio/KitAnkleAudio.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/SubtitleLayout.h"
 #include "platform/windows/WindowsSubtitleBitmap.h"
@@ -136,6 +141,7 @@
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "gameplay/validation/MotionEvidenceScenario.h"
 #include "gameplay/validation/ChapterRoundTripProbe.h"
+#include "gameplay/validation/CampaignTombInput.h"
 #include "gameplay/validation/RecordedReturnCheckpoint.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "platform/windows/WindowsPresentInterval.h"
@@ -147,6 +153,7 @@
 #include "platform/windows/WindowsBenchmarkMenuOwner.h"
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
+#include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"
@@ -200,6 +207,7 @@ bool gOpeningBenchmarkDetachedCancelInjected=false;
 #endif
 bool gLookoutHiddenValidation=false;
 bool gRouteHiddenValidation=false;
+bool gRouteNewGame=false;
 bool gRouteKitTurnStartValidation=false;
 bool gRouteNaturalWalkValidation=false;
 bool gRouteReturnRecovery=false;
@@ -211,6 +219,44 @@ bool gLookoutInspectKitPartials=false;
 bool gLookoutInspectKitPartialsDense=false;
 bool gLookoutInspectKitController=false;
 bool gShowcaseCaptureHidden=false;
+#if defined(_DEBUG)
+std::filesystem::path gBellwetherVoiceDirectory;
+bool gBellwetherArrivalAudition = false;
+bool gBellwetherSalvagerAudition = false;
+bool gBellwetherFollowOnAudition = false;
+std::filesystem::path gBellwetherCampaignActors;
+bool gBellwetherCombinedCampaignActors = false;
+bool gBellwetherCombinedRelicDealer = false;
+bool gBellwetherPackagedPlaytest = false;
+horde::gameplay::bellwether::Specialist gBellwetherCampaignSpecialist{};
+bool gBellwetherEarnTavernValidation = false;
+bool gBellwetherAnkleRestoreValidation = false;
+bool gBellwetherExpeditionValidation = false;
+bool gBellwetherPreparationsValidation = false;
+bool gBellwetherHearthRestValidation = false;
+
+bool SetBellwetherCampaignResidentSources(horde::vulkan::raytracing::PresentableTinyRtScene& scene,
+    const std::filesystem::path& root, std::string& diagnostic)
+{
+    using namespace horde::vulkan::raytracing;
+    return gBellwetherCombinedCampaignActors ?
+        SetBellwetherCombinedResidentSources(scene, root, diagnostic, gBellwetherCombinedRelicDealer) :
+        SetBellwetherResidentSources(scene, root, diagnostic, gBellwetherCampaignSpecialist);
+}
+#endif
+
+horde::gameplay::simulation::GameSimulationConfig WindowsApplicationSimulationConfig()
+{
+    auto config = horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+#if defined(_DEBUG)
+    config.bellwetherTavernKeeperAdmitted = !gBellwetherCampaignActors.empty();
+    config.bellwetherCombinedResidents = gBellwetherCombinedCampaignActors;
+    config.bellwetherSpecialist = gBellwetherCampaignSpecialist;
+    config.bellwetherTrade = gBellwetherCombinedRelicDealer ||
+        gBellwetherCampaignSpecialist == horde::gameplay::bellwether::Specialist::RelicDealer;
+#endif
+    return config;
+}
 bool gCampaignValidationHoldPreparation=false;
 std::filesystem::path gCampaignValidationDirectory;
 horde::platform::windows::WindowsAcceptanceProfile gAcceptanceProfile;
@@ -396,30 +442,8 @@ CompatibilityWindowOwner CaptureWindowsCompatibilityProbe(const horde::vulkan::V
     if(GetVersionExW(&os))s.os="Windows API major "+std::to_string(os.dwMajorVersion)+" minor "+
         std::to_string(os.dwMinorVersion)+" build "+std::to_string(os.dwBuildNumber)+" (manifest/compatibility dependent)";
 #pragma warning(pop)
-    const auto physical=probe.GetSelectedPhysicalDevice();
-    if(initialised && physical!=VK_NULL_HANDLE) {
-        s.probe=CompatibilityProbe::DeviceChecked;s.outcome=CompatibilityOutcome::CapabilityOnly;
-        s.gpu=capabilities.identity.gpuName;s.rawDriverVersion=capabilities.identity.driverVersion;s.vulkanApiVersion=capabilities.identity.vulkanApiVersion;
-        std::uint32_t count=0;bool checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,nullptr)==VK_SUCCESS;
-        std::vector<VkExtensionProperties> extensions;
-        if(checked && count<=4096u) {extensions.resize(count);const auto capacity=count;
-            if(count)checked=vkEnumerateDeviceExtensionProperties(physical,nullptr,&count,extensions.data())==VK_SUCCESS && count<=capacity;
-            if(checked)extensions.resize(count);
-        } else checked=false;
-        const auto extension=[&](bool observed,const char* name){
-            if(!checked)return observed?CompatibilityCheck::Present:CompatibilityCheck::Unknown;
-            return std::any_of(extensions.begin(),extensions.end(),[&](const auto& e){return std::strncmp(e.extensionName,name,VK_MAX_EXTENSION_NAME_SIZE)==0;})?
-                CompatibilityCheck::Present:CompatibilityCheck::Absent;};
-        const auto& e=capabilities.extensions;
-        s.extensions={extension(e.accelerationStructure,VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME),extension(e.rayTracingPipeline,VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME),
-            extension(e.rayQuery,VK_KHR_RAY_QUERY_EXTENSION_NAME),extension(e.bufferDeviceAddress,VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME),extension(e.deferredHostOperations,VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME)};
-        const auto feature=[](bool b){return b?CompatibilityCheck::Present:CompatibilityCheck::Unknown;};const auto& f=capabilities.features;
-        s.features={feature(f.accelerationStructure),feature(f.rayTracingPipeline),feature(f.rayQuery),feature(f.bufferDeviceAddress)};
-        const auto& x=s.extensions;
-        if((capabilities.identity.vulkanApiVersion!=0 && capabilities.identity.vulkanApiVersion<VK_API_VERSION_1_2) ||
-            x.accelerationStructure==CompatibilityCheck::Absent || x.bufferDeviceAddress==CompatibilityCheck::Absent || x.deferredHostOperations==CompatibilityCheck::Absent ||
-            (x.rayTracingPipeline==CompatibilityCheck::Absent && x.rayQuery==CompatibilityCheck::Absent))s.outcome=CompatibilityOutcome::Unsupported;
-    }
+    if (initialised && probe.GetSelectedPhysicalDevice()!=VK_NULL_HANDLE)
+        CaptureCompatibilityDeviceEvidence(s, capabilities);
     owner.probeSnapshot=s;return owner;
 }
 constexpr int kMenuTeachingEnabledId = 2030;
@@ -448,6 +472,16 @@ constexpr UINT kMaxFramesInFlight = 1u;
 
 struct CaptureLaunchOptions
 {
+    std::filesystem::path chapterResidentFixture;
+    std::filesystem::path chapterResidentTextureRoundTrip;
+    std::filesystem::path chapterResidentModelRoundTrip;
+    std::filesystem::path bellwetherVoiceDirectory;
+    std::filesystem::path bellwetherCampaignDirectory;
+    bool staffedTavernCapture = false;
+    bool recordKeeperCapture = false;
+    bool artificerCapture = false;
+    bool salvagerCapture = false;
+    bool relicDealerCapture = false;
     horde::platform::windows::SkyAttributionMode skyAttribution =
         horde::platform::windows::SkyAttributionMode::Production;
     horde::platform::windows::WindowsBenchmarkLaunch benchmark;
@@ -472,6 +506,10 @@ struct CaptureLaunchOptions
     bool validateStaticTriangleCutover = false;
     std::vector<std::uint32_t> staticTriangleOmissions;
     std::string inspectStaticWorldMaterial;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
+    bool bellwetherFurnitureTransitions=false;
+    bool bellwetherFurnitureRoute=false;
+    bool bellwetherFurnitureResidency=false;
     std::string forestContentCandidate;
     bool validateForestContentCandidate = false;
     bool validateChapterRoundTrip = false;
@@ -479,6 +517,10 @@ struct CaptureLaunchOptions
     bool captureGpuStages = false;
     bool measureChapterShippingRoute = false;
     bool measureChapterForeground = false;
+    bool measureBellwetherDoorway = false;
+    bool measureBellwetherResidentRoundTrip = false;
+    bool measureBellwetherWestRoundTrip = false;
+    bool measureBellwetherFromPackage = false;
     std::filesystem::path outputDirectory;
     std::string developmentCheckpoint;
     std::string error;
@@ -530,6 +572,22 @@ struct ShowcaseCaptureRecord
     horde::gameplay::items::HeldItemTransform publishedLanternHinge{};
     horde::gameplay::items::HeldItemTransform publishedLanternBody{};
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
+    std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
+    std::optional<horde::gameplay::dialogue::RecordKeeperPose> recordKeeper;
+    std::optional<horde::gameplay::bellwether::ArtificerPose> artificer;
+    std::optional<horde::gameplay::bellwether::SalvagerPose> salvager;
+    std::optional<horde::gameplay::bellwether::RelicDealerPose> relicDealer;
+    std::array<std::uint8_t,3> relicDealerResidentMasks{};
+    std::array<std::uint8_t,3> salvagerResidentMasks{};
+    std::array<std::uint8_t,3> millResidentMasks{};
+    horde::gameplay::bellwether::MillPreparation millPreparation{};
+    float millDriveAngleRadians=0.f;
+    std::uint8_t millDriveMask=0u;
+    bool registerInterpreted = false;
+    std::uint64_t tavernLanternPresentedRaiseTick = 0;
+    unsigned tavernLanternLinesStarted = 0;
+    horde::gameplay::dialogue::Line chapterLine = horde::gameplay::dialogue::Line::None;
+    std::optional<horde::gameplay::DevelopmentCheckpointStageEvidence::BellwetherVisit> bellwetherVisit;
     float keeperDissolve = 0.0f;
     float playerHeightDelta = 0.0f;
     std::uint8_t playerSupportId = 0u;
@@ -678,6 +736,16 @@ struct VulkanSurfaceContext
         horde::platform::windows::PreviewMeshPairCaptureMode::None;
     std::shared_ptr<const horde::scene::assets::StaticMeshAsset> previewMeshPairMaster;
     std::optional<horde::graphics::PreviewCameraPose> previewMeshPairCamera;
+    std::filesystem::path chapterResidentFixture;
+    bool staffedTavernCapture = false;
+    bool recordKeeperCapture = false;
+    bool artificerCapture = false;
+    bool salvagerCapture = false;
+    bool relicDealerCapture = false;
+    bool combinedBellwetherResidents = false;
+    bool bellwetherFurnitureTransitions=false;
+    bool bellwetherFurnitureResidency=false;
+    horde::scene::BellwetherFurnitureDetail bellwetherFurnitureDetail=horde::scene::BellwetherFurnitureDetail::Near;
     horde::platform::windows::ForestRouteCaptureMode forestRouteProof=
         horde::platform::windows::ForestRouteCaptureMode::Disabled;
 #endif
@@ -799,6 +867,7 @@ struct VulkanSurfaceContext
     bool chestInteractionPromptPresented = false;
     bool rescueInteractionPromptPresented = false;
     bool flaskUpgradeInteractionPromptPresented = false;
+    bool tavernInteractionPromptPresented = false;
     bool flaskLessonSeen=false,flaskUpgradeLessonSeen=false;
     ULONGLONG flaskLessonUntil=0;
     int flaskHudWidth=0,flaskHudDpi=0;
@@ -810,6 +879,7 @@ struct VulkanSurfaceContext
     std::string environmentSurveyProfile;
 #if defined(_DEBUG)
     std::optional<horde::gameplay::simulation::SimulationSnapshot> playerDodgeInspectionSnapshot;
+    std::optional<std::uint32_t> residentModelProofActor;
     std::optional<horde::vulkan::raytracing::SkeletonPoseBlendRequests> inspectionSkeletonBlends;
     bool playerDodgeInspectionDisabled=false;
 #endif
@@ -1127,6 +1197,10 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
     }
     options.measureChapterShippingRoute=chapterShipping.requested;
     options.measureChapterForeground=chapterShipping.foregroundRequested;
+    options.measureBellwetherDoorway=chapterShipping.bellwetherDoorway;
+    options.measureBellwetherResidentRoundTrip=chapterShipping.bellwetherResidentRoundTrip;
+    options.measureBellwetherWestRoundTrip=chapterShipping.bellwetherWestRoundTrip;
+    options.measureBellwetherFromPackage=chapterShipping.bellwetherFromPackage;
     for (int index = 1; index < argumentCount; ++index)
     {
         const std::wstring_view argument(arguments[index]);
@@ -1168,6 +1242,45 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.validateStaticZoneCutover=true;
 #else
             options.error="--validate-static-sparse-cutover is Debug-only.";
+#endif
+            continue;
+        }
+        if(argument==L"--bellwether-furniture-residency") {
+#if defined(_DEBUG)
+            options.bellwetherFurnitureResidency=true;
+#else
+            options.error="Bellwether furniture residency is Debug-only.";
+#endif
+            continue;
+        }
+        if(argument==L"--bellwether-furniture-route") {
+#if defined(_DEBUG)
+            options.bellwetherFurnitureRoute=true;
+#else
+            options.error="Bellwether furniture route is Debug-only.";
+#endif
+            continue;
+        }
+        if(argument==L"--bellwether-furniture-transitions") {
+#if defined(_DEBUG)
+            options.bellwetherFurnitureTransitions=true;
+#else
+            options.error="Bellwether furniture transitions are Debug-only.";
+#endif
+            continue;
+        }
+        if(argument==L"--bellwether-furniture-detail") {
+#if defined(_DEBUG)
+            using Detail=horde::scene::BellwetherFurnitureDetail;
+            if(options.bellwetherFurnitureDetail!=Detail::Near || index+1>=argumentCount) {
+                options.error="Bellwether furniture detail requires lod1 or lod2, once.";break;
+            }
+            const std::wstring_view level=arguments[++index];
+            if(level==L"lod1")options.bellwetherFurnitureDetail=Detail::Mid;
+            else if(level==L"lod2")options.bellwetherFurnitureDetail=Detail::Far;
+            else {options.error="Bellwether furniture detail requires lod1 or lod2.";break;}
+#else
+            options.error="Bellwether furniture detail is Debug-only.";
 #endif
             continue;
         }
@@ -1247,6 +1360,65 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
             options.portrait = true;
             continue;
         }
+        if (argument == L"--chapter-resident-fixture")
+        {
+#if defined(_DEBUG)
+            if (!options.chapterResidentFixture.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--chapter-resident-fixture requires one local fixture directory.";
+                break;
+            }
+            options.chapterResidentFixture = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--chapter-resident-fixture is Debug only.";
+#endif
+            continue;
+        }
+        if (argument == L"--chapter-resident-texture-round-trip" || argument == L"--chapter-resident-model-round-trip")
+        {
+#if defined(_DEBUG)
+            if (!options.chapterResidentTextureRoundTrip.empty() || !options.chapterResidentModelRoundTrip.empty() ||
+                index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "Select one resident round trip and supply one alternate asset directory.";
+                break;
+            }
+            auto& destination = argument == L"--chapter-resident-model-round-trip"
+                ? options.chapterResidentModelRoundTrip : options.chapterResidentTextureRoundTrip;
+            destination = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "Chapter resident round trips are Debug only.";
+#endif
+            continue;
+        }
+        if (argument == L"--bellwether-voice-dir")
+        {
+#if defined(_DEBUG)
+            if (!options.bellwetherVoiceDirectory.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--bellwether-voice-dir requires one local directory.";
+                break;
+            }
+            options.bellwetherVoiceDirectory = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--bellwether-voice-dir is Debug only.";
+#endif
+            continue;
+        }
+        if (argument == L"--bellwether-campaign-dir")
+        {
+#if defined(_DEBUG)
+            if (!options.bellwetherCampaignDirectory.empty() || index + 1 >= argumentCount ||
+                arguments[index + 1][0] == L'-') {
+                options.error = "--bellwether-campaign-dir requires one local resident directory.";
+                break;
+            }
+            options.bellwetherCampaignDirectory = std::filesystem::path(arguments[++index]);
+#else
+            options.error = "--bellwether-campaign-dir is Debug only.";
+#endif
+            continue;
+        }
         if (argument == L"--development-checkpoint")
         {
             if (!options.developmentCheckpoint.empty())
@@ -1296,6 +1468,56 @@ CaptureLaunchOptions ParseCaptureLaunchOptions()
            options.validateChapterRoundTrip)
             options.error="--inspect-static-world-source requires one hidden Debug authored-chapter showcase capture.";
     }
+    const auto* residentCheckpoint = horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
+    const bool fixedFurnitureDetail=options.bellwetherFurnitureDetail!=horde::scene::BellwetherFurnitureDetail::Near;
+    if(options.error.empty() && (fixedFurnitureDetail || options.bellwetherFurnitureTransitions) &&
+       (!options.requested || !options.captureHidden || !residentCheckpoint ||
+        !options.developmentCheckpoint.starts_with("bellwether-") ||
+        !horde::gameplay::DevelopmentCheckpointRequiresAuthoredChapter(*residentCheckpoint) ||
+        options.measureChapterShippingRoute || options.validateChapterRoundTrip || options.validateStaticZoneCutover ||
+        !options.forestContentCandidate.empty() || options.validateForestContentCandidate ||
+        options.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled ||
+        options.environmentSurvey.requested || options.graphicsPreview || options.outputResizeValidation ||
+        !options.nativeMotionScenario.empty() || options.benchmark.requested || options.chapterLandingOnly ||
+        !options.inspectStaticWorldMaterial.empty() || (fixedFurnitureDetail && options.bellwetherFurnitureTransitions)))
+        options.error="Bellwether furniture comparisons require an isolated hidden authored Bellwether capture.";
+    if(options.error.empty() && options.bellwetherFurnitureRoute &&
+       (!options.bellwetherFurnitureTransitions || options.developmentCheckpoint!="bellwether-repeat-visit"))
+        options.error="Bellwether furniture route requires automatic selection and the repeat-visit checkpoint.";
+    if(options.error.empty() && options.bellwetherFurnitureResidency && !options.bellwetherFurnitureRoute)
+        options.error="Bellwether furniture residency requires the moving repeat-visit witness.";
+#if defined(HORDE_RT_BELLWETHER_RAY_WITNESS)
+    if(options.error.empty() && (!options.bellwetherFurnitureTransitions || options.bellwetherFurnitureRoute))
+        options.error="The private Bellwether ray witness requires one hidden automatic-detail checkpoint.";
+#endif
+    const bool returnToKit = residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::KitIntroduction;
+    options.artificerCapture = residentCheckpoint &&
+        (residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillArtificer ||
+         residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::MillDriveTested);
+    options.salvagerCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::SalvagerShore;
+    options.relicDealerCapture = residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RelicDealerVisit;
+    options.staffedTavernCapture = residentCheckpoint &&
+        (residentCheckpoint->bellwetherStaffedView != horde::gameplay::BellwetherStaffedView::None ||
+         returnToKit || options.artificerCapture || options.salvagerCapture || options.relicDealerCapture);
+    options.recordKeeperCapture = returnToKit || (residentCheckpoint &&
+        residentCheckpoint->bellwetherBranchView == horde::gameplay::BellwetherBranchView::RegisterHandoff);
+    if (options.error.empty() && (options.staffedTavernCapture || options.recordKeeperCapture || !options.chapterResidentFixture.empty()) &&
+        ((options.chapterResidentFixture.empty() && !options.measureBellwetherResidentRoundTrip) ||
+         !options.requested || !options.captureHidden ||
+         (!options.staffedTavernCapture && !options.recordKeeperCapture && options.developmentCheckpoint != "chapter-kit-reunion") ||
+         options.validateChapterRoundTrip || options.validateStaticZoneCutover))
+        options.error = "Chapter resident fixtures require a compatible hidden Bellwether or reunion capture.";
+    if (options.error.empty() && (options.artificerCapture || options.salvagerCapture || options.relicDealerCapture) &&
+        !options.bellwetherCampaignDirectory.empty())
+        options.error = "Pass the specialist and tavern keeper together in --chapter-resident-fixture.";
+    if (options.error.empty() && (!options.chapterResidentTextureRoundTrip.empty() || !options.chapterResidentModelRoundTrip.empty()) &&
+        ((!options.salvagerCapture && !options.artificerCapture) || !options.captureHidden ||
+         !options.requested || options.chapterResidentFixture.empty() ||
+         options.bellwetherFurnitureRoute || options.forestRouteProof != horde::platform::windows::ForestRouteCaptureMode::Disabled))
+        options.error = "Resident round trip requires one hidden mill or shore resident capture.";
     if(options.error.empty() && (!options.forestContentCandidate.empty() || options.validateForestContentCandidate)) {
         const auto* checkpoint=horde::gameplay::FindDevelopmentCheckpoint(options.developmentCheckpoint);
         if(options.forestContentCandidate.empty() || !options.requested || !options.captureHidden || !checkpoint ||
@@ -1472,6 +1694,134 @@ bool Sha256File(const std::filesystem::path& path, std::string& hexDigest, std::
     diagnostic.clear();
     return true;
 }
+
+#if defined(_DEBUG)
+bool ConfigureBellwetherVoiceDirectory(const std::filesystem::path& directory)
+{
+    if (directory.empty()) return true;
+    std::error_code error;
+    const auto root = std::filesystem::canonical(directory, error);
+    if (error || !std::filesystem::is_directory(root, error) || error) return false;
+    const auto pathFor = [&](const auto& cut) {
+        return root / (std::string(horde::gameplay::dialogue::Spec(cut.line).stableId) + ".wav");
+    };
+    const auto verify = [&](const auto& cuts) {
+        for (const auto& cut : cuts) {
+            const auto path = pathFor(cut);
+            const auto bytes = std::filesystem::file_size(path, error);
+            std::string digest, diagnostic;
+            if (error || bytes != 78u + cut.frames * 2u || !Sha256File(path, digest, diagnostic) ||
+                digest != cut.sha256) return false;
+        }
+        return true;
+    };
+    if (!verify(horde::audio::kBellwetherVoiceCuts)) return false;
+    const auto admitOptional = [&](const auto& cuts, bool& admitted) {
+        for (const auto& cut : cuts) {
+            const bool present = std::filesystem::exists(pathFor(cut), error);
+            if (error) return false;
+            if (present) {
+                admitted = verify(cuts);
+                return admitted;
+            }
+        }
+        return true;
+    };
+    if (!admitOptional(horde::audio::kBellwetherArrivalAuditionCuts, gBellwetherArrivalAudition) ||
+        !admitOptional(horde::audio::kBellwetherSalvagerAuditionCuts, gBellwetherSalvagerAudition) ||
+        !admitOptional(horde::audio::kBellwetherFollowOnAuditionCuts, gBellwetherFollowOnAudition)) return false;
+    gBellwetherVoiceDirectory = root;
+    std::cerr << "Bellwether private Kit WAVs verified.\n";
+    if (gBellwetherArrivalAudition) std::cerr << "Bellwether private arrival audition WAVs verified.\n";
+    if (gBellwetherSalvagerAudition) std::cerr << "Bellwether private salvager audition WAVs verified.\n";
+    if (gBellwetherFollowOnAudition) std::cerr << "Bellwether private follow-on audition WAVs verified.\n";
+    return true;
+}
+
+bool ConfigureBellwetherCampaignActors(const std::filesystem::path& directory)
+{
+    if (directory.empty()) return true;
+    constexpr std::pair<std::string_view, std::string_view> standIn[]{
+        {"tavern-keeper/asset.manifest.json", "a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7"},
+        {"tavern-keeper/resident.glb", "67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696"},
+    };
+    constexpr std::pair<std::string_view, std::string_view> texturedKeeper[]{
+        {"tavern-keeper/asset.manifest.json", "e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341"},
+        {"tavern-keeper/resident.glb", "61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827"},
+        {"tavern-keeper/base-color.windows.ktx2", "a6b150a54e3b5ae66513b104078960a96d4d7d6a45e0c95201407174bb574feb"},
+        {"tavern-keeper/normal.windows.ktx2", "d00d3af09449b6edf2331d7fcf49b96fe1eca16607bd4a7264787946ff3d4050"},
+        {"tavern-keeper/orm.windows.ktx2", "e66ba00bbb9669ec62d322549972b700bf9e8fe427dc48ec56348215052cbafd"},
+    };
+    constexpr std::pair<std::string_view, std::string_view> recordKeeper[]{
+        {"record-keeper/asset.manifest.json", "5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864"},
+        {"record-keeper/resident.glb", "10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884"},
+        {"record-keeper/base-color.windows.ktx2", "38b1c2ece28db386be8c2633311c487c3a8b4d70a0cd1852ae16c362d718e6dc"},
+        {"record-keeper/normal.windows.ktx2", "ac7b1b04940c66b88176b2209a4d934467c67ece2e85497aae3c387c73f091a0"},
+        {"record-keeper/orm.windows.ktx2", "98163b1d3313ed5aa6fbab5cc00b37f25bbba9546c73f370ad1fcd3ae2bdded6"}
+    };
+    constexpr std::pair<std::string_view, std::string_view> artificer[]{
+        {"artificer/asset.manifest.json", "890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864"},
+        {"artificer/resident.glb", "58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f"},
+        {"artificer/base-color.windows.ktx2", "8dc88a5c8b417e044611e423c7ac512e85d751fb1d9baee1f849e731edce5492"},
+        {"artificer/normal.windows.ktx2", "7185fe6d08e19f029cb2dcb3d37f8d04f94fcb9190836733e4dcbb9cc1d2493a"},
+        {"artificer/orm.windows.ktx2", "f99cb2a329f67eba4270b86abfd355831326ab289bf518a3a57c386447353d1a"}
+    };
+    constexpr std::pair<std::string_view, std::string_view> salvager[]{
+        {"salvager/asset.manifest.json", "5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc"},
+        {"salvager/resident.glb", "26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa"},
+        {"salvager/base-color.windows.ktx2", "8112345b1a802fd68101f64c5dffa8acdbff9cc37f47dea355ed6f27046cdc5a"},
+        {"salvager/normal.windows.ktx2", "ea2bee3dfd0a2eaad084f0511406696a1e764b3a50a10efcb15bbf5aca65d3a7"},
+        {"salvager/orm.windows.ktx2", "bd75d588cd6d3e92161aba844bb083e040b1ec68ce0f7ceabd9fbb300c1fc57e"}
+    };
+    constexpr std::pair<std::string_view, std::string_view> relicDealer[]{
+        {"relic-dealer/asset.manifest.json", "840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae"},
+        {"relic-dealer/resident.glb", "588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe"},
+        {"relic-dealer/base-color.windows.ktx2", "d87516c62dd29c30605f8c1cbb4a7245fd964097fbd28a65097c863da63d3d6f"},
+        {"relic-dealer/normal.windows.ktx2", "f1f443710b7ca242caa0126c7c73378b4da0bf65a7ef368e93b68116b0a2cee7"},
+        {"relic-dealer/orm.windows.ktx2", "538f0755b2f15e6726b977ceae4a0b04bb08a525d8cfcc53f7d2b6944037fca8"}
+    };
+    std::error_code error;
+    const auto root = std::filesystem::canonical(directory, error);
+    if (error) return false;
+    const auto matches = [&](const auto& files) {
+        for (const auto& [relative, expected] : files) {
+            const auto path = root / relative;
+            std::string digest, diagnostic;
+            if (!std::filesystem::is_regular_file(path, error) || error ||
+                !Sha256File(path, digest, diagnostic) || digest != expected) return false;
+        }
+        return true;
+    };
+    const bool textured = matches(texturedKeeper);
+    if (!textured && !matches(standIn)) return false;
+    const bool mill = std::filesystem::exists(root / "artificer", error);
+    if (error) return false;
+    const bool church = std::filesystem::exists(root / "record-keeper", error);
+    if (error) return false;
+    const bool shore = std::filesystem::exists(root / "salvager", error);
+    if (error) return false;
+    const bool west = std::filesystem::exists(root / "relic-dealer", error);
+    if (error) return false;
+    const int specialistCount = static_cast<int>(mill) + static_cast<int>(church) +
+        static_cast<int>(shore) + static_cast<int>(west);
+    const bool combined = mill && church && shore;
+    if (combined) {
+        if (!textured || !matches(recordKeeper) || !matches(artificer) || !matches(salvager) ||
+            (west && !matches(relicDealer))) return false;
+    } else if (specialistCount != 1 ||
+               (west ? !matches(relicDealer) : shore ? !matches(salvager) :
+                    mill ? !matches(artificer) : !matches(recordKeeper))) {
+        return false;
+    }
+    gBellwetherCampaignActors = root;
+    gBellwetherCombinedCampaignActors = combined;
+    gBellwetherCombinedRelicDealer = combined && west;
+    using horde::gameplay::bellwether::Specialist;
+    gBellwetherCampaignSpecialist = combined ? Specialist::RecordKeeper : west ? Specialist::RelicDealer :
+        shore ? Specialist::Salvager : mill ? Specialist::Artificer : Specialist::RecordKeeper;
+    return true;
+}
+#endif
 
 bool ValidateCapturedObjGeometry(const std::filesystem::path& path,
                                  horde::platform::windows::CapturedPlayerGeometryEvidence& evidence,
@@ -2289,10 +2639,17 @@ bool PlayXAudioFile(const std::filesystem::path& path,
 
 #include "windows_private_lich_revival_audio.inl"
 
+bool KitAnkleAudioAudible(const VulkanSurfaceContext& context)
+{
+    return context.controlsEnabled && !context.unattendedBenchmark && !MeasurementPausedByUi(context) &&
+        context.sfxVolumePercent>0 && GetForegroundWindow()==context.windowHandle;
+}
+
 void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
 {
     if(gCampaignHiddenValidation)return;
     UpdatePrivateLichRevivalAudio(context);
+    if(!KitAnkleAudioAudible(context))SpatialAudioEngine().StopLoop("kit_ankle_foley");
     if((!horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()) &&
         !horde::gameplay::simulation::ChapterLocalAmbience::Eligible(context.simulation.Snapshot())) ||
@@ -2303,7 +2660,15 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     const auto& dialogue = simulation.chapterDialogue;
     const auto line = dialogue.line;
     const auto lineId = static_cast<std::uint32_t>(line);
-    if (line == Line::None)
+    const auto& spec = horde::gameplay::dialogue::Spec(line);
+    std::filesystem::path privateVoice;
+#if defined(_DEBUG)
+    if (!gBellwetherVoiceDirectory.empty() &&
+        horde::audio::HasBellwetherVoiceCut(line, gBellwetherArrivalAudition,
+            gBellwetherSalvagerAudition, gBellwetherFollowOnAudition))
+        privateVoice = gBellwetherVoiceDirectory / (std::string(spec.stableId) + ".wav");
+#endif
+    if (line == Line::None || (spec.audio[0] == '\0' && privateVoice.empty()))
     {
         if (context.playingDialogueLine != 0u)
             SpatialAudioEngine().StopLoop("chapter_dialogue");
@@ -2326,13 +2691,15 @@ void UpdateChapterDialogueAudio(VulkanSurfaceContext& context)
     SpatialAudioEngine().StopLoop("chapter_dialogue");
     context.playingDialogueLine = 0u;
     context.playingDialogueGeneration = 0u;
-    const auto& spec = horde::gameplay::dialogue::Spec(line);
-    if (spec.audio == nullptr || spec.audio[0] == '\0') return;
-    const auto path = horde::platform::windows::WindowsDialogueAudioPath(
-        ResolveAssetRoot(), spec.audio);
+    const auto path = privateVoice.empty() ? horde::platform::windows::WindowsDialogueAudioPath(
+        ResolveAssetRoot(), spec.audio) : privateVoice;
     if (!std::filesystem::exists(path))
     {
-        LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + path.string());
+        if (context.loggedDialogueAttemptGeneration != dialogue.generation) {
+            LogWindowsAudio("chapter line audio unavailable; subtitle remains active: " + std::string(spec.stableId));
+            context.loggedDialogueAttemptGeneration = dialogue.generation;
+            context.loggedDialogueAttemptAccepted = false;
+        }
         return;
     }
     if (gains.left <= 0.0f && gains.right <= 0.0f) return;
@@ -2364,7 +2731,11 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     HWND subtitle = GetDlgItem(context.windowHandle, kChapterSubtitleId);
     if (subtitle == nullptr) return;
     const auto& dialogue = context.simulation.Snapshot().chapterDialogue;
-    if (!context.subtitlesEnabled || dialogue.line == horde::gameplay::dialogue::Line::None ||
+    const bool voicePlaying = context.playingDialogueLine == static_cast<unsigned>(dialogue.line) &&
+        context.playingDialogueGeneration == dialogue.generation && context.voiceVolumePercent > 0;
+    const bool requiresCaption = !voicePlaying && horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line);
+    if ((!context.subtitlesEnabled && !requiresCaption) ||
+        dialogue.line == horde::gameplay::dialogue::Line::None ||
         dialogue.paused || !context.controlsEnabled || MeasurementPausedByUi(context))
     {
         SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
@@ -2656,9 +3027,21 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::TombDrip:
         case GameplayEventType::RopeContact:
         case GameplayEventType::ForestFoliage:
+        case GameplayEventType::BellwetherHearth:
+        case GameplayEventType::BellwetherPigGrunt:
+        case GameplayEventType::BellwetherHenCluck:
+        case GameplayEventType::BellwetherWaterwheelCreak:
             if(event.sequence!=latestAmbienceSignal)break;
             if(event.type==GameplayEventType::ForestFoliage &&
                !horde::gameplay::simulation::ForestBirdAmbience::FoliageEligible(context.simulation.Snapshot())) {
+                SpatialAudioEngine().StopLoop("chapter_ambience");break;
+            }
+            if(horde::gameplay::simulation::IsStockAmbienceEvent(event.type) &&
+               !horde::gameplay::simulation::ChapterLocalAmbience::StockEventEligible(context.simulation.Snapshot(),event)) {
+                SpatialAudioEngine().StopLoop("chapter_ambience");break;
+            }
+            if(event.type==GameplayEventType::BellwetherWaterwheelCreak &&
+               !horde::gameplay::simulation::ChapterLocalAmbience::MillEligible(context.simulation.Snapshot())) {
                 SpatialAudioEngine().StopLoop("chapter_ambience");break;
             }
             if(context.controlsEnabled && !context.simulationPaused && context.sfxVolumePercent>0 &&
@@ -2669,17 +3052,22 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
                    horde::gameplay::simulation::ChapterLocalAmbience::DripEligible(context.simulation.Snapshot()):
                 event.type==GameplayEventType::RopeContact?
                    horde::gameplay::simulation::ChapterLocalAmbience::RopeEligible(context.simulation.Snapshot()):
-                event.type==GameplayEventType::PondFrogs?
+                event.type==GameplayEventType::BellwetherHearth?
+                   horde::gameplay::simulation::ChapterLocalAmbience::HearthEligible(context.simulation.Snapshot()):
+                horde::gameplay::simulation::IsBellwetherExteriorAmbienceEvent(event.type) ||
+                (event.type==GameplayEventType::PondFrogs?
                    horde::gameplay::simulation::ForestBirdAmbience::PondEligible(context.simulation.Snapshot()):
-                   horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot()))) {
+                   horde::gameplay::simulation::ForestBirdAmbience::Eligible(context.simulation.Snapshot())))) {
                 auto& audio=SpatialAudioEngine();audio.StopLoop("chapter_ambience");
-                const auto gains=horde::gameplay::CalculateSpatialAudio(
-                    horde::gameplay::simulation::ChapterAmbienceEmitter(event),
-                    {event.listenerX,event.listenerZ,event.listenerYawRadians,event.listenerY});
+                const auto gains=horde::gameplay::simulation::ChapterAmbienceGains(event);
                 const auto clip=event.type==GameplayEventType::ForestFoliage?
                     "audio/forest-foliage/runtime/leaf_rustle.wav":event.type==GameplayEventType::TombDrip?
                     "audio/chapter-local-ambience/runtime/tomb_drip.wav":event.type==GameplayEventType::RopeContact?
-                    "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::PondFrogs?
+                    "audio/chapter-local-ambience/runtime/rope_contact.wav":event.type==GameplayEventType::BellwetherHearth?
+                    "audio/bellwether-hearth/runtime/hearth_crackle.wav":event.type==GameplayEventType::BellwetherPigGrunt?
+                    "audio/bellwether-stock/runtime/pig_grunt.wav":event.type==GameplayEventType::BellwetherHenCluck?
+                    "audio/bellwether-stock/runtime/hen_cluck.wav":event.type==GameplayEventType::BellwetherWaterwheelCreak?
+                    "audio/bellwether-mill/runtime/wheel_creak.wav":event.type==GameplayEventType::PondFrogs?
                     "audio/night-ambience/runtime/pond_frogs_crickets.wav":event.type==GameplayEventType::ForestCrickets?
                     "audio/night-ambience/runtime/evening_cricket.wav":"audio/night-ambience/runtime/tawny_owl.wav";
                 (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,
@@ -2690,6 +3078,18 @@ void DrainGameplayEvents(VulkanSurfaceContext& context)
         case GameplayEventType::ChapterLocalAmbienceStopped:
             if(event.sequence!=latestAmbienceSignal)break;
             SpatialAudioEngine().StopLoop("chapter_ambience");break;
+        case GameplayEventType::KitAnkleFoley:
+            if(KitAnkleAudioAudible(context)) {
+                const auto* clip=horde::audio::KitAnkleClip(horde::audio::KitAnkleCueForEvent(event));
+                const auto gains=horde::audio::KitAnkleGains(event);
+                if(clip && (gains.left>0 || gains.right>0)) {
+                    auto& audio=SpatialAudioEngine();
+                    audio.StopLoop("kit_ankle_foley");
+                    (void)audio.Play(ResolveAssetRoot()/clip,gains.left,gains.right,"kit_ankle_foley",0,0,
+                        horde::platform::windows::WindowsSfxSourceGain(1.f,context.sfxVolumePercent));
+                }
+            }
+            break;
         case GameplayEventType::PlayerWetFootstep:
         {
             const unsigned variant = static_cast<unsigned>(context.playerFootstepVariant++) & 3u;
@@ -3167,19 +3567,25 @@ void UpdateFlaskHud(VulkanSurfaceContext& context)
         context.flaskLessonUntil=now+3500;
     }
     std::string hint;
+    using horde::gameplay::campaign::CheckpointId;
+    const bool hearth = s.flaskNearbyRestAnchor==static_cast<std::uint32_t>(CheckpointId::BellwetherTavern);
     switch(s.flaskHint) {
     case FlaskHint::Returning:hint="Returning flask...";break;
     case FlaskHint::Interrupted:hint="Interrupted. No charge used.";break;
     case FlaskHint::Drinking:hint="Drinking... stay still.";break;
     case FlaskHint::Resting:hint="Resting... stay still.";break;
-    case FlaskHint::Empty:if(quiet && (now<context.flaskEmptyHintUntil || now<context.flaskAttemptHintUntil))
+    case FlaskHint::Empty:if(!hearth && quiet && (now<context.flaskEmptyHintUntil || now<context.flaskAttemptHintUntil))
         hint="Empty. Rest at a basin.";break;
     case FlaskHint::FullHealth:if(now<context.flaskAttemptHintUntil)hint="Health full.";break;
     case FlaskHint::StandStill:if(now<context.flaskAttemptHintUntil)hint="Stand still; lower guard.";break;
     default:break;
     }
-    if(hint.empty() && s.flaskNearbyRestAnchor)hint=s.flaskRestAnchor?
-        (controller?"D-pad Down: Rest":"J: Rest"):"Basin nearby";
+    if(hint.empty() && s.flaskNearbyRestAnchor) {
+        if(s.flaskRestAnchor) {
+            hint=controller?"D-pad Down: Rest":"J: Rest";
+            if(hearth)hint+=" by the hearth";
+        } else hint=hearth?"Rest by the hearth":"Basin nearby";
+    }
     if(hint.empty() && quiet && now<context.flaskLessonUntil &&
        (s.flaskHint==FlaskHint::Ready || s.flaskHint==FlaskHint::FullHealth))hint=flask.resources.upgraded?
         "Capacity 3. Rest refills.":"Drink heals one heart. Stay still.";
@@ -3250,6 +3656,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     context.chestInteractionPromptPresented = false;
     context.rescueInteractionPromptPresented = false;
     context.flaskUpgradeInteractionPromptPresented = false;
+    context.tavernInteractionPromptPresented = false;
     HWND promptControl = GetDlgItem(context.windowHandle, kChestPromptControlId);
     if (promptControl == nullptr)
     {
@@ -3270,14 +3677,26 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     const bool rescueJourney = snapshot.developmentRescueJourney &&
         snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None;
     const bool flaskUpgrade = !rescueJourney && snapshot.flaskUpgrade.interactEligible;
+    const bool chapterInteract = !rescueJourney && !flaskUpgrade && snapshot.HasChapterInteractPrompt();
+    using horde::gameplay::bellwether::MillLeakTestPhase;
+    using horde::gameplay::bellwether::SalvagerAction;
+    using horde::gameplay::bellwether::ShorePracticeStage;
+    using horde::gameplay::campaign::OrdinarySilverAction;
+    const bool saleReceipt = !rescueJourney && !flaskUpgrade && snapshot.ordinarySilverAction==OrdinarySilverAction::Sold;
+    const auto leakTest=snapshot.millLeakTestPhase;
+    const auto shorePractice=snapshot.shorePracticeStage;
     const bool raiseLantern = snapshot.NeedsRaiseLanternPrompt();
-    const bool visible = (rescueJourney || flaskUpgrade || raiseLantern)
+    const bool visible = (rescueJourney || flaskUpgrade || chapterInteract || saleReceipt || raiseLantern ||
+                          snapshot.tavernLanternAvailable || leakTest!=MillLeakTestPhase::Idle ||
+                          snapshot.millDriveTesting || shorePractice!=ShorePracticeStage::Idle)
         ? !visibility.simulationPaused && !visibility.pauseMenuVisible && !visibility.settingsVisible &&
           !visibility.diagnosticsVisible && !visibility.benchmarkReportVisible && !visibility.rtLabVisible &&
           !visibility.deathOverlayVisible && !visibility.endingOverlayVisible && !visibility.benchmarkRunning &&
           !visibility.captureMode
         : horde::platform::windows::ShouldShowWindowsChestPrompt(snapshot.chestPrompt, visibility);
     std::string_view text;
+    std::string tradeText;
+    bool showingShorePracticeCue = false;
     if (rescueJourney)
     {
         using horde::gameplay::traversal::RescuePrompt;
@@ -3296,6 +3715,121 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
         text = "FLASK UPGRADE | LEFT-CLICK / A TO TAKE";
         context.flaskUpgradeInteractionPromptPresented=visible;
     }
+    else if(chapterInteract && snapshot.tavernDoorAction!=horde::gameplay::bellwether::DoorAction::None) {
+        text = snapshot.tavernDoorAction==horde::gameplay::bellwether::DoorAction::Open
+            ? "LEFT-CLICK / A TO OPEN THE TAVERN DOOR" : "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR";
+    }
+    else if(chapterInteract && snapshot.tavernLanternFittingAvailable) {
+        text = "LEFT-CLICK / A TO FIT LANTERN HINGE";
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.millTallyAction!=horde::gameplay::campaign::MillTallyAction::None) {
+        using horde::gameplay::campaign::MillTallyAction;
+        switch(snapshot.millTallyAction) {
+        case MillTallyAction::Take: text="LEFT-CLICK / A TO TAKE THE TALLY STAMP"; break;
+        case MillTallyAction::Sell:
+            tradeText="SELL TALLY STAMP (+" +
+                std::to_string(horde::gameplay::campaign::TreasurePurse::kMillTallySaleCoins) + " COINS) | LEFT-CLICK / A";
+            text=tradeText;
+            break;
+        case MillTallyAction::RecordClaim: text="LEFT-CLICK / A TO CHECK THE MILL MARK"; break;
+        case MillTallyAction::Recover: text="LEFT-CLICK / A TO RECOVER THE STAMP (FREE)"; break;
+        case MillTallyAction::Return: text="LEFT-CLICK / A TO RETURN THE TALLY STAMP"; break;
+        case MillTallyAction::None: break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.millAction!=horde::gameplay::bellwether::MillAction::None) {
+        using horde::gameplay::bellwether::MillAction;
+        switch(snapshot.millAction) {
+        case MillAction::InspectGearing: text = "LEFT-CLICK / A TO INSPECT MILL GEARING"; break;
+        case MillAction::RecoverBearing: text = "LEFT-CLICK / A TO TAKE A SPARE BEARING"; break;
+        case MillAction::CheckFit: text = "LEFT-CLICK / A TO CHECK BEARING FIT"; break;
+        case MillAction::StartLeakTest: text = "LEFT-CLICK / A TO START LEAK TEST"; break;
+        case MillAction::ConfirmSeal: text = "LEFT-CLICK / A TO CONFIRM SEAL"; break;
+        case MillAction::SeatBearing: text = "LEFT-CLICK / A TO SEAT THE BEARING"; break;
+        case MillAction::TurnDrive: text = "LEFT-CLICK / A TO TURN THE DRIVE"; break;
+        case MillAction::TakeRig: text = "LEFT-CLICK / A TO TAKE THE BREATHING RIG"; break;
+        default: break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.salvagerAction!=SalvagerAction::None) {
+        switch(snapshot.salvagerAction) {
+        case SalvagerAction::StartPractice: text="LEFT-CLICK / A TO START SHORE PRACTICE"; break;
+        case SalvagerAction::ReportPractice: text="LEFT-CLICK / A TO REPORT TO THE SALVAGER"; break;
+        case SalvagerAction::RecallPractice: text="LEFT-CLICK / A TO RECALL THE LESSON"; break;
+        case SalvagerAction::None: break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.privyRagAction!=horde::gameplay::bellwether::PrivyRagAction::None) {
+        text = snapshot.privyRagAction==horde::gameplay::bellwether::PrivyRagAction::Take
+            ? "LEFT-CLICK / A TO TAKE A CLEAN RAG" : "LEFT-CLICK / A TO PASS THE RAG";
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract && snapshot.gardenGrateTalkAvailable) {
+        text="LEFT-CLICK / A TO TALK THROUGH THE GRATE";
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if((chapterInteract || saleReceipt) && snapshot.ordinarySilverAction!=OrdinarySilverAction::None) {
+        switch(snapshot.ordinarySilverAction) {
+        case OrdinarySilverAction::Take: text="LEFT-CLICK / A TO TAKE ORDINARY SILVER"; break;
+        case OrdinarySilverAction::Sell:
+            tradeText="SELL ORDINARY SILVER (+"+
+                std::to_string(horde::gameplay::campaign::TreasurePurse::kOrdinarySilverSaleCoins)+
+                " COINS) | LEFT-CLICK / A";
+            text=tradeText;
+            break;
+        case OrdinarySilverAction::Sold: text="ORDINARY SILVER SOLD"; break;
+        case OrdinarySilverAction::None: break;
+        }
+        context.tavernInteractionPromptPresented=visible && snapshot.ordinarySilverAction!=OrdinarySilverAction::Sold;
+    }
+    else if(chapterInteract && snapshot.relicDealerTradeAvailable) {
+        text = "LEFT-CLICK / A TO ASK ABOUT TRADE";
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(chapterInteract) {
+        using horde::gameplay::bellwether::ArchiveAction;
+        switch (snapshot.waysideArchiveAction) {
+        case ArchiveAction::Inspect: text = "LEFT-CLICK / A TO INSPECT ARCHIVE"; break;
+        case ArchiveAction::Open: text = "LEFT-CLICK / A TO OPEN LOWER STONE"; break;
+        case ArchiveAction::Listen: text = "LEFT-CLICK / A TO LISTEN TO THE LANTERN"; break;
+        case ArchiveAction::TakeRegister: text = "LEFT-CLICK / A TO TAKE THE ROAD REGISTER"; break;
+        case ArchiveAction::Recap: text = "LEFT-CLICK / A TO RECALL THE LANTERN'S WORDS"; break;
+        case ArchiveAction::RestoreBinding: text = "LEFT-CLICK / A TO RESTORE SHRINE BINDING"; break;
+        default:
+            using horde::gameplay::dialogue::RecordKeeperAction;
+            switch (snapshot.recordKeeperAction) {
+            case RecordKeeperAction::ShowRoadMark: text = "LEFT-CLICK / A TO SHOW THE ROAD MARK"; break;
+            case RecordKeeperAction::ShowRegister: text = "LEFT-CLICK / A TO SHOW THE ROAD REGISTER"; break;
+            case RecordKeeperAction::RecallRoutes: text = "LEFT-CLICK / A TO RECALL THE EXPEDITION ROUTES"; break;
+            case RecordKeeperAction::CollectReward: text = "LEFT-CLICK / A TO COLLECT REGISTER REWARD"; break;
+            case RecordKeeperAction::LearnAirWard: text = "LEFT-CLICK / A TO LEARN THE AIR WARD"; break;
+            default: text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT"; break;
+            }
+            break;
+        }
+        context.tavernInteractionPromptPresented=visible;
+    }
+    else if(snapshot.millDriveTesting) {
+        text = "TESTING THE DRIVE";
+    }
+    else if(leakTest!=MillLeakTestPhase::Idle) {
+        text = leakTest==MillLeakTestPhase::Testing ? "LEAK TEST | STAY IN THE SHALLOWS" : "RETURN TO DRY STONE";
+    }
+    else if(shorePractice!=ShorePracticeStage::Idle) {
+        showingShorePracticeCue = true;
+        switch(shorePractice) {
+        case ShorePracticeStage::FindDryMark: text="FOLLOW THE CAUSEWAY TO THE RIVER RAIL"; break;
+        case ShorePracticeStage::EnterShallows: text="WADE TO THE RAIL"; break;
+        case ShorePracticeStage::Retreat: text="RETURN TO DRY STONE"; break;
+        case ShorePracticeStage::ReportBack: text="RETURN TO THE SALVAGER AT THE FORK"; break;
+        case ShorePracticeStage::RecoverBreath: text="RECOVER BREATH ON DRY STONE"; break;
+        case ShorePracticeStage::Idle: break;
+        }
+    }
     else
     {
         text = horde::platform::windows::WindowsChestPromptText(snapshot.chestPrompt);
@@ -3304,7 +3838,19 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
              snapshot.chestPrompt == horde::gameplay::interactions::ChestRewardPrompt::ClaimLantern);
     }
     std::string contextualText(text);
-    if (raiseLantern) {
+    if (showingShorePracticeCue && snapshot.shorePracticeBreathTicksRemaining > 0) {
+        contextualText += " | BREATH " + std::to_string(
+            horde::gameplay::bellwether::ShorePracticeSecondsRemaining(
+                snapshot.shorePracticeBreathTicksRemaining)) + "s";
+    }
+    if(chapterInteract && snapshot.tavernLanternFittingAvailable)
+        contextualText+=" ("+std::to_string(horde::gameplay::campaign::TreasurePurse::kLanternFittingPrice)+" COINS)";
+    if (snapshot.tavernLanternAvailable) {
+        const bool controller = context.teachingControllerGlyphs;
+        const bool high = snapshot.interaction.heldLightPose==horde::gameplay::interactions::HeldLightPose::High;
+        contextualText = high ? (controller ? "Y: LOWER, THEN RAISE LANTERN FOR KIT" : "E: LOWER, THEN RAISE LANTERN FOR KIT")
+                              : (controller ? "Y: RAISE LANTERN FOR KIT" : "E: RAISE LANTERN FOR KIT");
+    } else if (raiseLantern) {
         contextualText=horde::platform::windows::WindowsRaiseLanternPromptText(context.teachingControllerGlyphs,
             rescueJourney && snapshot.rescuePrompt==horde::gameplay::traversal::RescuePrompt::Descend);
     }
@@ -3463,9 +4009,13 @@ LookoutPanel::View CurrentLookoutObjectiveView(const VulkanSurfaceContext& conte
         !context.settingsVisible && !context.diagnosticsVisible && !context.benchmarkReportVisible &&
         !context.graphicsVisible && !context.rtLabVisible && !context.deathOverlayVisible && !context.endingOverlayVisible &&
         !context.campaignPause && !(context.campaignMenu && context.campaignMenu->Visible()) &&
-        !context.benchmark.IsRunning() && context.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
-        horde::gameplay::campaign::LookoutObjectiveAvailable(snapshot,context.simulation.LatestCampaignBoundary());
-    return {available,context.lookoutAppActive,snapshot.worldRoute.generation,context.campaignSurfaceGeneration};
+        !context.benchmark.IsRunning() && context.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase;
+    const auto objective = available ?
+        horde::gameplay::campaign::CurrentPauseObjective(snapshot,context.simulation.LatestCampaignBoundary()) :
+        LookoutPanel::Objective::None;
+    return {objective!=LookoutPanel::Objective::None,context.lookoutAppActive,
+        snapshot.worldRoute.generation,context.campaignSurfaceGeneration,objective,
+        horde::gameplay::campaign::CurrentBellwetherDirections(snapshot)};
 }
 
 void ApplyOverlayState(VulkanSurfaceContext& context)
@@ -3676,6 +4226,9 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
     SetControlVisible(context.windowHandle,kCampaignLoadButtonId,pauseVisible && !campaignVisible &&
         (!context.entryMenuVisible || context.entryMoreVisible) && !context.endingOverlayVisible);
     const auto lookoutView=CurrentLookoutObjectiveView(context);
+    if (lookoutView.available)
+        horde::platform::windows::SetNativeTextIfChanged(GetDlgItem(context.windowHandle,kLookoutObjectiveButtonId),
+            lookoutView.objective==LookoutPanel::Objective::Lookout?"LOOKOUT OBJECTIVE":"BELLWETHER DIRECTIONS");
     SetControlVisible(context.windowHandle,kLookoutObjectiveButtonId,pauseVisible && lookoutView.available && lookoutView.active);
     if(campaignVisible) {
         EnumChildWindows(context.windowHandle,[](HWND child,LPARAM)->BOOL {
@@ -3957,7 +4510,9 @@ void OpenLookoutObjective(VulkanSurfaceContext& context)
     if(!context.lookoutObjective)context.lookoutObjective=std::make_unique<LookoutPanel>();
     const auto font=reinterpret_cast<HFONT>(SendMessageA(GetDlgItem(context.windowHandle,kResumeButtonId),WM_GETFONT,0,0));
     if(!context.lookoutObjective->Open(context.windowHandle,view,font))return;
-    for(auto control:context.lookoutObjective->ActionControls())InstallControllerFocusOutline(control);
+    for(auto control:context.lookoutObjective->ActionControls())if(control)InstallControllerFocusOutline(control);
+    if(view.objective!=LookoutPanel::Objective::Lookout)
+        InstallControllerFocusOutline(GetDlgItem(context.windowHandle,LookoutPanel::BodyId));
     ApplyOverlayState(context);
     RECT client{};GetClientRect(context.windowHandle,&client);
     LayoutOverlayControls(context.windowHandle,client.right,client.bottom);
@@ -3982,6 +4537,11 @@ void FinishLookoutObjective(VulkanSurfaceContext& context,LookoutPanel::Action a
     context.simulationInput.dialogueCompletionLine=0;context.simulationInput.dialogueCompletionGeneration=0;
     context.lookoutMovementNeedsFreshKeyDown=true;context.lastControlSteadyNs=0;
     if(action==LookoutPanel::Action::ContinueExploring) {ShowPauseMenu(context,false);return;}
+    if(action==LookoutPanel::Action::BackToPause) {
+        ShowPauseMenu(context,true);
+        FocusGameControl(GetDlgItem(context.windowHandle,kLookoutObjectiveButtonId));
+        return;
+    }
     // Reuse the branded RT entry profile. Its existing retirement path retains
     // the paused logical simulation and latest boundary; no reset/save/write.
     context.entryMenu.Reset();context.entryMenu.SetReducedMotion(context.reducedMotionEnabled);
@@ -4461,6 +5021,9 @@ horde::ui::DeveloperOverlaySnapshot BuildDeveloperOverlaySnapshot(
     snapshot.rtMode = horde::vulkan::ToString(context.rtScene.ExecutionBackend());
     snapshot.routeZone = horde::gameplay::ShowcaseZoneName(
         horde::gameplay::QueryShowcaseZone(context.cameraX, context.cameraZ));
+    snapshot.playerX = simulation.playerX;
+    snapshot.playerZ = simulation.playerZ;
+    snapshot.playerYawRadians = simulation.playerYawRadians;
     snapshot.materialEncoding = context.rtScene.MaterialEncoding();
     snapshot.torchFailurePhase = horde::gameplay::TorchFailurePhaseName(context.torchFailureSnapshot.phase);
     snapshot.selectedEnemy = horde::gameplay::EnemyKindName(roster.selectedEnemy);
@@ -4724,7 +5287,10 @@ bool HasDeviceExtension(VkPhysicalDevice physicalDevice, const char* extensionNa
 void ClearDesktopInput(VulkanSurfaceContext& context)
 {
     StopPrivateLichRevivalAudio(context);
-    if(!gCampaignHiddenValidation)SpatialAudioEngine().StopLoop("chapter_ambience");
+    if(!gCampaignHiddenValidation) {
+        SpatialAudioEngine().StopLoop("chapter_ambience");
+        SpatialAudioEngine().StopLoop("kit_ankle_foley");
+    }
     if (context.crouchHeld) context.crouchKeyBlockedUntilRelease = true;
     context.crouchHeld = false;
     context.controllerCrouchHeld = false;
@@ -5178,6 +5744,7 @@ void HandleControllerMenuEdges(
     }
     if (edges.decrease || edges.increase)
     {
+        if (context.lookoutObjective && context.lookoutObjective->ScrollPage(edges.increase)) return;
         if (!AdjustFocusedControllerSlider(context, edges.increase))
         {
             if (context.graphicsVisible)
@@ -6551,6 +7118,68 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
     ctx.rtScene.SetDevelopmentSupportFixture(ctx.developmentVerticalProof &&
         ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase);
 #if defined(_DEBUG)
+    if (!ctx.rtScene.SetBellwetherFurnitureDetail(ctx.bellwetherFurnitureDetail) ||
+        !ctx.rtScene.SetBellwetherFurnitureTransitions(ctx.bellwetherFurnitureTransitions) ||
+        !ctx.rtScene.SetBellwetherFurnitureResidency(ctx.bellwetherFurnitureResidency)) {
+        ctx.lastRtFrameError="Bellwether furniture detail must be selected before scene creation.";
+        return false;
+    }
+    if (ctx.artificerCapture || ctx.salvagerCapture || ctx.relicDealerCapture) {
+        using horde::gameplay::bellwether::Specialist;
+        const auto specialist = ctx.relicDealerCapture ? Specialist::RelicDealer :
+            ctx.artificerCapture ? Specialist::Artificer : Specialist::Salvager;
+        auto sources = horde::vulkan::raytracing::BellwetherResidentSources(
+            ctx.chapterResidentFixture, specialist);
+        const auto& alternate = ParseCaptureLaunchOptions().chapterResidentModelRoundTrip;
+        if (!alternate.empty()) {
+            using horde::scene::assets::AssetManifest;
+            AssetManifest original, replacement;
+            if (!AssetManifest::Load(sources.back().directory / "asset.manifest.json", original, diagnostic) ||
+                !AssetManifest::Load(alternate / "asset.manifest.json", replacement, diagnostic)) {
+                ctx.lastRtFrameError = diagnostic;
+                return false;
+            }
+            sources.back().replacementCapacity = {
+                std::max(original.budgets.maxVertices, replacement.budgets.maxVertices),
+                std::max(original.budgets.maxIndices, replacement.budgets.maxIndices)};
+        }
+        if (!ctx.rtScene.SetChapterResidentActors(sources, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            return false;
+        }
+        ctx.rtScene.RequestPackagedBellwetherFurniture(true);
+    } else if (!gBellwetherCampaignActors.empty()) {
+        const bool authoredShowcase = rescueJourney &&
+            ctx.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase;
+        if (!SetBellwetherCampaignResidentSources(ctx.rtScene,
+                authoredShowcase ? gBellwetherCampaignActors : std::filesystem::path{}, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            return false;
+        }
+    } else if (!ctx.chapterResidentFixture.empty()) {
+        using horde::vulkan::raytracing::ChapterResidentActorSource;
+        const std::vector<horde::scene::SkinnedClipBinding> clips{
+            {"Warden|idle", true, true}, {"Warden|walk", true, true}};
+        std::vector<ChapterResidentActorSource> fixtures;
+        if (ctx.staffedTavernCapture) {
+            fixtures.push_back({horde::gameplay::dialogue::kTavernKeeperActorId,
+                ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "tavern-keeper" : ctx.chapterResidentFixture,
+                "resident.glb", clips});
+        }
+        if (ctx.combinedBellwetherResidents || ctx.recordKeeperCapture) {
+            fixtures.push_back({horde::gameplay::dialogue::kRecordKeeperActorId,
+                ctx.combinedBellwetherResidents ? ctx.chapterResidentFixture / "record-keeper" : ctx.chapterResidentFixture,
+                "resident.glb", {clips.front()}});
+        }
+        if (fixtures.empty()) {
+            fixtures.push_back({0x52544431, ctx.chapterResidentFixture, "resident.glb", clips});
+            fixtures.push_back({0x52544432, ctx.chapterResidentFixture, "resident.glb", clips});
+        }
+        if (!ctx.rtScene.SetChapterResidentActors(fixtures, diagnostic)) {
+            ctx.lastRtFrameError = diagnostic;
+            return false;
+        }
+    }
     if(ctx.forestRouteProof!=horde::platform::windows::ForestRouteCaptureMode::Disabled) {
         using Mode=horde::vulkan::raytracing::PresentableTinyRtScene::ForestRouteProofMode;
         const bool normalShared=ctx.forestRouteProof==horde::platform::windows::ForestRouteCaptureMode::NormalShared64;
@@ -7376,6 +8005,25 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
 #endif
     if (useRtFrame)
     {
+        // The graphics fence above covers the older command recordings.
+        struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
+        ActorRetirementOwner actorOwner{&ctx, imageIndex};
+        const auto retireResourceReferences = [](void* user, std::string& error) {
+            auto& owner = *static_cast<ActorRetirementOwner*>(user);
+            auto& context = *owner.context;
+            if (context.inFlightFences.size() != 1u) {
+                error = "Character retirement requires the single completed graphics owner.";
+                return false;
+            }
+            for (std::size_t i = 0; i < context.commandBuffers.size(); ++i) {
+                if (i != owner.image && vkResetCommandBuffer(context.commandBuffers[i], 0u) != VK_SUCCESS) {
+                    error = "Prior character command references could not be reset.";
+                    return false;
+                }
+            }
+            return true;
+        };
+        std::string diagnostic;
         if (!gCampaignHiddenValidation && !ctx.environmentSurveyActive && !ctx.graphicsPreviewCapture && !ctx.outputResizeValidation && !ctx.nativeMotionValidation)
         {
             SpatialAudioEngine().Update();
@@ -7399,6 +8047,17 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             UpdateDesktopSceneControls(ctx, evidenceFrame ? &observation : nullptr);
         }
+#if defined(_DEBUG)
+        if (gBellwetherCombinedCampaignActors && !previewFrame && !frozenDevelopmentCheckpoint &&
+            ctx.simulation.Snapshot().developmentRescueJourney &&
+            !horde::vulkan::raytracing::AdvanceBellwetherCombinedResidents(
+                ctx.rtScene, ctx.simulation, gBellwetherCampaignActors,
+                retireResourceReferences, &actorOwner, diagnostic, gBellwetherCombinedRelicDealer)) {
+            ctx.lastRtFrameError = diagnostic;
+            if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
+#endif
         if (!gCampaignHiddenValidation && !ctx.environmentSurveyActive && !previewFrame && !ctx.outputResizeValidation && !ctx.nativeMotionValidation) UpdateWaterfallAmbience(ctx);
         const horde::gameplay::simulation::SimulationSnapshot& simulation =
 #if defined(_DEBUG)
@@ -7436,6 +8095,32 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             return false;
         }
 #if defined(_DEBUG)
+        if (ctx.residentModelProofActor) {
+            if (!frozenDevelopmentCheckpoint || !gShowcaseCaptureHidden ||
+                !frameInputs.chapterResidents.back().stableId) {
+                ctx.lastRtFrameError = "Resident model proof requires a hidden frozen specialist pose.";
+                if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+            frameInputs.chapterResidents.back().stableId = *ctx.residentModelProofActor;
+        }
+        if (!ctx.chapterResidentFixture.empty() && ctx.developmentCheckpoint == "chapter-kit-reunion") {
+            const auto terrain = ctx.rtScene.ChapterTerrainSurface();
+            const auto request = [&](std::size_t lane, std::uint32_t id, float x, float z, float yaw,
+                                     horde::scene::SkinnedClip clip, float time) {
+                if (!terrain) return false;
+                const auto support = terrain->Query(x, z);
+                if (!support.found || !support.walkable) return false;
+                frameInputs.chapterResidents[lane] = {id, {x, support.worldY, z}, yaw, clip, time};
+                return true;
+            };
+            if (!request(0, 0x52544431, -25.60f, -6.82f, -1.22f, horde::scene::SkinnedClip::Walking, .34f) ||
+                !request(1, 0x52544432, -25.32f, -4.96f, -1.92f, horde::scene::SkinnedClip::Idle, .51f)) {
+                ctx.lastRtFrameError = "Chapter resident diagnostic marks have no authored support.";
+                if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+                return false;
+            }
+        }
         if (ctx.inspectionSkeletonBlends) {
             if (!ctx.playerDodgeInspectionSnapshot || !frozenDevelopmentCheckpoint ||
                 !gShowcaseCaptureHidden || IsWindowVisible(ctx.windowHandle) ||
@@ -7524,7 +8209,6 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
                 frameInputs.skeletonEnemyCount = 0u;
             }
         }
-        std::string diagnostic;
 #if defined(_DEBUG)
         if(ctx.lookoutKitInspectionPose) {
             // Explicit hidden pose inspection only. Reuse the coherent camera/
@@ -7550,6 +8234,14 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         if(ctx.environmentSurveyActive && ctx.environmentSurveyProfile!="player-dodge")
         {
             const auto& camera=ctx.environmentSurveyCamera;
+            const auto& snapshot=ctx.simulation.Snapshot();
+            // A staged walk leaves a tiny decaying visual blend after the motor
+            // has settled. Normalize it only in the frozen mill inspection copy.
+            if(ctx.environmentSurveyProfile=="mill-wheel" && !ctx.developmentCheckpoint.empty() &&
+               snapshot.playerGrounded && snapshot.playerTravelledThisTick==0.f &&
+               snapshot.playerMovementSpeedMetresPerSecond==0.f &&
+               frameInputs.walkAmount>=0.f && frameInputs.walkAmount<=0.00001f)
+                frameInputs.walkAmount=0.f;
             if(!horde::vulkan::raytracing::RebaseEnvironmentSurveyFrame(frameInputs,
                 {camera.x,camera.z,camera.supportY,camera.yaw,camera.pitch,ctx.environmentSurveyTime},diagnostic)) {
                 ctx.lastRtFrameError=diagnostic;
@@ -7564,29 +8256,15 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
         {
             (void)ctx.rtFrameEvidence.BeginRecord(frameInputs.tickIndex);
         }
-        // This owner waited its sole graphics fence above. No scene descriptor
-        // has been bound in the current recording; reset every older recording
-        // before a binding change can invalidate its references.
-        struct ActorRetirementOwner { VulkanSurfaceContext* context; std::uint32_t image; };
-        ActorRetirementOwner actorOwner{&ctx, imageIndex};
-        const auto retireResourceReferences=[](void* user, std::string& error) {
-                    auto& owner = *static_cast<ActorRetirementOwner*>(user);
-                    auto& context = *owner.context;
-                    if (context.inFlightFences.size() != 1u) {
-                        error = "Character retirement requires the single completed graphics owner.";
-                        return false;
-                    }
-                    for (std::size_t i = 0; i < context.commandBuffers.size(); ++i)
-                        if (i != owner.image && vkResetCommandBuffer(context.commandBuffers[i], 0u) != VK_SUCCESS) {
-                            error = "Prior character command references could not be reset.";
-                            return false;
-                        }
-                    return true;
-                };
         if (!ctx.rtScene.PrepareThirdActorResourceLifetime(frameInputs,
                 retireResourceReferences, &actorOwner, diagnostic, evidenceFrame ? &observation : nullptr)) {
             ctx.lastRtFrameError = diagnostic;
             if (evidenceFrame) ctx.rtFrameEvidence.FailRecord(observation);
+            return false;
+        }
+        if(!ctx.rtScene.PrepareBellwetherFurnitureLifetime(frameInputs,retireResourceReferences,&actorOwner,diagnostic)) {
+            ctx.lastRtFrameError=diagnostic;
+            if(evidenceFrame)ctx.rtFrameEvidence.FailRecord(observation);
             return false;
         }
         using DetailFrame=horde::vulkan::raytracing::PresentableTinyRtScene::StaticDetailFrame;
@@ -8017,8 +8695,20 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                      horde::gameplay::items::PlayerMountProfile::AnatomicalBody
                  ? "AnatomicalBody" : "LegacyViewRelative") << "\",\n"
              << "  \"executionBackend\": \""
-             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n"
-             << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
+             << JsonEscape(horde::vulkan::ToString(context.rtScene.ExecutionBackend())) << "\",\n";
+#if defined(_DEBUG)
+    if(context.bellwetherFurnitureTransitions || context.bellwetherFurnitureDetail!=horde::scene::BellwetherFurnitureDetail::Near) {
+        const auto detail=context.bellwetherFurnitureTransitions ?
+            context.rtScene.ActiveBellwetherFurnitureDetail() : context.bellwetherFurnitureDetail;
+        const auto level=static_cast<std::size_t>(detail);
+        manifest<<"  \"bellwetherFurnitureLod\": "<<level<<",\n"
+                <<"  \"bellwetherFurnitureTriangles\": "<<horde::scene::kBellwetherFurnitureTriangles[level]<<",\n";
+    }
+#endif
+#if defined(HORDE_RT_BELLWETHER_RAY_WITNESS)
+    manifest << "  \"furnitureRayWitnessEncoding\": \"furniture-ray-red-low-nibble-v1\",\n";
+#endif
+    manifest << "  \"selectedRtPipelineBundle\": {\"opaqueFast\": {\"key\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastKey()))
              << "\", \"sha256\": \""
              << JsonEscape(std::string(context.rtScene.SelectedOpaqueFastSha256()))
@@ -8230,8 +8920,14 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << "      \"height\": " << capture.height << ",\n"
                  << "      \"rescueTraversal\": " << traversalEvidence.str() << ",\n"
                   << "      \"honestlyPresentedRtFrame\": true,\n"
-                  << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n"
-                  << "      \"indoorDust\": {\"requestedQuality\": "
+                  << "      \"completedFrame\": " << capture.completedFrameEvidenceJson << ",\n";
+        if (const auto& visit = capture.bellwetherVisit) {
+            manifest << "      \"bellwetherVisit\": {\"roadsideCaptions\": " << visit->roadsideCaptions
+                     << ", \"welcomeCaption\": " << (visit->welcomeCaption ? "true" : "false")
+                     << ", \"exchangeCaptions\": " << visit->exchangeCaptions
+                     << ", \"quietReturns\": " << visit->quietReturns << "},\n";
+        }
+        manifest << "      \"indoorDust\": {\"requestedQuality\": "
                   << static_cast<unsigned>(context.requestedDustQuality)
                   << ", \"actualUploadedQuality\": "
                   << static_cast<unsigned>(capture.actualUploadedDustQuality)
@@ -8262,8 +8958,65 @@ bool WriteCaptureManifest(const std::filesystem::path& outputDirectory,
                  << ", \"walking\": " << (capture.chapterCompanion.walking ? "true" : "false")
                  << ", \"position\": [" << capture.chapterCompanion.x << ", " << capture.chapterCompanion.y << ", " << capture.chapterCompanion.z << "]"
                  << ", \"yaw\": " << capture.chapterCompanion.yaw << ", \"animationSeconds\": " << capture.chapterCompanion.animationSeconds
-                 << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}"
-                 << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
+                 << ", \"motionMode\": " << static_cast<unsigned>(capture.chapterCompanion.motion.mode)
+                 << ", \"sitSeconds\": " << capture.chapterCompanion.motion.sitPlaybackSeconds
+                 << ", \"headPitch\": " << capture.chapterCompanion.acting.headPitch
+                 << ", \"headYaw\": " << capture.chapterCompanion.acting.headYaw
+                 << ", \"ankleSeconds\": " << capture.chapterCompanion.motion.anklePlaybackSeconds
+                 << ", \"bellwetherArrival\": " << static_cast<unsigned>(capture.chapterCompanion.bellwetherArrival)
+                 << ", \"bellwetherStation\": " << capture.chapterCompanion.bellwetherStation
+                 << ", \"generation\": " << capture.chapterCompanion.generation << ", \"keeperDissolve\": " << capture.keeperDissolve << "}";
+        if (capture.tavernKeeper) {
+            const auto& keeper = *capture.tavernKeeper;
+            manifest << ", \"tavernKeeper\": {\"stage\": " << static_cast<unsigned>(keeper.stage)
+                     << ", \"foot\": [" << keeper.foot[0] << ", " << keeper.foot[1] << ", " << keeper.foot[2]
+                     << "], \"yaw\": " << keeper.yaw << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId << "\"}";
+        }
+        if (capture.recordKeeper) {
+            const auto& keeper = *capture.recordKeeper;
+            manifest << ", \"recordKeeper\": {\"foot\": [" << keeper.foot[0] << ", " << keeper.foot[1] << ", " << keeper.foot[2]
+                     << "], \"yaw\": " << keeper.yaw << ", \"idleSeconds\": " << keeper.idleSeconds
+                     << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
+                     << "\", \"registerInterpreted\": " << (capture.registerInterpreted ? "true" : "false") << "}";
+        }
+        if (capture.artificer) {
+            const auto& smith = *capture.artificer;
+            manifest << ", \"artificer\": {\"foot\": [" << smith.foot[0] << ", " << smith.foot[1] << ", " << smith.foot[2]
+                     << "], \"yaw\": " << smith.yaw << ", \"submittedMasks\": {\"kit\": "
+                     << unsigned(capture.millResidentMasks[0]) << ", \"tavernKeeper\": "
+                     << unsigned(capture.millResidentMasks[1]) << ", \"artificer\": "
+                     << unsigned(capture.millResidentMasks[2]) << "}}"
+                     << ", \"millDrive\": {\"progress\": "
+                     << horde::gameplay::bellwether::MillProgress(capture.millPreparation)
+                     << ", \"angleRadians\": " << capture.millDriveAngleRadians
+                     << ", \"submittedMask\": " << unsigned(capture.millDriveMask) << "}";
+        }
+        if (capture.salvager) {
+            const auto& foot=capture.salvager->foot;
+            manifest << ", \"salvager\": {\"foot\": [" << foot[0] << ", " << foot[1] << ", " << foot[2]
+                     << "], \"yaw\": " << capture.salvager->yaw << ", \"submittedMasks\": {\"kit\": "
+                     << unsigned(capture.salvagerResidentMasks[0]) << ", \"tavernKeeper\": "
+                     << unsigned(capture.salvagerResidentMasks[1]) << ", \"salvager\": "
+                     << unsigned(capture.salvagerResidentMasks[2]) << "}}";
+        }
+        if (capture.relicDealer) {
+            const auto& foot = capture.relicDealer->foot;
+            manifest << ", \"relicDealer\": {\"foot\": [" << foot[0] << ", " << foot[1] << ", " << foot[2]
+                     << "], \"yaw\": " << capture.relicDealer->yaw << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId
+                     << "\", \"submittedMasks\": {\"kit\": " << unsigned(capture.relicDealerResidentMasks[0])
+                     << ", \"tavernKeeper\": " << unsigned(capture.relicDealerResidentMasks[1])
+                     << ", \"relicDealer\": " << unsigned(capture.relicDealerResidentMasks[2]) << "}}";
+        }
+        if (capture.tavernLanternPresentedRaiseTick) {
+            manifest << ", \"tavernLanternIntroduction\": {\"presentedRaiseTick\": "
+                     << capture.tavernLanternPresentedRaiseTick << ", \"linesStarted\": "
+                     << capture.tavernLanternLinesStarted << ", \"chapterLine\": \""
+                     << horde::gameplay::dialogue::Spec(capture.chapterLine).stableId << "\"}";
+        }
+        manifest << ", \"playerWorldBodyInstanceFlags\": " << capture.playerWorldBodyInstanceFlags
                  << ", \"instanceMasks\": [";
         for (std::size_t mask = 0u; mask < capture.instanceMasks.size(); ++mask)
             manifest << (mask == 0u ? "" : ", ")
@@ -8530,6 +9283,161 @@ bool RunStaticGeometryCutoverCapture(VulkanSurfaceContext& context,
 #endif
 
 #include "platform/windows/WindowsChapterRoundTripCapture.inl"
+#if defined(_DEBUG)
+#include "platform/windows/WindowsBellwetherFurnitureRouteCapture.inl"
+
+// Change one live resident lane and then restore the original input. The
+// simulation stays frozen while the normal render path presents each state.
+bool RunChapterResidentRoundTrip(VulkanSurfaceContext& context, const CaptureLaunchOptions& options,
+    const std::filesystem::path& output, const VkClearColorValue& clear, std::string& error)
+{
+    using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+    using horde::telemetry::RtPresentationOutcome;
+    using namespace horde::gameplay::bellwether;
+    const bool replaceModel = !options.chapterResidentModelRoundTrip.empty();
+    const auto& alternate = replaceModel ? options.chapterResidentModelRoundTrip : options.chapterResidentTextureRoundTrip;
+    const auto actor = options.salvagerCapture ? kSalvagerActorId : kArtificerActorId;
+    const auto alternateActor = options.salvagerCapture ? kArtificerActorId : kSalvagerActorId;
+    const auto original = options.chapterResidentFixture / (options.salvagerCapture ? "salvager" : "artificer");
+    auto handles = context.rtScene.CaptureResourceHandles();
+    auto lastBlases = std::exchange(handles.bottomLevelAccelerationStructures, {});
+    const auto epoch = context.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
+    const auto generation = context.rtScene.StaticGeometryGeneration();
+    const auto tick = context.simulation.Snapshot().tickIndex;
+    std::uint64_t lastSerial = 0;
+    const std::string prefix = replaceModel ? "resident-model-" : "resident-maps-";
+    const auto capture = [&](const char* name, Scene::StorageImageCapture& image, bool changedModel = false) {
+        bool presented = false;
+        if (!RenderFrame(context, clear, presented) || !presented ||
+            context.lastFramePresentation != RtPresentationOutcome::Presented ||
+            !CompleteRtEvidenceAfterDeviceIdle(context, vkDeviceWaitIdle(context.device)))
+        {
+            error = "Resident map proof did not reach a completed RT presentation.";
+            return false;
+        }
+        const auto publication = context.rtFrameEvidence.PublishedStateByValue();
+        const auto& completed = publication.completedEvidence;
+        const auto& identity = completed.identity.submitted;
+        auto currentHandles = context.rtScene.CaptureResourceHandles();
+        auto currentBlases = std::exchange(currentHandles.bottomLevelAccelerationStructures, {});
+        std::size_t changedBlases = 0;
+        if (currentBlases.size() != lastBlases.size())
+        {
+            error = "Resident proof changed the live BLAS count.";
+            return false;
+        }
+        for (std::size_t index = 0; index < currentBlases.size(); ++index)
+            changedBlases += currentBlases[index] != lastBlases[index];
+        lastBlases = std::move(currentBlases);
+        if (!publication.hasCompletedEvidence || identity.frame.sceneEpoch != epoch ||
+            identity.frame.simulationTick != tick || identity.submissionSerial <= lastSerial ||
+            completed.presentation.outcome != RtPresentationOutcome::Presented ||
+            completed.presentation.lastSuccessfulPresentSubmissionSerial != identity.submissionSerial ||
+            context.rtScene.StaticGeometryGeneration() != generation ||
+            changedBlases != (changedModel ? 1u : 0u) ||
+            context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex) != 1u ||
+            context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex) != 1u ||
+            context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1u) != 1u)
+        {
+            error = "Resident replacement lost scene identity, presentation order or active actors.";
+            return false;
+        }
+        if (currentHandles != handles)
+        {
+            error = "Resident replacement changed shared scene resources.";
+            return false;
+        }
+        lastSerial = identity.submissionSerial;
+        return context.rtScene.CaptureStorageImage(image, error) && WriteRgbaPng(output / (prefix + name), image, error);
+    };
+    const auto retire = [](void* data, std::string& diagnostic) {
+        const auto& target = *static_cast<VulkanSurfaceContext*>(data);
+        if (target.inFlightFences.size() == 1u &&
+            vkWaitForFences(target.device, 1u, target.inFlightFences.data(), VK_TRUE, 2'000'000'000ull) == VK_SUCCESS)
+            return true;
+        diagnostic = "Resident map proof could not retire the sole graphics owner.";
+        return false;
+    };
+    const auto apply = [&](std::uint32_t active, std::uint32_t incoming, const std::filesystem::path& directory,
+                           bool (*prove)(void*, std::string&), void* user, std::string& diagnostic) {
+        if (!replaceModel)
+            return context.rtScene.ReplaceChapterResidentTextureLayers(active, directory, prove, user, diagnostic);
+        return context.rtScene.ReplaceChapterResidentActor(active,
+            {incoming, directory, "resident.glb", {{"Warden|idle", true, true}}}, prove, user, diagnostic);
+    };
+    Scene::StorageImageCapture before, afterRejection, replaced, restored;
+    if (!capture("00-before.png", before)) return false;
+    const auto startingBlasCount = context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount;
+
+    // Validate the entire set before transferring even the first map.
+    const auto incomplete = output / "incomplete-resident-maps";
+    std::error_code fsError;
+    if (!std::filesystem::create_directory(incomplete, fsError) || fsError)
+    {
+        error = "Resident map proof requires a fresh capture directory.";
+        return false;
+    }
+    const auto copy = [&](const char* name) { return std::filesystem::copy_file(alternate / name, incomplete / name, fsError) && !fsError; };
+    if (!copy("base-color.windows.ktx2") || !copy("normal.windows.ktx2") ||
+        (replaceModel && (!copy("asset.manifest.json") || !copy("resident.glb"))))
+    {
+        error = "Could not stage the incomplete resident asset.";
+        return false;
+    }
+    bool retiredIncomplete = false;
+    std::string rejected;
+    const auto observeRetirement = [](void* data, std::string&) {
+        *static_cast<bool*>(data) = true;
+        return false;
+    };
+    if (apply(actor, alternateActor, incomplete,
+            replaceModel ? +retire : +observeRetirement, replaceModel ? static_cast<void*>(&context) : &retiredIncomplete, rejected) ||
+        retiredIncomplete || rejected.find("orm.windows.ktx2") == std::string::npos)
+    {
+        error = "An incomplete map set passed texture admission.";
+        return false;
+    }
+    if (!capture("01-after-rejection.png", afterRejection) ||
+        !apply(actor, alternateActor, alternate, retire, &context, error)) return false;
+    if (replaceModel) context.residentModelProofActor = alternateActor;
+    if (!capture("02-replaced.png", replaced, replaceModel)) return false;
+    if (replaceModel && context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount != startingBlasCount + 1u)
+    {
+        error = "Resident replacement did not retain exactly one retiring BLAS through submission.";
+        return false;
+    }
+    if (!apply(replaceModel ? alternateActor : actor, actor, original, retire, &context, error)) return false;
+    context.residentModelProofActor.reset();
+    if (!capture("03-restored.png", restored, replaceModel)) return false;
+    if (replaceModel)
+    {
+        Scene::StorageImageCapture retired;
+        if (!capture("04-retired.png", retired)) return false;
+        if (context.rtScene.ResourceInventory().bottomLevelAccelerationStructureCount != startingBlasCount ||
+            retired.rgba != restored.rgba)
+        {
+            error = "Resident geometry retirement changed the restored view or left a live BLAS.";
+            return false;
+        }
+    }
+    if (before.rgba != afterRejection.rgba || before.rgba == replaced.rgba || before.rgba != restored.rgba)
+    {
+        error = "Resident map proof did not preserve rejection, replacement and restoration pixels.";
+        return false;
+    }
+    std::ofstream receipt(output / (prefix + "round-trip.json"));
+    receipt << "{\"complete\":true,\"actorId\":" << actor << ",\"sceneEpoch\":" << epoch
+            << ",\"staticGeometryGeneration\":" << generation << ",\"simulationTick\":" << tick
+            << ",\"lastCompletedSerial\":" << lastSerial
+            << ",\"unchangedResources\":" << (replaceModel ? "false" : "true")
+            << ",\"unchangedSharedResources\":true,\"residentBlasReplaced\":" << (replaceModel ? "true" : "false")
+            << ",\"retiringBlasReleased\":" << (replaceModel ? "true" : "false")
+            << ",\"incompleteRejectedBeforeRetirement\":" << (replaceModel ? "false" : "true")
+            << ",\"incompletePreservedFrame\":true,\"replacementChangedPixels\":true,\"restoredExactly\":true}\n";
+    if (!receipt) { error = "Could not write the resident map proof receipt."; return false; }
+    return true;
+}
+#endif
 #if defined(_DEBUG) || HORDE_RT_CHAPTER_MEASUREMENT
 #include "platform/windows/WindowsChapterShippingMeasurement.inl"
 #endif
@@ -8617,6 +9525,13 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
     }
 
     const VkClearColorValue clearColor = ClearColorForMode(capabilities.rtMode);
+#if defined(_DEBUG)
+    if(ParseCaptureLaunchOptions().bellwetherFurnitureRoute) {
+        std::string error;
+        if(!RunBellwetherFurnitureRouteCapture(context,outputDirectory,clearColor,error))return fail(error);
+        return 0;
+    }
+#endif
     for (const horde::gameplay::ShowcaseCheckpoint* checkpointPointer : checkpoints)
     {
 #if defined(_DEBUG)
@@ -8632,6 +9547,8 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 #endif
         const horde::gameplay::ShowcaseCheckpoint& checkpoint = *checkpointPointer;
+        horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
+        std::uint64_t tavernLanternPresentedRaiseTick = 0;
 #if defined(_DEBUG)
         if(forestProof && forestRecreated)
         {
@@ -8650,7 +9567,6 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             horde::vulkan::raytracing::PublishDevelopmentWorldReadiness(context.simulation,context.rtScene);
             const auto* development =
                 horde::gameplay::FindDevelopmentCheckpoint(context.developmentCheckpoint);
-            horde::gameplay::DevelopmentCheckpointStageEvidence stageEvidence;
             if (development == nullptr ||
                 !horde::gameplay::StageDevelopmentCheckpointSimulation(
                     context.simulation, *development, &stageEvidence))
@@ -8669,6 +9585,15 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
                     << ", exterior=" << state.rescue.exteriorSide << ", worldGeneration="
                     << state.worldRoute.generation << ", terrain=" << bool(context.rtScene.ChapterTerrainSurface());
                 for(const auto ready:state.worldRoute.readiness)trace << ',' << static_cast<unsigned>(ready);
+                if(development && (development->bellwetherSitTicks!=0 || development->bellwetherAnkleTicks!=0)) {
+                    const auto boundary=context.simulation.LatestCampaignBoundary();
+                    trace << "; currentZone=" << static_cast<unsigned>(state.worldRoute.current)
+                          << ", KitArrival=" << static_cast<unsigned>(state.chapterCompanion.bellwetherArrival)
+                          << ", boundary=" << (boundary?static_cast<unsigned>(boundary->id):0u);
+                }
+                if (const auto& visit = stageEvidence.bellwetherVisit)
+                    trace << "; roadsideCaptions=" << visit->roadsideCaptions << ", welcomeCaption=" << visit->welcomeCaption
+                          << ", exchangeCaptions=" << visit->exchangeCaptions << ", quietReturns=" << visit->quietReturns;
                 return fail(trace.str());
             }
             context.simulation.ResetTiming();
@@ -8687,6 +9612,62 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             ApplyCaptureCheckpoint(context, checkpoint);
         }
 #if defined(_DEBUG)
+        if (context.relicDealerCapture) {
+            using namespace horde::gameplay::dialogue;
+            const auto& state = context.simulation.Snapshot();
+            if (!state.relicDealerTradeAvailable)
+                return fail("The west approach did not offer the relic dealer's trade introduction.");
+            const auto boundary = context.simulation.CampaignBoundaryRevision();
+            auto input = context.simulationInput;
+            input.paused = false;
+            input.yawRadians = state.playerYawRadians;
+            input.pitchRadians = state.playerPitchRadians;
+            input.commands.interact = state.lastConsumedInteractSequence + 1;
+            context.simulation.StepFixed(input, 1.f/60.f, state.inputPublicationSequence + 1);
+            if (state.chapterDialogue.line != Line::RelicDealerOrdinarySale ||
+                context.simulation.CampaignBoundaryRevision() != boundary)
+                return fail("The ordinary west-counter interaction did not present its trade line without a transaction.");
+            context.simulation.ClearEvents();
+            MirrorSimulationSnapshot(context);
+        }
+        if (context.developmentCheckpoint == "bellwether-return-to-kit") {
+            using horde::gameplay::dialogue::Line;
+            const auto& state = context.simulation.Snapshot();
+            const auto raiseTick = state.tickIndex;
+            const auto generation = state.chapterDialogue.generation;
+            bool presented = false;
+            if (!RenderFrame(context, clearColor, presented) || !presented ||
+                context.lastChapterPresentationAckTick != raiseTick ||
+                context.lastChapterPresentationAckGeneration != generation)
+                return fail("The raised lantern did not reach an acknowledged RT presentation at Kit's chair.");
+            tavernLanternPresentedRaiseTick = raiseTick;
+
+            // These are ordinary authored input edges after the real presentation
+            // acknowledgement. The save and speech director still own the scene.
+            auto input = context.simulationInput;
+            input.paused = false;
+            input.tutorialEnabled = false;
+            input.yawRadians = state.playerYawRadians;
+            input.pitchRadians = state.playerPitchRadians;
+            input.commands.interact = state.lastConsumedInteractSequence;
+            input.commands.toggleHeldLightPose = state.lastConsumedToggleHeldLightPoseSequence;
+            const auto advance = [&] {
+                context.simulation.StepFixed(input, 1.f/60.f, state.inputPublicationSequence+1);
+                context.simulation.ClearEvents();
+            };
+            for (const auto line : {Line::TavernLanternIdentity, Line::TavernLanternSeals, Line::KitVoiceReaction}) {
+                advance();
+                if (state.chapterDialogue.line != line)
+                    return fail("The acknowledged raise did not advance the authored tavern exchange.");
+                if (line != Line::KitVoiceReaction) ++input.commands.dialogueSkip;
+            }
+            for (unsigned tick = 0; tick < 160; ++tick) advance();
+            const auto saved = context.simulation.LatestCampaignBoundary();
+            if (state.chapterDialogue.line != Line::KitVoiceReaction || !saved || !saved->waysideRegisterInterpreted ||
+                saved->dialogue.tavernLanternLinesStarted != 3)
+                return fail("The tavern capture did not retain both the register reading and Kit's firsthand evidence.");
+            MirrorSimulationSnapshot(context);
+        }
         if(forestProof && !forestRecreated)
         {
             // Match the existing lifecycle pause policy before the first view,
@@ -8757,6 +9738,12 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         }
 
 #if defined(_DEBUG)
+        const auto& captureOptions = ParseCaptureLaunchOptions();
+        if (!captureOptions.chapterResidentTextureRoundTrip.empty() || !captureOptions.chapterResidentModelRoundTrip.empty()) {
+            std::string textureError;
+            if (!RunChapterResidentRoundTrip(context, captureOptions, outputDirectory, clearColor, textureError))
+                return fail("Chapter resident round trip: " + textureError);
+        }
         if (!ParseCaptureLaunchOptions().inspectStaticWorldMaterial.empty()) {
             std::string inspectionError;
             if (!InspectStaticWorldSource(context,outputDirectory,
@@ -8856,6 +9843,50 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
         record.publishedLanternHinge = simulation.rewardLanternWorldFromHinge;
         record.publishedLanternBody = simulation.lanternPendulum.worldFromBody;
         record.chapterCompanion = simulation.chapterCompanion;
+        record.tavernKeeper = simulation.tavernKeeper;
+        record.recordKeeper = simulation.recordKeeper;
+        record.artificer = simulation.artificer;
+        record.salvager = simulation.salvager;
+        record.relicDealer = simulation.relicDealer;
+        if (context.relicDealerCapture) {
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.relicDealerResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};
+            constexpr std::array residents{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::bellwether::kRelicDealerActorId};
+            if (!record.relicDealer || context.rtScene.ChapterResidentSourceIds() != residents ||
+                record.relicDealerResidentMasks != std::array<std::uint8_t,3>{1,1,1})
+                return fail("The relic dealer capture did not present the admitted three-actor roster.");
+        }
+        if (context.salvagerCapture) {
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.salvagerResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};
+            if (!record.salvager || std::any_of(record.salvagerResidentMasks.begin(), record.salvagerResidentMasks.end(),
+                    [](std::uint8_t mask) { return mask == 0; }))
+                return fail("The salvager capture did not submit all three admitted actors.");
+        }
+        if (record.artificer) {
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
+            record.millPreparation = simulation.millPreparation;
+            record.millDriveAngleRadians = simulation.millDriveAngleRadians;
+            record.millDriveMask = context.rtScene.SubmittedInstanceMask(Scene::kMillDriveMetadataIndex);
+            if ((record.millDriveMask != 0u) != horde::gameplay::bellwether::HasMillDrive(record.millPreparation))
+                return fail("The mill drive submission disagrees with the earned repair stage.");
+            record.millResidentMasks = {context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex),
+                context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1)};
+            if (std::any_of(record.millResidentMasks.begin(), record.millResidentMasks.end(),
+                    [](std::uint8_t mask) { return mask == 0; }))
+                return fail("The mill capture did not submit all three admitted actors.");
+        }
+        record.registerInterpreted = simulation.waysideArchive.registerInterpreted;
+        record.tavernLanternPresentedRaiseTick = tavernLanternPresentedRaiseTick;
+        record.tavernLanternLinesStarted = simulation.chapterDialogue.tavernLanternLinesStarted;
+        record.chapterLine = simulation.chapterDialogue.line;
+        record.bellwetherVisit = stageEvidence.bellwetherVisit;
         record.keeperDissolve = simulation.lich.deathDissolveProgress;
         record.playerHeightDelta = simulation.playerHeightDelta;
         record.playerSupportId = static_cast<std::uint8_t>(simulation.playerSupportId);
@@ -8901,9 +9932,17 @@ int RunShowcaseCapture(VulkanSurfaceContext& context,
             (development != nullptr &&
              development->rewardPose !=
                  horde::gameplay::DevelopmentRewardPose::None);
-        const auto claimedRewardPixelPolicy =
+        auto claimedRewardPixelPolicy =
             horde::platform::windows::ClaimedRewardCapturePolicy(checkpoint.name,
                 horde::platform::windows::IsCaptureSwordFullyStowed(simulation.heldItems[1]), &simulation);
+        if (development != nullptr && development->primaryHeldItemsMayBeOutsideFrame)
+        {
+            // This view frames the resident. The masks and final grip checks below still apply.
+            claimedRewardPixelPolicy.requirePlayerPixels = !record.primaryArmsMayBeOutsideFrame;
+            claimedRewardPixelPolicy.requireRewardRingPixels = false;
+            claimedRewardPixelPolicy.requireRewardBodyPixels = false;
+            claimedRewardPixelPolicy.requireSwordPixels = false;
+        }
         const bool claimedTorchOwnershipValid =
             horde::platform::windows::ClaimedTorchPrimaryOwnershipValid(
                 record.primaryTorchPixels, record.instanceMasks[1],
@@ -9563,6 +10602,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
 #if defined(_DEBUG)
     context.previewMeshPair=ParseCaptureLaunchOptions().previewMeshPair;
     context.forestRouteProof=ParseCaptureLaunchOptions().forestRouteProof;
+    context.chapterResidentFixture=ParseCaptureLaunchOptions().chapterResidentFixture;
+    context.staffedTavernCapture=ParseCaptureLaunchOptions().staffedTavernCapture;
+    context.recordKeeperCapture=ParseCaptureLaunchOptions().recordKeeperCapture;
+    context.artificerCapture=ParseCaptureLaunchOptions().artificerCapture;
+    context.salvagerCapture=ParseCaptureLaunchOptions().salvagerCapture;
+    context.relicDealerCapture=ParseCaptureLaunchOptions().relicDealerCapture;
+    context.bellwetherFurnitureDetail=ParseCaptureLaunchOptions().bellwetherFurnitureDetail;
+    context.bellwetherFurnitureTransitions=ParseCaptureLaunchOptions().bellwetherFurnitureTransitions;
+    context.bellwetherFurnitureResidency=ParseCaptureLaunchOptions().bellwetherFurnitureResidency;
+    std::error_code fixtureError;
+    context.combinedBellwetherResidents=developmentCheckpoint &&
+        (ParseCaptureLaunchOptions().measureBellwetherResidentRoundTrip ||
+         *developmentCheckpoint=="bellwether-return-to-kit" ||
+         (*developmentCheckpoint=="bellwether-repeat-visit" && !context.chapterResidentFixture.empty() &&
+          std::filesystem::is_directory(context.chapterResidentFixture / "tavern-keeper", fixtureError)));
 #if HORDE_RT_FRAME_STAGE_PROBE
     context.captureGpuStages=ParseCaptureLaunchOptions().captureGpuStages;
 #endif
@@ -9587,11 +10641,21 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
             horde::vulkan::raytracing::kProductionPlayerRenderRoute;
     if (!graphicsPreviewCapture) {
         auto simulationConfig=explicitComparison?horde::gameplay::simulation::GameSimulationConfig{}:
-            horde::gameplay::simulation::PrivateRevivalApplicationConfig();
+            WindowsApplicationSimulationConfig();
 #if defined(_DEBUG)
         // Only the strictly isolated existing route validator may opt in.
         // Normal application configuration, settings and save schema stay OFF.
         if(gRouteHiddenValidation && gRouteKitTurnStartValidation)simulationConfig.companionTurnStart=true;
+        simulationConfig.bellwetherTavernKeeperAdmitted |= context.staffedTavernCapture;
+        if (context.artificerCapture)
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Artificer;
+        else if (context.salvagerCapture)
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::Salvager;
+        else if (context.relicDealerCapture)
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RelicDealer;
+        else if (!context.chapterResidentFixture.empty() &&
+                 (context.combinedBellwetherResidents || context.recordKeeperCapture))
+            simulationConfig.bellwetherSpecialist = horde::gameplay::bellwether::Specialist::RecordKeeper;
 #endif
         context.simulation=horde::gameplay::simulation::GameSimulation(simulationConfig);
     }
@@ -9984,6 +11048,7 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
     if(gCampaignHiddenValidation){
         context.sfxVolumePercent=context.musicVolumePercent=context.voiceVolumePercent=0;
         const int result=gRouteHiddenValidation?RunHiddenRouteValidation(context):
+            !gBellwetherCampaignActors.empty()?RunHiddenBellwetherCampaignValidation(context,capabilities):
             gLookoutHiddenValidation?RunHiddenLookoutValidation(context,capabilities):RunHiddenCampaignValidation(context);
         return renderOwner.Retire()?result:1;
     }
@@ -11539,6 +12604,8 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
     switch (message)
     {
     case WM_MOUSEWHEEL:
+        if (sceneContext && sceneContext->lookoutObjective &&
+            sceneContext->lookoutObjective->ScrollWheel(GET_WHEEL_DELTA_WPARAM(wParam))) return 0;
         if (sceneContext && sceneContext->rtLabVisible)
         {
             UINT configuredLines = 3u;
@@ -12187,6 +13254,9 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
                 if((lParam & (1ll<<30))==0)CancelLookoutObjective(*sceneContext);
                 return 0;
             }
+            if (sceneContext->lookoutObjective &&
+                (wParam==VK_PRIOR || wParam==VK_NEXT || wParam==VK_LEFT || wParam==VK_RIGHT) &&
+                sceneContext->lookoutObjective->ScrollPage(wParam==VK_NEXT || wParam==VK_RIGHT)) return 0;
             if(wParam==VK_ESCAPE && sceneContext->campaignMenu && sceneContext->campaignMenu->Visible()){sceneContext->campaignMenu->HandleCommand(4121);return 0;}
             if (sceneContext->simulationPaused && wParam == VK_TAB && (lParam & (1ll << 30)) == 0)
             {
@@ -12497,16 +13567,18 @@ LRESULT CALLBACK DiagnosticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
             if (snapshot.developmentRescueJourney &&
                 (snapshot.rescuePrompt != horde::gameplay::traversal::RescuePrompt::None ||
                  sceneContext->rescueInteractionPromptPresented || snapshot.flaskUpgrade.interactEligible ||
-                 sceneContext->flaskUpgradeInteractionPromptPresented))
+                 sceneContext->flaskUpgradeInteractionPromptPresented || snapshot.HasChapterInteractPrompt() ||
+                 sceneContext->tavernInteractionPromptPresented))
             {
-                // Rescue mode owns every click. A stale/disabled rescue prompt
+                // A contextual prompt owns the click. A stale/disabled prompt
                 // is consumed without falling through to the attack action.
                 clickAction = !IsDesktopGameplayAvailable(*sceneContext) ? DesktopClickAction::Ignore :
                     !capturedAndFocused ? DesktopClickAction::AcquireCapture :
                     ((sceneContext->rescueInteractionPromptPresented &&
                       (snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Climb ||
                        snapshot.rescuePrompt == horde::gameplay::traversal::RescuePrompt::Descend)) ||
-                     (sceneContext->flaskUpgradeInteractionPromptPresented && snapshot.flaskUpgrade.interactEligible))
+                     (sceneContext->flaskUpgradeInteractionPromptPresented && snapshot.flaskUpgrade.interactEligible) ||
+                     (sceneContext->tavernInteractionPromptPresented && snapshot.HasChapterInteractPrompt()))
                         ? DesktopClickAction::Interact : DesktopClickAction::Ignore;
             }
             else
@@ -13014,7 +14086,8 @@ LRESULT CALLBACK ControllerFocusOutlineSubclass(
     {
         HWND parent = GetParent(control);
         auto* context = reinterpret_cast<VulkanSurfaceContext*>(GetWindowLongPtrA(parent, GWLP_USERDATA));
-        if (context != nullptr && context->rtLabVisible)
+        if (context != nullptr && (context->rtLabVisible ||
+            (context->lookoutObjective && context->lookoutObjective->Visible())))
         {
             return SendMessageA(parent, message, wParam, lParam);
         }
@@ -13080,8 +14153,10 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                         const horde::vulkan::raytracing::RtWorkloadPreset nativeMotionRtWorkloadPreset,
                         const std::optional<horde::graphics::DustQuality> captureDustQuality)
 {
-    // Only the Debug capture surface changes aspect; camera, gameplay pose,
-    // renderer quality and normal interactive-window sizing are untouched.
+    // Keep the ordinary client size for package stress measurements. Existing
+    // authored captures continue to use their fixed comparison surface.
+    const bool fixedCaptureExtent=captureDirectory!=nullptr &&
+        !ParseCaptureLaunchOptions().measureBellwetherFromPackage;
     const auto captureWidth = portraitCapture ? kCaptureHeight : kCaptureWidth;
     const auto captureHeight = portraitCapture ? kCaptureWidth : kCaptureHeight;
     const HINSTANCE instance = GetModuleHandleA(nullptr);
@@ -13105,7 +14180,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_VSCROLL;
     int windowWidth = MulDiv(1000, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
     int windowHeight = MulDiv(700, static_cast<int>(systemDpi == 0u ? kDefaultDpi : systemDpi), static_cast<int>(kDefaultDpi));
-    if (captureDirectory != nullptr)
+    if (fixedCaptureExtent)
     {
         RECT captureRect{0, 0, static_cast<LONG>(captureWidth), static_cast<LONG>(captureHeight)};
         AdjustWindowRectEx(&captureRect, windowStyle, TRUE, 0u);
@@ -13143,8 +14218,9 @@ int CreateAndShowWindow(const std::string& diagnosticText,
 #endif
 
     if (captureDirectory != nullptr)
-    {
         SetPropA(hWnd, kCaptureModeProperty, reinterpret_cast<HANDLE>(1));
+    if (fixedCaptureExtent)
+    {
         RECT windowRect{};
         RECT actualClientRect{};
         GetWindowRect(hWnd, &windowRect);
@@ -13396,9 +14472,12 @@ int CreateAndShowWindow(const std::string& diagnosticText,
     const std::string windowText = WindowSafeText(diagnosticText);
     const bool sceneMode = horde::vulkan::raytracing::SelectRtExecutionBackend(capabilities, true) !=
         horde::vulkan::RtExecutionBackend::Unsupported;
-    const std::string windowTitle = sceneMode
+    std::string windowTitle = sceneMode
         ? kWindowTitle
         : MakeWindowTitle(diagnosticText);
+#if defined(_DEBUG)
+    if (gBellwetherPackagedPlaytest) windowTitle += " [Bellwether 1.8 playtest]";
+#endif
     SetWindowTextA(edit, windowText.c_str());
     SetWindowTextA(hWnd, windowTitle.c_str());
     if (sceneMode)
@@ -13435,7 +14514,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
         FocusGameControl(hWnd);
     }
     UpdateWindow(hWnd);
-    if (captureDirectory != nullptr)
+    if (fixedCaptureExtent)
     {
         RECT windowRect{};
         RECT actualClientRect{};
@@ -13522,7 +14601,7 @@ int RunDiagnosticWindow(const int showCommand)
     if(!acceptanceReady){std::cerr<<gAcceptanceProfile.Error()<<'\n';return 2;}
 
     if(!ConfigureHiddenCampaignValidation())return 2;
-    const CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
+    CaptureLaunchOptions launchOptions = ParseCaptureLaunchOptions();
     if(gOpeningBenchmarkMenuValidation && (launchOptions.requested || launchOptions.benchmark.requested ||
         launchOptions.graphicsPreview || launchOptions.outputResizeValidation || !launchOptions.nativeMotionScenario.empty())) {
         std::cerr<<"Opening-menu validation cannot combine capture or standalone benchmark modes.\n";return 2;
@@ -13533,6 +14612,66 @@ int RunDiagnosticWindow(const int showCommand)
         std::cerr << launchOptions.error << '\n';
         return 2;
     }
+#if defined(_DEBUG)
+    const auto packageDirectory = ExecutableDirectory();
+    const auto playtestMarker = packageDirectory / "Bellwether.playtest";
+    std::error_code markerError;
+    gBellwetherPackagedPlaytest = std::filesystem::exists(playtestMarker, markerError);
+    const auto failPlaytest = [&](const char* diagnostic) {
+        std::cerr << diagnostic << '\n';
+        if (gBellwetherPackagedPlaytest && !gCampaignHiddenValidation && !launchOptions.measureBellwetherFromPackage)
+            GameMessageBoxA(nullptr, diagnostic, "Bellwether playtest", MB_OK | MB_ICONERROR);
+        return 2;
+    };
+    if (markerError) return failPlaytest("Could not inspect the local Bellwether playtest marker.");
+    if (gRouteNewGame && !gBellwetherPackagedPlaytest)
+        return failPlaytest("The New Game route needs the complete private Bellwether playtest package.");
+    if (launchOptions.measureBellwetherFromPackage && !gBellwetherPackagedPlaytest)
+        return failPlaytest("The packaged round trip requires the extracted private Bellwether playtest.");
+    if (gBellwetherPackagedPlaytest) {
+#if !HORDE_RT_FLASK_ADMITTED || !HORDE_RT_REVIVAL_ADMITTED
+        return failPlaytest("The Bellwether playtest build needs the admitted flask and revival.");
+#endif
+        if (!std::filesystem::is_regular_file(playtestMarker, markerError) || markerError ||
+            !launchOptions.bellwetherCampaignDirectory.empty() || !launchOptions.bellwetherVoiceDirectory.empty())
+            return failPlaytest("The Bellwether playtest requires its own packaged residents and voices.");
+        launchOptions.bellwetherCampaignDirectory = packageDirectory / "assets/private_bellwether";
+        launchOptions.bellwetherVoiceDirectory = packageDirectory / "assets/private_bellwether_voice";
+    }
+    if (!launchOptions.bellwetherCampaignDirectory.empty() &&
+        ((launchOptions.requested && !launchOptions.measureBellwetherResidentRoundTrip) ||
+         launchOptions.benchmark.requested || launchOptions.environmentSurvey.requested ||
+         launchOptions.graphicsPreview || launchOptions.outputResizeValidation ||
+         !launchOptions.nativeMotionScenario.empty() || gOpeningBenchmarkMenuValidation ||
+         (gRouteHiddenValidation && (!gBellwetherPackagedPlaytest || gRouteReturnRecovery)) ||
+         gAcceptanceProfile.Active())) {
+        std::cerr << "Bellwether campaign residents require the normal Debug campaign entry.\n";
+        return 2;
+    }
+    if (!ConfigureBellwetherCampaignActors(launchOptions.bellwetherCampaignDirectory)) {
+        return failPlaytest("Bellwether campaign directory failed the pinned resident identity check.");
+    }
+    if (gBellwetherPackagedPlaytest && !gBellwetherCombinedRelicDealer)
+        return failPlaytest("The Bellwether playtest requires the complete five-resident roster.");
+    if (gBellwetherEarnTavernValidation && gBellwetherCampaignActors.empty()) {
+        std::cerr << "The hidden tavern save check requires private Bellwether campaign residents.\n";
+        return 2;
+    }
+    if ((gBellwetherPreparationsValidation || launchOptions.measureBellwetherResidentRoundTrip) &&
+        !gBellwetherCombinedCampaignActors) {
+        std::cerr << "This Bellwether check requires the combined resident roster.\n";
+        return 2;
+    }
+    if (launchOptions.measureBellwetherWestRoundTrip && !gBellwetherCombinedRelicDealer) {
+        std::cerr << "The west round trip requires the prepared relic dealer.\n";
+        return 2;
+    }
+    if (!ConfigureBellwetherVoiceDirectory(launchOptions.bellwetherVoiceDirectory)) {
+        return failPlaytest("Bellwether voice directory failed the pinned WAV identity check.");
+    }
+    if (gBellwetherPackagedPlaytest && (!gBellwetherArrivalAudition || !gBellwetherSalvagerAudition))
+        return failPlaytest("The Bellwether playtest requires the complete arrival and shore voice overlays.");
+#endif
     gShowcaseCaptureHidden=launchOptions.captureHidden;
 #if !defined(_DEBUG)
     if (launchOptions.requested && !(HORDE_RT_CHAPTER_MEASUREMENT && launchOptions.measureChapterShippingRoute))

@@ -72,3 +72,9 @@ records Windows local startup/failure review, Android startup ownership and nati
 source/input identity. Owner requested a pause before new public projection,
 backend or website work. Required outcomes above remain unchanged and unfinished;
 resume only after an explicit owner request.
+
+## 1.8 compatibility probe follow-up
+
+[Issue #41](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/41) reported a Windows AMD adapter with absent ray-tracing extensions and positive ray-tracing feature fields. Both the reported 1.7 source and the starting 1.8 branch passed the three RT extension feature structures to Vulkan unconditionally. The probe now builds the feature query from the selected adapter's successful extension enumeration, with buffer device address available through Vulkan 1.2 core. Both platform reports copy the same probe evidence. A failed enumeration or omitted feature query stays unknown, and a queried false feature is reported as absent. Both backend reports require ray query evidence, including the pipeline that uses ray queries in ray generation. The raw buffer device address extension field continues to reflect the actual advertised list. [Vulkan structure-chain requirements](https://docs.vulkan.org/spec/latest/chapters/fundamentals.html#fundamentals-validusage-pNext)
+
+An injected AMD-shaped inventory exercised the omitted RT structures and an unsupported report. The actual Windows probe also inspected the local Intel UHD and RTX 5050 Laptop GPUs separately. The Intel adapter omitted the three RT feature queries and the hidden Windows application rejected its requested hardware RT route without a presented RT frame. The RTX queried all four features and both hardware backends passed the nine-check Bellwether campaign smoke test. The ARM64 Debug build passed package verification. Exact reproduction on the original AMD adapter and physical Android validation remain open.

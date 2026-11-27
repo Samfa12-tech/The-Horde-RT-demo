@@ -7,11 +7,18 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
 {
     using namespace horde::gameplay::validation;
     using namespace horde::telemetry;
+    const auto launch=ParseCaptureLaunchOptions();
+    const bool doorway=launch.measureBellwetherDoorway;
+    const bool residentRoundTrip=launch.measureBellwetherResidentRoundTrip;
+    const bool westRoundTrip=launch.measureBellwetherWestRoundTrip;
+    const bool packaged=launch.measureBellwetherFromPackage;
+    const auto bellwetherRoute=westRoundTrip ? BellwetherMeasurementRoute::WestRoundTrip :
+        residentRoundTrip ? BellwetherMeasurementRoute::EastRoundTrip : BellwetherMeasurementRoute::Doorway;
     // Windows may reject SetForegroundWindow for an automation-launched
     // process. Allow the owner to activate this test window once; never attach
     // other input threads or repeatedly steal focus. This setup wait is inside
     // the unchanged 180-second process deadline, before the 150-second route.
-    if(ParseCaptureLaunchOptions().measureChapterForeground && GetForegroundWindow()!=context.windowHandle) {
+    if(launch.measureChapterForeground && GetForegroundWindow()!=context.windowHandle) {
         SetWindowTextW(context.windowHandle,L"Horde 1.7 timing test - click the title bar to begin");
         const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(30);
         while(GetForegroundWindow()!=context.windowHandle) {
@@ -28,21 +35,32 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         SetWindowTextW(context.windowHandle,L"Horde 1.7 - approved route timing test");
     }
     const auto initial=context.rtFrameEvidence.PublishedStateByValue();
+    const auto& baseline=initial.completedEvidence.scene;
+    const auto instrumentation=baseline.pipeline.instrumentation;
+    const bool glassEnabled=context.rtScene.GlassEnabled();
     if(!initial.hasCompletedEvidence ||
-       initial.completedEvidence.scene.pipeline.instrumentation!=RtInstrumentationMode::Shipping ||
+       ((!doorway || packaged) && instrumentation!=RtInstrumentationMode::Shipping) ||
        initial.completedEvidence.scene.pipeline.dielectricQuality!=RtDielectricQuality::High ||
-       initial.completedEvidence.dielectric.compiled || initial.completedEvidence.dielectric.hasCounters ||
+       (!doorway && (initial.completedEvidence.dielectric.compiled || initial.completedEvidence.dielectric.hasCounters)) ||
        context.inFlightFences.size()!=1) {
-        error="Route measurement requires the actual Shipping/High artifact pair and no Diagnostic IO.";return false;
+        error=doorway ? "Doorway measurement requires High RT with one in-flight frame."
+                      : "Route measurement requires the actual Shipping/High artifact pair and no Diagnostic IO.";
+        return false;
     }
     ChapterRoundTripProbe probe;
-    if(!context.rtScene.OrdinaryStaticDetailAvailable()) {
+    BellwetherDoorwayProbe bellwether;
+    if(!doorway && !context.rtScene.OrdinaryStaticDetailAvailable()) {
         error="Actual chapter geometry did not admit the corridor static-detail certificate.";return false;
     }
-    if(!probe.Start(context.simulation.Snapshot())) {
-        error="Shipping route requires the admitted low-lantern reunion.";return false;
+    if(!(doorway ? bellwether.Start(context.simulation.Snapshot(),bellwetherRoute) :
+                    probe.Start(context.simulation.Snapshot()))) {
+        error=doorway ? "Doorway measurement requires the completed, staffed repeat-visit room."
+                      : "Shipping route requires the admitted low-lantern reunion.";
+        return false;
     }
-    const auto directory=output/"shipping-route";
+    const auto complete=[&] {return doorway ? bellwether.Complete() : probe.Phase()==ChapterProbePhase::Complete;};
+    const auto phaseName=[&] {return doorway ? bellwether.PhaseName() : ChapterProbePhaseName(probe.Phase());};
+    const auto directory=output/(doorway ? BellwetherMeasurementName(bellwetherRoute) : "shipping-route");
     std::error_code pathError;
     if(!std::filesystem::create_directory(directory,pathError)||pathError) {
         error="Shipping route evidence directory must be new and writable.";return false;
@@ -58,7 +76,11 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         csv<<','<<name<<"_ns,"<<name<<"_invocations,"<<name<<"_bytes,"<<name<<"_operations,"<<name<<"_overflow";
     }
     for(const auto name:kChapterHostPhaseNames)csv<<','<<name;
-    csv<<",host_previous_evidence_ns,host_phases_available\n";
+    csv<<",host_previous_evidence_ns,host_phases_available";
+    if(doorway)csv<<",fire_count,tlas_instances,blas_owners,kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
+    if(residentRoundTrip)csv<<",returns,resident_slot0_id,resident_slot1_id";
+    if(westRoundTrip)csv<<",stock_head_instances,stock_pose_mask";
+    csv<<'\n';
     struct Restore {
         VulkanSurfaceContext& ctx;bool paused,active;int sfx,voice,music;
         ~Restore() {
@@ -72,11 +94,16 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     context.sfxVolumePercent=context.voiceVolumePercent=context.musicVolumePercent=0;
     (void)context.rtFrameEvidence.SetPaused(false);
     struct Tag {
-        ChapterProbePhase phase=ChapterProbePhase::Failed;unsigned station=0;
+        std::string_view phase;unsigned station=0;
         std::uint64_t serial=0,tick=0,simulationNanoseconds=0,presentIntervalNanoseconds=0;
         double elapsedSeconds=0;bool intervalAvailable=false,unoccluded=false,foreground=false;
         horde::vulkan::raytracing::PresentableTinyRtScene::OrdinaryStaticDetailMeasurements detail{};
         ChapterRouteHostPhases host;
+        std::array<unsigned,3> roomMasks{};
+        unsigned recordKeeperMask=0,tavernDoorMask=0;
+        std::array<std::uint32_t,2> residents{};
+        unsigned returns=0;
+        unsigned stockHeadInstances=0,stockPoseMask=0;
     };
     // The sole in-flight graphics owner completes before reusing its slot.
     // Tags join that committed identity, never just a repeated simulation tick.
@@ -116,9 +143,11 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         lastSystemLoadSeconds=seconds;
     };
     auto lastSerial=initial.completedEvidence.identity.submitted.submissionSerial;
-    ChapterProbePhase lastPhase=ChapterProbePhase::Failed;
+    std::string_view lastPhase;
     unsigned frames=0,samples=0;std::uint64_t maximumDebt=0;
-    ChapterRouteMeasurementClock clock;
+    const double deadline=residentRoundTrip ? BellwetherDoorwayProbe::kResidentRoundTripDeadlineSeconds :
+        ChapterRouteMeasurementClock::kDefaultDeadlineSeconds;
+    ChapterRouteMeasurementClock clock(deadline);
     const auto append=[&] {
         const auto publication=context.rtFrameEvidence.PublishedStateByValue();
         if(!publication.hasCompletedEvidence)return true;
@@ -130,16 +159,26 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
            id.frame.sceneEpoch!=initial.sceneEpoch || id.frame.measurementGeneration!=initial.measurementGeneration ||
            sample.presentation.outcome!=RtPresentationOutcome::Presented ||
            sample.presentation.lastSuccessfulPresentSubmissionSerial!=id.submissionSerial ||
-           sample.scene.pipeline.instrumentation!=RtInstrumentationMode::Shipping || sample.dielectric.compiled ||
-           sample.dielectric.hasCounters || sample.dielectric.readCount || sample.dielectric.resetCount) {
+           sample.scene.pipeline.instrumentation!=instrumentation ||
+           (!doorway && (sample.dielectric.compiled || sample.dielectric.hasCounters ||
+                         sample.dielectric.readCount || sample.dielectric.resetCount))) {
             error="Shipping route lost completed identity, owning route tag or instrumentation isolation.";return false;
         }
         RtEvidenceValidationError validation{};
         if(!ValidateRtPerformanceEvidence(sample,validation)) {
             error="Shipping route completed sample failed canonical validation.";return false;
         }
+        if(doorway && (context.rtScene.GlassEnabled()!=glassEnabled ||
+            !baseline.dimensions || sample.scene.dimensions!=baseline.dimensions ||
+            sample.scene.pipeline.executionMode!=baseline.pipeline.executionMode ||
+            sample.scene.pipeline.waterQuality!=baseline.pipeline.waterQuality ||
+            sample.scene.shadowQuality!=baseline.shadowQuality || sample.scene.fireQuality!=baseline.fireQuality ||
+            sample.scene.actualUploadedMistEnabled!=baseline.actualUploadedMistEnabled ||
+            sample.scene.actualUploadedDustQuality!=baseline.actualUploadedDustQuality)) {
+            error="Doorway route changed its submitted resolution, backend or quality.";return false;
+        }
         csv<<tag.elapsedSeconds<<','<<tag.presentIntervalNanoseconds<<','<<tag.intervalAvailable<<','<<tag.unoccluded<<','<<tag.foreground<<','
-            <<ChapterProbePhaseName(tag.phase)<<','<<tag.station<<','
+            <<tag.phase<<','<<tag.station<<','
             <<tag.simulationNanoseconds<<','<<id.frame.sceneEpoch<<','
             <<id.frame.measurementGeneration<<','<<id.submissionSerial<<','<<id.frame.simulationTick<<','
             <<RtSampleStatusName(sample.gpu.status)<<','<<(sample.gpu.hasDuration?sample.gpu.durationNanoseconds:0)<<','
@@ -152,7 +191,43 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             csv<<','<<stage.durationNanoseconds<<','<<stage.workInvocationCount<<','<<stage.byteCount<<','
                 <<stage.operationCount<<','<<stage.overflowed;
         for(const auto duration:tag.host.nanoseconds)csv<<','<<duration;
-        csv<<','<<tag.host.previousEvidenceNanoseconds<<','<<tag.host.available<<'\n';
+        csv<<','<<tag.host.previousEvidenceNanoseconds<<','<<tag.host.available;
+        if(doorway) {
+            if(!sample.scene.fireLighting || (tag.phase=="room" &&
+               (sample.scene.fireLighting->count!=3 ||
+                tag.roomMasks!=std::array<unsigned,3>{1,unsigned(glassEnabled),1}))) {
+                error="Doorway frame lost the staffed room's fire or geometry admission.";return false;
+            }
+            if(context.combinedBellwetherResidents && tag.recordKeeperMask!=1) {
+                error="Doorway frame lost the submitted record keeper instance.";return false;
+            }
+            if(tag.tavernDoorMask!=1) {
+                error="Doorway frame lost the submitted tavern door instance.";return false;
+            }
+            csv<<','<<sample.scene.fireLighting->count<<','<<sample.scene.resources.tlasInstanceCount<<','
+               <<sample.scene.resources.bottomLevelAccelerationStructureCount;
+            for(const auto mask:tag.roomMasks)csv<<','<<mask;
+            csv<<','<<tag.recordKeeperMask<<','<<tag.tavernDoorMask;
+        }
+        if(residentRoundTrip) {
+            constexpr std::array town{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::dialogue::kRecordKeeperActorId};
+            constexpr std::array east{horde::gameplay::bellwether::kArtificerActorId,
+                horde::gameplay::bellwether::kSalvagerActorId};
+            constexpr std::array west{horde::gameplay::dialogue::kTavernKeeperActorId,
+                horde::gameplay::bellwether::kRelicDealerActorId};
+            if(((tag.phase=="room" || tag.phase=="complete") && tag.residents!=town) ||
+               (tag.phase=="east-fork" && (tag.residents!=east || tag.roomMasks[2]!=1)) ||
+               (tag.phase=="stock-yard" && (tag.residents!=west || tag.roomMasks[2]!=1 ||
+                                           tag.stockHeadInstances!=3u)) ||
+               sample.gpu.status!=RtSampleStatus::Valid || !sample.gpu.hasDuration ||
+               sample.gpu.completedSubmissionSerial!=id.submissionSerial) {
+                error="Resident round trip lost a staged roster or its exact submitted GPU timing.";return false;
+            }
+            csv<<','<<tag.returns<<','<<tag.residents[0]<<','<<tag.residents[1];
+        }
+        if(westRoundTrip)csv<<','<<tag.stockHeadInstances<<','<<tag.stockPoseMask;
+        csv<<'\n';
         if(samples%120==0 || tag.phase!=lastPhase) {
             std::string json;
             if(!SerializeRtPerformanceEvidenceJson(sample,json,validation)) {
@@ -161,8 +236,10 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             // Canonical JSON escapes line breaks inside strings. Remove only
             // real formatting CR/LF so each journal record is one valid line.
             std::erase_if(json,[](char c){return c=='\r'||c=='\n';});
-            snapshots<<"{\"phase\":\""<<ChapterProbePhaseName(tag.phase)<<"\",\"station\":"<<tag.station
-                <<",\"elapsedSeconds\":"<<tag.elapsedSeconds<<",\"evidence\":"<<json<<"}\n";
+            snapshots<<"{\"phase\":\""<<tag.phase<<"\",\"station\":"<<tag.station
+                <<",\"elapsedSeconds\":"<<tag.elapsedSeconds;
+            if(doorway)snapshots<<",\"tavernDoorMask\":"<<tag.tavernDoorMask;
+            snapshots<<",\"evidence\":"<<json<<"}\n";
             csv.flush();snapshots.flush();
         }
         lastSerial=id.submissionSerial;lastPhase=tag.phase;++samples;
@@ -196,7 +273,10 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         }
         return true;
     };
-    while(frames++<30000 && probe.Phase()!=ChapterProbePhase::Complete) {
+    // The west route is bounded by the wall clock. A fast hidden swapchain
+    // can submit more than the legacy 30,000 frames before its second return.
+    while(!complete() && (westRoundTrip || frames<30000u)) {
+        ++frames;
         const auto iterationStartNs=steadyNs();
         sampleSystemLoad();
         const auto systemEndNs=steadyNs();
@@ -206,20 +286,24 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
             TranslateMessage(&message);DispatchMessageW(&message);
         }
         const auto messagesEndNs=steadyNs();
-        const bool visible=unoccludedClient();
-        if(!visible) {error="Release route requires an uncovered visible client ("+error+"); no focus was acquired.";return false;}
+        const bool visible=!doorway && unoccludedClient();
+        if(!doorway && !visible) {error="Release route requires an uncovered visible client ("+error+"); no focus was acquired.";return false;}
         const bool foreground=GetForegroundWindow()==context.windowHandle;
-        if(ParseCaptureLaunchOptions().measureChapterForeground && !foreground) {
+        if(launch.measureChapterForeground && !foreground) {
             error="Owner-authorized foreground measurement lost foreground; no background FPS claim is allowed.";return false;
         }
         const auto visibilityEndNs=steadyNs();
         const auto ticks=clock.Consume(elapsed());
-        if(!ticks) {error="Shipping route exceeded its bounded150-second clock.";return false;}
+        if(!ticks) {error="Chapter route exceeded its measurement clock bound.";return false;}
         maximumDebt=std::max(maximumDebt,clock.PendingTicks());
         const auto simulationStart=std::chrono::steady_clock::now();
-        for(unsigned step=0;step<*ticks && probe.Phase()!=ChapterProbePhase::Complete;++step) {
-            const auto input=probe.Next(context.simulation.Snapshot());
-            if(probe.Phase()==ChapterProbePhase::Failed) {error="Shipping route lost progression/lifecycle ownership.";return false;}
+        for(unsigned step=0;step<*ticks && !complete();++step) {
+            const auto& state=context.simulation.Snapshot();
+            const auto input=doorway ? bellwether.Next(state) : probe.Next(state);
+            if(doorway ? bellwether.Failed() : probe.Phase()==ChapterProbePhase::Failed) {
+                error="Route lost progression/lifecycle ownership at player ("+
+                    std::to_string(state.playerX)+","+std::to_string(state.playerZ)+").";return false;
+            }
             context.simulationInput=input;
             context.simulation.StepFixed(input,1.f/60.f,context.simulation.Snapshot().inputPublicationSequence+1);
         }
@@ -245,13 +329,31 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
         if(!interval) {
             error="Shipping route successful present-return clock unavailable or nonmonotonic.";return false;
         }
+        const bool intervalAvailable=!doorway && interval->available;
         const auto host=MeasureChapterRouteHostPhases({previousPresentReturnNs,iterationStartNs,systemEndNs,
-            messagesEndNs,visibilityEndNs,simulationEndNs,presentReturnNs},previousEvidenceNs,interval->available);
+            messagesEndNs,visibilityEndNs,simulationEndNs,presentReturnNs},previousEvidenceNs,intervalAvailable);
         if(!host){error="Shipping route host-phase clocks lost monotonic interval ownership.";return false;}
-        tags[submitted.submissionSerial%tags.size()]={probe.Phase(),static_cast<unsigned>(probe.Station()),
-            submitted.submissionSerial,tick,simulationNs,interval->nanoseconds,
-            static_cast<double>(presentReturnNs-startNs)*1.e-9,interval->available,visible,foreground,
-            context.rtScene.OrdinaryStaticDetailEvidence(),*host};
+        auto& tag=tags[submitted.submissionSerial%tags.size()];
+        tag={phaseName(),static_cast<unsigned>(doorway ? bellwether.Station() : probe.Station()),
+            submitted.submissionSerial,tick,simulationNs,intervalAvailable ? interval->nanoseconds : 0u,
+            static_cast<double>(presentReturnNs-startNs)*1.e-9,intervalAvailable,visible,foreground,
+            context.rtScene.OrdinaryStaticDetailEvidence(),*host,{}};
+        if(doorway) {
+            using Scene=horde::vulkan::raytracing::PresentableTinyRtScene;
+            tag.roomMasks={context.rtScene.SubmittedInstanceMask(Scene::kKeeperMetadataIndex),
+                           context.rtScene.SubmittedInstanceMask(Scene::kChapterWindowMetadataIndex),
+                           context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex)};
+            tag.recordKeeperMask=context.rtScene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex+1);
+            tag.tavernDoorMask=context.rtScene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex);
+            if(residentRoundTrip) {
+                tag.residents=context.rtScene.ChapterResidentSourceIds();
+                tag.returns=bellwether.Returns();
+                if(westRoundTrip) {
+                    tag.stockHeadInstances=context.rtScene.SubmittedStockHeadCount();
+                    tag.stockPoseMask=BellwetherStockPoseMask(context.simulation.Snapshot());
+                }
+            }
+        }
         const auto evidenceStartNs=steadyNs();
         if(!append())return false;
         previousEvidenceNs=steadyNs()-evidenceStartNs;previousPresentReturnNs=presentReturnNs;
@@ -263,29 +365,40 @@ bool RunChapterShippingRouteMeasurement(VulkanSurfaceContext& context,
     }
     const auto& state=context.simulation.Snapshot();
     const auto& detail=context.rtScene.OrdinaryStaticDetailEvidence();
-    if(probe.Phase()!=ChapterProbePhase::Complete || finishSeconds<60 || !state.rescue.exteriorSide ||
-       state.rescue.equipmentStowed || !state.rescue.sawDescent || !state.rescue.sawLanding ||
-       state.rescue.claimCount!=1 || state.rescue.deploymentCount!=1 || !state.chapterDialogue.proofAccepted) {
+    if(!complete() || finishSeconds<60 || !state.rescue.exteriorSide || state.rescue.equipmentStowed ||
+       (!doorway && (!state.rescue.sawDescent || !state.rescue.sawLanding || state.rescue.claimCount!=1 ||
+                     state.rescue.deploymentCount!=1 || !state.chapterDialogue.proofAccepted))) {
         error="Shipping route lacks sustained duration or complete two-way progression.";return false;
     }
-    if(!detail.unloads || detail.restores!=detail.unloads || detail.savedOwnerBytes ||
+    if((!doorway && !detail.unloads) || detail.restores!=detail.unloads || detail.savedOwnerBytes ||
        !context.rtScene.StaticGeometryHasCompleteContributors() || state.staticDetailLease.resourceGeneration) {
         error="Ordinary route did not unload eligible static detail and restore the complete owner before return.";return false;
     }
     horde::vulkan::raytracing::PresentableTinyRtScene::StorageImageCapture image;
-    if(!context.rtScene.CaptureStorageImage(image,error)||!WriteRgbaPng(directory/"final-repeat-ascent.png",image,error))return false;
+    if(!context.rtScene.CaptureStorageImage(image,error)||
+       !WriteRgbaPng(directory/(doorway ? "final-repeat-visit.png" : "final-repeat-ascent.png"),image,error))return false;
     std::ostringstream summary;
 #if defined(_DEBUG)
     constexpr auto build="Debug CPU";
 #else
     constexpr auto build="Optimized Release CPU";
 #endif
-    summary<<"{\"schema\":4,\"scope\":\""<<build<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\","
-        <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames-1<<",\"completedSamples\":"<<samples
+    summary<<"{\"schema\":"<<(doorway?5:4)<<",\"scope\":\""<<build;
+    if(doorway)summary<<" with "<<RtInstrumentationModeName(instrumentation)
+        <<(residentRoundTrip ? " High shaders; hidden Bellwether resident round trip; GPU and resource evidence only\"," :
+            " High shaders; hidden Bellwether doorway route with keeper fixture; GPU and resource evidence only\",")
+        <<"\"quietReturns\":"<<bellwether.Returns()<<','
+        <<"\"recordKeeperIncluded\":"<<(context.combinedBellwetherResidents?"true":"false")<<','
+        <<"\"glassEnabled\":"<<(glassEnabled?"true":"false")<<','
+        <<"\"packagedPlaytest\":"<<(packaged?"true":"false")<<',';
+    else summary<<" with actual Shipping High shaders; visible uncovered wall-clock two-way route after staged Keeper death; no owner or phone acceptance\",";
+    summary
+        <<"\"durationSeconds\":"<<finishSeconds<<",\"renderedFrames\":"<<frames<<",\"completedSamples\":"<<samples
         <<",\"simulationTicks\":"<<state.tickIndex-baseTick<<",\"maximumPendingSimulationTicks\":"<<maximumDebt
-        <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":150,\"warmupSeconds\":5,"
-        <<"\"unoccludedClientChecks\":true,\"intervalMeaning\":\"wall time between successful present API returns, not GPU-only or exact display scanout timestamps\","
-        <<"\"foregroundRequested\":"<<(ParseCaptureLaunchOptions().measureChapterForeground?"true":"false")<<','
+        <<",\"simulationHz\":60,\"maximumTicksPerRender\":4,\"deadlineSeconds\":"<<deadline<<",\"warmupSeconds\":5,"
+        <<"\"unoccludedClientChecks\":"<<(doorway?"false":"true")<<",\"intervalMeaning\":\""
+        <<(doorway?"unavailable for hidden captures":"wall time between successful present API returns, not GPU-only or exact display scanout timestamps")<<"\","
+        <<"\"foregroundRequested\":"<<(launch.measureChapterForeground?"true":"false")<<','
         <<"\"staticDetailUnloads\":"<<detail.unloads<<",\"staticDetailRestores\":"<<detail.restores
         <<",\"maximumNormalStaticOwnerSavingBytes\":"<<detail.peakSavedOwnerBytes
         <<",\"finalStaticDetailSavingBytes\":"<<detail.savedOwnerBytes<<",\"staticPeakOwnerOverlapBytes\":"<<detail.peakOverlapOwnerBytes

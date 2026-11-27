@@ -30,7 +30,7 @@ inline std::filesystem::path WindowsDialogueAudioPath(
 inline std::string WindowsSubtitleCaption(const char* speaker, const char* text)
 {
     // Skip remains a control/help action rather than an extra subtitle paragraph.
-    return std::string(speaker) + ": " + text;
+    return *speaker ? std::string(speaker) + ": " + text : std::string(text);
 }
 
 inline int WindowsSubtitleBottomReserved(const bool interactionVisible, const int dpiPercent)

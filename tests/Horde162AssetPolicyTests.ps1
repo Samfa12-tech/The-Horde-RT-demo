@@ -25,8 +25,34 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-road-clue-v1/asset.manifest.json',
         'models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb',
         'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb',
-        'models/world/runtime/bellwether-shell-v4/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb',
+        'models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
+        'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/garden-crops.glb',
+        'models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/privy-rag.glb',
+        'models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/stock-heads.glb',
+        'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb',
+        'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb',
+        'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
         'models/world/runtime/forest-surroundings-v1/alder-far.glb',
         'models/world/runtime/forest-surroundings-v1/alder-middle.glb',
         'models/world/runtime/forest-surroundings-v1/asset.manifest.json',
@@ -39,7 +65,7 @@ function Assert-CollapseGradleInventory([string]$Text) {
         'models/world/runtime/forest-understory-v1/horde-fern-open-clump.glb',
         'models/world/runtime/forest-understory-v1/horde-fern-small-clump.glb',
         'models/world/runtime/forest-tree-pair-v1/horde-irregular-pine-v1-lod1.glb','models/world/runtime/forest-tree-pair-v1/horde-upright-alder-v1-lod1.glb') + @(Get-Horde17TombAssetSpecification | Where-Object {$_.Path -like 'models/world/*'} | ForEach-Object Path)
-    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest and tomb runtime rosters.'
+    Require ([string]::Join("`n",[string[]]@($names | Sort-Object -CaseSensitive)) -ceq [string]::Join("`n",[string[]]@($expected | Sort-Object -CaseSensitive))) 'Gradle world assets must match the exact collapse, forest, tomb and Bellwether runtime rosters.'
 }
 function Assert-PropsGradleInventory([string]$Text) {
     $names=@([regex]::Matches($Text, "(?m)^\s*include '([^']+)'\s*$") | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -like 'textures/props/*' })
@@ -80,10 +106,12 @@ function Assert-EquipmentAndroidStaging([string]$Gradle, [string]$Activity) {
                        $_ -like 'models/props/runtime/player-sword-scabbard/*' -or
                        $_ -like 'models/world/runtime/chapter-entry-return-v1/*' -or
                        $_ -like 'models/world/runtime/chapter-terrain-v1/*' -or
+                       $_ -like 'models/world/runtime/bellwether-tavern-v1/*' -or
+                       $_ -like 'models/world/runtime/bellwether-loose-road-stone-v1/*' -or
                        $_ -like 'textures/props/runtime/chapter-terrain/*.android.ktx2' -or
                        $_ -like 'models/characters/runtime/kit-warden-v1/*' -or
                        $_ -like 'textures/characters/runtime/kit-warden-v1/*.android.ktx2' })
-    Require ($required.Count -eq 18) 'Android equipment, entry and terrain staging require the closed eighteen-file package roster.'
+    Require ($required.Count -eq 46) 'Android equipment and chapter staging require the closed 46-file package roster.'
     $startup=@([regex]::Matches($Activity,
         '(?ms)^    StartupDiagnostics prepareInitialDiagnostics\(\)\s*\{(.*?)^    \}'))
     $helper=@([regex]::Matches($Activity,
@@ -216,9 +244,9 @@ function New-HeldFixtureArchive([string]$Name,[string[]]$Omit=@(), [string]$Dupl
 try {
     $gradle=Get-Content (Join-Path $repo 'android/app/build.gradle') -Raw
     Assert-CollapseGradleInventory $gradle; ++$script:checks
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'exact collapse, forest and tomb runtime rosters'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'exact collapse, forest and tomb runtime rosters'
-    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'exact collapse, forest and tomb runtime rosters'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/collapsed-entry/asset.manifest.json'",''))} 'Gradle world assets must match'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle.Replace("        include 'models/world/runtime/forest-tree-pair-v1/runtime-roster.json'",''))} 'Gradle world assets must match'
+    Expect-Failure {Assert-CollapseGradleInventory ($gradle+"`ninclude 'models/world/source/*.blend'`n")} 'Gradle world assets must match'
     Assert-PropsGradleInventory $gradle; ++$script:checks
     Expect-Failure {Assert-PropsGradleInventory ($gradle.Replace('textures/props/runtime/base-color.android.ktx2','textures/props/runtime/*.android.ktx2'))} 'exact eight-file Android runtime roster'
     Expect-Failure {Assert-PropsGradleInventory ($gradle+"`ninclude 'textures/props/runtime/base-color.windows.ktx2'`n")} 'exact eight-file Android runtime roster'
@@ -245,6 +273,19 @@ try {
                        'models/world/runtime/chapter-entry-return-v1/collapsed-entry-lod0.runtime.glb',
                        'models/world/runtime/chapter-terrain-v1/asset.manifest.json',
                        'models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb',
+                       'models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb',
+                       'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+                       'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/garden-crops.glb',
+                       'models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/privy-rag.glb',
+                       'models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/stock-heads.glb',
+                       'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
+                       'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json',
+                       'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb',
+                       'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb',
                        'textures/props/runtime/chapter-terrain/base-color.android.ktx2',
                        'textures/props/runtime/chapter-terrain/normal.android.ktx2',
                        'textures/props/runtime/chapter-terrain/orm.android.ktx2',
@@ -266,7 +307,7 @@ try {
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+' stageRuntimeAssetCache();'))} 'once before native report-root publication'
     $duplicate='stageAsset("models/props/runtime/player-rag-torch/asset.manifest.json", "models/props/runtime/player-rag-torch/asset.manifest.json");'
     Expect-Failure {Assert-EquipmentAndroidStaging $gradle ($activity.Replace($startupCall,$startupCall+$duplicate))} 'exact native path'
-    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed eighteen-file package roster'
+    Expect-Failure {Assert-EquipmentAndroidStaging ($gradle+"`ninclude 'models/characters/runtime/kit-warden-v1/unadmitted.glb'`n") $activity} 'closed 46-file package roster'
     foreach ($scriptPath in @('tools/package-alpha.ps1','tools/run-foundation-validation.ps1')) {
         $text=Get-Content (Join-Path $repo $scriptPath) -Raw
         Assert-CollapsePackageInventory $text; ++$script:checks
@@ -318,9 +359,9 @@ try {
     $windows=@(Get-Horde162RuntimeFiles $repo Windows);$android=@(Get-Horde162RuntimeFiles $repo Android)
     $baseWindows=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'})
     $baseAndroid=@(Get-Horde162AssetSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'})
-    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 58 -and
-             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 59) 'Current shared asset roster includes five exact prepared deadwood and three exact road-clue payloads.'
-    Require ($windows.Count -eq 118 -and $android.Count -eq 119) 'Current closed roster includes exact tomb, terrain, tree-pair, Kit, grave-marker, understory, town, deadwood and road-clue runtime assets; no editable sources.'
+    Require ($baseWindows.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Windows'}).Count -eq 84 -and
+             $baseAndroid.Count + @(Get-Horde162ManifestSpecification | Where-Object {$_.Platform -ceq 'Both' -or $_.Platform -ceq 'Android'}).Count -eq 85) 'Both base runtime rosters include the Bellwether world assets.'
+    Require ($windows.Count -eq 144 -and $android.Count -eq 145) 'Both platforms have the expected full runtime asset roster.'
     $woodland=@('asset.manifest.json','runtime-roster.json','pine-middle.glb','alder-middle.glb','pine-far.glb','alder-far.glb','boundary-panel.glb','woodland-low-fern.glb')
     foreach($name in $woodland) {
         $path='models/world/runtime/forest-surroundings-v1/'+$name
@@ -349,10 +390,36 @@ try {
         Require (@($windows | Where-Object {$_ -ceq $rock}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $rock}).Count -eq 1) 'Each exact rock payload is admitted once.'
     }
-    $townFiles=@('models/world/runtime/bellwether-shell-v4/asset.manifest.json',
-        'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb')
-    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2 -and
-             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-shell-*/*'}).Count -eq 2) 'Both platforms admit only the two final closed town payloads.'
+    $townFiles=@('models/world/runtime/bellwether-tavern-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb',
+        'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/garden-crops.glb',
+        'models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/privy-rag.glb',
+        'models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/stock-heads.glb',
+        'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb',
+        'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb',
+        'models/world/runtime/bellwether-tavern-v1/window.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb',
+        'models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json',
+        'models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb',
+        'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json',
+        'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb')
+    Require (@($windows | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count -and
+             @($android | Where-Object {$_ -like 'models/world/runtime/bellwether-*/*'}).Count -eq $townFiles.Count) 'Both platforms admit the exact shared Bellwether world payloads.'
     foreach($town in $townFiles) {
         Require (@($windows | Where-Object {$_ -ceq $town}).Count -eq 1 -and
                  @($android | Where-Object {$_ -ceq $town}).Count -eq 1) 'Each exact town payload is admitted once on both platforms.'

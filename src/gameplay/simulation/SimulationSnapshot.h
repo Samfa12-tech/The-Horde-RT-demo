@@ -1,4 +1,9 @@
 #pragma once
+
+#include "gameplay/campaign/TreasurePurse.h"
+
+#include "gameplay/dialogue/TavernKeeperPlacement.h"
+#include "gameplay/dialogue/RecordKeeperPlacement.h"
 #include "gameplay/effects/WaterContact.h"
 #include "gameplay/dialogue/ChapterDialogue.h"
 #include "gameplay/dialogue/CompanionRouteFixture.h"
@@ -6,6 +11,11 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/StaticDetailLease.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
+#include "gameplay/traversal/BellwetherMill.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
+#include "gameplay/traversal/BellwetherStock.h"
+#include "gameplay/traversal/BellwetherSalvager.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 
 #include <array>
 #include <cstddef>
@@ -32,6 +42,8 @@
 #include "gameplay/effects/EnemyHitParticles.h"
 #include "gameplay/simulation/CombatInputTiming.h"
 #include "gameplay/simulation/GameplayEvent.h"
+#include "gameplay/traversal/WaysideArchive.h"
+#include "gameplay/traversal/BellwetherTavernDoor.h"
 
 namespace horde::gameplay::simulation
 {
@@ -68,6 +80,51 @@ struct SkeletonEnemySnapshot
 struct SimulationSnapshot
 {
     horde::gameplay::dialogue::Snapshot chapterDialogue{};
+    bool tavernConversationAvailable=false;
+    bool tavernDirectionsAvailable=false;
+    bool tavernLanternFittingAvailable=false;
+    bool tavernLanternAvailable=false;
+    dialogue::RecordKeeperAction recordKeeperAction=dialogue::RecordKeeperAction::None;
+    campaign::TreasurePurse treasurePurse{};
+    bellwether::WaysideArchive waysideArchive;
+    bellwether::ArchiveAction waysideArchiveAction=bellwether::ArchiveAction::None;
+    bellwether::MillPreparation millPreparation{};
+    bellwether::MillAction millAction{};
+    bellwether::MillLeakTestPhase millLeakTestPhase{};
+    bool millDriveTesting=false;
+    float millDriveAngleRadians=0.f;
+    // Continuous waterwheel presentation, driven by the shared active fixed step.
+    float millWaterwheelAngleRadians=0.f;
+    bellwether::StockHeadPoses stockHeadPoses{};
+    bellwether::ShorePracticeStage shorePracticeStage{};
+    bellwether::SalvagerAction salvagerAction{};
+    std::uint16_t shorePracticeBreathTicksRemaining=0;
+    bool salvagerShorePracticeCompleted=false;
+    bool millServiceAvailable=false;
+    bool shorePracticeServiceAvailable=false;
+    bool relicDealerTradeAvailable=false;
+    campaign::OrdinarySilverAction ordinarySilverAction{};
+    campaign::MillTallyAction millTallyAction{};
+    bellwether::TavernDoor tavernDoor;
+    bellwether::DoorAction tavernDoorAction=bellwether::DoorAction::None;
+    bool gardenGrateTalkAvailable=false;
+    bellwether::PrivyRagState privyRag=bellwether::PrivyRagState::Available;
+    bellwether::PrivyRagAction privyRagAction=bellwether::PrivyRagAction::None;
+    [[nodiscard]] bool HasChapterInteractPrompt() const {
+        return tavernConversationAvailable || tavernDirectionsAvailable || tavernLanternFittingAvailable ||
+            recordKeeperAction!=dialogue::RecordKeeperAction::None || waysideArchiveAction!=bellwether::ArchiveAction::None ||
+            tavernDoorAction!=bellwether::DoorAction::None || millAction!=bellwether::MillAction::None ||
+            salvagerAction!=bellwether::SalvagerAction::None || relicDealerTradeAvailable ||
+            ordinarySilverAction==campaign::OrdinarySilverAction::Take ||
+            ordinarySilverAction==campaign::OrdinarySilverAction::Sell ||
+            millTallyAction!=campaign::MillTallyAction::None ||
+            gardenGrateTalkAvailable || privyRagAction!=bellwether::PrivyRagAction::None;
+    }
+    std::optional<horde::gameplay::dialogue::TavernKeeperPose> tavernKeeper;
+    std::optional<dialogue::RecordKeeperPose> recordKeeper;
+    std::optional<bellwether::ArtificerPose> artificer;
+    std::optional<bellwether::SalvagerPose> salvager;
+    std::optional<bellwether::RelicDealerPose> relicDealer;
     // Transient shared presentation multiplier, never a saved user setting.
     float dialogueBedGain=1.f;
     horde::gameplay::dialogue::CompanionSnapshot chapterCompanion{};
@@ -213,6 +270,8 @@ struct SimulationSnapshot
     bool NeedsRaiseLanternPrompt() const
     {
         using namespace horde::gameplay::interactions;
+        if(tavernLanternAvailable)
+            return interaction.heldLightKind==HeldLightKind::RewardLantern && interaction.heldLightPose==HeldLightPose::Low;
         return chapterDialogue.waitingForRaise && !chapterDialogue.proofAccepted &&
             developmentRescueJourney && rescue.phase == horde::gameplay::traversal::Phase::UpperSafe &&
             interaction.heldLightKind == HeldLightKind::RewardLantern &&

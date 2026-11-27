@@ -1,0 +1,18 @@
+{
+  "feature": "Church lane waymarker",
+  "originalTownSha256": "22e26474135dbb4ff95a548015ac9c34c4fd91dfa3e5de493edaf144288e8ad8",
+  "originalMasterSha256": "e821abb54129952512c4a92cf83d87b4cc021c111be505427930e6c257fe3c13",
+  "runtimeTownSha256": "f63849a8c080ad3e8ea0457739648d46d02620da4562a41a6f2b864cd9cc2a10",
+  "recipeSha256": "bd4f786416b5af104550d7b43fc584f5cc96d55b1e429e11fb449e18da8cd128",
+  "editableSha256": "34ea7434dc564ac58fb88aaec931d87be19eb657b8003f1bec007665b3ea3342",
+  "blender": "5.2.0 LTS",
+  "pivotXZ": [
+    34.65,
+    82.1
+  ],
+  "yawDegrees": -45.0,
+  "movedTriangles": {
+    "HordeTavernTimber": 348,
+    "HordeHearthChar": 16
+  }
+}

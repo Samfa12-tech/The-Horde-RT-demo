@@ -1,0 +1,21 @@
+// Android CI runners hit Central's shared-IP rate limit. Google's hosted
+// mirror serves the same pinned Central coordinates, including Robolectric's
+// separately resolved Android SDK. Keep Google's Android repo and the plugin
+// portal in their configured positions.
+def centralMirror = 'https://maven-central.storage-download.googleapis.com/maven2/'
+
+settingsEvaluated { settings ->
+    [settings.pluginManagement.repositories, settings.dependencyResolutionManagement.repositories].each { repositories ->
+        repositories.withType(MavenArtifactRepository).each { repo ->
+            if (repo.url.host == 'repo.maven.apache.org') {
+                repo.url = URI.create(centralMirror)
+            }
+        }
+    }
+}
+
+allprojects {
+    tasks.withType(Test).configureEach {
+        systemProperty 'robolectric.dependency.repo.url', centralMirror
+    }
+}

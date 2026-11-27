@@ -101,12 +101,17 @@ float NearestMasonryHit(const horde::scene::assets::StaticMeshAsset& asset,
                         std::size_t firstPrimitive = 0u,
                         std::size_t primitiveEnd = std::numeric_limits<std::size_t>::max())
 {
-    float nearest = std::numeric_limits<float>::max();
-    const float cosine = std::cos(yaw), sine = std::sin(yaw);
+    // These probes intentionally include fitted-frame edges and vertices.
+    // Keep source vertices authored/stored as float, but do the ray/triangle
+    // test in double so GCC does not reject a shared edge through float-only
+    // barycentric rounding.
+    double nearest = std::numeric_limits<double>::max();
+    const double cosine = std::cos(static_cast<double>(yaw));
+    const double sine = std::sin(static_cast<double>(yaw));
     const auto transformed = [&](const std::array<float, 3u>& source) {
-        return std::array<float, 3u>{{cosine * source[0] + sine * source[2] + translation[0],
-                                      source[1] + translation[1],
-                                      -sine * source[0] + cosine * source[2] + translation[2]}};
+        return std::array<double, 3u>{{cosine * source[0] + sine * source[2] + translation[0],
+                                       source[1] + translation[1],
+                                       -sine * source[0] + cosine * source[2] + translation[2]}};
     };
     primitiveEnd = std::min(primitiveEnd, asset.primitives.size());
     for (std::size_t primitiveIndex = firstPrimitive; primitiveIndex < primitiveEnd; ++primitiveIndex)
@@ -122,29 +127,30 @@ float NearestMasonryHit(const horde::scene::assets::StaticMeshAsset& asset,
             const auto a = transformed(as3(asset.vertices[primitive.vertexOffset + asset.indices[i]].position));
             const auto b = transformed(as3(asset.vertices[primitive.vertexOffset + asset.indices[i + 1u]].position));
             const auto c = transformed(as3(asset.vertices[primitive.vertexOffset + asset.indices[i + 2u]].position));
-            const std::array<float, 3u> e1{b[0]-a[0], b[1]-a[1], b[2]-a[2]};
-            const std::array<float, 3u> e2{c[0]-a[0], c[1]-a[1], c[2]-a[2]};
-            const std::array<float, 3u> p{
-                direction[1]*e2[2]-direction[2]*e2[1],
-                direction[2]*e2[0]-direction[0]*e2[2],
-                direction[0]*e2[1]-direction[1]*e2[0]};
-            const float determinant = e1[0]*p[0] + e1[1]*p[1] + e1[2]*p[2];
-            if (std::abs(determinant) < 1.0e-7f) continue;
-            const float inverse = 1.0f / determinant;
-            const std::array<float, 3u> tvec{origin[0]-a[0], origin[1]-a[1], origin[2]-a[2]};
-            const float u = (tvec[0]*p[0] + tvec[1]*p[1] + tvec[2]*p[2]) * inverse;
-            if (u < 0.0f || u > 1.0f) continue;
-            const std::array<float, 3u> q{
+            const std::array<double, 3u> e1{b[0]-a[0], b[1]-a[1], b[2]-a[2]};
+            const std::array<double, 3u> e2{c[0]-a[0], c[1]-a[1], c[2]-a[2]};
+            const std::array<double, 3u> d{direction[0],direction[1],direction[2]};
+            const std::array<double, 3u> p{
+                d[1]*e2[2]-d[2]*e2[1],
+                d[2]*e2[0]-d[0]*e2[2],
+                d[0]*e2[1]-d[1]*e2[0]};
+            const double determinant = e1[0]*p[0] + e1[1]*p[1] + e1[2]*p[2];
+            if (std::abs(determinant) < 1.0e-12) continue;
+            const double inverse = 1.0 / determinant;
+            const std::array<double, 3u> tvec{origin[0]-a[0], origin[1]-a[1], origin[2]-a[2]};
+            const double u = (tvec[0]*p[0] + tvec[1]*p[1] + tvec[2]*p[2]) * inverse;
+            if (u < 0.0 || u > 1.0) continue;
+            const std::array<double, 3u> q{
                 tvec[1]*e1[2]-tvec[2]*e1[1],
                 tvec[2]*e1[0]-tvec[0]*e1[2],
                 tvec[0]*e1[1]-tvec[1]*e1[0]};
-            const float v = (direction[0]*q[0] + direction[1]*q[1] + direction[2]*q[2]) * inverse;
-            if (v < 0.0f || u + v > 1.0f) continue;
-            const float distance = (e2[0]*q[0] + e2[1]*q[1] + e2[2]*q[2]) * inverse;
-            if (distance > 0.0f) nearest = std::min(nearest, distance);
+            const double v = (d[0]*q[0] + d[1]*q[1] + d[2]*q[2]) * inverse;
+            if (v < 0.0 || u + v > 1.0) continue;
+            const double distance = (e2[0]*q[0] + e2[1]*q[1] + e2[2]*q[2]) * inverse;
+            if (distance > 0.0) nearest = std::min(nearest, distance);
         }
     }
-    return nearest;
+    return static_cast<float>(nearest);
 }
 
 void TestRayHelperFixture()

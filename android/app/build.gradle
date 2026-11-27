@@ -42,6 +42,153 @@ if(flaskCandidateDirectory) {
 // The source MP3, editable Blender files and previews never enter an APK.
 def hordeShipping17AssetDirectory=providers.gradleProperty('hordeShipping17AssetDir').orNull
 
+// Local Bellwether phone proof. The staged ASTC textures and two exact model
+// derivatives are admitted only to the separately installed Debug application.
+def bellwetherResidentPath = providers.gradleProperty('hordeBellwetherResidentDir').orNull
+def bellwetherResidentDirectory = bellwetherResidentPath ? file(bellwetherResidentPath).canonicalFile : null
+def bellwetherVoicePath = providers.gradleProperty('hordeBellwetherVoiceDir').orNull
+def bellwetherVoiceDirectory = bellwetherVoicePath ? file(bellwetherVoicePath).canonicalFile : null
+def bellwetherPlaytestValue = providers.gradleProperty('hordeBellwetherPlaytest').orElse('false').get()
+if (!(bellwetherPlaytestValue in ['true', 'false'])) {
+    throw new GradleException('hordeBellwetherPlaytest must be true or false.')
+}
+def bellwetherPlaytest = bellwetherPlaytestValue == 'true'
+def verifyBellwetherOverlay = { File root, Map pinned, String label ->
+    if (!root.isDirectory()) throw new GradleException("Bellwether ${label} root is missing.")
+    def actual = []
+    root.eachFileRecurse(groovy.io.FileType.FILES) {
+        actual.add(root.toPath().relativize(it.toPath()).toString().replace('\\','/'))
+    }
+    if (actual.sort() != pinned.keySet().toList().sort())
+        throw new GradleException("Bellwether ${label} requires exactly the pinned files.")
+    pinned.each { relative, expected ->
+        def asset = new File(root, relative)
+        if (MessageDigest.getInstance('SHA-256').digest(asset.bytes).encodeHex().toString() != expected)
+            throw new GradleException("Bellwether ${label} asset differs: ${relative}")
+    }
+}
+def texturedTavernKeeper = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/tavern-keeper/base-color.android.ktx2').isFile()
+def bellwetherArtificer = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/artificer').isDirectory()
+def bellwetherSalvager = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/salvager').isDirectory()
+def bellwetherRelicDealer = bellwetherResidentDirectory &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/relic-dealer').isDirectory()
+def bellwetherCombinedResidents = bellwetherResidentDirectory && texturedTavernKeeper &&
+    new File(bellwetherResidentDirectory, 'private_bellwether/record-keeper').isDirectory() &&
+    bellwetherArtificer && bellwetherSalvager
+def bellwetherRelicDealerPinned = [
+    'private_bellwether/relic-dealer/asset.manifest.json': '840fedf5adb6a68720ae90d4794cb4b1626547e914cf32644ae10ae96ad2b1ae',
+    'private_bellwether/relic-dealer/resident.glb': '588ce3a7f4587aaae4d2b900804b3edb34d621a9654a9da214b4944791c328fe',
+    'private_bellwether/relic-dealer/base-color.android.ktx2': '09fdcf0bdf7f9b3b9108473574ddeec75acb4e62aad39ff3fab6337f9b31d7a2',
+    'private_bellwether/relic-dealer/normal.android.ktx2': 'b39f37aa2cf241c6e93168f32f7bebbcea444ed620af0d01d505ac74e2de9656',
+    'private_bellwether/relic-dealer/orm.android.ktx2': '9317c716ec88693e0bac4765e806511102c5ac3c8b4796be1de2323122144cf3'
+]
+if (bellwetherResidentDirectory) {
+    def pinned = bellwetherCombinedResidents ? [
+        'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
+        'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
+        'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
+        'private_bellwether/record-keeper/normal.android.ktx2': '04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0',
+        'private_bellwether/record-keeper/orm.android.ktx2': 'f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb',
+        'private_bellwether/artificer/asset.manifest.json': '890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864',
+        'private_bellwether/artificer/resident.glb': '58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f',
+        'private_bellwether/artificer/base-color.android.ktx2': '68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8',
+        'private_bellwether/artificer/normal.android.ktx2': '9f930fbdf2eeea390ae84a74123902f7d12e1a62fb1bccf784ac17b4606ff543',
+        'private_bellwether/artificer/orm.android.ktx2': '9985942d945dcde16a2d5e83d40778e09f5999c8425c12ac7e1815b679e7baa0',
+        'private_bellwether/salvager/asset.manifest.json': '5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc',
+        'private_bellwether/salvager/resident.glb': '26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa',
+        'private_bellwether/salvager/base-color.android.ktx2': '3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152',
+        'private_bellwether/salvager/normal.android.ktx2': '11b996752ab9c93dcd33eace337a2db2b4fad6459c63998e472c813644281628',
+        'private_bellwether/salvager/orm.android.ktx2': '26f765f78fc751e6e37196f2c5ed7843c59e7931d17b313ff333d0d702e5f117'
+    ] : bellwetherRelicDealer ? bellwetherRelicDealerPinned : bellwetherSalvager ? [
+        'private_bellwether/salvager/asset.manifest.json': '5813793ca9053a9071f6868934558a5ebf1432d41799d12e3b113f5aff79f3dc',
+        'private_bellwether/salvager/resident.glb': '26d951677e4d945d49702ff406c5075b7955901cb1446534fba26dcfe41ccfaa',
+        'private_bellwether/salvager/base-color.android.ktx2': '3e749f7acf0a74257c74bfa5d3420b8799c2fc7e5f9d8cf40ab8ab3c4877c152',
+        'private_bellwether/salvager/normal.android.ktx2': '11b996752ab9c93dcd33eace337a2db2b4fad6459c63998e472c813644281628',
+        'private_bellwether/salvager/orm.android.ktx2': '26f765f78fc751e6e37196f2c5ed7843c59e7931d17b313ff333d0d702e5f117'
+    ] : bellwetherArtificer ? [
+        'private_bellwether/artificer/asset.manifest.json': '890c80e97090501e45a78581ecc4d23dd34990d7ae8a0bb9d8d435b3f1b11864',
+        'private_bellwether/artificer/resident.glb': '58c9552de693dca7f848b17b0a7dda7926c9e01ee190ffaeb9310589777f3c6f',
+        'private_bellwether/artificer/base-color.android.ktx2': '68608fe3cd150af159dbbea58ca84be3d8b5c60621b91aba5bef19fcc4c686b8',
+        'private_bellwether/artificer/normal.android.ktx2': '9f930fbdf2eeea390ae84a74123902f7d12e1a62fb1bccf784ac17b4606ff543',
+        'private_bellwether/artificer/orm.android.ktx2': '9985942d945dcde16a2d5e83d40778e09f5999c8425c12ac7e1815b679e7baa0'
+    ] : [
+        'private_bellwether/record-keeper/asset.manifest.json': '5c539815f6f0b273aa82f69fea4b3241dd96d908fb4624b8308ad012ecfa2864',
+        'private_bellwether/record-keeper/resident.glb': '10bd7562fa275e87e414f95a185025af92263a6efaaeeb0dbf20cead00317884',
+        'private_bellwether/record-keeper/base-color.android.ktx2': 'e3af6941806be59a3a61d80c8676352e123acb3b69a51ac167480cf64cff8837',
+        'private_bellwether/record-keeper/normal.android.ktx2': '04403aff9d3460f7f6971093555d5e55c7319a85d6a58be7fb566737da7e32f0',
+        'private_bellwether/record-keeper/orm.android.ktx2': 'f5258e0b33a99975fa4f904b85c948751c82f302dbf736e6fa40c565f466bccb'
+    ]
+    if (texturedTavernKeeper) {
+        pinned.putAll([
+            'private_bellwether/tavern-keeper/asset.manifest.json': 'e2c05da7ef2867a9d531c0b3b9bc115460d683f7f850debd154287580047a341',
+            'private_bellwether/tavern-keeper/resident.glb': '61cb373e266f311d453f0f0d04262ab011e6b4e4c2ca46c355c3b73f448b9827',
+            'private_bellwether/tavern-keeper/base-color.android.ktx2': '57eed409fa5b6bbdbac2da57490eb3ed102a1fdc9b3423118d8ca39bcc37888e',
+            'private_bellwether/tavern-keeper/normal.android.ktx2': '7d6debe36b993c982758a2ec2768d76b724adee57389e844746b178c06af9f8a',
+            'private_bellwether/tavern-keeper/orm.android.ktx2': '03da79e706d71840c5f3f1de1cbf76a8f8c19f5ae8250d3c0fc0b227eaf9c43e'
+        ])
+    } else {
+        pinned.putAll([
+            'private_bellwether/tavern-keeper/asset.manifest.json': 'a07e7b89a6904abe633305b6dbe7a9e2b34454de646db1a4e7600d82865128b7',
+            'private_bellwether/tavern-keeper/resident.glb': '67e87fc1ce56413263ceb61f0b378e5a176545c4bd6770d7cf29c73a966cd696'
+        ])
+    }
+    if (bellwetherCombinedResidents && bellwetherRelicDealer) {
+        pinned.putAll(bellwetherRelicDealerPinned)
+    }
+    verifyBellwetherOverlay(bellwetherResidentDirectory, pinned, 'Debug resident overlay')
+}
+def bellwetherArrivalAuditionWavs = [
+    'private_bellwether_voice/kit.approach_injury.stop.wav': '817f8f5527b1d9764977b9c255f119d9cc1ad9f2903f6283f640440fe96a9391',
+    'private_bellwether_voice/kit.approach_injury.ankle.wav': 'ddb89b45e4bef7205c983c9fedf3e0cceca18db8479f0ac326cd0e6dc218c2e4',
+    'private_bellwether_voice/kit.approach_injury.slow.wav': '8c16e87f66d1514735c33d18a8d678ec2d1fea88993eb9800394cab7267826f4',
+    'private_bellwether_voice/hub.arrival_chair.wav': '927ca0dc61a138a704328079a5fa300a3b4131fabce204b9be7fc850fe1a8a0b',
+    'private_bellwether_voice/hub.horde_army.wav': 'a088307c4969f436888eb16eddf22ec23ceab59940adbf34ba7a2ba4f7401d5d'
+]
+def bellwetherArrivalAudition = bellwetherVoiceDirectory && bellwetherArrivalAuditionWavs.keySet().any {
+    new File(bellwetherVoiceDirectory, it).isFile()
+}
+def bellwetherSalvagerAuditionWavs = [
+    'private_bellwether_voice/access.body_task.wav': '8fe30ce30ccef9f9692f6d0f82a08bd618880038434b00336727cc70aad79ca9',
+    'private_bellwether_voice/access.body_progress.wav': '294501da575c700e3b4ed1e518f8dbfc6cb13e71c13c85a0a060e3c6ce993543',
+    'private_bellwether_voice/hub.passing.learned_retreat.wav': '01af397a57165188e559aaebe18edc5e76deeb4e2dedb91ab19a041cd11d1971'
+]
+def bellwetherSalvagerAudition = bellwetherVoiceDirectory && bellwetherSalvagerAuditionWavs.keySet().any {
+    new File(bellwetherVoiceDirectory, it).isFile()
+}
+def bellwetherFollowOnAuditionWavs = [
+    'private_bellwether_voice/hub.two_routes.wav': 'dc6602591b41f3b42a598f41f2113dc01a613f2b6ec62dbf94337b72a2c28d5d',
+    'private_bellwether_voice/hub.routes_independent.wav': '3506524546c1506b8183c2268f3a46c09421ffe79419ba25ae3646f826b6bcf0',
+    'private_bellwether_voice/kit.voice_reaction.wav': '305ea7a23ee19fa7c92db51b5b1a515139209a6dd6ffaf9e490f73864ea1f0ed',
+    'private_bellwether_voice/kit.first_direct_voice.finish.wav': 'fe8f68d761ad49bcdbf56e54c4f268a0584536a5c291f5051e6343391abb6048',
+    'private_bellwether_voice/kit.royal_claim.help.wav': '3bf0390321c7abf02f5faf13f02773f3b560fd74f2aef1b42f9f14f753e6e817',
+    'private_bellwether_voice/hub.ordinary_sale.wav': '7f045c4859e64d7dd79d9d813cffb5cb49f66e7d999dc2a70107beac683e05b7'
+]
+def bellwetherFollowOnAudition = bellwetherVoiceDirectory && bellwetherFollowOnAuditionWavs.keySet().any {
+    new File(bellwetherVoiceDirectory, it).isFile()
+}
+if (bellwetherVoiceDirectory) {
+    if (!bellwetherResidentDirectory)
+        throw new GradleException('Bellwether voices require the separate resident Debug package.')
+    def pinned = [
+        'private_bellwether_voice/kit.accept_base.sit.wav': 'e088a2419814e9e055d553c11ab43cfc4459371aca9d4687279e93235593986a',
+        'private_bellwether_voice/kit.accept_base.limit.wav': 'f008e256ac6301240931dd98865cf5f30332f65cc64d48845d06acd64a20e22a',
+        'private_bellwether_voice/kit.accept_base.work.wav': '9888430432f1972e100366a66b4aa932e757819bdb67cb1c8ead8ba989014e1e',
+        'private_bellwether_voice/hub.kit_introduce.wav': '64646e97b066c9dc8fd04d99a2a0a68dfa3f0cfab55e4ec2aa133ec8ab1ea2b9',
+        'private_bellwether_voice/hub.hoard_answer.wav': 'a91d048e340a2f8c9adbba0046393fc1db847e48331dc84ba5d467c5e5dfa5ee'
+    ]
+    if (bellwetherArrivalAudition) pinned.putAll(bellwetherArrivalAuditionWavs)
+    if (bellwetherSalvagerAudition) pinned.putAll(bellwetherSalvagerAuditionWavs)
+    if (bellwetherFollowOnAudition) pinned.putAll(bellwetherFollowOnAuditionWavs)
+    verifyBellwetherOverlay(bellwetherVoiceDirectory, pinned, 'private voice overlay')
+}
+if (bellwetherPlaytest && !(bellwetherCombinedResidents && bellwetherRelicDealer &&
+        bellwetherArrivalAudition && bellwetherSalvagerAudition && flaskCandidateDirectory && privateRevivalDirectory)) {
+    throw new GradleException('Bellwether playtest requires all five residents, both voice groups, the flask and revival.')
+}
+
 def hordeVersionFile = rootProject.file('../VERSION')
 def hordeVersionCodeMapFile = rootProject.file('../version-code-map.json')
 def readHordeUtf8Authority = { File authorityFile, String authorityName ->
@@ -86,7 +233,7 @@ if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
 }
 if (hordeShipping17AssetDirectory) {
-    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory)
+    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory || bellwetherResidentDirectory)
         throw new GradleException('Ordinary 1.7 assets cannot share a private Debug admission or another version.')
     def assetRoot=file(hordeShipping17AssetDirectory)
     if (!assetRoot.isDirectory()) throw new GradleException('Ordinary 1.7 asset root is missing.')
@@ -329,6 +476,10 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
+if (bellwetherResidentDirectory && (actorWorkerExperiment || hordeStagedPrimaryDebugValidation ||
+        viewmodelCandidate || (privateRevivalDirectory && !bellwetherPlaytest))) {
+    throw new GradleException('Bellwether Debug uses its own application and resident fixture.')
+}
 if (hordeBenchmarkMinRenderScale == 33 &&
     (hordeStagedPrimaryShaderDirProperty != null || hordeStagedPrimaryDebugValidation ||
      hordeStagedPrimaryTiming || viewmodelCandidate)) {
@@ -573,8 +724,34 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'models/world/runtime/forest-road-clue-v1/asset.manifest.json'
         include 'models/world/runtime/forest-road-clue-v1/horde-road-kerb.glb'
         include 'models/world/runtime/forest-road-clue-v1/horde-road-waystone.glb'
-        include 'models/world/runtime/bellwether-shell-v4/asset.manifest.json'
-        include 'models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/asset.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/privy-rag.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/stock-heads.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/garden-crops.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/south-door.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/window.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/bellwether-window.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb'
+        include 'models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json'
+        include 'models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb'
+        include 'models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json'
+        include 'models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb'
         include 'models/world/runtime/forest-surroundings-v1/alder-far.glb'
         include 'models/world/runtime/forest-surroundings-v1/alder-middle.glb'
         include 'models/world/runtime/forest-surroundings-v1/asset.manifest.json'
@@ -625,6 +802,16 @@ tasks.register('prepareRuntimeAssets', Sync) {
         include 'audio/chapter-local-ambience/asset.manifest.json'
         include 'audio/chapter-local-ambience/runtime/tomb_drip.wav'
         include 'audio/chapter-local-ambience/runtime/rope_contact.wav'
+        include 'audio/bellwether-hearth/asset.manifest.json'
+        include 'audio/bellwether-hearth/runtime/hearth_crackle.wav'
+        include 'audio/bellwether-stock/asset.manifest.json'
+        include 'audio/bellwether-stock/runtime/pig_grunt.wav'
+        include 'audio/bellwether-stock/runtime/hen_cluck.wav'
+        include 'audio/bellwether-mill/asset.manifest.json'
+        include 'audio/bellwether-mill/runtime/wheel_creak.wav'
+        include 'audio/kit-ankle/asset.manifest.json'
+        include 'audio/kit-ankle/runtime/boot_and_gravel.wav'
+        include 'audio/kit-ankle/runtime/steady_breath.wav'
         include 'audio/forest-foliage/asset.manifest.json'
         include 'audio/forest-foliage/runtime/leaf_rustle.wav'
         include 'audio/filmcow/equipment/sword_draw.wav'
@@ -699,6 +886,16 @@ android {
         versionName hordeVersionName
         buildConfigField 'boolean', 'PRIVATE_REVIVAL', 'false'
         buildConfigField 'boolean', 'FLASK_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_RELIC_DEALER_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', 'false'
+        buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', 'false'
         buildConfigField 'boolean', 'SHIPPING17_CONTENT', 'false'
         buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', 'false'
         buildConfigField 'boolean', 'MOTION_VALIDATION', 'false'
@@ -740,7 +937,32 @@ android {
         debug {
             buildConfigField 'boolean', 'PRIVATE_REVIVAL', privateRevivalDirectory ? 'true' : 'false'
             buildConfigField 'boolean', 'FLASK_CANDIDATE', flaskCandidateDirectory ? 'true' : 'false'
-            applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
+            buildConfigField 'boolean', 'BELLWETHER_RESIDENT_CANDIDATE', bellwetherResidentDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_ARTIFICER_CANDIDATE', bellwetherArtificer ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_SALVAGER_CANDIDATE', bellwetherSalvager ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_RELIC_DEALER_CANDIDATE', bellwetherRelicDealer ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_TEXTURED_TAVERN_KEEPER', texturedTavernKeeper ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_COMBINED_RESIDENTS', bellwetherCombinedResidents ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_VOICE_CANDIDATE', bellwetherVoiceDirectory ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_ARRIVAL_AUDITION', bellwetherArrivalAudition ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_SALVAGER_AUDITION', bellwetherSalvagerAudition ? 'true' : 'false'
+            buildConfigField 'boolean', 'BELLWETHER_FOLLOW_ON_AUDITION', bellwetherFollowOnAudition ? 'true' : 'false'
+            if (bellwetherResidentDirectory) {
+                def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
+                    bellwetherRelicDealer ? '.debug.bellwether.dealer' :
+                    (bellwetherSalvager ? '.debug.bellwether.shore' :
+                    (bellwetherArtificer ? '.debug.bellwether.mill' : '.debug.bellwether'))
+                applicationIdSuffix bellwetherPlaytest ? '.debug.bellwether.playtest' :
+                    rosterSuffix + (flaskCandidateDirectory ? '.flask' : '')
+                def rosterLabel = bellwetherCombinedResidents ? 'Horde RT Bellwether Combined Debug' :
+                    bellwetherRelicDealer ? 'Horde RT Bellwether Dealer Debug' :
+                    (bellwetherSalvager ? 'Horde RT Bellwether Shore Debug' :
+                    (bellwetherArtificer ? 'Horde RT Bellwether Mill Debug' :
+                    (flaskCandidateDirectory ? 'Horde RT Bellwether Flask Debug' : 'Horde RT Bellwether Debug')))
+                resValue 'string', 'app_name', bellwetherPlaytest ? 'Horde RT Bellwether 1.8 Playtest' : rosterLabel
+            } else {
+                applicationIdSuffix actorWorkerExperiment ? '.debug.actorworker' : (hordeStagedPrimaryDebugValidation ? '.debug.staged' : (viewmodelCandidate ? '.debug.viewmodel' : '.debug'))
+            }
             buildConfigField 'boolean', 'VIEWMODEL_CANDIDATE', viewmodelCandidate ? 'true' : 'false'
             buildConfigField 'boolean', 'OUTDOOR_SCALE_PROBE', outdoorScaleProbe ? 'true' : 'false'
             buildConfigField 'boolean', 'ACTOR_WORKER_EXPERIMENT', actorWorkerExperiment ? 'true' : 'false'
@@ -752,6 +974,11 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}", "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}", '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
+                        "-DHORDE_RT_BELLWETHER_RESIDENT_CANDIDATE=${bellwetherResidentDirectory ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE=${bellwetherArtificer ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_SALVAGER_CANDIDATE=${bellwetherSalvager ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE=${bellwetherRelicDealer ? 'ON' : 'OFF'}",
+                        "-DHORDE_RT_BELLWETHER_COMBINED_RESIDENTS=${bellwetherCombinedResidents ? 'ON' : 'OFF'}",
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -815,6 +1042,8 @@ android {
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
         if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
         if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
+        if (bellwetherResidentDirectory) debug.assets.srcDir(bellwetherResidentDirectory)
+        if (bellwetherVoiceDirectory) debug.assets.srcDir(bellwetherVoiceDirectory)
         if (hordeShipping17AssetDirectory) release.assets.srcDir(file(hordeShipping17AssetDirectory))
     }
 }
@@ -825,6 +1054,10 @@ dependencies {
 }
 
 gradle.taskGraph.whenReady { graph ->
+    if (bellwetherResidentDirectory &&
+        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+        throw new GradleException('Bellwether resident candidates are restricted to the separate Debug package.')
+    }
     if (hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory &&
         graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
         throw new GradleException('Ordinary 1.7 Android release requires the pinned hordeShipping17AssetDir; refusing an incomplete package.')

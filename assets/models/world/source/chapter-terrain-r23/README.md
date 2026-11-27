@@ -9,6 +9,9 @@ entry envelope, bound, texture or water-map endpoint changes.
 
 The runtime derivative is 18,441,928 bytes (+33,000 from r22), SHA-256
 `c636a67911b7f5c5381c30ec7a49e5d4ff15c70fe688b368ba52efe77b537774`.
+The source copy `chapter-terrain-r23.glb` is the original Git LFS object.
+Forest source regeneration reads this revision. The root-placement check also
+repeats all 64 fits on the current runtime terrain and compares their results.
 37,846 triangles and 19,486 exported vertices fit the unchanged 39,618 / 21,134
 limits. The runtime manifest and Forest Ground 0.5 material factor remain exact.
 All 17,125 original source vertices and 15,610 protected core/envelope triangles
@@ -58,10 +61,9 @@ three openings and 263 roof intersections); native intake against unchanged
 runtime limits; native terrain support (2,781 queries, 616 sweeps, zero failures,
 2,774,696 retained bytes); Khronos validator zero errors and warnings.
 
-The local Blend, duplicate source GLB and surface JSON remain preserved but
-Git-ignored. The existing tracked runtime GLB is the sole distribution copy.
-Small manifests, receipts and these versioned recipes reproduce the candidate;
-old source masters and rejected trials remain untouched.
+The Blend and intermediate surface JSON remain local. The r23 GLB is retained
+here as the woodland authoring input after the 1.8 millrace changed the runtime
+terrain. Android and Windows game packages use the runtime derivative.
 
 The failed plain-grid last-row gate and failed blanket analytic replacement
 are recorded in the bank receipt: the latter would unnecessarily lower five

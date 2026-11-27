@@ -222,6 +222,24 @@ int main()
                   "reset scene bundle must report no dielectric quality");
 
     const std::array genuinePair{*opaque, *generic};
+    {
+        PresentableTinyRtScene scene;
+        std::string diagnostic;
+        const std::array residents{ChapterResidentActorSource{
+            1u, "chapter/resident", "resident.glb", {{"idle", true, true}}}};
+        ok &= Require(scene.SetChapterResidentActors({}, diagnostic),
+                      "a fresh scene accepts an empty entry roster");
+        PresentableTinyRtScenePreflightTestAccess::Ledger ledger{};
+        (void)PresentableTinyRtScenePreflightTestAccess::Initialise(
+            scene, provider.request(), genuinePair, ledger, diagnostic);
+        ok &= Require(ledger.ownershipCalls == 1u && !scene.SetChapterResidentActors(residents, diagnostic),
+                      "a scene in its ownership stage rejects resident roster replacement");
+        scene.Destroy();
+        ok &= Require(scene.SetChapterResidentActors(residents, diagnostic),
+                      "retired entry resources permit the authored chapter roster on the retained device");
+        ok &= Require(scene.SetChapterResidentActors({}, diagnostic),
+                      "the retired scene can clear the roster for a non-chapter profile");
+    }
     for (const auto profile : {RtSceneProfile::Showcase, RtSceneProfile::GraphicsPreview})
     {
         PresentableTinyRtScene offScene;

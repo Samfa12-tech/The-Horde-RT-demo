@@ -46,6 +46,7 @@ struct StaticBounds
 // Shared is always retained. An absent/unclassified suffix is Shared too;
 // provenance identifies an authored region, never proves it safe to evict.
 enum class StaticTriangleRegion : std::uint8_t { Shared = 0, TombDressing = 1, ExteriorDressing = 2 };
+inline constexpr std::uint32_t kStaticMaterialCertifiedClosedVolume = 1024u;
 inline constexpr std::uint8_t kAllStaticTriangleRegions = 3u;
 
 struct StaticMaterial

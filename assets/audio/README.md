@@ -60,6 +60,21 @@ ascent/descent. Speech, pause, death, reconstruction and area exit suppress or
 rebase cadence. Both platforms reuse the existing single finite nature/incidental
 voice, SFX setting and lifecycle cleanup. No separate mixer or save field is added.
 
+## Kit's ankle catch in Bellwether (1.8 development)
+
+`kit-ankle/` has a 0.36-second boot and gravel contact and a 0.44-second
+unvoiced recovery breath. Both are mono 48 kHz PCM16. The shared simulation
+emits them from Kit's boot and head at animation ticks 8 and 31. They use the
+existing SFX gain and positional mix, with an eight-metre outdoor range. The
+two finite cues have a single voice independent of weather and dialogue.
+
+The [manifest](kit-ankle/asset.manifest.json) records both source crops and the
+original breath recipe. To check the exact derivatives with the local archive:
+
+```powershell
+python tools/prepare-kit-ankle-audio.py --output-dir assets/audio/kit-ankle --verify
+```
+
 ## Finite local forest foliage (1.7 development)
 
 `forest-foliage/` adds one 0.901729-second labelled FilmCow leaf-rustle cut with

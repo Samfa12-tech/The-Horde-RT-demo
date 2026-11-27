@@ -11,7 +11,22 @@ std::filesystem::path WindowsCampaignDirectory()
     PWSTR raw=nullptr;
     const auto result=SHGetKnownFolderPath(FOLDERID_LocalAppData,KF_FLAG_DONT_VERIFY,nullptr,&raw);
     std::filesystem::path root;
-    if(SUCCEEDED(result) && raw)root=std::filesystem::path(raw)/"HordeLanternRT"/"campaign-v1";
+    if(SUCCEEDED(result) && raw) {
+        root=std::filesystem::path(raw)/"HordeLanternRT";
+#if defined(_DEBUG)
+        if(gBellwetherPackagedPlaytest) {
+            root/="bellwether-playtest";
+        } else if(!gBellwetherCampaignActors.empty()) {
+            using horde::gameplay::bellwether::Specialist;
+            switch(gBellwetherCampaignSpecialist) {
+                case Specialist::Artificer: root/="bellwether-mill-debug"; break;
+                case Specialist::RelicDealer: root/="bellwether-dealer-debug"; break;
+                default: root/="bellwether-debug"; break;
+            }
+        }
+#endif
+        root/="campaign-v1";
+    }
     if(raw)CoTaskMemFree(raw);
     return root;
 }
@@ -53,6 +68,9 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     using Scene=horde::vulkan::raytracing::PresentableTinyRtScene;
     if(ctx.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
        ctx.simulation.Snapshot().developmentRescueJourney && ctx.rtScene.IsReady() &&
+#if defined(_DEBUG)
+       (gBellwetherCampaignActors.empty() || ctx.rtScene.ChapterResidentSourceCount()==horde::vulkan::raytracing::kBellwetherResidentCount) &&
+#endif
        ctx.rtScene.StaticGeometryHasCompleteContributors())return true;
     if(ctx.campaignPreparedScene)return ctx.campaignPreparedScene->IsReady() ||
         CampaignPreparationFailure(ctx,"retained-candidate","Previously prepared scene is not ready.");
@@ -63,6 +81,11 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     scene.SetDevelopmentSupportFixture(false);
     const auto root=ResolveAssetRoot();
     std::string diagnostic;
+#if defined(_DEBUG)
+    if(!gBellwetherCampaignActors.empty() &&
+       !SetBellwetherCampaignResidentSources(scene,gBellwetherCampaignActors,diagnostic))
+        return CampaignPreparationFailure(ctx,"bellwether-residents",diagnostic);
+#endif
     auto skeletonPath=(root/"models/enemies/meshy/skeleton_biped_merged_animations_v01.glb").string();
     std::vector<horde::scene::SkinnedClipBinding> bindings;
 #if HORDE_RT_REVIVAL_ADMITTED
@@ -253,7 +276,7 @@ void PumpCampaign(VulkanSurfaceContext& ctx)
                     }
                     else if(!PrepareCampaignResources(ctx))fail("New game resources could not prepare. Current game retained.");
                     else {
-                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(horde::gameplay::simulation::PrivateRevivalApplicationConfig());
+                        auto candidate=std::make_unique<horde::gameplay::simulation::GameSimulation>(WindowsApplicationSimulationConfig());
                         candidate->StartLiveDevelopmentRescueJourney(true);
                         if(!DrainCampaignResources(ctx) || !ctx.campaign->BeginNewGame(command.slot))fail("New game could not start. Current game retained.");
                         else {ctx.simulation=std::move(*candidate);ctx.campaignNewGame=true;FinishCampaignCommit(ctx);}

@@ -71,6 +71,28 @@ public final class HealingFlaskHudTest {
         setHud("controllerWindowFocused",false);invoke("requestHealingFlaskAction",new Class<?>[]{boolean.class},false);
         assertEquals(0,Bridge.drinks);
     }
+    @Test public void restButtonNamesTheCurrentAnchorAndRequestsRest()throws Exception {
+        MainActivity a=activity();
+        Button rest=a.findViewById(R.id.rest_button);
+        TextView hint=a.findViewById(R.id.flask_hint);
+        Bridge.flask=new long[]{2,31,1,0,4,0,2,0,4,0};
+        update();
+        assertEquals(a.getString(R.string.flask_hearth_rest_action),rest.getText().toString());
+        assertEquals(a.getString(R.string.flask_rest_touch_guidance),hint.getText().toString());
+        assertTrue(rest.getContentDescription().toString().startsWith(a.getString(R.string.flask_hearth_rest)));
+        assertTrue(rest.isEnabled());
+        rest.performClick();
+        assertEquals(1,Bridge.rests);
+
+        Bridge.flask[4]=0;
+        update();
+        assertEquals(a.getString(R.string.flask_hearth_rest_wait),hint.getText().toString());
+        assertFalse(rest.isEnabled());
+        Bridge.flask[8]=2;
+        update();
+        assertEquals(a.getString(R.string.flask_rest),rest.getText().toString());
+        assertEquals(a.getString(R.string.flask_rest_wait_hint),hint.getText().toString());
+    }
     @Test public void lessonWaitsForTeachingAndInterruptionTakesPriority()throws Exception {
         MainActivity a=activity();TextView teaching=a.findViewById(R.id.combat_teaching_prompt);setHud("combatTeachingPrompt",teaching);
         teaching.setVisibility(View.VISIBLE);Bridge.flask=new long[]{2,31,1,1,0,1,2,0,0,0};update();

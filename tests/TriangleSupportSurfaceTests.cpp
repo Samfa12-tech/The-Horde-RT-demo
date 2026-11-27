@@ -20,6 +20,20 @@ int main()
     check(sample.found&&sample.walkable&&std::abs(sample.worldY-1)<1e-6&&sample.surface==SupportSurface::Earth,
           "support must interpolate the rendered plane on its shared diagonal");
     check(terrain->GroundSweep(-1,0,1,0,.5f,.24f),"ordinary ramp movement was rejected");
+    check(!terrain->HorizontalVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f) &&
+          terrain->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "the continuing uphill floor must clear the carry lookahead");
+    const auto raisedDeck=Surface::WithAdditionalGroundGeometry(*terrain,
+        quad(.6f,1.5f,-.5f,.5f,1.85f,1.85f),error);
+    check(raisedDeck&&!raisedDeck->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "an upward face above the continuing slope must still block carry");
+    auto slopeRoof=quad(.6f,1.5f,-.5f,.5f,1.35f,1.35f);
+    for(auto& triangle:slopeRoof)std::swap(triangle.points[1],triangle.points[2]);
+    std::vector<Surface::Triangle> covered(ramp.begin(),ramp.end());
+    covered.insert(covered.end(),slopeRoof.begin(),slopeRoof.end());
+    const auto coveredSlope=Surface::Build(covered,error);
+    check(coveredSlope&&!coveredSlope->HorizontalCarryVolumeClear(0,0,1.5f,0,1.25f,3.3f,.24f),
+          "the uphill floor exemption must not hide a downward face inside the carry band");
     check(!terrain->GroundSweep(1.7f,0,2,0,1.85f,.24f),"capsule crossed an unsupported outer edge");
     check(!terrain->Query(3,0).found,"query invented a floor beyond the mesh");
     check(!terrain->Query(0,0,1.1f,2).found,"vertical range accepted a different surface");
@@ -35,8 +49,8 @@ int main()
     check(!Surface::Build({},error),"empty terrain admitted");
     invalid=ramp;invalid[0].surface=static_cast<SupportSurface>(255);
     check(!Surface::Build(invalid,error),"unknown surface classification admitted");
-    const std::vector<Surface::Triangle> tooMany(Surface::kMaximumTriangles+1,ramp[0]);
-    check(!Surface::Build(tooMany,error),"triangle intake overflow admitted");
+    const std::vector<Surface::Triangle> tooMany(Surface::NonWalkableCapacity(0)+1,ramp[0]);
+    check(!Surface::Build(std::span(tooMany).first(Surface::kMaximumTriangles+1),error),"triangle intake overflow admitted");
     const float nan=std::numeric_limits<float>::quiet_NaN();
     check(!terrain->Query(nan,0).found&&!terrain->Query(0,0,2,1).found&&
           !terrain->Query(0,0,0,nan).found,"invalid query parameters accepted");
@@ -58,6 +72,8 @@ int main()
         {{P{0,0,-.3f},P{0,2,.3f},P{0,0,.3f}},SupportSurface::Stone}}};
     const auto solid=Surface::Build(wall,error);
     const auto combined=Surface::WithNonWalkableGeometry(*terrain,wall,error);
+    check(solid && combined && combined->RetainedBytes()-terrain->RetainedBytes()+wall.size()*sizeof(P)==solid->RetainedBytes(),
+          "obstruction-only faces keep their geometry and BVH without retaining unused normals");
     check(combined && combined->TriangleCount()==terrain->TriangleCount() &&
           combined->NonWalkableTriangleCount()==2 && combined->Query(0,0).worldY==sample.worldY,
           "attaching actual nonwalkable geometry changed the admitted ground surface");
@@ -102,6 +118,17 @@ int main()
     check(roof&&!roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.8f,.1f)&&
           roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.4f,.1f),
           "downward overhead face or height clipping was incorrect");
+    // Reuse the ordinary height-band sweeps on the compact obstacle lane.
+    for(const auto& faces : {ramp,oblique,ceiling}) {
+        const auto fullSurface=Surface::Build(faces,error);
+        const auto obstacles=Surface::WithNonWalkableGeometry(*terrain,faces,error);
+        bool matches=fullSurface && obstacles;
+        for(float z : {-.6f,0.f,.35f,.7f})for(float height : {.2f,.9f,1.5f,2.1f}) {
+            matches=matches && fullSurface->HorizontalVolumeClear(-1,z,1,z,height,height+.3f,.12f)==
+                obstacles->NonWalkableVolumeClear(-1,z,1,z,height,height+.3f,.12f);
+        }
+        check(matches,"an attached slope, oblique wall or ceiling changed the swept-volume result");
+    }
     check(!solid->HorizontalVolumeClear(0,0,1,0,nan,2,.1f)&&
           !solid->HorizontalVolumeClear(0,0,1,0,2,1,.1f)&&
           !solid->HorizontalVolumeClear(0,0,1,0,0,2,0)&&
@@ -127,7 +154,24 @@ int main()
     auto layered=std::vector<Surface::Triangle>(ramp.begin(),ramp.end());
     const auto upper=quad(-2,2,-2,2,4,8);layered.insert(layered.end(),upper.begin(),upper.end());
     const auto layers=Surface::Build(layered,error);
-    check(layers&&!layers->Query(0,0).walkable&&layers->Query(0,0,0,2).walkable,
-          "highest candidate or bounded-height selection is inconsistent");
+    check(layers&&!layers->Query(0,0).walkable&&layers->Query(0,0,0,2).walkable &&
+          !layers->GroundSweep(-.35f,0,.35f,0,1,.24f),
+          "a lower floor cannot hide an exposed upper bank");
+    const auto buried=quad(-.18f,.18f,-2,2,-1,.5f);
+    const auto deck=[&](float leftEnd,float rightStart) {
+        std::vector<Surface::Triangle> triangles(buried.begin(),buried.end());
+        const auto left=quad(-2,leftEnd,-2,2,1,1);
+        const auto right=quad(rightStart,2,-2,2,1,1);
+        triangles.insert(triangles.end(),left.begin(),left.end());
+        triangles.insert(triangles.end(),right.begin(),right.end());
+        return Surface::Build(triangles,error);
+    };
+    const auto continuousDeck=deck(0,0);
+    check(continuousDeck && continuousDeck->GroundSweep(-.35f,0,.35f,0,1,.24f) &&
+          continuousDeck->GroundSweep(.35f,0,-.35f,0,1,.24f),
+          "joined walkable surfaces cover the buried steep plane in both directions");
+    const auto openSeam=deck(.001f,.003f);
+    check(openSeam && !openSeam->GroundSweep(-.35f,0,.35f,0,1,.24f),
+          "an exposed steep sliver between raised surfaces blocks the swept footprint");
     std::cout<<"Triangle support failures="<<failures<<'\n';return failures?1:0;
 }

@@ -1,0 +1,217 @@
+{
+  "building": "B01",
+  "status": "source review",
+  "blender": "5.2.0 LTS",
+  "inputSha256": {
+    "assets/models/world/source/bellwether-tavern-v1/bellwether-tavern-v1.blend": "a39bcb56ae8964317c438a4fe92bbc70025755766e1fcf739001310ec622514e",
+    "assets/models/world/source/bellwether-tavern-v1/authoring-receipt.json": "f09dc742969ad5e067545a6471e52128ffa9823c0cf16bf21e8189e45822398c",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "71739dbab1045a219e04ff6fd9da9a7dfb881fa04aba77055e73490ccfd3077d",
+    "assets/models/world/runtime/bellwether-tavern-v1/asset.manifest.json": "8174804e3e057a21e170ba223bc7095fd71f05bd895b6829fdbd698757d65885",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-window.glb": "f9bddea2b07d7fd3480f3cb27735767e4a8b15984f145899a41d21c9067802fc",
+    "assets/models/world/runtime/bellwether-tavern-v1/window.manifest.json": "4fc919a3851ba6f890c8c8d518abe5975a46cd0e1fc4384a4346be3edf34540f",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb": "65e78893ef1a5cf5ebd572ffa1dc67507526948fa3fce7a73796b2eaac239fb9",
+    "assets/models/world/runtime/bellwether-tavern-v1/south-door.manifest.json": "ec9ea1c3e1cf79e03813781e33b6196cd89cc5c8363eeea5a2d85b663022f550"
+  },
+  "shared": {
+    "mesh": "tavern-architecture.glb",
+    "sha256": "04e82f85b94c8d2e3afae6f60815b5adeeab7a919c9e4060296cfaed7b08c9a6",
+    "manifest": "tavern-architecture.manifest.json",
+    "manifestSha256": "fb590e0ab8fd7b02daf1ca909ed6fa3f013488b565c1bc8b85ebbbce8d58603c",
+    "bounds": [
+      [
+        79.05000305175781,
+        -12.579760551452637,
+        102.94999694824219
+      ],
+      [
+        101.55000305175781,
+        1.620449185371399,
+        130.6999969482422
+      ]
+    ],
+    "vertices": 1236,
+    "triangles": 542,
+    "materials": [
+      "HordeTownRoofClay",
+      "HordeTownStone",
+      "HordeHearthChar",
+      "HordeTavernTimber"
+    ],
+    "objects": [
+      "B01_closed_gable",
+      "B01_cold_chimney",
+      "B01_cold_closed_upper_shutter",
+      "B01_west_wall",
+      "B01_east_wall",
+      "B01_north_wall",
+      "B01_south_west_wall",
+      "B01_south_door_pier_wall",
+      "B01_south_east_wall",
+      "B01_south_sill_wall",
+      "B01_south_window_header_wall",
+      "B01_south_door_header",
+      "B01_continuous_foundation",
+      "B01_ramp_top",
+      "B01_room_floor",
+      "B01_hearth_north",
+      "B01_hearth_south",
+      "B01_hearth_lintel",
+      "B01_door_fixed_lower_pintle",
+      "B01_door_fixed_upper_pintle",
+      "B01_door_west_jamb",
+      "B01_door_east_jamb",
+      "B01_door_head_frame",
+      "B01_window_left",
+      "B01_window_right",
+      "B01_window_mullion",
+      "B01_window_lower_rail",
+      "B01_window_upper_rail",
+      "B01_candlestick_stand",
+      "B01_candlestick_wax",
+      "B01_candlestick_wick",
+      "B01_hearth_billet_front",
+      "B01_hearth_billet_back",
+      "B01_hearth_billet_cross"
+    ]
+  },
+  "furniture": {
+    "lod0": {
+      "mesh": "tavern-furniture-lod0.glb",
+      "sha256": "c6f5d8ea4165dc9c8df2219debe6be88c99cc8d9c239f83c36a8dfba6ee418d0",
+      "manifest": "tavern-furniture-lod0.manifest.json",
+      "manifestSha256": "7c70dcf4dbc40b8b48bbf9970f5f6b3d6950f799eb63db5f4fe818c06d2136c1",
+      "bounds": [
+        [
+          81.69499969482422,
+          -8.709550857543945,
+          105.82350158691406
+        ],
+        [
+          83.02999877929688,
+          -7.619550704956055,
+          107.59600067138672
+        ]
+      ],
+      "vertices": 2524,
+      "triangles": 1012,
+      "materials": [
+        "HordeTavernTimber"
+      ],
+      "objects": [
+        "B01_chair_front_leg_-1",
+        "B01_chair_back_post_-1",
+        "B01_chair_side_stretcher_-1",
+        "B01_chair_front_leg_1",
+        "B01_chair_back_post_1",
+        "B01_chair_side_stretcher_1",
+        "B01_chair_seat_-1",
+        "B01_chair_seat_0",
+        "B01_chair_seat_1",
+        "B01_chair_back_lower",
+        "B01_chair_back_upper",
+        "B01_chair_front_apron",
+        "B01_table_leg_-1_-1",
+        "B01_table_leg_-1_1",
+        "B01_table_end_apron_-1",
+        "B01_table_long_apron_-1",
+        "B01_table_leg_1_-1",
+        "B01_table_leg_1_1",
+        "B01_table_end_apron_1",
+        "B01_table_long_apron_1",
+        "B01_table_top_-1",
+        "B01_table_top_0",
+        "B01_table_top_1"
+      ]
+    },
+    "lod1": {
+      "mesh": "tavern-furniture-lod1.glb",
+      "sha256": "46ca11aaec5fd9d50fca1954347a29d5ffa0ebe0d0c108cf91ca177d1599d4b5",
+      "manifest": "tavern-furniture-lod1.manifest.json",
+      "manifestSha256": "0d22c5e9eec9c725d05ee406cace94a807a11618149370610050e738bb3f8d8a",
+      "bounds": [
+        [
+          81.69499969482422,
+          -8.709550857543945,
+          105.82350158691406
+        ],
+        [
+          83.02999877929688,
+          -7.619550704956055,
+          107.59600067138672
+        ]
+      ],
+      "vertices": 552,
+      "triangles": 276,
+      "materials": [
+        "HordeTavernTimber"
+      ],
+      "objects": [
+        "mid_B01_chair_front_leg_-1",
+        "mid_B01_chair_back_post_-1",
+        "mid_B01_chair_side_stretcher_-1",
+        "mid_B01_chair_front_leg_1",
+        "mid_B01_chair_back_post_1",
+        "mid_B01_chair_side_stretcher_1",
+        "mid_B01_chair_seat_-1",
+        "mid_B01_chair_seat_0",
+        "mid_B01_chair_seat_1",
+        "mid_B01_chair_back_lower",
+        "mid_B01_chair_back_upper",
+        "mid_B01_chair_front_apron",
+        "mid_B01_table_leg_-1_-1",
+        "mid_B01_table_leg_-1_1",
+        "mid_B01_table_end_apron_-1",
+        "mid_B01_table_long_apron_-1",
+        "mid_B01_table_leg_1_-1",
+        "mid_B01_table_leg_1_1",
+        "mid_B01_table_end_apron_1",
+        "mid_B01_table_long_apron_1",
+        "mid_B01_table_top_-1",
+        "mid_B01_table_top_0",
+        "mid_B01_table_top_1"
+      ]
+    },
+    "lod2": {
+      "mesh": "tavern-furniture-lod2.glb",
+      "sha256": "c4f19634e08be2a9959f0a6064062a01b244fe4ab2c076dac0d110b817da65a3",
+      "manifest": "tavern-furniture-lod2.manifest.json",
+      "manifestSha256": "f208ac879df8364d23ef1c4f8c93772fd15a15301fc27c0057ee3a556db2f188",
+      "bounds": [
+        [
+          81.69499969482422,
+          -8.709550857543945,
+          105.82350158691406
+        ],
+        [
+          83.02999877929688,
+          -7.619550704956055,
+          107.59600067138672
+        ]
+      ],
+      "vertices": 288,
+      "triangles": 144,
+      "materials": [
+        "HordeTavernTimber"
+      ],
+      "objects": [
+        "far_B01_chair_front_leg_-1",
+        "far_B01_chair_back_post_-1",
+        "far_B01_chair_front_leg_1",
+        "far_B01_chair_back_post_1",
+        "far_B01_chair_back_lower",
+        "far_B01_chair_back_upper",
+        "far_B01_table_leg_-1_-1",
+        "far_B01_table_leg_-1_1",
+        "far_B01_table_leg_1_-1",
+        "far_B01_table_leg_1_1",
+        "far_B01_chair_seat",
+        "far_B01_table_top"
+      ]
+    }
+  },
+  "sharedProps": {
+    "window": "bellwether-window.glb",
+    "hingedLeaf": "bellwether-south-door.glb"
+  },
+  "coordinates": "glTF Y-up, authored world metres, identity node for all four files"
+}

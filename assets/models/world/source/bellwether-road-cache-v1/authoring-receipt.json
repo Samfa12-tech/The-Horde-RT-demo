@@ -1,0 +1,26 @@
+{
+  "originalTownSha256": "bcd753a6286b57997a87e1f36ce21af5c6b7704949812a066c83b0ae3dace368",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "18674a3693b2122a1a1df95d37a2373eb1ecc28b5f39dd4bccb66d512f197501",
+  "townVertices": 15198,
+  "townTriangles": 7208,
+  "addedSolidTriangles": 168,
+  "approach": [
+    33.6,
+    82.92
+  ],
+  "reach": [
+    35.3,
+    -5.483359680175782,
+    82.95
+  ],
+  "recipeSha256": "eb5402fee1fbdee71c18a91017ff34b7bf5fe0e734174cb3c6bc3f9703221c18",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "bellwether-road-cache.blend": "3bdf5e679987a52bd767de872987235a40785babf9dd87d5042ff9a531f86e6d",
+    "road-cache.glb": "8a87ed7627d970781b840adfb436e160e647e45ee40e2ce711a02f4bd3a9e377",
+    "asset.manifest.json": "daeb901c927e6506c5a9212ff346278890668441953fe8fe7780aaeb0b0bd97b",
+    "geometry.generated.h": "17a75847a7afb8897ee4649ac29750f79ad1b3607fef76855638593beb326bfd",
+    "bellwether-tavern-v1.glb": "18674a3693b2122a1a1df95d37a2373eb1ecc28b5f39dd4bccb66d512f197501"
+  }
+}

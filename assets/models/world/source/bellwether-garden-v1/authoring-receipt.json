@@ -1,0 +1,42 @@
+{
+  "mapFeature": "T02",
+  "centre": [
+    35.3,
+    136.2
+  ],
+  "plotX": [
+    -1.9,
+    1.92
+  ],
+  "plotZ": [
+    [
+      -1.78,
+      -0.63
+    ],
+    [
+      0.69,
+      1.84
+    ]
+  ],
+  "aisleWidth": 1.3199999999999998,
+  "originalTownSha256": "a3c37483acfee86676fffbdcc5d9c5acc4e1d99c6b168b0b025eb6ce7a16e74f",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "d744239755677d24ee51af756a0ac0dd1639cdf4555c7ad277281eb4299a921f",
+  "addedSolidTriangles": 420,
+  "townVertices": 18946,
+  "townTriangles": 8872,
+  "cropTriangles": 1872,
+  "cropVertices": 5616,
+  "cropMaterialFamily": "ForestAlder",
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "5392c277869ecbd247adec377ee92260836a4d71c44c58db873000b75b72c307",
+  "files": {
+    "bellwether-garden.blend": "731a02a70c8f94ff300ae048271b00ec6191815b27e3478ca7e04223165385b2",
+    "garden-beds.glb": "62813b1d4e042fb47636c3c8dc18f8c76c2fb682f39f26fbf2698809d7bf0b9c",
+    "garden-crops.glb": "ea55200b061adcab443b7859cd7874f3552c94b908bef808509f371b8287cf8e",
+    "bellwether-tavern-v1.glb": "d744239755677d24ee51af756a0ac0dd1639cdf4555c7ad277281eb4299a921f",
+    "asset.manifest.json": "4159cb87b9c52e85c9a05cd1e53d0dac70508144be24b1b1b7dc0bfb8440bd17",
+    "garden-crops.manifest.json": "4312b85a97302f39935d10d3b2cac1f4ceba7412344ddca82293610cfa6bb9b3",
+    "geometry.generated.h": "7109f00a27243e4d9916f64b56721f4736af768592228e4651e650169424dec2"
+  }
+}

@@ -1,4 +1,5 @@
 #include "gameplay/effects/KeeperCastPresentation.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
 #include "scene/EntryPortalCapGeometry.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestUnderstory.h"
@@ -23,15 +24,18 @@
 #include "scene/atmosphere/ForestFireflies.h"
 #include "scene/atmosphere/ChimneySmoke.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
 #include "scene/CorridorStaticDetailFaces.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "graphics/EntryMenuScene.h"
 #include "graphics/GraphicsPreviewSession.h"
 #include <sstream>
 #include <iomanip>
+#include <iostream>
 #include <locale>
 #include "vulkan/raytracing/ChestGuidanceLight.h"
 #include "vulkan/raytracing/DynamicBlasSynchronization.h"
+#include "vulkan/raytracing/RtIndexedActorGeometry.h"
 #include "vulkan/raytracing/RtDescriptorSetLayoutBindings.h"
 #include "vulkan/raytracing/RtDeviceAddressLayout.h"
 #include "vulkan/raytracing/RtTextureLayerSubset.h"
@@ -53,6 +57,8 @@
 #include "vulkan/raytracing/TlasInstanceRefresh.h"
 #include "vulkan/raytracing/WaterContactRenderGeometry.h"
 #include "vulkan/raytracing/RegionalWaterRenderData.h"
+#include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
+#include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 
 #include <algorithm>
 #include <array>
@@ -93,6 +99,228 @@ namespace
 {
 
 using InitialiseClock = std::chrono::steady_clock;
+
+bool AppendBellwetherWaterwheelGeometry(
+    horde::scene::assets::StaticMeshAsset& millDrive,
+    horde::scene::assets::StaticMeshAsset& waterwheel,
+    std::string& diagnostic)
+{
+    using horde::scene::assets::StaticMeshAsset;
+    if (millDrive.primitives.size() != PresentableTinyRtScene::kMillDrivePrimitiveCount ||
+        millDrive.materials.size() != 1u || millDrive.indices.size() != 384u * 3u ||
+        waterwheel.primitives.size() != PresentableTinyRtScene::kMillWaterwheelPrimitiveCount ||
+        waterwheel.materials.size() != 2u || waterwheel.indices.size() != 2180u * 3u ||
+        !waterwheel.HasValidTriangleProvenance())
+    {
+        diagnostic = "Bellwether waterwheel source changed its two-primitive, two-material, 2180-triangle contract.";
+        return false;
+    }
+
+    std::array<bool, 2u> materialFamilies{};
+    for (auto& material : waterwheel.materials)
+    {
+        const std::size_t family = material.name == "ChestWood" ? 0u :
+            material.name == "BlackIron" ? 1u : materialFamilies.size();
+        if (family >= materialFamilies.size() || materialFamilies[family] ||
+            material.baseColorTexture < 0 || material.normalTexture < 0 || material.ormTexture < 0 ||
+            material.emissiveTexture >= 0 || material.transmissionFactor != 0.0f ||
+            (material.flags & (static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+                static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) != 0u)
+        {
+            diagnostic = "Bellwether waterwheel requires the opaque ChestWood and BlackIron PBR material pair.";
+            return false;
+        }
+        materialFamilies[family] = true;
+        material.textureGroup = static_cast<std::int32_t>(family);
+        material.deferTextureAllocation = false;
+    }
+    if (!std::all_of(materialFamilies.begin(), materialFamilies.end(), [](bool present) { return present; }))
+    {
+        diagnostic = "Bellwether waterwheel is missing a shared ChestWood or BlackIron material.";
+        return false;
+    }
+
+    const auto pivot = std::find_if(waterwheel.nodeTransforms.begin(), waterwheel.nodeTransforms.end(),
+        [](const auto& transform) { return transform.name == "BellwetherWaterwheel"; });
+    if (pivot == waterwheel.nodeTransforms.end())
+    {
+        diagnostic = "Bellwether waterwheel GLB is missing its local BellwetherWaterwheel pivot node.";
+        return false;
+    }
+    const auto pivotIndex = static_cast<std::uint32_t>(pivot - waterwheel.nodeTransforms.begin());
+    for (std::size_t row = 0u; row < 4u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+        {
+            const float expected = row == column ? 1.0f : 0.0f;
+            if (!std::isfinite(pivot->world[row * 4u + column]) ||
+                std::abs(pivot->world[row * 4u + column] - expected) > 1.0e-5f)
+            {
+                diagnostic = "Bellwether waterwheel pivot node must stay at local identity.";
+                return false;
+            }
+        }
+    std::array<bool, 2u> primitiveMaterials{};
+    std::uint32_t primitiveTriangles = 0u;
+    for (const auto& primitive : waterwheel.primitives)
+    {
+        if (primitive.nodeTransformIndex != pivotIndex || primitive.materialIndex >= waterwheel.materials.size() ||
+            !primitive.indexCount || primitive.indexCount % 3u ||
+            primitive.indexOffset > waterwheel.indices.size() ||
+            primitive.indexCount > waterwheel.indices.size() - primitive.indexOffset)
+        {
+            diagnostic = "Bellwether waterwheel primitives must stay in the pivot-local opaque mesh ranges.";
+            return false;
+        }
+        primitiveMaterials[primitive.materialIndex] = true;
+        primitiveTriangles += primitive.indexCount / 3u;
+    }
+    if (primitiveTriangles != 2180u ||
+        !std::all_of(primitiveMaterials.begin(), primitiveMaterials.end(), [](bool used) { return used; }))
+    {
+        diagnostic = "Bellwether waterwheel primitives must retain both material ranges and all 2180 triangles.";
+        return false;
+    }
+
+    const std::uint64_t vertexBase = millDrive.vertices.size();
+    const std::uint64_t indexBase = millDrive.indices.size();
+    const std::uint64_t transformBase = millDrive.nodeTransforms.size();
+    const std::uint64_t materialBase = millDrive.materials.size();
+    const auto fits32 = [](std::uint64_t base, std::size_t count) {
+        return base + count <= std::numeric_limits<std::uint32_t>::max();
+    };
+    if (!fits32(vertexBase, waterwheel.vertices.size()) || !fits32(indexBase, waterwheel.indices.size()) ||
+        !fits32(transformBase, waterwheel.nodeTransforms.size()) ||
+        !fits32(materialBase, waterwheel.materials.size()) ||
+        !fits32(millDrive.primitives.size(), waterwheel.primitives.size()) ||
+        !fits32(transformBase, waterwheel.sockets.size()))
+    {
+        diagnostic = "Bellwether waterwheel exceeds the existing mill-drive packed-asset offsets.";
+        return false;
+    }
+
+    StaticMeshAsset combined = millDrive;
+    combined.triangleRegions.resize(combined.indices.size() / 3u,
+        horde::scene::assets::StaticTriangleRegion::Shared);
+    combined.vertices.insert(combined.vertices.end(), waterwheel.vertices.begin(), waterwheel.vertices.end());
+    combined.indices.insert(combined.indices.end(), waterwheel.indices.begin(), waterwheel.indices.end());
+    combined.nodeTransforms.insert(combined.nodeTransforms.end(),
+        waterwheel.nodeTransforms.begin(), waterwheel.nodeTransforms.end());
+    combined.materials.insert(combined.materials.end(), waterwheel.materials.begin(), waterwheel.materials.end());
+    for (auto primitive : waterwheel.primitives)
+    {
+        primitive.vertexOffset += static_cast<std::uint32_t>(vertexBase);
+        primitive.indexOffset += static_cast<std::uint32_t>(indexBase);
+        primitive.nodeTransformIndex += static_cast<std::uint32_t>(transformBase);
+        primitive.materialIndex += static_cast<std::uint32_t>(materialBase);
+        combined.primitives.push_back(primitive);
+    }
+    for (const auto region : waterwheel.triangleRegions)
+        combined.triangleRegions.push_back(region);
+    combined.triangleRegions.resize(combined.indices.size() / 3u,
+        horde::scene::assets::StaticTriangleRegion::Shared);
+    for (auto socket : waterwheel.sockets)
+    {
+        socket.nodeTransformIndex += static_cast<std::uint32_t>(transformBase);
+        combined.sockets.push_back(std::move(socket));
+    }
+    for (std::size_t axis = 0u; axis < combined.bounds.minimum.size(); ++axis)
+    {
+        combined.bounds.minimum[axis] = std::min(combined.bounds.minimum[axis], waterwheel.bounds.minimum[axis]);
+        combined.bounds.maximum[axis] = std::max(combined.bounds.maximum[axis], waterwheel.bounds.maximum[axis]);
+    }
+    millDrive = std::move(combined);
+    diagnostic.clear();
+    return true;
+}
+
+bool LoadBellwetherStockHeads(const std::filesystem::path& dir,
+    horde::scene::assets::StaticMeshAsset& asset, std::string& diagnostic)
+{
+    using namespace horde::gameplay::bellwether;
+    using namespace horde::scene::assets;
+    AssetManifest manifest;
+    if (!AssetManifest::Load(dir / "stock-heads.manifest.json", manifest, diagnostic) ||
+        !StaticMeshAsset::Load(dir / "stock-heads.glb", manifest, asset, diagnostic)) return false;
+    constexpr std::array names{"StockPigHead", "StockHenHead"};
+    constexpr std::array identity{1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f};
+    const auto fail = [&diagnostic] {
+        diagnostic = "Bellwether stock requires two pivot-local opaque head meshes with five admitted primitives.";
+        return false;
+    };
+    if (asset.primitives.size() != 5u || asset.materials.size() != 3u ||
+        asset.indices.size() != 3u * kBellwetherStockHeadTriangles) return fail();
+    for (const auto& material : asset.materials) {
+        if (material.baseColorFactor[3] != 1.f || material.transmissionFactor != 0.f ||
+            material.baseColorTexture >= 0 || material.normalTexture >= 0 || material.ormTexture >= 0 ||
+            material.emissiveTexture >= 0 || (material.flags & static_cast<std::uint32_t>(RtMaterialFlag::Alpha)))
+            return fail();
+    }
+    for (std::size_t kind = 0; kind < names.size(); ++kind) {
+        const auto& [first, count] = kBellwetherStockHeadGeometry[kind];
+        for (const auto& primitive : std::span(asset.primitives).subspan(first, count)) {
+            const auto& node = asset.nodeTransforms[primitive.nodeTransformIndex];
+            if (node.name != names[kind] || node.world != identity) return fail();
+        }
+    }
+    return true;
+}
+
+bool ValidateBellwetherPrivyRagAsset(
+    const horde::scene::assets::StaticMeshAsset& rag,
+    std::string& diagnostic)
+{
+    using horde::scene::assets::StaticMeshAsset;
+    if (rag.primitives.size() != 1u || rag.materials.size() != 1u ||
+        rag.vertices.size() != 122u || rag.indices.size() != horde::gameplay::bellwether::kPrivyRagTriangles * 3u ||
+        !rag.HasValidTriangleProvenance())
+    {
+        diagnostic = "The Bellwether privy rag requires one primitive/material and its exact 56-triangle source mesh.";
+        return false;
+    }
+    const auto& material = rag.materials.front();
+    if (material.name != "HordePrivyLinen" || material.baseColorTexture >= 0 ||
+        material.normalTexture >= 0 || material.ormTexture >= 0 || material.emissiveTexture >= 0 ||
+        material.textureGroup >= 0 || material.deferTextureAllocation || material.transmissionFactor != 0.0f ||
+        material.baseColorFactor[3] != 1.0f || material.metallicFactor != 0.0f ||
+        std::abs(material.baseColorFactor[0] - 0.82f) > 0.001f ||
+        std::abs(material.baseColorFactor[1] - 0.74f) > 0.001f ||
+        std::abs(material.baseColorFactor[2] - 0.58f) > 0.001f ||
+        std::abs(material.roughnessFactor - 0.94f) > 0.001f ||
+        (material.flags & (static_cast<std::uint32_t>(RtMaterialFlag::Alpha) |
+            static_cast<std::uint32_t>(RtMaterialFlag::Transmission))) != 0u)
+    {
+        diagnostic = "The Bellwether privy rag requires its opaque, untextured HordePrivyLinen material.";
+        return false;
+    }
+    const auto node = std::find_if(rag.nodeTransforms.begin(), rag.nodeTransforms.end(),
+        [](const auto& transform) { return transform.name == "BellwetherCleanRag"; });
+    if (node == rag.nodeTransforms.end())
+    {
+        diagnostic = "The Bellwether privy rag GLB is missing its BellwetherCleanRag source node.";
+        return false;
+    }
+    const auto nodeIndex = static_cast<std::uint32_t>(node - rag.nodeTransforms.begin());
+    for (std::size_t row = 0u; row < 4u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+        {
+            const float expected = row == column ? 1.0f : 0.0f;
+            if (!std::isfinite(node->world[row * 4u + column]) ||
+                std::abs(node->world[row * 4u + column] - expected) > 1.0e-5f)
+            {
+                diagnostic = "The Bellwether privy rag source node must remain at local identity.";
+                return false;
+            }
+        }
+    const auto& primitive = rag.primitives.front();
+    if (primitive.materialIndex != 0u || primitive.nodeTransformIndex != nodeIndex ||
+        primitive.indexOffset != 0u || primitive.indexCount != horde::gameplay::bellwether::kPrivyRagTriangles * 3u)
+    {
+        diagnostic = "The Bellwether privy rag primitive must retain its single identity-local material range.";
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
 
 template <typename Action>
 bool MeasureInitialisationStageWork(
@@ -564,7 +792,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     lichEmissive_ = std::exchange(other.lichEmissive_, TextureArray{});
     keeperTextureLifetime_ = std::exchange(other.keeperTextureLifetime_, {});
     keeperTextureRestoreQuarantine_ = std::exchange(other.keeperTextureRestoreQuarantine_, {});
-    keeperTextureUploadRecovery_ = std::exchange(other.keeperTextureUploadRecovery_, {});
+    textureUploadRecovery_ = std::exchange(other.textureUploadRecovery_, {});
     keeperTextureDirectory_ = std::exchange(other.keeperTextureDirectory_, {});
     staticBaseColor_ = std::exchange(other.staticBaseColor_, TextureArray{});
     staticNormal_ = std::exchange(other.staticNormal_, TextureArray{});
@@ -627,6 +855,26 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterDropletBlas_ = std::exchange(other.waterDropletBlas_, AccelerationStructure{});
     attackWarningRingBlas_ = std::exchange(other.attackWarningRingBlas_, AccelerationStructure{});
     healingFlaskBlas_ = std::exchange(other.healingFlaskBlas_, AccelerationStructure{});
+    roadStoneBlas_ = std::exchange(other.roadStoneBlas_, AccelerationStructure{});
+    waysideCoverBlas_ = std::exchange(other.waysideCoverBlas_, AccelerationStructure{});
+    waysideRegisterBlas_ = std::exchange(other.waysideRegisterBlas_, AccelerationStructure{});
+    tavernDoorBlas_ = std::exchange(other.tavernDoorBlas_, AccelerationStructure{});
+    millDriveBlas_ = std::exchange(other.millDriveBlas_, AccelerationStructure{});
+    millWaterwheelBlas_ = std::exchange(other.millWaterwheelBlas_, AccelerationStructure{});
+    privyRagBlas_ = std::exchange(other.privyRagBlas_, AccelerationStructure{});
+    stockHeadBlas_ = std::exchange(other.stockHeadBlas_, {});
+    bellwetherFurnitureBlas_=std::exchange(other.bellwetherFurnitureBlas_,{});
+    bellwetherFurnitureAsset_=std::move(other.bellwetherFurnitureAsset_);
+    bellwetherFurnitureTransitions_=std::exchange(other.bellwetherFurnitureTransitions_,false);
+    bellwetherFurnitureResidency_=std::exchange(other.bellwetherFurnitureResidency_,false);
+    bellwetherFurniturePackaged_=std::exchange(other.bellwetherFurniturePackaged_,false);
+    bellwetherFurnitureWarmStart_=std::exchange(other.bellwetherFurnitureWarmStart_,false);
+    bellwetherFurnitureLifetime_=std::exchange(other.bellwetherFurnitureLifetime_,{});
+    bellwetherNearCandidate_=std::exchange(other.bellwetherNearCandidate_,{});
+    bellwetherNearBuildScratch_=std::exchange(other.bellwetherNearBuildScratch_,{});
+    bellwetherNearBuild_=std::exchange(other.bellwetherNearBuild_,{});
+    bellwetherNearRetryTick_=std::exchange(other.bellwetherNearRetryTick_,0u);
+    activeBellwetherFurnitureDetail_=std::exchange(other.activeBellwetherFurnitureDetail_,horde::scene::BellwetherFurnitureDetail::Near);
     waterDropletBlasUpdateScratch_ = std::exchange(other.waterDropletBlasUpdateScratch_, Buffer{});
     viewmodelBlasUpdateScratch_ = std::exchange(other.viewmodelBlasUpdateScratch_, Buffer{});
     skinnedPlayerBlasUpdateScratch_ =
@@ -635,6 +883,8 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     tlasUpdateScratch_ = std::exchange(other.tlasUpdateScratch_, Buffer{});
     characterSlot_ = std::move(other.characterSlot_);
     chapterActor_ = std::move(other.chapterActor_);
+    chapterResidentSources_ = std::exchange(other.chapterResidentSources_, {});
+    chapterResidents_ = std::exchange(other.chapterResidents_, {});
 #if defined(_DEBUG)
     chapterInspectionActor_=std::move(other.chapterInspectionActor_);
     chapterInspectionLast_=std::exchange(other.chapterInspectionLast_,std::nullopt);
@@ -671,13 +921,19 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     waterDropletGeometryVisible_ = std::exchange(other.waterDropletGeometryVisible_, false);
     attackWarningRingAsset_ = std::move(other.attackWarningRingAsset_);
     healingFlaskAsset_ = std::move(other.healingFlaskAsset_);
+    roadStoneAsset_ = std::move(other.roadStoneAsset_);
+    waysideCoverAsset_ = std::move(other.waysideCoverAsset_);
+    waysideRegisterAsset_ = std::move(other.waysideRegisterAsset_);
+    tavernDoorAsset_ = std::move(other.tavernDoorAsset_);
+    millDriveAsset_ = std::move(other.millDriveAsset_);
+    millWaterwheelAsset_ = std::move(other.millWaterwheelAsset_);
+    privyRagAsset_ = std::move(other.privyRagAsset_);
+    stockHeadAsset_ = std::move(other.stockHeadAsset_);
     healingFlaskUpgradeSite_ = std::exchange(other.healingFlaskUpgradeSite_,std::nullopt);
     jointPropPresentationActive_ = std::exchange(other.jointPropPresentationActive_, false);
     skinnedPlayerUpload_ = std::move(other.skinnedPlayerUpload_);
     viewmodelAsset_ = std::move(other.viewmodelAsset_);
     viewmodelSkin_ = std::move(other.viewmodelSkin_);
-    viewmodelPoseVertices_ = std::move(other.viewmodelPoseVertices_);
-    viewmodelPoseTangents_ = std::move(other.viewmodelPoseTangents_);
     viewmodelUpload_ = std::move(other.viewmodelUpload_);
     viewmodelAvailable_ = std::exchange(other.viewmodelAvailable_, false);
     playerBodyRemainderAvailable_ = std::exchange(other.playerBodyRemainderAvailable_, false);
@@ -822,6 +1078,7 @@ PresentableTinyRtScene& PresentableTinyRtScene::operator=(PresentableTinyRtScene
     developmentSupportFixture_ = std::exchange(other.developmentSupportFixture_, false);
     developmentWorldRoute_=std::exchange(other.developmentWorldRoute_,false);
     developmentRescueJourney_=std::exchange(other.developmentRescueJourney_,false);
+    bellwetherFurnitureDetail_=std::exchange(other.bellwetherFurnitureDetail_,horde::scene::BellwetherFurnitureDetail::Near);
     playerUtilityCandidateAsset_=std::exchange(other.playerUtilityCandidateAsset_,{});
     regionalWaterDiagnosticEnabled_=std::exchange(other.regionalWaterDiagnosticEnabled_,true);
     floorDebrisEnabled_=std::exchange(other.floorDebrisEnabled_,true);
@@ -1020,6 +1277,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
        <<",\"surroundingsTreeContactTriangles\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.treeContactTriangles:0u)
        <<",\"surroundingsUnderstoryClumps\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.understoryClumps:0u)
        <<",\"surroundingsArrivalPortalRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.arrivalPortalRuns:0u)
+       <<",\"surroundingsBellwetherRoadRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.bellwetherRoadRuns:0u)
        <<",\"surroundingsBoundarySectionsContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundarySectionsContained?"true":"false")
        <<",\"surroundingsBoundaryContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundaryContained?"true":"false")
        <<",\"proofOverride\":"<<(forestRouteProofMode_!=ForestRouteProofMode::Disabled?"true":"false")<<",\"fullyResident\":"<<(!ordinaryStaticOmissions_ && !ordinaryStaticReduced_?"true":"false")
@@ -1166,7 +1424,7 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
             return fail("Full-route forest lacks its exclusive fully resident boundary/geometry owner.");
     }else if(forestSurroundingsPrototype_)return fail("Full-route forest leaked into another profile.");
     if(forestSharedLayout_.supplementalPlacements.size()!=supplementalCount ||
-       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u) ||
+       tlasInstanceCount_!=kOrdinaryTlasInstanceCount+(shared?64u:0u)+(sector?12u:0u)+ChapterTailInstanceCount() ||
        staticMeshSlot_.PrimitiveMetadata().size()>kRtPrimitiveMetadataCapacity ||
        sceneMaterials_.size()>kRtMaterialCapacity)return fail("Forest proof exceeds or changes its admitted active capacities.");
     std::array<bool,kRtStaticAssetCapacity> assets{};
@@ -1174,7 +1432,12 @@ bool PresentableTinyRtScene::ValidateForestRouteProof(std::string& diagnostic,
         if(row.assetIndex>=assets.size())return fail("Forest proof has an unadmitted static asset owner.");
         assets[row.assetIndex]=true;
     }
-    if(std::count(assets.begin(),assets.end(),true)!=15)return fail("Forest proof did not preserve exactly fifteen unique static assets.");
+    const bool millWaterwheelSharesDriveAsset = millDriveBlas_.address && millWaterwheelBlas_.address &&
+        staticMeshSlot_.InstanceMetadata()[kMillDriveMetadataIndex].assetIndex ==
+            staticMeshSlot_.InstanceMetadata()[kMillWaterwheelMetadataIndex].assetIndex;
+    if(std::count(assets.begin(),assets.end(),true)!=
+       15+ChapterTailInstanceCount()-(millWaterwheelSharesDriveAsset?1u:0u)-(StockHeadInstanceCount()?2u:0u))
+        return fail("Forest proof did not preserve every unique static asset.");
     if(retention) {
         const auto omitted=std::count(forestRetentionLastOmitted_.begin(),forestRetentionLastOmitted_.end(),true);
         if(omitted!=forestRetentionOmittedCount_ || (!forestRetentionFrameEligible_ && omitted))
@@ -1385,6 +1648,11 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     initialiseMeasurements_ = {};
     InitialiseAttemptTimer totalAttemptTimer(initialiseMeasurements_);
     sceneProfile_ = sceneProfile;
+    if (!chapterResidentSources_.empty() &&
+        (sceneProfile_ != RtSceneProfile::Showcase || !developmentRescueJourney_)) {
+        diagnostic = "Chapter residents require the authored chapter scene.";
+        return false;
+    }
 #if defined(_DEBUG)
     if(diagnosticPreviewPairMaster_ && sceneProfile_!=RtSceneProfile::GraphicsPreview) {
         diagnostic="Diagnostic preview pair cannot initialize a gameplay or entry scene.";return false;
@@ -1677,8 +1945,8 @@ void PresentableTinyRtScene::Destroy()
     // The platform proves device idle before destroying a scene. Pending upload
     // commands and staging must outlive every image referenced by that work.
     if (device_ != VK_NULL_HANDLE)
-        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, keeperTextureUploadRecovery_.work);
-    else keeperTextureUploadRecovery_.work = {};
+        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, textureUploadRecovery_.work);
+    else textureUploadRecovery_.work = {};
 #if defined(_DEBUG)
     if(device_!=VK_NULL_HANDLE)RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},diagnosticPreviewPairBuild_);
     else diagnosticPreviewPairBuild_={};
@@ -1690,7 +1958,7 @@ void PresentableTinyRtScene::Destroy()
     forestRetentionProof_={};forestRetentionLastOmitted_={};forestRetentionFrameEligible_=false;
     forestRetentionFrameGeneration_=0;forestRetentionOmittedCount_=0;
     forestSharedLayout_={};forestF01NorthPrototype_.reset();forestSurroundingsPrototype_.reset();sharedForestGeometryActive_=false;
-    DestroyBuffer(keeperTextureUploadRecovery_.staging);
+    DestroyBuffer(textureUploadRecovery_.staging);
     for (auto& texture : keeperTextureRestoreQuarantine_) DestroyTextureArray(texture);
     keeperTextureLifetime_ = {};
     keeperTextureDirectory_.clear();
@@ -1729,6 +1997,9 @@ void PresentableTinyRtScene::Destroy()
     thirdActorSubmittedCompanion_ = false;
     jointPropPresentationActive_ = false;
     keeperVertexLifetime_ = {};
+    bellwetherFurnitureLifetime_={};
+    bellwetherFurnitureWarmStart_=false;
+    bellwetherNearRetryTick_=0;
     executionPolicy_ = {};
     computeDispatchGroups_ = {};
     if (device_ == VK_NULL_HANDLE)
@@ -1742,8 +2013,29 @@ void PresentableTinyRtScene::Destroy()
         waterDropletGeometryVisible_ = false;
         attackWarningRingBlas_ = {};
         healingFlaskBlas_ = {};
+        roadStoneBlas_ = {};
+        waysideCoverBlas_ = {};
+        waysideRegisterBlas_ = {};
+        tavernDoorBlas_ = {};
+        millDriveBlas_ = {};
+        millWaterwheelBlas_ = {};
+        privyRagBlas_ = {};
+        stockHeadBlas_ = {};
+        bellwetherFurnitureBlas_={};
+        bellwetherNearCandidate_={};
+        bellwetherNearBuildScratch_={};
+        bellwetherNearBuild_={};
+        bellwetherFurnitureAsset_={};
         attackWarningRingAsset_ = {};
         healingFlaskAsset_ = {};
+        roadStoneAsset_ = {};
+        waysideCoverAsset_ = {};
+        waysideRegisterAsset_ = {};
+        tavernDoorAsset_ = {};
+        millDriveAsset_ = {};
+        millWaterwheelAsset_ = {};
+        privyRagAsset_ = {};
+        stockHeadAsset_ = {};
         healingFlaskUpgradeSite_.reset();
         pipelineEvidenceIdentity_ = {};
         pipelineEvidenceIdentityValid_ = false;
@@ -1773,6 +2065,15 @@ void PresentableTinyRtScene::Destroy()
     regionalWaterFaces_.clear();
     finaleRoofSurfaceBase_=0; finaleRoofSurfaceCount_=0;
     characterSlot_.DestroyGpuResources(gpuResources_);
+    for (auto& resident : chapterResidents_) {
+        RetireRtGpuWorkAfterIdle({device_, queue_, commandPool_}, resident.replacementWork);
+        DestroyAccelerationStructure(resident.replacementBlas);
+        DestroyBuffer(resident.replacementScratch);
+        DestroyAccelerationStructure(resident.retiredBlas);
+        DestroyAccelerationStructure(resident.blas);
+        DestroyBuffer(resident.scratch);
+        resident = {};
+    }
     chapterActor_ = {};
     chapterActorReady_ = thirdActorIsCompanion_ = thirdActorSubmittedCompanion_ =
         thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
@@ -1788,6 +2089,19 @@ void PresentableTinyRtScene::Destroy()
     DestroyAccelerationStructure(waterDropletBlas_);
     DestroyAccelerationStructure(attackWarningRingBlas_);
     DestroyAccelerationStructure(healingFlaskBlas_);
+    DestroyAccelerationStructure(roadStoneBlas_);
+    DestroyAccelerationStructure(waysideCoverBlas_);
+    DestroyAccelerationStructure(waysideRegisterBlas_);
+    DestroyAccelerationStructure(tavernDoorBlas_);
+    DestroyAccelerationStructure(millDriveBlas_);
+    DestroyAccelerationStructure(millWaterwheelBlas_);
+    DestroyAccelerationStructure(privyRagBlas_);
+    for (auto& owner : stockHeadBlas_) DestroyAccelerationStructure(owner);
+    RetireRtGpuWorkAfterIdle({device_,queue_,commandPool_},bellwetherNearBuild_);
+    DestroyAccelerationStructure(bellwetherNearCandidate_);
+    DestroyBuffer(bellwetherNearBuildScratch_);
+    for(auto& owner:bellwetherFurnitureBlas_)DestroyAccelerationStructure(owner);
+    bellwetherFurnitureAsset_={};
     DestroyAccelerationStructure(skinnedPlayerBlas_);
     DestroyAccelerationStructure(playerLimbBlas_);
     DestroyAccelerationStructure(playerBodyBlas_);
@@ -1858,13 +2172,19 @@ void PresentableTinyRtScene::Destroy()
     waterDropletGeometryVisible_ = false;
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    roadStoneAsset_ = {};
+    waysideCoverAsset_ = {};
+    waysideRegisterAsset_ = {};
+    tavernDoorAsset_ = {};
+    millDriveAsset_ = {};
+    millWaterwheelAsset_ = {};
+    privyRagAsset_ = {};
+    stockHeadAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     playerRenderSlot_ = {};
     skinnedPlayerUpload_.clear();
     viewmodelAsset_ = {};
     viewmodelSkin_ = {};
-    viewmodelPoseVertices_.clear();
-    viewmodelPoseTangents_.clear();
     viewmodelUpload_.clear();
     viewmodelAvailable_ = false;
     playerBodyRemainderAvailable_ = false;
@@ -1974,8 +2294,13 @@ PresentableTinyRtScene::CaptureResourceHandles() const
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
         append(result.bottomLevelAccelerationStructures, blas->handle);
+    for (const auto& owner : stockHeadBlas_) append(result.bottomLevelAccelerationStructures, owner.handle);
+    for(const auto& owner:bellwetherFurnitureBlas_)
+        append(result.bottomLevelAccelerationStructures,owner.handle);
+    for (const auto& resident : chapterResidents_)
+        append(result.bottomLevelAccelerationStructures, resident.blas.handle);
     for (std::size_t bucket = 0u;
          bucket < CharacterRenderSlot::kMaximumSkeletonPoseBuckets; ++bucket)
         append(result.bottomLevelAccelerationStructures,
@@ -2022,7 +2347,7 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &instanceMetadataBuffer_, &primitiveMetadataBuffer_, &materialMetadataBuffer_,
              &skinnedPlayerBlasUpdateScratch_, &viewmodelBlasUpdateScratch_,
              &rescueWorldUpdateScratch_, &waterDropletBlasUpdateScratch_,
-             &tlas_.backing, &tlasUpdateScratch_, &keeperTextureUploadRecovery_.staging})
+             &tlas_.backing, &tlasUpdateScratch_, &textureUploadRecovery_.staging})
     {
         AccumulateRtGpuBuffer(inventory, *buffer);
     }
@@ -2039,9 +2364,20 @@ horde::telemetry::RtResourceInventory PresentableTinyRtScene::ResourceInventory(
              &gothicChestBaseBlas_, &gothicChestLidBlas_, &rewardLanternRingBlas_,
              &rewardLanternBodyBlas_, &dielectricFixtureBlas_, &playerBodyBlas_,
              &playerLimbBlas_, &skinnedPlayerBlas_, &viewmodelBlas_, &collapseBlas_,
-             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_})
+             &waterDropletBlas_, &attackWarningRingBlas_, &healingFlaskBlas_, &roadStoneBlas_, &waysideCoverBlas_, &waysideRegisterBlas_, &tavernDoorBlas_, &millDriveBlas_, &millWaterwheelBlas_, &privyRagBlas_})
     {
         accumulateBlas(*blas);
+    }
+    for(const auto& owner:bellwetherFurnitureBlas_)accumulateBlas(owner);
+    for (const auto& owner : stockHeadBlas_) accumulateBlas(owner);
+    accumulateBlas(bellwetherNearCandidate_);
+    AccumulateRtGpuBuffer(inventory,bellwetherNearBuildScratch_);
+    for (const auto& resident : chapterResidents_) {
+        accumulateBlas(resident.blas);
+        accumulateBlas(resident.retiredBlas);
+        accumulateBlas(resident.replacementBlas);
+        AccumulateRtGpuBuffer(inventory, resident.scratch);
+        AccumulateRtGpuBuffer(inventory, resident.replacementScratch);
     }
     if (tlas_.handle != VK_NULL_HANDLE)
     {
@@ -2661,7 +2997,7 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
                                            const std::span<const std::uint32_t> sourceLayers,
                                            const VkImageViewType viewType,
                                            const std::span<const RtTextureLayerAlias> sourceAliases,
-                                           std::span<const std::string> appendedArrayPaths,
+                                           std::span<const TextureArrayAddition> additions,
                                            TextureUploadRecovery* recovery,
                                            RtSceneRecordObservation* observation)
 {
@@ -2704,18 +3040,18 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         diagnostic = "Failed to read PBR texture array: " + path;
         return false;
     }
-    if (appendedArrayPaths.size() > kRtTextureLayerCapacity) {
+    if (additions.size() > kRtTextureLayerCapacity) {
         diagnostic = "Too many appended PBR arrays."; return false;
     }
-    std::vector<std::vector<std::uint8_t>> appendedBytes(appendedArrayPaths.size());
-    std::vector<RtKtxArrayAppendView> appended(appendedArrayPaths.size());
+    std::vector<std::vector<std::uint8_t>> appendedBytes(additions.size());
+    std::vector<RtKtxArrayAppendView> appended(additions.size());
     std::uint32_t appendedLayerCount = 0;
-    for (std::size_t i = 0; i < appendedArrayPaths.size(); ++i)
+    for (std::size_t i = 0; i < additions.size(); ++i)
     {
         if (!ktx2 || sourceLayers.empty()) {
             diagnostic = "Appended PBR arrays require an explicit KTX layer selection."; return false;
         }
-        const auto& appendedArrayPath = appendedArrayPaths[i];
+        const auto& appendedArrayPath = additions[i].path;
         std::ifstream extra(appendedArrayPath, std::ios::binary | std::ios::ate);
         if (!extra || extra.tellg() < 80) {
             diagnostic = "Appended PBR texture array is missing or truncated: " + appendedArrayPath; return false;
@@ -2726,9 +3062,11 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
             diagnostic = "Failed to read appended PBR texture array: " + appendedArrayPath; return false;
         }
         std::uint32_t count = 0; std::memcpy(&count, bytes.data() + 32, sizeof(count));
-        if (!count || count > kRtTextureLayerCapacity ||
-            sourceLayers.size() + appendedLayerCount + count > layers ||
-            !PrepareRtKtxArrayAppend(fileBytes, bytes, static_cast<std::uint32_t>(format),
+        if (count != additions[i].layers || sourceLayers.size() + appendedLayerCount + count > layers) {
+            diagnostic = "Appended PBR texture array has an unexpected layer count: " + appendedArrayPath;
+            return false;
+        }
+        if (!PrepareRtKtxArrayAppend(fileBytes, bytes, static_cast<std::uint32_t>(format),
                 width, height, static_cast<std::uint32_t>(sourceLayers.size()),
                 static_cast<std::uint32_t>(sourceLayers.size()) + count, appended[i], diagnostic)) return false;
         appendedLayerCount += count;
@@ -2951,26 +3289,10 @@ bool PresentableTinyRtScene::CreateTexture(const std::string& path,
         return false;
     }
     texture.mipLevels = mipLevels;
+    texture.format = format;
+    texture.extent = {width, height};
+    texture.layers = layers;
     return true;
-}
-
-VkAccelerationStructureGeometryKHR PresentableTinyRtScene::ChapterActorGeometry() const
-{
-    const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
-    const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
-    VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-    geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-    geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
-    auto& triangle = geometry.geometry.triangles;
-    triangle.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-    triangle.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-    triangle.vertexData.deviceAddress = staticVertexBuffer_.address +
-        VkDeviceSize(primitive.vertexOffset) * sizeof(horde::scene::assets::StaticRtVertex);
-    triangle.vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
-    triangle.maxVertex = staticMeshSlot_.PrimitiveVertexCounts()[metadata.primitiveBase] - 1u;
-    triangle.indexType = VK_INDEX_TYPE_UINT32;
-    triangle.indexData.deviceAddress = staticIndexBuffer_.address + VkDeviceSize(primitive.indexOffset) * sizeof(std::uint32_t);
-    return geometry;
 }
 
 bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
@@ -2994,6 +3316,635 @@ bool PresentableTinyRtScene::SupportsTextureArrayFormat(VkFormat format) const
                                                                       &imageProperties);
     return result == VK_SUCCESS && imageProperties.maxExtent.width >= 512u &&
            imageProperties.maxExtent.height >= 512u && imageProperties.maxArrayLayers >= 5u;
+}
+
+bool PresentableTinyRtScene::SetChapterResidentActors(
+    const std::span<const ChapterResidentActorSource> sources, std::string& diagnostic)
+{
+    // Destroy retires the scene bundle and its resources but retains the
+    // borrowed device. Each subsequent profile may select its own roster.
+    if (ready_ || pipelineBundle_.HasSelection() || sources.size() > chapterResidents_.size()) {
+        diagnostic = "Chapter resident sources must be configured before Vulkan scene creation or after retirement.";
+        return false;
+    }
+    for (std::size_t lane = 0; lane < sources.size(); ++lane) {
+        const auto& source = sources[lane];
+        if (!source.stableId || source.directory.empty() || source.fileName.empty() ||
+            source.clips.empty() ||
+            std::any_of(sources.begin(), sources.begin() + lane, [&](const auto& prior) {
+                return prior.stableId == source.stableId;
+            })) {
+            diagnostic = "Chapter resident sources require unique identities and complete asset inputs.";
+            return false;
+        }
+    }
+    chapterResidentSources_.assign(sources.begin(), sources.end());
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::LoadChapterResidents(std::string& diagnostic)
+{
+    for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        const auto& source = chapterResidentSources_[lane];
+        auto& resident = chapterResidents_[lane];
+        auto& actor = resident.actor;
+        if (!actor.Load(source.directory, source.fileName.c_str(), source.clips, diagnostic))
+            return false;
+        resident.hasPbrMaps = false;
+        std::optional<std::array<std::int32_t, 3>> sharedMaps;
+        for (auto& material : actor.Asset().materials) {
+            const std::array maps{material.baseColorTexture, material.normalTexture, material.ormTexture};
+            const bool textured = std::any_of(maps.begin(), maps.end(), [](auto index) { return index >= 0; });
+            if (material.emissiveTexture >= 0 || material.transmissionFactor > 0 ||
+                (textured && (std::any_of(maps.begin(), maps.end(), [](auto index) { return index < 0; }) ||
+                              (sharedMaps && *sharedMaps != maps)))) {
+                diagnostic = "Chapter residents support one shared base-color, normal and ORM map set per actor, without emissive maps or transmission.";
+                return false;
+            }
+            if (textured) {
+                sharedMaps = maps;
+                // Append after terrain and Kit without moving their material layers.
+                material.textureGroup = 0;
+                material.deferTextureAllocation = true;
+            }
+        }
+        resident.hasPbrMaps = sharedMaps.has_value();
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::ReplaceChapterResidentTextureLayers(
+    std::uint32_t stableId, const std::filesystem::path& directory,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    return PublishChapterResidentTexturePayload(stableId, directory, nullptr,
+        retireReferences, user, diagnostic);
+}
+
+PresentableTinyRtScene::ResidentTextureLayouts PresentableTinyRtScene::ChapterResidentTextureLayouts() const noexcept
+{
+    return {{
+        {staticBaseColor_.format, staticBaseColor_.extent.width, staticBaseColor_.extent.height, staticBaseColor_.mipLevels},
+        {staticNormal_.format, staticNormal_.extent.width, staticNormal_.extent.height, staticNormal_.mipLevels},
+        {staticOrm_.format, staticOrm_.extent.width, staticOrm_.extent.height, staticOrm_.mipLevels}
+    }};
+}
+
+bool PresentableTinyRtScene::PrepareChapterResidentTexturePayload(const ResidentTextureLayouts& layouts,
+    const std::filesystem::path& activeDirectory, const std::filesystem::path& incomingDirectory,
+    ResidentTexturePayload& payload, std::string& diagnostic)
+{
+#if defined(__ANDROID__)
+    constexpr std::array names{"base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"};
+#else
+    constexpr std::array names{"base-color.windows.ktx2", "normal.windows.ktx2", "orm.windows.ktx2"};
+#endif
+    const auto readBytes = [](const std::filesystem::path& path, std::vector<std::uint8_t>& bytes) {
+        std::ifstream file(path, std::ios::binary | std::ios::ate);
+        if (!file || file.tellg() < 80) return false;
+        bytes.resize(static_cast<std::size_t>(file.tellg()));
+        file.seekg(0, std::ios::beg);
+        return bool(file.read(reinterpret_cast<char*>(bytes.data()), static_cast<std::streamsize>(bytes.size())));
+    };
+    ResidentTexturePayload prepared;
+    prepared.layouts = layouts;
+    for (std::size_t map = 0; map < layouts.size(); ++map)
+    {
+        std::vector<std::uint8_t> baseline, replacement;
+        const auto path = incomingDirectory / names[map];
+        if (!readBytes(activeDirectory / names[map], baseline) || !readBytes(path, replacement))
+        {
+            diagnostic = "Resident texture replacement could not read a complete map: " + path.string();
+            return false;
+        }
+        const auto& layout = layouts[map];
+        RtKtxArrayAppendView mips;
+        // The original sidecar and the incoming map each have one layer.
+        if (!PrepareRtKtxArrayAppend(baseline, replacement, static_cast<std::uint32_t>(layout.format),
+                layout.width, layout.height, 1u, 2u, mips, diagnostic) ||
+            mips.mipLevels != layout.mipLevels || mips.mipLevels > prepared.mipOffsets[map].size())
+        {
+            diagnostic = "Resident texture replacement does not match its atlas mip layout or colour metadata: " + path.string();
+            return false;
+        }
+        for (std::uint32_t mip = 0; mip < mips.mipLevels; ++mip)
+        {
+            prepared.mipOffsets[map][mip] = prepared.pixels.size();
+            prepared.pixels.insert(prepared.pixels.end(), mips.mips[mip].begin(), mips.mips[mip].end());
+        }
+    }
+    payload = std::move(prepared);
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::PublishChapterResidentTexturePayload(std::uint32_t stableId,
+    const std::filesystem::path& directory, const ResidentTexturePayload* prepared,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    auto& recovery = textureUploadRecovery_;
+    if (!ready_ || staticGeometryCompletionUnproved_ || directory.empty() || !retireReferences ||
+        recovery.staging.buffer || recovery.work.command || recovery.work.fence)
+    {
+        diagnostic = "Resident texture replacement needs a ready scene, an empty upload owner and a frame retirement proof.";
+        return false;
+    }
+    const auto source = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& resident) { return resident.stableId == stableId; });
+    if (source == chapterResidentSources_.end())
+    {
+        diagnostic = "Resident texture replacement requested an unknown actor.";
+        return false;
+    }
+    const auto lane = static_cast<std::size_t>(source - chapterResidentSources_.begin());
+    if (!chapterResidents_[lane].hasPbrMaps)
+    {
+        diagnostic = "Resident texture replacement requires an existing PBR layer set.";
+        return false;
+    }
+
+    // Deferred resident map sets occupy the tail of each array, in source order.
+    const auto trailingSets = static_cast<std::uint32_t>(std::count_if(
+        chapterResidents_.begin() + lane, chapterResidents_.end(),
+        [](const auto& resident) { return resident.hasPbrMaps; }));
+    const auto& instance = staticMeshSlot_.InstanceMetadata()[kFirstResidentMetadataIndex + lane];
+    const auto& primitives = staticMeshSlot_.PrimitiveMetadata();
+    const auto& materials = staticMeshSlot_.Materials();
+    if (instance.stableObjectId != stableId || !instance.primitiveCount ||
+        instance.primitiveBase >= primitives.size() ||
+        instance.primitiveCount > primitives.size() - instance.primitiveBase)
+    {
+        diagnostic = "Resident texture replacement could not resolve its packed primitive rows.";
+        return false;
+    }
+    const auto rows = std::span(primitives).subspan(instance.primitiveBase, instance.primitiveCount);
+    const auto layouts = ChapterResidentTextureLayouts();
+    ResidentTexturePayload direct;
+    if (!prepared)
+    {
+        if (!PrepareChapterResidentTexturePayload(layouts, source->directory, directory, direct, diagnostic))
+            return false;
+        prepared = &direct;
+    }
+    if (prepared->layouts != layouts || prepared->pixels.empty())
+    {
+        diagnostic = "Prepared resident maps do not match the current atlas.";
+        return false;
+    }
+    const std::array arrays{&staticBaseColor_, &staticNormal_, &staticOrm_};
+    struct LayerUpload
+    {
+        VkImage image = VK_NULL_HANDLE;
+        VkImageSubresourceRange range{};
+        std::array<VkBufferImageCopy, 16> copies{};
+    };
+    std::array<LayerUpload, arrays.size()> uploads{};
+    for (std::size_t map = 0; map < arrays.size(); ++map)
+    {
+        const auto& texture = *arrays[map];
+        if (!texture.image || texture.layers <= trailingSets)
+        {
+            diagnostic = "Resident texture replacement requires an allocated atlas layer.";
+            return false;
+        }
+        const auto layer = texture.layers - trailingSets;
+        const auto ownsLayer = [&](const auto& row) {
+            return row.materialIndex < materials.size() &&
+                materials[row.materialIndex].textureLayers[map] == layer;
+        };
+        if (!std::all_of(rows.begin(), rows.end(), ownsLayer))
+        {
+            diagnostic = "Resident texture replacement disagrees with the packed layer ownership.";
+            return false;
+        }
+        auto& upload = uploads[map];
+        upload.image = texture.image;
+        upload.range = {VK_IMAGE_ASPECT_COLOR_BIT, 0u, texture.mipLevels, layer, 1u};
+        for (std::uint32_t mip = 0; mip < texture.mipLevels; ++mip)
+        {
+            auto& copy = upload.copies[mip];
+            copy.bufferOffset = prepared->mipOffsets[map][mip];
+            copy.imageSubresource = {VK_IMAGE_ASPECT_COLOR_BIT, mip, layer, 1u};
+            copy.imageExtent = {std::max(1u, texture.extent.width >> mip),
+                std::max(1u, texture.extent.height >> mip), 1u};
+        }
+    }
+
+    Buffer staging;
+    const auto& pixels = prepared->pixels;
+    if (!CreateBuffer(pixels.size(), VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            false, staging, diagnostic))
+        return false;
+    if (!WriteBuffer(staging, pixels.data(), pixels.size(), "resident map replacement", diagnostic) ||
+        !retireReferences(user, diagnostic))
+    {
+        DestroyBuffer(staging);
+        return false;
+    }
+    struct UploadBatch
+    {
+        const decltype(uploads)& layers;
+        VkBuffer staging;
+        VkPipelineStageFlags shaderStage;
+    } batch{uploads, staging.buffer, executionPolicy_.shaderPipelineStage};
+    const auto record = [](VkCommandBuffer command, void* userData) {
+        const auto& data = *static_cast<const UploadBatch*>(userData);
+        std::array<VkImageMemoryBarrier, 3> barriers{};
+        for (std::size_t i = 0; i < data.layers.size(); ++i)
+        {
+            auto& barrier = barriers[i];
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.srcQueueFamilyIndex = barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.image = data.layers[i].image;
+            barrier.subresourceRange = data.layers[i].range;
+        }
+        vkCmdPipelineBarrier(command, data.shaderStage, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+            0, nullptr, 0, nullptr, static_cast<std::uint32_t>(barriers.size()), barriers.data());
+        for (const auto& layer : data.layers)
+            vkCmdCopyBufferToImage(command, data.staging, layer.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                layer.range.levelCount, layer.copies.data());
+        for (auto& barrier : barriers)
+        {
+            std::swap(barrier.oldLayout, barrier.newLayout);
+            std::swap(barrier.srcAccessMask, barrier.dstAccessMask);
+        }
+        vkCmdPipelineBarrier(command, VK_PIPELINE_STAGE_TRANSFER_BIT, data.shaderStage, 0,
+            0, nullptr, 0, nullptr, static_cast<std::uint32_t>(barriers.size()), barriers.data());
+    };
+    const RtGpuWorkApi api{device_, queue_, commandPool_};
+    const bool submitted = SubmitRtGpuWork(api, recovery.work, record, &batch, diagnostic);
+    if (submitted && vkWaitForFences(device_, 1u, &recovery.work.fence, VK_TRUE, 2'000'000'000ull) == VK_SUCCESS &&
+        PollRtGpuWork(api, recovery.work, diagnostic) == RtGpuWorkStatus::Complete)
+    {
+        DestroyBuffer(staging);
+        return true;
+    }
+    if (recovery.work.submitted)
+    {
+        recovery.work.completionUnproved = true;
+        recovery.staging = std::exchange(staging, {});
+        staticGeometryCompletionUnproved_ = true;
+        ready_ = false;
+        diagnostic = "Resident atlas replacement has unproved completion. Retain the upload until device idle.";
+        return false;
+    }
+    DestroyBuffer(staging);
+    return false;
+}
+
+namespace
+{
+constexpr VkBuildAccelerationStructureFlagsKHR kChapterResidentBuildFlags =
+    VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR |
+    VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
+}
+
+bool PresentableTinyRtScene::RetireReplacedChapterResidents(
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    if (!tlasInstanceDefinitionsValid_) return true;
+    const auto definitions = std::span(tlasBuiltInstances_).first(tlasInstanceCount_);
+    bool retiredReferences = false;
+    for (auto& resident : chapterResidents_)
+    {
+        if (!resident.retiredBlas.handle ||
+            std::any_of(definitions.begin(), definitions.end(), [&](const auto& instance) {
+                return instance.accelerationStructureReference == resident.retiredBlas.address;
+            })) continue;
+        if (!retiredReferences)
+        {
+            if (!retireReferences || !retireReferences(user, diagnostic)) return false;
+            retiredReferences = true;
+        }
+        DestroyAccelerationStructure(resident.retiredBlas);
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::ReplaceChapterResidentActor(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, bool (*retireReferences)(void*, std::string&),
+    void* user, std::string& diagnostic)
+{
+    return CommitChapterResidentReplacement(activeId, std::move(replacement), nullptr,
+        retireReferences, user, diagnostic);
+}
+
+std::uint32_t PresentableTinyRtScene::PrefetchedChapterResidentId(std::size_t lane) const noexcept
+{
+    return lane < chapterResidentSources_.size() ? chapterResidents_[lane].prefetch.source.stableId : 0u;
+}
+
+bool PresentableTinyRtScene::PrefetchChapterResidentActor(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, std::string& diagnostic)
+{
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (!ready_ || current == chapterResidentSources_.end() || !current->replacementCapacity.vertices ||
+        !replacement.stableId || activeId == replacement.stableId || replacement.directory.empty() ||
+        replacement.fileName.empty() || replacement.clips.empty())
+    {
+        diagnostic = "Resident prefetch requires a reserved live lane and a complete alternate source.";
+        return false;
+    }
+    auto& prefetch = chapterResidents_[current - chapterResidentSources_.begin()].prefetch;
+    if (prefetch.import.valid())
+    {
+        if (prefetch.source.stableId == replacement.stableId ||
+            prefetch.import.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+        {
+            diagnostic.clear();
+            return true;
+        }
+        // An obsolete import may be discarded only after the worker is done.
+        // Keep the resident and GPU resources published throughout retargeting.
+        prefetch = {};
+    }
+    try
+    {
+        auto import = std::async(std::launch::async, [replacement,
+            activeDirectory = current->directory, layouts = ChapterResidentTextureLayouts()] {
+            ChapterResidentImport result;
+            result.ready = result.actor.Load(replacement.directory, replacement.fileName.c_str(),
+                replacement.clips, result.diagnostic) &&
+                PrepareChapterResidentTexturePayload(layouts, activeDirectory, replacement.directory,
+                    result.textures, result.diagnostic);
+            return result;
+        });
+        prefetch.source = std::move(replacement);
+        prefetch.import = std::move(import);
+    }
+    catch (const std::exception& exception)
+    {
+        diagnostic = std::string("Resident prefetch could not start: ") + exception.what();
+        return false;
+    }
+    diagnostic.clear();
+    return true;
+}
+
+PresentableTinyRtScene::ResidentPublication PresentableTinyRtScene::PublishPrefetchedChapterResidentActor(
+    std::uint32_t activeId, std::uint32_t incomingId,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (current == chapterResidentSources_.end())
+    {
+        diagnostic = "Resident publication requested an unknown active actor.";
+        return ResidentPublication::Failed;
+    }
+    auto& prefetch = chapterResidents_[current - chapterResidentSources_.begin()].prefetch;
+    if (!prefetch.import.valid() || prefetch.source.stableId != incomingId)
+    {
+        diagnostic = "Resident publication does not match the prefetched source.";
+        return ResidentPublication::Failed;
+    }
+    if (prefetch.import.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+    {
+        diagnostic.clear();
+        return ResidentPublication::Pending;
+    }
+    auto source = std::exchange(prefetch.source, {});
+    try
+    {
+        auto imported = prefetch.import.get();
+        if (!imported.ready)
+        {
+            diagnostic = std::move(imported.diagnostic);
+            return ResidentPublication::Failed;
+        }
+        return CommitChapterResidentReplacement(activeId, std::move(source), &imported,
+            retireReferences, user, diagnostic) ? ResidentPublication::Published : ResidentPublication::Failed;
+    }
+    catch (const std::exception& exception)
+    {
+        diagnostic = std::string("Resident prefetch failed: ") + exception.what();
+        return ResidentPublication::Failed;
+    }
+}
+
+bool PresentableTinyRtScene::CommitChapterResidentReplacement(std::uint32_t activeId,
+    ChapterResidentActorSource replacement, ChapterResidentImport* prepared,
+    bool (*retireReferences)(void*, std::string&), void* user, std::string& diagnostic)
+{
+    if (!ready_ || staticGeometryCompletionUnproved_ || !retireReferences ||
+        preparedStaticGeometry_ || ordinaryStaticReduced_ || fullStaticGeometrySource_)
+    {
+        diagnostic = "Resident model replacement needs a complete mutable scene and a graphics retirement proof.";
+        return false;
+    }
+    const auto current = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+        [&](const auto& source) { return source.stableId == activeId; });
+    if (current == chapterResidentSources_.end() || !replacement.stableId ||
+        replacement.directory.empty() || replacement.fileName.empty() || replacement.clips.empty())
+    {
+        diagnostic = "Resident model replacement requires a known lane and complete replacement source.";
+        return false;
+    }
+    const auto lane = static_cast<std::uint32_t>(current - chapterResidentSources_.begin());
+    auto& resident = chapterResidents_[lane];
+    if (!current->replacementCapacity.vertices || !resident.hasPbrMaps || resident.replacementWork.submitted)
+    {
+        diagnostic = "Resident model replacement needs a reserved textured lane and an empty build owner.";
+        return false;
+    }
+    horde::scene::assets::SkinnedPbrActor candidate;
+#if defined(_DEBUG)
+    const auto swapStart = std::chrono::steady_clock::now();
+#endif
+    if (prepared) candidate = std::move(prepared->actor);
+    else if (!candidate.Load(replacement.directory, replacement.fileName.c_str(), replacement.clips, diagnostic))
+        return false;
+#if defined(_DEBUG)
+    const auto imported = std::chrono::steady_clock::now();
+#endif
+    const auto& asset = candidate.Asset();
+    RtResidentReplacement plan{};
+    if (!staticMeshSlot_.PrepareResidentReplacement(kFirstResidentMetadataIndex + lane,
+            replacement.stableId, asset, resident.replacementRanges[resident.nextReplacementRange], plan, diagnostic))
+        return false;
+    if (!RetireReplacedChapterResidents(retireReferences, user, diagnostic)) return false;
+    if (resident.retiredBlas.handle)
+    {
+        diagnostic = "Publish and retire the preceding resident frame before reusing its geometry.";
+        return false;
+    }
+    const VkDeviceSize primitiveOffset = VkDeviceSize(plan.primitiveRow) * sizeof(RtPrimitiveMetadata);
+    if (plan.primitive.materialIndex >= sceneMaterials_.size() ||
+        primitiveOffset > primitiveMetadataBuffer_.size ||
+        sizeof(RtPrimitiveMetadata) > primitiveMetadataBuffer_.size - primitiveOffset)
+    {
+        diagnostic = "Resident model replacement would exceed the live metadata buffers.";
+        return false;
+    }
+    if (!retireReferences(user, diagnostic) ||
+        !gpuResources_.MapBufferForHostWrites(primitiveMetadataBuffer_, diagnostic))
+        return false;
+
+    const VkDeviceSize vertexStride = sizeof(horde::scene::assets::StaticRtVertex);
+    const VkDeviceSize vertexOffset = VkDeviceSize(plan.primitive.vertexOffset) * vertexStride;
+    const VkDeviceSize indexOffset = VkDeviceSize(plan.primitive.indexOffset) * sizeof(std::uint32_t);
+    if (!gpuResources_.WriteBufferRange(staticVertexBuffer_, vertexOffset, asset.vertices.data(),
+            asset.vertices.size() * vertexStride, "replacement resident vertices", diagnostic) ||
+        !gpuResources_.WriteBufferRange(staticIndexBuffer_, indexOffset, asset.indices.data(),
+            asset.indices.size() * sizeof(std::uint32_t), "replacement resident indices", diagnostic))
+        return false;
+
+    VkAccelerationStructureGeometryKHR geometry{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+    geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+    geometry.flags = VK_GEOMETRY_OPAQUE_BIT_KHR;
+    auto& triangles = geometry.geometry.triangles;
+    triangles.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+    triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+    triangles.vertexData.deviceAddress = staticVertexBuffer_.address + vertexOffset;
+    triangles.vertexStride = vertexStride;
+    triangles.maxVertex = plan.primitiveVertexCount - 1u;
+    triangles.indexType = VK_INDEX_TYPE_UINT32;
+    triangles.indexData.deviceAddress = staticIndexBuffer_.address + indexOffset;
+    const VkAccelerationStructureBuildRangeInfoKHR range{plan.primitive.indexCount / 3u, 0u, 0u, 0u};
+    const RtGpuWorkApi api{device_, queue_, commandPool_};
+    const auto releaseCandidate = [&] {
+        DestroyAccelerationStructure(resident.replacementBlas);
+        DestroyBuffer(resident.replacementScratch);
+    };
+    const bool submitted = BuildProfileAccelerationStructure(std::span(&geometry, 1), std::span(&range, 1),
+        VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, kChapterResidentBuildFlags,
+        resident.replacementBlas, &resident.replacementScratch, diagnostic, nullptr, &resident.replacementWork);
+    if (!submitted || vkWaitForFences(device_, 1u, &resident.replacementWork.fence, VK_TRUE, 2'000'000'000ull) != VK_SUCCESS ||
+        PollRtGpuWork(api, resident.replacementWork, diagnostic) != RtGpuWorkStatus::Complete)
+    {
+        if (resident.replacementWork.submitted)
+        {
+            resident.replacementWork.completionUnproved = true;
+            staticGeometryCompletionUnproved_ = true;
+            ready_ = false;
+            diagnostic = "Replacement resident BLAS has unproved completion. Retain it until device idle.";
+        }
+        else releaseCandidate();
+        return false;
+    }
+    // The old lanes, metadata and textures remain published through build
+    // completion. Texture work is the last fallible step before publication.
+#if defined(_DEBUG)
+    const auto built = std::chrono::steady_clock::now();
+#endif
+    if (!PublishChapterResidentTexturePayload(activeId, replacement.directory,
+            prepared ? &prepared->textures : nullptr, retireReferences, user, diagnostic))
+    {
+        releaseCandidate();
+        return false;
+    }
+    std::memcpy(static_cast<std::uint8_t*>(primitiveMetadataBuffer_.mappedWriteData) + primitiveOffset,
+        &plan.primitive, sizeof(plan.primitive));
+    staticMeshSlot_.PublishResidentReplacement(plan, asset);
+    sceneMaterials_[plan.primitive.materialIndex] = plan.material;
+    replacement.replacementCapacity = current->replacementCapacity;
+    *current = std::move(replacement);
+    resident.actor = std::move(candidate);
+    resident.retiredBlas = std::exchange(resident.blas, std::exchange(resident.replacementBlas, {}));
+    DestroyBuffer(resident.scratch);
+    resident.scratch = std::exchange(resident.replacementScratch, {});
+    resident.nextReplacementRange = 1u - resident.nextReplacementRange;
+    resident.uploadedClip = horde::scene::SkinnedClip::Idle;
+    resident.uploadedTime = 0.f;
+    resident.needsRefit = resident.refitRecorded = false;
+#if defined(_DEBUG)
+    const auto now = std::chrono::steady_clock::now();
+    const auto elapsed = [](auto end, auto start) {
+        return std::chrono::duration<double, std::milli>(end - start).count();
+    };
+    std::clog << "HORDE_RESIDENT_SWAP from=" << activeId << " to=" << current->stableId
+              << " prefetched=" << (prepared != nullptr)
+              << " import_ms=" << elapsed(imported, swapStart) << " build_ms=" << elapsed(built, imported)
+              << " publish_ms=" << elapsed(now, built) << " total_ms=" << elapsed(now, swapStart) << '\n';
+#endif
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::BuildChapterResidentStructures(std::string& diagnostic)
+{
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        auto& resident = chapterResidents_[lane];
+        RtIndexedActorGeometry geometry;
+        if (!geometry.Resolve(staticMeshSlot_, kFirstResidentMetadataIndex + lane,
+                resident.actor.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic) ||
+            !BuildProfileAccelerationStructure(geometry.Geometries(), geometry.Ranges(),
+                VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR, kChapterResidentBuildFlags,
+                resident.blas, &resident.scratch, diagnostic))
+            return false;
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::PrepareChapterResidents(const RtSceneFrameInputs& frame,
+    const std::span<VkAccelerationStructureInstanceKHR> instances,
+    const std::span<RtIndexedActorGeometry> geometries, std::string& diagnostic,
+    RtSceneRecordObservation* observation)
+{
+    std::array<const ChapterResidentActorPose*, kAdditionalChapterActorCapacity> byLane{};
+    for (const auto& pose : frame.chapterResidents) {
+        if (!pose.stableId) continue;
+        const auto source = std::find_if(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+            [&](const auto& item) { return item.stableId == pose.stableId; });
+        const auto lane = static_cast<std::size_t>(source - chapterResidentSources_.begin());
+        if (source == chapterResidentSources_.end() || byLane[lane] ||
+            !std::isfinite(pose.time) || pose.time < 0 || !std::isfinite(pose.yaw) ||
+            !std::all_of(pose.foot.begin(), pose.foot.end(), [](float value) { return std::isfinite(value); })) {
+            diagnostic = "Frame requests an unknown, duplicate or invalid chapter resident pose.";
+            return false;
+        }
+        byLane[lane] = &pose;
+    }
+    for (std::uint32_t lane = 0; lane < chapterResidentSources_.size(); ++lane) {
+        auto& resident = chapterResidents_[lane];
+        auto& instance = instances[lane];
+        resident.refitRecorded = false;
+        const auto* pose = byLane[lane];
+        instance = {};
+        instance.instanceCustomIndex = kFirstResidentMetadataIndex + lane;
+        instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+        instance.accelerationStructureReference = resident.blas.address;
+        instance.transform = {{{1,0,0,0}, {0,1,0,0}, {0,0,1,0}}};
+        if (!pose) continue;
+
+        auto& geometry = geometries[lane];
+        if (!geometry.Resolve(staticMeshSlot_, kFirstResidentMetadataIndex + lane,
+                resident.actor.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+            return false;
+        // Residents sample one clip without additive posing or blending. Equal
+        // authored keys share the same geometry even while facing changes.
+        const float sampleTime = resident.actor.HasConstantClipPose(pose->clip) ? 0.f : pose->time;
+        if (resident.uploadedClip != pose->clip || resident.uploadedTime != sampleTime) {
+            RtSceneStageScope skin(observation, horde::telemetry::RtStage::CharacterSkin);
+            horde::scene::SkinWorkMetrics work;
+            if (!resident.actor.Pose(pose->clip, sampleTime, diagnostic, {}, nullptr,
+                    WantsSkinWorkMetrics(observation) ? &work : nullptr)) {
+                skin.Cancel();
+                return false;
+            }
+            skin.Complete(1u);
+            ObserveSkinWork(observation, work);
+            if (!gpuResources_.WriteBufferRange(staticVertexBuffer_, geometry.VertexOffset(),
+                    resident.actor.Asset().vertices.data(), geometry.VertexBytes(),
+                    "chapter resident pose", diagnostic, observation))
+                return false;
+            resident.uploadedClip = pose->clip;
+            resident.uploadedTime = sampleTime;
+            resident.needsRefit = true;
+        }
+        const float sine = std::sin(pose->yaw), cosine = std::cos(pose->yaw);
+        instance.transform = {{{cosine,0,sine,pose->foot[0]}, {0,1,0,pose->foot[1]},
+            {-sine,0,cosine,pose->foot[2]}}};
+        instance.mask = 1u;
+    }
+    return true;
 }
 
 bool PresentableTinyRtScene::CreateMaterialTextures(const std::string& directory, std::string& diagnostic)
@@ -3176,6 +4127,14 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     productionDielectricFixtureAsset_ = {};
     attackWarningRingAsset_ = {};
     healingFlaskAsset_ = {};
+    roadStoneAsset_ = {};
+    waysideCoverAsset_ = {};
+    waysideRegisterAsset_ = {};
+    tavernDoorAsset_ = {};
+    millDriveAsset_ = {};
+    millWaterwheelAsset_ = {};
+    privyRagAsset_ = {};
+    stockHeadAsset_ = {};
     healingFlaskUpgradeSite_.reset();
     jointPropPresentationActive_ = false;
     if (!productionHeldItemAssetsEnabled_)
@@ -3188,6 +4147,14 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         return LoadPreviewStaticAssets(productionAssetRoot, diagnostic);
 
     const std::filesystem::path root(productionAssetRoot);
+    if(bellwetherFurniturePackaged_ && developmentRescueJourney_ &&
+       !bellwetherFurnitureTransitions_ && !bellwetherFurnitureResidency_ &&
+       bellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near &&
+       horde::scene::HasBellwetherFurnitureRuntime(root)) {
+        bellwetherFurnitureTransitions_=true;
+        bellwetherFurnitureResidency_=true;
+        bellwetherFurnitureWarmStart_=true;
+    }
     const auto swordDirectory = root / "models/weapons/runtime";
     const auto torchDirectory = root / "models/props/runtime";
     const auto playerTorchDirectory = root / "models/props/runtime/player-rag-torch";
@@ -3260,12 +4227,12 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         !(playerUtilityCandidateAsset_.empty() ? playerRenderSlot_.LoadAsset(
             (playerDirectory / "gothic-traveller-lod0.runtime.glb").string(), diagnostic) :
             playerRenderSlot_.LoadUtilityCandidateAsset(playerUtilityCandidateAsset_,diagnostic)) ||
-        !horde::scene::assets::AssetManifest::Load(
+        (!developmentRescueJourney_ && (!horde::scene::assets::AssetManifest::Load(
             dielectricDirectory / "asset.manifest.json",
             dielectricManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
             dielectricDirectory / "closed-glass-lod0.runtime.glb",
-            dielectricManifest, productionDielectricFixtureAsset_, diagnostic) ||
+            dielectricManifest, productionDielectricFixtureAsset_, diagnostic))) ||
         !horde::scene::assets::AssetManifest::Load(
             chestBaseDirectory / "asset.manifest.json", chestBaseManifest, diagnostic) ||
         !horde::scene::assets::StaticMeshAsset::Load(
@@ -3320,6 +4287,40 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
     healingFlaskAsset_ = std::move(healingFlaskCandidate);
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_)
     {
+        const auto roadStoneDirectory = root / "models/world/runtime/bellwether-loose-road-stone-v1";
+        horde::scene::assets::AssetManifest roadStoneManifest;
+        if (!horde::scene::assets::AssetManifest::Load(roadStoneDirectory / "asset.manifest.json",
+                roadStoneManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(roadStoneDirectory / "loose-road-stone.glb",
+                roadStoneManifest, roadStoneAsset_, diagnostic)) return false;
+        if (!jointPropAssetAdmitted(roadStoneAsset_)) {
+            diagnostic = "The Bellwether road stone requires one opaque untextured primitive and material.";
+            return false;
+        }
+        const auto millDirectory = root / "models/world/runtime/bellwether-tavern-v1";
+        horde::scene::assets::AssetManifest millDriveManifest;
+        horde::scene::assets::AssetManifest millWaterwheelManifest;
+        horde::scene::assets::AssetManifest privyRagManifest;
+        if (!horde::scene::assets::AssetManifest::Load(millDirectory / "mill-bench-drive.manifest.json",
+                millDriveManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-bench-drive.glb",
+                millDriveManifest, millDriveAsset_, diagnostic) ||
+            !horde::scene::assets::AssetManifest::Load(millDirectory / "mill-waterwheel.manifest.json",
+                millWaterwheelManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "mill-waterwheel.glb",
+                millWaterwheelManifest, millWaterwheelAsset_, diagnostic) ||
+            !horde::scene::assets::AssetManifest::Load(millDirectory / "privy-rag.manifest.json",
+                privyRagManifest, diagnostic) ||
+            !horde::scene::assets::StaticMeshAsset::Load(millDirectory / "privy-rag.glb",
+                privyRagManifest, privyRagAsset_, diagnostic)) return false;
+        if (!jointPropAssetAdmitted(millDriveAsset_) || millDriveAsset_.indices.size() != 384u * 3u) {
+            diagnostic = "The mill bench drive requires its bounded, opaque bronze geometry.";
+            return false;
+        }
+        if (!AppendBellwetherWaterwheelGeometry(millDriveAsset_, millWaterwheelAsset_, diagnostic))
+            return false;
+        if (!ValidateBellwetherPrivyRagAsset(privyRagAsset_, diagnostic)) return false;
+        if (!LoadBellwetherStockHeads(millDirectory, stockHeadAsset_, diagnostic)) return false;
         if (!ConfigureChapterTextureAliases(gothicChestBaseAsset_, gothicChestLidAsset_,
                 rewardLanternRingAsset_, rewardLanternBodyAsset_, diagnostic)) return false;
         horde::scene::TombDressingBuildReport dressing;
@@ -3330,7 +4331,10 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::GraveyardDressingReport graveyard;
         if (!horde::scene::AppendPreparedGraveyard(root, collapseStaticAsset_, chapterTerrainSurface_, graveyard, diagnostic))
             return false;
-        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, diagnostic)) return false;
+        if (!horde::scene::AppendBellwetherShell(root, collapseStaticAsset_, chapterTerrainSurface_, diagnostic,
+                &productionDielectricFixtureAsset_, &waysideCoverAsset_, &waysideRegisterAsset_, &tavernDoorAsset_,
+                bellwetherFurnitureDetail_,bellwetherFurnitureTransitions_ ? &bellwetherFurnitureAsset_ : nullptr))
+            return false;
         horde::scene::ForestDressingBuildReport forest;
         if(SelectSharedForestGeometry()) {
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
@@ -3360,6 +4364,8 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
         horde::scene::ForestUnderstoryReport understory;
         if (!horde::scene::AppendPreparedForestUnderstory(root, collapseStaticAsset_, *chapterTerrainSurface_, understory, diagnostic))
             return false;
+        if (!horde::scene::AppendBellwetherGardenCrops(root, collapseStaticAsset_, diagnostic))
+            return false;
         horde::scene::ForestRockReport rocks;
         if (!horde::scene::AppendPreparedForestRocks(root, collapseStaticAsset_, chapterTerrainSurface_, rocks, diagnostic))
             return false;
@@ -3374,9 +4380,15 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             if(!horde::scene::PrepareForestFlaskUpgrade(roadClue,healingFlaskAsset_,*chapterTerrainSurface_,placement,diagnostic))return false;
             healingFlaskUpgradeSite_=static_cast<const horde::gameplay::healing::FlaskUpgradeSite&>(placement);
         }
-        if(SelectForestSurroundingsPrototype() &&
-           !horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
-               chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic))return false;
+        if(SelectForestSurroundingsPrototype()) {
+            auto roadEnd=horde::scene::ForestRoadEnd::Bellwether;
+#if defined(_DEBUG)
+            if(forestRouteProofMode_==ForestRouteProofMode::BakedSurroundings480)
+                roadEnd=horde::scene::ForestRoadEnd::Closed;
+#endif
+            if(!horde::scene::AppendPreparedForestSurroundings(root,*forestSharedLayout_.prepared,collapseStaticAsset_,
+                chapterTerrainSurface_,forestSurroundingsPrototype_,diagnostic,roadEnd))return false;
+        }
         // Only the explicitly selected native flask application adds furniture.
         // Ordinary public/default packages retain their previous geometry.
         if(!playerUtilityCandidateAsset_.empty()) {
@@ -3409,6 +4421,11 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             forestSharedLayout_.commonPrimitiveCount=collapseStaticAsset_.primitives.size();
 #endif
     }
+    if(bellwetherFurnitureTransitions_ &&
+       (bellwetherFurnitureAsset_.primitives.size()!=horde::scene::kBellwetherFurnitureTriangles.size() ||
+        (HORDE_RT_REGION_PAGE_PROTOTYPE && !UsesBellwetherNearPage()))) {
+        diagnostic="Bellwether furniture transitions require the isolated authored chapter profile.";return false;
+    }
     // The selected immutable quality bundle owns the geometry profile too.
     // Mobile panes are absent from the BLAS, not hidden/skipped in a shader.
     if (!SelectLanternGeometryForQuality(
@@ -3430,25 +4447,44 @@ bool PresentableTinyRtScene::LoadStaticHeldItemAssets(
             !viewmodelSkin_.ValidateStaticVertexLayout(viewmodelAsset_, diagnostic)) return false;
     }
     if (sceneProfile_ == RtSceneProfile::Showcase && developmentRescueJourney_) {
-        const auto clips=horde::scene::CompanionTurnClipBindings();
+        const auto clips=horde::scene::CompanionChapterClipBindings();
         if (!chapterActor_.Load(root / "models/characters/runtime/kit-warden-v1",
                 horde::scene::kCompanionTurnRuntimeFile, clips, diagnostic)) return false;
-        if (chapterActor_.Asset().primitives.size() != 1) {
-            diagnostic = "The bounded chapter actor requires one indexed primitive."; return false;
-        }
         for (auto& material : chapterActor_.Asset().materials) {
             material.textureGroup = 0; material.deferTextureAllocation = true;
         }
         chapterActorReady_ = true;
     }
+    if (!LoadChapterResidents(diagnostic)) return false;
+    if(bellwetherFurnitureTransitions_ && !viewmodelAvailable_) {
+        diagnostic="Bellwether furniture transitions require a modelled chapter player.";return false;
+    }
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    std::unique_ptr<horde::world::streaming::GeometryPayload> nearPage;
+    if(UsesBellwetherNearPage()) {
+        nearPage=std::make_unique<horde::world::streaming::GeometryPayload>();
+        if(!SplitBellwetherNearPage(*nearPage,diagnostic))return false;
+    }
+#endif
     if (!PackLoadedStaticAssets(staticMeshSlot_, {}, diagnostic)) return false;
+    for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+    {
+        const auto capacity = chapterResidentSources_[lane].replacementCapacity;
+        if (!capacity.vertices && !capacity.indices) continue;
+        if (!staticMeshSlot_.ReserveResidentPayloads(
+                kFirstResidentMetadataIndex + static_cast<std::uint32_t>(lane), capacity,
+                chapterResidents_[lane].replacementRanges, diagnostic))
+            return false;
+    }
     // Pin the validated full CPU source once during heavy startup. Candidate
     // reconstruction can then copy in bounded turns without rescanning meshes
     // on the normal application thread. This adds CPU payload, not GPU rows.
-    if (developmentRescueJourney_)
+    // A resident replacement scene must never restore a stale immutable copy.
+    if (developmentRescueJourney_ && std::none_of(chapterResidentSources_.begin(), chapterResidentSources_.end(),
+            [](const auto& source) { return source.replacementCapacity.vertices != 0; }))
         fullStaticGeometrySource_ = std::make_shared<const RtStaticMeshSlot>(staticMeshSlot_);
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
-    if(!PrepareRegionPageSource(diagnostic))return false;
+    if(!PrepareRegionPageSource(std::move(nearPage),diagnostic))return false;
 #endif
     const RtInstanceMetadata playerMetadata = staticMeshSlot_.InstanceMetadata()[kPlayerWorldBodyInstanceIndex];
     if (playerMetadata.primitiveCount == 0u ||
@@ -3816,7 +4852,11 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto baseLayers = selection.baseColor;
     const auto normalOrmLayers = selection.normalOrm;
     const auto aliases = selection.aliases;
-    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) : 0u;
+    static_assert(kChapterBaseColorSourceLayers.size() + 3u + kAdditionalChapterActorCapacity <=
+        kRtTextureLayerCapacity);
+    const auto residentLayers = std::count_if(chapterResidents_.begin(), chapterResidents_.end(),
+        [](const auto& resident) { return resident.hasPbrMaps; });
+    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) + residentLayers : 0u;
     if (!baseLayers.empty() &&
         (textureCounts.baseColor != baseLayers.size() + extraLayers ||
          textureCounts.normal != normalOrmLayers.size() + extraLayers ||
@@ -3842,10 +4882,13 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto kitTextureDirectory = assetDirectory.parent_path().parent_path() /
         "characters/runtime/kit-warden-v1";
     const auto addition = [&assetDirectory,&kitTextureDirectory,chapterLayout,this](const char* name) {
-        std::vector<std::string> paths;
-        if (chapterLayout) paths.push_back((assetDirectory / "chapter-terrain" / name).string());
-        if (chapterActorReady_) paths.push_back((kitTextureDirectory / name).string());
-        return paths;
+        std::vector<TextureArrayAddition> additions;
+        if (chapterLayout) additions.push_back({(assetDirectory / "chapter-terrain" / name).string(), 2u});
+        if (chapterActorReady_) additions.push_back({(kitTextureDirectory / name).string(), 1u});
+        for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
+            if (chapterResidents_[lane].hasPbrMaps)
+                additions.push_back({(chapterResidentSources_[lane].directory / name).string(), 1u});
+        return additions;
     };
     const auto emissionPath = [&](const char* name) {
         return chapterActorReady_ ? (kitTextureDirectory / name).string() : path(name);
@@ -3900,6 +4943,75 @@ bool PresentableTinyRtScene::CreateScratchBuffer(const VkDeviceSize usableSize,
     return gpuResources_.CreateAlignedBuffer(
         usableSize, scratchAddressAlignment_, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, out, diagnostic);
+}
+
+bool PresentableTinyRtScene::AppendRegisteredStaticGeometries(std::uint32_t instanceCustomIndex,
+    std::vector<VkAccelerationStructureGeometryKHR>& geometries,
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
+    std::vector<std::uint32_t>& primitiveCounts, std::string& diagnostic,
+    std::optional<std::uint32_t> onePrimitive)
+{
+    const RtInstanceMetadata instance =
+        staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
+    if(onePrimitive && *onePrimitive>=instance.primitiveCount) {
+        diagnostic="Static RT BLAS detail range is out of bounds.";return false;
+    }
+    const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
+    const auto& materialMetadata = staticMeshSlot_.Materials();
+    const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
+    const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
+    const auto end=onePrimitive ? *onePrimitive+1u : instance.primitiveCount;
+    for (std::uint32_t localIndex = onePrimitive.value_or(0u); localIndex < end; ++localIndex)
+    {
+        const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
+        const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
+        if (vertexCounts[geometryIndex] == 0u || primitive.indexCount == 0u)
+        {
+            diagnostic = "Static RT BLAS primitive has an empty geometry range.";
+            return false;
+        }
+        VkAccelerationStructureGeometryKHR geometry{
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
+        geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
+        if (primitive.materialIndex >= materialMetadata.size())
+        {
+            diagnostic = "Static RT BLAS primitive has an out-of-range material.";
+            return false;
+        }
+        const bool transmissive =
+            (materialMetadata[primitive.materialIndex].materialFlags[0] &
+             static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
+        // Transparent-shadow accumulation is not idempotent: Vulkan may
+        // otherwise report the same triangle candidate more than once.
+        // Preserve non-opaque dielectric filtering and the opaque fast path.
+        geometry.flags = transmissive
+            ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
+            : VK_GEOMETRY_OPAQUE_BIT_KHR;
+        geometry.geometry.triangles.sType =
+            VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
+        geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
+        geometry.geometry.triangles.vertexData.deviceAddress =
+            vertexBuffer.address +
+            static_cast<VkDeviceSize>(primitive.vertexOffset) *
+                sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.vertexStride =
+            sizeof(horde::scene::assets::StaticRtVertex);
+        geometry.geometry.triangles.maxVertex =
+            vertexCounts[geometryIndex] - 1u;
+        geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
+        geometry.geometry.triangles.indexData.deviceAddress =
+            staticIndexBuffer_.address +
+            static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
+        geometry.geometry.triangles.transformData.deviceAddress =
+            staticGeometryTransformBuffer_.address +
+            static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
+        geometries.push_back(geometry);
+        VkAccelerationStructureBuildRangeInfoKHR range{};
+        range.primitiveCount = primitive.indexCount / 3u;
+        ranges.push_back(range);
+        primitiveCounts.push_back(range.primitiveCount);
+    }
+    return true;
 }
 
 bool PresentableTinyRtScene::BuildProfileAccelerationStructure(
@@ -5361,68 +6473,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     finaleRoofAddressInfo.accelerationStructure = finaleRoofBlas_.handle;
     finaleRoofBlas_.address = vkGetAccelerationStructureDeviceAddressKHR_(device_, &finaleRoofAddressInfo);
 
-    const auto appendStaticGeometries = [this, &diagnostic](
-        const std::uint32_t instanceCustomIndex,
-        std::vector<VkAccelerationStructureGeometryKHR>& geometries,
-        std::vector<VkAccelerationStructureBuildRangeInfoKHR>& ranges,
-        std::vector<std::uint32_t>& primitiveCounts) {
-        const RtInstanceMetadata instance =
-            staticMeshSlot_.InstanceMetadata()[instanceCustomIndex];
-        const auto& primitiveMetadata = staticMeshSlot_.PrimitiveMetadata();
-        const auto& materialMetadata = staticMeshSlot_.Materials();
-        const auto& vertexBuffer = VertexBufferForRole(static_cast<RtGeometryRole>(instance.geometryRole));
-        const auto& vertexCounts = staticMeshSlot_.PrimitiveVertexCounts();
-        for (std::uint32_t localIndex = 0u; localIndex < instance.primitiveCount; ++localIndex)
-        {
-            const std::uint32_t geometryIndex = instance.primitiveBase + localIndex;
-            const RtPrimitiveMetadata& primitive = primitiveMetadata[geometryIndex];
-            if (vertexCounts[geometryIndex] == 0u || primitive.indexCount == 0u)
-            {
-                diagnostic = "Static RT BLAS primitive has an empty geometry range.";
-                return false;
-            }
-            VkAccelerationStructureGeometryKHR geometry{
-                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_KHR};
-            geometry.geometryType = VK_GEOMETRY_TYPE_TRIANGLES_KHR;
-            if (primitive.materialIndex >= materialMetadata.size())
-            {
-                diagnostic = "Static RT BLAS primitive has an out-of-range material.";
-                return false;
-            }
-            const bool transmissive =
-                (materialMetadata[primitive.materialIndex].materialFlags[0] &
-                 static_cast<std::uint32_t>(RtMaterialFlag::Transmission)) != 0u;
-            // Transparent-shadow accumulation is not idempotent: Vulkan may
-            // otherwise report the same triangle candidate more than once.
-            // Preserve non-opaque dielectric filtering and the opaque fast path.
-            geometry.flags = transmissive
-                ? VK_GEOMETRY_NO_DUPLICATE_ANY_HIT_INVOCATION_BIT_KHR
-                : VK_GEOMETRY_OPAQUE_BIT_KHR;
-            geometry.geometry.triangles.sType =
-                VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_GEOMETRY_TRIANGLES_DATA_KHR;
-            geometry.geometry.triangles.vertexFormat = VK_FORMAT_R32G32B32_SFLOAT;
-            geometry.geometry.triangles.vertexData.deviceAddress =
-                vertexBuffer.address +
-                static_cast<VkDeviceSize>(primitive.vertexOffset) *
-                    sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.vertexStride =
-                sizeof(horde::scene::assets::StaticRtVertex);
-            geometry.geometry.triangles.maxVertex =
-                vertexCounts[geometryIndex] - 1u;
-            geometry.geometry.triangles.indexType = VK_INDEX_TYPE_UINT32;
-            geometry.geometry.triangles.indexData.deviceAddress =
-                staticIndexBuffer_.address +
-                static_cast<VkDeviceSize>(primitive.indexOffset) * sizeof(std::uint32_t);
-            geometry.geometry.triangles.transformData.deviceAddress =
-                staticGeometryTransformBuffer_.address +
-                static_cast<VkDeviceSize>(geometryIndex) * sizeof(VkTransformMatrixKHR);
-            geometries.push_back(geometry);
-            VkAccelerationStructureBuildRangeInfoKHR range{};
-            range.primitiveCount = primitive.indexCount / 3u;
-            ranges.push_back(range);
-            primitiveCounts.push_back(range.primitiveCount);
-        }
-        return true;
+    const auto appendStaticGeometries = [this, &diagnostic](std::uint32_t id,
+        auto& geometries,auto& ranges,auto& counts,std::optional<std::uint32_t> onePrimitive={}) {
+        return AppendRegisteredStaticGeometries(id,geometries,ranges,counts,diagnostic,onePrimitive);
     };
 
     const auto buildRegisteredStaticBlas = [this, &appendStaticGeometries, &buildBlas, &diagnostic](
@@ -5430,12 +6483,12 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         const char* label,
         AccelerationStructure& accelerationStructure,
         const bool productionProp = false,
-        Buffer* retainedUpdateScratch = nullptr) {
+        Buffer* retainedUpdateScratch = nullptr, std::optional<std::uint32_t> onePrimitive = {}) {
         std::vector<VkAccelerationStructureGeometryKHR> geometries;
         std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
         std::vector<std::uint32_t> primitiveCounts;
         if (!appendStaticGeometries(
-                instanceCustomIndex, geometries, ranges, primitiveCounts))
+                instanceCustomIndex, geometries, ranges, primitiveCounts, onePrimitive))
             return false;
         VkAccelerationStructureBuildGeometryInfoKHR buildInfo{
             VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
@@ -5684,8 +6737,9 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             7u, "production reward lantern ring", rewardLanternRingBlas_, true) ||
         !buildRegisteredStaticBlas(
             8u, "production reward lantern body", rewardLanternBodyBlas_, true) ||
-        (!chapterActorReady_ && !buildRegisteredStaticBlas(
-            9u, "generic dielectric fixture", dielectricFixtureBlas_)) ||
+        !buildRegisteredStaticBlas(chapterActorReady_ ? kChapterWindowMetadataIndex : 9u,
+            chapterActorReady_ ? "Bellwether window" : "generic dielectric fixture",
+            dielectricFixtureBlas_) ||
         !buildRegisteredStaticBlas(
             kCollapseInstanceIndex, "production collapsed entry", collapseBlas_, true) ||
         !buildRegisteredStaticBlas(
@@ -5698,8 +6752,34 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
         !buildRegisteredStaticBlas(kAttackWarningMetadataIndex,
             "attack warning ring", attackWarningRingBlas_, true) ||
         !buildRegisteredStaticBlas(kHealingFlaskMetadataIndex,
-            "healing flask", healingFlaskBlas_, true))
+            "healing flask", healingFlaskBlas_, true) ||
+        (!roadStoneAsset_.primitives.empty() && !buildRegisteredStaticBlas(kRoadStoneMetadataIndex,
+            "Bellwether road stone", roadStoneBlas_, true)) ||
+        (!waysideCoverAsset_.primitives.empty() && !buildRegisteredStaticBlas(kWaysideCoverMetadataIndex,
+            "Bellwether wayside cover", waysideCoverBlas_, true)) ||
+        (!waysideRegisterAsset_.primitives.empty() && !buildRegisteredStaticBlas(kWaysideRegisterMetadataIndex,
+            "Bellwether road register", waysideRegisterBlas_, true)) ||
+        (!tavernDoorAsset_.primitives.empty() && !buildRegisteredStaticBlas(kTavernDoorMetadataIndex,
+            "Bellwether tavern door", tavernDoorBlas_, true)) ||
+        (!millDriveAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillDriveMetadataIndex,
+            "Bellwether mill bench drive", millDriveBlas_, true)) ||
+        (!millWaterwheelAsset_.primitives.empty() && !buildRegisteredStaticBlas(kMillWaterwheelMetadataIndex,
+            "Bellwether waterwheel", millWaterwheelBlas_, true)) ||
+        (!privyRagAsset_.primitives.empty() && !buildRegisteredStaticBlas(kPrivyRagMetadataIndex,
+            "Bellwether privy rag", privyRagBlas_, true)))
         return false;
+    if (!stockHeadAsset_.primitives.empty()) {
+        for (std::uint32_t kind = 0; kind < kStockHeadBlasCount; ++kind)
+            if (!buildRegisteredStaticBlas(kFirstStockHeadMetadataIndex + kind,
+                    "Bellwether stock head", stockHeadBlas_[kind], true)) return false;
+    }
+    if(bellwetherFurnitureTransitions_) {
+        const std::uint32_t firstTier=(UsesBellwetherNearPage() ||
+            (bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_)) ? 1u : 0u;
+        for(std::uint32_t tier=firstTier;tier<bellwetherFurnitureBlas_.size();++tier)
+            if(!buildRegisteredStaticBlas(kBellwetherFurnitureLane,"Bellwether furniture",
+                bellwetherFurnitureBlas_[tier],true,nullptr,tier-(UsesBellwetherNearPage()?1u:0u)))return false;
+    }
     if (attackWarningRingBlas_.handle == VK_NULL_HANDLE || attackWarningRingBlas_.address == 0u ||
         healingFlaskBlas_.handle == VK_NULL_HANDLE || healingFlaskBlas_.address == 0u) {
         diagnostic = "Joint warning/flask BLAS owners are unavailable before TLAS construction.";
@@ -6033,11 +7113,16 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     // One third-lane AS allocation can be rebuilt for either compatible owner.
     // Size for both layouts up front; UPDATE is only used within an owner.
     if (chapterActorReady_) {
-        auto geometry = ChapterActorGeometry();
-        auto build = lichBuildInfo; build.pGeometries = &geometry;
-        const std::uint32_t count = static_cast<std::uint32_t>(chapterActor_.Asset().indices.size() / 3u);
+        RtIndexedActorGeometry actorGeometry;
+        if (!actorGeometry.Resolve(staticMeshSlot_, CharacterRenderSlot::kKeeperMetadataIndex,
+                chapterActor_.Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+            return false;
+        auto build = lichBuildInfo;
+        build.geometryCount = static_cast<std::uint32_t>(actorGeometry.Geometries().size());
+        build.pGeometries = actorGeometry.Geometries().data();
         VkAccelerationStructureBuildSizesInfoKHR sizes{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR};
-        vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR, &build, &count, &sizes);
+        vkGetAccelerationStructureBuildSizesKHR_(device_, VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR,
+            &build, actorGeometry.TriangleCounts().data(), &sizes);
         lichSizes.accelerationStructureSize = std::max(lichSizes.accelerationStructureSize, sizes.accelerationStructureSize);
         lichSizes.buildScratchSize = std::max(lichSizes.buildScratchSize, sizes.buildScratchSize);
         lichSizes.updateScratchSize = std::max(lichSizes.updateScratchSize, sizes.updateScratchSize);
@@ -6201,6 +7286,50 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
             static_cast<std::uint32_t>(forestSharedLayout_.supplementalPlacements.size());
     }else
         tlasInstanceCount_=kOrdinaryTlasInstanceCount;
+    if (roadStoneBlas_.address)
+        ApplyRoadStoneInstance(instances[tlasInstanceCount_++], {});
+    if (waysideCoverBlas_.address)
+        ApplyHingedPropInstance(instances[tlasInstanceCount_++], horde::gameplay::bellwether::ArchivePose{},
+            kWaysideCoverMetadataIndex, waysideCoverBlas_.address);
+    if (waysideRegisterBlas_.address)
+        ApplyWaysideRegisterInstance(instances[tlasInstanceCount_++], true);
+    if (tavernDoorBlas_.address)
+        ApplyHingedPropInstance(instances[tlasInstanceCount_++], horde::gameplay::bellwether::TavernDoor::PoseAt(1.f),
+            kTavernDoorMetadataIndex, tavernDoorBlas_.address);
+    if (chapterActorReady_)
+        ApplyChapterWindowInstance(instances[tlasInstanceCount_++], false);
+    if (!BuildChapterResidentStructures(diagnostic) ||
+        !PrepareChapterResidents({}, std::span(instances).subspan(tlasInstanceCount_,
+            chapterResidentSources_.size()), {}, diagnostic, nullptr)) return false;
+    tlasInstanceCount_ += static_cast<std::uint32_t>(chapterResidentSources_.size());
+    if (millDriveBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_++];
+        ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
+            horde::gameplay::traversal::kMillDriveMount, 0.f), kMillDriveMetadataIndex, millDriveBlas_.address);
+        instance.mask = 0u;
+    }
+    if (millWaterwheelBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_];
+        if (!ApplyMillWaterwheelInstance(instance, 0.f, diagnostic)) return false;
+        ++tlasInstanceCount_;
+    }
+    if (privyRagBlas_.address) {
+        auto& instance = instances[tlasInstanceCount_];
+        if (!ApplyPrivyRagInstance(instance, horde::gameplay::bellwether::PrivyRagState::Available,
+                diagnostic)) return false;
+        ++tlasInstanceCount_;
+    }
+    const auto stockCount = StockHeadInstanceCount();
+    if (stockCount) {
+        if (!ApplyStockHeadInstances(std::span(instances).subspan(tlasInstanceCount_, stockCount), {}, diagnostic))
+            return false;
+        tlasInstanceCount_ += stockCount;
+    }
+    if(bellwetherFurnitureTransitions_) {
+        activeBellwetherFurnitureDetail_=(bellwetherFurnitureResidency_ && !bellwetherFurnitureWarmStart_) ?
+            horde::scene::BellwetherFurnitureDetail::Far : horde::scene::BellwetherFurnitureDetail::Near;
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
+    }
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!viewmodelAvailable_ || kProductionPlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel){
         diagnostic="Region-page lane admission requires the real modelled player profile.";return false;
@@ -6211,6 +7340,8 @@ bool PresentableTinyRtScene::BuildAccelerationStructures(std::string& diagnostic
     for(std::size_t i=9;i<=16;++i)instances[i].mask=initialPlayerMasks.instanceMasks[i];
     instances[kPlayerWorldBodyInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerWorldBodyInstanceIndex];
     instances[kPlayerViewmodelInstanceIndex].mask=initialPlayerMasks.instanceMasks[kPlayerViewmodelInstanceIndex];
+    if(UsesBellwetherNearPage())
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
     auto initialMetadata=staticMeshSlot_.InstanceMetadata();
     horde::world::streaming::GeometryPageTable initialTable;
     if(!ApplyRegionPage(instances,initialMetadata,initialTable,diagnostic))return false;
@@ -7012,6 +8143,138 @@ bool PresentableTinyRtScene::CreateBundleStrategySbt(
     return true;
 }
 
+#if defined(_DEBUG)
+bool PresentableTinyRtScene::DebugHasRecordedInstance(std::uint32_t customIndex) const noexcept {
+    return tlasInstanceDefinitionsValid_ && std::any_of(tlasBuiltInstances_.begin(),
+        tlasBuiltInstances_.begin()+tlasInstanceCount_,[customIndex](const auto& instance) {
+            return instance.mask && instance.accelerationStructureReference && instance.instanceCustomIndex==customIndex;
+        });
+}
+
+std::optional<horde::scene::BellwetherFurnitureDetail>
+PresentableTinyRtScene::DebugRecordedBellwetherFurnitureDetail() const noexcept {
+    if(!bellwetherFurnitureTransitions_ || !tlasInstanceDefinitionsValid_)return {};
+    const auto& instance=tlasBuiltInstances_[kBellwetherFurnitureLane];
+    if(instance.instanceCustomIndex!=kBellwetherFurnitureLane || instance.mask!=0x01u ||
+       !instance.accelerationStructureReference)return {};
+    for(std::size_t tier=0;tier<bellwetherFurnitureBlas_.size();++tier)
+        if(instance.accelerationStructureReference==BellwetherFurnitureBlasAddress(tier))
+            return static_cast<horde::scene::BellwetherFurnitureDetail>(tier);
+    return {};
+}
+#endif
+
+bool PresentableTinyRtScene::PrepareBellwetherFurnitureLifetime(const RtSceneFrameInputs& frame,
+    bool (*retireReferences)(void*,std::string&),void* user,std::string& diagnostic)
+{
+    if(!bellwetherFurnitureResidency_)return true;
+    if(!bellwetherFurnitureTransitions_ || !ready_ || !tlasInstanceDefinitionsValid_ ||
+       tlasPendingDefinitionsValid_) {
+        diagnostic="Bellwether residency requires the completed furniture TLAS owner.";return false;
+    }
+    const bool validPosition=std::isfinite(frame.cameraX) && std::isfinite(frame.cameraZ);
+    const float distance=horde::scene::BellwetherFurnitureRoomDistanceSquared(frame.cameraX,frame.cameraZ);
+    constexpr float prepareRadius=9.f,retireRadius=11.f;
+    const bool prepare=validPosition && distance<=prepareRadius*prepareRadius;
+    const bool retire=validPosition && distance>retireRadius*retireRadius;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage())
+        return AdvanceBellwetherNearPage(prepare,retire,frame.tickIndex,retireReferences,user,diagnostic);
+#endif
+    auto& near=bellwetherFurnitureBlas_.front();
+    auto& lifetime=bellwetherFurnitureLifetime_;
+    const RtGpuWorkApi work{device_,queue_,commandPool_};
+    if(bellwetherNearBuild_.submitted) {
+        const bool alreadyUnproved=bellwetherNearBuild_.completionUnproved;
+        switch(PollRtGpuWork(work,bellwetherNearBuild_,diagnostic)) {
+        case RtGpuWorkStatus::Complete:
+            DestroyBuffer(bellwetherNearBuildScratch_);
+            near=std::exchange(bellwetherNearCandidate_,{});
+            ++lifetime.restorations;
+            break;
+        case RtGpuWorkStatus::Unproved:
+            if(!alreadyUnproved)++lifetime.preparationFailures;
+            [[fallthrough]];
+        case RtGpuWorkStatus::Pending:
+            diagnostic.clear();return true;
+        case RtGpuWorkStatus::Empty:
+            diagnostic="Bellwether near-build state lost its queue owner.";return false;
+        }
+    }
+    if(near.address && retire) {
+        const auto stillReferenced=[&](const auto& instance) {
+            return instance.accelerationStructureReference==near.address;
+        };
+        // The newest submitted TLAS must already use the coarse owner. The
+        // platform fence and command resets then retire all older references.
+        if(std::any_of(tlasBuiltInstances_.begin(),tlasBuiltInstances_.end(),stillReferenced))return true;
+        if(!retireReferences || !retireReferences(user,diagnostic)) {
+            if(diagnostic.empty())diagnostic="Bellwether near BLAS retirement lost its command-reference proof.";
+            return false;
+        }
+        lifetime.retiredAllocationBytes=near.backing.allocationSize;
+        DestroyAccelerationStructure(near);
+        ++lifetime.retirements;
+    }
+    if(near.address || !prepare || frame.tickIndex<bellwetherNearRetryTick_)return true;
+    std::vector<VkAccelerationStructureGeometryKHR> geometry;
+    std::vector<VkAccelerationStructureBuildRangeInfoKHR> ranges;
+    std::vector<std::uint32_t> counts;
+    if(!AppendRegisteredStaticGeometries(kBellwetherFurnitureLane,geometry,ranges,counts,diagnostic,0u))
+        return false;
+    const bool started=BuildProfileAccelerationStructure(geometry,ranges,VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR,
+        VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR,bellwetherNearCandidate_,
+        &bellwetherNearBuildScratch_,diagnostic,nullptr,&bellwetherNearBuild_);
+    lifetime.preparationPeakBytes=std::max(lifetime.preparationPeakBytes,
+        bellwetherNearCandidate_.backing.allocationSize+bellwetherNearBuildScratch_.allocationSize);
+    if(!started) {
+        ++lifetime.preparationFailures;
+        if(!bellwetherNearBuild_.submitted) {
+            DestroyAccelerationStructure(bellwetherNearCandidate_);
+            DestroyBuffer(bellwetherNearBuildScratch_);
+            bellwetherNearRetryTick_=frame.tickIndex+60u;
+        }
+        // Keep the coarse tier active even while an unproved submit stays owned.
+        diagnostic.clear();
+    }
+    return true;
+}
+
+VkDeviceAddress PresentableTinyRtScene::BellwetherFurnitureBlasAddress(std::size_t tier) const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage() && tier==0)return regionPageOwner_.blas.address;
+#endif
+    return bellwetherFurnitureBlas_[tier].address;
+}
+
+VkDeviceSize PresentableTinyRtScene::BellwetherNearBlasBytes() const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage())return regionPageOwner_.blas.backing.allocationSize;
+#endif
+    return bellwetherFurnitureBlas_.front().backing.allocationSize;
+}
+
+VkDeviceSize PresentableTinyRtScene::BellwetherNearGeometryBytes() const noexcept {
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
+    if(UsesBellwetherNearPage()) {
+        VkDeviceSize bytes=0;
+        for(const auto& buffer:regionPageOwner_.buffers)bytes+=buffer.allocationSize;
+        return bytes;
+    }
+#endif
+    return 0;
+}
+
+void PresentableTinyRtScene::ApplyBellwetherFurnitureInstance(VkAccelerationStructureInstanceKHR& instance,
+    horde::scene::BellwetherFurnitureDetail detail) const noexcept {
+    instance={};
+    instance.transform={{{1,0,0,0},{0,1,0,0},{0,0,1,0}}};
+    instance.instanceCustomIndex=kBellwetherFurnitureLane;
+    instance.mask=0x01u;
+    instance.flags=VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference=BellwetherFurnitureBlasAddress(static_cast<std::size_t>(detail));
+}
+
 void PresentableTinyRtScene::ApplyGlassFixtureVisibility(
     std::span<VkAccelerationStructureInstanceKHR> instances) const
 {
@@ -7284,32 +8547,6 @@ void PresentableTinyRtScene::ApplyKeeperTorchBodyInstances(
     }
 }
 
-bool PresentableTinyRtScene::PackPlayerWorldBodyPoseUpload(
-    std::string& diagnostic, RtSceneRecordObservation* observation)
-{
-    const auto& skinned = playerRenderSlot_.UniqueVertices();
-    const auto& skinnedTangents = playerRenderSlot_.UniqueTangents();
-    if (skinned.size() != productionPlayerAsset_.vertices.size() ||
-        skinnedTangents.size() != skinned.size() ||
-        skinnedPlayerUpload_.size() != skinned.size())
-    {
-        diagnostic = "Skinned player pose/tangent frame does not match its static-PBR vertex stream.";
-        return false;
-    }
-    RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
-    // LoadStaticHeldItemAssets installs the immutable uv0/template fields once.
-    // Each solved pose replaces all four components of every dynamic field.
-    for (std::size_t vertex = 0u; vertex < skinned.size(); ++vertex)
-    {
-        std::copy_n(skinned[vertex].position, 4u, skinnedPlayerUpload_[vertex].position.begin());
-        std::copy_n(skinned[vertex].normal, 4u, skinnedPlayerUpload_[vertex].normal.begin());
-        std::copy_n(skinnedTangents[vertex].tangent, 4u, skinnedPlayerUpload_[vertex].tangent.begin());
-    }
-    poseCopyScope.Complete(1u, skinnedPlayerUpload_.size() *
-        sizeof(horde::scene::assets::StaticRtVertex), 1u);
-    return true;
-}
-
 bool PresentableTinyRtScene::ApplyHealingFlaskInstances(
     std::span<VkAccelerationStructureInstanceKHR> instances,const RtSceneFrameInputs& frame,
     const horde::gameplay::items::HeldItemTransform& carriedWorldFromItem,std::string& diagnostic) const
@@ -7340,6 +8577,135 @@ bool PresentableTinyRtScene::ApplyHealingFlaskInstances(
     const auto pickup=make(frame.healingFlaskUpgradeWorldFromItem,frame.healingFlaskUpgradeVisible);
     instances[kHealingFlaskInstanceIndex]=carried;instances[kHealingFlaskUpgradeInstanceIndex]=pickup;
     diagnostic.clear();return true;
+}
+
+void PresentableTinyRtScene::ApplyRoadStoneInstance(VkAccelerationStructureInstanceKHR& instance,
+    const horde::gameplay::dialogue::CompanionSnapshot& companion) const
+{
+    const auto& transform = horde::gameplay::dialogue::BellwetherRoadStoneWorldFromModel(companion);
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t column = 0; column < 4; ++column)
+            instance.transform.matrix[row][column] = transform[row * 4 + column];
+    instance.instanceCustomIndex = kRoadStoneMetadataIndex;
+    instance.mask = 0x01u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = roadStoneBlas_.address;
+}
+
+void PresentableTinyRtScene::ApplyWaysideRegisterInstance(VkAccelerationStructureInstanceKHR& instance,
+    const bool visible) const
+{
+    instance.transform = {{{1.f, 0.f, 0.f, 0.f}, {0.f, 1.f, 0.f, 0.f}, {0.f, 0.f, 1.f, 0.f}}};
+    instance.instanceCustomIndex = kWaysideRegisterMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = waysideRegisterBlas_.address;
+}
+
+void PresentableTinyRtScene::ApplyHingedPropInstance(VkAccelerationStructureInstanceKHR& instance,
+    const horde::gameplay::traversal::HingedYawPose& pose, std::uint32_t metadataIndex, VkDeviceAddress address)
+{
+    ApplyRigidPropInstance(instance, pose.worldFromModel, metadataIndex, address);
+}
+
+void PresentableTinyRtScene::ApplyRigidPropInstance(VkAccelerationStructureInstanceKHR& instance,
+    const std::array<float, 12>& worldFromModel, std::uint32_t metadataIndex, VkDeviceAddress address)
+{
+    for (std::size_t row = 0; row < 3; ++row)
+        for (std::size_t column = 0; column < 4; ++column)
+            instance.transform.matrix[row][column] = worldFromModel[row * 4 + column];
+    instance.instanceCustomIndex = metadataIndex;
+    instance.mask = 0x01u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = address;
+}
+
+bool PresentableTinyRtScene::ApplyStockHeadInstances(std::span<VkAccelerationStructureInstanceKHR> instances,
+    const horde::gameplay::bellwether::StockHeadPoses& poses, std::string& diagnostic) const
+{
+    using namespace horde::gameplay::bellwether;
+    for (std::size_t i = 0; i < poses.size(); ++i) {
+        if (!std::isfinite(poses[i].yawRadians) || !std::isfinite(poses[i].pitchRadians)) {
+            diagnostic = "Bellwether stock head pose must be finite.";
+            return false;
+        }
+        const auto kind = static_cast<std::uint32_t>(kStockHeadKinds[i]);
+        ApplyRigidPropInstance(instances[i], StockHeadWorldFromModel(i, poses[i]),
+            kFirstStockHeadMetadataIndex + kind, stockHeadBlas_[kind].address);
+    }
+    return true;
+}
+
+bool PresentableTinyRtScene::ApplyMillWaterwheelInstance(VkAccelerationStructureInstanceKHR& instance,
+    const float angleRadians, std::string& diagnostic) const
+{
+    const auto transform = BellwetherWaterwheelWorldFromModel(angleRadians);
+    if (!transform || millWaterwheelBlas_.address == 0u)
+    {
+        diagnostic = "Bellwether waterwheel requires a finite angle and a built immutable BLAS.";
+        return false;
+    }
+    for (std::size_t row = 0u; row < 3u; ++row)
+        for (std::size_t column = 0u; column < 4u; ++column)
+            instance.transform.matrix[row][column] = (*transform)[row * 4u + column];
+    instance.instanceCustomIndex = kMillWaterwheelMetadataIndex;
+    instance.mask = 0x01u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = millWaterwheelBlas_.address;
+    diagnostic.clear();
+    return true;
+}
+
+bool PresentableTinyRtScene::ApplyPrivyRagInstance(VkAccelerationStructureInstanceKHR& instance,
+    const horde::gameplay::bellwether::PrivyRagState state, std::string& diagnostic) const
+{
+    if (privyRagBlas_.address == 0u)
+    {
+        diagnostic = "Bellwether privy rag requires its registered immutable BLAS.";
+        return false;
+    }
+    std::array<float, 3u> position = horde::gameplay::bellwether::kPrivyRagBasket;
+    bool visible = true;
+    switch (state)
+    {
+    case horde::gameplay::bellwether::PrivyRagState::Available:
+        break;
+    case horde::gameplay::bellwether::PrivyRagState::Carried:
+        visible = false;
+        break;
+    case horde::gameplay::bellwether::PrivyRagState::Delivered:
+        position = horde::gameplay::bellwether::kPrivyRagShelf;
+        break;
+    default:
+        diagnostic = "Bellwether privy rag snapshot has an invalid state.";
+        return false;
+    }
+    if (std::any_of(position.begin(), position.end(), [](const float coordinate) {
+            return !std::isfinite(coordinate);
+        }))
+    {
+        diagnostic = "Bellwether privy rag anchors must be finite world coordinates.";
+        return false;
+    }
+    instance.transform = {{{1.f, 0.f, 0.f, position[0]},
+                           {0.f, 1.f, 0.f, position[1]},
+                           {0.f, 0.f, 1.f, position[2]}}};
+    instance.instanceCustomIndex = kPrivyRagMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = privyRagBlas_.address;
+    diagnostic.clear();
+    return true;
+}
+
+void PresentableTinyRtScene::ApplyChapterWindowInstance(VkAccelerationStructureInstanceKHR& instance,
+                                                        bool visible) const
+{
+    instance.transform = {{{1.f, 0.f, 0.f, 0.f}, {0.f, 1.f, 0.f, 0.f}, {0.f, 0.f, 1.f, 0.f}}};
+    instance.instanceCustomIndex = kChapterWindowMetadataIndex;
+    instance.mask = visible ? 0x01u : 0u;
+    instance.flags = VK_GEOMETRY_INSTANCE_TRIANGLE_FACING_CULL_DISABLE_BIT_KHR;
+    instance.accelerationStructureReference = dielectricFixtureBlas_.address;
 }
 
 bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffer,
@@ -7384,6 +8750,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const bool glassFixtureVisible =
         glassEnabled_ && clampedTuning.glassFixtureVisible &&
         !clampedTuning.productionRewardPropsVisible;
+    // The exterior retains the pane for secondary rays and arbitrary view
+    // reversals. The enclosed tomb has no path to this contributor.
+    const bool chapterWindowVisible = chapterActorReady_ && glassEnabled_ &&
+        frame.zone == horde::gameplay::ShowcaseZone::Outside;
     if (chapterActorReady_ && glassFixtureVisible) {
         diagnostic = "The freestanding glass fixture belongs to the separate RT Lab preview, not the chapter scene.";
         return false;
@@ -7450,7 +8820,7 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         gothicChestLidBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternRingBlas_.handle == VK_NULL_HANDLE ||
         rewardLanternBodyBlas_.handle == VK_NULL_HANDLE ||
-        (!chapterActorReady_ && dielectricFixtureBlas_.handle == VK_NULL_HANDLE) ||
+        dielectricFixtureBlas_.handle == VK_NULL_HANDLE ||
         collapseBlas_.handle == VK_NULL_HANDLE ||
         playerBodyBlas_.handle == VK_NULL_HANDLE || playerLimbBlas_.handle == VK_NULL_HANDLE ||
         skinnedPlayerBlas_.handle == VK_NULL_HANDLE ||
@@ -7766,10 +9136,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             diagnostic="Rescue rope rig mapping rejected nonfinite authority.";return false;
         }
         if (!(utilitySample ? playerRenderSlot_.PrepareUtilityCandidatePose(rigAnimation,*utilitySample,frame.tickIndex,
-                                           playerCpuSkinCadence_,updateSkinnedPlayer,diagnostic,observation) :
+                                           playerCpuSkinCadence_,updateSkinnedPlayer,diagnostic,observation,
+                                           &skinnedPlayerUpload_) :
               playerRenderSlot_.PreparePose(rigAnimation, frame.tickIndex,
                                            playerCpuSkinCadence_, updateSkinnedPlayer,
-                                           diagnostic, observation)))
+                                           diagnostic, observation, &skinnedPlayerUpload_)))
             return false;
         if (updateSkinnedPlayer)
         {
@@ -7784,8 +9155,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         }
         if (updateSkinnedPlayer)
         {
-            if (!PackPlayerWorldBodyPoseUpload(diagnostic, observation))
-                return false;
             const VkDeviceSize playerOffset =
                 static_cast<VkDeviceSize>(playerStaticVertexBase_) *
                 sizeof(horde::scene::assets::StaticRtVertex);
@@ -7801,37 +9170,22 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         updateViewmodel = usesViewmodel && (updateSkinnedPlayer || !viewmodelPoseCurrent_);
         if (updateViewmodel)
         {
+            viewmodelPoseCurrent_ = false;
+            if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
             const auto viewSkinBegin = std::chrono::steady_clock::now();
             RtSceneStageScope viewSkinScope(observation, horde::telemetry::RtStage::PlayerSkin);
             RtSceneStageScope viewVerticesScope(observation, horde::telemetry::RtStage::ViewmodelVertices);
-            if (!viewmodelSkin_.SkinPlayerPoseUniqueTextured(playerRenderSlot_.SolvedPose(),
-                    viewmodelPoseVertices_, viewmodelPoseTangents_, diagnostic))
+            if (!viewmodelSkin_.SkinPlayerPoseStaticPbr(playerRenderSlot_.SolvedPose(), viewmodelUpload_, diagnostic))
             {
                 viewSkinScope.Cancel();
                 viewVerticesScope.Cancel();
                 return false;
             }
-            viewVerticesScope.Complete(1u,0u,viewmodelPoseVertices_.size());
+            viewVerticesScope.Complete(1u, 0u, viewmodelUpload_.size());
             viewSkinScope.Complete(1u);
             playerSkinTotalMilliseconds_ += std::chrono::duration<double, std::milli>(
                 std::chrono::steady_clock::now() - viewSkinBegin).count();
             if (!updateSkinnedPlayer) ++playerSkinUpdateCount_;
-            if (viewmodelPoseVertices_.size() != viewmodelAsset_.vertices.size() ||
-                viewmodelPoseTangents_.size() != viewmodelPoseVertices_.size())
-            {
-                diagnostic = "Viewmodel skin output disagrees with its independent static-PBR stream.";
-                return false;
-            }
-            RtSceneStageScope poseCopyScope(observation, horde::telemetry::RtStage::PoseCopy);
-            if (viewmodelUpload_.empty()) viewmodelUpload_ = viewmodelAsset_.vertices;
-            for (std::size_t vertex = 0u; vertex < viewmodelUpload_.size(); ++vertex)
-            {
-                std::copy_n(viewmodelPoseVertices_[vertex].position, 4u, viewmodelUpload_[vertex].position.begin());
-                std::copy_n(viewmodelPoseVertices_[vertex].normal, 4u, viewmodelUpload_[vertex].normal.begin());
-                std::copy_n(viewmodelPoseTangents_[vertex].tangent, 4u, viewmodelUpload_[vertex].tangent.begin());
-            }
-            poseCopyScope.Complete(1u, viewmodelUpload_.size() *
-                sizeof(horde::scene::assets::StaticRtVertex), 1u);
             if (!gpuResources_.WriteBuffer(viewmodelVertexBuffer_, viewmodelUpload_.data(),
                     viewmodelUpload_.size() * sizeof(viewmodelUpload_.front()),
                     "modelled player viewmodel vertices", diagnostic, observation)) return false;
@@ -7887,6 +9241,11 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     }
 
     const bool wantCompanion = WantsChapterCompanion(frame);
+    RtIndexedActorGeometry actorGeometry;
+    if (wantCompanion &&
+        !actorGeometry.Resolve(staticMeshSlot_, CharacterRenderSlot::kKeeperMetadataIndex,
+            companionActor->Asset(), staticVertexBuffer_, staticIndexBuffer_, diagnostic))
+        return false;
     if (!wantCompanion && lichGpu.vertices.Empty()) {
         diagnostic = "Keeper vertex storage must be restored before recording its character owner.";
         return false;
@@ -7941,12 +9300,10 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lastActorPreparationPerformed_=true;
 #endif
         ObserveSkinWork(observation,companionWork);
-        const auto& metadata = staticMeshSlot_.InstanceMetadata()[CharacterRenderSlot::kKeeperMetadataIndex];
-        const auto& primitive = staticMeshSlot_.PrimitiveMetadata()[metadata.primitiveBase];
         const auto& vertices = companionActor->Asset().vertices;
         if (!gpuResources_.WriteBufferRange(staticVertexBuffer_,
-                VkDeviceSize(primitive.vertexOffset) * sizeof(vertices.front()), vertices.data(),
-                vertices.size() * sizeof(vertices.front()), "chapter actor pose", diagnostic, observation)) return false;
+                actorGeometry.VertexOffset(), vertices.data(), actorGeometry.VertexBytes(),
+                "chapter actor pose", diagnostic, observation)) return false;
         chapterActorPoseGeneration_ = frame.chapterCompanion.generation;
         chapterActorPoseSeconds_ = frame.chapterCompanion.animationSeconds;
         chapterActorWalking_ = frame.chapterCompanion.walking;
@@ -8473,6 +9830,31 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         if (!glassFixtureVisible)
             frameInstanceMetadata[9u].flags = 0u;
     }
+    if (!chapterWindowVisible)
+        frameInstanceMetadata[kChapterWindowMetadataIndex].flags = 0u;
+    if(bellwetherFurnitureTransitions_) {
+        const auto usesFurnitureLane=[](const auto& instance) {
+            return instance.mask && instance.instanceCustomIndex==kBellwetherFurnitureLane;
+        };
+        if(effectivePlayerRenderRoute!=PlayerRenderRoute::ModelledViewmodel || instances[kBellwetherFurnitureLane].mask ||
+           std::any_of(instances.begin(),instances.begin()+tlasInstanceCount_,usesFurnitureLane)) {
+            diagnostic="Bellwether furniture cannot overwrite a live player lane.";return false;
+        }
+        activeBellwetherFurnitureDetail_=horde::scene::SelectBellwetherFurnitureDetail(
+            frame.cameraX,frame.cameraZ,activeBellwetherFurnitureDetail_);
+        if(activeBellwetherFurnitureDetail_==horde::scene::BellwetherFurnitureDetail::Near &&
+           !BellwetherFurnitureBlasAddress(0)) {
+            activeBellwetherFurnitureDetail_=horde::scene::BellwetherFurnitureDetail::Mid;
+            ++bellwetherFurnitureLifetime_.deferredNearFrames;
+        }
+        ApplyBellwetherFurnitureInstance(instances[kBellwetherFurnitureLane],activeBellwetherFurnitureDetail_);
+        auto& furniture=frameInstanceMetadata[kBellwetherFurnitureLane];
+        furniture=staticMeshSlot_.InstanceMetadata()[kBellwetherFurnitureLane];
+        const auto tier=static_cast<std::uint32_t>(activeBellwetherFurnitureDetail_);
+        if(!UsesBellwetherNearPage() || tier>0)
+            furniture.primitiveBase+=tier-(UsesBellwetherNearPage()?1u:0u);
+        furniture.primitiveCount=1u;
+    }
     lastPlayerWorldBodyInstanceFlags_ = frameInstanceMetadata[kPlayerWorldBodyInstanceIndex].flags;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     horde::world::streaming::GeometryPageTable framePageTable;
@@ -8534,6 +9916,55 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
            {forestMasterBlas_[0].address,forestMasterBlas_[1].address},diagnostic))return false;
     if(UsesSharedForestRetention())
         ApplySharedForestRetentionProof(instances,frame);
+    auto chapterPropSlot = tlasInstanceCount_ - ChapterTailInstanceCount();
+    if (roadStoneBlas_.address)
+        ApplyRoadStoneInstance(instances[chapterPropSlot++], frame.chapterCompanion);
+    if (waysideCoverBlas_.address)
+        ApplyHingedPropInstance(instances[chapterPropSlot++], frame.waysideArchivePose,
+            kWaysideCoverMetadataIndex, waysideCoverBlas_.address);
+    if (waysideRegisterBlas_.address)
+        ApplyWaysideRegisterInstance(instances[chapterPropSlot++], !frame.waysideRegisterRecovered);
+    if (tavernDoorBlas_.address)
+        ApplyHingedPropInstance(instances[chapterPropSlot++], horde::gameplay::bellwether::TavernDoor::PoseAt(frame.tavernDoorOpening),
+            kTavernDoorMetadataIndex, tavernDoorBlas_.address);
+    if (chapterActorReady_)
+        ApplyChapterWindowInstance(instances[chapterPropSlot++], chapterWindowVisible);
+    const auto residentInstances = std::span(instances).subspan(chapterPropSlot, chapterResidentSources_.size());
+    std::array<RtIndexedActorGeometry, kAdditionalChapterActorCapacity> residentGeometries;
+    if (!PrepareChapterResidents(frame, residentInstances, residentGeometries, diagnostic, observation))
+        return false;
+    auto millPropSlot = chapterPropSlot + residentInstances.size();
+    if (millDriveBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_) {
+            diagnostic = "Bellwether mill-drive TLAS owner exceeds the live chapter tail.";
+            return false;
+        }
+        auto& instance = instances[millPropSlot++];
+        ApplyHingedPropInstance(instance, horde::gameplay::traversal::HingedYawPose::At(
+            horde::gameplay::traversal::kMillDriveMount, frame.millDriveAngleRadians),
+            kMillDriveMetadataIndex, millDriveBlas_.address);
+        instance.mask = frame.millDriveInstalled ? 1u : 0u;
+    }
+    if (millWaterwheelBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_ ||
+            !ApplyMillWaterwheelInstance(instances[millPropSlot++],
+                frame.millWaterwheelAngleRadians, diagnostic)) return false;
+    }
+    if (privyRagBlas_.address) {
+        if (millPropSlot >= tlasInstanceCount_ ||
+            !ApplyPrivyRagInstance(instances[millPropSlot++], frame.privyRag, diagnostic)) return false;
+    }
+    const auto stockCount = StockHeadInstanceCount();
+    if (stockCount) {
+        if (millPropSlot + stockCount > tlasInstanceCount_ ||
+            !ApplyStockHeadInstances(std::span(instances).subspan(millPropSlot, stockCount), frame.stockHeadPoses,
+                diagnostic)) return false;
+        millPropSlot += stockCount;
+    }
+    if (millPropSlot != tlasInstanceCount_) {
+        diagnostic = "Bellwether chapter TLAS tail does not match its submitted dynamic owners.";
+        return false;
+    }
     lastInstanceMasks_={};
     for(std::size_t i=0;i<tlasInstanceCount_;++i)lastInstanceMasks_[i]=instances[i].mask;
     if (!WriteDustQuality(*quality, frame, diagnostic, observation) ||
@@ -8660,9 +10091,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
                                  nullptr);
         });
 
-    const std::array<bool, 7u> requestedBlasWork{{
+    static_assert(kRtDynamicBlasWorkCapacity == 7u + kAdditionalChapterActorCapacity);
+    std::array<bool, kRtDynamicBlasWorkCapacity> requestedBlasWork{{
         updateRescueWorldBlas, updateSkinnedPlayer, updateSkeletonPose0,
         updateSkeletonPose1, updateLich, updateViewmodel, updateWaterDropletBlas}};
+    for (std::size_t lane = 0; lane < residentInstances.size(); ++lane)
+        requestedBlasWork[7u + lane] = residentInstances[lane].mask && chapterResidents_[lane].needsRefit;
     const std::uint64_t blasWorkInvocationCount = static_cast<std::uint64_t>(
         std::count(requestedBlasWork.begin(), requestedBlasWork.end(), true));
     RtSceneStageScope blasRefitScope(
@@ -8772,7 +10206,6 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichGeometry.geometry.triangles.vertexStride = sizeof(horde::scene::TexturedSkinnedRtVertex);
         lichGeometry.geometry.triangles.maxVertex = static_cast<std::uint32_t>(lichSkinnedVertices_.size() - 1u);
         lichGeometry.geometry.triangles.indexType = VK_INDEX_TYPE_NONE_KHR;
-        if (thirdActorIsCompanion_) lichGeometry = ChapterActorGeometry();
         VkAccelerationStructureBuildGeometryInfoKHR lichUpdateInfo{VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
         lichUpdateInfo.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
         lichUpdateInfo.flags = VK_BUILD_ACCELERATION_STRUCTURE_PREFER_FAST_TRACE_BIT_KHR | VK_BUILD_ACCELERATION_STRUCTURE_ALLOW_UPDATE_BIT_KHR;
@@ -8782,8 +10215,12 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
         lichUpdateInfo.geometryCount = 1u;
         lichUpdateInfo.pGeometries = &lichGeometry;
         lichUpdateInfo.scratchData.deviceAddress = lichBlasUpdateScratch_.AlignedAddress();
+        if (thirdActorIsCompanion_) {
+            actorGeometry.Record(commandBuffer, vkCmdBuildAccelerationStructuresKHR_, lichUpdateInfo);
+            return;
+        }
         VkAccelerationStructureBuildRangeInfoKHR lichRange{};
-        lichRange.primitiveCount = static_cast<std::uint32_t>(thirdActorIsCompanion_ ? chapterActor_.Asset().indices.size() / 3u : lichSkinnedVertices_.size() / 3u);
+        lichRange.primitiveCount = static_cast<std::uint32_t>(lichSkinnedVertices_.size() / 3u);
         const VkAccelerationStructureBuildRangeInfoKHR* lichRanges[] = {&lichRange};
         vkCmdBuildAccelerationStructuresKHR_(commandBuffer, 1u, &lichUpdateInfo, lichRanges);
     };
@@ -8866,7 +10303,8 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
     const DynamicBlasToTlasDependency blasToTlasDependency =
         BuildDynamicBlasToTlasDependency({
             requestedBlasWork[0] || requestedBlasWork[1] || requestedBlasWork[5] ||
-                requestedBlasWork[6],
+                requestedBlasWork[6] || std::any_of(requestedBlasWork.begin() + 7, requestedBlasWork.end(),
+                    [](bool update) { return update; }),
             requestedBlasWork[2], requestedBlasWork[3], requestedBlasWork[4]});
     const auto recordBlasToTlasBarrier = [&]() noexcept
     {
@@ -8896,7 +10334,21 @@ bool PresentableTinyRtScene::UpdateDynamicInstances(VkCommandBuffer commandBuffe
             case 4u: recordLichBlas(); break;
             case 5u: recordPlayerBlas(kPlayerViewmodelInstanceIndex, viewmodelBlas_, viewmodelBlasUpdateScratch_); break;
             case 6u: recordWaterDropletBlas(); break;
-            default: break;
+            default: {
+                const auto lane = index - 7u;
+                auto& resident = chapterResidents_[lane];
+                VkAccelerationStructureBuildGeometryInfoKHR info{
+                    VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_GEOMETRY_INFO_KHR};
+                info.type = VK_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL_KHR;
+                info.flags = kChapterResidentBuildFlags;
+                info.mode = VK_BUILD_ACCELERATION_STRUCTURE_MODE_UPDATE_KHR;
+                info.srcAccelerationStructure = resident.blas.handle;
+                info.dstAccelerationStructure = resident.blas.handle;
+                info.scratchData.deviceAddress = resident.scratch.AlignedAddress();
+                residentGeometries[lane].Record(commandBuffer, vkCmdBuildAccelerationStructuresKHR_, info);
+                resident.refitRecorded = true;
+                break;
+            }
             }
         },
         recordBlasToTlasBarrier);
@@ -9055,7 +10507,7 @@ bool PresentableTinyRtScene::PrepareThirdActorTextureLifetimeWithApi(
        (restore && (lichBaseColor_.image || lichBaseColor_.memory || lichBaseColor_.view ||
                     lichEmissive_.image || lichEmissive_.memory || lichEmissive_.view)) ||
        keeperTextureRestoreQuarantine_[0].image || keeperTextureRestoreQuarantine_[1].image ||
-       keeperTextureUploadRecovery_.work.command || keeperTextureUploadRecovery_.staging.buffer) {
+       textureUploadRecovery_.work.command || textureUploadRecovery_.staging.buffer) {
         diagnostic="Third actor texture lifetime prerequisites are incomplete.";return false;
     }
     const auto generation=staticGeometryGeneration_,actorGeneration=chapterActorPoseGeneration_;
@@ -9073,7 +10525,7 @@ bool PresentableTinyRtScene::PrepareThirdActorTextureLifetimeWithApi(
     };
     std::array<TextureArray,2> candidate{};
     const auto reject=[&] {
-        if(staticGeometryCompletionUnproved_ || keeperTextureUploadRecovery_.work.submitted) {
+        if(staticGeometryCompletionUnproved_ || textureUploadRecovery_.work.submitted) {
             // Submitted texture upload references may still be live. The owned
             // command/fence/staging and both images stay until platform idle.
             keeperTextureRestoreQuarantine_=std::exchange(candidate,{});
@@ -9249,6 +10701,7 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
     const RtSceneFrameInputs& frame, bool (*retireReferences)(void*, std::string&),
     void* user, std::string& diagnostic, RtSceneRecordObservation* observation)
 {
+    if (!RetireReplacedChapterResidents(retireReferences, user, diagnostic)) return false;
 #if HORDE_RT_REGION_PAGE_PROTOTYPE
     if(!RetireCompletedRegionPage(retireReferences,user,diagnostic))return false;
 #endif
@@ -9268,7 +10721,7 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
         [](void* opaque, TextureArray& base, TextureArray& emission, std::string& error) {
             auto& o = *static_cast<Owner*>(opaque);
             return o.scene->CreateKeeperTexturePair(o.scene->keeperTextureDirectory_, base, emission,
-                error, &o.scene->keeperTextureUploadRecovery_, o.observation);
+                error, &o.scene->textureUploadRecovery_, o.observation);
         },
         [](void* opaque, const std::array<VkDescriptorImageInfo, 2>& images) noexcept {
             auto& scene = *static_cast<Owner*>(opaque)->scene;
@@ -9292,12 +10745,37 @@ bool PresentableTinyRtScene::PrepareThirdActorResourceLifetime(
 void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 {
     characterSlot_.NotifyFrameSubmitted();
+    for (auto& resident : chapterResidents_)
+        if (resident.refitRecorded) {
+            resident.needsRefit = false;
+            resident.refitRecorded = false;
+        }
     thirdActorNeedsBuild_ = chapterActorNeedsRefit_ = false;
     if (!tlasPendingDefinitionsValid_) return;
     thirdActorSubmittedCompanion_ = thirdActorIsCompanion_;
     tlasBuiltInstances_ = tlasPendingInstances_;
     tlasInstanceDefinitionsValid_ = true;
     tlasPendingDefinitionsValid_ = false;
+}
+
+std::uint8_t PresentableTinyRtScene::SubmittedInstanceMask(const std::uint32_t metadataIndex) const noexcept
+{
+    if (!tlasInstanceDefinitionsValid_ || metadataIndex >= kRtInstanceMetadataCapacity) return 0;
+    std::uint8_t mask = 0;
+    for (const auto& instance : std::span(tlasBuiltInstances_).first(tlasInstanceCount_))
+        if (instance.instanceCustomIndex == metadataIndex)
+            mask |= static_cast<std::uint8_t>(instance.mask);
+    return mask;
+}
+
+unsigned PresentableTinyRtScene::SubmittedStockHeadCount() const noexcept
+{
+    if (!tlasInstanceDefinitionsValid_) return 0u;
+    const auto instances = std::span(tlasBuiltInstances_).first(tlasInstanceCount_);
+    return static_cast<unsigned>(std::count_if(instances.begin(), instances.end(), [](const auto& instance) {
+        return instance.mask == 1u && instance.instanceCustomIndex >= kFirstStockHeadMetadataIndex &&
+            instance.instanceCustomIndex < kFirstStockHeadMetadataIndex + kStockHeadBlasCount;
+    }));
 }
 
 bool PresentableTinyRtScene::RecordTraceAndCopy(VkCommandBuffer commandBuffer,

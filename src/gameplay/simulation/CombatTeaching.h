@@ -29,6 +29,13 @@ struct DodgeProtectionWindow
 
 // Preserve the published stage values consumed by platform snapshots.
 enum class TutorialStage : std::uint8_t { Parry=0, Dodge=1, Complete=2, Skipped=3, Block=4, AttackFromGuard=5, Ready=6 };
+inline constexpr std::uint64_t kSkipCombatTeachingCard = std::uint64_t{1} << 63;
+
+inline bool HasCombatTeachingCard(TutorialStage stage)
+{
+    return stage == TutorialStage::Block || stage == TutorialStage::Parry ||
+           stage == TutorialStage::Dodge || stage == TutorialStage::AttackFromGuard;
+}
 // Attack category, not a widened defense window or lesson state. The presentation
 // owner maps these semantic values to neutral/yellow/red and readable text.
 enum class AttackReadability : std::uint8_t { Neutral = 0, Parryable = 1, Unblockable = 2 };
@@ -93,6 +100,8 @@ struct CombatTeachingSnapshot
     float promptOpacity = 0.0f;
     std::uint32_t practiceMisses = 0u;
     std::uint64_t generation = 1u;
+    // The low three bits contain the stage. A zero token means no modal lesson.
+    std::uint64_t cardToken = 0;
 };
 
 // Lesson state belongs to the shared owner. UI consumes this snapshot only.

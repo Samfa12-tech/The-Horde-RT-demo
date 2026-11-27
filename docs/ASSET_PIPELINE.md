@@ -90,6 +90,28 @@ GPU allocation, performance or native/owner visual acceptance.
 
 Prefer glTF/GLB for models unless a better Vulkan-friendly pipeline is chosen later.
 
+### Chapter resident actors
+
+Chapter residents can use one opaque base-color, normal and ORM set per actor.
+Keep the material links in the GLB and place one-layer, 1024-square mipmapped
+KTX2 arrays alongside it. Use the same names and Windows RGBA8 and Android ASTC
+formats as Kit's maps. With no authored AO, pack neutral occlusion into ORM R and
+preserve roughness and metallic in G and B. Use
+`tools/compile-static-texture-array.ps1` for each platform and map type.
+
+For a walking Meshy resident, `tools/author-bellwether-keeper.py` accepts a
+profile with a Bellwether asset ID and SHA-256 hashes for the original rigged
+and walking GLBs. It prepares the grounded idle, retimed walk and one-material
+manifest from those exact files. Run the native `horde_rt_skinned_character_smoke`
+with `--validate-walking-resident <resident-directory>` to import the pair of
+clips and sample the skinned pose at the existing resident asset boundary.
+
+The chapter appends each resident's maps after the terrain and Kit, in resident
+source order. Each append must match the atlas format and mip layout and its
+declared layer count. The chapter has 18 base-color layers before additional
+residents and up to 20 with both textured slots occupied. Local diagnostic
+assets still need their exact redistribution rights recorded before packaging.
+
 ## Texture direction
 
 ### Material normals and real-world texture scale (1.6.2)

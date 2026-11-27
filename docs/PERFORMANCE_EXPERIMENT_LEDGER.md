@@ -11,7 +11,151 @@
 - CPU render-entry-through-present cycles include waits; GPU intervals may include AS, trace/shading and transfer. Neither reciprocal GPU time nor nominal display refresh is playable FPS. Actual-present rates, fixed-step routes, generated-input motion and sustained ordinary play are separate evidence classes. Never add overlapping stage medians or interpolate between different APKs, OS versions, extents or profiles.
 - **Repository evidence** means committed reports, receipts, selected CSVs or images explicitly named below. **Private/local evidence** means raw material reported as retained outside Git; this documentation pass did not access or verify those private bytes. A hash/manifest is not the image or APK itself. Missing raw PNGs cannot be reconstructed from hashes or summary statistics; do not invent replacement captures or silently upgrade availability.
 
+## Bellwether 1.8 performance baseline
+
+**26 November static collision storage.** The Windows native scene inventory
+loaded the complete forest and town with 163,788 collision triangles before
+and after the change. Retained CPU support arrays fell from 11,157,976 to
+9,696,520 bytes. Static obstacle sweeps use the original triangle positions
+and the same BVH. Their unused normals accounted for the entire difference.
+The obstacle intake now charges additional faces and BVH nodes against the
+bytes previously reserved for those normals. With the current ground and
+step geometry this leaves room for 17,799 static obstacle faces. The
+measurement covers retained CPU arrays. Startup peak memory, frame time
+and sustained phone performance require separate measurements.
+
+**24 November ordinary Android arrival.** The
+[seeded-lookout touch walkthrough](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--android-touch-walkthrough-from-the-lookout-to-bellwether)
+reached the hearth through the live campaign. The staffed room held
+154 SurfaceFlinger intervals across 22.19 seconds at 33% on RayTracingPipeline.
+The display interval median was 141.67 ms, with p95 at 166.67 ms and battery
+temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
+
+**24 November ordinary Android hearth controls.** At the same position and
+graphics settings, the [stationary view comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
+recorded median display intervals of 141.67 ms facing the hearth, 108.33 ms
+facing the doorway and 141.67 ms facing the hearth again. Native GPU window
+means moved from 111.51–116.37 ms to 81.73–83.33 ms and back to 115.17 ms.
+Command-record means stayed near 24–25 ms. Turning also moved the held
+lantern. The trial bounds the cost for this position with both effects in
+play. The separate fixed-step route uses a different camera and workload.
+
+**INCONCLUSIVE (24 November): same-view Android RT backend comparison.**
+The [fresh-process controls at the hearth](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
+recorded 158.33 ms median displayed interval on the opening Pipeline run,
+129.17 ms on RayQueryCompute and 116.67 ms on the closing Pipeline run.
+Temperatures, Android thermal status and sampled GPU power limits differed.
+The original backend preference stays in place. A backend performance
+decision needs repeatable controls and equivalent ordinary-play coverage.
+
+**23 November five-resident replay.** The private Android and Windows QA
+builds share the native 60 Hz route and its twelve resident swaps. The
+[Galaxy S26 Ultra run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-five-resident-shippingmobile-round-trip)
+used Shipping/Mobile Pipeline at 33% and took 159.40 seconds. Median GPU
+time was 64.90 ms in the staffed tavern and 51.20 ms at the east fork. The
+room medians increased from 51.06 to 68.97 ms across visits.
+
+**23 November tavern stage attribution.** A [second handset run](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-tavern-gpu-stage-timings)
+used the same route and displayed graphics settings with per-stage queries
+enabled. All 2,460 frames passed the stage-to-submission join. Dispatch
+medians across the three tavern visits were 50.32, 73.51 and 67.50 ms,
+about 99% of each room's GPU interval. The actor roster, light count,
+TLAS and BLAS counts and allocations matched across all room visits.
+**DEFER (23 November): skip passage/staff-light math when inactive.**
+The [original–trial–original handset comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#23-november-2026--bellwether-inactive-local-light-trial)
+held roster, resolution and settings fixed and joined 7,394 measured frames.
+The trial had lower dispatch times, especially on the returns, but it started
+cooler and the original runs diverged as the phone warmed. The GPU reported
+different thermal power levels at the same point in the trial and closing
+control. Eight Windows capture pairs were pixel-identical. The branch uses
+the original shader bank. A repeat would need interleaved runs with comparable
+GPU thermal state and clock observations before attributing a gain.
+
+**CLOSED (24 November): first confirmed blocker in Bellwether binary shadows.**
+The [Galaxy S26 Ultra comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--bellwether-binary-shadow-traversal-trial)
+completed the two-return route in original–trial–original order with the
+same 33% Shipping/Mobile RayQueryCompute workload and matched assets.
+The trial had the slowest staffed-room dispatch on all three visits and
+the slowest sampled display cadence. The 1.8 branch retains the original
+shader bank despite a roughly 13% whole-GPU saving on the Windows route.
+The [Windows captures and route timings](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#binary-shadow-traversal-trial)
+remain useful platform-specific evidence.
+
+The five-resident Windows baseline uses optimized Debug code (`/O2 /Ob2`) to preserve the private
+fixture gates, with Shipping/High shaders and 960 × 540 trace and output
+on an RTX 5050 Laptop GPU. The executable SHA-256 is
+`00eb88034fe01220921b9672c1d6dfae46bff97745fcbb70c5f92ec9d0a7bcec`.
+Pipeline and RayQueryCompute each completed both returns in 156.94 seconds
+with 9,416 simulation ticks and zero pending ticks at peak. They recorded
+25,496 and 25,523 completed frames respectively.
+
+| Windows RT backend | Staffed room GPU median / p95 (ms) | Staffed room native cycle median / p95 (ms) | East fork simulation per tick median / p95 (ms) |
+| --- | ---: | ---: | ---: |
+| RayTracingPipeline | 2.38 / 3.87 | 5.86 / 5.91 | 2.41 / 2.71 |
+| RayQueryCompute | 2.28 / 3.67 | 5.86 / 5.92 | 2.40 / 2.78 |
+
+The hidden Windows replays establish a native timing baseline with both
+CPU changes present. Measuring each change's optimized-build gain still
+requires matched control builds. Raw runs, including the first Windows
+launch that stopped on missing private staging assets, are retained locally
+under `reports/horde-bellwether-shipping-profile-20261123-100005`.
+
+### West village timing route
+
+The five-resident west route uses the same 60 Hz clock, four-tick catch-up
+limit and successful-present join. It walks from the staffed room through
+the south door, past the relic stall and gardens to the dry stock yard.
+Each of two 24-second holds samples all three head instances and each
+animal's gesture before the return. The east route remains its own cohort.
+Use `-BellwetherWest` with the existing Windows measurement runner and its
+private five-resident campaign directory, then verify the output.
+
+```powershell
+python tools/analyze-chapter-route-measurement.py --bellwether-west-roundtrip <run-directory>
+```
+
+Android uses a separate checkpoint and CSV. Keep the APK and shader digests,
+graphics settings, thermal observations, and completed frame evidence with each
+handset run. [Android launch and retrieval](../android/README.md#west-village-round-trip)
+
+On 23 November the RTX 5050 Laptop GPU completed both returns on each backend
+in 234.88 seconds with 14,092 simulation ticks and zero peak pending ticks.
+The same optimized Debug executable used Shipping/High at 960 × 540. The
+verifier joined every GPU sample to its successful present, saw one dealer
+handoff each way on both laps, and observed the settled pose and all three
+gestures with three submitted head instances on each visit.
+
+| Windows RT backend | Joined frames | Room GPU median | Stock-yard GPU median / p95 |
+| --- | ---: | ---: | ---: |
+| RayTracingPipeline | 38,582 | 2.38 ms | 1.45 / 2.91 ms |
+| RayQueryCompute | 38,496 | 2.28 ms | 1.31 / 2.78 ms |
+
+The Windows executable SHA-256 is
+`f60fd14f10b1375ad7a80e7561dc654fcf3a1d192f4bf831cf8b6499c8699757`.
+The first attempt reached its second yard visit before the inherited
+30,000-frame limit stopped collection at 182.72 seconds. The verified west
+run uses the 240-second route clock as its bound. Raw reports and exact
+hashes are under `reports/horde-bellwether-west-timing-20261123-130910`.
+
+The signed five-resident ARM64 Debug APK at `542cd184` has SHA-256
+`b4a2bd990d4b942cee31edc96deb52341b1331d77e93141c051b3be6384c66b2`.
+It includes the west checkpoint with Shipping/Mobile and GPU-stage recording,
+the same 25 resident files and 13 voice files, and 602 passing Android tests
+with six skipped. The phone was disconnected. Physical timings remain open.
+
 ## Closed or retained rendering experiments
+
+**23 November Bellwether held-item clearance — KEEP for 1.8.** One carry reach search reuses the camera support check and sampled heights at the 64 authored tree roots. Each candidate reach still checks the same solids, trunk bounds, terrain slope and current tavern door pose. The cache ends with the search.
+
+On the RTX 5050 Laptop GPU, the hidden Windows Debug RayTracingPipeline replay at 960 × 540 ran control → candidate → control with the same shaders, resident assets and 60 Hz route. The square's median / p95 simulation time per advanced tick was 54.48 / 56.27 ms, 10.80 / 11.42 ms, and 53.35 / 57.03 ms in run order. Each replay advanced 5,232 ticks and completed two returns. Elapsed time was 101.03, 87.25 and 99.32 seconds. Peak pending simulation ticks fell from 1,436 and 1,341 in the controls to 10 in the candidate. All three final room images were byte-identical.
+
+The control and candidate executable hashes are `0c2b87bcda29a646cb380ee44446f1e95377fc0ce762b9649fb8ae9c26cbe5d4` and `a83bb18bc2e9a0f71a20747de31ced891f8f89fd0fbf1b0834870c92ac94aab2`. The five affected Windows checks passed, including a clear carry sweep between two obstructed trunk probes using the same query. Local measurements are under `reports/horde-bellwether-carry-query-20261123-093301`. Android and optimized-build gains remain to be measured.
+
+**23 November Bellwether player vertex upload — KEEP for 1.8.** The shared skinning loop writes the player body and first-person pose directly into their initialized static-PBR streams. The pose cadence, socket checks and static vertex data are preserved. The upload regression check compared all vertex bytes for both meshes across twelve walking, reverse and crouching poses.
+
+The hidden Windows Debug doorway replay ran control → candidate → control on the RTX 5050 Laptop GPU. All three runs used RayTracingPipeline, 960 × 540 dispatch and output, the same shaders and resident assets, and the same 60 Hz simulation. The first five seconds were excluded. Across the four route phases, all 4,355 measured frames skinned both streams. The candidate lowered the median combined player skin and pose-copy cost by 18.6–21.8% versus each control. In the staffed tavern, the combined median / p95 was 28.00 / 29.82 ms, 22.02 / 23.75 ms, and 27.11 / 28.61 ms in run order. The corresponding whole-cycle medians were 30.80, 24.84 and 29.90 ms. The room GPU medians stayed within 5.11–5.16 ms.
+
+The room resource peaks matched, both returns completed on every run, and the final screenshots had identical SHA-256 `e54ed99a66ba76b8a2d5f7919f29915882ad4e33a3bdcad9a67893fc1b58b3db`. The control and candidate executables were `129ef87db16ff34d646c170a79d5b18665fb9559a1d96d0e73cd40ed1780984c` and `0c2b87bcda29a646cb380ee44446f1e95377fc0ce762b9649fb8ae9c26cbe5d4`. Local evidence is retained in `reports/horde-player-direct-skin-20261123-090941`. Optimized builds, handset timings and sustained play need their own measurements.
 
 **1 November Mobile-water quality reduction — KEEP, scoped to the waterfall hitch:** [Controlled comparison and pause handoff](evidence/2026-10-31-mobile-efficiency/MOBILE_WATER.md). One APK/process, three conditioning routes then A/B/B/A, 2,844 actual-presentation joins. Spray Off improves the predefined water window by 10.0–35.7% against both controls; median intervals 91.667 ms become 62.500/54.167 ms. Whole-route rates 16.707/16.691/16.353/15.924 images/s show no broad FPS gain; closing drift −4.682% and one whole-route p95 almost +15% are borderline. Six active-contact stills inspected, not pixel parity. Mobile now omits optional droplets while water/ripples remain; High and saved tier values are preserved. Private probe removed. Final normal-policy APK completed 793 RT frames, including 28 active-contact frames on OpaqueFast. Native Android fresh/reset default aligned to the approved 33%. Four CTests, 24 Java tests, both platform builds and Android lint pass locally; no new hosted CI/LFS downloads. Phone restored/released; owner-requested pause. Future direct-light scaling is a recommendation only, not another started experiment.
 

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
@@ -70,6 +71,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -110,6 +112,10 @@ public class MainActivity extends Activity {
     private static final String PREF_CHAPTER_SUBTITLE_SIZE = "chapter_subtitle_size_percent";
     private static final String PREF_CHAPTER_SUBTITLE_POSITION = "chapter_subtitle_position";
     private static final String PREF_CHAPTER_SUBTITLE_BACKING = "chapter_subtitle_backing";
+    private static final String PREF_CHAPTER_SUBTITLE_YELLOW = "chapter_subtitle_yellow";
+    private static final String PREF_CHAPTER_SUBTITLE_BACKING_OPACITY = "chapter_subtitle_backing_opacity";
+    private static final int DEFAULT_SUBTITLE_BACKING_OPACITY = 79;
+    private static final int MIN_SUBTITLE_BACKING_OPACITY = 10;
     private static final String PREF_CHAPTER_VOICE_VOLUME = "chapter_voice_volume";
     static final int SUBTITLE_POSITION_AUTO = 0;
     static final int SUBTITLE_POSITION_TOP = 1;
@@ -259,7 +265,19 @@ public class MainActivity extends Activity {
     private static final int RESCUE_PROMPT_MASK = 7 << RESCUE_PROMPT_SHIFT;
     private static final int CONTEXTUAL_RESCUE_MODE = 1 << 9;
     private static final int CONTEXTUAL_FLASK_UPGRADE = 1 << 12;
+    private static final int CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION = 1 << 31;
     private static final int CONTEXTUAL_RAISE_OBJECTIVE = 1 << 13;
+    private static final int CONTEXTUAL_TAVERN_TALK = 1 << 14;
+    private static final int CONTEXTUAL_TAVERN_DIRECTIONS = 1 << 15;
+    private static final int CONTEXTUAL_ARCHIVE_SHIFT = 16;
+    private static final int CONTEXTUAL_ARCHIVE_MASK = 7;
+    private static final int CONTEXTUAL_MILL_TAG = 7;
+    private static final int CONTEXTUAL_RECORD_KEEPER_SHIFT = 19;
+    private static final int CONTEXTUAL_RECORD_KEEPER_MASK = 3;
+    private static final int CONTEXTUAL_TAVERN_DOOR_SHIFT = 22;
+    private static final int CONTEXTUAL_TAVERN_DOOR_MASK = 3;
+    private static final int CONTEXTUAL_RECORD_KEEPER_EXTENDED = 1 << 24;
+    private static final int CONTEXTUAL_RERAISE_OBJECTIVE = 1 << 21;
     private static final int CHEST_PROMPT_NONE = 0;
     private static final int CHEST_PROMPT_LOCKED = 1;
     private static final int CHEST_PROMPT_OPEN = 2;
@@ -285,6 +303,9 @@ public class MainActivity extends Activity {
     private final Set<AlertDialog> controllerFocusedDialogs = new HashSet<>();
     private TextView controllerPrompt;
     private TextView combatTeachingPrompt;
+    private AlertDialog combatTeachingCardDialog;
+    private long combatTeachingCardToken;
+    private long respondedCombatTeachingCard;
     private FrameLayout appRoot;
     private LinearLayout chapterSubtitlePanel;
     private ScrollView chapterSubtitleScroll;
@@ -299,6 +320,7 @@ public class MainActivity extends Activity {
     private int privateRevivalSoundId;
     private long privateRevivalAudioGeneration;
     private int chapterAmbienceStream;
+    private int kitAnkleStream;
     private boolean chapterAmbienceDialogueActive;
     private boolean chapterVoicePaused;
     private boolean chapterSubtitleOverflowReported;
@@ -565,6 +587,7 @@ public class MainActivity extends Activity {
     private String campaignDeathMessage;
     private volatile boolean campaignDestroyed;
     private String campaignTestNamespace, campaignLocalMessage;
+    private String lastCampaignTestPose = "";
     private int campaignMenuAction=CampaignMenuState.LOAD, campaignAction;
     private long campaignRequest, campaignAcknowledgedToken, campaignAcknowledgedGeneration;
     private long campaignRebaseAttemptToken, campaignRebaseAttemptGeneration, campaignRebaseAttemptRevision;
@@ -750,6 +773,7 @@ public class MainActivity extends Activity {
             if (!isMusicAudioFocusGranted()) {
                 if (menuAmbience != null) menuAmbience.stop();
                 stopChapterAmbience();
+                stopKitAnkleFoley();
                 stopPrivateLichRevivalAudio();
             }
             });
@@ -956,6 +980,45 @@ public class MainActivity extends Activity {
                 PrivateLichRevivalAudio.validatePinnedFile(new File(getFilesDir(),"private_flask/player.glb"),2719368L,
                     "56d97faeb0595a625282c3798bc40b49d7ffedd9598e2d99fd8a186acf15f014")!=null))
                 throw new IllegalStateException("Pinned flask native binding failed staging or identity verification.");
+            if (BuildConfig.BELLWETHER_RESIDENT_CANDIDATE) {
+                if (BuildConfig.BELLWETHER_COMBINED_RESIDENTS) {
+                    final String[] residents = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE
+                            ? new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager", "relic-dealer"}
+                            : new String[] {"tavern-keeper", "record-keeper", "artificer", "salvager"};
+                    for (String resident : residents) {
+                        final String prefix = "private_bellwether/" + resident + "/";
+                        for (String asset : new String[] {
+                                "asset.manifest.json", "resident.glb",
+                                "base-color.android.ktx2", "normal.android.ktx2", "orm.android.ktx2"
+                        }) {
+                            final String path = prefix + asset;
+                            if (!stageAsset(path, path))
+                                throw new IllegalStateException("Bellwether combined Debug could not stage " + path);
+                        }
+                    }
+                } else {
+                    final String specialist = BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE ? "relic-dealer/" :
+                            BuildConfig.BELLWETHER_SALVAGER_CANDIDATE ? "salvager/" :
+                            (BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE ? "artificer/" : "record-keeper/");
+                    for (String asset : new String[] {
+                            "tavern-keeper/asset.manifest.json", "tavern-keeper/resident.glb",
+                            specialist + "asset.manifest.json", specialist + "resident.glb",
+                            specialist + "base-color.android.ktx2", specialist + "normal.android.ktx2",
+                            specialist + "orm.android.ktx2"
+                    }) {
+                        final String path = "private_bellwether/" + asset;
+                        if (!stageAsset(path, path))
+                            throw new IllegalStateException("Bellwether Debug could not stage " + asset);
+                    }
+                    if (BuildConfig.BELLWETHER_TEXTURED_TAVERN_KEEPER) {
+                        for (String map : new String[] {"base-color", "normal", "orm"}) {
+                            final String path = "private_bellwether/tavern-keeper/" + map + ".android.ktx2";
+                            if (!stageAsset(path, path))
+                                throw new IllegalStateException("Bellwether Debug could not stage " + path);
+                        }
+                    }
+                }
+            }
             final boolean lichStaged = stageAsset(LICH_ASSET, LICH_FILE);
             final boolean materialsStaged = stageAsset("textures/polyhaven/mobile_1k/diff-array-512-astc6x6.ktx2", "diff-array-512-astc6x6.ktx2")
                     && stageAsset("textures/polyhaven/mobile_1k/normal-array-512-astc4x4.ktx2", "normal-array-512-astc4x4.ktx2")
@@ -1067,8 +1130,34 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb", "models/world/runtime/forest-rocks-v1/horde-rock-low_boulder.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb", "models/world/runtime/forest-rocks-v1/horde-rock-split_shelf.glb") &&
                     stageAsset("models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb", "models/world/runtime/forest-rocks-v1/horde-rock-upright_crag.glb") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v4/asset.manifest.json", "models/world/runtime/bellwether-shell-v4/asset.manifest.json") &&
-                    stageAsset("models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb", "models/world/runtime/bellwether-shell-v4/bellwether-shell-v4.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/asset.manifest.json", "models/world/runtime/bellwether-tavern-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json", "models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.glb", "models/world/runtime/bellwether-tavern-v1/privy-rag.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json", "models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/stock-heads.glb", "models/world/runtime/bellwether-tavern-v1/stock-heads.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json", "models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.glb", "models/world/runtime/bellwether-tavern-v1/garden-crops.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/window.manifest.json", "models/world/runtime/bellwether-tavern-v1/window.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-window.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-window.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod0.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod1.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb", "models/world/runtime/bellwether-tavern-v1/tavern-furniture-lod2.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb", "models/world/runtime/bellwether-tavern-v1/wayside-archive-cover.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb", "models/world/runtime/bellwether-tavern-v1/wayside-road-register.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/south-door.manifest.json", "models/world/runtime/bellwether-tavern-v1/south-door.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json", "models/world/runtime/bellwether-tavern-v1/mill-bench-drive.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb", "models/world/runtime/bellwether-tavern-v1/mill-waterwheel.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json", "models/world/runtime/bellwether-tavern-v1/mill-waterwheel.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json", "models/world/runtime/bellwether-loose-road-stone-v1/asset.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb", "models/world/runtime/bellwether-loose-road-stone-v1/loose-road-stone.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-far.glb", "models/world/runtime/forest-surroundings-v1/alder-far.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/alder-middle.glb", "models/world/runtime/forest-surroundings-v1/alder-middle.glb") &&
                     stageAsset("models/world/runtime/forest-surroundings-v1/asset.manifest.json", "models/world/runtime/forest-surroundings-v1/asset.manifest.json") &&
@@ -1298,9 +1387,12 @@ public class MainActivity extends Activity {
     }
 
     private void stopSurface() {
+        dismissCombatTeachingCard();
+        respondedCombatTeachingCard = 0;
         stopPrivateLichRevivalAudio();
         cancelOpeningBenchmarkRequest();
         stopChapterAmbience();
+        stopKitAnkleFoley();
         cancelCombatTeachingPromptPoll();
         clearCombatTeachingPrompt();
         stopMenuAmbience();
@@ -1453,7 +1545,7 @@ public class MainActivity extends Activity {
         final LookoutObjectiveState lookout=readLookoutObjective();
         if(lookout!=null && lookout.available) {
             final long menuEpoch=lookoutObjectiveEpoch;
-            addMenuButton(panel,"Lookout objective",() -> {
+            addMenuButton(panel,lookout.isLookout()?"Lookout objective":"Bellwether directions",() -> {
                 if(menuEpoch==lookoutObjectiveEpoch)showLookoutObjective(lookout);
             });
         }
@@ -1499,23 +1591,39 @@ public class MainActivity extends Activity {
 
     private void showLookoutObjective(LookoutObjectiveState expected) {
         if(!menuVisible || !controllerWindowFocused || expected==null || !expected.matches(readLookoutObjective()))return;
+        final String text;
+        try {
+            text = ProbeBridge.getLookoutObjectiveText(expected.surfaceGeneration, expected.worldGeneration, expected.objective);
+        } catch (RuntimeException | LinkageError unavailable) {return;}
+        if (text==null || text.isEmpty())return;
         // Opening is an explicit pause-menu action. No arrival poll invokes this page.
         clearTouchState();setGameplayPaused(true);
         invalidateLookoutObjective();lookoutObjectiveVisible=true;lookoutObjectiveState=expected;
         final long epoch=lookoutObjectiveEpoch;
         menuScrim.removeAllViews();
-        final LinearLayout panel=createPanel("The road ahead","FOREST LOOKOUT");
+        final boolean lookout = expected.isLookout();
+        final LinearLayout panel=lookout ? createPanel("The road ahead","FOREST LOOKOUT") :
+                createPanel("Directions","BELLWETHER");
         lookoutObjectivePanel=panel;
-        addBody(panel,"The 1.7 demo ends at the timber road closure ahead. Bellwether opens in a future chapter; this is a temporary endpoint. You can explore the lookout with Kit or return to the tomb.");
-        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,false));
+        addBody(panel,text);
+        final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,this::hideMenu));
         panel.addView(exploring,menuButtonLayoutParams());
-        addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,true));
+        if (lookout)
+            addMenuButton(panel,"Return to menu",() -> finishLookoutObjective(epoch,expected,this::returnGameplayToMainMenu));
+        else
+            addMenuButton(panel,"Back to pause menu",() -> finishLookoutObjective(epoch,expected,() -> showMainMenu(false)));
         attachPanel(panel);
         if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
         else exploring.requestFocus();
     }
 
-    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,boolean returnToMenu) {
+    private void cancelLookoutObjective() {
+        final LookoutObjectiveState shown = lookoutObjectiveState;
+        if(shown!=null)
+            finishLookoutObjective(lookoutObjectiveEpoch,shown,shown.isLookout()?this::hideMenu:() -> showMainMenu(false));
+    }
+
+    private void finishLookoutObjective(long epoch,LookoutObjectiveState expected,Runnable action) {
         if(!lookoutObjectiveVisible || epoch!=lookoutObjectiveEpoch || !resumed || !controllerWindowFocused)return;
         ViewParent owner=lookoutObjectivePanel==null?null:lookoutObjectivePanel.getParent();
         while(owner instanceof View && owner!=menuScrim)owner=owner.getParent();
@@ -1524,8 +1632,7 @@ public class MainActivity extends Activity {
             showMainMenu(false);return; // A replaced world remains paused; old UI cannot resume it.
         }
         invalidateLookoutObjective();clearTouchState();
-        if(returnToMenu) returnGameplayToMainMenu();
-        else hideMenu();
+        action.run();
     }
 
     private void returnGameplayToMainMenu() {
@@ -1680,6 +1787,7 @@ public class MainActivity extends Activity {
         startupUiVisible=false;
         invalidateLookoutObjective();
         closeBenchmarkSummaryReview();
+        benchmarkReportVisible = false;
         interfaceVisible = false;
         menuVisible = true;
         entryMenuSidePage = sidePage;
@@ -4044,9 +4152,67 @@ public class MainActivity extends Activity {
         ProbeBridge.setCombatTeachingOptions(values.enabled, values.slowdown);
     }
 
+    private void syncCombatTeachingCard(int surfaceState, boolean cardPending) {
+        final boolean playing = resumed && surfaceStarted && surfaceState == 1 &&
+                !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
+                !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
+                !deathOverlayVisible && !endingOverlayVisible;
+        if (!playing) {
+            dismissCombatTeachingCard();
+            return;
+        }
+        final long token = cardPending ? ProbeBridge.getCombatTeachingCard() : 0;
+        if (token == 0) respondedCombatTeachingCard = 0;
+        if (combatTeachingCardToken == token) return;
+        dismissCombatTeachingCard();
+        combatTeachingCardToken = token;
+        if (token == 0 || token == respondedCombatTeachingCard) return;
+
+        final int title;
+        final int body;
+        switch ((int) (token & 7)) {
+            case 4: title = R.string.combat_card_block_title; body = R.string.combat_card_block_body; break;
+            case 0: title = R.string.combat_card_parry_title; body = R.string.combat_card_parry_body; break;
+            case 1: title = R.string.combat_card_dodge_title; body = R.string.combat_card_dodge_body; break;
+            case 5: title = R.string.combat_card_attack_title; body = R.string.combat_card_attack_body; break;
+            default: return;
+        }
+        clearTouchState();
+        clearCombatTeachingPrompt();
+        final long surfaceGeneration = surfaceRequestGeneration;
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(title).setMessage(body).setCancelable(false)
+                .setPositiveButton(R.string.combat_card_continue,
+                        (owner, which) -> respondToCombatTeachingCard(token, surfaceGeneration, false))
+                .setNegativeButton(R.string.combat_teaching_skip,
+                        (owner, which) -> respondToCombatTeachingCard(token, surfaceGeneration, true))
+                .create();
+        combatTeachingCardDialog = dialog;
+        dialog.show();
+        installControllerDialog(dialog);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).requestFocus();
+    }
+
+    private void respondToCombatTeachingCard(long token, long surfaceGeneration, boolean skip) {
+        if (!resumed || surfaceRequestGeneration != surfaceGeneration ||
+                combatTeachingCardToken != token || ProbeBridge.getCombatTeachingCard() != token) return;
+        clearTouchState();
+        if (ProbeBridge.respondToCombatTeachingCard(token, skip)) respondedCombatTeachingCard = token;
+        else dismissCombatTeachingCard();
+    }
+
+    private void dismissCombatTeachingCard() {
+        combatTeachingCardToken = 0;
+        if (combatTeachingCardDialog != null) {
+            combatTeachingCardDialog.dismiss();
+            combatTeachingCardDialog = null;
+        }
+    }
+
     private boolean updateCombatTeachingPrompt(int surfaceState) {
         if (combatTeachingPrompt == null) return false;
         final long packed = ProbeBridge.getCombatTeachingState();
+        syncCombatTeachingCard(surfaceState, (packed & (1L << 59)) != 0);
         final String text = CombatTeachingPreferences.prompt(packed, controllerMode);
         final boolean attackCue = CombatTeachingPreferences.attackReadability(packed) != 0;
         final boolean practiceCue=CombatTeachingPreferences.safePractice(packed) && !CombatTeachingPreferences.lessonSuppressed(packed);
@@ -4059,6 +4225,7 @@ public class MainActivity extends Activity {
         combatAttackCueVisible = attackCue;
         combatPracticeCueVisible = practiceCue;
         final boolean allowed = resumed && surfaceStarted && surfaceState == 1 &&
+                combatTeachingCardToken == 0 &&
                 preferences.getBoolean("show_hud", true) &&
                 !menuVisible && !diagnosticsVisible && !graphicsVisible && !rtLabVisible &&
                 !playtestReportVisible && !benchmarkRunning && !debugCaptureUiSuppressed &&
@@ -4142,12 +4309,10 @@ public class MainActivity extends Activity {
         chapterSubtitleScroll.setFillViewport(true);
         chapterSubtitleScroll.setVerticalScrollBarEnabled(true);
         chapterSubtitleScroll.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
-        chapterSubtitleText = new TextView(this);
-        chapterSubtitleText.setTextColor(0xFFF2E9D8);
+        chapterSubtitleText = new OutlinedSubtitleView(this);
         chapterSubtitleText.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         chapterSubtitleText.setGravity(Gravity.CENTER);
         chapterSubtitleText.setIncludeFontPadding(true);
-        chapterSubtitleText.setShadowLayer(dp(2), 0, dp(1), 0xE6000000);
         chapterSubtitleText.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         chapterSubtitleText.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         final LinearLayout content = new LinearLayout(this);
@@ -4163,21 +4328,28 @@ public class MainActivity extends Activity {
         chapterSubtitlePanel.setVisibility(View.GONE);
         appRoot.addView(chapterSubtitlePanel, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        applyChapterSubtitleBacking();
+        applyChapterSubtitleStyle();
     }
 
-    private void applyChapterSubtitleBacking() {
+    private int chapterSubtitleBackingOpacity() {
+        return Math.max(MIN_SUBTITLE_BACKING_OPACITY, Math.min(100, GraphicsPreferences.integer(
+                preferences, PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, DEFAULT_SUBTITLE_BACKING_OPACITY)));
+    }
+
+    private void applyChapterSubtitleStyle() {
         if (chapterSubtitlePanel == null) return;
-        if (preferences != null && preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)) {
+        final boolean yellow = preferences != null &&
+                InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_YELLOW, false);
+        chapterSubtitleText.setTextColor(yellow ? 0xFFFFDF69 : 0xFFF2E9D8);
+        if (hasChapterSubtitleBacking()) {
             final GradientDrawable backing = new GradientDrawable();
-            backing.setColor(0xC9000000);
+            backing.setColor(Color.argb(Math.round(chapterSubtitleBackingOpacity() * 255f / 100f), 0, 0, 0));
             backing.setCornerRadius(dp(3));
             chapterSubtitlePanel.setBackground(backing);
-            chapterSubtitlePanel.setPadding(dp(8), dp(4), dp(8), dp(4));
         } else {
             chapterSubtitlePanel.setBackground(null);
-            applyChapterSubtitleBasePadding();
         }
+        applyChapterSubtitleBasePadding();
         reflowChapterDialoguePlacement();
     }
 
@@ -4268,7 +4440,7 @@ public class MainActivity extends Activity {
         final String text;
         try {
             state = ProbeBridge.getChapterDialogueState();
-            if (state == null || state.length != 5) {
+            if (state == null || state.length != 6) {
                 chapterSubtitlePanel.setVisibility(View.GONE);
                 pauseChapterVoice(true);
                 return;
@@ -4282,7 +4454,7 @@ public class MainActivity extends Activity {
         final long[] confirm;
         try { confirm = ProbeBridge.getChapterDialogueState(); }
         catch (RuntimeException | LinkageError unavailable) { pauseChapterVoice(true); return; }
-        if (confirm == null || confirm.length != 5 || state[1] != confirm[1] ||
+        if (confirm == null || confirm.length != 6 || state[1] != confirm[1] ||
                 (state[0] > 0 && (text == null || text.isEmpty()))) {
             // The render owner published between JNI reads. Wait one poll for a coherent pair.
             pauseChapterVoice(true);
@@ -4303,7 +4475,7 @@ public class MainActivity extends Activity {
             return;
         }
         final long generation = state[1];
-        stopChapterAmbience(); // Kit has priority even when captions or Voice gain are muted.
+        final boolean captionFallback = state[5] != 0;
         if (chapterDialogueSkipPendingGeneration != generation)
             chapterDialogueSkipPendingGeneration = Long.MIN_VALUE;
         final boolean hiddenByUi = !resumed || !surfaceStarted || surfaceState != 1 || menuVisible ||
@@ -4314,7 +4486,12 @@ public class MainActivity extends Activity {
             stopChapterVoice();
             chapterVoiceGeneration = generation;
         } else updateChapterVoice(line, generation, paused);
-        final boolean subtitles = preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
+        final boolean voicePlaying = chapterVoiceGeneration == generation && chapterVoiceStream != 0;
+        chapterAmbienceDialogueActive = !captionFallback || voicePlaying;
+        if (chapterAmbienceDialogueActive) stopChapterAmbience();
+        final boolean requiresCaption = captionFallback &&
+                (!voicePlaying || preferences.getInt(PREF_CHAPTER_VOICE_VOLUME, 100) <= 0);
+        final boolean subtitles = requiresCaption || preferences.getBoolean(PREF_CHAPTER_SUBTITLES, true);
         chapterSubtitleText.setVisibility(subtitles ? View.VISIBLE : View.GONE);
         if (chapterSubtitleGeneration != generation) {
             chapterSubtitleGeneration = generation;
@@ -4482,10 +4659,13 @@ public class MainActivity extends Activity {
         chapterSubtitlePanel.setLayoutParams(params);
     }
 
+    private boolean hasChapterSubtitleBacking() {
+        return preferences != null && InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_BACKING, false);
+    }
+
     private void applyChapterSubtitleBasePadding() {
-        final boolean backing = preferences != null &&
-                preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false);
-        final int horizontal = backing ? dp(8) : 0;
+        final boolean backing = hasChapterSubtitleBacking();
+        final int horizontal = backing ? dp(8) : dp(2);
         final int vertical = backing ? dp(4) : dp(2);
         chapterSubtitlePanel.setPadding(horizontal, vertical, horizontal, vertical);
     }
@@ -4574,19 +4754,36 @@ public class MainActivity extends Activity {
         subtitlesEnabled.setOnCheckedChangeListener((buttonView, checked) ->
                 preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLES, checked).apply());
         panel.addView(subtitlesEnabled, matchWrap());
+        final CheckBox subtitleYellow = new CheckBox(this);
+        subtitleYellow.setText(R.string.subtitle_yellow);
+        subtitleYellow.setTextColor(0xFFFFE5BA);
+        subtitleYellow.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
+        subtitleYellow.setTextSize(16);
+        subtitleYellow.setMinHeight(dp(48));
+        subtitleYellow.setChecked(InterfacePreferences.flag(preferences, PREF_CHAPTER_SUBTITLE_YELLOW, false));
+        subtitleYellow.setOnCheckedChangeListener((buttonView, checked) -> {
+            preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_YELLOW, checked).apply();
+            applyChapterSubtitleStyle();
+        });
+        panel.addView(subtitleYellow, matchWrap());
         final CheckBox subtitleBacking = new CheckBox(this);
         subtitleBacking.setText("Add contrast backing behind subtitles");
         subtitleBacking.setContentDescription("Add a subtle background behind subtitles for extra contrast");
         subtitleBacking.setTextColor(0xFFFFE5BA);
         subtitleBacking.setButtonTintList(HordeUiTokens.label(HordeUiTokens.BRASS));
         subtitleBacking.setTextSize(16);
-        subtitleBacking.setChecked(preferences.getBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false));
+        subtitleBacking.setChecked(hasChapterSubtitleBacking());
         subtitleBacking.setMinHeight(dp(48));
         subtitleBacking.setOnCheckedChangeListener((buttonView, checked) -> {
             preferences.edit().putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, checked).apply();
-            applyChapterSubtitleBacking();
+            applyChapterSubtitleStyle();
         });
         panel.addView(subtitleBacking, matchWrap());
+        addSlider(panel, getString(R.string.subtitle_backing_opacity), chapterSubtitleBackingOpacity(),
+                MIN_SUBTITLE_BACKING_OPACITY, 100, value -> {
+                    preferences.edit().putInt(PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, value).apply();
+                    applyChapterSubtitleStyle();
+                });
         addSlider(panel, "Subtitle size", clampChapterSubtitleSize(
                         preferences.getInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)), 80, 160,
                 value -> {
@@ -4707,6 +4904,9 @@ public class MainActivity extends Activity {
                             .putBoolean(PREF_CHAPTER_SUBTITLES, true)
                             .putInt(PREF_CHAPTER_SUBTITLE_SIZE, 100)
                             .putInt(PREF_CHAPTER_SUBTITLE_POSITION, SUBTITLE_POSITION_AUTO)
+                            .putBoolean(PREF_CHAPTER_SUBTITLE_YELLOW, false)
+                            .putBoolean(PREF_CHAPTER_SUBTITLE_BACKING, false)
+                            .putInt(PREF_CHAPTER_SUBTITLE_BACKING_OPACITY, DEFAULT_SUBTITLE_BACKING_OPACITY)
                             .putInt(PREF_CHAPTER_VOICE_VOLUME, 100)
                             .putInt(PREF_MUSIC_VOLUME, 70).putInt("look_sensitivity", 100)
                             .putBoolean("haptics_enabled", true).putBoolean("show_hud", true)
@@ -4716,6 +4916,7 @@ public class MainActivity extends Activity {
                     if (musicPlayback != null) musicPlayback.setVolumePercent(70);
                     InterfacePreferences.reset(preferences);
                     applyInterfacePresentation();
+                    applyChapterSubtitleStyle();
                     showSettings();
                 },
                 getString(R.string.back), () -> showMainMenu(false));
@@ -6086,7 +6287,11 @@ public class MainActivity extends Activity {
         if(openingBenchmarkRecoveryRejected)return;
         if (paused) {stopChapterAmbience();stopPrivateLichRevivalAudio();}
         if(!paused && (campaignMenuVisible || (campaignState!=null && campaignState.loadBarrier()))) paused=true;
-        if (paused) { clearRunIntent(); clearCrouchIntent(); }
+        if (paused) {
+            stopKitAnkleFoley();
+            clearRunIntent();
+            clearCrouchIntent();
+        }
         if (paused) suspendAndResetWaterfall(); // Same generation retains the Core cursor.
         if (musicPlayback != null) musicPlayback.setSuspended(paused || !resumed ||
                 !surfaceStarted || ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) != 1);
@@ -6153,6 +6358,7 @@ public class MainActivity extends Activity {
     private void resetRoute() {
         clearRunIntent();
         stopChapterAmbience();
+        stopKitAnkleFoley();
         ++delayedGameplayFeedbackGeneration;
         stopPrivateLichRevivalAudio();
         clearVerticalProofFeedbackSelection();
@@ -6719,6 +6925,7 @@ public class MainActivity extends Activity {
             return;
         }
         stopChapterAmbience();
+        stopKitAnkleFoley();
         ++delayedGameplayFeedbackGeneration;
         stopPrivateLichRevivalAudio();
         campaignFromDeath=confirmed;
@@ -6967,6 +7174,18 @@ public class MainActivity extends Activity {
                 if (isDebuggableApp() && developerOverlayVisible && state == 1 &&
                         !menuVisible && !diagnosticsVisible && !benchmarkRunning) {
                     final String overlayText = ProbeBridge.getDeveloperOverlayText();
+                    if (campaignTestNamespace != null) {
+                        // Mirror the developer overlay into logcat for isolated touch walkthroughs.
+                        final int start = overlayText.indexOf("\nPOSE ");
+                        final int end = start < 0 ? -1 : overlayText.indexOf('\n', start + 1);
+                        if (end > start) {
+                            final String pose = overlayText.substring(start + 1, end);
+                            if (!pose.equals(lastCampaignTestPose)) {
+                                lastCampaignTestPose = pose;
+                                Log.d("HordeCampaignWalk", pose);
+                            }
+                        }
+                    }
                     developerOverlay.setText(overlayText);
                     developerOverlay.setVisibility(overlayText.isEmpty() ? View.GONE : View.VISIBLE);
                     developerOverlay.bringToFront();
@@ -7011,12 +7230,21 @@ public class MainActivity extends Activity {
                         case ChapterAmbienceFeedback.TOMB_DRIP:
                         case ChapterAmbienceFeedback.ROPE_CONTACT:
                         case ChapterAmbienceFeedback.FOREST_FOLIAGE:
+                        case ChapterAmbienceFeedback.BELLWETHER_HEARTH:
+                        case ChapterAmbienceFeedback.BELLWETHER_PIG_GRUNT:
+                        case ChapterAmbienceFeedback.BELLWETHER_HEN_CLUCK:
+                        case ChapterAmbienceFeedback.BELLWETHER_WATERWHEEL_CREAK:
                             if(eventIndex==latestAmbienceSignal)
                                 playChapterAmbience(stereoGains, ChapterAmbienceFeedback.soundKey(eventType));
                             break;
                         case PLATFORM_EVENT_FOREST_BIRD_STOPPED:
                         case ChapterAmbienceFeedback.LOCAL_STOPPED:
                             if(eventIndex==latestAmbienceSignal)stopChapterAmbience();
+                            break;
+                        case KitAnkleFeedback.EVENT_TYPE:
+                            final String ankleKey = KitAnkleFeedback.soundKey(eventAudioCue);
+                            if (ankleKey != null && stereoGains != 0 && chapterSceneSfxAudible())
+                                kitAnkleStream = replaceChapterOneShot(kitAnkleStream, stereoGains, ankleKey);
                             break;
                         case PLATFORM_EVENT_PLAYER_WET_FOOTSTEP:
                             playSpatialSound(wetFootstepSoundKey(playerStepVariant++), PLAYER_WET_FOOTSTEP_GAIN,
@@ -7206,6 +7434,18 @@ public class MainActivity extends Activity {
                 HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING);
     }
 
+    private static boolean hasBellwetherRecordKeeper() {
+        return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
+                (BuildConfig.BELLWETHER_COMBINED_RESIDENTS ||
+                (!BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_SALVAGER_CANDIDATE &&
+                        !BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE));
+    }
+
+    private static boolean hasBellwetherWestRoundTrip() {
+        return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE && BuildConfig.BELLWETHER_COMBINED_RESIDENTS &&
+                BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE;
+    }
+
     static int checkpointId(final String name) {
         if (name == null) return -1;
         switch (name) {
@@ -7282,6 +7522,28 @@ public class MainActivity extends Activity {
             case "world-route": return 190;
             case "world-route-staged": return 191;
             case "rescue-journey-start": return 192;
+            case "bellwether-repeat-visit": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 329 : -1;
+            case "bellwether-doorway-measurement": return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? 337 : -1;
+            case "bellwether-resident-roundtrip-measurement":
+                return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
+                        BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 347 : -1;
+            case "bellwether-west-roundtrip-measurement":
+                return hasBellwetherWestRoundTrip() ? 349 : -1;
+            case "bellwether-wayside-archive": return 331;
+            case "bellwether-square-frontage": return 350;
+            case "bellwether-wayside-archive-open": return 332;
+            case "bellwether-wayside-register-recovered": return 333;
+            case "bellwether-church-approach": return 334;
+            case "bellwether-mill-yard": return 341;
+            case "bellwether-river-landing": return 342;
+            case "bellwether-rig-leak-trial": return 343;
+            case "bellwether-record-keeper-handoff":
+                return hasBellwetherRecordKeeper() ? 335 : -1;
+            case "bellwether-mill-artificer": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 344 : -1;
+            case "bellwether-mill-drive-tested": return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 345 : -1;
+            case "bellwether-salvager-shore": return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 346 : -1;
+            case "bellwether-relic-dealer": return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE &&
+                    !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? 348 : -1;
             case "chapter-landing-north": return 193;
             case "chapter-landing-east": return 194;
             case "chapter-landing-south": return 195;
@@ -7626,6 +7888,26 @@ public class MainActivity extends Activity {
 
     static float[] developmentCheckpointViewPose(final int checkpoint) {
         switch (checkpoint) {
+            case 329:
+            case 337: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE ? new float[]{-0.14f, -0.11f} : null;
+            case 347: return BuildConfig.BELLWETHER_RESIDENT_CANDIDATE &&
+                    BuildConfig.BELLWETHER_COMBINED_RESIDENTS
+                    ? new float[]{-0.14f, -0.11f} : null;
+            case 349: return hasBellwetherWestRoundTrip() ? new float[]{-0.14f, -0.11f} : null;
+            case 331:
+            case 332:
+            case 333: return new float[]{0.0f, -0.12f};
+            case 334: return new float[]{-1.57f, -0.24f};
+            case 341: return new float[]{1.76f, -0.21f};
+            case 342:
+            case 343: return new float[]{1.68f, -0.28f};
+            case 335:
+                return hasBellwetherRecordKeeper() ? new float[]{1.57079632679f, -0.07f} : null;
+            case 344:
+            case 345: return BuildConfig.BELLWETHER_ARTIFICER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{1.64f, -0.32f} : null;
+            case 346: return BuildConfig.BELLWETHER_SALVAGER_CANDIDATE && !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-0.08f, -0.17f} : null;
+            case 348: return BuildConfig.BELLWETHER_RELIC_DEALER_CANDIDATE &&
+                    !BuildConfig.BELLWETHER_COMBINED_RESIDENTS ? new float[]{-1.57079632679f, -0.14f} : null;
             case 192: return new float[]{3.1415927f, -0.05f};
             case 193: return new float[]{0.0f, -0.15f};
             case 194: return new float[]{1.57079632679f, -0.15f};
@@ -7762,7 +8044,13 @@ public class MainActivity extends Activity {
         loadSound("pond_frogs_crickets", "audio/night-ambience/runtime/pond_frogs_crickets.wav");
         loadSound("tomb_drip", "audio/chapter-local-ambience/runtime/tomb_drip.wav");
         loadSound("rope_contact", "audio/chapter-local-ambience/runtime/rope_contact.wav");
+        loadSound("kit_boot_and_gravel", "audio/kit-ankle/runtime/boot_and_gravel.wav");
+        loadSound("kit_steady_breath", "audio/kit-ankle/runtime/steady_breath.wav");
         loadSound("forest_leaf_rustle", "audio/forest-foliage/runtime/leaf_rustle.wav");
+        loadSound("bellwether_hearth", "audio/bellwether-hearth/runtime/hearth_crackle.wav");
+        loadSound("bellwether_pig_grunt", "audio/bellwether-stock/runtime/pig_grunt.wav");
+        loadSound("bellwether_hen_cluck", "audio/bellwether-stock/runtime/hen_cluck.wav");
+        loadSound("bellwether_waterwheel_creak", "audio/bellwether-mill/runtime/wheel_creak.wav");
         loadSound("skeleton_step_1", "audio/filmcow/skeleton_step_1.wav");
         loadSound("skeleton_step_2", "audio/filmcow/skeleton_step_2.wav");
         loadSound("skeleton_attack", "audio/filmcow/skeleton_attack.wav");
@@ -7858,6 +8146,7 @@ public class MainActivity extends Activity {
 
     private void updateWaterfallLoop() {
         if (!chapterAmbienceAudible()) stopChapterAmbience();
+        if (!chapterSceneSfxAudible()) stopKitAnkleFoley();
         if (waterfallPlayback == null) return;
         final boolean audible = resumed && surfaceStarted && !menuVisible && !diagnosticsVisible &&
                 !benchmarkRunning && preferences.getBoolean("sfx_enabled", true) &&
@@ -7918,6 +8207,17 @@ public class MainActivity extends Activity {
     private void stopPrivateLichRevivalAudio(){if(privateLichRevivalAudio!=null)privateLichRevivalAudio.stop();}
 
     private void loadSound(final String key, final String assetPath) {
+        int directSoundId = 0;
+        try (AssetFileDescriptor descriptor = getAssets().openFd(assetPath)) {
+            directSoundId = soundPool.load(descriptor, 1);
+        } catch (IOException | RuntimeException unavailable) {
+            // Compressed assets have no file descriptor. Keep the stream-copy
+            // fallback for these and other direct-load failures.
+        }
+        if (directSoundId != 0) {
+            sounds.put(key, directSoundId);
+            return;
+        }
         final File audioDirectory = new File(getCacheDir(), "alpha_sfx");
         final File stagedSound = new File(audioDirectory, key + ".wav");
         if (!audioDirectory.exists() && !audioDirectory.mkdirs()) {
@@ -7938,7 +8238,11 @@ public class MainActivity extends Activity {
     }
 
     private boolean chapterAmbienceAudible() {
-        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() && !chapterAmbienceDialogueActive &&
+        return !chapterAmbienceDialogueActive && chapterSceneSfxAudible();
+    }
+
+    private boolean chapterSceneSfxAudible() {
+        return resumed && surfaceStarted && hasWindowFocus() && isMusicAudioFocusGranted() &&
                 !menuVisible && !campaignMenuVisible && !diagnosticsVisible && !graphicsVisible &&
                 !rtLabVisible && !playtestReportVisible && !benchmarkRunning && !debugMotionActive &&
                 !deathOverlayVisible && !endingOverlayVisible && preferences.getBoolean("sfx_enabled", true) &&
@@ -7950,14 +8254,24 @@ public class MainActivity extends Activity {
         chapterAmbienceStream=0;
     }
 
+    private void stopKitAnkleFoley() {
+        if (soundPool != null && kitAnkleStream != 0) soundPool.stop(kitAnkleStream);
+        kitAnkleStream = 0;
+    }
+
     private void playChapterAmbience(long packedStereoGains, String soundKey) {
-        if (!chapterAmbienceAudible() || soundPool==null) return;
+        if (chapterAmbienceAudible())
+            chapterAmbienceStream = replaceChapterOneShot(chapterAmbienceStream, packedStereoGains, soundKey);
+    }
+
+    private int replaceChapterOneShot(int stream, long packedStereoGains, String soundKey) {
+        if (soundPool == null) return stream;
         final Integer id=sounds.get(soundKey);
-        if (id==null) return;
-        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return; }
-        stopChapterAmbience(); // One finite voice; never queue/retry a missed ambience cue.
+        if (id==null) return stream;
+        synchronized(loadedSounds) { if (!loadedSounds.contains(id)) return stream; }
+        if (stream != 0) soundPool.stop(stream);
         final float gain=preferences.getInt("sfx_volume",70)/100.f;
-        chapterAmbienceStream=soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
+        return soundPool.play(id,gain*clamp(Float.intBitsToFloat((int)packedStereoGains),0,1),
                 gain*clamp(Float.intBitsToFloat((int)(packedStereoGains>>>32)),0,1),0,0,1.f);
     }
 
@@ -8323,7 +8637,7 @@ public class MainActivity extends Activity {
         if(lookoutObjectiveVisible && event!=null && event.isFromSource(InputDevice.SOURCE_KEYBOARD) &&
                 event.getKeyCode()==KeyEvent.KEYCODE_ESCAPE) {
             if(event.getAction()==KeyEvent.ACTION_UP)
-                finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);
+                cancelLookoutObjective();
             return true;
         }
         if (!AndroidControllerInput.isControllerKey(event)) {
@@ -8411,6 +8725,7 @@ public class MainActivity extends Activity {
         if (!focused) {
             if(lookoutObjectiveVisible)showMainMenu(false);
             stopChapterAmbience();
+            stopKitAnkleFoley();
             stopPrivateLichRevivalAudio();
             clearRunIntent();
             clearCrouchIntent();
@@ -8516,6 +8831,7 @@ public class MainActivity extends Activity {
             ControllerNavigation.ensureFocus(ui);
             if ((result.actions & AndroidControllerInput.CANCEL)!=0 ||
                     (result.actions & AndroidControllerInput.PAUSE)!=0) {
+                if (controllerDialog != null && controllerDialog == combatTeachingCardDialog) return;
                 if(controllerDialog!=null && controllerDialog.isShowing())controllerDialog.cancel();
                 else onBackPressed();
             } else {
@@ -8596,11 +8912,11 @@ public class MainActivity extends Activity {
         if(interactButton!=null && toggleHeldLightPoseButton!=null)updateContextualControls(hud && playing);
     }
 
-    private void updateControllerPrompt(int interactLabel,boolean interactEnabled,boolean raise,boolean lower) {
+    private void updateControllerPrompt(String interactText,boolean interactEnabled,boolean raise,boolean lower) {
         if(controllerPrompt==null || !controllerMode)return;
         // Timed teaching has its own owner. This footer contains nearby actions only.
         String prompt="";
-        if(interactLabel!=0)prompt+=(interactEnabled?"A: ":"")+getString(interactLabel);
+        if(!interactText.isEmpty())prompt+=(interactEnabled?"A: ":"")+interactText;
         if(raise || lower)prompt+="\nY: "+getString(raise?R.string.raise_lantern:R.string.lower_lantern);
         prompt=prompt.trim();
         controllerPrompt.setText(prompt); controllerPrompt.setContentDescription(prompt);
@@ -8608,8 +8924,10 @@ public class MainActivity extends Activity {
     }
 
     private void showRaiseLanternObjective(int contextualState) {
-        if (controllerPrompt == null || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0) return;
-        final int label = controllerMode ? R.string.raise_lantern_controller_prompt :
+        if (controllerPrompt == null ||
+                (contextualState & (CONTEXTUAL_RAISE_OBJECTIVE | CONTEXTUAL_RERAISE_OBJECTIVE)) == 0) return;
+        final int label = (contextualState & CONTEXTUAL_RERAISE_OBJECTIVE) != 0 ? R.string.reraise_lantern_prompt :
+                controllerMode ? R.string.raise_lantern_controller_prompt :
                 latestSubtitleInputMode == SUBTITLE_INPUT_TOUCH ? R.string.raise_lantern_touch_prompt :
                 R.string.raise_lantern_keyboard_prompt;
         String prompt = controllerMode && controllerPrompt.getVisibility() == View.VISIBLE
@@ -8722,6 +9040,8 @@ public class MainActivity extends Activity {
         String hint="";
         if(flask.hint==4 || flask.action!=0)hint=reason==0?"":getString(reason);
         else if(flask.hint==5 && now<flaskLessonUntil)hint=getString(flaskLessonResource);
+        else if(flask.hearthNearby())
+            hint=getString(flask.allows(true)?R.string.flask_rest_touch_guidance:R.string.flask_hearth_rest_wait);
         else if(flask.nearbyRestAnchor!=0 && !flask.allows(true))hint=getString(R.string.flask_rest_wait_hint);
         else if(now<flaskLessonUntil && (quiet || flask.hint==5))hint=getString(flaskLessonResource);
         if(!android.text.TextUtils.equals(flaskHint.getText(),hint))flaskHint.setText(hint);
@@ -8731,8 +9051,11 @@ public class MainActivity extends Activity {
         drinkFlaskButton.setEnabled(flask.allows(false));drinkFlaskButton.setContentDescription(actionDescription);
         restButton.setVisibility(touch && flask.nearbyRestAnchor!=0?View.VISIBLE:View.GONE);
         restButton.setEnabled(flask.allows(true));
-        restButton.setContentDescription(getString(R.string.flask_rest)+". "+getString(flask.restAnchor!=0?
-                R.string.flask_rest_touch_guidance:R.string.flask_rest_wait_hint));
+        final String restLabel=getString(flask.hearthNearby()?R.string.flask_hearth_rest_action:R.string.flask_rest);
+        if(!android.text.TextUtils.equals(restButton.getText(),restLabel))restButton.setText(restLabel);
+        restButton.setContentDescription(getString(flask.hearthNearby()?R.string.flask_hearth_rest:R.string.flask_rest)+
+                ". "+getString(flask.restAnchor!=0?R.string.flask_rest_touch_guidance:
+                        flask.hearthNearby()?R.string.flask_hearth_rest_wait:R.string.flask_rest_wait_hint));
         flaskPanel.setVisibility(View.VISIBLE);layoutHealingFlaskHud();positionFlaskTeachingPrompt();
     }
 
@@ -8743,7 +9066,7 @@ public class MainActivity extends Activity {
     private static int flaskHintResource(HealingFlaskUiState state) {
         switch(state.hint) {
             case 1:return R.string.flask_health_full_hint;
-            case 2:return R.string.flask_empty_hint;
+            case 2:return state.hearthNearby()?R.string.flask_hearth_rest:R.string.flask_empty_hint;
             case 3:return R.string.flask_still_hint;
             case 4:return R.string.flask_returning_hint;
             case 5:return R.string.flask_interrupted_hint;
@@ -8762,7 +9085,7 @@ public class MainActivity extends Activity {
         final HealingFlaskUiState state=readHealingFlaskState();
         if(state==null)return;
         if(!state.allows(rest)) {
-            int reason=rest?R.string.flask_rest_wait_hint:flaskHintResource(state);
+            int reason=rest?(state.hearthNearby()?R.string.flask_hearth_rest_wait:R.string.flask_rest_wait_hint):flaskHintResource(state);
             if(reason!=0) {showBriefFlaskHint(reason,SystemClock.uptimeMillis());updateHealingFlaskHud(true);}
             return;
         }
@@ -8771,7 +9094,8 @@ public class MainActivity extends Activity {
 
     private boolean canSendGameplayAction() {
         return !menuVisible && !diagnosticsVisible && !deathOverlayVisible && !endingOverlayVisible &&
-                !benchmarkRunning && ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
+                !benchmarkRunning && combatTeachingCardToken == 0 &&
+                ProbeBridge.getSurfaceRuntimeState(surfaceRequestGeneration) == 1;
     }
     private void clearTouchState() {
         keyboardFlaskBlocked|=keyboardFlaskHeld;keyboardFlaskHeld=0;
@@ -8819,6 +9143,77 @@ public class MainActivity extends Activity {
     static int contextualInteractLabel(final int state) {
         if ((state & CONTEXTUAL_RESCUE_MODE) != 0) return 0; // Separate rope labels retain priority.
         if ((state & CONTEXTUAL_FLASK_UPGRADE) != 0) return R.string.take_flask_upgrade;
+        switch ((state >> CONTEXTUAL_TAVERN_DOOR_SHIFT) & CONTEXTUAL_TAVERN_DOOR_MASK) {
+            case 1: return R.string.open_tavern_door;
+            case 2: return R.string.close_tavern_door;
+            default: break;
+        }
+        if ((state & CONTEXTUAL_TAVERN_TALK) != 0) return R.string.talk_to_kit;
+        if ((state & CONTEXTUAL_TAVERN_DIRECTIONS) != 0) return R.string.directions;
+        switch ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) {
+            case 1: return R.string.inspect_archive;
+            case 2: return R.string.open_lower_stone;
+            case 3: return R.string.listen_to_lantern;
+            case 4: return R.string.recall_lantern_words;
+            case 5: return R.string.take_road_register;
+            case 6: return R.string.restore_shrine_binding;
+            case CONTEXTUAL_MILL_TAG:
+                final int detail = (state >>> 25) & 63;
+                switch (detail) {
+                    case 0: return (state & CONTEXTUAL_INTERACT) != 0 ? R.string.take_clean_rag : 0;
+                    case 1: return R.string.inspect_mill_gearing;
+                    case 2: return R.string.take_spare_bearing;
+                    case 3: return R.string.check_mill_bearing_fit;
+                    case 4: return R.string.start_rig_leak_test;
+                    case 5: return R.string.confirm_rig_seal;
+                    case 6: return R.string.rig_leak_test_in_progress;
+                    case 7: return R.string.rig_leak_test_return_to_dry;
+                    case 8: return R.string.seat_mill_bearing;
+                    case 9: return R.string.turn_mill_drive;
+                    case 10: return R.string.take_breathing_rig;
+                    case 11: return R.string.mill_drive_turning;
+                    case 12: return R.string.salvager_start_shore_practice;
+                    case 13: return R.string.salvager_report_shore_practice;
+                    case 14: return R.string.salvager_recall_shore_practice;
+                    case 15: return R.string.salvager_find_dry_mark;
+                    case 16: return R.string.salvager_enter_shallows;
+                    case 17: return R.string.rig_leak_test_return_to_dry;
+                    case 18: return R.string.salvager_report_back;
+                    case 19: return R.string.salvager_recover_breath;
+                    case 52: return R.string.ask_relic_dealer_trade;
+                    case 63: return (state & CONTEXTUAL_INTERACT) != 0 ? R.string.pass_the_rag : 0;
+                    default:
+                        if (detail == 53) return R.string.take_ordinary_silver;
+                        if (detail == 54) return R.string.ordinary_silver_sold;
+                        if (detail >= 55 && detail <= 62) return R.string.sell_ordinary_silver;
+                        if (detail >= 20 && detail <= 35) return R.string.salvager_enter_shallows_timed;
+                        if (detail >= 36 && detail <= 51) return R.string.salvager_retreat_timed;
+                        return 0;
+                }
+            default: break;
+        }
+        if ((state & CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION) != 0) {
+            switch ((state >>> 25) & 7) {
+                case 0: return R.string.talk_through_grate;
+                case 1: return R.string.take_mill_tally;
+                case 2: return R.string.sell_mill_tally;
+                case 3: return R.string.record_mill_tally_claim;
+                case 4: return R.string.recover_mill_tally;
+                case 5: return R.string.return_mill_tally;
+                default: return 0;
+            }
+        }
+        if (lanternFittingPrice(state) != 0) return R.string.fit_lantern_hinge;
+        final int keeperAction = ((state >> CONTEXTUAL_RECORD_KEEPER_SHIFT) & CONTEXTUAL_RECORD_KEEPER_MASK) |
+                ((state & CONTEXTUAL_RECORD_KEEPER_EXTENDED) != 0 ? 4 : 0);
+        switch (keeperAction) {
+            case 1: return R.string.show_road_mark;
+            case 2: return R.string.show_road_register;
+            case 3: return R.string.recall_expedition_routes;
+            case 4: return R.string.collect_register_reward;
+            case 5: return R.string.learn_air_ward;
+            default: break;
+        }
         switch ((state & CHEST_PROMPT_MASK) >> CHEST_PROMPT_SHIFT) {
             case CHEST_PROMPT_LOCKED: return R.string.chest_locked_until_lich_defeated;
             case CHEST_PROMPT_OPEN: return R.string.open_chest;
@@ -8827,6 +9222,40 @@ public class MainActivity extends Activity {
             case CHEST_PROMPT_UNLOCKING: return R.string.chest_unlocking;
             default: return 0;
         }
+    }
+
+    static int contextualRiverSeconds(final int state) {
+        if (((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) != CONTEXTUAL_MILL_TAG) return 0;
+        final int detail = (state >>> 25) & 63;
+        if (detail >= 20 && detail <= 35) return detail - 19;
+        if (detail >= 36 && detail <= 51) return detail - 35;
+        return 0;
+    }
+
+    static int contextualOrdinarySilverPrice(final int state) {
+        final int detail = (state >>> 25) & 63;
+        return detail >= 55 && detail <= 62 ? detail - 54 : 0;
+    }
+
+    static String contextualInteractText(final Context context, final int state) {
+        final int label = contextualInteractLabel(state);
+        if (label == 0) return "";
+        if (label == R.string.sell_mill_tally)
+            return context.getString(label, (state >>> 28) & 7);
+        if (label == R.string.fit_lantern_hinge)
+            return context.getString(label, lanternFittingPrice(state));
+        if (label == R.string.salvager_enter_shallows_timed ||
+                label == R.string.salvager_retreat_timed)
+            return context.getString(label, contextualRiverSeconds(state));
+        if (label == R.string.sell_ordinary_silver)
+            return context.getString(label, contextualOrdinarySilverPrice(state));
+        return context.getString(label);
+    }
+
+    static int lanternFittingPrice(int state) {
+        return (state & CONTEXTUAL_BELLWETHER_OPTIONAL_ACTION) != 0 ||
+                ((state >> CONTEXTUAL_ARCHIVE_SHIFT) & CONTEXTUAL_ARCHIVE_MASK) == CONTEXTUAL_MILL_TAG
+                ? 0 : (state >>> 25) & 63;
     }
 
     private void updateContextualControls(final boolean controlsAllowed) {
@@ -8841,7 +9270,7 @@ public class MainActivity extends Activity {
             return;
         }
         final int contextualState = ProbeBridge.getContextualControlState();
-        if (controllerMode || (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0)
+        if (controllerMode || (contextualState & (CONTEXTUAL_RAISE_OBJECTIVE | CONTEXTUAL_RERAISE_OBJECTIVE)) == 0)
             positionContextualPrompt(false);
         logDebugContextualControls(true, contextualState);
         final boolean traversalOwned = (contextualState & CONTEXTUAL_RESCUE_MODE) != 0 &&
@@ -8883,18 +9312,18 @@ public class MainActivity extends Activity {
             return;
         }
         final boolean interactEnabled = (contextualState & CONTEXTUAL_INTERACT) != 0;
-        final int interactLabel = contextualInteractLabel(contextualState);
-        if (interactLabel == 0) {
+        final String interactText = contextualInteractText(this, contextualState);
+        if (interactText.isEmpty()) {
             interactButton.setVisibility(View.GONE);
         } else {
-            interactButton.setText(interactLabel);
-            interactButton.setContentDescription(getString(interactLabel));
+            interactButton.setText(interactText);
+            interactButton.setContentDescription(interactText);
             interactButton.setEnabled(interactEnabled);
             interactButton.setVisibility(controllerMode ? View.GONE : View.VISIBLE);
         }
         final boolean showRaise = (contextualState & CONTEXTUAL_RAISE) != 0;
         final boolean showLower = (contextualState & CONTEXTUAL_LOWER) != 0;
-        updateControllerPrompt(interactLabel, interactEnabled,
+        updateControllerPrompt(interactText, interactEnabled,
                 showRaise && (contextualState & CONTEXTUAL_RAISE_OBJECTIVE) == 0, showLower);
         updateLanternPoseControl(contextualState);
         showRaiseLanternObjective(contextualState);
@@ -9016,7 +9445,7 @@ public class MainActivity extends Activity {
         if(openingBenchmarkPending()) {
             cancelOpeningBenchmarkRequest(); showOpeningBenchmarkProgress(); return;
         }
-        if(benchmarkReportVisible && entryMenuEnabled) {
+        if(benchmarkReportVisible && entryMenuEnabled && !benchmarkSummaryVisible) {
             playSound("ui_back",.18f); showMainMenu(false); return;
         }
         if(campaignConfirmation!=null && campaignConfirmation.isShowing()) {
@@ -9024,7 +9453,7 @@ public class MainActivity extends Activity {
         }
         if(campaignMenuVisible) { backFromCampaignMenu(); return; }
         if(lookoutObjectiveVisible) {
-            finishLookoutObjective(lookoutObjectiveEpoch,lookoutObjectiveState,false);return;
+            cancelLookoutObjective();return;
         }
         if (backExitDialog != null && backExitDialog.isShowing()) {
             backExitDialog.cancel();
@@ -9278,6 +9707,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        dismissCombatTeachingCard();
         if (benchmarkSummarySendControls != null) benchmarkSummarySendControls.interrupt();
         if (compatibilityReportDialog != null) compatibilityReportDialog.interruptSubmission();
         if (environmentSurveyMode) {
@@ -9297,6 +9727,7 @@ public class MainActivity extends Activity {
             Log.w(TAG, "Pending performance motion cancelled by pause before arming.");
         }
         stopChapterAmbience();
+        stopKitAnkleFoley();
         campaignAcknowledgedToken=campaignAcknowledgedGeneration=0;
         campaignRebaseAttemptToken=campaignRebaseAttemptGeneration=campaignRebaseAttemptRevision=0;
         dismissCampaignConfirmation();

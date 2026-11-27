@@ -2,6 +2,7 @@ package com.samfa12.hordelanternrt;
 
 /** Immutable owner publication; UI eligibility never performs healing or starts a timer. */
 final class HealingFlaskUiState {
+    private static final int BELLWETHER_TAVERN = 4;
     final long generation;
     final boolean enabled, drinkEligible;
     final int restAnchor, nearbyRestAnchor, charges, capacity, action, hint;
@@ -14,12 +15,13 @@ final class HealingFlaskUiState {
     static HealingFlaskUiState decode(long[] v,long generation) {
         if(v==null || !((v.length==8 && v[0]==1) || (v.length==10 && v[0]==2)) ||
            generation<=0 || v[1]!=generation ||
-           v[2]<0 || v[2]>1 || v[3]<0 || v[3]>1 || v[4]<0 || v[4]>3 ||
+           v[2]<0 || v[2]>1 || v[3]<0 || v[3]>1 || v[4]<0 || v[4]>(v[0]==2?BELLWETHER_TAVERN:3) ||
            v[5]<0 || v[5]>v[6] || v[6]<2 || v[6]>3 || v[7]<0 || v[7]>2 ||
-           (v[0]==2 && (v[8]<0 || v[8]>3 || v[9]<0 || v[9]>7 || (v[4]!=0 && v[4]!=v[8]))))return null;
+           (v[0]==2 && (v[8]<0 || v[8]>BELLWETHER_TAVERN || v[9]<0 || v[9]>7 || (v[4]!=0 && v[4]!=v[8]))))return null;
         return new HealingFlaskUiState(v);
     }
     boolean allows(boolean rest) {return enabled && action==0 && (rest?restAnchor!=0:drinkEligible);}
     boolean empty() {return charges==0;}
     boolean full() {return charges==capacity;}
+    boolean hearthNearby() { return nearbyRestAnchor==BELLWETHER_TAVERN; }
 }

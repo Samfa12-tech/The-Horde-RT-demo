@@ -35,6 +35,8 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/simulation/TriangleSupportSurface.h"
 #include "gameplay/traversal/DevelopmentRescueJourney.h"
+#include "gameplay/traversal/BellwetherResidentRoster.h"
+#include "gameplay/traversal/BellwetherPrivy.h"
 
 namespace horde::gameplay::validation
 {
@@ -87,6 +89,12 @@ struct GameSimulationConfig
     bool healingFlask1_7 = false;
     // Explicit source/native integration trial; normal platform callers stay OFF.
     bool flaskUtilityCandidate = false;
+    // Set by the scene profile when the placed tavern keeper is admitted.
+    bool bellwetherTavernKeeperAdmitted = false;
+    bellwether::Specialist bellwetherSpecialist = bellwether::Specialist::None;
+    // Private combined campaign: the owner publishes current GPU-ready residents.
+    bool bellwetherCombinedResidents = false;
+    bool bellwetherTrade = false;
 };
 
 // Keep the historical constructor configuration available for deterministic
@@ -147,6 +155,9 @@ public:
     void StartLiveDevelopmentRescueJourney(bool authoredTerrain = false);
     bool PublishChapterTerrain(WorldZoneToken token, std::shared_ptr<const TriangleSupportSurface> terrain);
     bool PublishWorldZoneReadiness(WorldZoneToken token, ZoneReadiness readiness);
+    // Owner-thread receipt of the residents whose GPU assets are currently ready.
+    // Changes only the immutable snapshot and never advances or saves gameplay.
+    bool PublishBellwetherResidents(traversal::ResidentMask residents);
     // Current owner receipt only; never awards progress. Empty receipts
     // withdraw presentation; stale world/resource responses reject.
     bool PublishFlaskUpgradeReadiness(WorldZoneToken token,const healing::FlaskUpgradeReadiness& readiness);
@@ -213,6 +224,10 @@ private:
     StaticDetailLease staticDetailLease_{};
     bool deferredStaticDetailReset_ = false;
     bool deferredStaticDetailRetry_ = false;
+    traversal::ResidentMask bellwetherResidentMask_=traversal::kTownResidentMask;
+    bool IsBellwetherResidentReady(traversal::ResidentMask resident) const;
+    bool IsBellwetherTavernKeeperReady() const;
+    void EnsureBellwetherResidentPoses(bool requireAuthoredTerrain = false);
     friend class horde::gameplay::validation::MotionEvidenceScenario;
     friend bool horde::gameplay::StageDevelopmentCheckpointSimulation(GameSimulation&,
         const horde::gameplay::DevelopmentCheckpoint&,
@@ -238,6 +253,8 @@ private:
                        bool activateTimestampedEdges = true);
     static EntityId EntityForEnemy(EnemyKind kind);
     void IngestCommands(const InputSnapshot& input, bool ingestCombatEdges = true);
+    bool HoldForCombatTeachingCard(const InputSnapshot& input, bool acceptResponse);
+    void DiscardCombatTeachingCardInput(const InputSnapshot& input);
     void ScheduleTimestampedCombatEdges(const InputSnapshot& input,
                                         double frameDeltaSeconds,
                                         std::uint64_t ownerAdvanceSteadyNs,
@@ -319,14 +336,51 @@ private:
     bool FlaskCompetingIntent(const InputSnapshot& input) const;
     std::optional<campaign::CheckpointId> EligibleFlaskRestAnchor() const;
     std::uint32_t NearbyFlaskRestAnchor() const;
+    bool AtEarnedBellwetherRestSite() const;
     void RefreshFlaskGuidance(const InputSnapshot& input);
     healing::FlaskContext FlaskContextFor(const InputSnapshot&, bool cancel, bool acceptedDamage) const;
     void StepHealingFlask(const InputSnapshot& input, float gameplaySeconds,
                           bool competingIntent, int healthBeforeEncounter);
     bool FlaskUpgradeEligible(const InputSnapshot&) const;
     bool TryFlaskUpgradeInteraction();
+    void InteractWithClaimedChapter();
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
+    dialogue::Context ChapterInteractionContext(bool paused,
+        std::optional<float> facingYaw = std::nullopt) const;
+    std::optional<dialogue::Tuple> HeldRewardLanternSource() const;
+    void TryStartShrineReveal(const dialogue::Context&);
+    bellwether::ArchiveAction WaysideArchiveAction(const dialogue::Context&) const;
+    bellwether::MillAction CurrentMillAction(const dialogue::Context&) const;
+    bool CanWorkAtMill(const dialogue::Context&) const;
+    bool MillTargetInReach(const dialogue::Context&,const std::array<float,3>& mark,float reach) const;
+    void AdvanceMillDriveTest(float seconds);
+    void AdvanceMillLeakTest(float seconds);
+    void InteractWithMill(bellwether::MillAction);
+    bool CommitMillPreparation(bellwether::MillPreparation);
+    bellwether::SalvagerAction CurrentSalvagerAction(const dialogue::Context&) const;
+    void InteractWithSalvager(bellwether::SalvagerAction,const dialogue::Context&);
+    void AdvanceShorePractice();
+    bool CommitShorePractice();
+    dialogue::RecordKeeperAction RecordKeeperAction(const dialogue::Context&) const;
+    void ClaimRegisterReward(const dialogue::Context&);
+    bool CanBuyLanternFitting(const dialogue::Context&) const;
+    campaign::OrdinarySilverAction CurrentOrdinarySilverAction(const dialogue::Context&) const;
+    void InteractWithOrdinarySilver(campaign::OrdinarySilverAction);
+    campaign::MillTallyAction CurrentMillTallyAction(const dialogue::Context&) const;
+    void InteractWithMillTally(campaign::MillTallyAction);
+    bellwether::PrivyRagAction CurrentPrivyRagAction(const dialogue::Context&) const;
+    void InteractWithPrivyRag(bellwether::PrivyRagAction,const dialogue::Context&);
+    std::optional<campaign::Checkpoint> PreparePrivyRagDeliveredCheckpoint() const;
+    void CommitPrivyRagDeliveredCheckpoint(const campaign::Checkpoint&);
+    void BuyLanternFitting(const dialogue::Context&);
+    std::optional<campaign::Checkpoint> PrepareTreasureCheckpoint(campaign::TreasurePurse) const;
+    void CommitTreasureCheckpoint(const campaign::Checkpoint&);
+    void AdvanceWaysideArchive(float seconds);
+    bool ArchiveContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
+    bellwether::DoorAction TavernDoorAction(const dialogue::Context&) const;
+    void AdvanceTavernDoor(float seconds);
+    bool TavernDoorContactClear(float x0,float z0,float x1,float z1,float y0,float y1,float radius) const;
 
     GameSimulationConfig config_{};
     float presentationAspect_ = 1.0f;
@@ -338,6 +392,12 @@ private:
     BoundedGameplayEventQueue events_{};
     CombatPresentationTimeline combatPresentation_{};
     CombatTeaching combatTeaching_{};
+    std::uint64_t combatTeachingCardToken_ = 0;
+    std::uint64_t combatTeachingCardSerial_ = 0;
+    std::uint64_t combatTeachingCardGeneration_ = 0;
+    std::uint64_t combatTeachingCardResponseFloor_ = 0;
+    std::uint8_t acknowledgedTeachingCards_ = 0;
+    bool combatTeachingCardAwaitingRelease_ = false;
     SkeletonRevivalBridge skeletonRevival_{};
     std::uint64_t skeletonRevivalResourceGeneration_ = 0;
     float skeletonRevivalDeadDurationSeconds_ = 0.0f;
@@ -368,6 +428,24 @@ private:
     std::uint64_t pendingTutorialReplayCommands_ = 0u;
     SimulationSnapshot snapshot_{};
     horde::gameplay::dialogue::Director chapterDialogue_{};
+    horde::gameplay::dialogue::TavernKeeperPlacement tavernKeeper_{};
+    std::optional<dialogue::RecordKeeperPose> recordKeeper_;
+    std::optional<bellwether::ArtificerPose> artificer_;
+    std::optional<bellwether::SalvagerPose> salvager_;
+    std::optional<bellwether::RelicDealerPose> relicDealer_;
+    bellwether::WaysideArchive waysideArchive_;
+    campaign::TreasurePurse treasurePurse_;
+    bellwether::MillPreparation millPreparation_{};
+    bellwether::MillLeakTestPhase millLeakTestPhase_{};
+    float millLeakTestSeconds_{};
+    float millWaterwheelAngleRadians_{};
+    bellwether::BellwetherStockIdle stockIdle_{};
+    std::optional<float> millDriveTurnSeconds_;
+    bellwether::ShorePracticeStage shorePracticeStage_{};
+    std::uint16_t shorePracticeBreathTicksRemaining_=0;
+    bool salvagerShorePracticeCompleted_=false;
+    bellwether::TavernDoor tavernDoor_;
+    bellwether::PrivyRagState privyRagState_=bellwether::PrivyRagState::Available;
     horde::audio::DialogueDucking dialogueDucking_{};
     ForestBirdAmbience forestBird_{};
     ChapterLocalAmbience localAmbience_{};
@@ -407,7 +485,8 @@ private:
     std::array<horde::gameplay::effects::FireEmitterState,
                horde::gameplay::effects::kFireEmitterCapacity> fireEmitters_{{
         horde::gameplay::effects::MakeOpeningTorchFireEmitter()}};
-    std::size_t fireEmitterCount_ = 3u;
+    std::array<horde::gameplay::effects::FireEmitterState, 8> bellwetherFireEmitters_{};
+    bool bellwetherFireReady_ = false;
     EnemyKind activeEnemyKind_ = EnemyKind::Skeleton;
 
     PlayerSupportResolution playerSupport_{};

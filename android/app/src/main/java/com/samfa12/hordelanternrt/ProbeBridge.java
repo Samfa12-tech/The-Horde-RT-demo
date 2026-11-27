@@ -76,6 +76,7 @@ public final class ProbeBridge {
     public static native long[] getChapterDialogueState();
     /** Coherent lookout availability: schema, surface generation, world generation, available. */
     public static native long[] getLookoutObjectiveState(long surfaceGeneration);
+    public static native String getLookoutObjectiveText(long surfaceGeneration, long worldGeneration, int objective);
     /** Speaker and exact catalog text from the same render-owner publication. */
     public static native String getChapterDialogueText(long generation);
     /** Packed Float left/right planar gains from the shared spatial-audio model. */
@@ -84,6 +85,8 @@ public final class ProbeBridge {
     public static native void requestChapterDialogueSkip();
     /** Packed immutable teaching snapshot published by the simulation owner. */
     public static native long getCombatTeachingState();
+    public static native long getCombatTeachingCard();
+    public static native boolean respondToCombatTeachingCard(long token, boolean skip);
     /** Current shared envelope only; no Java duck clock or gameplay mutation. */
     public static native float getSfxDialogueBedGain();
     public static native void requestInteract();

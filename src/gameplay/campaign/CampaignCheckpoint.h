@@ -1,15 +1,38 @@
 #pragma once
 
 #include "gameplay/dialogue/ChapterDialogue.h"
+#include "gameplay/campaign/TreasurePurse.h"
 #include "gameplay/CorridorCollision.h"
 #include "gameplay/traversal/RescueTraversal.h"
+#include "gameplay/traversal/BellwetherMill.h"
 #include "gameplay/healing/HealingFlask.h"
 #include <array>
 #include <cmath>
 #include <cstdint>
 
 namespace horde::gameplay::campaign {
-enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2, ForestEndpoint = 3 };
+enum class CheckpointId : std::uint32_t { LowerClaimed = 1, SafeExit = 2, ForestEndpoint = 3, BellwetherTavern = 4 };
+inline constexpr std::uint32_t kForestContentRevision=2, kBellwetherContentRevision=3;
+inline constexpr std::uint32_t kHearthSpeechSchema=6;
+inline constexpr std::uint32_t kTavernConversationSchema=7;
+inline constexpr std::uint32_t kWaysideArchiveSchema=8;
+inline constexpr std::uint32_t kShrineLanternSchema=9;
+inline constexpr std::uint32_t kWaysideRegisterSchema=10;
+inline constexpr std::uint32_t kRegisterInterpretationSchema=11;
+inline constexpr std::uint32_t kTavernLanternExchangeSchema=12;
+inline constexpr std::uint32_t kTreasurePurseSchema=13;
+inline constexpr std::uint32_t kLanternFittingSchema=14;
+inline constexpr std::uint32_t kAirWardSchema=15;
+inline constexpr std::uint32_t kMillPreparationSchema=16;
+inline constexpr std::uint32_t kSalvagerShorePracticeSchema=17;
+inline constexpr std::uint32_t kOrdinarySilverSchema=18;
+inline constexpr std::uint32_t kPrivyRagSchema=19;
+inline constexpr std::uint32_t kBellwetherAnkleSchema=20;
+inline constexpr std::uint32_t kMillTallySchema=21;
+enum class WaysideArchiveProgress : std::uint8_t { Closed, Inspected, Open, Restored };
+// The first safe standing mark beside the chair is part of revision 3's save
+// contract. A later furniture or conversation edit must not move old saves.
+inline constexpr traversal::Vec3 kBellwetherCheckpointPosition{84.52f,-8.709551f,107.68f};
 struct GuardPose {
     float x = -4.0f, z = -15.2f, yaw = 0.0f;
     bool operator==(const GuardPose&) const = default;
@@ -42,14 +65,28 @@ struct Checkpoint {
     float torchDropYaw = -1.57079632679f, torchDropPitch = -.08f;
     std::array<GuardPose, 2> guards{};
     dialogue::Progress dialogue{};
+    WaysideArchiveProgress waysideArchive=WaysideArchiveProgress::Closed;
+    bool waysideLanternRevealStarted=false;
+    bool waysideRegisterRecovered=false;
+    bool waysideRegisterInterpreted=false;
+    TreasurePurse treasurePurse{};
+    bool airWardLearned=false;
+    bellwether::MillPreparation millPreparation{};
+    bool salvagerShorePracticeCompleted=false;
+    bool privyRagDelivered=false;
+    // Revision 2 can remember the completed roadside beat before Kit's seat
+    // is earned. Revision 3 already restores Kit settled in the tavern.
+    bool bellwetherAnkleAssessed=false;
 };
 inline bool HasFlaskResources(const Checkpoint& c) {
     return c.schema==3 || (c.schema>=4 && c.flaskRecorded);
 }
 inline simulation::WorldZoneId Destination(CheckpointId id) {
     if (id == CheckpointId::ForestEndpoint) return simulation::WorldZoneId::Lookout;
-    return id == CheckpointId::SafeExit ? simulation::WorldZoneId::TombExterior
-                                     : simulation::WorldZoneId::Dungeon;
+    // Bellwether is outside the narrow 1.7 route and uses the shared exterior owner.
+    if (id == CheckpointId::SafeExit || id == CheckpointId::BellwetherTavern)
+        return simulation::WorldZoneId::TombExterior;
+    return simulation::WorldZoneId::Dungeon;
 }
 inline bool CompletedForestProgress(const dialogue::Progress& p) {
     return p.proofAccepted && p.forestNightConsumed && p.forestWaystoneConsumed &&
@@ -58,26 +95,66 @@ inline bool CompletedForestProgress(const dialogue::Progress& p) {
 }
 inline bool Validate(const Checkpoint& c) {
     const bool forest = c.id == CheckpointId::ForestEndpoint;
-    // Revision 1 records keep their exact bytes and interpretation. Revision 2
-    // retains completed forest progress at the lookout and later safe-side
-    // returns, with the same logical payload. Old executables reject revision 2.
-    const bool completedForest = c.contentRevision == 2;
-    if ((c.schema != 1 && c.schema != 2 && c.schema != 3 && c.schema != 4 && c.schema != 5) ||
+    const bool tavern = c.id == CheckpointId::BellwetherTavern;
+    // Revision 3 retains Kit's earned seated state even when the player
+    // later saves at another safe boundary. The byte layout is unchanged.
+    const bool completedForest = c.contentRevision>=kForestContentRevision;
+    if (c.schema < 1 || c.schema > kMillTallySchema ||
+        (c.bellwetherAnkleAssessed &&
+            (c.schema<kBellwetherAnkleSchema || c.contentRevision!=kForestContentRevision)) ||
+        (c.privyRagDelivered && (c.schema<kPrivyRagSchema || c.contentRevision<kBellwetherContentRevision ||
+            c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        c.millPreparation>bellwether::MillPreparation::GearingVerified ||
+        c.treasurePurse.millTally>MillTallyProgress::ReturnedAfterSale ||
+        (c.treasurePurse.millTally!=MillTallyProgress::Unfound &&
+            (c.schema<kMillTallySchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        c.treasurePurse.ordinarySilver>OrdinarySilverProgress::Sold ||
+        (c.treasurePurse.ordinarySilver!=OrdinarySilverProgress::Unfound &&
+            (c.schema<kOrdinarySilverSchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        (c.millPreparation!=bellwether::MillPreparation::Unexamined &&
+            (c.schema<kMillPreparationSchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        (c.salvagerShorePracticeCompleted &&
+            (c.schema<kSalvagerShorePracticeSchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.tavernConversationLinesResolved!=dialogue::kTavernConversation.size())) ||
+        (c.airWardLearned && c.waysideArchive!=WaysideArchiveProgress::Restored) ||
+        (c.waysideArchive==WaysideArchiveProgress::Restored &&
+            (c.schema<kAirWardSchema || !c.waysideRegisterInterpreted)) ||
+        (c.schema<kTreasurePurseSchema && c.treasurePurse!=TreasurePurse{}) ||
+        (c.treasurePurse.lanternFittingPurchased &&
+            (c.schema<kLanternFittingSchema || !c.treasurePurse.HasEarnedCoins())) ||
+        c.treasurePurse.coins>TreasurePurse::kMaximumCoins ||
+        (c.treasurePurse.registerRewardClaimed && !c.waysideRegisterInterpreted) ||
+        (!c.treasurePurse.registerRewardClaimed && c.treasurePurse.coins>c.treasurePurse.CoinsIssuedFromSales()) ||
+        (c.dialogue.tavernLanternLinesStarted &&
+            (c.schema<kTavernLanternExchangeSchema || !c.waysideLanternRevealStarted)) ||
+        (c.waysideRegisterInterpreted && (c.schema<kRegisterInterpretationSchema || !c.waysideRegisterRecovered)) ||
+        (c.waysideRegisterRecovered && (c.schema<kWaysideRegisterSchema || !c.waysideLanternRevealStarted)) ||
+        (c.waysideLanternRevealStarted && (c.schema<kShrineLanternSchema || c.waysideArchive<WaysideArchiveProgress::Open)) ||
+        c.waysideArchive>WaysideArchiveProgress::Restored ||
+        (c.waysideArchive!=WaysideArchiveProgress::Closed &&
+            (c.schema<kWaysideArchiveSchema || c.contentRevision<kBellwetherContentRevision ||
+             c.dialogue.hearthLinesResolved!=dialogue::kHearthLines.size())) ||
+        (c.dialogue.hearthLinesResolved && (c.schema<kHearthSpeechSchema || c.contentRevision<kBellwetherContentRevision)) ||
+        (c.dialogue.tavernConversationLinesResolved && c.schema<kTavernConversationSchema) ||
         c.savedAtUnixSeconds > 253402300799ULL || (c.schema < 4 && c.savedAtUnixSeconds != 0) ||
         (c.schema < 4 && c.flaskRecorded) ||
         (c.schema >= 4 && !c.flaskRecorded && c.flask != healing::FlaskResources{false,0}) ||
         (c.schema == 1 && c.halfHeart) || !c.flask.Valid() ||
         (c.schema < 3 && c.flask != healing::FlaskResources{false,0}) ||
-        (c.contentRevision != 1 && !completedForest) ||
+        (c.contentRevision < 1 || c.contentRevision > kBellwetherContentRevision) ||
         (forest && !completedForest) ||
-        (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest) ||
+        (tavern && c.contentRevision!=kBellwetherContentRevision) ||
+        (c.id != CheckpointId::LowerClaimed && c.id != CheckpointId::SafeExit && !forest && !tavern) ||
         c.zone != Destination(c.id) || c.vitality < 1 || c.vitality > 3 ||
         c.defeatedGuards > 3 || (c.schema<5 && c.defeatedGuards!=3) || !c.keeperDefeated || !c.lanternClaimed ||
         !c.lidOpen || !c.ropeReady || !c.night || !dialogue::Director::ValidateProgress(c.dialogue)) return false;
     const bool upper = c.id != CheckpointId::LowerClaimed;
     // Live guards remain confined to the tomb. Never create a lower-room
     // recovery point among them, or allow legacy records to gain new semantics.
-    if(c.schema==5 && !upper && c.defeatedGuards!=3)return false;
+    if(c.schema>=5 && !upper && c.defeatedGuards!=3)return false;
     for(std::size_t i=0;i<c.guardHealth.size();++i) {
         const auto health=c.guardHealth[i];
         if(c.schema<5 ? health!=0 :
@@ -89,7 +166,8 @@ inline bool Validate(const Checkpoint& c) {
     const auto endpoint = simulation::kWorldRoutePoints.back();
     // Forest height is checked against the actual terrain at restore admission,
     // rather than the earlier route blockout's nominal elevation.
-    const auto safe = forest ? traversal::Vec3{endpoint.x,c.position.y,endpoint.z} :
+    const auto safe = tavern ? kBellwetherCheckpointPosition :
+        forest ? traversal::Vec3{endpoint.x,c.position.y,endpoint.z} :
         (upper ? traversal::kExteriorLanding : traversal::kLowerLanding);
     if (!std::isfinite(c.position.x) || !std::isfinite(c.position.y) || !std::isfinite(c.position.z) ||
         !std::isfinite(c.yaw) || !std::isfinite(c.pitch) || c.pitch < -.32f || c.pitch > .28f ||

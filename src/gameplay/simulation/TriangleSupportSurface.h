@@ -3,6 +3,7 @@
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -32,18 +33,73 @@ public:
         std::uint32_t testedTriangles=0;
     };
     static constexpr float kMaximumWalkableSlope=.65f;
-    // Bounded intake capacity, not a renderer/quality budget or runtime growth.
-    static constexpr std::size_t kMaximumTriangles=147456;
+    // Ground and step faces need normals. The original full-face budget also
+    // bounds the bytes available for the remaining, obstruction-only faces.
+    static constexpr std::size_t kMaximumTriangles=163840;
+    static std::size_t NonWalkableCapacity(std::size_t groundAndStepCount)
+    {
+        if(groundAndStepCount>=kMaximumTriangles)return 0;
+        const auto original=kMaximumTriangles-groundAndStepCount;
+        constexpr auto faceBytes=sizeof(Triangle)+sizeof(std::uint32_t); // Face and BVH permutation.
+        const auto saved=original*sizeof(Point);
+        const auto originalNodes=NodeCount(original);
+        // BVH storage grows in steps. Charge both extra faces and their new
+        // nodes against the same retained bytes as the previous solid lane.
+        auto low=original, high=original+saved/faceBytes;
+        while(low<high) {
+            const auto count=low+(high-low+1)/2;
+            const auto cost=(count-original)*faceBytes+(NodeCount(count)-originalNodes)*sizeof(Node);
+            if(cost<=saved) low=count;
+            else high=count-1;
+        }
+        return low;
+    }
     static constexpr std::size_t kMaximumSweepIntervals=512;
     static std::shared_ptr<const TriangleSupportSurface> Build(std::span<const Triangle> input,
                                                               std::string& diagnostic)
     {
-        if(input.empty() || input.size()>kMaximumTriangles) {
+        return BuildSurface(input,diagnostic);
+    }
+
+    // Preserve the exact existing triangle IDs and auxiliary solids. Walkable
+    // additions must use the same triangles as their rendered surfaces.
+    static std::shared_ptr<const TriangleSupportSurface> WithAdditionalGroundGeometry(
+        const TriangleSupportSurface& terrain,std::span<const Triangle> input,std::string& diagnostic)
+    {
+        const auto supportCount=terrain.TriangleCount()+terrain.StepTriangleCount();
+        if(input.empty() || input.size()>kMaximumTriangles-supportCount ||
+           terrain.NonWalkableTriangleCount()>NonWalkableCapacity(supportCount+input.size())) {
+            diagnostic="Additional ground geometry is empty or exceeds bounded intake.";return {};
+        }
+        std::vector<Triangle> triangles;
+        triangles.reserve(terrain.TriangleCount()+input.size());
+        triangles.insert(triangles.end(),terrain.triangles_.begin(),terrain.triangles_.end());
+        triangles.insert(triangles.end(),input.begin(),input.end());
+        auto merged=BuildSurface(triangles,diagnostic);
+        if(!merged)return {};
+        for(std::size_t i=terrain.TriangleCount();i<merged->normals_.size();++i) {
+            const auto& n=merged->normals_[i];
+            if(n[1]<=1e-7f || std::hypot(n[0],n[2])>kMaximumWalkableSlope*n[1]+1e-7f) {
+                diagnostic="An additional ground triangle faces down or exceeds the walkable slope.";return {};
+            }
+        }
+        merged->nonWalkable_=terrain.nonWalkable_;
+        merged->steps_=terrain.steps_;
+        merged->hingedContact_=terrain.hingedContact_;
+        return merged;
+    }
+
+private:
+    static constexpr std::size_t kLeafTriangleLimit=8;
+    static std::shared_ptr<TriangleSupportSurface> BuildSurface(std::span<const Triangle> input,
+                                                               std::string& diagnostic,bool obstructionOnly=false)
+    {
+        if(input.empty() || input.size()>(obstructionOnly?NonWalkableCapacity(0):kMaximumTriangles)) {
             diagnostic="Terrain support triangle count is outside bounded intake capacity.";return {};
         }
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface);
         result->triangles_.assign(input.begin(),input.end());
-        result->normals_.reserve(input.size());
+        if(!obstructionOnly)result->normals_.reserve(input.size());
         for(const auto& triangle:input) {
             for(const auto& p:triangle.points) for(float c:p)
                 if(!std::isfinite(c)||std::abs(c)>1000000.f) {
@@ -61,7 +117,7 @@ public:
             if(!std::isfinite(length)||length<=1e-10) {
                 diagnostic="Terrain support contains a degenerate triangle.";return {};
             }
-            result->normals_.push_back({float(nx/length),float(ny/length),float(nz/length)});
+            if(!obstructionOnly)result->normals_.push_back({float(nx/length),float(ny/length),float(nz/length)});
         }
         result->order_.resize(input.size());
         std::iota(result->order_.begin(),result->order_.end(),0u);
@@ -69,6 +125,8 @@ public:
         result->BuildNode(0,static_cast<std::uint32_t>(input.size()));
         diagnostic.clear();return result;
     }
+
+public:
     Sample Query(float x,float z,float minimumY=-1000000.f,float maximumY=1000000.f) const
     {
         Sample result;
@@ -81,11 +139,10 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithNonWalkableGeometry(
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
-        const auto retained=ground.TriangleCount()+ground.StepTriangleCount();
-        if(ground.nonWalkable_ || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        if(ground.nonWalkable_ || input.size()>NonWalkableCapacity(ground.TriangleCount()+ground.StepTriangleCount())) {
             diagnostic="Nonwalkable geometry was already attached or exceeds bounded intake.";return {};
         }
-        auto contact=Build(input,diagnostic);
+        auto contact=BuildSurface(input,diagnostic,true);
         if(!contact)return {};
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
@@ -100,8 +157,8 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithStepGeometry(
         const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic)
     {
-        const auto retained=ground.TriangleCount()+ground.NonWalkableTriangleCount();
-        if(ground.steps_ || input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        if(ground.steps_ || input.empty() || input.size()>kMaximumTriangles-ground.TriangleCount() ||
+           ground.NonWalkableTriangleCount()>NonWalkableCapacity(ground.TriangleCount()+input.size())) {
             diagnostic="Step geometry is empty, already attached or exceeds bounded intake.";return {};
         }
         auto steps=Build(input,diagnostic);
@@ -136,18 +193,39 @@ public:
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
         const auto oldCount=ground.NonWalkableTriangleCount();
-        const auto retained=ground.TriangleCount()+oldCount+ground.StepTriangleCount();
-        if(input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        const auto capacity=NonWalkableCapacity(ground.TriangleCount()+ground.StepTriangleCount());
+        if(input.empty() || input.size()>capacity-oldCount) {
             diagnostic="Additional nonwalkable geometry is empty or exceeds bounded intake.";return {};
         }
         std::vector<Triangle> combined;
         combined.reserve(oldCount+input.size());
         if(ground.nonWalkable_)combined=ground.nonWalkable_->triangles_;
         combined.insert(combined.end(),input.begin(),input.end());
-        auto contact=Build(combined,diagnostic);
+        auto contact=BuildSurface(combined,diagnostic,true);
         if(!contact)return {};
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
+    }
+    enum class HingedPart { WaysideCover, TavernDoor };
+
+    // Keep small local-space contact separate from immutable world solids.
+    static std::shared_ptr<const TriangleSupportSurface> WithHingedContact(
+        const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic,
+        HingedPart part=HingedPart::WaysideCover)
+    {
+        const auto index=static_cast<std::size_t>(part);
+        const std::size_t limit=part==HingedPart::WaysideCover?64:288;
+        if(ground.hingedContact_[index] || input.empty() || input.size()>limit) {
+            diagnostic="Hinged contact is empty, already attached or exceeds its intake bound.";return {};
+        }
+        auto contact=Build(input,diagnostic);
+        if(!contact)return {};
+        auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
+        result->hingedContact_[index]=std::move(contact);
+        return result;
+    }
+    const TriangleSupportSurface* HingedContact(HingedPart part=HingedPart::WaysideCover) const {
+        return hingedContact_[static_cast<std::size_t>(part)].get();
     }
     std::size_t NonWalkableTriangleCount() const {return nonWalkable_?nonWalkable_->TriangleCount():0;}
     // Collision query for an elevated horizontal volume, independent of ground
@@ -159,6 +237,26 @@ public:
     {
         if(!ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
         return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius);
+    }
+    // Carry lookahead extends beyond the held geometry. The upward continuation
+    // of the player's current floor is not an obstacle in that lookahead.
+    // Only walkable faces can use the rising floor band; other faces keep the
+    // fixed limits. Raised ground above the local slope still obstructs carry.
+    bool HorizontalCarryVolumeClear(float fromX,float fromZ,float toX,float toZ,
+                                    float minimumY,float maximumY,float radius) const
+    {
+        if(!ValidVolume(fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return false;
+        if(HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius))return true;
+        const float dx=toX-fromX,dz=toZ-fromZ;
+        const float length=std::hypot(dx,dz);
+        if(length<=1e-6f)return false;
+        const auto floor=Query(fromX,fromZ);
+        if(!floor.found||!floor.walkable)return false;
+        const float unitX=dx/length,unitZ=dz/length;
+        const float rise=-(floor.normal[0]*unitX+floor.normal[2]*unitZ)/floor.normal[1];
+        if(rise<=0.f)return false;
+        return HorizontalVolumeNodeClear(0,fromX,fromZ,toX,toZ,minimumY,maximumY,radius,
+            minimumY,{rise*unitX,rise*unitZ});
     }
     // Terrain-only body sweep with a conservative floor-band exemption.
     // Upward walkable faces are clipped to the part above the footprint's
@@ -210,16 +308,19 @@ public:
     std::size_t TriangleCount() const { return triangles_.size(); }
     std::size_t RetainedBytes() const {
         return (nonWalkable_?nonWalkable_->RetainedBytes():0)+(steps_?steps_->RetainedBytes():0)+
+            (hingedContact_[0]?hingedContact_[0]->RetainedBytes():0)+
+            (hingedContact_[1]?hingedContact_[1]->RetainedBytes():0)+
                triangles_.capacity()*sizeof(Triangle)+normals_.capacity()*sizeof(Point)+
                order_.capacity()*sizeof(std::uint32_t)+nodes_.capacity()*sizeof(Node);
     }
 private:
-    struct Interval { double begin=0,end=1,height=0,deltaHeight=0; };
+    struct Interval { double begin=0,end=1,height=0,deltaHeight=0;bool walkable=false; };
     using Intervals=std::array<Interval,kMaximumSweepIntervals>;
     struct Node { Point minimum{},maximum{};std::uint32_t begin=0,count=0,left=0,right=0; };
     std::vector<Triangle> triangles_;
     std::shared_ptr<const TriangleSupportSurface> nonWalkable_;
     std::shared_ptr<const TriangleSupportSurface> steps_;
+    std::array<std::shared_ptr<const TriangleSupportSurface>,2> hingedContact_;
     std::vector<Point> normals_;
     std::vector<std::uint32_t> order_;
     std::vector<Node> nodes_;
@@ -325,31 +426,49 @@ private:
     }
     bool HorizontalVolumeNodeClear(std::uint32_t index,float x,float z,float toX,float toZ,
                                   float minY,float maxY,float radius,
-                                  float ignoredWalkableBelow=-std::numeric_limits<float>::infinity()) const
+                                  float ignoredWalkableBelow=-std::numeric_limits<float>::infinity(),
+                                  std::array<float,2> floorRise={}) const
     {
         const auto& node=nodes_[index];
         if(std::max(x,toX)+radius<node.minimum[0]||std::min(x,toX)-radius>node.maximum[0]||
            std::max(z,toZ)+radius<node.minimum[2]||std::min(z,toZ)-radius>node.maximum[2]||
            maxY<node.minimum[1]||minY>node.maximum[1])return true;
-        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow)&&
-                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow);
+        if(!node.count)return HorizontalVolumeNodeClear(node.left,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow,floorRise)&&
+                               HorizontalVolumeNodeClear(node.right,x,z,toX,toZ,minY,maxY,radius,ignoredWalkableBelow,floorRise);
         const Point from{x,0,z},to{toX,0,toZ};
         const double radiusSquared=double(radius)*radius;
         for(auto i=node.begin;i<node.begin+node.count;++i) {
             Polygon a{},b{};
-            const auto id=order_[i];const auto& triangle=triangles_[id];const auto n=normals_[id];
-              const bool walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
+            const auto id=order_[i];const auto& triangle=triangles_[id];
+            bool walkable=false;
+            if(ignoredWalkableBelow!=-std::numeric_limits<float>::infinity()) {
+                const auto& n=normals_[id];
+                walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
+            }
             std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
-              const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
+            const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
             const auto count=ClipHeight(b,first,maxY,false,a);
             if(!count)continue;
-            if(SweptFootprintTouches(a,count,from,to,radiusSquared))return false;
+            if(walkable&&(floorRise[0]!=0.f||floorRise[1]!=0.f)) {
+                // After clipping the fixed height band, flatten only Y against
+                // the sloped lower plane. The footprint test uses X and Z.
+                for(std::size_t vertex=0;vertex<count;++vertex) {
+                    auto& p=a[vertex];
+                    p[1]-=floorRise[0]*(p[0]-x)+floorRise[1]*(p[2]-z);
+                }
+                const auto aboveSlope=ClipHeight(a,count,minY,true,b);
+                if(aboveSlope&&SweptFootprintTouches(b,aboveSlope,from,to,radiusSquared))return false;
+            } else if(SweptFootprintTouches(a,count,from,to,radiusSquared))return false;
         }
         return true;
     }
     static std::size_t NodeCount(std::size_t triangles)
     {
-        return triangles<=8?1:1+NodeCount(triangles/2)+NodeCount(triangles-triangles/2);
+        if(triangles<=kLeafTriangleLimit)return 1;
+        // Median splits distribute faces evenly at each depth. At the last
+        // complete level, each leaf with a ninth face splits just once more.
+        const auto leaves=std::bit_floor(triangles/kLeafTriangleLimit);
+        return 2*(leaves+std::min(leaves,triangles-kLeafTriangleLimit*leaves))-1;
     }
     bool GatherIntervals(std::uint32_t index,double x,double z,double dx,double dz,
                          Intervals& intervals,std::size_t& count) const
@@ -376,15 +495,40 @@ private:
                 else interval.end=std::min(interval.end,-bary[0]/bary[1]);
             }
             if(!intersects||interval.begin>interval.end) continue;
-            // Conservative for layered meshes: an intersected steep upward
-            // face is rejected even if another floor might obscure it. This
-            // support sweep is intended for the exported terrain heightfield.
-            if(std::hypot(n[0],n[2])>kMaximumWalkableSlope*n[1]+1e-7f || count==intervals.size()) return false;
+            if(count==intervals.size()) return false;
+            interval.walkable=std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
             interval.height=u*a[1]+v*b[1]+(1-u-v)*c[1];
             interval.deltaHeight=du*a[1]+dv*b[1]+(-du-dv)*c[1];
             intervals[count++]=interval;
         }
         return true;
+    }
+    static bool SteepIntervalBuried(const Interval& steep,std::span<const Interval> spans)
+    {
+        // A bridge or raised walkable deck can mask the terrain only where
+        // there is continuous, strictly higher walkable support. Clip the
+        // two linear height functions to their common interval before merging
+        // coverage so even a thin exposed part of the bank stays impassable.
+        constexpr double heightMargin=.00001;
+        constexpr double joinTolerance=1e-9;
+        double covered=steep.begin;
+        for(;;) {
+            double next=covered;
+            for(const auto& top:spans) {
+                if(!top.walkable || top.begin>covered+joinTolerance || top.end<covered) continue;
+                const double difference=top.height-steep.height-heightMargin;
+                const double slope=top.deltaHeight-steep.deltaHeight;
+                double from=std::max(steep.begin,top.begin),to=std::min(steep.end,top.end);
+                if(slope>0)from=std::max(from,-difference/slope);
+                else if(slope<0)to=std::min(to,-difference/slope);
+                else if(difference<0)continue;
+                if(from>to || from>covered+joinTolerance || to<covered)continue;
+                if(to>=steep.end)return true;
+                next=std::max(next,to);
+            }
+            if(next<=covered)return false;
+            covered=next;
+        }
     }
     bool ContinuousSupport(float x,float z,float toX,float toZ,float maximumStep) const
     {
@@ -395,7 +539,8 @@ private:
         });
         double covered=0;
         for(std::size_t i=0;i<count;++i) {
-            if(intervals[i].begin>covered+1e-9) return false;
+            if(intervals[i].begin>covered+1e-9 ||
+               (!intervals[i].walkable && !SteepIntervalBuried(intervals[i],{intervals.data(),count}))) return false;
             covered=std::max(covered,intervals[i].end);
         }
         if(covered<1-1e-9) return false;
@@ -422,7 +567,7 @@ private:
         for(auto i=begin;i<begin+count;++i) for(const auto& p:triangles_[order_[i]].points)
             for(unsigned k=0;k<3;++k) {node.minimum[k]=std::min(node.minimum[k],p[k]);node.maximum[k]=std::max(node.maximum[k],p[k]);}
         const auto index=static_cast<std::uint32_t>(nodes_.size());nodes_.push_back(node);
-        if(count>8) {
+        if(count>kLeafTriangleLimit) {
             const unsigned axis=node.maximum[0]-node.minimum[0]>node.maximum[2]-node.minimum[2]?0:2;
             const auto middle=begin+count/2;
             const auto centroid=[&](std::uint32_t triangle) {

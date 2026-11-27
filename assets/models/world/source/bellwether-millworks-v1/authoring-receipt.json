@@ -1,0 +1,66 @@
+{
+  "originalTownSha256": "71739dbab1045a219e04ff6fd9da9a7dfb881fa04aba77055e73490ccfd3077d",
+  "wheelSourceSha256": "68ce5b5edaf57f667a6464eaf56c6b83f364a6f6b4b60d1a1374e505808612e7",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "finishProviderSha256": "b65e6e5c5e8c69ea4695c16e0085bdaa0209f5f963bc0af75eda5174354a04f2",
+  "authoringRecipeSha256": "8b21e118d4910e74aadf4cc19f861fc274ee50c3d9bc7655988e1d3597fd76a8",
+  "solidTrianglesAdded": 700,
+  "townVertices": 9897,
+  "townPrimitives": 5,
+  "wheelTriangles": 2180,
+  "fit": {
+    "bearingFootprints": [
+      [
+        135.48,
+        136.14999999999998,
+        108.83999999999999,
+        109.86,
+        -23.081,
+        -21.33
+      ],
+      [
+        138.25,
+        138.92,
+        108.83999999999999,
+        109.86,
+        -23.076,
+        -21.33
+      ]
+    ],
+    "sluiceCentreXZ": [
+      137.328,
+      106.74
+    ],
+    "sluiceClearanceOverWater": 0.24
+  },
+  "outputs": {
+    "asset.manifest.json": {
+      "bytes": 707,
+      "sha256": "5aa025771ea1d462433d6544dfb35e7ff943f8e67bfb25cbe9194dbc837bab2c"
+    },
+    "bellwether-tavern-v1.glb": {
+      "bytes": 507832,
+      "sha256": "605612b5d65c01d7c20b37a979ee159c0b0aefe4852e13b9a486f1e55dba0c66"
+    },
+    "mill-waterwheel.glb": {
+      "bytes": 222196,
+      "sha256": "848c723d3b04de91da33aad231b61c8ea6700f9d977cc8e12fdd9fa47c557145"
+    },
+    "mill-waterwheel.manifest.json": {
+      "bytes": 671,
+      "sha256": "a69e877ec88197ef4d5cd6308f56ce028d023041fcd3b1ad5e9c76ac51d9cc20"
+    },
+    "millworks.blend": {
+      "bytes": 102841,
+      "sha256": "1b44350b8dfe955c794cf63520004ecf0ca513740199cc8a9ae92c7fb1b4bde1"
+    },
+    "millworks.glb": {
+      "bytes": 77828,
+      "sha256": "00d2d418d9196e0e244df95be78f8f1411f33e442cdd240d10672bfcf25a8ddd"
+    },
+    "geometry.generated.h": {
+      "bytes": 210,
+      "sha256": "0e62c111e90e12a9dd4fc3b452ad296fa4a2e06d94d8e50dead8da7407b845c8"
+    }
+  }
+}

@@ -5,9 +5,15 @@
 #include <string_view>
 
 #include "gameplay/ShowcaseRoute.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
+#include "../../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 
 namespace horde::gameplay
 {
+
+enum class BellwetherStaffedView : std::uint8_t { None, Room, KeeperReply, LanternGlance, RepeatVisit, DoorClosed };
 
 enum class DevelopmentCombatPose : std::uint8_t
 {
@@ -24,6 +30,11 @@ enum class DevelopmentRewardPose : std::uint8_t
     HeldLow,
     GlassTransmission,
     MotionExtreme,
+};
+
+enum class BellwetherBranchView : std::uint8_t {
+    None, Church, Archive, ArchiveOpen, RegisterRecovered, RegisterHandoff, KitIntroduction,
+    MillYard, RiverLanding, RigLeakTrial, MillArtificer, MillDriveTested, SalvagerShore, RelicDealerVisit
 };
 
 struct DevelopmentCheckpoint
@@ -53,6 +64,7 @@ struct DevelopmentCheckpoint
     bool stagesUnlockedChest = false;
     // Capture framing only; dedicated modelled primary ownership stays mandatory.
     bool primaryArmsMayBeOutsideFrame = false;
+    bool primaryHeldItemsMayBeOutsideFrame = false;
     // Explicit development capture only; production encounter defaults stay unchanged.
     bool stagesWaterfallGuards = false;
     std::uint32_t waterfallGuardFixedTicks = 0u;
@@ -68,6 +80,11 @@ struct DevelopmentCheckpoint
     // 3 return grip/backoff, 4 second ascent. No authored root teleport.
     std::uint8_t rescueTraversalCapture = 0u;
     bool walksBeyondExteriorStation = false;
+    std::size_t bellwetherStations = 0;
+    std::uint32_t bellwetherSitTicks = 0;
+    std::uint32_t bellwetherAnkleTicks = 0;
+    BellwetherBranchView bellwetherBranchView = BellwetherBranchView::None;
+    BellwetherStaffedView bellwetherStaffedView = BellwetherStaffedView::None;
     // Real attack-phase staging: yellow windup/contact, red windup/contact, accepted hit.
     std::uint8_t combatFeedbackCapture = 0u;
 };
@@ -77,10 +94,11 @@ struct DevelopmentCheckpoint
 inline constexpr bool DevelopmentCheckpointRequiresAuthoredChapter(
     const DevelopmentCheckpoint& checkpoint) noexcept
 {
-    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-");
+    return checkpoint.id == 192 || checkpoint.name.starts_with("chapter-") ||
+        checkpoint.bellwetherStations!=0 || checkpoint.bellwetherStaffedView!=BellwetherStaffedView::None;
 }
 
-inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints{{
+inline constexpr std::array<DevelopmentCheckpoint, 146u> kDevelopmentCheckpoints{{
     {.id=234,.name="attack-ring-yellow-windup",.baseShowcaseCheckpointId=12,
      .cameraX=-3.4f,.cameraZ=-15.2f,.yaw=-1.57079632679f,.pitch=-.05f,.combatFeedbackCapture=1u},
     {.id=235,.name="attack-ring-yellow-contact",.baseShowcaseCheckpointId=12,
@@ -201,6 +219,141 @@ inline constexpr std::array<DevelopmentCheckpoint, 118u> kDevelopmentCheckpoints
     {.id = 203, .name = "chapter-forest-lookout", .baseShowcaseCheckpointId = 11,
      .cameraX = 13.3f, .cameraZ = 36.2f, .yaw = 2.51f, .pitch = -0.15f,
      .stagesRescueExterior = true, .exteriorRouteStation = 7u, .keeperDeathFixedTicks = 240u},
+    {.id=350,.name="bellwether-square-frontage",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherWestJunction].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherWestJunction].z,
+     .yaw=-.35f,.pitch=.02f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherWestJunction+1},
+    {.id=320,.name="bellwether-south-approach",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthApproachStation].z,
+     .yaw=0,.pitch=-.23f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthApproachStation+1},
+    {.id=321,.name="bellwether-tavern-hearth",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute.back().x,
+     .cameraZ=traversal::kBellwetherTavernRoute.back().z,
+     .yaw=-.79f,.pitch=-.27f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size()},
+    {.id=322,.name="bellwether-kit-lowering",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=41u},
+    {.id=323,.name="bellwether-kit-seated",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=100u},
+    {.id=324,.name="bellwether-kit-ankle-catch",.baseShowcaseCheckpointId=11,
+     .cameraX=61.0f,.cameraZ=110.4f,.yaw=-.66f,.pitch=-.20f,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,.keeperDeathFixedTicks=240u,
+     .bellwetherStations=traversal::kBellwetherAnkleStation+1,.bellwetherAnkleTicks=20u},
+    {.id=325,.name="bellwether-tavern-window",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,
+     .yaw=2.43f,.pitch=.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthDoorStation+2},
+    {.id=339,.name="bellwether-south-door-closed",.baseShowcaseCheckpointId=11,
+     .cameraX=82.3f,.cameraZ=120.93f,.yaw=0.f,.pitch=.05f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=120u,
+     .bellwetherStaffedView=BellwetherStaffedView::DoorClosed},
+    {.id=326,.name="bellwether-staffed-room",.baseShowcaseCheckpointId=11,
+     .cameraX=83.97f,.cameraZ=114.04f,.yaw=-.14f,.pitch=-.11f,.stagesRescueExterior=true,
+     .bellwetherStaffedView=BellwetherStaffedView::Room},
+    {.id=327,.name="bellwether-keeper-reply",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=2.47f,.pitch=-.08f,.stagesRescueExterior=true,
+     .bellwetherStaffedView=BellwetherStaffedView::KeeperReply},
+    {.id=328,.name="bellwether-kit-lantern-glance",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,
+     .bellwetherStaffedView=BellwetherStaffedView::LanternGlance},
+    {.id=329,.name="bellwether-repeat-visit",.baseShowcaseCheckpointId=11,
+     .cameraX=83.97f,.cameraZ=114.04f,.yaw=-.14f,.pitch=-.11f,.stagesRescueExterior=true,
+     .bellwetherStations=traversal::kBellwetherTavernRoute.size(),.bellwetherSitTicks=100u,
+     .bellwetherStaffedView=BellwetherStaffedView::RepeatVisit},
+    {.id=330,.name="bellwether-church-waymarker",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherChurchJunction].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherChurchJunction].z,
+     .yaw=1.54f,.pitch=-.08f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1},
+    {.id=331,.name="bellwether-wayside-archive",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
+     .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::Archive},
+    {.id=332,.name="bellwether-wayside-archive-open",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
+     .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::ArchiveOpen},
+    {.id=333,.name="bellwether-wayside-register-recovered",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kWaysideInspection[0],.cameraZ=bellwether::kWaysideInspection[2],
+     .yaw=0.f,.pitch=-.12f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RegisterRecovered},
+    {.id=334,.name="bellwether-church-approach",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRecordKeeperMark.x,.cameraZ=traversal::kBellwetherRecordKeeperMark.z,
+     .yaw=-1.57f,.pitch=-.24f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::Church},
+    {.id=341,.name="bellwether-mill-yard",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherMillYardView.x,.cameraZ=traversal::kBellwetherMillYardView.z,
+     .yaw=1.76f,.pitch=-.21f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::MillYard},
+    {.id=344,.name="bellwether-mill-artificer",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherMillArtificerView.x,.cameraZ=traversal::kBellwetherMillArtificerView.z,
+     .yaw=1.64f,.pitch=-.32f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::MillArtificer},
+    {.id=345,.name="bellwether-mill-drive-tested",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherMillArtificerView.x,.cameraZ=traversal::kBellwetherMillArtificerView.z,
+     .yaw=1.64f,.pitch=-.32f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::MillDriveTested},
+    // Frame the resident at conversation distance. Keep dedicated primary ownership.
+    {.id=346,.name="bellwether-salvager-shore",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherSalvagerMark.x,.cameraZ=traversal::kBellwetherSalvagerMark.z,
+     .yaw=-.08f,.pitch=-.17f,.primaryArmsMayBeOutsideFrame=true,.primaryHeldItemsMayBeOutsideFrame=true,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::SalvagerShore},
+    {.id=348,.name="bellwether-relic-dealer",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRelicDealerApproach.x,.cameraZ=traversal::kBellwetherRelicDealerApproach.z,
+     .yaw=traversal::kBellwetherRelicDealerApproachYaw,.pitch=-.14f,
+     .primaryArmsMayBeOutsideFrame=true,.primaryHeldItemsMayBeOutsideFrame=true,
+     .stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherWestJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RelicDealerVisit},
+    {.id=342,.name="bellwether-river-landing",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRiverLandingView.x,.cameraZ=traversal::kBellwetherRiverLandingView.z,
+     .yaw=1.68f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RiverLanding},
+    {.id=343,.name="bellwether-rig-leak-trial",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRiverLandingView.x,.cameraZ=traversal::kBellwetherRiverLandingView.z,
+     .yaw=1.68f,.pitch=-.28f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherMillJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RigLeakTrial},
+    {.id=335,.name="bellwether-record-keeper-handoff",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z,
+     .yaw=1.57079632679f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RegisterHandoff},
+    {.id=340,.name="bellwether-record-keeper-listener",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherRecordKeeperApproach.x,.cameraZ=traversal::kBellwetherRecordKeeperApproach.z+.66f,
+     .yaw=1.20f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::RegisterHandoff},
+    {.id=336,.name="bellwether-return-to-kit",.baseShowcaseCheckpointId=11,
+     .cameraX=bellwether::kConversation[0],.cameraZ=bellwether::kConversation[2],
+     .yaw=-1.40f,.pitch=-.22f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherChurchJunction+1,
+     .bellwetherBranchView=BellwetherBranchView::KitIntroduction},
+    {.id=338,.name="bellwether-south-door",.baseShowcaseCheckpointId=11,
+     .cameraX=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].x,
+     .cameraZ=traversal::kBellwetherTavernRoute[traversal::kBellwetherSouthDoorStation+1].z,
+     .yaw=-2.89f,.pitch=-.07f,.stagesRescueExterior=true,.exteriorRouteStation=7u,
+     .keeperDeathFixedTicks=240u,.bellwetherStations=traversal::kBellwetherSouthDoorStation+2},
     {.id = 198, .name = "chapter-stone-portal-front", .baseShowcaseCheckpointId = 0,
      .cameraX = 0.0f, .cameraZ = -4.9f, .yaw = 0, .pitch = -0.15f},
     {.id = 199, .name = "chapter-stone-portal-rear", .baseShowcaseCheckpointId = 0,

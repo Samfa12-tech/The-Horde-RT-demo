@@ -1,10 +1,16 @@
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "platform/android/GameplayEventMetadata.h"
 #include "gameplay/DevelopmentCheckpointSimulation.h"
+#include "gameplay/campaign/CampaignCheckpointCodec.h"
+#include "gameplay/dialogue/BellwetherRoadStone.h"
+#include "gameplay/effects/BellwetherHearth.h"
+#include "gameplay/items/HeldItemKinematics.h"
 #include "gameplay/simulation/GameSimulation.h"
 #include "gameplay/simulation/ForestTreePlacementContract.h"
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
 #include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
+#include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
 #include "scene/ForestRockDressing.h"
@@ -20,6 +26,9 @@
 #include "scene/assets/StaticTriangleSelection.h"
 #include "vulkan/raytracing/RtStaticMeshSlot.h"
 #include "gameplay/traversal/ChapterTerrainMovement.h"
+#include "gameplay/traversal/BellwetherEastRoute.h"
+#include "gameplay/traversal/BellwetherNorthRoute.h"
+#include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "scene/assets/AssetManifest.h"
 
 #include <algorithm>
@@ -30,6 +39,7 @@
 #include <chrono>
 #include <filesystem>
 #include <iostream>
+#include <iterator>
 #include <limits>
 #include <string>
 #include <string_view>
@@ -686,7 +696,7 @@ void TestSharedMasterPacking()
     const bool base=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
         AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
         AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic) &&
-        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic) &&
         PrepareForestDressing(kRoot/"assets",prepared,diagnostic,terrain.get());
     Check(base,diagnostic.empty()?"shared master proof prepares the same real chapter and root-fitted snapshot":diagnostic);
     if(!base)return;
@@ -1135,16 +1145,1009 @@ void AuditBoundary(const gameplay::simulation::TriangleSupportSurface& terrain,b
     std::cout<<"Containment audit: sentinels="<<std::count(reached.begin(),reached.end(),true)<<" approaches="<<attempted<<" leaks="<<leaks<<" floodCells="<<visited<<" movementSteps="<<moves<<'\n';
 }
 
-void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+gameplay::campaign::Checkpoint LookoutCheckpoint(
+    const gameplay::simulation::TriangleSupportSurface& terrain) {
     namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
     cp::Checkpoint record;record.contentRevision=2;record.id=cp::CheckpointId::ForestEndpoint;
     record.zone=sim::WorldZoneId::Lookout;record.firstAscentCompleted=true;
     record.guards={cp::GuardPose{-4.f,-15.2f,.3f},cp::GuardPose{-6.f,-16.f,-.7f}};
-    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain->Query(anchor.x,anchor.z);
+    const auto anchor=sim::kWorldRoutePoints.back();const auto ground=terrain.Query(anchor.x,anchor.z);
     record.position={anchor.x,ground.worldY,anchor.z};record.yaw=2.57f;
     record.dialogue.grateConsumed=record.dialogue.rescueConsumed=record.dialogue.reunionStarted=true;
     record.dialogue.proofAccepted=record.dialogue.forestNightConsumed=record.dialogue.forestWaystoneConsumed=true;
     record.dialogue.forestClueConsumed=record.dialogue.forestVillageConsumed=true;
+    return record;
+}
+
+void TestBellwetherWelcomeClearance(const gameplay::simulation::TriangleSupportSurface& terrain) {
+    using namespace gameplay::dialogue;
+    using namespace gameplay::traversal;
+    const auto door=kBellwetherTavernRoute[kBellwetherSouthDoorStation];
+    const auto& keeper=gameplay::bellwether::kKeeperDoor;
+    const Tuple source{keeper[0],keeper[1]+kCompanionSpeechHeight,keeper[2]};
+    const auto listenerAt=[&](float x,float z) {
+        const auto ground=terrain.Query(x,z);
+        Check(ground.found && ground.walkable,"welcome clearance probe has grounded listener support");
+        return Tuple{x,gameplay::simulation::PlayerEyeWorldY(ground.worldY),z};
+    };
+    // The oblique line from the keeper crosses the east jamb from farther down
+    // the ramp. The grounded sill and upper ramp give a clear path to the room.
+    Check(TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z)) &&
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)),
+          "the welcome carries through the real south aperture as the player approaches the sill");
+    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)) &&
+          !TavernWelcomeAudible(terrain,source,listenerAt(keeper[0],door.z+.5f)),
+          "the south jamb and adjacent wall occlude the welcome away from the open path");
+}
+
+void TestBellwetherHearthRest() {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::dialogue;
+    using gameplay::healing::FlaskAction;
+    using gameplay::healing::FlaskResources;
+    std::string diagnostic;
+    auto owner=LoadCollapse(diagnostic);
+    std::shared_ptr<const sim::TriangleSupportSurface> terrain;
+    TombDressingBuildReport tomb;
+    GraveyardDressingReport graves;
+    const bool admitted=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
+        AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
+        AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic);
+    Check(admitted,diagnostic);
+    if(!admitted)return;
+
+    TestBellwetherWelcomeClearance(*terrain);
+
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=true;
+    config.healingFlask1_7=true;
+    sim::GameSimulation game(config);
+    auto record=LookoutCheckpoint(*terrain);
+    record.id=cp::CheckpointId::BellwetherTavern;
+    record.zone=cp::Destination(record.id);
+    record.position=cp::kBellwetherCheckpointPosition;
+    record.yaw=-1.40f;record.pitch=-.22f;
+    record.vitality=2;record.halfHeart=true;
+    record.schema=cp::kHearthSpeechSchema;record.contentRevision=cp::kBellwetherContentRevision;
+    record.dialogue.hearthLinesResolved=kHearthLines.size();
+    sim::InputSnapshot input;
+    input.yawRadians=record.yaw;input.pitchRadians=record.pitch;
+    const auto restore=[&](const cp::Checkpoint& checkpoint) {
+        const auto token=game.BeginCampaignRestore(checkpoint);
+        return token && game.CommitCampaignRestore(*token,{token->worldGeneration,checkpoint.zone},terrain,input);
+    };
+    const auto step=[&](unsigned count=1) {
+        for(unsigned tick=0;tick<count;++tick)game.StepFixed(input);
+        game.ClearEvents();
+    };
+    if(!restore(record)) {Check(false,"hearth Rest test loads before the tavern Talk");return;}
+    step();
+    const auto& state=game.Snapshot();
+    constexpr auto hearth=static_cast<std::uint32_t>(cp::CheckpointId::BellwetherTavern);
+    Check(!state.flaskRestAnchor && !state.flaskNearbyRestAnchor && state.tavernConversationAvailable,
+          "an earned arrival before the first Talk hides Rest on the actual tavern floor");
+
+    record.schema=cp::kTavernConversationSchema;
+    record.dialogue.tavernConversationLinesResolved=kTavernConversation.size();
+    if(!restore(record)) {Check(false,"hearth Rest test loads the completed tavern Talk");return;}
+    step();
+    const auto stillHurt=[&] {
+        return state.healingFlask.resources.charges==0 && state.playerVitals.vitality==2 && state.playerVitals.halfHeart;
+    };
+    Check(state.flaskRestAnchor==hearth && state.flaskNearbyRestAnchor==hearth && stillHurt(),
+          "reloading completed Talk offers hearth Rest and preserves saved injuries and empty charges");
+    const auto generation=state.completedRestGeneration;
+    ++input.commands.rest;step(60);
+    Check(state.healingFlask.action==FlaskAction::Resting,"the shared Rest command starts the hearth service");
+    input.paused=true;step();
+    input.paused=false;step();
+    Check(state.healingFlask.action==FlaskAction::Idle && state.completedRestGeneration==generation && stillHurt(),
+          "pausing interrupts a partial hearth Rest without awarding resources");
+    ++input.commands.rest;step(119);
+    Check(state.healingFlask.action==FlaskAction::Resting && state.completedRestGeneration==generation && stillHurt(),
+          "hearth Rest cannot complete before two seconds");
+    step(4);
+    const auto rested=game.LatestCampaignBoundary();
+    Check(state.completedRestGeneration==generation+1 && state.playerVitals.vitality==3 && !state.playerVitals.halfHeart &&
+          state.healingFlask.resources==FlaskResources{false,2} && rested && rested->flaskRecorded &&
+          rested->vitality==3 && !rested->halfHeart && rested->flask==state.healingFlask.resources &&
+          rested->position.x==record.position.x && rested->position.z==record.position.z &&
+          rested->dialogue.tavernConversationLinesResolved==kTavernConversation.size(),
+          "hearth Rest heals and refills once and updates the same earned save");
+    input.guardHeld=true;step();
+    Check(!state.flaskRestAnchor && state.flaskNearbyRestAnchor==hearth,
+          "hearth discovery persists during guard without allowing Rest");
+}
+
+void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain,
+                              bool stayAtIncident) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::dialogue;
+    using Stage=BellwetherArrivalStage;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=stayAtIncident;
+    config.bellwetherSpecialist=stayAtIncident ? gameplay::bellwether::Specialist::RecordKeeper :
+        gameplay::bellwether::Specialist::None;
+    sim::GameSimulation game(config);
+    const auto record=LookoutCheckpoint(*terrain);
+    const auto token=game.BeginCampaignRestore(record);
+    const bool restored=token && game.CommitCampaignRestore(
+        *token,{token->worldGeneration,record.zone},terrain,{});
+    Check(restored,"the production movement fixture can start from a completed 1.7 lookout save");
+    if(!restored)return;
+    const auto publishWorld=[&](std::uint64_t generation) {
+        for(const auto& zone:sim::kWorldZones) {
+            const sim::WorldZoneToken ready{generation,zone.id};
+            if(zone.id==sim::WorldZoneId::Dungeon)game.PublishWorldZoneReadiness(ready,sim::ZoneReadiness::Ready);
+            else game.PublishChapterTerrain(ready,terrain);
+        }
+    };
+    publishWorld(token->worldGeneration);
+    sim::InputSnapshot neutral;
+    neutral.yawRadians=record.yaw;
+    neutral.pitchRadians=record.pitch;
+    game.StepFixed(neutral);
+    Check(game.Snapshot().chapterCompanion.bellwetherArrival==Stage::AtLookout,
+          "restoring at the lookout leaves Kit waiting for the player to take the road");
+
+    const auto& route=gameplay::traversal::kBellwetherTavernRoute;
+    const auto [signX,signY,signZ]=gameplay::bellwether::kChurchWaymarker;
+    const auto signGround=terrain->Query(signX,signZ);
+    Check(signGround.found && std::abs(signGround.worldY-signY)<.01f &&
+          !terrain->NonWalkableVolumeClear(signX,signZ,signX,signZ,signY+.05f,signY+1.50f,.03f),
+          "the church waymarker is grounded and the rendered post has native contact");
+    const auto approach=route[gameplay::traversal::kBellwetherSouthApproachStation];
+    const auto ramp=terrain->Query(approach.x,approach.z);
+    const auto clearance=gameplay::items::ComputeRewardLanternForwardClearance(
+        approach.x,approach.z,0,-1,false,true,ramp.worldY,terrain.get());
+    Check(ramp.found && clearance>2.69f,
+          "the uphill tavern approach keeps the normal carried-item reach");
+    const auto& door=route[gameplay::traversal::kBellwetherSouthDoorStation];
+    TestBellwetherWelcomeClearance(*terrain);
+    sim::InputSnapshot input;
+    input.moveForward=1.f;
+    input.runHeld=true;
+    input.damageEnabled=false;
+    bool replayedLookoutLine=false;
+    bool injuryOnRoad=false;
+    unsigned injuryEntries=0;
+    bool assessmentStayedPlanted=true,protectivePhaseMatchesTravel=true;
+    unsigned assessmentTicks=0,assessmentSampleTicks=0,protectiveTicks=0;
+    bool keeperAtDoor=false,keeperWalkedAfterSeat=true;
+    float keeperTravel=0.f,minimumSpeakerGap=100.f;
+    std::uint64_t welcomeGeneration=0;
+    unsigned welcomes=0;
+    bool welcomeAtDoor=true,kitWalkedDuringWelcome=false;
+    std::vector<horde::audio::KitAnkleCue> ankleCues;
+    bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
+    unsigned hearthCues=0;
+    bool hearthSourceCorrect=true, hearthStoppedForTalk=false;
+    unsigned riverWetFootsteps=0;
+    bool riverSourcesOnSurface=true;
+    bool stoneMovesOnlyAfterContact=true;
+    unsigned stoneMotionTicks=0;
+    std::vector<Line> hearthSpoken;
+    std::vector<Line> roadSpoken;
+    const std::vector<Line> expectedRoad = stayAtIncident ? std::vector(kRoadLines.begin(),kRoadLines.end())
+                                                         : std::vector<Line>{};
+    std::uint64_t roadCaptionGeneration=0;
+    bool roadCaptionsMatchMotion=true;
+    std::uint64_t hearthVoiceGeneration=0;
+    bool firstCaptionAtChair=false;
+    float maximumKitStep=0;
+    Stage previousStage=Stage::AtLookout;
+    const auto step=[&] {
+        using horde::gameplay::dialogue::BellwetherRoadStoneWorldFromModel;
+        const auto before=game.Snapshot().chapterCompanion;
+        game.StepFixed(input);
+        const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
+        if(const auto& keeper=after.tavernKeeper) {
+            keeperAtDoor|=keeper->stage==TavernKeeperStage::AtDoor;
+            if(keeper->travelled>0.f) {
+                keeperWalkedAfterSeat&=kit.bellwetherArrival==Stage::Seated;
+                keeperTravel+=keeper->travelled;
+            }
+            minimumSpeakerGap=std::min(minimumSpeakerGap,std::hypot(keeper->foot[0]-kit.x,keeper->foot[2]-kit.z));
+        }
+        if(BellwetherRoadStoneWorldFromModel(before)!=BellwetherRoadStoneWorldFromModel(kit)) {
+            ++stoneMotionTicks;
+            stoneMovesOnlyAfterContact &= kit.bellwetherArrival==Stage::AnkleAssessment &&
+                kit.motion.anklePlaybackSeconds>=horde::audio::kKitAnkleBeats.front().seconds &&
+                kit.motion.anklePlaybackSeconds<=horde::audio::kKitAnkleBeats.back().seconds+.00001f;
+        }
+        const float travelled=std::hypot(kit.x-before.x,kit.z-before.z);
+        if(after.chapterDialogue.line==Line::TavernWelcome) {
+            const auto& speech=after.chapterDialogue;
+            if(speech.generation!=welcomeGeneration) {
+                welcomeGeneration=speech.generation;
+                ++welcomes;
+                const auto& keeper=after.tavernKeeper;
+                welcomeAtDoor&=keeper && keeper->stage==TavernKeeperStage::AtDoor &&
+                    speech.source.x==keeper->foot[0] && speech.source.z==keeper->foot[2] &&
+                    kit.bellwetherArrival==Stage::ProtectiveApproach && hearthSpoken.empty();
+            }
+            kitWalkedDuringWelcome|=kit.walking && travelled>0.f;
+        }
+        replayedLookoutLine|=after.chapterDialogue.line==Line::ForestVillage;
+        if(IsRoadLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=roadCaptionGeneration) {
+            const auto& speech=after.chapterDialogue;
+            roadCaptionGeneration=speech.generation;
+            roadSpoken.push_back(speech.line);
+            roadCaptionsMatchMotion&=speech.source.x==kit.x && speech.source.z==kit.z &&
+                (speech.line==Line::RoadSlow ? kit.bellwetherArrival==Stage::ProtectiveApproach :
+                    kit.bellwetherArrival==Stage::AnkleAssessment &&
+                    kit.motion.anklePlaybackSeconds>=horde::audio::kKitAnkleBeats.back().seconds);
+        }
+        if(IsHearthLine(after.chapterDialogue.line) && after.chapterDialogue.generation!=hearthVoiceGeneration) {
+            if(hearthSpoken.empty())firstCaptionAtChair=kit.bellwetherArrival==Stage::ChairTurn ||
+                kit.bellwetherArrival==Stage::Lowering;
+            hearthSpoken.push_back(after.chapterDialogue.line);
+            hearthVoiceGeneration=after.chapterDialogue.generation;
+        }
+        maximumKitStep=std::max(maximumKitStep,travelled);
+        if(kit.bellwetherArrival==Stage::AnkleAssessment && previousStage!=Stage::AnkleAssessment) {
+            ++injuryEntries;
+            const auto station=route[gameplay::traversal::kBellwetherAnkleStation];
+            injuryOnRoad=kit.grounded && std::hypot(kit.x-station.x,kit.z-station.z)<.002f;
+        }
+        using namespace horde::audio;
+        for(const auto& event:game.Events().Events()) {
+            if(event.type==sim::GameplayEventType::PlayerWetFootstep) {
+                ++riverWetFootsteps;
+                const auto waterY=horde::scene::ChapterRegionalWaterSurfaceAt(event.worldX,event.worldZ);
+                riverSourcesOnSurface &= waterY && std::abs(*waterY-event.worldY)<.001f;
+            }
+            if(event.type==sim::GameplayEventType::BellwetherHearth) {
+                ++hearthCues;
+                const auto source=sim::ChapterLocalAmbience::kHearthPosition;
+                hearthSourceCorrect &= event.worldX==source.x && event.worldY==source.y &&
+                    event.worldZ==source.z && after.chapterDialogue.line==Line::None &&
+                    sim::ChapterLocalAmbience::HearthEligible(after);
+            }
+            if(event.type==sim::GameplayEventType::ChapterLocalAmbienceStopped &&
+                after.chapterDialogue.line==Line::TavernIntroduce) hearthStoppedForTalk=true;
+            if(event.type!=sim::GameplayEventType::KitAnkleFoley)continue;
+            const auto cue=KitAnkleCueForEvent(event);
+            const auto metadata=horde::platform::android::PackGameplayEventMetadata(event);
+            const auto gains=KitAnkleGains(event);
+            const auto beat=std::find_if(kKitAnkleBeats.begin(),kKitAnkleBeats.end(),
+                [cue](const auto& item){return item.cue==cue;});
+            ankleCuesMatchContact&=beat!=kKitAnkleBeats.end() && event.tickIndex==after.tickIndex &&
+                ((metadata>>24)&255)==static_cast<unsigned>(cue) && !gains.obstructed &&
+                std::abs(kit.y+beat->height-event.worldY)<.001f &&
+                std::abs(std::hypot(event.worldX-kit.x,event.worldZ-kit.z)-std::hypot(beat->forward,beat->right))<.001f &&
+                before.motion.anklePlaybackSeconds<beat->seconds && kit.motion.anklePlaybackSeconds>=beat->seconds;
+            ankleCues.push_back(cue);
+        }
+        game.ClearEvents();
+        if(kit.motion.anklePlaybackSeconds>before.motion.anklePlaybackSeconds)++assessmentSampleTicks;
+        if(kit.bellwetherArrival==Stage::AnkleAssessment) {
+            ++assessmentTicks;
+            assessmentStayedPlanted&=kit.grounded && !kit.walking && travelled<.001f;
+        }
+        if(kit.bellwetherArrival==Stage::ProtectiveApproach && kit.walking) {
+            ++protectiveTicks;
+            const float expected=std::fmod(before.locomotion.walkPhase + travelled/kProtectiveWalkStrideMetres,1.f);
+            protectivePhaseMatchesTravel&=std::abs(std::remainder(kit.locomotion.walkPhase-expected,1.f))<.00005f;
+        }
+        previousStage=kit.bellwetherArrival;
+        if(!anklePausedBeforeCue && kit.bellwetherArrival==Stage::AnkleAssessment) {
+            const auto time=kit.motion.anklePlaybackSeconds;
+            const auto stoneBeforePause=BellwetherRoadStoneWorldFromModel(kit);
+            auto pausedInput=input;
+            pausedInput.paused=true;
+            pausedInput.yawRadians+=3.14f;
+            for(unsigned tick=0;tick<20;++tick)game.StepFixed(pausedInput);
+            anklePausedBeforeCue=game.Snapshot().chapterCompanion.motion.anklePlaybackSeconds==time &&
+                BellwetherRoadStoneWorldFromModel(game.Snapshot().chapterCompanion)==stoneBeforePause &&
+                std::none_of(game.Events().Events().begin(),game.Events().Events().end(),
+                    [](const auto& event){return event.type==sim::GameplayEventType::KitAnkleFoley;});
+            game.ClearEvents();
+        }
+    };
+    const auto walkTo=[&](gameplay::traversal::BellwetherStation station) {
+        const auto [x,z]=station;
+        for(unsigned tick=0;tick<1200;++tick) {
+            const auto& current=game.Snapshot();
+            const float dx=x-current.playerX,dz=z-current.playerZ;
+            if(std::hypot(dx,dz)<.15f)return true;
+            input.yawRadians=std::atan2(dx,-dz);
+            step();
+            const auto& next=game.Snapshot();
+            if(next.worldRoute.blocked || !next.playerGrounded)break;
+        }
+        std::cerr<<"Bellwether approach stopped at "<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ
+                 <<" en route to "<<x<<','<<z<<'\n';
+        return false;
+    };
+    for(std::size_t i=0;i<route.size();++i) {
+        if(!walkTo(route[i])) {Check(false,"the normal player motor enters the tavern by its mapped south entrance");return;}
+        if(stayAtIncident && i==gameplay::traversal::kBellwetherAnkleStation) {
+            input.moveForward=0;
+            for(unsigned tick=0;tick<3600 && roadSpoken.size()<kRoadLines.size();++tick)step();
+            input.moveForward=1;
+        }
+        if(stayAtIncident && i==gameplay::traversal::kBellwetherSouthDoorStation) {
+            input.moveForward=0;
+            for(unsigned tick=0;tick<3600 && welcomes==0;++tick)step();
+            input.moveForward=1;
+        }
+    }
+    Check(game.Snapshot().playerZ<118.4f &&
+          std::abs(game.Snapshot().playerSupportWorldY-(-8.70955f))<.001f,
+          "the shared motor stands on the actual imported tavern floor behind the portal");
+    const auto& room=game.Snapshot();
+    using gameplay::effects::kBellwetherHearthFlame;
+    using gameplay::effects::kBellwetherHearthLight;
+    const auto floor=terrain->Query(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2]);
+    const auto& hearth=room.fireEmitters[1];
+    Check(room.fireEmitterCount==4 &&
+          hearth.stableId==gameplay::effects::kBellwetherHearthEmitterId &&
+          hearth.strength>0 && hearth.zone==gameplay::ShowcaseZone::Outside &&
+          floor.found && std::abs(kBellwetherHearthFlame[1]-floor.worldY-.18f)<.002f &&
+          terrain->NonWalkableVolumeClear(kBellwetherHearthFlame[0],kBellwetherHearthFlame[2],
+              kBellwetherHearthLight[0],kBellwetherHearthLight[2],kBellwetherHearthFlame[1],
+              kBellwetherHearthFlame[1]+hearth.height,hearth.radius),
+          "the stationary fire fits inside the rendered hearth, over its imported floor");
+    using namespace gameplay::bellwether;
+    const auto& candle=room.fireEmitters[2];
+    Check(candle.stableId==gameplay::effects::kBellwetherCandleEmitterId &&
+          candle.strength>0 && candle.zone==gameplay::ShowcaseZone::Outside &&
+          candle.worldFromFlame[12]==kTavernCandleFlame[0] &&
+          candle.worldFromFlame[13]==kTavernCandleFlame[1] &&
+          candle.worldFromFlame[14]==kTavernCandleFlame[2] &&
+          candle.worldFromLight[13]==kTavernCandleLight[1] &&
+          terrain->NonWalkableVolumeClear(kTavernCandleFlame[0],kTavernCandleFlame[2],
+              kTavernCandleLight[0],kTavernCandleLight[2],kTavernCandleFlame[1]+.004f,
+              kTavernCandleFlame[1]+candle.height,candle.radius),
+          "the candlestick publishes a flame and direct light above its authored wick");
+    const auto exteriorLampAt=[&](std::uint32_t id,const auto& flame,const auto& light) {
+        const auto& lamp=game.Snapshot().fireEmitters[3];
+        return lamp.stableId==id && lamp.strength>0 && lamp.zone==gameplay::ShowcaseZone::Outside &&
+            std::equal(flame.begin(),flame.end(),lamp.worldFromFlame.begin()+12) &&
+            std::equal(light.begin(),light.end(),lamp.worldFromLight.begin()+12);
+    };
+    Check(exteriorLampAt(gameplay::effects::kBellwetherPorchLampEmitterId,kSquarePorchLampFlame,kSquarePorchLampLight),
+          "the tavern approach publishes the south porch wick and light");
+    // The road surfacing sits 18 mm above the hillside used to fit the post.
+    const auto forkLampBed=terrain->Query(kRiverForkLampPostFoot[0],kRiverForkLampPostFoot[2],
+        -1000000.f,kRiverForkLampPostFoot[1]+.002f);
+    const auto forkLampFloor=terrain->Query(kRiverForkLampPostFoot[0],kRiverForkLampPostFoot[2]);
+    const bool planted=forkLampBed.found && forkLampFloor.found &&
+        std::abs(kRiverForkLampPostFoot[1]-forkLampBed.worldY)<.002f &&
+        forkLampFloor.worldY-forkLampBed.worldY<=.020f;
+    if(!planted)
+        std::cerr<<"Fork lamp foot="<<kRiverForkLampPostFoot[1]<<" bed="<<forkLampBed.worldY
+                 <<" top="<<forkLampFloor.worldY<<'\n';
+    const float salvagerFaceDistance=std::hypot(kRiverForkLampLight[0]-gameplay::traversal::kBellwetherSalvagerStand.x,
+        kRiverForkLampLight[2]-gameplay::traversal::kBellwetherSalvagerStand.z);
+    Check(planted &&
+          std::abs(kRiverForkLampFlame[1]-kRiverForkLampPostFoot[1]-1.39f)<.002f &&
+          std::abs(kRiverForkLampLight[1]-kRiverForkLampPostFoot[1]-1.52f)<.002f &&
+          std::abs(salvagerFaceDistance-2.04f)<.1f,
+          "the fork lamp stands on imported ground beside the salvager");
+    CompanionRouteFixture kit(true);
+    Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
+          "Kit requires the real supported seat handoff before sitting");
+    constexpr float fixed=1.f/60.f;
+    kit.Step(fixed,kConversation[0],kConversation[2],true,true,true,terrain.get(),true);
+    Check(kit.State().motion.sitPlaybackSeconds==0,"pausing leaves the sit at its current pose");
+    for(unsigned tick=0;tick<41;++tick)
+        kit.Step(fixed,kConversation[0],kConversation[2],true,true,false,terrain.get(),true);
+    Check(kit.State().motion.mode==CompanionMotionMode::Sitting &&
+          std::abs(kit.State().motion.sitPlaybackSeconds-41*fixed)<.00001f,
+          "the shared fixed step advances the real lowering sample");
+    for(unsigned tick=0;tick<110;++tick)
+        kit.Step(fixed,record.position.x,record.position.z,true,true,false,terrain.get(),true);
+    Check(kit.State().motion.mode==CompanionMotionMode::Seated &&
+          kit.State().motion.sitPlaybackSeconds==kTavernSitDurationSeconds &&
+          kit.State().x==kChairSitRoot[0] && kit.State().z==kChairSitRoot[2] && !kit.BeginTavernSit(),
+          "the final seat remains planted and does not replay when the player leaves");
+    for(const auto& mark:{kChairTurn,kChairApproach,kConversation}) {
+        if(!walkTo({mark[0],mark[2]})) {Check(false,"the normal player motor reaches the staged seat and conversation");return;}
+    }
+    input.moveForward=0;input.runHeld=false;input.yawRadians=1.2f;
+    for(unsigned tick=0;tick<5400 && game.Snapshot().chapterCompanion.bellwetherArrival!=Stage::Seated;++tick)step();
+    const auto seated=game.Snapshot().chapterCompanion;
+    if(seated.bellwetherArrival!=Stage::Seated)
+        std::cerr<<"Kit arrival stopped at "<<seated.x<<','<<seated.y<<','<<seated.z<<" waypoint="<<seated.bellwetherStation
+                 <<" phase="<<unsigned(seated.bellwetherArrival)<<" wait="<<unsigned(seated.wait)<<'\n';
+    Check(injuryEntries==1 && injuryOnRoad && maximumKitStep<.032f && seated.grounded &&
+          seated.bellwetherArrival==Stage::Seated && seated.x==kChairSitRoot[0] && seated.z==kChairSitRoot[2],
+          "from the earned lookout Kit crosses the real road once, assesses at the mapped mark, and settles without a teleport or player tether");
+    Check(assessmentSampleTicks==96 && (stayAtIncident ? assessmentTicks>96 : assessmentTicks==96) &&
+          assessmentStayedPlanted && protectiveTicks>120 && protectivePhaseMatchesTravel,
+          "Kit stays planted for the one-shot ankle take, then ties the protective cycle to supported travel");
+    Check(roadSpoken==expectedRoad && roadCaptionsMatchMotion,
+          stayAtIncident ? "all three roadside captions follow contact, hold and departure on the actual Bellwether road"
+                         : "overtaking the injury beat leaves the road quiet and Kit continues independently");
+    Check(ankleCuesMatchContact && anklePausedBeforeCue && ankleCues==std::vector{
+        horde::audio::KitAnkleCue::BootAndGravel,horde::audio::KitAnkleCue::SteadyBreath},
+        "the real ankle take emits the two local audio beats in order and waits through pause");
+    const auto stoneTravel = [&] {
+        using namespace horde::gameplay::dialogue;
+        const auto& initial = BellwetherRoadStoneWorldFromModel({});
+        const auto& current = BellwetherRoadStoneWorldFromModel(game.Snapshot().chapterCompanion);
+        return std::hypot(current[3] - initial[3], current[11] - initial[11]);
+    };
+    Check(stoneMovesOnlyAfterContact && stoneMotionTicks==23 && std::abs(stoneTravel()-.284f)<.001f,
+          "the real road route moves the stone only between the scrape and breath, then holds the authored settled pose");
+    Check(game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
+          game.LatestCampaignBoundary()->contentRevision==cp::kBellwetherContentRevision,
+          "standing near the hearth after Kit sits earns the canonical tavern boundary");
+    for(unsigned tick=0;tick<900 && game.Snapshot().chapterDialogue.hearthLinesResolved<kHearthLines.size();++tick)step();
+    Check(firstCaptionAtChair && hearthSpoken==std::vector{Line::TavernSit,Line::TavernLimit,Line::TavernWork} &&
+          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->dialogue.hearthLinesResolved==3,
+          "the real route delivers all three hearth captions in order and records the completed sequence");
+    // Kit can finish speaking while the keeper is still crossing the room.
+    // Wait for the same interaction the player sees before sending Talk.
+    if(stayAtIncident) {
+        for(unsigned tick=0;tick<900 && !game.Snapshot().tavernConversationAvailable;++tick)step();
+    }
+    const auto& keeper=game.Snapshot().tavernKeeper;
+    Check(stayAtIncident ? (keeper && keeperAtDoor && keeperWalkedAfterSeat && keeperTravel>9.7f && keeperTravel<10.f &&
+          minimumSpeakerGap>.85f && keeper->stage==TavernKeeperStage::AtHearth &&
+          keeper->travelled==0.f && std::abs(keeper->walkSeconds*1.08f-keeperTravel)<.001f &&
+          std::abs(keeper->foot[1]-kKeeperHearth[1])<.001f && game.Snapshot().tavernConversationAvailable)
+          : (!keeper && !game.Snapshot().tavernConversationAvailable),
+          "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");
+    Check(stayAtIncident ? (welcomes==1 && welcomeAtDoor && kitWalkedDuringWelcome) : welcomes==0,
+          "the welcome plays once at the mapped door while Kit keeps walking, and requires the keeper");
+    if(stayAtIncident) {
+        const auto previousHearthCues=hearthCues;
+        for(unsigned tick=0;tick<sim::ChapterLocalAmbience::kHearthIntervalTicks &&
+            hearthCues==previousHearthCues;++tick)step();
+        Check(hearthCues==previousHearthCues+1 && hearthSourceCorrect,
+              "the real tavern route hears the lit hearth on the authored floor during a quiet interval");
+        input.commands.interact=game.Snapshot().lastConsumedInteractSequence+1;
+        step();
+        Check(hearthStoppedForTalk,"choosing Talk stops the active hearth cue before the exchange");
+        for(const auto line:kTavernConversation) {
+            const auto& speech=game.Snapshot().chapterDialogue;
+            const float speakerX=line==Line::TavernHordeArmy ? kKeeperHearth[0] : kChairSitRoot[0];
+            Check(speech.line==line && speech.source.x==speakerX,
+                  "the natural exchange after the live arrival follows its speaker order");
+            for(unsigned tick=0;tick<420 && game.Snapshot().chapterDialogue.line==line;++tick)step();
+        }
+        const auto finished=game.LatestCampaignBoundary();
+        Check(finished && finished->dialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+              game.Snapshot().chapterDialogue.line==Line::None,"the exchange finishes and reaches the earned checkpoint");
+
+        constexpr auto square=gameplay::traversal::kBellwetherSouthApproachStation-1;
+        input.moveForward=1;input.runHeld=true;
+        for(std::size_t index=route.size();index>square;--index)
+            if(!walkTo(route[index-1])) {Check(false,"a completed visit can exit to the square");return;}
+        Check(game.Snapshot().playerGrounded && game.Snapshot().playerZ>door.z,
+              "the return actually starts outdoors beyond the mapped portal");
+        for(std::size_t index=square+1;index<route.size();++index)
+            if(!walkTo(route[index])) {Check(false,"the player can re-enter the tavern on foot");return;}
+        if(!walkTo({kConversation[0],kConversation[2]})) {Check(false,"the return clears the furniture");return;}
+        input.moveForward=0;input.runHeld=false;
+        step();
+        Check(game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+              game.Snapshot().tavernKeeper && game.Snapshot().tavernKeeper->stage==TavernKeeperStage::AtHearth &&
+              !game.Snapshot().tavernConversationAvailable && game.Snapshot().tavernDirectionsAvailable &&
+              game.Snapshot().chapterDialogue.line==Line::None,
+              "the first physical return leaves both actors settled and offers directions quietly");
+        ++input.commands.interact;
+        step();
+        Check(game.Snapshot().chapterDialogue.line==Line::TavernDirections,
+              "the normal hearth interaction opens the directions before walking north");
+        ++input.commands.dialogueSkip;
+        step();
+    }
+    input.moveForward=1;input.runHeld=true;
+    if(!walkTo(route.back())) {Check(false,"the seated conversation clears the outward route and doorway");return;}
+    using namespace gameplay::traversal;
+    for(auto index=route.size()-1;index>0;) {
+        --index;
+        if(!walkTo(route[index])) {Check(false,"the player can return from the tavern to the same lookout");return;}
+        if(stayAtIncident && index==kBellwetherMillJunction) {
+            using gameplay::bellwether::MillAction;
+            using gameplay::bellwether::MillPreparation;
+            using gameplay::bellwether::kMillBearingBin;
+            using gameplay::bellwether::kMillComparison;
+            const auto& mill=kBellwetherMillApproach;
+            const auto before=game.LatestCampaignBoundary();
+            const auto walkStations=[&](auto first,auto last) {
+                for(;first!=last;++first)if(!walkTo(*first))return false;
+                return true;
+            };
+            const auto turnToward=[&](const auto& mark) {
+                input.moveForward=0;input.runHeld=false;
+                input.yawRadians=std::atan2(mark[0]-game.Snapshot().playerX,game.Snapshot().playerZ-mark[2]);
+                step();
+            };
+            const auto interact=[&] {++input.commands.interact;step();};
+            const auto& landing=kBellwetherRiverLanding;
+            const auto& crossing=kBellwetherMillCrossing;
+            const auto beforeCrossing=game.Snapshot().waterContact.stepCount;
+            const auto walkDry=[&](auto begin,auto end) {
+                for(;begin!=end;++begin)
+                    if(!walkTo(*begin) || !game.Snapshot().playerGrounded ||
+                       game.Snapshot().waterContact.wetGround ||
+                       game.Snapshot().waterContact.stepCount!=beforeCrossing)
+                        return false;
+                return true;
+            };
+            const bool crossed=walkTo(mill[1]) && walkTo(kBellwetherSalvagerMark) &&
+                walkDry(landing.begin(),landing.end()-2) &&
+                walkDry(crossing.begin(),crossing.end()) &&
+                walkDry(crossing.rbegin(),crossing.rend());
+            Check(crossed,"the shared player motor reaches the millrace turnout and returns dry with no water steps");
+            if(!crossed)return;
+            const bool reachedShallows=walkStations(landing.end()-3,landing.end());
+            Check(reachedShallows && game.Snapshot().playerGrounded && game.Snapshot().waterContact.wetGround,
+                  "the normal motor can descend from the salvager's shore path into the river shallows");
+            if(!reachedShallows)return;
+            const auto wetSteps=game.Snapshot().waterContact.stepCount;
+            for(unsigned crossing=0;crossing<3 && game.Snapshot().waterContact.stepCount==wetSteps;++crossing) {
+                input.runHeld=false;
+                if(!walkTo(kBellwetherRiverDryMark) || !walkTo(landing.back())) {
+                    Check(false,"shallow practice allows repeated entries from dry ground");
+                    return;
+                }
+            }
+            Check(game.Snapshot().waterContact.stepCount>wetSteps && riverWetFootsteps>0 && riverSourcesOnSurface,
+                  "shallow walking emits fixed-step cues with the actual river height");
+            input.runHeld=true;
+            const bool dryReturn=walkTo(kBellwetherRiverDryMark) && !game.Snapshot().waterContact.wetGround &&
+                walkStations(landing.rbegin()+2,landing.rend()) && walkTo(kBellwetherSalvagerMark);
+            Check(dryReturn && game.Snapshot().playerGrounded,
+                  "the same supported causeway lets the player leave the water and return to Bellwether");
+            if(!dryReturn)return;
+            Check(exteriorLampAt(gameplay::effects::kBellwetherRiverForkLampEmitterId,kRiverForkLampFlame,kRiverForkLampLight),
+                  "returning to the salvager selects the authored fork wick and light");
+            const bool visited=walkTo(mill[1]) &&
+                walkTo(kBellwetherSalvagerMark) && game.Snapshot().playerGrounded &&
+                walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) && game.Snapshot().playerGrounded;
+            Check(visited,"the walk from the square reaches the mapped salvager mark and mill landing");
+            if(!visited)return;
+            const bool benchReached=walkTo(kBellwetherMillWorkMark) && game.Snapshot().playerGrounded;
+            Check(benchReached,"the player can walk to the mill workbench");
+            if(!benchReached)return;
+            turnToward(kMillComparison);
+            Check(game.Snapshot().millAction==MillAction::InspectGearing,"the workbench offers a gearing inspection");
+            interact();
+            const auto inspected=game.LatestCampaignBoundary();
+            Check(game.Snapshot().millAction==MillAction::None && inspected &&
+                  inspected->millPreparation==MillPreparation::BearingNeeded,
+                  "inspection notes the missing bearing without awarding one at the bench");
+            input.moveForward=1;input.runHeld=true;
+            const bool reachedBin=walkTo(mill.back()) && walkStations(mill.rbegin()+1,mill.rend()-1) &&
+                walkTo(kBellwetherBearingBinApproach);
+            Check(reachedBin,"the normal player motor can reach the spare parts bin from the workbench");
+            if(!reachedBin)return;
+            turnToward(kMillBearingBin);
+            const auto facing=input.yawRadians;
+            input.yawRadians+=3.14159265f;step();
+            interact();
+            Check(game.Snapshot().millAction==MillAction::None &&
+                  game.Snapshot().millPreparation==MillPreparation::BearingNeeded,
+                  "looking away from the bin cannot recover a bearing");
+            input.yawRadians=facing;step();
+            Check(game.Snapshot().millAction==MillAction::RecoverBearing,"the parts bin offers a spare bearing in reach");
+            interact();
+            const auto recovered=game.LatestCampaignBoundary();
+            Check(recovered && recovered->millPreparation==MillPreparation::BearingRecovered &&
+                  game.Snapshot().millAction==MillAction::None && !recovered->airWardLearned &&
+                  !recovered->treasurePurse.lanternFittingPurchased,
+                  "recovering a spare saves once without depending on or granting the other preparations");
+            if(!recovered)return;
+            sim::GameSimulation reloaded(config);
+            const auto reloadToken=reloaded.BeginCampaignRestore(*recovered);
+            Check(reloadToken && reloaded.CommitCampaignRestore(*reloadToken,
+                    {reloadToken->worldGeneration,recovered->zone},terrain,{}) &&
+                  reloaded.Snapshot().millPreparation==MillPreparation::BearingRecovered &&
+                  reloaded.Snapshot().playerX==recovered->position.x,
+                  "a recovered bearing reloads at the existing tavern return point");
+            input.moveForward=1;input.runHeld=true;
+            const bool backAtBench=walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) &&
+                walkTo(kBellwetherMillWorkMark);
+            Check(backAtBench,"the bearing can be brought back to the workbench");
+            if(!backAtBench)return;
+            turnToward(kMillComparison);
+            Check(game.Snapshot().millAction==MillAction::CheckFit,"the recovered bearing enables the fit check");
+            interact();
+            const auto fittedRevision=game.CampaignBoundaryRevision();
+            interact();
+            Check(game.Snapshot().millPreparation==MillPreparation::FitChecked &&
+                  game.Snapshot().millAction==MillAction::None && game.CampaignBoundaryRevision()==fittedRevision,
+                  "the same interaction cannot repeat the completed bearing check");
+            input.moveForward=1;input.runHeld=true;
+            const bool returned=walkTo(mill.back()) && walkStations(mill.rbegin()+1,mill.rend());
+            const auto after=game.LatestCampaignBoundary();
+            Check(returned && before && after && before->position.x==after->position.x &&
+                  before->position.z==after->position.z && before->dialogue.tavernConversationLinesResolved==
+                  after->dialogue.tavernConversationLinesResolved &&
+                  after->schema==cp::kMillPreparationSchema && after->millPreparation==MillPreparation::FitChecked &&
+                  game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated,
+                  "the fitted bearing keeps Kit seated and preserves the earned tavern return point");
+            if(!returned)return;
+        }
+        if(stayAtIncident && index==kBellwetherChurchJunction) {
+            const auto walkStations=[&](auto first,auto last) {
+                for(;first!=last;++first)if(!walkTo(*first))return false;
+                return true;
+            };
+            const bool visited=walkStations(std::next(kBellwetherNorthApproach.begin()),kBellwetherNorthApproach.end()) &&
+                walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherRecordKeeperApproach);
+            Check(visited && game.Snapshot().playerGrounded,
+                  "the completed tavern visit can reach the mapped exterior record keeper mark on foot");
+            if(!visited)return;
+            const BellwetherStation sideMark{kBellwetherRecordKeeperApproach.x,kBellwetherRecordKeeperApproach.z+.66f};
+            const bool sideReached=walkTo(sideMark);
+            Check(sideReached,"the mapped church deck lets the player reach the keeper from the side");
+            if(!sideReached)return;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=-1.57079632679f;
+            for(unsigned tick=0;tick<35;++tick)step();
+            constexpr float restYaw=kRecordKeeperRestYaw;
+            Check(game.Snapshot().recordKeeper && game.Snapshot().recordKeeperAction==RecordKeeperAction::None,
+                  "the grounded record keeper waits until the player faces the service mark");
+            const auto& state=game.Snapshot();
+            const float dx=kBellwetherRecordKeeperMark.x-state.playerX,dz=kBellwetherRecordKeeperMark.z-state.playerZ;
+            const float expectedFacing=std::atan2(-dx,dz);
+            input.yawRadians=std::atan2(dx,-dz);step();
+            const auto recordKeeper=game.Snapshot().recordKeeper;
+            Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&
+                  game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRoadMark,
+                  "at the church the player can show the forest road mark before finding the register");
+            Check(recordKeeper && recordKeeper->yaw<restYaw && recordKeeper->yaw>expectedFacing &&
+                  restYaw-recordKeeper->yaw<.03f,"the record keeper turns toward the prospective listener at a bounded rate");
+            const float idleBeforePause=recordKeeper ? recordKeeper->idleSeconds : 0.f;
+            input.paused=true;step();
+            Check(idleBeforePause>0 && recordKeeper && game.Snapshot().recordKeeper &&
+                  game.Snapshot().recordKeeper->idleSeconds==idleBeforePause &&
+                  game.Snapshot().recordKeeper->yaw==recordKeeper->yaw,
+                  "the admitted record keeper holds idle time and facing while paused");
+            input.paused=false;
+            for(unsigned tick=0;tick<35;++tick)step();
+            Check(recordKeeper && state.recordKeeper && state.recordKeeper->idleSeconds>idleBeforePause &&
+                  state.recordKeeper->foot==recordKeeper->foot && std::abs(state.recordKeeper->yaw-expectedFacing)<.001f,
+                  "the record keeper resumes and faces the player from the same grounded mark");
+            ++input.commands.interact;step();
+            input.yawRadians=-1.57079632679f;step();
+            Check(state.recordKeeper && std::abs(state.recordKeeper->yaw-expectedFacing)<.001f &&
+                  state.chapterDialogue.line==Line::RecordKeeperInspect,
+                  "the speaking record keeper keeps addressing the listener when the player looks away");
+            for(const auto line:kRecordKeeperLead) {
+                Check(game.Snapshot().chapterDialogue.line==line &&
+                      game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
+                      "the record keeper gives the ordered shrine lead from the church");
+                ++input.commands.dialogueSkip;step();
+            }
+            Check(!game.Snapshot().waysideArchive.registerInterpreted,
+                  "showing the waystone mark earns no expedition routes");
+            input.moveForward=1;input.runHeld=true;
+            const bool shrineReached=walkTo(kBellwetherChurchApproach.front()) &&
+                walkTo(kBellwetherNorthApproach.back()) &&
+                walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end());
+            Check(shrineReached && game.Snapshot().playerGrounded,
+                  "the church junction leads on continuous support to the archive inspection mark");
+            if(!shrineReached)return;
+            Check(state.recordKeeper && std::abs(state.recordKeeper->yaw-restYaw)<.001f,
+                  "the record keeper returns to the church-path stance when the player leaves");
+            using namespace gameplay::bellwether;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=3.14159265359f;
+            step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::None,
+                  "the archive waits until the player faces the lower stone");
+            input.yawRadians=0.f;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Inspect,
+                  "the inspection action is offered at the real wayside mark with Kit still seated");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Inspected &&
+                  game.Snapshot().chapterDialogue.line==Line::LanternFirstHelp &&
+                  game.Snapshot().waysideArchiveAction==ArchiveAction::None,
+                  "inspection starts the practical lantern line before any identity claim");
+            const auto& help=game.Snapshot().chapterDialogue;
+            Check(RequiresChapterCaption(help.line) && std::hypot(help.source.x-game.Snapshot().playerX,
+                  help.source.z-game.Snapshot().playerZ)<1.f,
+                  "the draft caption is essential and its source follows the carried lantern");
+            ++input.commands.dialogueSkip;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Open &&
+                  game.Snapshot().chapterDialogue.line==Line::None,
+                  "skip preserves the open interaction and does not jump ahead to the claim");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Opening &&
+                  game.Snapshot().waysideArchive.pose.worldFromModel!=ArchivePose{}.worldFromModel,
+                  "the second interaction begins the physical hinge motion in fixed-step simulation");
+            const auto opening=game.Snapshot().waysideArchive.opening;
+            auto paused=input;paused.paused=true;game.StepFixed(paused);
+            Check(game.Snapshot().waysideArchive.opening==opening,"the hinge holds its pose while paused");
+            for(unsigned tick=0;tick<65;++tick)step();
+            Check(game.Snapshot().waysideArchive.stage==ArchiveStage::Open &&
+                  game.Snapshot().waysideArchiveAction==ArchiveAction::None &&
+                  game.Snapshot().waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(1.f).worldFromModel &&
+                  game.Snapshot().chapterDialogue.line==Line::LanternFirstIdentity &&
+                  game.Snapshot().waysideArchive.lanternRevealStarted,
+                  "the lantern makes its identity claim after the stone finishes opening");
+            for(const auto expected:{Line::LanternKingName,Line::LanternFirstRequest,Line::None}) {
+                ++input.commands.dialogueSkip;step();
+                Check(game.Snapshot().chapterDialogue.line==expected,"the reveal keeps its scripted order");
+            }
+            const auto opened=game.LatestCampaignBoundary();
+            Check(opened && opened->schema==cp::kMillPreparationSchema && !opened->waysideRegisterRecovered,
+                  "the open shrine is an earned autosave even before the register is taken");
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::TakeRegister,
+                  "the open niche offers the register after the reveal");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().waysideArchive.registerRecovered &&
+                  game.Snapshot().chapterDialogue.line==Line::LanternRegisterReturn &&
+                  RequiresChapterCaption(Line::LanternRegisterReturn),
+                  "the pickup independently earns the register and gives the return instruction");
+            const auto boundary=game.LatestCampaignBoundary();
+            Check(boundary && boundary->schema==cp::kMillPreparationSchema &&
+                  boundary->waysideArchive==cp::WaysideArchiveProgress::Open && boundary->waysideLanternRevealStarted &&
+                  boundary->waysideRegisterRecovered && boundary->dialogue.activeLine==Line::None && opened &&
+                  boundary->position.x==opened->position.x && boundary->position.z==opened->position.z &&
+                  boundary->vitality==opened->vitality && boundary->flask==opened->flask,
+                  "taking the register updates the tavern autosave without changing its saved pose, resources or speech");
+            ++input.commands.dialogueSkip;step();
+            Check(game.Snapshot().waysideArchiveAction==ArchiveAction::Recap,"the player can recall the request after pickup");
+            ++input.commands.interact;step();
+            Check(game.Snapshot().chapterDialogue.line==Line::LanternFirstRequest,"recap repeats the practical request");
+            input.moveForward=1;input.runHeld=true;
+            const bool returnedToChurch=walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+                walkTo(kBellwetherNorthApproach.back()) && walkTo(kBellwetherChurchApproach.front()) &&
+                walkTo(kBellwetherRecordKeeperApproach);
+            Check(returnedToChurch,"the player returns from the shrine to the record keeper by the same path");
+            if(!returnedToChurch)return;
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57079632679f;step();
+            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::ShowRegister &&
+                  !game.Snapshot().waysideArchive.registerInterpreted,
+                  "collecting the register offers a physical handoff without earning its routes");
+            ++input.commands.interact;step();
+            const auto read=game.LatestCampaignBoundary();
+            Check(read && read->schema==cp::kMillPreparationSchema && read->waysideRegisterInterpreted &&
+                  read->dialogue.activeLine==Line::None && boundary && read->position.x==boundary->position.x &&
+                  read->position.z==boundary->position.z && read->flask==boundary->flask,
+                  "showing the register updates the earned tavern save without changing its anchor or saving active speech");
+            for(const auto line:kRecordKeeperFirstReading) {
+                Check(game.Snapshot().chapterDialogue.line==line &&
+                      game.Snapshot().chapterDialogue.source.x==kBellwetherRecordKeeperMark.x,
+                      "the church reading identifies both independent routes in order");
+                ++input.commands.dialogueSkip;step();
+            }
+            Check(game.Snapshot().recordKeeperAction==RecordKeeperAction::CollectReward &&
+                  game.Snapshot().treasurePurse.coins==0 && read && read->treasurePurse==cp::TreasurePurse{},
+                  "interpretation offers a reward without crediting it before the player collects it");
+            input.moveForward=1;input.runHeld=true;
+            if(!(walkTo(kBellwetherChurchApproach.front()) && walkTo(kBellwetherNorthApproach.back()) &&
+                 walkStations(kBellwetherWaysideApproach.begin(),kBellwetherWaysideApproach.end()))) {
+                Check(false,"the keeper's binding instruction leads back to the same shrine");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=0.f;step();
+            Check(state.waysideArchiveAction==ArchiveAction::RestoreBinding && !state.waysideArchive.airWardLearned,
+                  "the interpreted register offers physical restoration from the shrine front");
+            ++input.commands.interact;step();
+            const float closing=state.waysideArchive.opening;
+            const auto duringClosing=game.LatestCampaignBoundary();
+            auto pausedClosing=input;pausedClosing.paused=true;game.StepFixed(pausedClosing);
+            Check(state.waysideArchive.stage==ArchiveStage::Closing && state.waysideArchive.opening==closing &&
+                  duringClosing && duringClosing->waysideArchive==cp::WaysideArchiveProgress::Open,
+                  "pausing stops the hinge and an interrupted save still represents the open stone");
+            for(unsigned tick=0;tick<72;++tick)step();
+            const auto restored=game.LatestCampaignBoundary();
+            Check(state.waysideArchive.stage==ArchiveStage::Restored && state.waysideArchive.opening==0.f &&
+                  state.waysideArchive.pose.worldFromModel==ArchivePose::AtOpening(0.f).worldFromModel &&
+                  state.waysideArchiveAction==ArchiveAction::Recap && restored &&
+                  restored->waysideArchive==cp::WaysideArchiveProgress::Restored && !restored->airWardLearned &&
+                  restored->schema==cp::kMillPreparationSchema && restored->waysideRegisterRecovered,
+                  "the real stone closes while preserving the collected register and the lantern recap");
+            input.moveForward=1;input.runHeld=true;
+            if(!(walkStations(std::next(kBellwetherWaysideApproach.rbegin()),kBellwetherWaysideApproach.rend()) &&
+                 walkTo(kBellwetherNorthApproach.back()) && walkTo(kBellwetherChurchApproach.front()) &&
+                 walkTo(kBellwetherRecordKeeperApproach))) {
+                Check(false,"the restored shrine has a walkable return to the ward teacher");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57079632679f;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::LearnAirWard && state.treasurePurse==cp::TreasurePurse{},
+                  "the keeper teaches the ward before any reward is collected or spent");
+            ++input.commands.interact;step();
+            const auto taught=game.LatestCampaignBoundary();
+            Check(state.chapterDialogue.line==Line::RecordKeeperWardLesson && state.waysideArchive.airWardLearned &&
+                  taught && taught->airWardLearned && taught->treasurePurse==cp::TreasurePurse{} && read &&
+                  taught->position.x==read->position.x && taught->position.z==read->position.z && taught->flask==read->flask,
+                  "the lesson records preparation at the existing checkpoint without charging the player");
+            ++input.commands.dialogueSkip;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::CollectReward,"the original coin reward remains available after the lesson");
+            ++input.commands.interact;step();
+            const auto rewarded=game.LatestCampaignBoundary();
+            const cp::TreasurePurse earned{cp::TreasurePurse::kRegisterRewardCoins,true};
+            Check(state.chapterDialogue.line==Line::RecordKeeperReward && state.treasurePurse==earned &&
+                  rewarded && read && rewarded->schema==cp::kMillPreparationSchema && rewarded->treasurePurse==earned &&
+                  rewarded->position.x==read->position.x && rewarded->position.z==read->position.z &&
+                  rewarded->dialogue.activeLine==Line::None && rewarded->flask==read->flask,
+                  "the player collects the coins once and updates the existing return point and resources atomically");
+            ++input.commands.dialogueSkip;step();
+            Check(state.recordKeeperAction==RecordKeeperAction::RecallRoutes,
+                  "the keeper offers directions again once the reward has been collected");
+            ++input.commands.interact;step();
+            Check(state.chapterDialogue.line==Line::RecordKeeperRegister && state.treasurePurse==earned,
+                  "a repeat interaction recalls the routes without paying again");
+            for(const auto line:kRecordKeeperReading) {
+                Check(state.chapterDialogue.line==line,"the reading remains repeatable after the reward");
+                ++input.commands.dialogueSkip;step();
+            }
+            input.moveForward=1;input.runHeld=true;
+            const bool returned=walkTo(kBellwetherChurchApproach.front()) &&
+                walkStations(kBellwetherNorthApproach.rbegin(),kBellwetherNorthApproach.rend());
+            Check(returned && game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+                  game.Snapshot().chapterDialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+                  game.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
+                  "returning from the wayside branch preserves seated Kit and the completed tavern exchange");
+            if(!returned)return;
+            const auto tavernEntry=std::next(route.begin(),index);
+            if(!walkStations(tavernEntry+1,route.end()) || !walkTo(kBellwetherLanternFittingApproach)) {
+                Check(false,"the register route reaches the keeper's side of the tavern");return;
+            }
+            input.moveForward=0;input.runHeld=false;input.yawRadians=1.57f;step();
+            Check(!state.tavernLanternFittingAvailable && state.treasurePurse==earned,
+                  "the lantern fitting is offered only while facing the keeper");
+            input.yawRadians=std::atan2(kKeeperHearth[0]-state.playerX,state.playerZ-kKeeperHearth[2]);step();
+            Check(state.tavernLanternFittingAvailable && state.treasurePurse==earned,
+                  "the funded fitting is available beside the keeper before committing any coins");
+            ++input.commands.interact;step();
+            const cp::TreasurePurse fitted{earned.coins-cp::TreasurePurse::kLanternFittingPrice,true,true};
+            const auto bought=game.LatestCampaignBoundary();
+            Check(state.chapterDialogue.line==Line::TavernLanternFitting && state.treasurePurse==fitted &&
+                  bought && rewarded && bought->schema==cp::kMillPreparationSchema && bought->treasurePurse==fitted &&
+                  bought->position.x==rewarded->position.x && bought->position.z==rewarded->position.z &&
+                  bought->vitality==rewarded->vitality && bought->flask==rewarded->flask,
+                  "one fitting purchase saves its debit and ownership at the earned return point");
+            ++input.commands.dialogueSkip;step();
+            ++input.commands.interact;step();
+            Check(!state.tavernLanternFittingAvailable && state.treasurePurse==fitted,
+                  "a second interaction cannot rebuy the fitted hinge");
+            if(rewarded && bought) {
+                const auto measureWalk=[&](const cp::Checkpoint& checkpoint) {
+                    sim::GameSimulation reopened(config);
+                    sim::InputSnapshot walk;
+                    walk.yawRadians=checkpoint.yaw;walk.pitchRadians=checkpoint.pitch;
+                    const auto token=reopened.BeginCampaignRestore(checkpoint);
+                    const bool restored=token && reopened.CommitCampaignRestore(
+                        *token,{token->worldGeneration,checkpoint.zone},terrain,walk);
+                    Check(restored,"the real tavern save restores for a matched lantern walking check");
+                    std::array<float,2> sums{};
+                    if(!restored)return sums;
+                    reopened.StepFixed(walk);
+                    walk.yawRadians=3.14159265f;
+                    for(unsigned tick=0;tick<20;++tick)reopened.StepFixed(walk);
+                    for(unsigned tick=0;tick<120;++tick) {
+                        walk.moveForward=tick<50?1.f:0.f;
+                        reopened.StepFixed(walk);
+                        const auto& sample=reopened.Snapshot();
+                        sums[0]+=sample.playerTravelledThisTick;
+                        sums[1]+=std::hypot(sample.lanternPendulum.forwardAngleRadians,
+                                            sample.lanternPendulum.strafeAngleRadians);
+                    }
+                    return sums;
+                };
+                const auto standard=measureWalk(*rewarded),damped=measureWalk(*bought);
+                std::cout<<"Matched lantern walk travel="<<standard[0]<<','<<damped[0]
+                         <<" accumulated swing="<<standard[1]<<','<<damped[1]<<'\n';
+                Check(standard[0]>1.f && std::abs(standard[0]-damped[0])<.001f &&
+                      damped[1]>0.f && damped[1]<standard[1]*.9f,
+                      "a fitted save measurably reduces swing on the same walking path");
+            }
+            input.moveForward=1;input.runHeld=true;
+            if(!walkTo({kConversation[0],kConversation[2]})) {
+                Check(false,"the fitting leaves a clear path back to Kit's table");return;
+            }
+            input.moveForward=0;input.runHeld=false;step();
+            using HeldLightPose=gameplay::interactions::HeldLightPose;
+            const auto settleLantern=[&](HeldLightPose wanted) {
+                for(unsigned tick=0;tick<125 && game.Snapshot().interaction.heldLightPose!=wanted;++tick)step();
+                return game.Snapshot().interaction.heldLightPose==wanted;
+            };
+            if(game.Snapshot().interaction.heldLightPose==HeldLightPose::High)++input.commands.toggleHeldLightPose;
+            Check(settleLantern(HeldLightPose::Low) && game.Snapshot().NeedsRaiseLanternPrompt() &&
+                  game.Snapshot().chapterDialogue.tavernLanternLinesStarted==0,
+                  "the completed shrine route offers a local raise at Kit's chair without granting knowledge");
+            ++input.commands.toggleHeldLightPose;
+            Check(settleLantern(HeldLightPose::High) && game.Snapshot().chapterDialogue.line==Line::None,
+                  "the new raise waits for presentation before speaking");
+            Check(game.AcknowledgeChapterPresentation(game.Snapshot().tickIndex,game.Snapshot().chapterDialogue.generation),
+                  "the raised lantern can be acknowledged at the physical chair");
+            step();
+            for(const auto line:kTavernLanternExchange) {
+                Check(game.Snapshot().chapterDialogue.line==line,"the direct tavern exchange follows the English bank's order");
+                ++input.commands.dialogueSkip;step();
+            }
+            const auto introduced=game.LatestCampaignBoundary();
+            Check(introduced && introduced->schema==cp::kMillPreparationSchema && introduced->treasurePurse==fitted && introduced->airWardLearned &&
+                  introduced->millPreparation==gameplay::bellwether::MillPreparation::FitChecked &&
+                  introduced->dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size() &&
+                  introduced->waysideRegisterInterpreted && game.Snapshot().chapterDialogue.line==Line::None,
+                  "the direct exchange updates the earned save and retains the independently interpreted register");
+            input.moveForward=1;input.runHeld=true;
+            if(!walkStations(route.rbegin(),std::make_reverse_iterator(tavernEntry))) {
+                Check(false,"the direct tavern exchange leaves the outbound route clear");return;
+            }
+        }
+    }
+    Check(!replayedLookoutLine && game.Snapshot().chapterDialogue.forestVillageConsumed &&
+          game.LatestCampaignBoundary() && game.LatestCampaignBoundary()->id==cp::CheckpointId::BellwetherTavern &&
+          game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated && injuryEntries==1 && ankleCues.size()==2 &&
+          hearthSpoken.size()==3 && roadSpoken==expectedRoad && welcomes==(stayAtIncident?1u:0u) &&
+          std::abs(stoneTravel()-.284f)<.001f,
+          "return preserves the tavern checkpoint and seated Kit without replaying the injury or its foley");
+    if(!stayAtIncident)return;
+
+    const auto townSave=game.LatestCampaignBoundary();
+    if(!townSave || !townSave->airWardLearned || !townSave->treasurePurse.lanternFittingPurchased) {
+        Check(false,"the return to the tomb starts with earned Bellwether preparations");return;
+    }
+    const auto keepsTownProgress=[&](const cp::Checkpoint& checkpoint) {
+        return checkpoint.contentRevision==townSave->contentRevision &&
+            checkpoint.treasurePurse==townSave->treasurePurse &&
+            checkpoint.millPreparation==townSave->millPreparation &&
+            checkpoint.airWardLearned && checkpoint.waysideArchive==townSave->waysideArchive &&
+            checkpoint.waysideRegisterInterpreted &&
+            checkpoint.dialogue.tavernConversationLinesResolved==kTavernConversation.size() &&
+            checkpoint.dialogue.tavernLanternLinesStarted==kTavernLanternExchange.size();
+    };
+    for(std::size_t index=sim::kWorldRoutePoints.size()-1;index>3;) {
+        const auto& point=sim::kWorldRoutePoints[--index];
+        if(!walkTo({point.x,point.z})) {
+            Check(false,"the player can follow the forest path back toward the rescue rope");return;
+        }
+    }
+    if(!walkTo({kExteriorLanding.x,kExteriorLanding.z})) {
+        Check(false,"the player can approach the original rescue rope from Bellwether");return;
+    }
+    input.moveForward=0;
+    input.runHeld=false;
+    step();
+    if(game.Snapshot().rescuePrompt!=RescuePrompt::Descend) {
+        Check(false,"the earned rope still offers descent after leaving Bellwether");return;
+    }
+    ++input.commands.interact;
+    step();
+    for(unsigned tick=0; tick<1800 && game.Snapshot().rescue.equipmentStowed; ++tick)step();
+    const auto lower=game.LatestCampaignBoundary();
+    if(!lower || lower->id!=cp::CheckpointId::LowerClaimed || !keepsTownProgress(*lower) ||
+       game.Snapshot().rescue.exteriorSide || !game.Snapshot().rescue.sawLanding) {
+        Check(false,"the completed descent earns a lower save that retains Bellwether progress");return;
+    }
+
+    std::vector<std::byte> saveBytes;
+    cp::codec::Error codecError;
+    cp::Checkpoint savedLower;
+    if(!cp::codec::Encode(*lower,saveBytes,codecError) ||
+       !cp::codec::Decode(saveBytes,savedLower,codecError) || !keepsTownProgress(savedLower)) {
+        Check(false,"the lower save encodes and decodes the earned Bellwether progress");return;
+    }
+    const auto reload=game.BeginCampaignRestore(savedLower);
+    if(!reload || !game.CommitCampaignRestore(*reload,{reload->worldGeneration,savedLower.zone},terrain,input)) {
+        Check(false,"the earned lower save restores after a visit to Bellwether");return;
+    }
+    publishWorld(reload->worldGeneration);
+    input.yawRadians=savedLower.yaw;
+    input.pitchRadians=savedLower.pitch;
+    step();
+    if(game.Snapshot().rescuePrompt!=RescuePrompt::Climb) {
+        Check(false,"a lower save with Bellwether progress retains its original climb action");return;
+    }
+    ++input.commands.interact;
+    step();
+    for(unsigned tick=0; tick<1800 && game.Snapshot().rescue.equipmentStowed; ++tick)step();
+    const auto exterior=game.LatestCampaignBoundary();
+    Check(game.Snapshot().rescue.exteriorSide && !game.Snapshot().rescue.equipmentStowed &&
+          game.Snapshot().chapterCompanion.bellwetherArrival==Stage::Seated &&
+          game.Snapshot().chapterDialogue.line==Line::None && injuryEntries==1 && ankleCues.size()==2 &&
+          exterior && exterior->id==cp::CheckpointId::SafeExit && keepsTownProgress(*exterior),
+          "reascending from the lower save keeps Kit in Bellwether and retains every earned preparation");
+}
+
+void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSupportSurface> terrain) {
+    namespace sim=gameplay::simulation;namespace cp=gameplay::campaign;
+    const auto record=LookoutCheckpoint(*terrain);
+    const auto anchor=sim::kWorldRoutePoints.back();
     Check(cp::Validate(record),"canonical old forest save remains valid with new demo endpoint");
     auto outside=record;outside.position.x=40;outside.position.z=60;
     Check(!cp::Validate(outside),"old arbitrary off-trail position cannot be a valid persistent checkpoint");
@@ -1194,6 +2197,683 @@ void TestEndpointRecovery(std::shared_ptr<const gameplay::simulation::TriangleSu
     }
 }
 
+void TestBellwetherResidentRosters(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    using gameplay::bellwether::Specialist;
+    using namespace gameplay::traversal;
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-mill-artificer");
+    if(!view) {Check(false,"the mill artificer checkpoint is registered");return;}
+    for(const auto specialist:{Specialist::RecordKeeper,Specialist::Artificer}) {
+        auto config=sim::ProductionGameSimulationConfig();
+        config.bellwetherTavernKeeperAdmitted=true;
+        config.bellwetherSpecialist=specialist;
+        sim::GameSimulation game(config);
+        game.SetDevelopmentRescueJourney(true,true);
+        const auto generation=game.Snapshot().worldRoute.generation;
+        if(!game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain)) {
+            Check(false,"the mill checkpoint can publish authored terrain");
+            return;
+        }
+        const bool staged=gameplay::StageDevelopmentCheckpointSimulation(game,*view);
+        const auto& state=game.Snapshot();
+        if(specialist==Specialist::RecordKeeper) {
+            Check(!staged && !state.artificer,"the church roster cannot stage the mill artificer");
+            const auto* returnView=gameplay::FindDevelopmentCheckpoint("bellwether-return-to-kit");
+            Check(returnView && gameplay::StageDevelopmentCheckpointSimulation(game,*returnView) &&
+                  state.tavernKeeper && state.recordKeeper && !state.artificer &&
+                  state.waysideArchive.registerInterpreted,
+                  "the church roster completes the first register reading including the air ward offer and returns to Kit");
+            continue;
+        }
+        Check(staged && state.artificer && state.tavernKeeper && !state.recordKeeper && state.playerGrounded,
+              "the authored route reaches the artificer with Kit and the tavern keeper in the mill roster");
+        if(!staged || !state.artificer)return;
+        const auto& foot=state.artificer->foot;
+        const auto support=ChapterExteriorStepSupport(*terrain,foot[0],foot[2],.28f,1.78f);
+        const float sightY=std::min(state.playerSupportWorldY+1.5f,foot[1]+1.5f);
+        Check(support.grounded && foot[0]==kBellwetherMillArtificerMark.x && foot[2]==kBellwetherMillArtificerMark.z &&
+              std::abs(foot[1]-support.worldY)<.001f &&
+              terrain->NonWalkableVolumeClear(state.playerX,state.playerZ,foot[0],foot[2],sightY-.025f,sightY+.025f,.025f),
+              "the artificer stands on real support at a clear working-side approach");
+    }
+
+    auto combinedConfig=sim::ProductionGameSimulationConfig();
+    combinedConfig.bellwetherCombinedResidents=true;
+    combinedConfig.bellwetherTavernKeeperAdmitted=true;
+    combinedConfig.bellwetherSpecialist=Specialist::Artificer; // preserves authored staging policy
+    sim::GameSimulation combined(combinedConfig);
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) &&
+          !combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper,
+          "combined residency starts at the town pair before the chapter terrain is published");
+    const auto* millView=gameplay::FindDevelopmentCheckpoint("bellwether-mill-artificer");
+    if(!millView) {Check(false,"the authored mill checkpoint is registered");return;}
+    combined.SetDevelopmentRescueJourney(true,true);
+    const auto generation=combined.Snapshot().worldRoute.generation;
+    if(!combined.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain)) {
+        Check(false,"combined residency can load the authored Bellwether terrain");
+        return;
+    }
+    const auto stagedRoster=static_cast<ResidentMask>(kTavernKeeperResident|kArtificerResident);
+    Check(combined.PublishBellwetherResidents(stagedRoster),"two admitted residents can be published together");
+    Check(!combined.PublishBellwetherResidents(static_cast<ResidentMask>(stagedRoster|kRecordKeeperResident)) &&
+          !combined.PublishBellwetherResidents(0x20u),
+          "third and unknown resident bits are rejected");
+    Check(combined.PublishBellwetherResidents(stagedRoster),"resident publication is idempotent");
+    const bool staged=millView && gameplay::StageDevelopmentCheckpointSimulation(combined,*millView);
+    Check(staged && combined.Snapshot().artificer && combined.Snapshot().tavernKeeper,
+          "combined admission keeps authored mill checkpoint staging intact");
+    if(!staged)return;
+    const auto tickBefore=combined.Snapshot().tickIndex;
+    Check(combined.PublishBellwetherResidents(kEastResidentMask) &&
+          combined.Snapshot().tickIndex==tickBefore && combined.Snapshot().artificer && combined.Snapshot().salvager &&
+          !combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper,
+          "east admission immediately publishes both resident poses without stepping or saving");
+    const auto artificerFoot=combined.Snapshot().artificer->foot;
+    const auto salvagerFoot=combined.Snapshot().salvager->foot;
+    const auto westRoster=static_cast<ResidentMask>(kTavernKeeperResident|kRelicDealerResident);
+    Check(combined.PublishBellwetherResidents(westRoster) &&
+          combined.Snapshot().tickIndex==tickBefore && combined.Snapshot().relicDealer &&
+          combined.Snapshot().tavernKeeper && !combined.Snapshot().recordKeeper &&
+          !combined.Snapshot().artificer && !combined.Snapshot().salvager,
+          "the west pair uses the same two admissions and retains the tavern keeper");
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) && !combined.Snapshot().relicDealer &&
+          !combined.Snapshot().relicDealerTradeAvailable && !combined.Snapshot().artificer &&
+          !combined.Snapshot().salvager && combined.Snapshot().tavernKeeper,
+          "town admission evicts the west actor and its interaction from the immutable snapshot");
+    Check(combined.PublishBellwetherResidents(kEastResidentMask) && combined.Snapshot().artificer &&
+          combined.Snapshot().salvager && combined.Snapshot().artificer->foot==artificerFoot &&
+          combined.Snapshot().salvager->foot==salvagerFoot,
+          "re-admission restores the persisted east actor poses");
+
+    const auto* repeatVisit=gameplay::FindDevelopmentCheckpoint("bellwether-repeat-visit");
+    Check(combined.PublishBellwetherResidents(kTownResidentMask) && repeatVisit &&
+          gameplay::StageDevelopmentCheckpointSimulation(combined,*repeatVisit),
+          "the combined performance route stages the same completed room as the doorway route");
+    gameplay::validation::BellwetherDoorwayProbe probe;
+    if(!probe.Start(combined.Snapshot(),gameplay::validation::BellwetherMeasurementRoute::EastRoundTrip)) {
+        Check(false,"the combined performance route admits the staffed town pair");return;
+    }
+    const auto startTick=combined.Snapshot().tickIndex;
+    unsigned eastVisits=0;
+    bool atEast=false;
+    const auto deadlineTicks=static_cast<std::uint64_t>(probe.kResidentRoundTripDeadlineSeconds*60);
+    while(combined.Snapshot().tickIndex-startTick<deadlineTicks && !probe.Complete() && !probe.Failed()) {
+        const auto& state=combined.Snapshot();
+        const auto input=probe.Next(state);
+        if(probe.PhaseName()=="east-fork") {
+            if(!atEast) {
+                atEast=true;
+                ++eastVisits;
+                Check(std::hypot(state.playerX-kBellwetherSalvagerMark.x,
+                                 state.playerZ-kBellwetherSalvagerMark.z)<.045f && state.playerGrounded,
+                      "the normal player motor reaches the grounded salvager's fork mark");
+                auto missingResident=probe;
+                Check(missingResident.Next(state).paused && missingResident.Failed(),
+                      "the fork hold rejects a stale town roster");
+                if(!combined.PublishBellwetherResidents(kEastResidentMask)) break;
+            }
+        } else if(atEast && probe.PhaseName()=="doorway-inbound") {
+            atEast=false;
+            if(!combined.PublishBellwetherResidents(kTownResidentMask)) break;
+        }
+        if(!input.paused) combined.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        combined.ClearEvents();
+    }
+    Check(probe.Complete() && probe.Returns()==2 && eastVisits==2 &&
+          combined.Snapshot().tickIndex-startTick>=3600 &&
+          combined.Snapshot().tavernKeeper && combined.Snapshot().recordKeeper,
+          "the combined input schedule walks to the east fork and back into the staffed tavern twice within the measurement deadline");
+}
+
+void TestBellwetherRelicDealerVisit(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    using namespace gameplay::traversal;
+    using gameplay::bellwether::Specialist;
+    using gameplay::dialogue::Line;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=Specialist::RelicDealer;
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* visit=gameplay::FindDevelopmentCheckpoint("bellwether-relic-dealer");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=visit && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*visit);
+    const auto& state=game.Snapshot();
+    if(!ready) {
+        std::cerr<<"Relic dealer route stopped at "<<state.playerX<<','<<state.playerZ<<'\n';
+        Check(false,"the ordinary player motor can walk from the tavern to the dealer's mark");return;
+    }
+    const auto& stallLamp=state.fireEmitters[3];
+    bool stallLampAnchored=true;
+    for(std::size_t axis=0;axis<3;++axis)
+        stallLampAnchored &= stallLamp.worldFromFlame[12+axis]==gameplay::bellwether::kRelicStallLampFlame[axis] &&
+            stallLamp.worldFromLight[12+axis]==gameplay::bellwether::kRelicStallLampLight[axis];
+    Check(state.fireEmitterCount==4 &&
+          stallLamp.stableId==gameplay::effects::kBellwetherRelicStallLampEmitterId &&
+          stallLamp.strength>0 && stallLamp.zone==gameplay::ShowcaseZone::Outside && stallLampAnchored,
+          "the admitted dealer approach selects the serviced relic-stall lamp in fixed light slot three");
+    const auto support=ChapterExteriorStepSupport(*terrain,kBellwetherRelicDealerStand.x,
+        kBellwetherRelicDealerStand.z,.28f,1.78f);
+    Check(support.grounded && state.relicDealer && state.tavernKeeper && state.chapterCompanion.grounded &&
+          !state.recordKeeper && !state.artificer && !state.salvager && state.relicDealerTradeAvailable &&
+          std::abs(state.relicDealer->foot[1]-support.worldY)<.001f,
+          "the dealer fits the authored support and the existing three-actor roster");
+    if(!state.relicDealer)return;
+
+    sim::InputSnapshot input;
+    input.damageEnabled=false;input.tutorialEnabled=false;
+    input.yawRadians=visit->yaw+3.14159265359f;
+    input.pitchRadians=visit->pitch;
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    Check(!state.relicDealerTradeAvailable && state.chapterDialogue.line==Line::None,
+          "a player facing away cannot start the dealer's trade caption");
+    input.yawRadians=visit->yaw;
+    const auto revision=game.CampaignBoundaryRevision();
+    const auto purse=state.treasurePurse;
+    ++input.commands.interact;
+    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    Check(state.chapterDialogue.line==Line::RelicDealerOrdinarySale &&
+          gameplay::dialogue::RequiresChapterCaption(state.chapterDialogue.line) &&
+          state.chapterDialogue.source.x==state.relicDealer->foot[0] &&
+          state.chapterDialogue.source.z==state.relicDealer->foot[2] &&
+          state.treasurePurse==purse && game.CampaignBoundaryRevision()==revision,
+          "the normal action starts the source-backed caption and leaves the purse and save intact");
+}
+
+void TestBellwetherSalvagerPractice(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::bellwether;
+    using namespace gameplay::traversal;
+    using gameplay::dialogue::Line;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=Specialist::Salvager;
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* checkpoint=gameplay::FindDevelopmentCheckpoint("bellwether-salvager-shore");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=checkpoint && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*checkpoint);
+    Check(ready,"the player can walk from the earned tavern to the salvager's grounded fork");
+    if(!ready)return;
+    const auto& snap=game.Snapshot();
+    const auto starting=*game.LatestCampaignBoundary();
+    Check(snap.salvager && snap.tavernKeeper && !snap.recordKeeper && !snap.artificer &&
+          snap.salvagerAction==SalvagerAction::StartPractice && !starting.salvagerShorePracticeCompleted,
+          "the admitted river resident owns the first practice prompt within the three-character roster");
+    if(!snap.salvager)return;
+    sim::InputSnapshot input;
+    input.damageEnabled=false;
+    input.tutorialEnabled=false;
+    input.yawRadians=snap.playerYawRadians;
+    input.pitchRadians=snap.playerPitchRadians;
+    input.commands.interact=snap.lastConsumedInteractSequence;
+    std::uint16_t peakBreath=0;
+    const auto advance=[&] {
+        game.StepFixed(input,1.f/60.f,snap.inputPublicationSequence+1);
+        peakBreath=std::max(peakBreath,snap.shorePracticeBreathTicksRemaining);
+    };
+    const auto walkTo=[&](BellwetherStation mark) {
+        for(unsigned tick=0;tick<1600;++tick) {
+            const float dx=mark.x-snap.playerX,dz=mark.z-snap.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.012f) {
+                input.moveForward=0.f;
+                input.runHeld=false;
+                advance();
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            input.runHeld=false;
+            advance();
+        }
+        std::cerr<<"Salvager walk blocked at "<<snap.playerX<<','<<snap.playerZ
+                 <<" en route to "<<mark.x<<','<<mark.z<<'\n';
+        return false;
+    };
+    input.yawRadians+=3.14159265f;
+    ++input.commands.interact;advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::Idle && snap.salvagerAction==SalvagerAction::None,
+          "looking away does not start practice");
+    input.yawRadians=checkpoint->yaw;advance();
+    ++input.commands.interact;advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::FindDryMark && snap.chapterDialogue.line==Line::SalvagerShoreTask &&
+          snap.chapterDialogue.source.x==snap.salvager->foot[0] && snap.chapterDialogue.source.z==snap.salvager->foot[2],
+          "the normal action starts the named caption at the salvager's terrain-bound position");
+    input.paused=true;
+    advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::FindDryMark && snap.salvagerAction==SalvagerAction::None &&
+          snap.chapterDialogue.paused,"pause suspends the caption and the availability of practice actions");
+    input.paused=false;
+    const auto& shore=kBellwetherRiverLanding;
+    for(auto station=shore.begin();station!=shore.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"shore practice follows the authored causeway");return;}
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the dry mark is reachable");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && !snap.waterContact.wetGround &&
+          snap.shorePracticeBreathTicksRemaining==0 &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "the dry mark prepares the drill without starting the breath timer or awarding completion");
+    if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"the practice waterline is reachable through the ordinary movement motor");return;
+    }
+    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && snap.waterContact.wetGround &&
+          peakBreath==kShorePracticeBreathTicks &&
+          snap.shorePracticeBreathTicksRemaining>0 &&
+          snap.shorePracticeBreathTicksRemaining<=kShorePracticeBreathTicks &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "wet contact starts finite breath and reaching the rail asks for a timed return");
+    const auto breathAtRail=snap.shorePracticeBreathTicksRemaining;
+    const auto revisionAtRail=game.CampaignBoundaryRevision();
+    const auto vitalityAtRail=snap.playerVitals;
+    input.paused=true;
+    for(unsigned tick=0;tick<kShorePracticeBreathTicks;++tick)advance();
+    Check(snap.shorePracticeBreathTicksRemaining==breathAtRail && snap.shorePracticeStage==ShorePracticeStage::Retreat,
+          "pause freezes the remaining breath even across the whole active budget");
+    input.paused=false;
+    for(unsigned tick=0;tick<breathAtRail;++tick)advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::RecoverBreath && snap.shorePracticeBreathTicksRemaining==0 &&
+          snap.waterContact.wetGround && snap.playerVitals.vitality==vitalityAtRail.vitality &&
+          snap.playerVitals.halfHeart==vitalityAtRail.halfHeart &&
+          game.CampaignBoundaryRevision()==revisionAtRail && !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "expiration requests a safe dry recovery without damage or saving an incomplete drill");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"dry recovery remains reachable after expiration");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::EnterShallows && snap.shorePracticeBreathTicksRemaining==0,
+          "recovering on the dry mark makes the same exercise available for retry");
+    peakBreath=0;
+    if(!walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"a fresh breath attempt reaches the rail");return;
+    }
+    Check(snap.shorePracticeStage==ShorePracticeStage::Retreat && peakBreath==kShorePracticeBreathTicks &&
+          snap.shorePracticeBreathTicksRemaining>0 && snap.shorePracticeBreathTicksRemaining<=peakBreath,
+          "retry starts a fresh full budget on first wet contact and carries it to the rail");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the wet mark can be left safely");return;}
+    Check(snap.shorePracticeStage==ShorePracticeStage::ReportBack && !snap.waterContact.wetGround &&
+          snap.shorePracticeBreathTicksRemaining==0,
+          "timely dry footing clears the timer and advances the report without requiring a rig or ward");
+    for(auto station=shore.rbegin()+2;station!=shore.rend();++station)
+        if(!walkTo(*station)) {Check(false,"the reporting route can be retraced");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"the salvager can be revisited");return;}
+    input.yawRadians=checkpoint->yaw;advance();
+    const auto revision=game.CampaignBoundaryRevision();
+    Check(snap.salvagerAction==SalvagerAction::ReportPractice &&
+          !game.LatestCampaignBoundary()->salvagerShorePracticeCompleted,
+          "the player recovers completion through a deliberate report at the fork");
+    ++input.commands.interact;advance();
+    const auto& completed=game.LatestCampaignBoundary();
+    Check(completed && completed->salvagerShorePracticeCompleted && completed->schema==cp::kSalvagerShorePracticeSchema &&
+          game.CampaignBoundaryRevision()==revision+1 && completed->id==starting.id &&
+          completed->position.x==starting.position.x && completed->position.z==starting.position.z &&
+          completed->treasurePurse==starting.treasurePurse && completed->millPreparation==starting.millPreparation &&
+          completed->airWardLearned==starting.airWardLearned && snap.chapterDialogue.line==Line::SalvagerShoreReturn,
+          "the lesson saves once at the earned tavern boundary without changing other preparations");
+    if(!completed)return;
+    const auto restore=game.BeginCampaignRestore(*completed);
+    Check(restore && game.CommitCampaignRestore(*restore,{restore->worldGeneration,completed->zone},terrain,input) &&
+          snap.salvagerShorePracticeCompleted && snap.shorePracticeStage==ShorePracticeStage::Idle &&
+          snap.shorePracticeBreathTicksRemaining==0 &&
+          snap.chapterDialogue.line==Line::None,"the saved outcome restores without a live exercise or caption");
+
+    const auto* rigTrial=gameplay::FindDevelopmentCheckpoint("bellwether-rig-leak-trial");
+    if(!rigTrial || !gameplay::StageDevelopmentCheckpointSimulation(game,*rigTrial)) {
+        Check(false,"the accepted rig-trial fixture also admits the salvager");return;
+    }
+    for(auto station=shore.rbegin()+2;station!=shore.rend();++station)
+        if(!walkTo(*station)) {Check(false,"a rig carrier can retrace the river path to the salvager");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"a rig carrier reaches the fork");return;}
+    input.yawRadians=checkpoint->yaw;
+    input.commands.interact=snap.lastConsumedInteractSequence;
+    advance();
+    Check(snap.salvagerAction==SalvagerAction::StartPractice,"carrying the rig does not remove the breath lesson");
+    ++input.commands.interact;advance();
+    for(auto station=shore.begin();station!=shore.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"the rig carrier can return to the practice landing");return;}
+    if(!walkTo(kBellwetherRiverDryMark) || !walkTo(shore[shore.size()-2]) || !walkTo(shore.back())) {
+        Check(false,"a rig carrier can choose to practise at the rail");return;
+    }
+    Check(snap.shorePracticeBreathTicksRemaining>0 && snap.millAction==MillAction::None,
+          "the active breath cue has the landing while both preparations are available");
+    for(unsigned tick=0;tick<kShorePracticeBreathTicks;++tick)advance();
+    Check(snap.shorePracticeStage==ShorePracticeStage::RecoverBreath && snap.millAction==MillAction::StartLeakTest,
+          "an expired breath drill leaves the rig option available at the same rail");
+    ++input.commands.interact;advance();
+    for(unsigned tick=0;tick<125;++tick)advance();
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"the rig carrier can return to dry stone");return;}
+    Check(snap.millAction==MillAction::ConfirmSeal && !snap.salvagerShorePracticeCompleted,
+          "the leak test can be finished after changing approaches");
+    ++input.commands.interact;advance();
+    Check(snap.millPreparation==MillPreparation::RigTested && snap.shorePracticeBreathTicksRemaining==0 &&
+          !snap.salvagerShorePracticeCompleted,"the rig seal and breath lesson retain independent completion");
+}
+
+void TestBellwetherMillRepairAndLeakTrial(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    namespace cp=gameplay::campaign;
+    using namespace gameplay::traversal;
+    using gameplay::bellwether::MillAction;
+    using gameplay::bellwether::MillLeakTestPhase;
+    using gameplay::bellwether::MillPreparation;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherSpecialist=gameplay::bellwether::Specialist::Artificer;
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation game(config);
+    game.SetDevelopmentRescueJourney(true,true);
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-mill-drive-tested");
+    const auto generation=game.Snapshot().worldRoute.generation;
+    const bool ready=view && game.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(game,*view);
+    const auto& state=game.Snapshot();
+    Check(ready && state.millAction==MillAction::TakeRig &&
+          state.millPreparation==MillPreparation::GearingVerified && !state.millDriveTesting &&
+          std::abs(state.millDriveAngleRadians-gameplay::bellwether::kMillDriveTestRadians)<.001f,
+          "the real workbench route fits and turns the drive before the artificer offers the rig");
+    if(!ready)std::cerr<<"Mill repair stopped at "<<state.playerX<<','<<state.playerZ
+        <<" stage "<<unsigned(state.millPreparation)<<" action "<<unsigned(state.millAction)<<'\n';
+    if(!ready)return;
+
+    // The continuous wheel is presentation state derived from fixed-step time,
+    // not campaign progress. Check an unrepaired yard, an operating save reload,
+    // pause, and a pre-wheel save schema against the same production authority.
+    {
+        const auto* yardView=gameplay::FindDevelopmentCheckpoint("bellwether-mill-yard");
+        sim::GameSimulation unrepaired(config);
+        unrepaired.SetDevelopmentRescueJourney(true,true);
+        const auto yardGeneration=unrepaired.Snapshot().worldRoute.generation;
+        const bool yardReady=yardView && unrepaired.PublishChapterTerrain(
+            {yardGeneration,sim::WorldZoneId::TombExterior},terrain) &&
+            gameplay::StageDevelopmentCheckpointSimulation(unrepaired,*yardView);
+        Check(yardReady && unrepaired.Snapshot().millPreparation==MillPreparation::Unexamined &&
+              unrepaired.Snapshot().millWaterwheelAngleRadians==0.f,
+              "the unrepaired mill yard publishes a stopped waterwheel");
+        sim::InputSnapshot running;
+        running.damageEnabled=false;running.tutorialEnabled=false;
+        if(yardReady) {
+            for(unsigned tick=0;tick<120;++tick)unrepaired.StepFixed(running);
+            Check(unrepaired.Snapshot().millWaterwheelAngleRadians==0.f,
+                  "fixed-step time cannot start the wheel before gearing is verified");
+        }
+
+        const auto operating=game.LatestCampaignBoundary();
+        sim::GameSimulation restored(config);
+        const auto restore=[&](const gameplay::campaign::Checkpoint& checkpoint,
+                               sim::GameSimulation& target) {
+            const auto token=target.BeginCampaignRestore(checkpoint);
+            return token && target.CommitCampaignRestore(*token,
+                {token->worldGeneration,checkpoint.zone},terrain,{});
+        };
+        Check(operating && operating->millPreparation==MillPreparation::GearingVerified &&
+              restore(*operating,restored) &&
+              restored.Snapshot().millWaterwheelAngleRadians==0.f,
+              "an operating mill reload starts from a deterministic zero presentation phase");
+        if(operating && restored.Snapshot().millPreparation==MillPreparation::GearingVerified) {
+            running.yawRadians=operating->yaw;running.pitchRadians=operating->pitch;
+            for(unsigned tick=0;tick<60;++tick)restored.StepFixed(running);
+            const float afterOneSecond=restored.Snapshot().millWaterwheelAngleRadians;
+            Check(std::abs(afterOneSecond-.5f)<.0001f,
+                  "the wheel advances at 0.5 radians per active simulation second");
+            auto paused=running;paused.paused=true;
+            Check(restored.AdvanceFrame(paused,.5)==0 &&
+                  restored.Snapshot().millWaterwheelAngleRadians==afterOneSecond,
+                  "a paused frame freezes the wheel angle");
+
+            sim::GameSimulation repeated(config);
+            const bool repeatedRestore=restore(*operating,repeated);
+            for(unsigned tick=0;repeatedRestore && tick<60;++tick)repeated.StepFixed(running);
+            Check(repeatedRestore && repeated.Snapshot().millWaterwheelAngleRadians==afterOneSecond,
+                  "reloading and replaying the same fixed ticks reproduces the wheel phase");
+            for(unsigned tick=0;tick<800;++tick)restored.StepFixed(running);
+            Check(restored.Snapshot().millWaterwheelAngleRadians>=0.f &&
+                  restored.Snapshot().millWaterwheelAngleRadians<6.2831855f,
+                  "the long-running wheel phase stays within one revolution");
+
+            auto legacy=*operating;
+            legacy.schema=gameplay::campaign::kTavernConversationSchema;
+            legacy.millPreparation=MillPreparation::Unexamined;
+            sim::GameSimulation olderSave(config);
+            const bool legacyRestored=restore(legacy,olderSave);
+            for(unsigned tick=0;legacyRestored && tick<120;++tick)olderSave.StepFixed(running);
+            Check(legacyRestored && olderSave.Snapshot().millPreparation==MillPreparation::Unexamined &&
+                  olderSave.Snapshot().millWaterwheelAngleRadians==0.f,
+                  "an older save without mill preparation keeps the wheel stopped");
+        }
+    }
+
+    sim::InputSnapshot input;
+    input.damageEnabled=false;input.tutorialEnabled=false;
+    input.commands.interact=state.lastConsumedInteractSequence;
+    input.yawRadians=state.playerYawRadians;input.pitchRadians=state.playerPitchRadians;
+    const auto step=[&] {
+        game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        game.ClearEvents();
+    };
+    const auto walkTo=[&](BellwetherStation point) {
+        for(unsigned tick=0;tick<1800;++tick) {
+            const float dx=point.x-state.playerX,dz=point.z-state.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.008f) {
+                input.moveForward=0;input.runHeld=false;
+                step();
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            input.runHeld=distance>.3f;
+            step();
+        }
+        return false;
+    };
+    const auto interact=[&] {++input.commands.interact;step();};
+    const auto repairRevision=game.CampaignBoundaryRevision();
+    interact();
+    interact();
+    Check(state.millPreparation==MillPreparation::RigTrialReady && state.millAction==MillAction::None &&
+          game.CampaignBoundaryRevision()==repairRevision+1,
+          "only taking the rig from the artificer earns the seal trial and the hand-off saves once");
+    const auto& mill=kBellwetherMillApproach;
+    if(!walkTo(mill.back())) {Check(false,"can leave the mill bench with the rig");return;}
+    for(auto station=mill.rbegin()+1;station!=mill.rend()-1;++station)
+        if(!walkTo(*station)) {Check(false,"can retrace the mill approach with the rig");return;}
+    if(!walkTo(kBellwetherSalvagerMark)) {Check(false,"can reach the river path with the rig");return;}
+    const auto& landing=kBellwetherRiverLanding;
+    for(auto station=landing.begin();station!=landing.end()-2;++station)
+        if(!walkTo(*station)) {Check(false,"can follow the dry causeway with the rig");return;}
+    if(!walkTo(kBellwetherRiverLandingView)) {Check(false,"can reach the dry test starting point");return;}
+    constexpr auto shallows=kBellwetherRiverLanding.back();
+    const auto trialBoundaryRevision=game.CampaignBoundaryRevision();
+    interact();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Idle &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "a dry start cannot begin or save the leak test");
+    if(!walkTo(shallows)) {Check(false,"can walk to the wet trial mark");return;}
+    Check(state.millAction==MillAction::StartLeakTest && state.waterContact.wetGround,
+          "the test appears only in grounded, shallow river contact");
+    interact();
+    input.paused=true;
+    for(unsigned tick=0;tick<125;++tick)step();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Testing && state.millAction==MillAction::None,
+          "pause cannot count toward the wet hold");
+    input.paused=false;
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"can step back to dry stone early");return;}
+    interact();
+    Check(!state.waterContact.wetGround && state.millLeakTestPhase==MillLeakTestPhase::Idle &&
+          state.millPreparation==MillPreparation::RigTrialReady &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "leaving the water early aborts the test without earning the seal");
+    if(!walkTo(shallows)) {Check(false,"can re-enter the shallows for a retry");return;}
+    interact();
+    for(unsigned tick=0;tick<115;++tick)step();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::Testing,
+          "an uninterrupted hold still requires the last part of the two seconds");
+    for(unsigned tick=0;tick<9;++tick)step();
+    interact();
+    const auto unconfirmed=game.LatestCampaignBoundary();
+    Check(state.millLeakTestPhase==MillLeakTestPhase::ReturnToDry && state.millAction==MillAction::None &&
+          unconfirmed && unconfirmed->millPreparation==MillPreparation::RigTrialReady &&
+          game.CampaignBoundaryRevision()==trialBoundaryRevision,
+          "a complete wet hold cannot be confirmed or saved while still in the shallows");
+    if(!unconfirmed)return;
+    sim::GameSimulation reloaded(config);
+    const auto reload=[&](const cp::Checkpoint& record) {
+        const auto token=reloaded.BeginCampaignRestore(record);
+        return token && reloaded.CommitCampaignRestore(*token,{token->worldGeneration,record.zone},terrain,{});
+    };
+    Check(reload(*unconfirmed) && reloaded.Snapshot().millLeakTestPhase==MillLeakTestPhase::Idle &&
+          reloaded.Snapshot().millPreparation==MillPreparation::RigTrialReady,
+          "reloading discards an unconfirmed wet trial");
+    if(!walkTo(kBellwetherRiverDryMark)) {Check(false,"can return dry after a full hold");return;}
+    Check(state.millAction==MillAction::ConfirmSeal && !state.waterContact.wetGround,
+          "dry stone offers confirmation after a successful wet hold");
+    interact();
+    const auto tested=game.LatestCampaignBoundary();
+    const auto confirmationRevision=game.CampaignBoundaryRevision();
+    interact();
+    Check(tested && tested->millPreparation==MillPreparation::RigTested && cp::Validate(*tested) &&
+          tested->position.x==unconfirmed->position.x && tested->position.z==unconfirmed->position.z &&
+          confirmationRevision==trialBoundaryRevision+1 && game.CampaignBoundaryRevision()==confirmationRevision &&
+          state.millAction==MillAction::None && state.millLeakTestPhase==MillLeakTestPhase::Idle,
+          "dry confirmation earns one durable seal at the existing tavern boundary");
+    const bool testedReloaded=tested && reload(*tested) &&
+        reloaded.Snapshot().millPreparation==MillPreparation::RigTested;
+    const float testedReloadPhase=reloaded.Snapshot().millWaterwheelAngleRadians;
+    sim::InputSnapshot resumed;
+    resumed.damageEnabled=false;resumed.tutorialEnabled=false;
+    if(testedReloaded) {
+        resumed.yawRadians=tested->yaw;resumed.pitchRadians=tested->pitch;
+        reloaded.StepFixed(resumed);
+    }
+    float resumedPhaseDelta=reloaded.Snapshot().millWaterwheelAngleRadians-testedReloadPhase;
+    if(resumedPhaseDelta<0.f)resumedPhaseDelta+=6.2831855f;
+    Check(testedReloaded && std::abs(resumedPhaseDelta-(.5f/60.f))<.0001f,
+          "a confirmed seal reloads with the waterwheel still running");
+}
+
+void TestBellwetherRepeatVisitCheckpoint(
+    const std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain) {
+    namespace sim=gameplay::simulation;
+    auto config=sim::ProductionGameSimulationConfig();
+    config.bellwetherTavernKeeperAdmitted=true;
+    sim::GameSimulation capture(config);
+    capture.SetDevelopmentRescueJourney(true,true);
+    const auto* view=gameplay::FindDevelopmentCheckpoint("bellwether-repeat-visit");
+    const auto generation=capture.Snapshot().worldRoute.generation;
+    gameplay::DevelopmentCheckpointStageEvidence evidence;
+    const bool staged=view && capture.PublishChapterTerrain({generation,sim::WorldZoneId::TombExterior},terrain) &&
+        gameplay::StageDevelopmentCheckpointSimulation(capture,*view,&evidence);
+    const auto& state=capture.Snapshot();
+    if(!staged) {
+        std::cerr<<"Repeat visit stopped at "<<state.playerX<<','<<state.playerZ
+                 <<" with Kit phase "<<unsigned(state.chapterCompanion.bellwetherArrival);
+        if(const auto& visit=evidence.bellwetherVisit)
+            std::cerr<<", roadside captions "<<visit->roadsideCaptions<<", welcome "<<visit->welcomeCaption
+                     <<", exchange captions "<<visit->exchangeCaptions<<", quiet returns "<<visit->quietReturns;
+        std::cerr<<'\n';
+    }
+    Check(staged && evidence.bellwetherVisit && evidence.bellwetherVisit->roadsideCaptions==3 &&
+          evidence.bellwetherVisit->welcomeCaption && evidence.bellwetherVisit->exchangeCaptions==3 &&
+          evidence.bellwetherVisit->quietReturns==2 && std::hypot(state.playerX-view->cameraX,state.playerZ-view->cameraZ)<.01f,
+          "the exact render replay starts at the old lookout and reaches the authored room again after two quiet returns");
+    if(!staged)return;
+    auto obstructed=state;
+    obstructed.tavernDoor.opening=0.f;
+    gameplay::validation::BellwetherDoorwayProbe blockedProbe;
+    Check(!blockedProbe.Start(obstructed),"the performance route rejects a closed tavern door at admission");
+    Check(blockedProbe.Start(state),"the performance route accepts the staffed open entrance");
+    obstructed=state;
+    obstructed.tavernDoor.destination=0.f;
+    const auto interrupted=blockedProbe.Next(obstructed);
+    Check(interrupted.paused && blockedProbe.Failed(),"a closing door invalidates an in-progress performance route");
+    gameplay::validation::BellwetherDoorwayProbe probe;
+    if(!probe.Start(state)) {Check(false,"the measured route admits the completed tavern visit");return;}
+    unsigned steps=0;
+    bool squareReached=false;
+    while(steps++<9000 && !probe.Complete() && !probe.Failed()) {
+        const auto input=probe.Next(state);
+        squareReached|=probe.PhaseName()=="square" &&
+            state.playerZ>gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation].z;
+        if(!input.paused)capture.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+        capture.ClearEvents();
+    }
+    Check(probe.Complete() && !probe.Failed() && squareReached && probe.Returns()==2 && steps>3600,
+          "the wall-clock runner's exact input schedule walks through the authored portal both ways for two visits");
+
+    using gameplay::bellwether::DoorAction;
+    const auto* closedView=gameplay::FindDevelopmentCheckpoint("bellwether-south-door-closed");
+    const bool closed=closedView && gameplay::StageDevelopmentCheckpointSimulation(capture,*closedView);
+    Check(closed && state.tavernDoor.opening==0.f && state.tavernDoorAction==DoorAction::Open,
+          "the ordinary interaction closes the real tavern door after the staffed arrival");
+    if(!closed)return;
+    const auto carryReach=[&] {
+        const auto pose=gameplay::bellwether::TavernDoor::PoseAt(state.tavernDoor.opening);
+        const auto sill=gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation];
+        const float z=sill.z+.29f;
+        const float floor=terrain->Query(sill.x,z).worldY;
+        return gameplay::items::ComputeRewardLanternForwardClearance(sill.x,z,
+            0.f,-1.f,false,true,floor,terrain.get(),&pose);
+    };
+    const float closedReach=carryReach();
+    Check(closedReach<.65f,"the shared carry clearance retracts the lantern before the closed leaf");
+    sim::InputSnapshot input;
+    input.damageEnabled=false;
+    const auto step=[&](unsigned ticks) {
+        for(unsigned tick=0;tick<ticks;++tick) {
+            capture.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+            capture.ClearEvents();
+        }
+    };
+    input.yawRadians=0.f;input.moveForward=1.f;
+    step(100);
+    const float stoppedAt=state.playerZ-gameplay::bellwether::kSouthDoorHinge[2];
+    Check(stoppedAt>.24f && stoppedAt<.38f && state.tavernDoor.opening==0.f,
+          "the normal player motor cannot pass the closed door");
+    input.moveForward=0.f;input.yawRadians=.95f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Open,"the player can reach the latch from the ramp");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    Check(state.tavernDoor.opening==1.f,"the door opens from the ramp through the shared interaction input");
+    Check(carryReach()>closedReach+1.f,"opening the leaf restores held-item clearance down the doorway lane");
+    input.yawRadians=0.f;input.moveForward=1.f;
+    for(unsigned tick=0;tick<140 && state.playerZ>117.76f;++tick)step(1);
+    Check(state.playerZ<117.8f,"the ordinary player motor crosses the same threshold once open");
+    input.moveForward=0.f;input.yawRadians=-.94f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Close,"the open leaf can be operated from inside the room");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    const float stopped=state.tavernDoor.opening;
+    const float stoppedX=state.playerX,stoppedZ=state.playerZ;
+    step(30);
+    Check(stopped>0.f && stopped<1.f && state.tavernDoor.opening==stopped &&
+          state.playerX==stoppedX && state.playerZ==stoppedZ,
+          "the inward swing stops at the player and never pushes them");
+    // Exit around the tip of the halted leaf. Walking north along the door's
+    // centreline would require passing through the solid door.
+    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::kSouthDoorSwingRadius+
+        gameplay::kPlayerCollisionRadius+.10f;
+    input.yawRadians=0.f;input.moveStrafe=1.f;
+    for(unsigned tick=0;tick<140 && state.playerX<clearX;++tick)step(1);
+    input.moveStrafe=0.f;
+    step(100);
+    if(state.tavernDoor.opening!=0.f)
+        std::cerr<<"Tavern closing stopped at opening "<<state.tavernDoor.opening
+                 <<" with player at "<<state.playerX<<','<<state.playerSupportWorldY<<','<<state.playerZ<<'\n';
+    Check(state.playerX>=clearX && state.tavernDoor.opening==0.f,
+          "the player can sidestep the stalled leaf and let it finish closing");
+    input.yawRadians=3.14159265f;
+    step(1);
+    Check(state.tavernDoorAction==DoorAction::Open,"the player can reach the closed latch from the hearth side");
+    input.commands.interact=state.lastConsumedInteractSequence+1;
+    step(100);
+    Check(state.tavernDoor.opening==1.f,"the same interaction reopens the door from inside");
+}
+
 void TestFullSurroundings()
 {
     std::string diagnostic;
@@ -1205,7 +2885,7 @@ void TestFullSurroundings()
     const bool ready=AppendPreparedTombDressing(kRoot/"assets",owner,tomb,diagnostic) &&
         AppendChapterTerrain(kRoot/"assets",owner,terrain,diagnostic) &&
         AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graves,diagnostic) &&
-        AppendBellwetherShell(kRoot/"assets",owner,diagnostic) &&
+        AppendBellwetherShell(kRoot/"assets",owner,terrain,diagnostic) &&
         PrepareForestDressing(kRoot/"assets",original,diagnostic,terrain.get()) &&
         AppendPreparedForestDressing(*original,owner,forest,diagnostic) &&
         AppendPreparedForestUnderstory(kRoot/"assets",owner,*terrain,understory,diagnostic) &&
@@ -1305,6 +2985,28 @@ void TestFullSurroundings()
     Check(!AppendPreparedForestSurroundings(kRoot/"missing-assets",*original,owner,terrain,result,diagnostic) &&
           ForestRepresentationDigest(owner,{})==digest && terrain==retained && result==prior,
           "failed candidate preparation preserves all already published geometry/support/receipts");
+    if(!auditContainment) {
+        recreatedOwner=baseline;
+        recreatedTerrain=baselineTerrain;
+        recreated.reset();
+        const bool open=AppendPreparedForestSurroundings(kRoot/"assets",*original,recreatedOwner,
+            recreatedTerrain,recreated,diagnostic,ForestRoadEnd::Bellwether);
+        Check(open,diagnostic);
+        if(open) {
+            const auto& road=recreated->report;
+            Check(road.bellwetherRoadRuns==2 && road.boundarySectionsContained && !road.boundaryContained &&
+                  road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
+                  road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
+                  "the live forest opens only the two road spans and retains the closed sections and full tree roster");
+            TestBellwetherTavernRoute(recreatedTerrain,true);
+            TestBellwetherTavernRoute(recreatedTerrain,false);
+            TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);
+            TestBellwetherMillRepairAndLeakTrial(recreatedTerrain);
+            TestBellwetherSalvagerPractice(recreatedTerrain);
+            TestBellwetherRelicDealerVisit(recreatedTerrain);
+            TestBellwetherResidentRosters(recreatedTerrain);
+        }
+    }
     std::cout<<"Surroundings native: trees="<<64+r.extraTrees<<" fences="<<r.fenceRuns<<" natural="<<r.naturalBankRuns
              <<" retainedSupportBytes="<<terrain->RetainedBytes()<<" baseline64SupportBytes="<<baselineTerrain->RetainedBytes()<<" rocks="<<r.rockRuns<<" rockTriangles="<<r.rockTriangles<<" totalSupport="<<terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()<<" treeContact="<<r.treeContactTriangles<<" openWoodland="<<r.openWoodlandRuns<<" understoryTriangles="<<r.understoryTriangles<<" fenceTriangles="<<r.fenceTriangles<<" boundaryCollision="<<r.boundaryCollisionTriangles<<" crossingProbes="<<r.boundaryProbes
              <<" routeClearanceProbes="<<clearanceProbes<<" cpuSubsetTriangles="<<omissions.size()<<" addedRawBytes="<<r.addedVertices*sizeof(StaticRtVertex)+r.addedIndices*4<<" sourceWitness="<<digest<<'\n';
@@ -1343,7 +3045,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
                   malformed.triangleRegions.size()==owner.indices.size()/3u+1u,
                   "graveyard append rejects excessive provenance and retains prior geometry/contact");
             return AppendPreparedGraveyard(kRoot/"assets",owner,terrain,graveyard,diagnostic);}() &&
-        AppendBellwetherShell(kRoot / "assets", owner, diagnostic) &&
+        AppendBellwetherShell(kRoot / "assets", owner, terrain, diagnostic) &&
         [&]{CheckCorruptForestProvenance(owner,[&](auto& invalid) {
                 ForestDressingBuildReport rejected;
                 return AppendPreparedForestDressing(kRoot/"assets",invalid,rejected,diagnostic,terrain.get());
@@ -2011,6 +3713,7 @@ void TestTriangleRegionFailures()
 
 int main(int argc,char** argv)
 {
+    if(argc==2 && std::string_view(argv[1])=="--bellwether-hearth-rest") {TestBellwetherHearthRest();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--flask-basins") {auditRestBasins=true;TestNativeChapterPrimitiveOwnership();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--containment") {auditContainment=true;TestFullSurroundings();return failures?1:0;}
     if(argc==2 && std::string_view(argv[1])=="--surroundings480") { TestFullSurroundings();return failures?1:0; }

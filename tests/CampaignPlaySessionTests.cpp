@@ -1,6 +1,7 @@
 #include "gameplay/campaign/CampaignPlaySession.h"
 #include "gameplay/campaign/CampaignSlotSelection.h"
 #include "gameplay/validation/RecordedReturnCheckpoint.h"
+#include "gameplay/validation/CampaignTombInput.h"
 #include "scene/ChapterTerrainSurface.h"
 #include "scene/assets/AssetManifest.h"
 #include <atomic>
@@ -446,53 +447,24 @@ void NormalBoundaryJourney(const std::shared_ptr<const sim::TriangleSupportSurfa
                   "village consumed-at-start flag cannot publish endpoint while final speech is active");
         }
     };
-    const auto aimMove=[&](float x,float z,float stop=.03f){
-        const auto& s=game.Snapshot();const float dx=x-s.playerX,dz=z-s.playerZ,d=std::hypot(dx,dz);
-        input.yawRadians=std::atan2(dx,-dz);input.pitchRadians=0;input.moveStrafe=0;
-        const float lookahead=std::min(d,.30f),scale=d>.0001f?lookahead/d:0.f;
-        input.crouchHeld=!sim::AuthoredBodySweepClear(s.playerX,s.playerZ,s.playerX+dx*scale,s.playerZ+dz*scale,
-            s.playerSupportWorldY,sim::kStandingBodyHeight,kPlayerCollisionRadius);
-        input.moveForward=d>stop?std::min(1.f,d/.15f):0.f;return d;
-    };
+    const auto tomb=validation::CampaignTombInput{game.Snapshot(),input,[&]{step();return true;}};
     const auto walk=[&](float x,float z){
-        for(int tick=0;tick<2400;++tick){if(aimMove(x,z)<.035f){input.moveForward=0;step();return true;}step();}
+        if(tomb.WalkTo(x,z))return true;
         std::cerr<<"ordinary route blocked at "<<game.Snapshot().playerX<<','<<game.Snapshot().playerZ<<" target="<<x<<','<<z<<'\n';return false;
     };
-    for(auto p:std::array<std::array<float,2>,8>{{{{0,-1}},{{0,-4.8f}},{{0,-9.4f}},{{4.2f,-9.4f}},
-          {{4.2f,-14.6f}},{{1,-14.6f}},{{-1.8f,-15.2f}},{{-3.2f,-15.2f}}}})
-        if(!walk(p[0],p[1])){Check(false,"normal input opening/waterfall route reaches guards");return;}
+    if(!tomb.ReachGuards()){Check(false,"normal input opening/waterfall route reaches guards");return;}
     Check(!game.LatestCampaignBoundary(),"no pre-victory milestone can publish a checkpoint");
-    for(int tick=0;tick<2400;++tick){
-        const auto s=game.Snapshot();int target=-1;float nearest=100;
-        for(unsigned i=0;i<s.skeletonEnemyCount;++i)if(!s.skeletonEnemies[i].dead){
-            const auto& e=s.skeletonEnemies[i];const float d=std::hypot(e.x-s.playerX,e.z-s.playerZ);
-            if(d<nearest){target=static_cast<int>(i);nearest=d;}}
-        if(target<0)break;
-        const auto& e=s.skeletonEnemies[target];aimMove(e.x,e.z,1.05f);
-        if(nearest<1.55f && s.playerCombat.action==PlayerCombatAction::Idle)++input.commands.attack;
-        step();
-    }
-    Check(game.Snapshot().skeletonEnemies[0].dead && game.Snapshot().skeletonEnemies[1].dead,"normal sword input defeats both guards");
-    if(!game.Snapshot().skeletonEnemies[0].dead || !game.Snapshot().skeletonEnemies[1].dead)return;
+    const bool guards=tomb.DefeatGuards();
+    Check(guards,"normal sword input defeats both guards");
+    if(!guards)return;
     if(!walk(-31.2f,-15.2f)){Check(false,"normal input reaches Keeper reveal");return;}
-    for(int tick=0;tick<2400 && game.Snapshot().lich.phase!=LichPhase::Dead;++tick){
-        const auto s=game.Snapshot();const float d=aimMove(s.lich.x,s.lich.z,1.15f);
-        if(s.lich.revealComplete && s.lich.hitCooldownRemaining<=0 && d<1.8f &&
-           s.playerCombat.action==PlayerCombatAction::Idle)++input.commands.attack;
-        step();
-    }
-    Check(game.Snapshot().lich.phase==LichPhase::Dead,"normal sword input defeats Keeper");
-    if(game.Snapshot().lich.phase!=LichPhase::Dead)return;
+    const bool keeper=tomb.DefeatKeeper();
+    Check(keeper,"normal sword input defeats Keeper");
+    if(!keeper)return;
     if(!walk(-34.f,-17.55f)){Check(false,"normal input reaches real chest interaction point");return;}
-    input.moveForward=0;input.yawRadians=-1.57079632679f;
-    for(int tick=0;tick<600 && game.Snapshot().chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed;++tick){
-        const auto prompt=game.Snapshot().chestPrompt;
-        if(prompt==interactions::ChestRewardPrompt::OpenChest || prompt==interactions::ChestRewardPrompt::ClaimLantern)
-            ++input.commands.interact;
-        step();
-    }
-    Check(game.Snapshot().chestReward.phase==interactions::ChestRewardPhase::LanternClaimed,"normal chest edges claim reward");
-    if(game.Snapshot().chestReward.phase!=interactions::ChestRewardPhase::LanternClaimed)return;
+    const bool reward=tomb.ClaimLantern();
+    Check(reward,"normal chest edges claim reward");
+    if(!reward)return;
     for(int tick=0;tick<600 && !game.LatestCampaignBoundary();++tick)step();
     const auto lower=game.LatestCampaignBoundary();
     MarkElapsed("earned-lower-boundary",game.Snapshot().tickIndex);

@@ -1,0 +1,46 @@
+{
+  "feature": "Dry garden-edge grate",
+  "centre": [
+    39.2,
+    130.6
+  ],
+  "mouth": [
+    39.31,
+    -10.963287658691407,
+    130.18
+  ],
+  "listenPoint": [
+    39.2,
+    -10.383287658691406,
+    131.63
+  ],
+  "approachXZ": [
+    39.2,
+    132.25
+  ],
+  "lampFlame": [
+    38.650000000000006,
+    -10.960287658691406,
+    130.563
+  ],
+  "lampLight": [
+    38.730000000000004,
+    -10.794287658691406,
+    130.535
+  ],
+  "originalTownSha256": "d08a45df8a6ab34792a6918833074f05bfd94d82ea1a4dd84bad4fcb00fbb72a",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "runtimeTownSha256": "2ed3b1b980fafe18013265caee40897fa3d67d628d5fca968685c5b55a0ff4fd",
+  "addedSolidTriangles": 720,
+  "townVertices": 49912,
+  "townTriangles": 22548,
+  "blender": "5.2.0 LTS",
+  "recipeSha256": "306ec5498ed0226ab2bd56f300e62d81b0479ab5fc1a599fb29c916d86a92cb4",
+  "files": {
+    "bellwether-grate.blend": "3624baf2f08eba4034e1104ee89ebec05ea8b36ca0a9f0c0d9f687e3fb50312e",
+    "garden-grate.glb": "8c803e0f4936c5fb210c627121843093adbaa95fae7c0583538567fbde71b875",
+    "bellwether-tavern-v1.glb": "2ed3b1b980fafe18013265caee40897fa3d67d628d5fca968685c5b55a0ff4fd",
+    "asset.manifest.json": "5ac2f9629aa1db87551fb79820b4109a82192e37e22fd298a6faa1dace765e98",
+    "geometry.generated.h": "77eda856a55de623d50005ba209dd409a698d80b5e82f2f8951e357386f894ae"
+  }
+}

@@ -18,12 +18,13 @@ CONTRACT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(CONTRACT)
 SOURCE = ROOT / 'assets/models/world/source/forest-placement-v1/woodland-placements-v2.json'
 OUTPUT = SOURCE.with_name('woodland-placements-v3.json')
-TERRAIN = ROOT / 'assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
+SOURCE_TERRAIN = ROOT / 'assets/models/world/source/chapter-terrain-r23/chapter-terrain-r23.glb'
+RUNTIME_TERRAIN = ROOT / 'assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
 ROUTE = [(-33.7,-12.8),(-28.7,-5.8),(-15.7,.2),(-17.7,15.2),(-3.7,20.2),(13.3,36.2)]
 
 
-def terrain_queries():
-    data = TERRAIN.read_bytes()
+def terrain_queries(terrain):
+    data = terrain.read_bytes()
     length = struct.unpack_from('<I', data, 12)[0]
     doc = json.loads(data[20:20+length]); binary = data[28+length:]
     assert all(not any(k in n for k in ('matrix','scale','rotation','translation')) for n in doc['nodes'])
@@ -70,8 +71,8 @@ def segment_box(a,b,box,pad):
     return True
 
 
-def generate():
-    plan=json.loads(SOURCE.read_text()); ground=terrain_queries()
+def generate(terrain):
+    plan=json.loads(SOURCE.read_text()); ground=terrain_queries(terrain)
     sources={name:CONTRACT.bark_points(spec) for name,spec in plan['sources'].items()}
     shapes=[]
     for p in plan['placements']:
@@ -103,15 +104,20 @@ def generate():
         measurements.append(dict(index=index,moveMetres=math.hypot(x-p['x'],z-p['z']),beforeBurial=before,afterBurial=depth))
         p['x'],p['z']=round(x,9),round(z,9)
     plan['description']='64 upright woodland placements fitted to native root footprints; 2.4m trail plus capsule margin, original models and four material families retained. v2 preserved. Runtime validates <=0.65m burial and actual imported tips.'
-    plan['grounding']={'terrainSha256':hashlib.sha256(TERRAIN.read_bytes()).hexdigest(),'rootBaseBandMetres':.02,'minimumTipEmbedMetres':.02,'runtimeMaximumBurialMetres':.65,'measurements':measurements}
+    plan['grounding']={'terrainSha256':hashlib.sha256(terrain.read_bytes()).hexdigest(),'rootBaseBandMetres':.02,'minimumTipEmbedMetres':.02,'runtimeMaximumBurialMetres':.65,'measurements':measurements}
     return plan
 
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__); parser.add_argument('--write',action='store_true'); args=parser.parse_args()
-    result=generate(); encoded=json.dumps(result,indent=2)+'\n'
+    result=generate(SOURCE_TERRAIN); encoded=json.dumps(result,indent=2)+'\n'
     if args.write:
         with OUTPUT.open('x',encoding='utf-8',newline='\n') as f: f.write(encoded)
-    else: assert OUTPUT.read_text()==encoded,'root placement receipt is stale'
+    else:
+        assert OUTPUT.read_text()==encoded,'root placement receipt is stale'
+        current=generate(RUNTIME_TERRAIN)
+        assert current['placements']==result['placements'],'active terrain moved a fitted woodland root'
+        assert current['grounding']['measurements']==result['grounding']['measurements'], \
+            'active terrain changed a fitted woodland root footprint'
     rows=result['grounding']['measurements']
     print(json.dumps({'trees':len(rows),'moved':sum(r['moveMetres']>0 for r in rows),'maximumMoveMetres':max(r['moveMetres'] for r in rows),'maximumBurialMetres':max(r['afterBurial'] for r in rows)}))

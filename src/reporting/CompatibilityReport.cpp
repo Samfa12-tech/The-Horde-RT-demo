@@ -2,6 +2,7 @@
 #include "reporting/PlaytestReport.h"
 #include "reporting/BuildIdentity.h"
 #include "reporting/ReportIdentity.h"
+#include "vulkan/DeviceCapabilities.h"
 
 #include <algorithm>
 #include <array>
@@ -32,11 +33,12 @@ auto AllChecks(const CompatibilityReportSnapshot& s)
 
 auto RequiredChecks(const CompatibilityReportSnapshot& s, bool pipeline)
 {
-    return std::array{s.extensions.accelerationStructure,
-        pipeline?s.extensions.rayTracingPipeline:s.extensions.rayQuery,
-        s.extensions.bufferDeviceAddress,s.extensions.deferredHostOperations,
-        s.features.accelerationStructure,pipeline?s.features.rayTracingPipeline:s.features.rayQuery,
-        s.features.bufferDeviceAddress};
+    // Both routes execute hardware ray queries, and Vulkan 1.2 already
+    // provides the BDA API. The named BDA extension is strictly raw evidence.
+    return std::array{s.extensions.accelerationStructure,s.extensions.rayQuery,s.extensions.deferredHostOperations,
+        s.features.accelerationStructure,s.features.rayQuery,s.features.bufferDeviceAddress,
+        pipeline?s.extensions.rayTracingPipeline:Check::Present,
+        pipeline?s.features.rayTracingPipeline:Check::Present};
 }
 
 bool ValidApi(std::uint32_t api)
@@ -71,6 +73,14 @@ bool ValidEvidence(const CompatibilityReportSnapshot& s)
     if (s.vulkanApiVersion && !ValidApi(*s.vulkanApiVersion)) return false;
     if (s.probe==CompatibilityProbe::DeviceChecked) {
         if (s.gpu.empty() || !s.rawDriverVersion || !s.vulkanApiVersion) return false;
+        const auto inconsistent = [](Check extension, Check feature) {
+            return extension != Check::Present && feature != Check::Unknown;
+        };
+        if (inconsistent(s.extensions.accelerationStructure,s.features.accelerationStructure) ||
+            inconsistent(s.extensions.rayTracingPipeline,s.features.rayTracingPipeline) ||
+            inconsistent(s.extensions.rayQuery,s.features.rayQuery) ||
+            (!RequiredApi(*s.vulkanApiVersion) && inconsistent(s.extensions.bufferDeviceAddress,s.features.bufferDeviceAddress)))
+            return false;
     } else {
         // A missing/failed probe cannot turn default false checks into observed
         // absence, or carry hardware copied from an earlier startup attempt.
@@ -158,6 +168,31 @@ void Number(std::string& out, std::string_view key, std::optional<std::uint32_t>
     out+=','; Text(out,key); out+=':'; out+=value?std::to_string(*value):"null";
 }
 } // namespace
+
+void CaptureCompatibilityDeviceEvidence(CompatibilityReportSnapshot& s,
+    const horde::vulkan::DeviceCapabilities& capabilities)
+{
+    s.probe = CompatibilityProbe::DeviceChecked;
+    s.gpu = capabilities.identity.gpuName;
+    s.rawDriverVersion = capabilities.identity.driverVersion;
+    s.vulkanApiVersion = capabilities.identity.vulkanApiVersion;
+    const auto check = [](bool observed, bool present) {
+        return !observed ? Check::Unknown : present ? Check::Present : Check::Absent;
+    };
+    const auto& e = capabilities.extensions;
+    const bool enumerated = capabilities.extensionsEnumerated;
+    s.extensions = {check(enumerated,e.accelerationStructure), check(enumerated,e.rayTracingPipeline),
+        check(enumerated,e.rayQuery), check(enumerated,e.bufferDeviceAddress), check(enumerated,e.deferredHostOperations)};
+    const auto& f = capabilities.features;
+    const auto& q = capabilities.featuresQueried;
+    s.features = {check(q.accelerationStructure && s.extensions.accelerationStructure==Check::Present,f.accelerationStructure),
+        check(q.rayTracingPipeline && s.extensions.rayTracingPipeline==Check::Present,f.rayTracingPipeline),
+        check(q.rayQuery && s.extensions.rayQuery==Check::Present,f.rayQuery),
+        check(q.bufferDeviceAddress && (RequiredApi(*s.vulkanApiVersion) ||
+            s.extensions.bufferDeviceAddress==Check::Present),f.bufferDeviceAddress)};
+    s.outcome = RouteBlocked(s,true) && RouteBlocked(s,false) ?
+        CompatibilityOutcome::Unsupported : CompatibilityOutcome::CapabilityOnly;
+}
 
 PreparedCompatibilityReport PrepareCompatibilityReport(const CompatibilityReportSnapshot& s,
     const CompatibilityReportApproval& approval)

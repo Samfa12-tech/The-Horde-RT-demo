@@ -11,6 +11,8 @@
 #include <string_view>
 #include <vector>
 
+namespace horde::vulkan::raytracing { struct StaticRtVertex; }
+
 namespace horde::scene
 {
 
@@ -64,7 +66,10 @@ enum class SkinnedClip
     Attack = 2,
     Dead = 3,
     TurnLeft = 4,
-    TurnRight = 5
+    TurnRight = 5,
+    Sit = 6,
+    AnkleAssessment = 7,
+    ProtectiveWalk = 8
 };
 using SkeletonClip = SkinnedClip;
 
@@ -82,6 +87,8 @@ struct SkinnedClipBinding
     std::string name;
     bool loops = false;
     bool required = true;
+    // Fixed environment contacts use the clip's model-space height.
+    bool preserveAuthoredHeight = false;
 };
 
 struct SkinnedClipSet
@@ -177,7 +184,7 @@ const SkinnedClipSet& LichPlaceholderClipSet();
 const SkinnedClipSet& PlayerLocomotionClipSet();
 
 // Deliberately narrow glTF 2.0 reader for the audited Meshy bipeds. It imports
-// one skinned primitive into up to six semantic clip slots selected by the caller.
+// one skinned primitive into bounded semantic clip slots selected by the caller.
 class SkinnedMeshAsset
 {
 public:
@@ -191,7 +198,7 @@ public:
     bool LoadClips(const std::string& glbPath, const SkinnedClipSet& clipSet, std::string& diagnostic);
     // Bindings follow SkinnedClip slot order; omitted trailing slots stay unmapped.
     // Explicit empty optional bindings preserve holes such as Attack and Dead.
-    static constexpr std::size_t kMaximumClipBindings = 6u;
+    static constexpr std::size_t kMaximumClipBindings = static_cast<std::size_t>(SkinnedClip::ProtectiveWalk) + 1u;
     bool LoadClips(const std::string& glbPath, std::span<const SkinnedClipBinding> bindings,
                    std::string& diagnostic);
     bool LoadCombatClips(const std::string& glbPath, std::string& diagnostic);
@@ -210,6 +217,7 @@ public:
     }
     const std::vector<SkinnedPrimitiveRange>& PrimitiveRanges() const { return primitiveRanges_; }
     float ClipDuration(SkinnedClip clip) const;
+    bool HasConstantClipPose(SkinnedClip clip) const;
     bool BootGroundingMinimumY(SkinnedClip clip,
                                float timeSeconds,
                                float& minimumY,
@@ -276,8 +284,17 @@ public:
                                       std::vector<TexturedSkinnedRtVertex>& output,
                                       std::vector<SkinnedPbrTangent>& outputTangents,
                                       std::string& diagnostic) const;
+    // The destination is the matching mesh's initialized static-PBR stream.
+    // Only position, normal and tangent change. Discard writes on failure.
+    bool SkinPlayerPoseStaticPbr(const SkinnedPlayerPose& pose,
+                                 std::span<horde::vulkan::raytracing::StaticRtVertex> output,
+                                 std::string& diagnostic) const;
 
 private:
+    bool ValidatePlayerSkinPose(const SkinnedPlayerPose& pose, std::string& diagnostic) const;
+    template<class WriteVertex>
+    bool SkinBoundPlayerVertices(const SkinnedPlayerPose& pose, WriteVertex write,
+                                 std::string& diagnostic) const;
     bool SkinUniqueGeometry(SkinnedClip clip, float timeSeconds,
                             std::string& diagnostic,
                             std::span<const SkinnedNodeRotation> additiveNodeRotations,

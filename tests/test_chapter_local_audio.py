@@ -79,4 +79,107 @@ class ChapterLocalAudioTests(unittest.TestCase):
         self.assertNotIn('leaves rustle 1.wav',gradle);self.assertNotIn('leaves rustle 1.wav',windows)
         self.assertIn('assets/audio/forest-foliage/',(ROOT/'ASSET_LICENSES.md').read_text(encoding='utf-8'))
 
+    def test_bellwether_hearth_finite_pcm_and_package_roster(self):
+        relative = 'audio/bellwether-hearth/'
+        directory = ROOT/'assets'/relative
+        manifest = json.loads((directory/'asset.manifest.json').read_text(encoding='utf-8'))
+        asset = manifest['runtime']
+        self.assertEqual(manifest['source']['license'], 'CC0-1.0')
+        self.assertFalse(manifest['listeningAcceptance'])
+        self.assertFalse(asset['loop'])
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()},
+                         {'asset.manifest.json', 'runtime/hearth_crackle.wav'})
+        path = directory/asset['file']
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), asset['sha256'])
+        self.assertEqual(path.stat().st_size, asset['bytes'])
+        with wave.open(str(path), 'rb') as wav:
+            self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+            self.assertEqual(wav.getnframes(), 6 * 48000)
+            pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+        self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+        self.assertEqual(max(map(abs, pcm)), asset['peakSample'])
+        for roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            contents = (ROOT/roster).read_text(encoding='utf-8')
+            self.assertIn(relative + 'asset.manifest.json', contents)
+            self.assertIn(relative + asset['file'], contents)
+            self.assertNotIn('414482_1738686-hq.mp3', contents)
+
+    def test_bellwether_stock_crops_have_a_closed_package_and_provenance(self):
+        relative = 'audio/bellwether-stock/'
+        directory = ROOT / 'assets' / relative
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        self.assertFalse(manifest['listeningAcceptance'])
+        self.assertEqual({cue['runtimeFile']: cue['frames'] for cue in manifest['assets']},
+                         {'runtime/pig_grunt.wav': 42240, 'runtime/hen_cluck.wav': 21120})
+        files = {'asset.manifest.json', 'runtime/pig_grunt.wav', 'runtime/hen_cluck.wav'}
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}, files)
+        for source_roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            admitted = (ROOT / source_roster).read_text(encoding='utf-8')
+            for path in files:
+                self.assertIn(relative + path, admitted)
+            self.assertNotIn('233173_4056007-hq.mp3', admitted)
+            self.assertNotIn('607245_887696-hq.mp3', admitted)
+        for cue in manifest['assets']:
+            self.assertEqual(cue['source']['license'], 'CC0-1.0')
+            self.assertRegex(cue['source']['sha256'], r'^[0-9a-f]{64}$')
+            self.assertFalse(cue['loop'])
+            path = directory / cue['runtimeFile']
+            self.assertEqual(path.stat().st_size, cue['runtimeBytes'])
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), cue['runtimeSha256'])
+            with wave.open(str(path), 'rb') as wav:
+                self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+                self.assertEqual(wav.getnframes(), cue['frames'])
+                samples = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+            self.assertEqual((samples[0], samples[-1]), (0, 0))
+            self.assertEqual(max(map(abs, samples)), cue['peakSample'])
+            self.assertLess(cue['peakSample'], 6000)
+
+    def test_mill_contact_is_finite_and_packaged_on_both_platforms(self):
+        relative = 'audio/bellwether-mill/'
+        directory = ROOT / 'assets' / relative
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        cue, = manifest['assets']
+        self.assertFalse(cue['loop'])
+        raw = (directory / cue['runtimeFile']).read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), cue['runtimeSha256'])
+        self.assertEqual(len(raw), cue['runtimeBytes'])
+        with wave.open(str(directory / cue['runtimeFile']), 'rb') as wav:
+            self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+            self.assertEqual(wav.getnframes(), 36480)
+            pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+        self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+        self.assertEqual(max(map(abs, pcm)), cue['peakSample'])
+        for roster in ('android/app/build.gradle', 'tools/horde-night-audio-policy.ps1'):
+            contents = (ROOT / roster).read_text(encoding='utf-8')
+            self.assertIn(relative + 'asset.manifest.json', contents)
+            self.assertIn(relative + cue['runtimeFile'], contents)
+
+    def test_kit_ankle_packages_two_finite_cues_and_their_provenance(self):
+        directory = ROOT / 'assets/audio/kit-ankle'
+        manifest = json.loads((directory / 'asset.manifest.json').read_text(encoding='utf-8'))
+        gradle = (ROOT / 'android/app/build.gradle').read_text(encoding='utf-8')
+        windows = (ROOT / 'tools/horde-night-audio-policy.ps1').read_text(encoding='utf-8')
+        self.assertFalse(manifest['listeningAcceptance'])
+        roster = {'asset.manifest.json', 'runtime/boot_and_gravel.wav', 'runtime/steady_breath.wav'}
+        self.assertEqual({p.relative_to(directory).as_posix() for p in directory.rglob('*') if p.is_file()}, roster)
+        self.assertEqual({a['runtimeFile']: a['frames'] for a in manifest['assets']},
+                         {'runtime/boot_and_gravel.wav': 17280, 'runtime/steady_breath.wav': 21120})
+        self.assertEqual([p['file'] for p in manifest['assets'][0]['sources']],
+                         ['footstep dirt 7.wav', 'rock 19.wav'])
+        self.assertIn('Original Horde foley', manifest['assets'][1]['license'])
+        for asset in manifest['assets']:
+            path = directory / asset['runtimeFile']
+            raw = path.read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), asset['runtimeSha256'])
+            self.assertEqual(len(raw), asset['bytes'])
+            with wave.open(str(path), 'rb') as wav:
+                self.assertEqual((wav.getnchannels(), wav.getsampwidth(), wav.getframerate()), (1, 2, 48000))
+                self.assertEqual(wav.getnframes(), asset['frames'])
+                pcm = struct.unpack(f"<{wav.getnframes()}h", wav.readframes(wav.getnframes()))
+            self.assertEqual((pcm[0], pcm[-1]), (0, 0))
+            self.assertTrue(2000 < max(map(abs, pcm)) < 8192)
+        for relative in roster:
+            self.assertIn('audio/kit-ankle/' + relative, gradle)
+            self.assertIn('audio/kit-ankle/' + relative, windows)
+
 if __name__=='__main__': unittest.main()
