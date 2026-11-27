@@ -1760,10 +1760,17 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             return state.fireEmitterCount == 4 && state.fireEmitters[3].stableId == wick &&
                                 ctx.rtScene.HasUploadedFireEmitters() && std::find(ids.begin(), ids.end(), wick) != ids.end();
                         };
-                        // From the smith approach the player sees both the slope and the north gable of B08.
-                        input.pitchRadians=.10f;
-                        if(!face(79.3f,170.2f) || !capture("windows-combined-outbuilding-roof.png",false,true))return false;
-                        input.pitchRadians=-.08f;
+                        const auto previousPose = state.interaction.heldLightPose;
+                        input.pitchRadians = .10f;
+                        if (!face(79.3f, 170.2f) || !capture("windows-combined-outbuilding-roof.png", false, true))
+                            return false;
+                        // Walk down the east side of B08 so the player sees the tile courses above the eave.
+                        input.pitchRadians = .32f;
+                        if (!walkTo({92.5f, 164.5f}) || !setInspectionLight(HeldLightPose::High) ||
+                            !face(83.5f, 169.f) || !capture("windows-combined-outbuilding-eave.png", false, true) ||
+                            !setInspectionLight(previousPose) || !walkSmith(*std::prev(viewEnd)))
+                            return false;
+                        input.pitchRadians = -.08f;
                         const bool presented = face(anvil[0], anvil[1]) && wickPresented() &&
                             capture("windows-combined-smith-approach.png", false) &&
                             std::all_of(viewEnd, approach.end(), walkSmith) && face(97.15f, 151.31f) &&
