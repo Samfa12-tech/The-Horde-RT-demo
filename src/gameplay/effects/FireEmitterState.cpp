@@ -216,6 +216,32 @@ void StepFireEmitterFixed(FireEmitterState& state,
     SanitizeAuthoredState(state);
 }
 
+void IncludeNearbyWorldFire(std::span<FireEmitterState> worldSlots, const FireEmitterState& candidate,
+                            float eyeX, float eyeZ) noexcept
+{
+    const auto horizontalDistanceSquared = [&](const FireEmitterState& emitter) {
+        const float dx = emitter.worldFromFlame[12] - eyeX;
+        const float dz = emitter.worldFromFlame[14] - eyeZ;
+        return dx * dx + dz * dz;
+    };
+    float farthest = kDefaultFireViewDistance * kDefaultFireViewDistance;
+    if (!(horizontalDistanceSquared(candidate) <= farthest) || !(candidate.strength * candidate.fuel > 0.0f))
+        return;
+
+    // Horizontal distance is a lower bound on the renderer's eye-to-flame
+    // distance. Only borrow a slot whose current flame is already out of reach.
+    auto spare = worldSlots.end();
+    for (auto it = worldSlots.begin(); it != worldSlots.end(); ++it) {
+        if (it->stableId == candidate.stableId) return;
+        const float distance = horizontalDistanceSquared(*it);
+        if (distance > farthest) {
+            farthest = distance;
+            spare = it;
+        }
+    }
+    if (spare != worldSlots.end()) *spare = candidate;
+}
+
 FireEmitterCheckpoint ExportFireEmitterCheckpoint(const FireEmitterState& state)
 {
     return {state};

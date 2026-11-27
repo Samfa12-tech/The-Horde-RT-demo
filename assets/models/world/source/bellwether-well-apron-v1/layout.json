@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "feature": "Covered-well fetching apron",
+  "coordinates": "Horde world XZ in metres; +Y is vertical",
+  "anchors": {
+    "wellCentre": [
+      78.3,
+      126.2
+    ],
+    "benchCentre": [
+      77.75,
+      128.15
+    ],
+    "westLaneContact": [
+      76.2,
+      129.45
+    ],
+    "rampLaneContact": [
+      80.8,
+      130.5
+    ],
+    "rampToe": [
+      82.3,
+      130.7
+    ],
+    "view": [
+      77.8,
+      131.1
+    ],
+    "lookAt": [
+      77.75,
+      128.15
+    ],
+    "fetching": [
+      76.54,
+      128.61
+    ],
+    "publicLaneContact": [
+      77.8,
+      130.55
+    ],
+    "existingWellView": [
+      76.9,
+      130.35
+    ]
+  },
+  "topLiftMetres": 0.018,
+  "wornCentreInsetMetres": 0.01,
+  "stones": [
+    {
+      "name": "West stepping slab",
+      "centre": [
+        76.686,
+        129.45
+      ],
+      "size": [
+        0.772,
+        0.84
+      ],
+      "shape": "east-west"
+    },
+    {
+      "name": "Apron slab 2",
+      "centre": [
+        77.493,
+        129.45
+      ],
+      "size": [
+        0.772,
+        0.84
+      ],
+      "shape": "east-west"
+    },
+    {
+      "name": "Apron centre slab",
+      "centre": [
+        78.3,
+        129.45
+      ],
+      "size": [
+        0.772,
+        0.84
+      ],
+      "shape": "east-west"
+    },
+    {
+      "name": "Apron slab 4",
+      "centre": [
+        79.107,
+        129.45
+      ],
+      "size": [
+        0.772,
+        0.84
+      ],
+      "shape": "east-west"
+    },
+    {
+      "name": "Ramp-side stepping slab",
+      "centre": [
+        79.914,
+        129.45
+      ],
+      "size": [
+        0.772,
+        0.84
+      ],
+      "shape": "east-west"
+    },
+    {
+      "name": "Public lane and well-view stone",
+      "centre": [
+        77.35,
+        130.21
+      ],
+      "size": [
+        1.8,
+        0.68
+      ],
+      "shape": "north-south"
+    },
+    {
+      "name": "Bench approach stone",
+      "centre": [
+        76.54,
+        128.61
+      ],
+      "size": [
+        0.72,
+        0.84
+      ],
+      "shape": "north-south"
+    },
+    {
+      "name": "Ramp-toe connector",
+      "centre": [
+        80.45,
+        130.2
+      ],
+      "size": [
+        0.7,
+        0.6
+      ],
+      "shape": "north-south"
+    }
+  ],
+  "bevelWidthMetres": 0.16,
+  "buriedEdgeMetres": 0.01
+}

@@ -130,7 +130,7 @@ bool BuildFireEmitterUpload(
     std::vector<Candidate> candidates;
     candidates.reserve(configuredEmitters.size());
     const float maximumDistance = FiniteClamped(
-        selection.maximumDistance, 0.0f, 1000.0f, 24.0f);
+        selection.maximumDistance, 0.0f, 1000.0f, horde::gameplay::effects::kDefaultFireViewDistance);
     const float maximumDistanceSquared = maximumDistance * maximumDistance;
     const FireEmitterQualityBudget budget = ResolveFireEmitterQualityBudget(quality);
     for (const auto& emitter : configuredEmitters)

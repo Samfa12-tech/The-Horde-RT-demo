@@ -74,7 +74,31 @@ def relocate_surround(master, doc, blocks, site, entrance, ground):
     return moved
 
 
-def household(site, entrance, ground):
+def open_window(doc, blocks, site, floor, wall):
+    """Replace the surveyed south-wall sheet with a true framed aperture."""
+    node = next(n for n in doc["nodes"] if n["name"] == "BellwetherSolid")
+    primitive, = [p for p in doc["meshes"][node["mesh"]]["primitives"]
+                  if doc["materials"][p["material"]]["name"] == "HordeTownStone"]
+    positions = town["read_accessor"](doc, blocks, primitive["attributes"]["POSITION"])
+    indices = town["read_accessor"](doc, blocks, primitive["indices"]).reshape(-1, 3)
+    triangles = positions[indices]
+    # The original B03 south elevation is one two-triangle masonry sheet.
+    # Its surveyed bounds and exact plane make ownership unambiguous.
+    mask = ((np.abs(triangles[:, :, 2] - wall) < .001).all(axis=1) &
+            (triangles[:, :, 0].min(axis=1) >= site["engineX"]-site["width"]/2-.001) &
+            (triangles[:, :, 0].max(axis=1) <= site["engineX"]+site["width"]/2+.001) &
+            (triangles[:, :, 1].min(axis=1) >= floor-.03) &
+            (triangles[:, :, 1].max(axis=1) <= floor+site["wallHeight"]+.03))
+    if int(mask.sum()) != 2:
+        raise ValueError(f"Expected exact B03 south masonry face, found {int(mask.sum())} triangles")
+    south_bounds = (float(triangles[mask, :, 0].min()), float(triangles[mask, :, 0].max()),
+                    float(triangles[mask, :, 1].min()), float(triangles[mask, :, 1].max()),
+                    float(triangles[mask, :, 2].mean()))
+    town["write_accessor"](doc, blocks, primitive["indices"], indices[~mask].reshape(-1))
+    return south_bounds
+
+
+def household(site, entrance, ground, south_bounds):
     oak = town["material"]("HordeTavernTimber", (.27,.16,.085), .84)
     clay = town["material"]("HordeTownRoofClay", (.26,.12,.065), .82)
     stone = bpy.data.materials["HordeTownStone"]
@@ -134,22 +158,80 @@ def household(site, entrance, ground):
     for side in (-1,1):
         beam("Portal knee",(ex+.055,floor+2.46,ez+side*1.45),
              (ex+.055,floor+3.66,ez+side*2.65),.16,.158,oak)
-    # A latched pair of shutters and a sloped drip cap face the garden.
+    # The south elevation's former flat sheet is replaced by masonry around
+    # a shallow pocket. The opaque inner cheek bounds the recess behind it.
     wall = site["engineZ"] + site["depth"]/2
-    sx = 39.8
-    block("Window surround",sx-1.02,sx+1.02,wall-.02,wall+.107,floor+.86,floor+2.39,stone,.035)
-    for i in range(8):
-        x = sx-.88+i*.22
-        block("Shutter boards",x,x+.211,wall+.105,wall+.154,floor+.99,floor+2.26,oak,.008)
-    for h in (1.13,2.02):
-        for side in (-1,1):
-            x = sx + side*.45
-            block("Shutter battens",x-.422,x+.422,wall+.151,wall+.212,floor+h,floor+h+.10,oak)
-    for side in (-1,1):
-        beam("Shutter diagonal",(sx+side*.78,floor+1.24,wall+.19),
-             (sx+side*.13,floor+2.015,wall+.19),.08,.07,oak)
-    block("Shutter latch",sx-.19,sx+.22,wall+.21,wall+.246,floor+1.67,floor+1.72,iron)
-    block("Projecting stone sill",sx-1.12,sx+1.12,wall-.03,wall+.30,floor+.80,floor+.94,stone,.03)
+    sx = south_bounds[0]+site["width"]*.78125
+    x0,x1=sx-.64,sx+.64
+    y0,y1=floor+1.00,floor+2.27
+    zback=wall-.76
+    min_x,max_x,min_y,max_y,wall=south_bounds
+    # Rebuild the original facade exactly on its plane and bounds around the
+    # hole; no inset/offset copy of the full south elevation remains.
+    wall_points,wall_faces=[],[]
+    def wall_quad(xa,xb,ya,yb):
+        start=len(wall_points)
+        wall_points.extend(((xa,ya,wall),(xb,ya,wall),(xb,yb,wall),(xa,yb,wall)))
+        wall_faces.append((start,start+1,start+2,start+3))
+    wall_quad(min_x,x0,min_y,max_y)
+    wall_quad(x1,max_x,min_y,max_y)
+    wall_quad(x0,x1,min_y,y0)
+    wall_quad(x0,x1,y1,max_y)
+    facade=mesh("South masonry around window",wall_points,wall_faces,stone)
+    facade_normals=[(p.normal.x,p.normal.z,-p.normal.y) for p in facade.data.polygons]
+    if any(n[2]<.999 for n in facade_normals):
+        raise ValueError(f"South elevation winding changed: {facade_normals}")
+    # Five continuous, shared-edge faces bound the shallow recess: full sill,
+    # two cheeks, head, and opaque back. Every face meets at an exact vertex.
+    pocket=[(x0,y0,wall),(x1,y0,wall),(x1,y1,wall),(x0,y1,wall),
+            (x0,y0,zback),(x1,y0,zback),(x1,y1,zback),(x0,y1,zback)]
+    returns=mesh("Five-face window pocket",pocket,[(0,1,5,4),(1,2,6,5),(2,3,7,6),
+                                                   (3,0,4,7),(4,5,6,7)],stone)
+    expected=((0,1,0),(-1,0,0),(0,-1,0),(1,0,0),(0,0,1))
+    return_normals=[(p.normal.x,p.normal.z,-p.normal.y) for p in returns.data.polygons]
+    if any(sum(a*b for a,b in zip(n,want))<.999 for n,want in zip(return_normals,expected,strict=True)):
+        raise ValueError(f"Window pocket return winding changed: {return_normals}")
+    block("Projecting stone sill",sx-1.12,sx+1.12,wall,wall+.30,floor+.80,floor+.94,stone,.025)
+    # Fixed timber casing and drip cap align to the masonry jambs.
+    for x in (x0-.045,x1+.045):
+        block("Fixed oak window jamb",x-.045,x+.045,wall+.035,wall+.105,y0-.035,y1+.035,oak,.012)
+    block("Fixed oak window head",x0-.06,x1+.06,wall+.035,wall+.105,y1+.03,y1+.12,oak,.012)
+    # One leaf swings out at roughly fifty degrees; its edge stays clear of
+    # the aperture center where the lamp is visible.
+    hinge=(x0+.03,wall+.19)
+    free=(x0+.47,wall+.84)
+    ux,uz=free[0]-hinge[0],free[1]-hinge[1]
+    length=math.hypot(ux,uz); ux,uz=ux/length,uz/length
+    vx,vz=-uz*.055,ux*.055
+    panel=[]
+    for y in (y0+.045,y1-.045):
+        panel.extend(((hinge[0]+vx,y,hinge[1]+vz),(free[0]+vx,y,free[1]+vz),
+                      (free[0]-vx,y,free[1]-vz),(hinge[0]-vx,y,hinge[1]-vz)))
+    shutter=mesh("Partly open oak shutter",panel,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),
+                                                   (2,3,7,6),(3,0,4,7)],oak)
+    shutter_expected=((0,-1,0),(0,1,0),(-uz,0,ux),(ux,0,uz),(uz,0,-ux),(-ux,0,-uz))
+    shutter_normals=[(p.normal.x,p.normal.z,-p.normal.y) for p in shutter.data.polygons]
+    if any(sum(a*b for a,b in zip(n,want))<.99 for n,want in zip(shutter_normals,shutter_expected,strict=True)):
+        raise ValueError(f"Open shutter winding changed: {shutter_normals}")
+    for along in (0.,1.):
+        x,z=hinge[0]+ux*length*along,hinge[1]+uz*length*along
+        beam("Open shutter stile",(x,floor+1.05,z),(x,floor+2.23,z),.09,.07,oak)
+    for h in (floor+1.28,floor+2.01):
+        beam("Open shutter crossbatten",(hinge[0],h,hinge[1]),(free[0],h,free[1]),.075,.06,oak)
+    for h in (floor+1.19,floor+1.94):
+        block("Forged shutter hinge plate",hinge[0]-.06,hinge[0]+.05,wall+.09,wall+.21,
+              h-.045,h+.045,iron,.008)
+    # Small low-fired oil cup, dark wick and charred holder on the inner sill.
+    lamp_x,lamp_z=sx-.02,zback+.20
+    lamp_base=floor+1.00
+    vessel("Clay oil lamp",lamp_x,lamp_base,lamp_z,
+           [(0,.045),(.025,.073),(.085,.088),(.115,.078),(.105,.055),(.025,.018)],12,clay)
+    block("Lamp wick holder",lamp_x-.018,lamp_x+.018,lamp_z-.018,lamp_z+.018,
+          lamp_base+.10,lamp_base+.17,iron)
+    beam("Lamp wick",(lamp_x,lamp_base+.15,lamp_z),(lamp_x,lamp_base+.25,lamp_z),.009,.009,iron)
+    # A tiny clay reservoir is accompanied by a real runtime flame/light anchor.
+    window_flame=(lamp_x,lamp_base+.25,lamp_z)
+    window_light=(lamp_x-.025,lamp_base+.34,lamp_z+.035)
 
     # A clay-tiled lean-to shelters the household washing bench. Runoff falls
     # through an open timber gutter and a projecting lip into the rain butt.
@@ -204,7 +286,7 @@ def household(site, entrance, ground):
     vessel("Glazed washing basin",bx-.33,top,bz,[(0,.19),(.045,.23),(.19,.355),(.23,.37),
            (.25,.362),(.245,.33),(.07,.19)],18,clay)
     vessel("Dipping cup",bx+.46,top,bz+.02,[(0,.065),(.03,.083),(.19,.095),(.192,.081),(.022,.061)],12,clay)
-    return parts
+    return parts, window_flame, window_light
 
 
 def main(root, previous, output):
@@ -222,7 +304,9 @@ def main(root, previous, output):
     bpy.data.orphans_purge(do_recursive=True)
     doc,blocks=town["read_glb"](previous)
     moved=relocate_surround(root/MASTER,doc,blocks,site,entrance,ground)
-    parts=household(site,entrance,ground)
+    wall=site["engineZ"]+site["depth"]/2
+    south_bounds=open_window(doc,blocks,site,site["actualFloorY"],wall)
+    parts,window_flame,window_light=household(site,entrance,ground,south_bounds)
     old_lanes=root/"assets/models/world/source/bellwether-paths-v1/layout.json"
     yard_lanes=root/"assets/models/world/source/bellwether-garden-house-v1/lanes.json"
     existing=json.loads(old_lanes.read_bytes())["routes"]
@@ -244,7 +328,7 @@ def main(root, previous, output):
     town["save_glb"](aligned,doc,blocks)
     furnished=output/"house-solids.glb"
     added,_,primitives=town["join_town"](aligned,patch,furnished)
-    if moved!=48 or not 0<added<=3200 or primitives!=5:
+    if moved!=48 or not 0<added<=3500 or primitives!=5:
         raise ValueError(f"Unexpected house ownership: {moved} relocated, {added} added, {primitives} primitives")
     geometry["join_parts"](lane_parts,"BellwetherHousePaths")
     lane_patch=output/"house-paths.glb"
@@ -256,18 +340,24 @@ def main(root, previous, output):
     if walkable!=sum(lane_counts.values()) or not 0<walkable<=230 or primitives!=5:
         raise ValueError(f"Unexpected house paths: {lane_counts}")
     manifest=json.loads((previous.parent/"asset.manifest.json").read_bytes())
-    indices=manifest["budgets"]["maxIndices"]+(added+walkable)*3
+    indices=manifest["budgets"]["maxIndices"]+(added+walkable-2)*3
     manifest["budgets"].update(maxVertices=vertices,maxIndices=indices)
     manifest["lods"][0]["maxTriangles"]=indices//3
     town["save_json"](output/"asset.manifest.json",manifest)
     header=output/"geometry.generated.h"
-    header.write_text("#pragma once\n#include <cstddef>\n\nnamespace horde::gameplay::bellwether {\n"
-                      f"inline constexpr std::size_t kGardenHouseSolidTriangles={added};\n"
-                      f"inline constexpr std::size_t kGardenHousePathTriangles={walkable};\n}}\n",
+    header.write_text("#pragma once\n#include <array>\n#include <cstddef>\n\nnamespace horde::gameplay::bellwether {\n"
+                      f"inline constexpr std::size_t kGardenHouseSolidTriangles={added-2};\n"
+                      f"inline constexpr std::size_t kGardenHousePathTriangles={walkable};\n"
+                      f"inline constexpr std::array<float,3> kGardenHouseWindowFlame{{{{{window_flame[0]:.7f}f,{window_flame[1]:.7f}f,{window_flame[2]:.7f}f}}}};\n"
+                      f"inline constexpr std::array<float,3> kGardenHouseWindowLight{{{{{window_light[0]:.7f}f,{window_light[1]:.7f}f,{window_light[2]:.7f}f}}}};\n}}\n",
                       encoding="utf-8",newline="\n")
     town["save_json"](output/"authoring-receipt.json",dict(feature="Garden-side household and mapped east door",
         originalTownSha256=PARENT,terrainSha256=digest(terrain),sources=INPUTS,runtimeTownSha256=digest(runtime),
-        eastEntranceXZ=entrance,relocatedMasonryTriangles=moved,addedSolidTriangles=added,
+        eastEntranceXZ=entrance,relocatedMasonryTriangles=moved,removedSouthWallTriangles=2,
+        windowApertureXZ=[south_bounds[0]+site["width"]*.78125-.64,
+                          south_bounds[0]+site["width"]*.78125+.64,wall],windowPocketBackZ=wall-.76,
+        windowFlame=window_flame,windowLight=window_light,addedSolidTriangles=added,
+        netSolidTriangleDelta=added-2,
         addedGroundTriangles=walkable,routeTriangles=lane_counts,originalLanesSha256=digest(old_lanes),
         houseLanesSha256=digest(yard_lanes),
         townVertices=vertices,townTriangles=indices//3,recipeSha256=digest(RECIPE),blender=bpy.app.version_string,

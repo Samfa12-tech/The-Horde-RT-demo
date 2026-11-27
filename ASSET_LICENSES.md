@@ -1234,3 +1234,14 @@ and rain barrel for House A in Blender. Its stone entrance reuses four
 pieces from the original Bellwether v4 master. The [recipe and export
 receipt](assets/models/world/source/bellwether-garden-house-v1/README.md)
 record the mapped placement and the source and runtime hashes.
+
+The partly open shutter, masonry window recess and clay oil lamp are also
+original Horde geometry in that master. The wick uses the shared native
+fire emitter and the house's existing material families.
+
+## Bellwether well paving - 27 November 2026
+
+Samfa12/Codex modeled the eight worn flagstones between the water bench,
+the public lane and the south tavern ramp. They use Bellwether's existing
+stone material. The [editable source and export receipt](assets/models/world/source/bellwether-well-apron-v1/README.md)
+record their original layout and the town and terrain they fit.

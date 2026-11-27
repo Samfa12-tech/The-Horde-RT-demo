@@ -9,6 +9,20 @@ from tempfile import TemporaryDirectory
 repo=pathlib.Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('measurement',repo/'tools/analyze-chapter-route-measurement.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+room_ids=[0x42303148,0x42303143,0x4c414e54,0x42303150]
+lighting={'count':4,'emitters':[{'stableId':value} for value in room_ids]}
+room_row={'fire_count':'4','fire_ids':';'.join(map(str,room_ids))}
+assert m.verify_bellwether_room_fire(room_row,lighting)==frozenset(room_ids)
+legacy_lighting={'count':3,'emitters':[{'stableId':value} for value in room_ids[:3]]}
+assert m.verify_bellwether_room_fire({'fire_count':'3'},legacy_lighting)==m.BELLWETHER_LEGACY_ROOM_FIRE_IDS
+for bad_row,bad_lights in (
+        ({'fire_count':'3','fire_ids':';'.join(map(str,room_ids[:3]))}, legacy_lighting),
+        ({'fire_count':'4','fire_ids':';'.join(map(str,room_ids[:-1]+[77]))}, lighting),
+        ({'fire_count':'4','fire_ids':';'.join(map(str,room_ids[:-1]))}, lighting),
+        (room_row, dict(lighting, emitters=[*lighting['emitters'][:3], {'stableId':77}]))):
+    try:m.verify_bellwether_room_fire(bad_row,bad_lights)
+    except (AssertionError,ValueError):pass
+    else:raise AssertionError('Unaccounted room fire admission passed')
 row=dict(zip(m.HOST_SPANS,map(str,(10,10,600,10,10,10))))
 row.update(host_previous_evidence_ns='5',host_phases_available='1',present_interval_available='1',present_return_interval_ns='650')
 assert m.verify_host_phases(row)['host_messages_ns']==600
@@ -57,7 +71,8 @@ def verify_android_route():
                 gpu_ns=40_000_000, cpu_cycle_ns=66_000_000, backend='RayTracingPipeline',
                 shader_sha256='a' * 64, internal_width=475, internal_height=980,
                 output_width=1440, output_height=2971, glass_enabled=0,
-                fire_count=3, tlas_instances=37, blas_owners=28,
+                fire_count=4, fire_ids='1110454595;1110454600;1110454608;1279348308',
+                tlas_instances=37, blas_owners=28,
                 device_local_bytes=231_192_576, host_visible_bytes=78_070_656,
                 kit_mask=1, window_mask=0, resident_mask=1, record_keeper_mask=1))
 
@@ -75,6 +90,7 @@ def verify_android_route():
         analyze(rows)
         analyze(rows)
         assert 'openDoorWitness' not in json.loads((report.parent / 'analysis.json').read_text())
+        assert json.loads((report.parent / 'analysis.json').read_text())['roomFireAdmission'] == 'stable-emitter-ids-v1'
         rows = [dict(row, tavern_door_mask=1) for row in rows]
         analyze(rows, 'door-analysis.json')
         assert json.loads((report.parent / 'door-analysis.json').read_text())['openDoorWitness']
@@ -98,6 +114,32 @@ def verify_android_route():
             assert 'two complete' in str(error), error
         else:
             raise AssertionError('A truncated Android route passed')
+
+        # Old recorder CSVs have no ID column; they are admitted only through
+        # the old exact-three-light schema. New four-light CSVs must name IDs.
+        legacy = [dict(row) for row in rows]
+        for item in legacy:
+            item.pop('fire_ids', None)
+            if item['phase'] in ('room', 'complete'):
+                item['fire_count'] = 3
+        analyze(legacy, 'legacy-analysis.json')
+        assert json.loads((report.parent / 'legacy-analysis.json').read_text())['roomFireAdmission'] == 'legacy-three-count-only-v1'
+        malformed = [dict(row) for row in rows]
+        malformed[0]['fire_ids'] = '1110454595;1110454600;1110454608;77'
+        try:
+            analyze(malformed, 'unaccounted-fire.json')
+        except ValueError as error:
+            assert 'fire admission' in str(error), error
+        else:
+            raise AssertionError('An unaccounted room emitter passed')
+        malformed = [dict(row) for row in rows]
+        malformed[0]['fire_ids'] = '1110454595;1110454600;1110454608'
+        try:
+            analyze(malformed, 'fire-count-mismatch.json')
+        except ValueError as error:
+            assert 'fire admission' in str(error), error
+        else:
+            raise AssertionError('A fire ID/count mismatch passed')
 
 
 verify_android_route()
@@ -149,7 +191,9 @@ def verify_android_resident_roundtrip(west=False):
                     gpu_ns=40_000_000, cpu_cycle_ns=66_000_000, backend='RayTracingPipeline',
                     shader_sha256='a' * 64, internal_width=475, internal_height=980,
                     output_width=1440, output_height=2971, glass_enabled=0,
-                    fire_count=3 if phase in ('room', 'complete') else 2,
+                    fire_count=4 if phase in ('room', 'complete') else 2,
+                    fire_ids=('1110454595;1110454600;1110454608;1279348308'
+                              if phase in ('room', 'complete') else '1110454595;1110454600'),
                     tlas_instances=37, blas_owners=28,
                     device_local_bytes=231_192_576, host_visible_bytes=78_070_656,
                     kit_mask=1, window_mask=0, resident_mask=1, record_keeper_mask=1,

@@ -49,7 +49,7 @@ struct FireEmitterSelectionContext
 {
     std::array<float, 3u> cameraWorld{};
     horde::gameplay::ShowcaseZone zone = horde::gameplay::ShowcaseZone::Opening;
-    float maximumDistance = 24.0f;
+    float maximumDistance = horde::gameplay::effects::kDefaultFireViewDistance;
 };
 
 struct FireEmitterUpload

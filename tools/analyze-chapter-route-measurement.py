@@ -33,6 +33,39 @@ BELLWETHER_RESIDENT_SOURCE_IDS = {
     'Artificer': 0x42303541,
     'Salvager': 0x42303553,
 }
+BELLWETHER_LEGACY_ROOM_FIRE_IDS = frozenset((0x42303148, 0x42303143, 0x4c414e54))
+BELLWETHER_ROOM_FIRE_IDS = BELLWETHER_LEGACY_ROOM_FIRE_IDS | {0x42303150}
+
+def parse_fire_ids(value):
+    if not re.fullmatch(r'[0-9]+(?:;[0-9]+)*', value or ''):
+        raise ValueError('Missing or malformed admitted fire emitter IDs')
+    ids = tuple(int(item) for item in value.split(';'))
+    if len(set(ids)) != len(ids) or any(not item for item in ids):
+        raise ValueError('Duplicate or invalid admitted fire emitter IDs')
+    return frozenset(ids)
+
+def verify_bellwether_room_fire(row, frame_lighting=None):
+    """Check the known legacy trio or the current trio plus porch lamp."""
+    count = int(row['fire_count'])
+    if 'fire_ids' in row:
+        ids = parse_fire_ids(row['fire_ids'])
+        assert len(ids) == count, 'Fire emitter ID list does not match fire_count'
+        assert ids == BELLWETHER_ROOM_FIRE_IDS, 'Current room requires the hearth, candle, porch and player lantern'
+    elif frame_lighting is not None:
+        ids = frozenset(int(emitter['stableId']) for emitter in frame_lighting['emitters'][:count])
+        assert len(ids) == count, 'Completed frame has duplicate fire emitter IDs'
+        assert ids == BELLWETHER_LEGACY_ROOM_FIRE_IDS, 'Legacy room fire IDs differ from the admitted trio'
+        return ids
+    else:
+        # Historical Android CSVs have no stable IDs. Their native recorder
+        # admitted exactly three lights; the absent column is this legacy schema.
+        assert count == 3, 'Legacy room recording lacks the three-light admission'
+        return None
+    if frame_lighting is not None:
+        frame_ids = frozenset(int(emitter['stableId']) for emitter in frame_lighting['emitters'][:count])
+        assert ids == frame_ids, 'CSV fire emitter IDs differ from the completed frame'
+    return ids
+
 def verify_bellwether_resident_roster(rows, intervals=None, *, relic_dealer=False, west=False):
     """Validate the resident sequence shared by the Windows and Android routes."""
     ids = BELLWETHER_RESIDENT_SOURCE_IDS.copy()
@@ -339,8 +372,9 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         verify_host_phases(row)
         assert all(int(row[column]) == 0 for column in row if column.endswith('_overflow'))
         if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
-            assert [row[column] for column in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == [
-                '3', '1', '1' if glass_enabled else '0', '1']
+            assert [row[column] for column in ('kit_mask', 'window_mask', 'resident_mask')] == [
+                '1', '1' if glass_enabled else '0', '1']
+            verify_bellwether_room_fire(row)
         if record_keeper_included:
             assert row['record_keeper_mask'] == '1'
         if door_witness:
@@ -376,6 +410,8 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
         assert frame['resources']['tlasInstanceCount'] == int(row['tlas_instances'])
         assert frame['resources']['bottomLevelAccelerationStructureCount'] == int(row['blas_owners'])
         assert frame['fireLighting']['count'] == int(row['fire_count'])
+        if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
+            verify_bellwether_room_fire(row, frame['fireLighting'])
     assert serials[0] in keys and serials[-1] in keys
     assert {item['phase'] for item in journal} == set(phases)
     summary = dict(scope=run['scope'], backend=receipt['backend'], executableSha256=receipt['executableSha256'],
@@ -537,6 +573,7 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
     require(not gpu_stage_fields or gpu_stage_fields == gpu_stage_columns,
             'Incomplete GPU stage columns in Bellwether route report')
     require(not require_gpu_stages or gpu_stage_fields, 'GPU stage columns are required')
+    legacy_fire_schema = 'fire_ids' not in fields
     cpu_samples = []
     gpu_stage_samples = {}
     destination = 'stock-yard' if west else 'east-fork' if resident_roundtrip else 'square'
@@ -607,8 +644,12 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
         if door_witness:
             require(row['tavern_door_mask'] == '1', f'Frame {serial} lost the open tavern door instance')
         if row['phase'] == 'room' or (resident_roundtrip and row['phase'] == 'complete'):
-            require([row[key] for key in ('fire_count', 'kit_mask', 'window_mask', 'resident_mask')] == ['3', '1', str(glass), '1'],
+            require([row[key] for key in ('kit_mask', 'window_mask', 'resident_mask')] == ['1', str(glass), '1'],
                     f'Frame {serial} changed the staffed tavern workload')
+            try:
+                verify_bellwether_room_fire(row)
+            except (AssertionError, ValueError) as error:
+                raise ValueError(f'Frame {serial} changed the staffed room fire admission: {error}') from error
         require(returned[index] - elapsed[index] == clock_base and
                 (index == 0 or (returned[index] > returned[index - 1] and 0 <= ticks[index] - ticks[index - 1] <= 4)),
                 f'Frame {serial} broke the clock or 60 Hz catch-up bound')
@@ -619,6 +660,8 @@ def analyze_android_bellwether(name, analysis_name, *, resident_roundtrip=False,
                    simulationTicks=ticks[-1] - ticks[0], shaderHashes=sorted({row['shader_sha256'] for row in rows}),
                    internalExtent=[width, height], outputExtent=[surface_width, surface_height], glassEnabled=bool(glass),
                    phases={})
+    summary['roomFireAdmission'] = ('legacy-three-count-only-v1' if legacy_fire_schema else
+                                    'stable-emitter-ids-v1')
     if door_witness:
         summary['openDoorWitness'] = True
     if west:

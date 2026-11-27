@@ -50,7 +50,7 @@ public final class LookoutObjectiveMenuTest {
                         + "Purse: 0 coins.\r\nOrdinary silver: sell it at the stall west of the square.";
                 case 4: return "Show the road register to the record keeper by the northern church.";
                 case 5: return "The Abbey lies downstream. The Foundry is east, across the gorge. Both are leads for future expeditions.";
-                case 7: return "Follow the road down to Bellwether. Cross the square and enter the tavern through its south door.";
+                case 7: return "Follow the road to the covered well in Bellwether square. Look for the lit tankard sign. Follow the oak rail up to the tavern's south door.";
                 case 8: return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
                 case 9: return "The wayside archive is open. Stand near the opening and choose Listen to the lantern.";
                 default: return "";
@@ -191,7 +191,7 @@ public final class LookoutObjectiveMenuTest {
         assertEquals(0,actionCount());
     }
     @Test public void bellwetherDirectionsOpenForTheRoadHearthAndUnheardLantern()throws Exception {
-        String[] expected={"south door","Choose Talk","Listen to the lantern"};
+        String[] expected={"lit tankard sign","Choose Talk","Listen to the lantern"};
         for(int i=0;i<expected.length;i++) {
             Bridge.objective[3]=7+i;
             pause();

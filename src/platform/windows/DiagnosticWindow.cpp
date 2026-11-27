@@ -154,6 +154,7 @@
 #include "platform/windows/WindowsChapterShippingLaunch.h"
 #include "gameplay/validation/ChapterRouteHostPhases.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
+#include "gameplay/validation/BellwetherRoomFireContract.h"
 #include "platform/windows/WindowsAssetRoot.h"
 #include "platform/windows/WindowsMistCaptureLaunch.h"
 #include "platform/windows/WindowsInteractionPrompt.h"

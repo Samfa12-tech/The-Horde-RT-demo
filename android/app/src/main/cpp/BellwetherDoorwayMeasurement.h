@@ -12,6 +12,7 @@
 #include "gameplay/dialogue/RecordKeeperPlacement.h"
 #include "gameplay/dialogue/TavernKeeperPlacement.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
+#include "gameplay/validation/BellwetherRoomFireContract.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
 #include "gameplay/traversal/BellwetherMill.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
@@ -41,7 +42,7 @@ public:
         frames_ << "phase,station,returns,elapsed_ns,present_return_ns,scene_epoch,generation,record_serial,"
                    "submission_serial,tick,completion_serial,present_serial,gpu_serial,gpu_ns,cpu_cycle_ns,"
                    "backend,shader_sha256,internal_width,internal_height,output_width,output_height,glass_enabled,"
-                   "fire_count,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
+                   "fire_count,fire_ids,tlas_instances,blas_owners,device_local_bytes,host_visible_bytes,"
                    "kit_mask,window_mask,resident_mask,record_keeper_mask,tavern_door_mask";
         if (ResidentRoundTrip()) frames_ << ",resident_slot0_id,resident_slot1_id";
         if (probe.West()) frames_ << ",stock_head_instances,stock_pose_mask";
@@ -108,7 +109,7 @@ public:
             sample.gpu.status != RtSampleStatus::Valid || !sample.gpu.hasDuration ||
             sample.gpu.completedSubmissionSerial != serial || sample.gpu.durationNanoseconds == 0 ||
             !sample.scene.fireLighting || !sample.scene.dimensions || tag.masks[3] != 1 || tag.tavernDoorMask != 1 ||
-            (phase == "room" && (sample.scene.fireLighting->count != 3 ||
+            (phase == "room" && (!gameplay::validation::HasBellwetherRoomFireAdmission(*sample.scene.fireLighting) ||
                                  tag.masks != std::array<unsigned, 4>{1, tag.glassEnabled ? 1u : 0u, 1, 1})) ||
             (ResidentRoundTrip() && (tag.masks[2] != 1 ||
                 ((phase == "room" || phase == "complete" || phase == "east-fork" || phase == "stock-yard") &&
@@ -127,7 +128,12 @@ public:
                 << RtExecutionModeName(sample.scene.pipeline.executionMode) << ',' << RtFixedTextView(sample.scene.pipeline.active.sha256) << ','
                 << dimensions.internalWidth << ',' << dimensions.internalHeight << ',' << dimensions.outputWidth << ','
                 << dimensions.outputHeight << ',' << (tag.glassEnabled ? 1 : 0) << ','
-                << sample.scene.fireLighting->count << ',' << resources.tlasInstanceCount << ','
+                << sample.scene.fireLighting->count << ',';
+        for (std::uint32_t i = 0; i < sample.scene.fireLighting->count; ++i) {
+            if (i) frames_ << ';';
+            frames_ << sample.scene.fireLighting->emitters[i].stableId;
+        }
+        frames_ << ',' << resources.tlasInstanceCount << ','
                 << resources.bottomLevelAccelerationStructureCount << ',' << resources.deviceLocalBytes << ',' << resources.hostVisibleBytes;
         for (const unsigned mask : tag.masks) frames_ << ',' << mask;
         frames_ << ',' << tag.tavernDoorMask;
