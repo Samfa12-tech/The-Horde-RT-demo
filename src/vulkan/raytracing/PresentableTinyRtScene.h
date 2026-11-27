@@ -747,9 +747,8 @@ public:
     }
     [[nodiscard]] std::uint8_t MillWaterwheelInstanceMask() const noexcept
     {
-        return ready_ && millWaterwheelBlas_.address != 0u && tlasInstanceCount_ != 0u &&
-            tlasInstanceCount_ <= kTlasInstanceCount
-            ? lastInstanceMasks_[tlasInstanceCount_ - 1u] : 0u;
+        return ready_ && millWaterwheelBlas_.address
+            ? SubmittedInstanceMask(kMillWaterwheelMetadataIndex) : 0u;
     }
     [[nodiscard]] std::uint8_t SubmittedInstanceMask(std::uint32_t metadataIndex) const noexcept;
     [[nodiscard]] unsigned SubmittedStockHeadCount() const noexcept;

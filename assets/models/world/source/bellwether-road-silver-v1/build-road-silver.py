@@ -23,6 +23,7 @@ RECIPE = SOURCE / "build-road-silver.py"
 BOX = (35.3, 82.95)
 TRIANGLES_BUDGET = 500
 APPROACH = (33.6, 82.92)
+YAW_DEGREES = -15.0
 
 
 def sha(path):
@@ -82,32 +83,35 @@ def make_cup():
         faces.append((inner[-1][i], inner[-1][j], centre))
         uv_faces.append(((i / sides, .98), ((i + 1) / sides, .98), (.5, .5)))
 
-    # A stout, flattened loop handle is attached on the visible side of the
-    # fallen cup. Its curve clears the floor and remains inside the cache.
-    path_steps, tube_sides = 16, 6
-    handle_x, handle_y = -.20, .076
-    handle_z = -.052
+    # A curved U strap projects toward the player's side. Its plane faces
+    # west, leaving a true finger opening in the approach silhouette.
+    path_steps, tube_sides = 14, 6
+    handle_x, handle_y = -.03, .061
+    handle_z, handle_depth, handle_half_height = -.035, .09, .030
+    tube_radius = .007
     path = []
-    for step in range(path_steps):
-        angle = math.tau * step / path_steps
-        path.append((handle_x + .045 * math.cos(angle),
-                     handle_y + .041 * math.sin(angle), handle_z))
+    for step in range(path_steps + 1):
+        angle = -math.pi / 2 + math.pi * step / path_steps
+        path.append((handle_x,
+                     handle_y + handle_half_height * math.sin(angle),
+                     handle_z - handle_depth * math.cos(angle)))
     handle_rings = []
     for step, point in enumerate(path):
-        previous, following = path[(step - 1) % path_steps], path[(step + 1) % path_steps]
-        dx, dy = following[0] - previous[0], following[1] - previous[1]
-        length = math.hypot(dx, dy)
-        nx, ny = -dy / length, dx / length
+        previous = path[max(0, step - 1)]
+        following = path[min(path_steps, step + 1)]
+        dy, dz = following[1] - previous[1], following[2] - previous[2]
+        length = math.hypot(dy, dz)
+        ny, nz = -dz / length, dy / length
         ids = []
         for side in range(tube_sides):
             around = math.tau * side / tube_sides
             ids.append(len(verts))
-            verts.append((point[0] + .008 * nx * math.cos(around),
-                          point[1] + .008 * ny * math.cos(around),
-                          point[2] + .008 * math.sin(around)))
+            verts.append((point[0] + tube_radius * math.cos(around),
+                          point[1] + tube_radius * ny * math.sin(around),
+                          point[2] + tube_radius * nz * math.sin(around)))
         handle_rings.append(ids)
-    for step, a in enumerate(handle_rings):
-        b = handle_rings[(step + 1) % path_steps]
+    for step, a in enumerate(handle_rings[:-1]):
+        b = handle_rings[step + 1]
         for side in range(tube_sides):
             nxt = (side + 1) % tube_sides
             faces.append((a[side], a[nxt], b[nxt], b[side]))
@@ -115,16 +119,29 @@ def make_cup():
                              (step / path_steps, (side + 1) / tube_sides),
                              ((step + 1) / path_steps, (side + 1) / tube_sides),
                              ((step + 1) / path_steps, side / tube_sides)))
+    for endpoint, reverse in ((handle_rings[0], True), (handle_rings[-1], False)):
+        centre = len(verts)
+        end_path = path[0] if reverse else path[-1]
+        verts.append(end_path)
+        for side in range(tube_sides):
+            nxt = (side + 1) % tube_sides
+            face = (centre, endpoint[nxt], endpoint[side]) if reverse else (centre, endpoint[side], endpoint[nxt])
+            faces.append(face)
+            uv_faces.append(((.5, .5), (side / tube_sides, .98), ((side + 1) / tube_sides, .98)))
 
     # The cup rests on its mouth rim and its narrow foot rim. Pitch the axis
     # down by 0.125 m/m toward the foot to match the tapered profile's contact
     # height and keep the intervening wall just clear of the board.
     engine_verts = [(x - .17, y - .125 * (x + .12), z) for x, y, z in verts]
+    yaw = math.radians(YAW_DEGREES)
+    cosine, sine = math.cos(yaw), math.sin(yaw)
+    engine_verts = [(cosine * x + sine * z, y, -sine * x + cosine * z)
+                    for x, y, z in engine_verts]
     features = {
         "mouthCrown": engine_verts[outer[0][0]],
         "mouthNearRim": engine_verts[outer[0][12]],
         "shoulderCrown": engine_verts[outer[2][0]],
-        "handleCrown": engine_verts[handle_rings[4][3]],
+        "handleCrown": engine_verts[handle_rings[path_steps // 2][2]],
     }
     support = {
         "mouthRimY": min(engine_verts[index][1] for index in outer[0]),

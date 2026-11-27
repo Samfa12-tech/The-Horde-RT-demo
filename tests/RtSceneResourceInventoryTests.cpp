@@ -520,6 +520,25 @@ struct PresentableTinyRtSceneObservationTestAccess
             std::memcmp(instances.data(),before.data(),sizeof(instances))==0;
     }
 
+    static bool CheckMillWheelMaskWithCollectedSilver()
+    {
+        PresentableTinyRtScene scene;
+        scene.ready_=true;
+        scene.millWaterwheelBlas_.address=1u;
+        scene.tlasInstanceDefinitionsValid_=true;
+        scene.tlasInstanceCount_=2u;
+        auto& wheel=scene.tlasBuiltInstances_[0];
+        auto& cup=scene.tlasBuiltInstances_[1];
+        wheel.instanceCustomIndex=PresentableTinyRtScene::kMillWaterwheelMetadataIndex;
+        cup.instanceCustomIndex=PresentableTinyRtScene::kRoadSilverMetadataIndex;
+        wheel.mask=1u;
+        cup.mask=0u;
+        const bool collected=scene.MillWaterwheelInstanceMask()==1u;
+        wheel.mask=0u;
+        cup.mask=1u;
+        return collected && scene.MillWaterwheelInstanceMask()==0u;
+    }
+
     static bool CheckPrivyRagInstancePublication()
     {
         using horde::gameplay::bellwether::PrivyRagState;
@@ -2377,6 +2396,8 @@ int main(int argc, char** argv)
         "chapter residents keep separate GPU references and retry an unsubmitted pose");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckFlaskPhysicalAliases(),
         "carried flask and world pickup share one valid immutable owner with independent poses, masks and atomic restoration");
+    ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckMillWheelMaskWithCollectedSilver(),
+        "mill wheel visibility follows its submitted identity independently of the last pickup");
     ok &= Require(PresentableTinyRtSceneObservationTestAccess::CheckPrivyRagInstancePublication(),
         "privy rag is a real opaque RT instance at the basket/shelf and hidden only while carried");
     ok &= PresentableTinyRtSceneObservationTestAccess::CheckPersistentReadback();

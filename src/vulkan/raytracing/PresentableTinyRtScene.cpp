@@ -10802,7 +10802,8 @@ void PresentableTinyRtScene::NotifyFrameSubmitted() noexcept
 
 std::uint8_t PresentableTinyRtScene::SubmittedInstanceMask(const std::uint32_t metadataIndex) const noexcept
 {
-    if (!tlasInstanceDefinitionsValid_ || metadataIndex >= kRtInstanceMetadataCapacity) return 0;
+    if (!tlasInstanceDefinitionsValid_ || tlasInstanceCount_ > tlasBuiltInstances_.size() ||
+        metadataIndex >= kRtInstanceMetadataCapacity) return 0;
     std::uint8_t mask = 0;
     for (const auto& instance : std::span(tlasBuiltInstances_).first(tlasInstanceCount_))
         if (instance.instanceCustomIndex == metadataIndex)
