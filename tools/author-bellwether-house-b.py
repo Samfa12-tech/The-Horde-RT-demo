@@ -37,7 +37,7 @@ REPLACED = {
 
 
 def open_shell(master, original, edited):
-    """Remove the original wall block, fake north doorway and the foundation cap."""
+    """Remove the wall block, old north doorway and floor-contact masonry."""
     doc, blocks = town["read_glb"](original)
     node, = (node for node in doc["nodes"] if node["name"] == "BellwetherSolid")
     stone, = (p for p in doc["meshes"][node["mesh"]]["primitives"]
@@ -58,9 +58,11 @@ def open_shell(master, original, edited):
             raise ValueError(f"Expected twelve exact B04 shell faces for {obj.name}")
         if not REPLACED[obj.name]:
             height = max(p[1] for p in points)
-            owned &= (positions[indices, 1] == height).all(axis=1)
-            if np.count_nonzero(owned) != 2:
-                raise ValueError("The B04 foundation cap must be two triangles")
+            east = max(p[0] for p in points)
+            owned &= ((positions[indices, 1] == height).all(axis=1) |
+                      (positions[indices, 0] == east).all(axis=1))
+            if np.count_nonzero(owned) != 4:
+                raise ValueError("The B04 foundation cap and east face must each have two triangles")
         if (removed & owned).any():
             raise ValueError(f"Two B04 source blocks claim the same faces: {obj.name}")
         removed |= owned
@@ -93,6 +95,13 @@ def author_room(site, entrance, ground):
     box("East wall north of entrance", ex-thickness, ex, north, left, floor, top)
     box("East wall south of entrance", ex-thickness, ex, right, south, floor, top)
     box("East stone lintel and upper wall", ex-thickness, ex, left, right, floor+2.63, top)
+    # The two foundation faces finish against the stair cheeks. A continuous
+    # foundation face across the door catches the leading edge of the player
+    # capsule while its centre is still on the ramp below the threshold.
+    for name, z0, z1 in (("North", north, left), ("South", right, south)):
+        base = site["foundationBottomY"]
+        points = [(ex,base,z0),(ex,floor,z0),(ex,floor,z1),(ex,base,z1)]
+        solids.append(mesh_tools["mesh"](f"{name} east foundation", points, [(0,1,2,3)], stone))
 
     for z, name in ((left-.115, "North"), (right+.115, "South")):
         box(f"{name} oak jamb", ex-.16, ex+.13, z-.106, z+.106, floor, floor+2.64, oak, .018)
@@ -105,20 +114,31 @@ def author_room(site, entrance, ground):
         box("Door strap iron", ex-1.84, ex-.12, left+.046, left+.074, floor+y, floor+y+.067, iron, .008)
 
     lip_x = ex + 2.79
-    lip_y = max(ground(lip_x,z) for z in (left, ez, right)) + .028
-    landing = [(ex,floor,left),(ex,floor,right),(lip_x,lip_y,right),(lip_x,lip_y,left)]
-    # The outward cheeks match the ramp grade and support the exposed edges.
-    for side, z in (("North", left), ("South", right)):
-        rise = [(ex, floor, z), (lip_x, lip_y, z),
-                (lip_x, ground(lip_x,z)-.12, z), (ex, ground(ex,z)-.12, z)]
-        winding = (0,1,2,3) if side == "North" else (3,2,1,0)
-        solids.append(mesh_tools["mesh"](f"{side} ramp cheek", rise, [winding], stone))
-    for side, z in (("North", left-.115), ("South", right+.115)):
-        for fraction in (.2,.94):
-            x = ex + fraction*(lip_x-ex)
-            y = floor + fraction*(lip_y-floor)
-            box(f"{side} approach post", x-.079, x+.079, z-.081, z+.081, ground(x,z)-.09, y+.88, oak, .016)
-        edge = [(ex+f*(lip_x-ex), floor+f*(lip_y-floor), z) for f in (.18,.956)]
+    across = [left+i*(right-left)/8. for i in range(9)]
+    mid_x = ex + 1.67
+    mid_y = max(ground(mid_x,z) for z in across) + .08
+    lip_heights = [ground(lip_x,z)+paths["SURFACE_LIFT"] for z in across]
+    grade = [(ex,[floor]*len(across)),(ex+.70,[floor]*len(across)),
+             (mid_x,[mid_y]*len(across)),(lip_x,lip_heights)]
+    landing = [(x,y,z) for x,heights in grade for y,z in zip(heights,across,strict=True)]
+    width = len(across)
+    steps = [(i,i+1,i+1+width,i+width) for row in range(len(grade)-1)
+             for i in range(row*width,(row+1)*width-1)]
+    # The graded landing clears the terrain rib through the centre of the
+    # ramp. Stone cheeks run from its outer edges down to surveyed terrain.
+    for side, z, edge_index in (("North", left, 0), ("South", right, -1)):
+        points = [(x,h,z) for x,heights in grade for h in (heights[edge_index],ground(x,z)-.12)]
+        faces = [(i,i+2,i+3,i+1) for i in range(0,len(points)-2,2)]
+        if side == "South":
+            faces = [face[::-1] for face in faces]
+        solids.append(mesh_tools["mesh"](f"{side} ramp cheek", points, faces, stone))
+    for side, z, edge_index in (("North", left-.115, 0), ("South", right+.115, -1)):
+        start = (ex+.32,floor,z)
+        lip_y = lip_heights[edge_index]
+        end = (lip_x-.11,lip_y+.11*(mid_y-lip_y)/(lip_x-mid_x),z)
+        for x,y,_ in (start,end):
+            box(f"{side} approach post", x-.079, x+.079, z-.081, z+.081, ground(x,z)-.09, y+.95, oak, .016)
+        edge = [start] + [(x,heights[edge_index],z) for x,heights in grade[1:-1]] + [end]
         solids.extend(mesh_tools["rail"](f"{side} approach", edge, oak, omit_posts=[(x,z) for x,_,z in edge]))
 
     # Closed timber bins give the west end an occupied edge. Keep the main
@@ -170,8 +190,8 @@ def author_room(site, entrance, ground):
 
     slab = [(west,floor,north),(west,floor,south),(ex,floor,south),(ex,floor,north)]
     walkable = [mesh_tools["mesh"]("Dressed stone floor", slab, [(0,1,2,3)], stone),
-                mesh_tools["mesh"]("East entry ramp", landing, [(0,1,2,3)], stone)]
-    return solids, walkable, (lip_x, lip_y, ez), stone
+                mesh_tools["mesh"]("East entry ramp", landing, steps, stone)]
+    return solids, walkable, (lip_x, lip_heights[len(across)//2], ez), stone
 
 
 def export_layer(parts, name, file):
@@ -236,6 +256,7 @@ def main(root, original, output):
         f"inline constexpr std::size_t kHouseBSolidTriangles={solid_triangles-removed};\n"
         f"inline constexpr std::size_t kHouseBGroundTriangles={ground_triangles};\n"
         f"inline constexpr float kHouseBFloorY={site['actualFloorY']:.8f}f;\n"
+        f"inline constexpr std::array<float,2> kHouseBEastDoorXZ{{{{{ex:.3f}f,{ez:.3f}f}}}};\n"
         f"inline constexpr std::array<std::array<float,2>,{len(stations)}> kHouseBStations"
         f"{{{{{station_lines}}}}};\n"
         "} // namespace horde::gameplay::bellwether\n",

@@ -1784,7 +1784,8 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = -.10f;
                         const bool visited =
                             std::all_of(kHouseBStations.begin(), kHouseBStations.begin()+4, walkStation) &&
-                            face(39.3f,97.2f) && capture("windows-combined-house-b-approach.png",false,true) &&
+                            face(kHouseBEastDoorXZ[0],kHouseBEastDoorXZ[1]) &&
+                            capture("windows-combined-house-b-approach.png",false,true) &&
                             std::all_of(kHouseBStations.begin()+4, kHouseBStations.end(), walkStation) &&
                             std::abs(state.playerSupportWorldY-kHouseBFloorY)<.02f &&
                             setInspectionLight(HeldLightPose::High) &&
