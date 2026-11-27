@@ -1,0 +1,44 @@
+{
+  "originalTownSha256": "5b679d961594c8b2ce181a979aaca42a018f4699679ff296795b0911ea385269",
+  "runtimeTownSha256": "d44bdbac5b5cea8c6807b4f86dfc28f920e44dcf73f74bb139eecc9a2bfba18e",
+  "tavernStagingSha256": "ea61d89fcf753652b4e7ea4d7833988a5895eca9c1d6e21ed7fb3d91c2ee1585",
+  "shellSurveySha256": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1",
+  "addedSolidTriangles": 2440,
+  "townVertices": 82974,
+  "townTriangles": 39769,
+  "marks": {
+    "JugBase": [
+      82.81,
+      -7.95955078125,
+      105.96
+    ],
+    "BeakerBase": [
+      82.17999999999999,
+      -7.95955078125,
+      106.28999999999999
+    ],
+    "TrencherBase": [
+      82.39,
+      -7.95955078125,
+      106.17
+    ],
+    "DresserTop": [
+      84.4,
+      -7.80955078125,
+      103.932
+    ],
+    "DresserFoot": [
+      83.43,
+      -8.70955078125,
+      104.11
+    ]
+  },
+  "blender": "5.2.0 LTS",
+  "files": {
+    "hearth-service.blend": "05245b7159ca72dca2c5fdcd8e94b67a971e618450068b84a0803c631c477fd3",
+    "hearth-service.glb": "3319a280e3e27e1d89711a159e07d40a36cbf60341af311541bee724ab1e237b",
+    "geometry.generated.h": "f39af734aae93464a8fad79289f5521dd8abe347af58900077bfe385c3cdef0b",
+    "asset.manifest.json": "7595191a5665dfdd431df6d358e4fdc018bf4962ded9b58b5fb15965f838f14c"
+  },
+  "recipeSha256": "97dafd147a1b8c2ce40ee0b7149a0ac68507803a76a885afa37576321d45d615"
+}
