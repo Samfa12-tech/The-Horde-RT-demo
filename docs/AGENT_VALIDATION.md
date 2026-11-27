@@ -146,10 +146,20 @@ the current runtime roster and existing flask and revival assets in a ZIP under
 detects the local playtest marker, validates the packaged overlays, and uses the
 separate `bellwether-playtest/campaign-v1` save profile.
 
-For a private optimized Windows package, configure a dedicated build with
-`HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=ON` and `HORDE_RT_SHIPPING17_CONTENT=ON`.
-Build `horde_rt_diagnostic_window` in Release with the standard Shipping/High
-policy. Pass that executable to the same packager with `-OptimizedCandidate`.
+For a private optimized Windows package, build from a clean commit using the
+dedicated preset.
+
+```powershell
+cmake --preset windows-x64-bellwether-candidate
+cmake --build --preset windows-x64-bellwether-candidate
+```
+
+The preset builds `horde_rt_diagnostic_window` in Release with the standard
+Shipping/High policy and writes `build/bellwether-windows-candidate/Release/HordeLanternRT.exe`.
+Keep the preset's single MSBuild worker. Windows secondary workers can drop
+empty values from the inherited Git configuration, causing Git to reject the
+source identity query. Pass the executable to the playtest packager with
+`-OptimizedCandidate`.
 The pinned voice overlay is optional. Extract the candidate ZIP to a writable
 folder and start from the ordinary menu. Each extraction keeps its own
 `state/campaign-v1` and settings. The candidate admits only its packaged
