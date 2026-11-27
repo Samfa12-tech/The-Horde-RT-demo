@@ -4896,3 +4896,28 @@ The earlier ordinary tap at Kit's hearth verifies narrative delivery; the
 staged line here isolates visual readability. The temporary test APK was
 removed, the original preference-file state was restored, and all three
 original campaign test saves retained their hashes.
+
+### 27 November 2026 — West silver route on the Galaxy S26 Ultra (partial)
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17/API 37), **Play → Continue →
+Continue Slot 1** loaded a copy of an earned tavern save. This run used the
+previous private ARM64 APK from `754a06f4`, SHA-256
+`1500a177ead8fd391a929ad3ee297ff5b4a659efa3b0cd67ce8aee3e00f56fce`.
+RayTracingPipeline presented at 33%, tracing 475 × 980 pixels for a 1440 × 2971
+portrait surface at 60 Hz.
+
+Touch input moved the player from the hearth at X/Z (84.52, 107.68) to the
+south doorway at (82.44, 118.58), looking down the ramp towards the well.
+The script stopped 0.63 m short of its target with a 0.38 m tolerance.
+The cause of the stop is undetermined. Collection at the church fork, sale at
+the stall, the hinge purchase, reload and route timing still need a phone run.
+
+The test used the separate namespace `west-trade-phone-20261127-210456`.
+Its last observed autosave matched the starting copy. All six original test
+saves had verified local backups. The game was paused and backgrounded to
+cool. At the last reading Android reported thermal status 0 and a battery
+temperature of 35.8 °C. The phone disconnected before the final on-device
+save and preference check. The pose overlay was enabled by launch intent
+and may still be visible if that same process resumes. Screenshots, touch
+inputs, original hashes and thermal readings are retained locally in
+`reports/horde-android-west-trade-20261127-210346`.
