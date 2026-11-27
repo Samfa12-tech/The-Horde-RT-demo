@@ -145,11 +145,21 @@ void TestTotalInternalReflection()
 void TestCriticalAngleIsTransmissionBoundary()
 {
     Vec3 transmitted{};
-    Check(RefractDirection(Vec3{0.5f, -0.8660254038f, 0.0f},
-                           Vec3{0.0f, 1.0f, 0.0f}, 2.0f, 1.0f, transmitted),
-          "an exact zero Snell discriminant is the critical transmission boundary, not TIR");
+    // 4/5 tangent and 3/5 normal form a rational unit direction; eta=5/4
+    // places it exactly at critical incidence without a rounded sqrt(3)/2.
+    Check(RefractDirection(Vec3{4.0f, -3.0f, 0.0f},
+                           Vec3{0.0f, 1.0f, 0.0f}, 1.25f, 1.0f, transmitted),
+          "an exact rational Snell boundary transmits instead of reporting TIR");
     Check(Finite(transmitted) && NearlyEqual(transmitted, Vec3{1.0f, 0.0f, 0.0f}, 0.0001f),
           "critical-angle transmission is finite and tangent to the interface");
+    const float belowCriticalTangent = std::nextafter(4.0f, 0.0f);
+    const float aboveCriticalTangent = std::nextafter(4.0f, 5.0f);
+    Check(RefractDirection(Vec3{belowCriticalTangent, -3.0f, 0.0f},
+                           Vec3{0.0f, 1.0f, 0.0f}, 1.25f, 1.0f, transmitted),
+          "the nearest representable lower-angle case transmits");
+    Check(!RefractDirection(Vec3{aboveCriticalTangent, -3.0f, 0.0f},
+                            Vec3{0.0f, 1.0f, 0.0f}, 1.25f, 1.0f, transmitted),
+          "the nearest representable higher-angle case is total internal reflection");
 }
 
 void TestEffectiveFresnelPartitionsAllValidEnergy()
