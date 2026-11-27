@@ -3208,6 +3208,19 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
                 Check(before==after,"basins preserve swept canonical rope/arrival approach contact");
             }
         }
+        auto config=gameplay::simulation::ProductionGameSimulationConfig();
+        config.flaskUtilityCandidate=config.healingFlask1_7=true;
+        gameplay::simulation::GameSimulation capture(config);
+        const auto* lookout=gameplay::FindDevelopmentCheckpoint("chapter-forest-lookout");
+        const bool reached=lookout && gameplay::StageDevelopmentCheckpointForScene(capture,*lookout,[&] {
+            using namespace gameplay::simulation;
+            for(std::size_t zone=1;zone<kWorldZones.size();++zone)
+                capture.PublishChapterTerrain({capture.Snapshot().worldRoute.generation,
+                    static_cast<WorldZoneId>(zone)},terrain);
+        });
+        Check(reached && std::hypot(capture.Snapshot().playerX-basins[1].anchor.x,
+                                    capture.Snapshot().playerZ-basins[1].anchor.z)<.01f,
+              "the scripted climb clears the actual lookout basin and reaches the saved anchor");
         std::cout<<"Rest basin full chapter packing: triangles=216 materials="<<materials
             <<" primitives="<<owner.primitives.size()<<" no GPU/image claim\n";
         return;

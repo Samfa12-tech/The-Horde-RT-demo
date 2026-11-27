@@ -4798,3 +4798,48 @@ the later exchange with Kit and sustained play need separate checks.
 The touchscreen trace, screenshots, exact APK receipt and decoded saves
 are retained locally under
 `reports/horde-android-register-walk-20261124-122154`.
+
+### 27 November 2026 — Bellwether square and south tavern ramp
+
+The Galaxy S26 Ultra (SM-S948B, Android 17, API 37) ran the five-resident
+private ARM64 Debug build. From the staffed hearth, the player motor went
+through the south door, down the ramp, across the square to the salvager
+and back twice. Both builds completed all twelve resident swaps, retained
+the staffed-room lights, and joined all 2,354 recorded frames to GPU
+completion and successful native RT presentation.
+
+| RayTracingPipeline at 33%, Shipping/Mobile | Previous town | Fingerpost, lamp and delivery cask |
+| --- | ---: | ---: |
+| Source | `3d4f1bd4` | `94c4e1f6` |
+| Installed APK SHA-256 | `f9f98bdeb81c2664930c1f69732fb3c12181ce39b24ae0298e799aa937750dc0` | `6ca18053a4d8a6638c88708631ca07935062d3bf35a5ed94fe1ef69ab0135263` |
+| Battery temperature, start to finish | 34.2–36.1 °C | 33.7–36.1 °C |
+| South door to square, median GPU (200 frames) | 87.44 ms | 86.85 ms |
+| Square to south door, median GPU (199 frames) | 104.05 ms | 108.32 ms |
+| Whole-route sampled display interval, median / p95 | 83.33 / 125.00 ms | 83.33 / 125.00 ms |
+
+Both runs used 475 × 980 internal and 1440 × 2971 output, glass off, and
+the same shader SHA-256
+`56c73ee7fe76a355f142801d3426adea3ab1710facff9966d210c55aec375b6f`.
+The ramp rows cover the same route segments in opposite directions
+(outbound targets 2 and 3, inbound targets 3 and 4 in `kEastPath`).
+SurfaceFlinger actual-present samples were collected separately. The climb
+cost 4.27 ms more GPU time in this pair. Sustained performance and walking
+feel still need playtesting.
+
+The previous build also attempted the longer stock-yard circuit. Its
+four-minute route deadline expired on the second return near the tavern.
+That incomplete run is excluded from the comparison. The CSVs, shader and
+temperature logs, display samples and APK receipts are local under
+`reports/horde-bellwether-kit-question-20261127-182128`.
+
+The two stationary Debug views initially stopped on the way to the square.
+The recorded player position was (12.795, 35.725) while approaching the
+lookout anchor at (13.300, 36.200). That diagonal clips the optional stone
+flask basin. The scripted walk now approaches the landing from the south
+with the normal player motor. On the same phone the corrected APK from
+`4cd1319b`, SHA-256
+`1126e3bd556adc6fc25eeaa867638a742eb93917d40df7098a0818ef53425ca9`,
+reached and presented both `bellwether-square-waymarker` and
+`bellwether-square-frontage` through RayTracingPipeline. The portrait
+captures show the illuminated post beside the well and the open ramp to
+the tavern. The original campaign test saves retained their hashes.
