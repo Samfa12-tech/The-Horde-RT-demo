@@ -1,4 +1,3 @@
-# Preserve reproducible local masters; distribute the admitted GLB once.
+# Keep the local editable master and intermediate survey outside the repository.
 /chapter-terrain-r23.blend
-/chapter-terrain-r23.glb
 /surface.json

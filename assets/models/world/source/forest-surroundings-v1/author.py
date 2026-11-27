@@ -23,7 +23,7 @@ TREE = ROOT / 'assets/models/world/runtime/forest-tree-pair-v1'
 QA = ROOT / 'assets/models/world/source/forest-tree-pair-v1/qa'
 MAP = ROOT / 'docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json'
 PLACEMENTS = ROOT / 'assets/models/world/source/forest-placement-v1/woodland-placements-v3.json'
-TERRAIN = ROOT / 'assets/models/world/runtime/chapter-terrain-v1/chapter-terrain-lod0.runtime.glb'
+TERRAIN = ROOT / 'assets/models/world/source/chapter-terrain-r23/chapter-terrain-r23.glb'
 SEED = 20261031
 # Frozen native-ground/contact classification, reverified by the independent
 # production-geometry flood and movement tests. No per-startup movement audit.
@@ -297,7 +297,7 @@ def simplify(points,tolerance):
 def composition(assets,tips):
     mapping=json.loads(MAP.read_text()); route=[(round(x+78.3,6),round(126.2-y,6)) for x,y,z in mapping['forest']]
     require(route==[(-33.7,-12.8),(-28.7,-5.8),(-15.7,.2),(-17.7,15.2),(-3.7,20.2),(13.3,36.2)],'Map transform/route changed')
-    spec=importlib.util.spec_from_file_location('forest_terrain_queries',ROOT/'tools/fit-forest-root-placements.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);ground=mod.terrain_queries()
+    spec=importlib.util.spec_from_file_location('forest_terrain_queries',ROOT/'tools/fit-forest-root-placements.py');mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod);ground=mod.terrain_queries(TERRAIN)
     # A source-only union of corridor and explicit pockets. F01 includes graves,
     # slab/shaft and rope approaches, not merely the trail's landing centre.
     pockets=[{'id':'F01-burial-shaft','center':[-33.7,-17.0],'radius':10.0},{'id':'F02-reunion','center':list(route[1]),'radius':3.2},{'id':'F04-lookout','center':list(route[-1]),'radius':3.5}]
