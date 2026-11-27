@@ -2,6 +2,7 @@ package com.samfa12.hordelanternrt;
 
 /** Immutable menu eligibility only. Never completes a quest or writes a save. */
 final class LookoutObjectiveState {
+    private static final int LAST_BELLWETHER_OBJECTIVE = 11;
     final long surfaceGeneration, worldGeneration;
     final int objective;
     final boolean available;
@@ -11,7 +12,8 @@ final class LookoutObjectiveState {
     }
     static LookoutObjectiveState decode(long[] values,long currentSurface) {
         if(values==null || values.length!=4 || values[0]!=2 || currentSurface<=0 ||
-                values[1]!=currentSurface || values[2]<=0 || values[3]<0 || values[3]>10)return null;
+                values[1]!=currentSurface || values[2]<=0 || values[3]<0 ||
+                values[3]>LAST_BELLWETHER_OBJECTIVE)return null;
         return new LookoutObjectiveState(values);
     }
     boolean isLookout() { return objective==1; }
