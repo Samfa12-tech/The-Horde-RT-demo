@@ -45,7 +45,10 @@ final class ChapterVoiceAssets {
     // generated line-ID selection keeps each admission independent.
     private static final Asset[] OPTIONAL_BELLWETHER_ASSETS = {
             bellwether(35, "hub.first_errand", "record_keeper_"),
-            bellwether(36, "hub.shrine_direction", "record_keeper_")
+            bellwether(36, "hub.shrine_direction", "record_keeper_"),
+            bellwether(30, "lantern.first_identity", "lantern_"),
+            bellwether(32, "lantern.first_request", "lantern_"),
+            bellwether(43, "lantern.town_seals", "lantern_")
     };
     private static final List<Asset> ALL = admittedAssets();
 

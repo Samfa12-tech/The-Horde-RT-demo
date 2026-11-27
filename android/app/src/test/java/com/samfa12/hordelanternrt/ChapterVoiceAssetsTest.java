@@ -140,23 +140,25 @@ public final class ChapterVoiceAssetsTest {
         }
     }
 
-    @Test public void privateKeeperLeadAuditionSelectsOnlyTheTwoPinnedLines() {
-        final int[] lines = {35, 36};
-        final String[] ids = {"hub.first_errand", "hub.shrine_direction"};
+    @Test public void privateOptionalVoiceAuditionSelectsEachPinnedLineIndependently() {
+        final int[] lines = {35, 36, 30, 32, 43};
+        final String[] ids = {"hub.first_errand", "hub.shrine_direction", "lantern.first_identity",
+                "lantern.first_request", "lantern.town_seals"};
+        final String[] soundKeys = {"record_keeper_hub_first_errand", "record_keeper_hub_shrine_direction",
+                "lantern_lantern_first_identity", "lantern_lantern_first_request", "lantern_lantern_town_seals"};
         for (int i = 0; i < lines.length; ++i) {
             final ChapterVoiceAssets.Asset asset = ChapterVoiceAssets.forLine(lines[i]);
             if (optionalVoiceSelected(ids[i])) {
                 assertNotNull(asset);
                 assertEquals(ids[i], asset.stableId);
-                assertEquals("record_keeper_" + ids[i].replace('.', '_'), asset.soundKey);
+                assertEquals(soundKeys[i], asset.soundKey);
                 assertEquals("private_bellwether_voice/" + ids[i] + ".wav", asset.assetPath);
                 assertEquals(Integer.valueOf(31), ChapterVoiceAssets.soundIdForLine(
                         lines[i], java.util.Collections.singletonMap(asset.soundKey, 31)));
             } else {
                 assertNull(asset);
                 assertNull(ChapterVoiceAssets.soundIdForLine(
-                        lines[i], java.util.Collections.singletonMap(
-                                "record_keeper_" + ids[i].replace('.', '_'), 31)));
+                        lines[i], java.util.Collections.singletonMap(soundKeys[i], 31)));
             }
             assertNull(ChapterVoiceAssets.soundIdForLine(lines[i], java.util.Collections.emptyMap()));
         }

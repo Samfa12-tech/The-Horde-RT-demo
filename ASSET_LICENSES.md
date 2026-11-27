@@ -1309,3 +1309,11 @@ records the source and runtime hashes, frame counts and sample comparison.
 The uncut audition for the preceding road-mark inspection contains two lines.
 The inspection uses its existing caption. The masters and playable WAVs stay
 in private storage, with ownership recorded in the 28 November intake.
+
+## Bellwether lantern archival audition — 28 November 2026
+
+The [Mureka archive receipt](docs/evidence/2026-11-28-bellwether-owner-intake/lantern-archive.json)
+pins two lantern lines at the shrine and one heard by Kit at the tavern.
+The optional private Debug files preserve the samples and fit the existing
+dialogue timing. The recorded owner confirmation covers the voices. The takes
+remain provisional for in-game listening review.
