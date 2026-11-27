@@ -246,6 +246,13 @@ python tools/prototype-dispatch-clock.py . reports/hearth-clock-shaders
 python tools/compile-dispatch-clock.py reports/hearth-clock-shaders
 ```
 
+For the Bellwether shadow comparison, add `--hearth-shadow-split` to the
+first command. The sidecars and analyzer report `direct_fire_shadow` for
+visibility queries from direct fire-emitter lighting and `other_shadow`
+for the other visibility queries. Those two categories together cover
+the previous `shadow` category. Mist, electricity and dust share a slot
+in this profile. The analyzer rejects mixed profiles within one run.
+
 Build the private Bellwether APK with its usual assets, Shipping/Mobile,
 `-PhordeRtRouteTiming=true`, `-PhordeFrameStageProbe=true`,
 `-PhordeDispatchClockProbe=true` and `-PhordeDispatchClockShaderRoot=<absolute path to reports/hearth-clock-shaders/source>`.
