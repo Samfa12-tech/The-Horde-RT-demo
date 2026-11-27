@@ -848,6 +848,16 @@ The Windows ZIP and signed Android ARM64 APK from `0eab2912` contain the same ni
 
 The private Horde audio archive retains the original MP3s, per-line review WAVs and exact text, voice and cost manifests. The Debug audition uses byte-for-byte copies, and its review receipt pins the local reel and the five source WAVs.
 
+### Background level during Bellwether speech
+
+The package's verified line roster feeds the shared simulation envelope.
+The same tavern keeper reply ducks the music and existing continuous beds
+when its WAV is included, and keeps the background level steady in a fresh
+caption-only run. A caption-only line after speech follows the existing
+hold and release. The original WAVs, line lengths and subtitle policy stay
+as authored. Audio/haptic manual revalidation required — YES, for speech
+intelligibility and the background level during ordinary play.
+
 ## Animation and gameplay acceptance gate
 
 First author a short test on the real Kit rig: loose-ground step/catch, protective standing assessment, several injured steps, turn and sit. Keep editable sources. Review normal first-person, front and side views for weight, planted feet, contact and coherent transitions before expanding into the complete scene. A flattering render is insufficient.

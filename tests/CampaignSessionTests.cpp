@@ -1,3 +1,4 @@
+#include "audio/BellwetherVoiceFixture.h"
 #include "gameplay/campaign/CampaignSession.h"
 #include "gameplay/campaign/CampaignCheckpointCodec.h"
 #include "gameplay/campaign/CampaignPlaySession.h"
@@ -197,11 +198,21 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
 
     auto staffedConfig=sim::ProductionGameSimulationConfig();
     staffedConfig.bellwetherTavernKeeperAdmitted=true;
-    for (const auto& [name,expected] : std::array{
-            std::pair{"bellwether-keeper-reply",Line::TavernHordeArmy},
-            std::pair{"bellwether-staffed-room",Line::None},
-            std::pair{"bellwether-kit-lantern-glance",Line::TavernIntroduce}}) {
-        sim::GameSimulation capture(staffedConfig);
+    constexpr auto roster = horde::audio::BellwetherVoiceLinesFromIds("hub.horde_army,lantern.first_request");
+    static_assert(roster && (*roster)[static_cast<std::size_t>(Line::TavernHordeArmy)] &&
+        (*roster)[static_cast<std::size_t>(Line::LanternFirstRequest)]);
+    static_assert(!horde::audio::BellwetherVoiceLinesFromIds("hub.horde_army,unknown") &&
+        !horde::audio::BellwetherVoiceLinesFromIds("hub.horde_army,hub.horde_army") &&
+        !horde::audio::BellwetherVoiceLinesFromIds("rescue.found"));
+    struct StaffedView { const char* name; Line expected; bool voicePackage; };
+    for (const auto& [name, expected, voicePackage] : std::array{
+            StaffedView{"bellwether-keeper-reply", Line::TavernHordeArmy, false},
+            StaffedView{"bellwether-keeper-reply", Line::TavernHordeArmy, true},
+            StaffedView{"bellwether-staffed-room", Line::None, true},
+            StaffedView{"bellwether-kit-lantern-glance", Line::TavernIntroduce, true}}) {
+        auto config = staffedConfig;
+        if (voicePackage) config.bellwetherRecordedVoiceLines = *roster;
+        sim::GameSimulation capture(config);
         capture.SetDevelopmentRescueJourney(true, true);
         const auto generation = capture.Snapshot().worldRoute.generation;
         const bool ready = capture.PublishChapterTerrain({generation, sim::WorldZoneId::TombExterior}, terrain);
@@ -213,6 +224,15 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
             Check(frame.tavernKeeper && frame.chapterDialogue.line == expected &&
                   std::hypot(frame.playerX - view->cameraX, frame.playerZ - view->cameraZ) < .01f,
                 "each view holds its own speaker or the quiet room at the authored camera mark");
+            sim::InputSnapshot idle;
+            idle.yawRadians = view->yaw;
+            idle.pitchRadians = view->pitch;
+            for (unsigned tick = 0; tick < 15; ++tick) capture.StepFixed(idle);
+            const float expectedGain = voicePackage && expected == Line::TavernHordeArmy
+                ? horde::audio::DialogueDucking::kDuckedGain : 1.f;
+            Check(capture.Snapshot().chapterDialogue.line == expected &&
+                capture.Snapshot().dialogueBedGain == expectedGain,
+                "only an admitted recording for the active tavern line ducks the background");
         }
     }
     sim::GameSimulation staffed(staffedConfig);
