@@ -1,0 +1,491 @@
+{
+  "schema": 1,
+  "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "driver": "610.47",
+  "scope": "Windows Debug host, Shipping/High opaque-fast, 960x540, west stock-yard and two staffed hearth returns",
+  "match": "Exclude the first five seconds and measurement completion row. Join on route phase, return count, station, simulation tick and identical sampled scene/resource keys. Compare the median per tick so a faster arm cannot weight a tick by rendering more frames.",
+  "intervals": "Native GPU duration and host frame cycle. The hidden harness does not measure displayed intervals.",
+  "armOrder": [
+    "pipeline-control",
+    "pipeline-candidate",
+    "query-candidate",
+    "query-control"
+  ],
+  "routeDeadlineSeconds": 240,
+  "pairs": [
+    {
+      "backend": "RayTracingPipeline",
+      "control": {
+        "durationSeconds": 234.877,
+        "fullRouteCompleted": true,
+        "returns": 2,
+        "completedFrames": 38622,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 0,
+        "shaderSha256": "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+        "exeSha256": "4d7733d2c6773f541a11abd1e6339ae1a7e42bd7b4486be7f5d6eec40e34c9b3",
+        "gpu": {
+          "startIdleCelsius": 46,
+          "sampledTemperaturesCelsius": [
+            47,
+            67
+          ],
+          "sampledActiveGraphicsClockMedianMhz": 1852,
+          "sampledActiveMemoryClockMedianMhz": 9001,
+          "sampledPowerStates": {
+            "P4": 26,
+            "P5": 1,
+            "P2": 22
+          },
+          "samplesAtApproxFiveSeconds": 52
+        },
+        "rawFramesSha256": "6f59bd95f7f74d02f6a8f05e5c0c7f00ce85a43c63f2babac9c528ac471818ec",
+        "rawGpuSamplesSha256": "5ed6afcc529b1f3122e7120de677fbac69b73d63f46c1764474816a68ac4e038",
+        "unmatchedSamplingPerPhase": {
+          "room": {
+            "gpuMilliseconds": {
+              "median": 2.325568,
+              "p95": 3.675232
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8462,
+              "p95": 5.9034
+            }
+          },
+          "doorway-outbound": {
+            "gpuMilliseconds": {
+              "median": 1.80128,
+              "p95": 3.121056
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8442,
+              "p95": 5.9056
+            }
+          },
+          "stock-yard": {
+            "gpuMilliseconds": {
+              "median": 1.39904,
+              "p95": 2.770624
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8516,
+              "p95": 5.9058
+            }
+          },
+          "doorway-inbound": {
+            "gpuMilliseconds": {
+              "median": 2.148672,
+              "p95": 3.444416
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8414,
+              "p95": 5.9045
+            }
+          }
+        }
+      },
+      "candidate": {
+        "durationSeconds": 234.874,
+        "fullRouteCompleted": true,
+        "returns": 2,
+        "completedFrames": 38632,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 0,
+        "shaderSha256": "0bc5bbc866068637a95f78c2bcee3c40198a9796f15aa6b97f3cb8d7b3221482",
+        "exeSha256": "f9c2d06388523f7289451e6dd64e45b0421e7472953a350add61b326d254e160",
+        "gpu": {
+          "startIdleCelsius": 48,
+          "sampledTemperaturesCelsius": [
+            50,
+            66
+          ],
+          "sampledActiveGraphicsClockMedianMhz": 1785,
+          "sampledActiveMemoryClockMedianMhz": 10820,
+          "sampledPowerStates": {
+            "P4": 19,
+            "P2": 30
+          },
+          "samplesAtApproxFiveSeconds": 52
+        },
+        "rawFramesSha256": "716dc682e7ff5d299f98202a1adf756c7999f376cde79c1af89af139295b44ba",
+        "rawGpuSamplesSha256": "396fdcad0f0aa3c01c5d8722ddb600e89dcb07108b7ed0b32a7dd5f94a6cd6bc",
+        "unmatchedSamplingPerPhase": {
+          "room": {
+            "gpuMilliseconds": {
+              "median": 1.927968,
+              "p95": 3.28736
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8491,
+              "p95": 5.9026
+            }
+          },
+          "doorway-outbound": {
+            "gpuMilliseconds": {
+              "median": 1.558464,
+              "p95": 2.889824
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8404,
+              "p95": 5.9063
+            }
+          },
+          "stock-yard": {
+            "gpuMilliseconds": {
+              "median": 1.16272,
+              "p95": 2.552288
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8529,
+              "p95": 5.9066
+            }
+          },
+          "doorway-inbound": {
+            "gpuMilliseconds": {
+              "median": 1.811616,
+              "p95": 3.100832
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8402,
+              "p95": 5.904
+            }
+          }
+        }
+      },
+      "pairedPhases": {
+        "room": {
+          "matchedTickStates": 1502,
+          "controlTickStates": 1502,
+          "candidateTickStates": 1502,
+          "controlGpu": {
+            "medianMs": 2.326704,
+            "p95Ms": 2.995836
+          },
+          "candidateGpu": {
+            "medianMs": 1.928752,
+            "p95Ms": 2.587452
+          },
+          "gpuMedianRelativePercent": -17.103679711729548,
+          "controlCycle": {
+            "medianMs": 5.8408,
+            "p95Ms": 5.8866
+          },
+          "candidateCycle": {
+            "medianMs": 5.84385,
+            "p95Ms": 5.88639
+          }
+        },
+        "doorway-outbound": {
+          "matchedTickStates": 4708,
+          "controlTickStates": 4708,
+          "candidateTickStates": 4708,
+          "controlGpu": {
+            "medianMs": 1.651648,
+            "p95Ms": 2.4521
+          },
+          "candidateGpu": {
+            "medianMs": 1.463072,
+            "p95Ms": 2.2156664
+          },
+          "gpuMedianRelativePercent": -11.417444879296323,
+          "controlCycle": {
+            "medianMs": 5.8375,
+            "p95Ms": 5.8878
+          },
+          "candidateCycle": {
+            "medianMs": 5.83275,
+            "p95Ms": 5.8873
+          }
+        },
+        "stock-yard": {
+          "matchedTickStates": 2880,
+          "controlTickStates": 2880,
+          "candidateTickStates": 2880,
+          "controlGpu": {
+            "medianMs": 1.399808,
+            "p95Ms": 2.0761464
+          },
+          "candidateGpu": {
+            "medianMs": 1.164128,
+            "p95Ms": 1.8524848
+          },
+          "gpuMedianRelativePercent": -16.836594732991948,
+          "controlCycle": {
+            "medianMs": 5.84355,
+            "p95Ms": 5.889405
+          },
+          "candidateCycle": {
+            "medianMs": 5.8443,
+            "p95Ms": 5.889105
+          }
+        },
+        "doorway-inbound": {
+          "matchedTickStates": 4706,
+          "controlTickStates": 4706,
+          "candidateTickStates": 4707,
+          "controlGpu": {
+            "medianMs": 1.843856,
+            "p95Ms": 2.798276
+          },
+          "candidateGpu": {
+            "medianMs": 1.597872,
+            "p95Ms": 2.452096
+          },
+          "gpuMedianRelativePercent": -13.340738105361805,
+          "controlCycle": {
+            "medianMs": 5.8352,
+            "p95Ms": 5.8879
+          },
+          "candidateCycle": {
+            "medianMs": 5.8324,
+            "p95Ms": 5.8875
+          }
+        }
+      },
+      "finalFrame": {
+        "controlRgbSha256": "f01cf7a0483006af545d559209f9ddbd2a6068cbef43e2ac092c993f87bd46b9",
+        "candidateRgbSha256": "f01cf7a0483006af545d559209f9ddbd2a6068cbef43e2ac092c993f87bd46b9",
+        "differentPixelBounds": null
+      }
+    },
+    {
+      "backend": "RayQueryCompute",
+      "control": {
+        "durationSeconds": 234.879,
+        "fullRouteCompleted": true,
+        "returns": 2,
+        "completedFrames": 38645,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 0,
+        "shaderSha256": "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+        "exeSha256": "4d7733d2c6773f541a11abd1e6339ae1a7e42bd7b4486be7f5d6eec40e34c9b3",
+        "gpu": {
+          "startIdleCelsius": 57,
+          "sampledTemperaturesCelsius": [
+            57,
+            67
+          ],
+          "sampledActiveGraphicsClockMedianMhz": 1904.5,
+          "sampledActiveMemoryClockMedianMhz": 9001.0,
+          "sampledPowerStates": {
+            "P4": 31,
+            "P2": 17
+          },
+          "samplesAtApproxFiveSeconds": 52
+        },
+        "rawFramesSha256": "12c119bf61080e37c73780df3a1c63ccdb15149205e260db97519551bc4fa832",
+        "rawGpuSamplesSha256": "cbee22d54feb63c6baf64d2e791611be301a8b1fed34681bbdae78bac7cec474",
+        "unmatchedSamplingPerPhase": {
+          "room": {
+            "gpuMilliseconds": {
+              "median": 2.386496,
+              "p95": 3.716288
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8536,
+              "p95": 5.9085
+            }
+          },
+          "doorway-outbound": {
+            "gpuMilliseconds": {
+              "median": 1.8602400000000001,
+              "p95": 3.212864
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.84685,
+              "p95": 5.9061
+            }
+          },
+          "stock-yard": {
+            "gpuMilliseconds": {
+              "median": 1.444192,
+              "p95": 2.800032
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8582,
+              "p95": 5.9077
+            }
+          },
+          "doorway-inbound": {
+            "gpuMilliseconds": {
+              "median": 2.226944,
+              "p95": 3.508512
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8443,
+              "p95": 5.9075
+            }
+          }
+        }
+      },
+      "candidate": {
+        "durationSeconds": 234.877,
+        "fullRouteCompleted": true,
+        "returns": 2,
+        "completedFrames": 38645,
+        "simulationTicks": 14092,
+        "maximumPendingSimulationTicks": 0,
+        "shaderSha256": "52a70fc7cfaa8f2589d48d836bab4477339b5889ab486c67c90bce6def7c7ef2",
+        "exeSha256": "f9c2d06388523f7289451e6dd64e45b0421e7472953a350add61b326d254e160",
+        "gpu": {
+          "startIdleCelsius": 57,
+          "sampledTemperaturesCelsius": [
+            56,
+            66
+          ],
+          "sampledActiveGraphicsClockMedianMhz": 1785,
+          "sampledActiveMemoryClockMedianMhz": 10820,
+          "sampledPowerStates": {
+            "P4": 15,
+            "P5": 1,
+            "P2": 33
+          },
+          "samplesAtApproxFiveSeconds": 52
+        },
+        "rawFramesSha256": "6dbba873d56b9ff7df569f8dbff9fa4b59c13210a72fa6cfe29c9eaf2b3a1ebc",
+        "rawGpuSamplesSha256": "070a9711e742dbdff6a7b5a341f53e65c4adee844a0949f882005e7ec4e5a4d2",
+        "unmatchedSamplingPerPhase": {
+          "room": {
+            "gpuMilliseconds": {
+              "median": 1.97664,
+              "p95": 3.32768
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8526,
+              "p95": 5.907
+            }
+          },
+          "doorway-outbound": {
+            "gpuMilliseconds": {
+              "median": 1.5896,
+              "p95": 2.918496
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8415,
+              "p95": 5.905
+            }
+          },
+          "stock-yard": {
+            "gpuMilliseconds": {
+              "median": 1.17472,
+              "p95": 2.557024
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8527,
+              "p95": 5.9059
+            }
+          },
+          "doorway-inbound": {
+            "gpuMilliseconds": {
+              "median": 1.854832,
+              "p95": 3.1536
+            },
+            "nativeCycleMilliseconds": {
+              "median": 5.8408,
+              "p95": 5.9059
+            }
+          }
+        }
+      },
+      "pairedPhases": {
+        "room": {
+          "matchedTickStates": 1502,
+          "controlTickStates": 1502,
+          "candidateTickStates": 1502,
+          "controlGpu": {
+            "medianMs": 2.387504,
+            "p95Ms": 3.029116
+          },
+          "candidateGpu": {
+            "medianMs": 1.977104,
+            "p95Ms": 2.6403488
+          },
+          "gpuMedianRelativePercent": -17.189499996649214,
+          "controlCycle": {
+            "medianMs": 5.8473,
+            "p95Ms": 5.89109
+          },
+          "candidateCycle": {
+            "medianMs": 5.8459,
+            "p95Ms": 5.8889
+          }
+        },
+        "doorway-outbound": {
+          "matchedTickStates": 4707,
+          "controlTickStates": 4708,
+          "candidateTickStates": 4708,
+          "controlGpu": {
+            "medianMs": 1.706496,
+            "p95Ms": 2.5107456
+          },
+          "candidateGpu": {
+            "medianMs": 1.487968,
+            "p95Ms": 2.2371536
+          },
+          "gpuMedianRelativePercent": -12.805655565556561,
+          "controlCycle": {
+            "medianMs": 5.8399,
+            "p95Ms": 5.8885
+          },
+          "candidateCycle": {
+            "medianMs": 5.8336,
+            "p95Ms": 5.8885
+          }
+        },
+        "stock-yard": {
+          "matchedTickStates": 2880,
+          "controlTickStates": 2880,
+          "candidateTickStates": 2880,
+          "controlGpu": {
+            "medianMs": 1.444768,
+            "p95Ms": 2.1029784
+          },
+          "candidateGpu": {
+            "medianMs": 1.176096,
+            "p95Ms": 1.8461928
+          },
+          "gpuMedianRelativePercent": -18.59620368114465,
+          "controlCycle": {
+            "medianMs": 5.8496,
+            "p95Ms": 5.8915
+          },
+          "candidateCycle": {
+            "medianMs": 5.84635,
+            "p95Ms": 5.889905
+          }
+        },
+        "doorway-inbound": {
+          "matchedTickStates": 4707,
+          "controlTickStates": 4707,
+          "candidateTickStates": 4707,
+          "controlGpu": {
+            "medianMs": 1.909376,
+            "p95Ms": 2.8652864
+          },
+          "candidateGpu": {
+            "medianMs": 1.63312,
+            "p95Ms": 2.5000832
+          },
+          "gpuMedianRelativePercent": -14.46839176778173,
+          "controlCycle": {
+            "medianMs": 5.8371,
+            "p95Ms": 5.8892
+          },
+          "candidateCycle": {
+            "medianMs": 5.8318,
+            "p95Ms": 5.88807
+          }
+        }
+      },
+      "finalFrame": {
+        "controlRgbSha256": "8cf9fe34091746e95844f221abcb508686e0a75d917d80d75a5d0e96a1239527",
+        "candidateRgbSha256": "8cf9fe34091746e95844f221abcb508686e0a75d917d80d75a5d0e96a1239527",
+        "differentPixelBounds": null
+      }
+    }
+  ],
+  "matchedRouteTickSamples": {
+    "file": "windows-matched-route-ticks.csv.gz",
+    "uncompressedSha256": "cea03dfa891e5fde7004d3701c10a8f0e6e9ffece0a6d24c27f417776c857c1d"
+  }
+}
