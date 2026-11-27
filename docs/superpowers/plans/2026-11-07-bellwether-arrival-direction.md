@@ -665,6 +665,12 @@ The combined Windows Debug campaign captures the well from the walked route with
 
 The [T02 planting](../../../assets/models/world/source/bellwether-garden-v1/README.md) keeps two small beds centred on the mapped kitchen plots. The dry 1.32-metre aisle is accessible from the west stall approach. Raised timber edges use town collision. The foliage shares the existing alder material and is rendered as opaque leaves.
 
+[House A](../../../assets/models/world/source/bellwether-garden-house-v1/README.md)
+has a household washing place on the garden-facing wall. A tiled shelter
+covers the basin and draining bench, and its gutter empties into a barrel.
+The original stone entrance now stands at the mapped east door. That door
+stays latched. The path past the grate remains open to the kitchen plots.
+
 The combined Windows Debug campaign walks through the aisle, raises the lantern for a view of both beds and returns past the stall. Both hardware RT backends presented the garden. The private Android ARM64 Debug build contains the exact town mesh and crop asset. Physical phone performance remains open.
 
 ### Settled livestock south of the kitchen plots

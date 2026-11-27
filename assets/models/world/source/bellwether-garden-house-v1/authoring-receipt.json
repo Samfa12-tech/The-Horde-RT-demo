@@ -1,0 +1,28 @@
+{
+  "feature": "Garden-side household and mapped east door",
+  "originalTownSha256": "b38d8e63d2b227ea88c6ada22462ea8c98523827125e71dcc381447f48eb87c4",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "sources": {
+    "assets/models/world/source/bellwether-shell-v4/bellwether-shell-v4.blend": "a93583bbdcf4e84f90a58dd347ac025a3331b37671cefe47a89db59181802581",
+    "docs/references/horde-1.7/d37f1638/docs/design/world/connected/shared-coordinate-layout.json": "0a4da29bf8d988145c0f7b3f1c7afaf415a5da9b14c34bbd53bd1e00e3a86e59",
+    "assets/models/world/source/bellwether-shell-v2/authoring-receipt.json": "29b28ad491fd198c58aecd562d058ed1e3a5264fcab0ab4c97de732c3ee89ad1"
+  },
+  "runtimeTownSha256": "6ee344487c070e15b02b4e34b4746db8b5987627b9451e44368b0f1ad48744f5",
+  "eastEntranceXZ": [
+    43.3,
+    118.2
+  ],
+  "relocatedMasonryTriangles": 48,
+  "addedSolidTriangles": 3080,
+  "townVertices": 79168,
+  "townTriangles": 37040,
+  "recipeSha256": "8248772c786d78586991e52c5a84325e9f1b02848aecf3685c35cfecca373dc9",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "garden-house.blend": "985ce1b71f50c744025fe550a6afc2bf613c7acd69798e4236d97fec0747d744",
+    "garden-house.glb": "da05c11e6cc54c367446fc1bb75049af15e733a567d47d6d2dc786476177606f",
+    "bellwether-tavern-v1.glb": "6ee344487c070e15b02b4e34b4746db8b5987627b9451e44368b0f1ad48744f5",
+    "geometry.generated.h": "b50fa39a7b3b2401346e48607311db8461a7ea0069bd195b8257e5f44ed76aaf",
+    "asset.manifest.json": "197276301198633098052542d4100b50f9344876dadbd5c93db86e821ac347ae"
+  }
+}

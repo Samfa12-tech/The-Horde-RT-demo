@@ -367,6 +367,15 @@ int main(int argc,char** argv) {
                   follow(garden.back(),kBellwetherGardenAisle) && follow(kBellwetherGardenAisle,garden.back()) &&
                   follow(garden.back(),garden[1]) && follow(garden[1],garden[0]) && follow(garden[0],stall),
                   "the west stall connects to the dry garden aisle and view without crossing the raised beds");
+            check(follow(garden[1],kGardenHouseCorner) && follow(kGardenHouseCorner,kGardenHouseWashView) &&
+                  follow(kGardenHouseWashView,kGardenHouseCorner) && follow(kGardenHouseCorner,kGardenHouseDoorView) &&
+                  follow(kGardenHouseDoorView,kGardenHouseCorner) && follow(kGardenHouseCorner,garden[1]),
+                  "a grounded player can visit both cottage frontages and return around the grate");
+            // At the mapped height the east stone jamb stands proud of the wall.
+            // Its old position ahead of the solid north wall is clear.
+            check(!support->NonWalkableVolumeClear(43.42f,116.7f,43.42f,117.5f,-9.28f,-9.22f,.025f) &&
+                   support->NonWalkableVolumeClear(33.8f,112.065f,34.65f,112.065f,-9.28f,-9.22f,.025f),
+                  "House A's original surround belongs to the mapped east entrance only");
             constexpr auto gardenCentre=kBellwetherGardenCentre;
             const auto gardenGround=support->Query(gardenCentre[0],gardenCentre[1]);
             check(gardenGround.found && gardenGround.walkable &&

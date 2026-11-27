@@ -21,6 +21,10 @@ inline constexpr std::array kBellwetherWestApproach{
 inline constexpr std::array kBellwetherGardenApproach{
     BellwetherStation{48.f,134.4f}, BellwetherStation{43.f,134.9f}, BellwetherStation{39.5f,136.23f}};
 inline constexpr BellwetherStation kBellwetherGardenView{38.65f,138.48f};
+// The lane outside House A skirts the covered grate on its east side.
+inline constexpr BellwetherStation kGardenHouseCorner{43.8f,128.4f};
+inline constexpr BellwetherStation kGardenHouseWashView{37.3f,128.7f};
+inline constexpr BellwetherStation kGardenHouseDoorView{47.f,120.05f};
 inline constexpr auto kBellwetherStockApproach=[] {
     constexpr auto& points=bellwether::kBellwetherStockViewRoute;
     std::array<BellwetherStation,points.size()> route{};

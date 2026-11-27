@@ -1701,10 +1701,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = -.34f;
                         const bool presented = face(kBellwetherGardenCentre[0], kBellwetherGardenCentre[1]) &&
                             setInspectionLight(HeldLightPose::High) && frame() && capture("windows-combined-garden.png", false);
+                        input.pitchRadians = .05f;
+                        if (!check(presented && walkTo(approach.back()) && walkTo(approach[1]) &&
+                            walkTo(kGardenHouseCorner) && walkTo(kGardenHouseWashView) &&
+                            face(35.2f,124.9f) && frame() && capture("windows-combined-house-wash.png", false) &&
+                            walkTo(kGardenHouseCorner) && walkTo(kGardenHouseDoorView) &&
+                            face(43.3f,118.2f) && frame() && capture("windows-combined-house-door.png", false) &&
+                            walkTo(kGardenHouseCorner) && walkTo(approach[1]),
+                            "the west garden lane reaches the household wash place and closed east door and returns"))
+                            return false;
                         input.pitchRadians = previousPitch;
                         const auto& listen = kBellwetherGrateListenPoint;
                         const auto journalBoundary = ctx.simulation.CampaignBoundaryRevision();
-                        if (!check(presented && walkTo(approach.back()) && walkTo(kBellwetherGardenGrateApproach) &&
+                        if (!check(walkTo(approach.back()) && walkTo(kBellwetherGardenGrateApproach) &&
                             face(listen[0],listen[2]+2.f) && !state.gardenGrateTalkAvailable &&
                             state.chapterDialogue.line != Line::GardenGrateTalk,
                             "the dry garden route approaches the grate without starting speech when facing away"))
