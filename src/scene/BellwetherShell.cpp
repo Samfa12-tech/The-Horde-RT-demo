@@ -177,7 +177,8 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& support,
     std::string& diagnostic, assets::StaticMeshAsset* glazing, assets::StaticMeshAsset* archiveCover,
     assets::StaticMeshAsset* roadRegister, assets::StaticMeshAsset* southDoor,
-    BellwetherFurnitureDetail furnitureDetail, StaticMeshAsset* isolatedFurnitureTiers) {
+    BellwetherFurnitureDetail furnitureDetail, StaticMeshAsset* isolatedFurnitureTiers,
+    const assets::StaticMaterial* timberMaterialProvider) {
     if(!support) {
         diagnostic="Bellwether contact requires admitted chapter terrain.";return false;
     }
@@ -187,6 +188,15 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
     }
     constexpr std::array names{"HordeTownStone","HordeTownRoofClay","HordeTavernTimber","HordeHearthChar"};
     constexpr std::array families{"MedievalWall02","TombEarthenware","TombEarthenware","TombCharredWick"};
+    if(timberMaterialProvider && (timberMaterialProvider->name!="ChestWood" ||
+       timberMaterialProvider->baseColorTexture<0 || timberMaterialProvider->normalTexture<0 ||
+       timberMaterialProvider->ormTexture<0 || timberMaterialProvider->emissiveTexture>=0 ||
+       timberMaterialProvider->textureGroup<0 || timberMaterialProvider->deferTextureAllocation ||
+       timberMaterialProvider->transmissionFactor!=0.f ||
+       timberMaterialProvider->emissiveFactor!=std::array<float,3>{} ||
+       (timberMaterialProvider->flags&assets::kStaticMaterialCertifiedClosedVolume))) {
+        diagnostic="Bellwether timber requires the admitted opaque ChestWood texture provider.";return false;
+    }
     const auto dir=root/kTavernRuntimeDirectory;
     assets::AssetManifest manifest, glazingManifest, coverManifest, registerManifest, doorManifest;
     assets::StaticMeshAsset source, pane, cover, ledger, door;
@@ -232,13 +242,40 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
        std::any_of(door.materials.begin(),door.materials.end(),[](const auto& material) {
            return (material.name!="HordeTavernTimber" && material.name!="HordeHearthChar") ||
                   material.baseColorTexture>=0 || material.normalTexture>=0 || material.ormTexture>=0 ||
-                  material.emissiveTexture>=0 || material.transmissionFactor!=0;
+                  material.emissiveTexture>=0 || material.transmissionFactor!=0.f;
        })) {
         diagnostic="Bellwether south door requires a local-space timber leaf with opaque fittings.";return false;
+    }
+    if(timberMaterialProvider) {
+        for(auto& material:door.materials)if(material.name==kTavernTimber) {
+            const auto name=material.name;
+            material=*timberMaterialProvider;
+            material.name=name;
+        }
+    }
+    if(std::any_of(door.materials.begin(),door.materials.end(),[timberMaterialProvider](const auto& material) {
+        const bool timber=material.name==kTavernTimber;
+        return material.transmissionFactor!=0.f ||
+            (!timber || !timberMaterialProvider) &&
+                (material.baseColorTexture>=0 || material.normalTexture>=0 || material.ormTexture>=0 ||
+                 material.emissiveTexture>=0);
+    })) {
+        diagnostic="Bellwether south door materials must preserve opaque fittings and the admitted timber maps.";return false;
     }
     std::array<std::uint32_t,names.size()> mappedRows{};
     std::array<bool,names.size()> seen{};
     std::array<bool,names.size()> wood{};
+    auto stagedMaterials=world.materials;
+    if(timberMaterialProvider) {
+        if(std::any_of(stagedMaterials.begin(),stagedMaterials.end(),[](const auto& material) {
+            return material.name==kTavernTimber;
+        })) {
+            diagnostic="Bellwether timber provider row already exists in the world owner.";return false;
+        }
+        auto timber=*timberMaterialProvider;
+        timber.name=std::string(kTavernTimber);
+        stagedMaterials.push_back(std::move(timber));
+    }
     for(std::size_t i=0;i<names.size();++i) {
         const auto& m=source.materials[i];
         const auto named=std::find(names.begin(),names.end(),m.name);
@@ -248,13 +285,14 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
             diagnostic="Bellwether source requests unadmitted material or light features.";return false;
         }
         const auto index=static_cast<std::size_t>(named-names.begin());
-        const auto found=std::find_if(world.materials.begin(),world.materials.end(),
-            [&](const auto& material){return material.name==families[index];});
-        if(seen[index] || found==world.materials.end()) {
+        const auto rowName=index==2u && timberMaterialProvider ? kTavernTimber : families[index];
+        const auto found=std::find_if(stagedMaterials.begin(),stagedMaterials.end(),
+            [&](const auto& material){return material.name==rowName;});
+        if(seen[index] || found==stagedMaterials.end()) {
             diagnostic="Bellwether requires each authored finish and its existing material row.";return false;
         }
         seen[index]=true;
-        mappedRows[i]=static_cast<std::uint32_t>(found-world.materials.begin());
+        mappedRows[i]=static_cast<std::uint32_t>(found-stagedMaterials.begin());
         wood[i]=index>=2;
     }
     using Surface=gameplay::simulation::TriangleSupportSurface;
@@ -307,6 +345,7 @@ bool AppendBellwetherShell(const std::filesystem::path& root, assets::StaticMesh
         return false;
 
     auto staged=world;
+    staged.materials=std::move(stagedMaterials);
     const auto vertices=static_cast<std::uint32_t>(staged.vertices.size());
     const auto indices=static_cast<std::uint32_t>(staged.indices.size());
     const auto transforms=static_cast<std::uint32_t>(staged.nodeTransforms.size());

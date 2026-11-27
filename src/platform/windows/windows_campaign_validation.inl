@@ -1613,6 +1613,27 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     input.yawRadians = std::atan2(x - state.playerX, state.playerZ - z);
                     return step() && frame();
                 };
+                if (progressed && gBellwetherPreparationsValidation) {
+                    const bool legalView=atHearth() && town() &&
+                        std::abs(state.playerX-kConversation[0])<.14f &&
+                        std::abs(state.playerSupportWorldY-kConversation[1])<.01f &&
+                        std::abs(state.playerZ-kConversation[2])<.14f;
+                    const float previousPitch=input.pitchRadians;
+                    input.pitchRadians=-.32f;
+                    const bool presented=legalView && face(kTableTop[0],kTableTop[2]) &&
+                        std::abs(state.playerX-kConversation[0])<.14f &&
+                        std::abs(state.playerZ-kConversation[2])<.14f &&
+                        capture("windows-combined-tavern-table.png",true,true);
+                    progressed=check(presented,
+                        "the occupied tavern presents the hearth table from the conversation mark");
+                    input.pitchRadians=-.17f;
+                    progressed=progressed && check(walkTo({kConversation[0],kKeeperHearth[2]+.30f}) && town() &&
+                        face(kTableTop[0]+.14f,kTableTop[2]-.58f) &&
+                        capture("windows-combined-tavern-dresser.png",true,true) &&
+                        walkTo({kConversation[0],kConversation[2]}) && atHearth(),
+                        "the keeper's serving dresser is visible from the aisle and the player returns to Kit");
+                    input.pitchRadians=previousPitch;
+                }
                 const auto interact = [&] {
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
@@ -1953,6 +1974,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),
                                 static_cast<int>(quote.size())) > 0 && std::string_view(quote.data()) == sellText &&
                             interact() && state.ordinarySilverAction == OrdinarySilverAction::Sold &&
+                            ctx.rtScene.PrefetchedChapterResidentId(1) == kRecordKeeperActorId &&
                             !state.HasChapterInteractPrompt() && frame() && !ctx.tavernInteractionPromptPresented &&
                             interact() && state.treasurePurse.coins == price &&
                             savedSilver(OrdinarySilverProgress::Sold, price, false) &&

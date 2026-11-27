@@ -22,6 +22,7 @@
 #include "../../assets/models/world/source/bellwether-tavern-rail-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-garden-house-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-well-apron-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-hearth-service-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
@@ -35,7 +36,8 @@ inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kMillTallySolidTriangles+gameplay::bellwether::kBellwetherStockSolidTriangles+
     gameplay::bellwether::kMillBenchLampSolidTriangles+gameplay::bellwether::kSquareFrontageSolidTriangles+
     gameplay::bellwether::kWestTradeSolidTriangles+gameplay::bellwether::kTavernRailSolidTriangles+
-    gameplay::bellwether::kGardenHouseSolidTriangles+gameplay::bellwether::kWellApronSolidTriangles;
+    gameplay::bellwether::kGardenHouseSolidTriangles+gameplay::bellwether::kWellApronSolidTriangles+
+    gameplay::bellwether::kTavernServiceSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=
@@ -61,7 +63,8 @@ bool AppendBellwetherShell(const std::filesystem::path& assetsRoot,
     assets::StaticMeshAsset* roadRegister = nullptr,
     assets::StaticMeshAsset* southDoor = nullptr,
     BellwetherFurnitureDetail furnitureDetail = BellwetherFurnitureDetail::Near,
-    assets::StaticMeshAsset* isolatedFurnitureTiers = nullptr);
+    assets::StaticMeshAsset* isolatedFurnitureTiers = nullptr,
+    const assets::StaticMaterial* timberMaterialProvider = nullptr);
 // Soft crop foliage reuses the deferred ForestAlder atlas family and creates no contact geometry.
 bool AppendBellwetherGardenCrops(const std::filesystem::path& assetsRoot,
     assets::StaticMeshAsset& world, std::string& diagnostic);

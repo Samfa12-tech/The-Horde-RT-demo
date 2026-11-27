@@ -501,6 +501,24 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     const StaticMeshAsset* furnitureOwner = furniture;
     StaticMeshAsset worldWithFurniture;
     std::uint32_t furnitureOffset = 0;
+    std::array<StaticRtMaterialAlias,1> worldTimberAliases{};
+    const auto chestWoodMaterial = std::find_if(gothicChestBaseAsset_.materials.begin(),gothicChestBaseAsset_.materials.end(),
+        [](const auto& material) { return material.name=="ChestWood"; });
+    const auto worldTimberMaterial = std::find_if(world->materials.begin(),world->materials.end(),
+        [](const auto& material) { return material.name=="HordeTavernTimber"; });
+    const bool hasTownSource=std::any_of(world->nodeTransforms.begin(),world->nodeTransforms.end(),[](const auto& node) {
+        return node.name=="BellwetherSolid";
+    });
+    if(developmentRescueJourney_ && hasTownSource &&
+       (chestWoodMaterial==gothicChestBaseAsset_.materials.end() ||
+       worldTimberMaterial==world->materials.end())) {
+        diagnostic="Bellwether timber lost its ChestWood provider or world material row.";return false;
+    }
+    const bool hasWorldTimberTextureAlias = developmentRescueJourney_ && hasTownSource;
+    if(hasWorldTimberTextureAlias) {
+        worldTimberAliases[0]={static_cast<std::uint32_t>(worldTimberMaterial-world->materials.begin()),
+            &gothicChestBaseAsset_,static_cast<std::uint32_t>(chestWoodMaterial-gothicChestBaseAsset_.materials.begin())};
+    }
     if (bellwetherFurnitureWarmStart_) {
         // The authored tiers use the existing world timber. Keep their own
         // BLAS ranges and instance identity while sharing that source and row.
@@ -567,6 +585,15 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     registrations.push_back({kCollapseInstanceIndex, 0x434f4c4cu,
         static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
         world});
+    if(hasWorldTimberTextureAlias) {
+        const auto collapse=std::find_if(registrations.begin(),registrations.end(),[](const auto& row) {
+            return row.instanceCustomIndex==kCollapseInstanceIndex;
+        });
+        if(collapse==registrations.end()) {
+            diagnostic="Bellwether timber lost its shared world registration.";return false;
+        }
+        collapse->immutableMaterialAliases=worldTimberAliases;
+    }
     // Player Rag torch gets its own metadata/material route. The original
     // production torch remains layer1 for permanent Keeper/world instances.
     registrations.push_back({kPlayerTorchInstanceIndex, 0x544f5243u,
@@ -630,9 +657,20 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
     if (!waysideRegisterAsset_.primitives.empty())
         registrations.push_back({kWaysideRegisterMetadataIndex, 0x42303952u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &waysideRegisterAsset_});
-    if (!tavernDoorAsset_.primitives.empty())
-        registrations.push_back({kTavernDoorMetadataIndex, 0x42303144u,
-            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &tavernDoorAsset_});
+    std::array<StaticRtMaterialAlias,1> tavernDoorTimberAlias{};
+    if (!tavernDoorAsset_.primitives.empty()) {
+        const auto doorTimber=std::find_if(tavernDoorAsset_.materials.begin(),tavernDoorAsset_.materials.end(),
+            [](const auto& material) { return material.name=="HordeTavernTimber"; });
+        if(doorTimber==tavernDoorAsset_.materials.end() || chestWoodMaterial==gothicChestBaseAsset_.materials.end()) {
+            diagnostic="Bellwether south door lost its timber or ChestWood provider material.";return false;
+        }
+        tavernDoorTimberAlias[0]={static_cast<std::uint32_t>(doorTimber-tavernDoorAsset_.materials.begin()),
+            &gothicChestBaseAsset_,static_cast<std::uint32_t>(chestWoodMaterial-gothicChestBaseAsset_.materials.begin())};
+        StaticRtAssetRegistration door{kTavernDoorMetadataIndex,0x42303144u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr),0u,&tavernDoorAsset_};
+        door.immutableMaterialAliases=tavernDoorTimberAlias;
+        registrations.push_back(door);
+    }
     if (!millDriveAsset_.primitives.empty()) {
         StaticRtAssetRegistration drive{kMillDriveMetadataIndex, 0x42303547u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u,
@@ -646,11 +684,22 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         waterwheel.primitiveCount = kMillWaterwheelPrimitiveCount;
         registrations.push_back(waterwheel);
     }
+    std::array<StaticRtMaterialAlias,1> furnitureTimberAlias{};
     if (!furniture->primitives.empty()) {
         StaticRtAssetRegistration tiers{kBellwetherFurnitureLane, 0x42303146u,
             static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, furnitureOwner};
         tiers.primitiveOffset = furnitureOffset;
         if (furnitureOffset) tiers.primitiveCount = static_cast<std::uint32_t>(furniture->primitives.size());
+        if(!furnitureOffset) {
+            const auto furnitureTimber=std::find_if(furniture->materials.begin(),furniture->materials.end(),
+                [](const auto& material) { return material.name=="HordeTavernTimber"; });
+            if(furnitureTimber==furniture->materials.end() || chestWoodMaterial==gothicChestBaseAsset_.materials.end()) {
+                diagnostic="Bellwether furniture tiers lost their timber or ChestWood provider material.";return false;
+            }
+            furnitureTimberAlias[0]={static_cast<std::uint32_t>(furnitureTimber-furniture->materials.begin()),
+                &gothicChestBaseAsset_,static_cast<std::uint32_t>(chestWoodMaterial-gothicChestBaseAsset_.materials.begin())};
+            tiers.immutableMaterialAliases=furnitureTimberAlias;
+        }
         registrations.push_back(tiers);
     }
     if (!privyRagAsset_.primitives.empty())
@@ -708,16 +757,6 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
         aliases[2].provider = aliases[0].provider;
         aliases[3].provider = aliases[1].provider;
         if (!out.ShareImmutableMaterialRows(aliases, diagnostic)) return false;
-        if(!furnitureOffset && !furniture->primitives.empty()) {
-            RtImmutableMaterialAlias furniture;
-            const auto& metadata=out.InstanceMetadata()[kBellwetherFurnitureLane];
-            furniture.consumer=out.PrimitiveMetadata()[metadata.primitiveBase].materialIndex;
-            if(!materialRow(collapseStaticAsset_,kCollapseInstanceIndex,0u,
-                bellwetherFurnitureAsset_.materials.front().name.c_str(),furniture.provider)) {
-                diagnostic="Bellwether furniture requires the existing world timber finish.";return false;
-            }
-            if(!out.ShareImmutableMaterialRows(std::span{&furniture,1u},diagnostic))return false;
-        }
     }
     return true;
 }

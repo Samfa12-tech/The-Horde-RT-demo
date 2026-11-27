@@ -1245,3 +1245,7 @@ Samfa12/Codex modeled the eight worn flagstones between the water bench,
 the public lane and the south tavern ramp. They use Bellwether's existing
 stone material. The [editable source and export receipt](assets/models/world/source/bellwether-well-apron-v1/README.md)
 record their original layout and the town and terrain they fit.
+
+## Bellwether hearth service - 27 November 2026
+
+Samfa12/Codex modeled the tavern's water jug, beakers, trencher, serving dresser, platters and storage crock in Blender. The timber uses the original Horde chest-wood base colour, normal and ORM maps recorded with the Bellwether waterwheel. The clay uses the existing earthenware surface. The [editable source and receipt](assets/models/world/source/bellwether-hearth-service-v1/README.md) record their origin and placement.

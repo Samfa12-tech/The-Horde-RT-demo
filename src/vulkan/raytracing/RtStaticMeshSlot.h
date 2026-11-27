@@ -14,6 +14,13 @@
 namespace horde::vulkan::raytracing
 {
 
+struct StaticRtMaterialAlias
+{
+    std::uint32_t consumerMaterialIndex = 0u;
+    const horde::scene::assets::StaticMeshAsset* providerAsset = nullptr;
+    std::uint32_t providerMaterialIndex = 0u;
+};
+
 struct StaticRtAssetRegistration
 {
     std::uint32_t instanceCustomIndex = 0u;
@@ -37,6 +44,12 @@ struct StaticRtAssetRegistration
     // mutually exclusive with the contiguous range, immutable StaticPbr only.
     // The legacy packer rejects this rather than silently ignoring selection.
     std::span<const std::uint32_t> primitiveSelection{};
+    // Per-material immutable bindings for a mixed owner. Consumer and provider
+    // convert to byte-identical GPU records; the consumer primitive maps
+    // directly to that provider row during admission. Providers must be earlier,
+    // self-owning assets and consumers must be StaticPbr-only.
+    // Borrowed only for the synchronous Initialize/InitializeSelectedGeometry call.
+    std::span<const StaticRtMaterialAlias> immutableMaterialAliases{};
 };
 
 struct RtImmutableMaterialAlias

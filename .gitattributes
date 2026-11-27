@@ -588,3 +588,6 @@ assets/models/world/source/bellwether-well-apron-v1/layout.json text eol=lf
 assets/models/world/source/bellwether-well-apron-v1/authoring-receipt.json text eol=lf
 assets/models/world/source/bellwether-well-apron-v1/geometry.generated.h text eol=lf
 assets/models/world/source/bellwether-well-apron-v1/README.md text eol=lf
+tools/author-bellwether-hearth-service.py text eol=lf
+assets/models/world/source/bellwether-hearth-service-v1/geometry.generated.h text eol=lf
+assets/models/world/source/bellwether-hearth-service-v1/authoring-receipt.json text eol=lf

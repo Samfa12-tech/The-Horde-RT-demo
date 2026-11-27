@@ -13,6 +13,7 @@
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "scene/assets/WorldTriangleKey.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
+#include "../assets/models/world/source/bellwether-hearth-service-v1/geometry.generated.h"
 #include <algorithm>
 #include <cstring>
 #include <cmath>
@@ -765,6 +766,34 @@ int main(int argc,char** argv) {
         check(exactHorizontalFace(kChairSeat) && exactHorizontalFace(kTableTop) &&
               std::abs(support->Query(kChairSeat[0],kChairSeat[2]).worldY-after.worldY)<.001f,
             "the authored contact marks match the seat and table surfaces above the shared floor");
+        const auto horizontalContact=[&](const auto& mark,float halfSpan,float height) {
+            return !support->NonWalkableVolumeClear(mark[0]-halfSpan,mark[2],mark[0]+halfSpan,mark[2],
+                mark[1]+height-.004f,mark[1]+height+.004f,.008f);
+        };
+        check(horizontalContact(kTavernJugBase,.12f,.13f) &&
+              horizontalContact(kTavernBeakerBase,.07f,.08f) &&
+              horizontalContact(kTavernTrencherBase,.16f,.03f) &&
+              std::abs(kTavernJugBase[1]-kTableTop[1])<.001f &&
+              std::abs(kTavernBeakerBase[1]-kTableTop[1])<.001f &&
+              std::abs(kTavernTrencherBase[1]-kTableTop[1])<.001f &&
+              support->NonWalkableVolumeClear(kTavernJugBase[0]-.12f,kTavernJugBase[2],
+                  kTavernJugBase[0]+.12f,kTavernJugBase[2],kTavernJugBase[1]+.335f,
+                  kTavernJugBase[1]+.35f,.012f),
+            "the jug, beaker and trencher intersect their authored tabletop placement while the jug clears overhead");
+        constexpr float dresserAisleZ=104.80f;
+        check(!support->NonWalkableVolumeClear(kTavernDresserTop[0],kTavernDresserTop[2],
+                  kTavernDresserTop[0],kTavernDresserTop[2],kTavernDresserTop[1]-.06f,
+                  kTavernDresserTop[1]+.06f,.008f) &&
+              !support->NonWalkableVolumeClear(kTavernDresserFoot[0]-.08f,kTavernDresserFoot[2],
+                  kTavernDresserFoot[0]+.08f,kTavernDresserFoot[2],kTavernDresserFoot[1]+.28f,
+                  kTavernDresserFoot[1]+.34f,.008f) &&
+              support->NonWalkableVolumeClear(83.50f,dresserAisleZ,85.30f,dresserAisleZ,
+                  after.worldY+.05f,after.worldY+1.80f,horde::gameplay::kPlayerCollisionRadius),
+            "the north dresser top and front leg occupy their authored positions while its full front aisle clears a player capsule");
+        check(support->NonWalkableVolumeClear(kConversation[0],kConversation[2],
+                  kConversation[0],kConversation[2],after.worldY+.05f,after.worldY+1.80f,
+                  horde::gameplay::kPlayerCollisionRadius),
+            "the legal conversation mark retains a clear first-person standing volume");
         check(support->NonWalkableVolumeClear(kChairTurn[0],kChairTurn[2],kChairApproach[0],kChairApproach[2],
                   after.worldY+.001f,after.worldY+1.8f,.24f) &&
               !support->NonWalkableVolumeClear(kChairApproach[0],kChairApproach[2],kChairSeat[0],kChairSeat[2],

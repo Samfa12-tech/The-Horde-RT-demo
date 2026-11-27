@@ -422,7 +422,9 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
         }
     }
     std::vector<StaticRtAssetRegistration> packed(registrations.begin(), registrations.end());
-    for (auto& registration : packed) {
+    std::vector<std::vector<StaticRtMaterialAlias>> materialAliasStorage(packed.size());
+    for (std::size_t registrationIndex=0;registrationIndex<packed.size();++registrationIndex) {
+        auto& registration=packed[registrationIndex];
         const auto selection = find(registration.asset);
         const bool listed = !registration.primitiveSelection.empty();
         const auto oldOffset = listed ? registration.primitiveSelection.front() : registration.primitiveOffset;
@@ -443,6 +445,16 @@ bool RtStaticMeshSlot::InitializeSelectedGeometry(
             const auto provider = find(registration.textureSource);
             if (provider == selections.end()) return reject("texture provider is not registered.");
             registration.textureSource = provider->complete ? provider->source : &provider->payload;
+        }
+        if(!registration.immutableMaterialAliases.empty()) {
+            auto& aliases=materialAliasStorage[registrationIndex];
+            aliases.assign(registration.immutableMaterialAliases.begin(),registration.immutableMaterialAliases.end());
+            for(auto& alias:aliases) {
+                const auto provider=find(alias.providerAsset);
+                if(provider==selections.end())return reject("material texture provider is not registered.");
+                alias.providerAsset=provider->complete ? provider->source : &provider->payload;
+            }
+            registration.immutableMaterialAliases=aliases;
         }
     }
     RtStaticMeshSlot candidate;
@@ -482,6 +494,8 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         firstRegistrationIndex;
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*,
                        const horde::scene::assets::StaticMeshAsset*> textureSources;
+    std::unordered_map<const horde::scene::assets::StaticMeshAsset*,
+                       std::vector<const StaticRtMaterialAlias*>> immutableMaterialAliases;
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*, RtGeometryRole>
         geometryRoles;
     const horde::scene::assets::StaticMeshAsset* worldBodyAsset = nullptr;
@@ -606,6 +620,80 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 return false;
             }
         }
+        if (!registration.immutableMaterialAliases.empty())
+        {
+            if (registration.textureSource != nullptr || registration.geometryRole!=RtGeometryRole::Static ||
+                !(registration.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+                (registration.flags&static_cast<std::uint32_t>(RtInstanceFlag::Transmissive)))
+            {
+                diagnostic = "RtStaticMeshSlot immutable material aliases require self-owned StaticPbr consumers.";
+                return false;
+            }
+            const auto [aliases, insertedAliases] = immutableMaterialAliases.emplace(
+                registration.asset,
+                std::vector<const StaticRtMaterialAlias*>(registration.asset->materials.size(),nullptr));
+            if (!insertedAliases)
+            {
+                diagnostic = "RtStaticMeshSlot repeated asset registration duplicates material texture aliases.";
+                return false;
+            }
+            for(const auto& owner:registrations)if(owner.asset==registration.asset &&
+                (owner.geometryRole!=RtGeometryRole::Static ||
+                 !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+                 (owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::Transmissive)))) {
+                diagnostic="RtStaticMeshSlot immutable material aliases cannot include a mutable or transmissive owner.";
+                return false;
+            }
+            for (const auto& alias : registration.immutableMaterialAliases)
+            {
+                if (alias.consumerMaterialIndex >= registration.asset->materials.size() ||
+                    alias.consumerMaterialIndex >= aliases->second.size() ||
+                    aliases->second[alias.consumerMaterialIndex] || alias.providerAsset == nullptr)
+                {
+                    diagnostic = "RtStaticMeshSlot material texture alias has an invalid or duplicate consumer.";
+                    return false;
+                }
+                aliases->second[alias.consumerMaterialIndex]=&alias;
+                const auto providerFirst = firstRegistrationIndex.find(alias.providerAsset);
+                const auto providerSource = textureSources.find(alias.providerAsset);
+                if (providerFirst == firstRegistrationIndex.end() || providerFirst->second >= registrationIndex ||
+                    providerSource == textureSources.end() || providerSource->second != nullptr)
+                {
+                    diagnostic = "RtStaticMeshSlot material texture provider must be an earlier self-owning asset.";
+                    return false;
+                }
+                for(const auto& owner:registrations)if(owner.asset==alias.providerAsset) {
+                    if(!owner.immutableMaterialAliases.empty()) {
+                        diagnostic="RtStaticMeshSlot immutable material alias chains are not permitted.";
+                        return false;
+                    }
+                    if(owner.geometryRole!=RtGeometryRole::Static ||
+                       !(owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr)) ||
+                       (owner.flags&static_cast<std::uint32_t>(RtInstanceFlag::Transmissive))){
+                        diagnostic="RtStaticMeshSlot immutable material provider has a mutable or transmissive owner.";
+                        return false;
+                    }
+                }
+                if (alias.providerMaterialIndex >= alias.providerAsset->materials.size())
+                {
+                    diagnostic = "RtStaticMeshSlot material texture provider row is outside its asset.";
+                    return false;
+                }
+                const auto& consumer = registration.asset->materials[alias.consumerMaterialIndex];
+                const auto& provider = alias.providerAsset->materials[alias.providerMaterialIndex];
+                const std::array<bool, 4u> consumerMaps{{consumer.baseColorTexture >= 0,
+                    consumer.normalTexture >= 0, consumer.ormTexture >= 0, consumer.emissiveTexture >= 0}};
+                const std::array<bool, 4u> providerMaps{{provider.baseColorTexture >= 0,
+                    provider.normalTexture >= 0, provider.ormTexture >= 0, provider.emissiveTexture >= 0}};
+                if (consumer.deferTextureAllocation || provider.deferTextureAllocation ||
+                    consumer.textureGroup < 0 || consumer.textureGroup != provider.textureGroup ||
+                    consumerMaps != providerMaps)
+                {
+                    diagnostic = "RtStaticMeshSlot material texture alias must match a resident provider group and map presence.";
+                    return false;
+                }
+            }
+        }
         if (std::find(uniqueAssets.begin(), uniqueAssets.end(), registration.asset) == uniqueAssets.end())
             uniqueAssets.push_back(registration.asset);
     }
@@ -626,6 +714,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
     };
     std::unordered_map<const horde::scene::assets::StaticMeshAsset*, AssetRoute> routes;
+    std::unordered_map<const horde::scene::assets::StaticMeshAsset*, std::vector<std::uint32_t>> packedMaterialRows;
     std::array<std::uint32_t, 4u> nextTextureLayers{};
     struct DeferredGroup {
         std::array<bool,4u> present{};
@@ -664,12 +753,6 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                          std::to_string(kRtPrimitiveMetadataCapacity) + "." + requiredRoster();
             return false;
         }
-        if (materials_.size() + asset.materials.size() > kRtMaterialCapacity)
-        {
-            diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed " +
-                         std::to_string(kRtMaterialCapacity) + "." + requiredRoster();
-            return false;
-        }
         if (roleVertices->size() + asset.vertices.size() > std::numeric_limits<std::uint32_t>::max() ||
             indices_.size() + asset.indices.size() > std::numeric_limits<std::uint32_t>::max())
         {
@@ -678,7 +761,6 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         }
         const std::uint32_t vertexBase = static_cast<std::uint32_t>(roleVertices->size());
         const std::uint32_t indexBase = static_cast<std::uint32_t>(indices_.size());
-        const std::uint32_t materialBase = static_cast<std::uint32_t>(materials_.size());
         const std::uint32_t primitiveBase = static_cast<std::uint32_t>(primitiveMetadata_.size());
         roleVertices->insert(roleVertices->end(), asset.vertices.begin(), asset.vertices.end());
         indices_.insert(indices_.end(), asset.indices.begin(), asset.indices.end());
@@ -688,6 +770,11 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
         std::map<std::int32_t, std::array<bool, 4u>> groupPresence;
         std::map<std::int32_t, std::array<std::uint32_t, 4u>> groupLayers;
         const auto textureSource = textureSources.at(uniqueAssets[assetIndex]);
+        const auto aliasesForAsset = immutableMaterialAliases.find(&asset);
+        const auto isMaterialTextureAliased = [&](std::size_t materialIndex) {
+            return aliasesForAsset != immutableMaterialAliases.end() &&
+                materialIndex<aliasesForAsset->second.size() && aliasesForAsset->second[materialIndex]!=nullptr;
+        };
         if (textureSource != nullptr)
         {
             const auto sourceRoute = routes.find(textureSource);
@@ -705,8 +792,10 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             // Explicit asset-local groups are allocated canonically before the
             // ordinary per-texture routes. Visibility-only material duplication
             // cannot exchange body/gauntlet atlas layers by changing material order.
-            for (const auto& material : asset.materials)
+            for (std::size_t materialIndex = 0u; materialIndex < asset.materials.size(); ++materialIndex)
             {
+                const auto& material = asset.materials[materialIndex];
+                if (isMaterialTextureAliased(materialIndex)) continue;
                 if(material.deferTextureAllocation && material.textureGroup<0) {
                     diagnostic="RtStaticMeshSlot deferred texture material requires an explicit group.";
                     return false;
@@ -773,10 +862,38 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             layer = entry->second;
             return true;
         };
-        for (const auto& sourceMaterial : asset.materials)
+        std::vector<std::uint32_t> assetMaterialRows;
+        assetMaterialRows.reserve(asset.materials.size());
+        for (std::size_t materialIndex = 0u; materialIndex < asset.materials.size(); ++materialIndex)
         {
+            const auto& sourceMaterial = asset.materials[materialIndex];
             std::array<std::uint32_t, 4u> layers{};
-            if (textureSource != nullptr)
+            const auto* materialAlias = aliasesForAsset!=immutableMaterialAliases.end() &&
+                materialIndex<aliasesForAsset->second.size() ? aliasesForAsset->second[materialIndex] : nullptr;
+            if (materialAlias)
+            {
+                const auto& alias = *materialAlias;
+                const auto providerRoute = routes.find(alias.providerAsset);
+                if (providerRoute == routes.end())
+                {
+                    diagnostic = "RtStaticMeshSlot material texture provider route is not resident before its consumer.";
+                    return false;
+                }
+                const auto& providerMaterial = alias.providerAsset->materials[alias.providerMaterialIndex];
+                const std::array<bool, 4u> present{{sourceMaterial.baseColorTexture >= 0,
+                    sourceMaterial.normalTexture >= 0, sourceMaterial.ormTexture >= 0,
+                    sourceMaterial.emissiveTexture >= 0}};
+                const auto presence = providerRoute->second.groupPresence.find(providerMaterial.textureGroup);
+                const auto route = providerRoute->second.groupLayers.find(providerMaterial.textureGroup);
+                if (presence == providerRoute->second.groupPresence.end() ||
+                    route == providerRoute->second.groupLayers.end() || presence->second != present)
+                {
+                    diagnostic = "RtStaticMeshSlot material texture alias provider group is absent or changed.";
+                    return false;
+                }
+                layers = route->second;
+            }
+            else if (textureSource != nullptr)
             {
                 const auto provider=std::find(uniqueAssets.begin(),uniqueAssets.end(),textureSource);
                 if(sourceMaterial.deferTextureAllocation ||
@@ -835,8 +952,32 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
             }
             if(sourceMaterial.deferTextureAllocation)
                 deferredGroups.at({assetIndex,sourceMaterial.textureGroup}).materialIndices.push_back(materials_.size());
-            materials_.push_back(ConvertMaterial(sourceMaterial, layers));
+            const auto converted=ConvertMaterial(sourceMaterial,layers);
+            if(materialAlias) {
+                const auto providerRows=packedMaterialRows.find(materialAlias->providerAsset);
+                if(providerRows==packedMaterialRows.end() ||
+                   materialAlias->providerMaterialIndex>=providerRows->second.size()) {
+                    diagnostic="RtStaticMeshSlot immutable material provider row is not packed before its consumer.";
+                    return false;
+                }
+                const auto providerRow=providerRows->second[materialAlias->providerMaterialIndex];
+                if(providerRow>=materials_.size() ||
+                   std::memcmp(&converted,&materials_[providerRow],sizeof(RtMaterialGpu))!=0) {
+                    diagnostic="RtStaticMeshSlot immutable material alias must match every converted GPU field and texture route.";
+                    return false;
+                }
+                assetMaterialRows.push_back(providerRow);
+            }else {
+                if(materials_.size()>=kRtMaterialCapacity) {
+                    diagnostic = "RtStaticMeshSlot capacity overflow: materials exceed " +
+                        std::to_string(kRtMaterialCapacity) + "." + requiredRoster();
+                    return false;
+                }
+                assetMaterialRows.push_back(static_cast<std::uint32_t>(materials_.size()));
+                materials_.push_back(converted);
+            }
         }
+        packedMaterialRows.emplace(&asset,std::move(assetMaterialRows));
         for (std::size_t primitiveIndex = 0u;
              primitiveIndex < asset.primitives.size(); ++primitiveIndex)
         {
@@ -872,7 +1013,7 @@ bool RtStaticMeshSlot::Initialize(std::span<const StaticRtAssetRegistration> reg
                 vertexBase + primitive.vertexOffset,
                 indexBase + primitive.indexOffset,
                 primitive.indexCount,
-                materialBase + primitive.materialIndex});
+                packedMaterialRows.at(&asset)[primitive.materialIndex]});
             primitiveVertexCounts_.push_back(vertexEnd - primitive.vertexOffset);
             geometryTransforms_.push_back({{
                 1.0f, 0.0f, 0.0f, 0.0f,

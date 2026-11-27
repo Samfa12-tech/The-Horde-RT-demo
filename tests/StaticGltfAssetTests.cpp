@@ -952,6 +952,62 @@ void TestSharedTextureSourceRouting()
               std::string(label) + ": " + diagnostic);
     };
 
+    using horde::vulkan::raytracing::RtInstanceFlag;
+    using horde::vulkan::raytracing::StaticRtMaterialAlias;
+    constexpr auto opaque = static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr);
+    auto mixedAsset = viewmodel;
+    mixedAsset.materials[0] = world.materials[0];
+    mixedAsset.materials[0].name = "Borrowed wood";
+    const std::array oneMaterial{StaticRtMaterialAlias{0u, &world, 0u}};
+    auto provider = worldRegistration;
+    provider.flags = opaque;
+    StaticRtAssetRegistration consumer{1u,2u,opaque,0u,&mixedAsset};
+    consumer.immutableMaterialAliases = oneMaterial;
+    auto partialProvider = provider;
+    partialProvider.primitiveCount = 1;
+    RtStaticMeshSlot mixed;
+    for (const bool compact : {false, true}) {
+        const std::array registrations{compact ? partialProvider : provider, consumer};
+        const bool loaded = compact ? mixed.InitializeSelectedGeometry(registrations, diagnostic)
+                                    : mixed.Initialize(registrations, diagnostic);
+        Check(loaded, std::string("one immutable row can come from a full or compacted provider: ") + diagnostic);
+        if (!loaded || mixed.Materials().size() != 3u) {
+            Check(false, "one of the four input rows reuses its provider at admission");
+            continue;
+        }
+        const auto counts = mixed.TextureArrayCounts();
+        const auto& prims = mixed.PrimitiveMetadata();
+        const auto table = mixed.InstanceMetadata()[consumer.instanceCustomIndex].primitiveBase;
+        const auto source = mixed.InstanceMetadata()[provider.instanceCustomIndex].primitiveBase;
+        Check(counts.baseColor == 3u && counts.normal == 3u && counts.orm == 3u && counts.emissive == 3u &&
+              prims[table].materialIndex == prims[source].materialIndex &&
+              prims[table+1].materialIndex != prims[table].materialIndex,
+              "only the bound material reuses the donor row and its maps");
+    }
+    const auto rejectBinding = [&](const auto& registrations, const char* message) {
+        Check(!mixed.InitializeSelectedGeometry(registrations, diagnostic) &&
+              mixed.Materials().size() == 3u && mixed.TextureArrayCounts().baseColor == 3u, message);
+    };
+    const std::array duplicateBindings{oneMaterial[0], oneMaterial[0]};
+    auto invalidConsumer = consumer;
+    invalidConsumer.immutableMaterialAliases = duplicateBindings;
+    rejectBinding(std::array{provider,invalidConsumer}, "duplicate bindings preserve the last good slot");
+    invalidConsumer = consumer;
+    invalidConsumer.textureSource = &world;
+    rejectBinding(std::array{provider,invalidConsumer}, "asset-wide and per-material sources cannot be combined");
+    auto altered = mixedAsset;
+    altered.materials[0].roughnessFactor = .17f;
+    invalidConsumer = consumer;
+    invalidConsumer.asset = &altered;
+    rejectBinding(std::array{provider,invalidConsumer}, "different roughness prevents immutable row sharing");
+    altered.materials[0] = world.materials[0];
+    altered.materials[0].normalTexture = -1;
+    rejectBinding(std::array{provider,invalidConsumer}, "a missing normal map prevents immutable row sharing");
+    rejectBinding(std::array{consumer,provider}, "a later provider cannot supply a bound material");
+    invalidConsumer = consumer;
+    invalidConsumer.geometryRole = horde::vulkan::raytracing::RtGeometryRole::PlayerWorldBody;
+    rejectBinding(std::array{provider,invalidConsumer}, "a mutable player lane cannot bind an immutable row");
+
     auto unregistered = makeAsset({makeMaterial("Unregistered", 7, 201)});
     expectFailure({worldRegistration, {1u, 3u, 0u, 0u, &viewmodel, &unregistered}},
                   "not registered", "unknown texture source is rejected");
