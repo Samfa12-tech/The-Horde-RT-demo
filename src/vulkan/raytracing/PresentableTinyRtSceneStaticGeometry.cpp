@@ -715,6 +715,9 @@ bool PresentableTinyRtScene::PackLoadedStaticAssets(RtStaticMeshSlot& out,
             registrations.push_back(row);
         }
     }
+    if (!roadSilverAsset_.primitives.empty())
+        registrations.push_back({kRoadSilverMetadataIndex, 0x42305343u,
+            static_cast<std::uint32_t>(RtInstanceFlag::StaticPbr), 0u, &roadSilverAsset_});
     // Packing consumes borrowed selections synchronously into owned vectors.
     if (!(developmentRescueJourney_
             ? out.InitializeSelectedGeometry(registrations, diagnostic)

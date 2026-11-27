@@ -321,10 +321,12 @@ def analyze_bellwether(name, analysis_name, *, print_phases=True, resident_round
                            'south-door.manifest.json', 'bellwether-south-door.glb'}
         drive_assets = {'mill-bench-drive.manifest.json', 'mill-bench-drive.glb'}
         wheel_assets = {'mill-waterwheel.manifest.json', 'mill-waterwheel.glb'}
+        silver_assets = {'road-silver.manifest.json', 'road-silver.glb'}
         stock_assets = {'stock-heads.manifest.json', 'stock-heads.glb'} if west else set()
         assert stock_assets <= set(hashes)
         assert set(hashes) - stock_assets in (original_assets, original_assets | drive_assets,
-                               original_assets | drive_assets | wheel_assets)
+                               original_assets | drive_assets | wheel_assets,
+                               original_assets | drive_assets | wheel_assets | silver_assets)
         assert all(re.fullmatch(r'[0-9a-f]{64}', digest) for digest in hashes.values())
     assert 60 <= run['durationSeconds'] <= (240 if resident_roundtrip else 150) and run['simulationHz'] == 60
     assert not run['unoccludedClientChecks'] and not run['foregroundRequested']

@@ -104,6 +104,7 @@ struct SimulationSnapshot
     bool millServiceAvailable=false;
     bool shorePracticeServiceAvailable=false;
     bool relicDealerTradeAvailable=false;
+    bool roadSilverInCache=false;
     campaign::OrdinarySilverAction ordinarySilverAction{};
     campaign::MillTallyAction millTallyAction{};
     bellwether::TavernDoor tavernDoor;

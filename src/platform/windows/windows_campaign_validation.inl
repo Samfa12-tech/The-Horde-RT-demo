@@ -1996,18 +1996,26 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         input.pitchRadians = previousPitch;
                     }
                     if (progressed && verifiesSilver) {
-                        // The graveyard walk has already brought the player back to this fork.
+                        // Look into the split lid from the same stance before and after taking the cup.
+                        const float previousPitch = input.pitchRadians;
+                        input.pitchRadians = -.64f;
                         progressed = check(
                             walkTo({kRoadSilverCacheApproach[0], kRoadSilverCacheApproach[1]}) &&
                             face(kRoadSilverCacheReach[0], kRoadSilverCacheReach[2]) &&
                             state.ordinarySilverAction == OrdinarySilverAction::Take &&
-                            capture("windows-combined-road-silver.png") && interact() &&
+                            setInspectionLight(HeldLightPose::High) && frame() &&
+                            ctx.rtScene.SubmittedInstanceMask(Scene::kRoadSilverMetadataIndex) == 1u &&
+                            capture("windows-combined-road-silver.png",true,true) && interact() && frame() &&
+                            ctx.rtScene.SubmittedInstanceMask(Scene::kRoadSilverMetadataIndex) == 0u &&
+                            capture("windows-combined-empty-cache.png",true,true) &&
                             state.treasurePurse.ordinarySilver == OrdinarySilverProgress::Carried &&
                             state.ordinarySilverAction == OrdinarySilverAction::None &&
                             savedSilver(OrdinarySilverProgress::Carried, 0, false) &&
                             reloadWithTownResidents() &&
-                            state.treasurePurse.ordinarySilver == OrdinarySilverProgress::Carried,
-                            "the ordinary road silver is collected once and reloads at the earned tavern boundary");
+                            state.treasurePurse.ordinarySilver == OrdinarySilverProgress::Carried &&
+                            ctx.rtScene.SubmittedInstanceMask(Scene::kRoadSilverMetadataIndex) == 0u,
+                            "taking the visible silver empties the cache and reloading preserves collection");
+                        input.pitchRadians = previousPitch;
                     }
                     if (progressed && verifiesSilver) {
                         constexpr auto price = campaign::TreasurePurse::kOrdinarySilverSaleCoins;

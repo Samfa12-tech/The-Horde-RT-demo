@@ -1260,3 +1260,7 @@ Samfa12/Codex modeled the tavern's water jug, beakers, trencher, serving dresser
 ## Bellwether square fingerpost and tavern delivery - 27 November 2026
 
 Samfa12/Codex modeled the four carved destination boards, oil bracket and coopered delivery cask for Horde. They use the existing town timber, stone, clay and char finishes. The [Blender master, recipes and receipt](assets/models/world/source/bellwether-square-waymarker-v1/README.md) record their origin.
+
+## Bellwether roadside silver - 27 November 2026
+
+Samfa12/Codex authored an original hollow handled silver cup in Blender for the west opening of the roadside cache. The single opaque metallic `WornSilver` material has no textures or emission. The [source master, recipe and receipt](assets/models/world/source/bellwether-road-silver-v1/README.md) document the local-space runtime export and placement. No external asset or third-party licence is involved.

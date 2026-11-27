@@ -1,0 +1,89 @@
+{
+  "source": "Original geometry authored locally in Blender; no external model or texture input.",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "recipeSha256": "574e6a17534e9eee2caceaae0acee8e61a139906928d9d75856350b42575bc61",
+  "blender": "5.2.0 LTS",
+  "cacheCentre": [
+    35.3,
+    -5.483359680175782,
+    82.95
+  ],
+  "cacheSupportBoardTop": [
+    35.69,
+    -5.562359680175781,
+    82.95
+  ],
+  "playerApproach": [
+    33.6,
+    82.92
+  ],
+  "placement": "On the broken-lid board near its west end; mouth faces west.",
+  "visibilityProof": {
+    "eyeWorld": [
+      33.6,
+      -4.350556945800781,
+      82.92
+    ],
+    "eyeHeightAboveApproachGround": 1.65,
+    "opaqueMeshTriangleCount": 81175,
+    "rays": [
+      {
+        "feature": "mouthCrown",
+        "targetWorld": [
+          35.4,
+          -5.440359680175781,
+          82.95
+        ],
+        "rayLengthMetres": 2.104419,
+        "unoccluded": true
+      },
+      {
+        "feature": "mouthNearRim",
+        "targetWorld": [
+          35.4,
+          -5.501359680175781,
+          82.889
+        ],
+        "rayLengthMetres": 2.136661,
+        "unoccluded": true
+      },
+      {
+        "feature": "shoulderCrown",
+        "targetWorld": [
+          35.485,
+          -5.461984680175782,
+          82.95
+        ],
+        "rayLengthMetres": 2.188471,
+        "unoccluded": true
+      },
+      {
+        "feature": "handleCrown",
+        "targetWorld": [
+          35.32,
+          -5.4273596801757815,
+          82.898
+        ],
+        "rayLengthMetres": 2.029382,
+        "unoccluded": true
+      }
+    ],
+    "townGlbSha256": "5c0b850b1159e5417f0d58800e8d38dce9c1a12b80f1ddd4c9e32a229b82e6de",
+    "cacheRecipeSha256": "eb5402fee1fbdee71c18a91017ff34b7bf5fe0e734174cb3c6bc3f9703221c18"
+  },
+  "sourceVertices": 241,
+  "runtimeVertices": 507,
+  "runtimeIndices": 1392,
+  "triangles": 464,
+  "supportContacts": {
+    "mouthRimY": 0.0,
+    "footRimY": -3.469446951953614e-18,
+    "intermediateClearanceY": 9.99999999999994e-05,
+    "mouthRimX": -0.29000000000000004,
+    "footRimX": -0.13
+  },
+  "glbSha256": "1f41fb0299d66fc409b2fc2be073ad07a0d931364d3f4393462d72b950bf1c5f",
+  "manifestSha256": "f10d0344c03b7d4b3461d58f719c8e09185a3b79653620c2a8965c9816bfb63f",
+  "blendSha256": "64dce2f6b7216a6f49544b26bae6b3ac50acbb2579c2eb30d06791f85a424713",
+  "geometryHeaderSha256": "2d1764ce1f21d7e0d61071f52d08097b90a14b78e98d6c811910ffea900df94f"
+}

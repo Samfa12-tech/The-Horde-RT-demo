@@ -1134,6 +1134,8 @@ public class MainActivity extends Activity {
                     stageAsset("models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb", "models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json", "models/world/runtime/bellwether-tavern-v1/privy-rag.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/privy-rag.glb", "models/world/runtime/bellwether-tavern-v1/privy-rag.glb") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/road-silver.manifest.json", "models/world/runtime/bellwether-tavern-v1/road-silver.manifest.json") &&
+                    stageAsset("models/world/runtime/bellwether-tavern-v1/road-silver.glb", "models/world/runtime/bellwether-tavern-v1/road-silver.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json", "models/world/runtime/bellwether-tavern-v1/stock-heads.manifest.json") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/stock-heads.glb", "models/world/runtime/bellwether-tavern-v1/stock-heads.glb") &&
                     stageAsset("models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json", "models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json") &&

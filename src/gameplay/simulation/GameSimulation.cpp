@@ -3658,6 +3658,7 @@ void GameSimulation::RefreshSnapshot(const InputSnapshot& input)
     snapshot_.salvager=currentExterior && IsBellwetherResidentReady(traversal::kSalvagerResident) ? salvager_ : std::nullopt;
     snapshot_.relicDealer=currentExterior && IsBellwetherResidentReady(traversal::kRelicDealerResident) ? relicDealer_ : std::nullopt;
     snapshot_.millTallyAction=CurrentMillTallyAction(chapterContext);
+    snapshot_.roadSilverInCache=config_.bellwetherTrade && treasurePurse_.CanCollectOrdinarySilver();
     snapshot_.ordinarySilverAction=CurrentOrdinarySilverAction(chapterContext);
     snapshot_.relicDealerTradeAvailable=snapshot_.ordinarySilverAction==campaign::OrdinarySilverAction::None &&
         chapterDialogue_.CanStartRelicDealer(chapterContext);
