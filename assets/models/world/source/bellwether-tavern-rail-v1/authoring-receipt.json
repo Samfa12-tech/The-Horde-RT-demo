@@ -1,0 +1,18 @@
+{
+  "feature": "South tavern ramp handrail",
+  "originalTownSha256": "35decf1c875b08bbf212a114c7e71fb7d9da87635aaa1333d59bf7aa30fb5337",
+  "rampSurveySha256": "ea61d89fcf753652b4e7ea4d7833988a5895eca9c1d6e21ed7fb3d91c2ee1585",
+  "runtimeTownSha256": "b38d8e63d2b227ea88c6ada22462ea8c98523827125e71dcc381447f48eb87c4",
+  "addedSolidTriangles": 1096,
+  "townVertices": 72201,
+  "townTriangles": 33960,
+  "recipeSha256": "91d43c029bfc2ce22c15804cf96aec625f6c71cc78129e13a36562ffac429f15",
+  "blender": "5.2.0 LTS",
+  "files": {
+    "tavern-rail.blend": "3d151edb4c1e2ffa8a1357633e1d37825767e3da76a25419e628c94eeeb88ab7",
+    "tavern-rail.glb": "9481868aa6a77f406089ab81f7c36e416d3fd58e1d2b93e5d41ff851f56b1bae",
+    "bellwether-tavern-v1.glb": "b38d8e63d2b227ea88c6ada22462ea8c98523827125e71dcc381447f48eb87c4",
+    "geometry.generated.h": "f69381ddc59938fb0b3574716046d7008331000447d47988376327c156305ffc",
+    "asset.manifest.json": "a3e899a9617234d6b36ffb52fa9c2ecb77d392e206d2c725a0d6b6098a7eaabe"
+  }
+}

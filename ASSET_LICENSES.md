@@ -1222,3 +1222,7 @@ Samfa12/Codex authored the dealer's spoked handcart, sealed pottery and
 equal-arm balance in Blender for Horde. They reuse the existing Bellwether
 material rows. The [editable master, recipe and export receipt](assets/models/world/source/bellwether-west-trade-v1/README.md)
 record the original geometry and its integration into the town.
+
+Samfa12/Codex also authored the [south tavern handrail](assets/models/world/source/bellwether-tavern-rail-v1/README.md)
+from the original ramp survey. Its planed rails, pegged uprights and socket
+stones use the same town timber, char and stone finishes.

@@ -576,3 +576,6 @@ assets/models/world/source/bellwether-church-waymarker-v1/authoring-receipt.json
 tools/author-bellwether-west-trade.py text eol=lf
 assets/models/world/source/bellwether-west-trade-v1/authoring-receipt.json text eol=lf
 assets/models/world/source/bellwether-west-trade-v1/geometry.generated.h text eol=lf
+tools/author-bellwether-tavern-rail.py text eol=lf
+assets/models/world/source/bellwether-tavern-rail-v1/authoring-receipt.json text eol=lf
+assets/models/world/source/bellwether-tavern-rail-v1/geometry.generated.h text eol=lf

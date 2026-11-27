@@ -324,12 +324,21 @@ int main(int argc,char** argv) {
             };
             check(follow(square,{view[0],view[1]}) && follow({view[0],view[1]},square),
                   "the validated south well view is reachable from the square and back along grounded collision support");
-            for (float offset : {-.45f,.45f}) {
-                const BellwetherStation foot{82.3f+offset,131.7f};
-                const BellwetherStation door{82.3f+offset,119.2f};
-                check(follow(foot,door) && follow(door,foot),
+            for (float side : {-1.f,1.f}) {
+                const BellwetherStation foot{82.3f+side*.85f,131.7f};
+                const BellwetherStation landing{82.3f+side*.85f,120.4f};
+                const BellwetherStation door{82.3f+side*.62f,119.2f};
+                check(follow(foot,landing) && follow(landing,door) &&
+                      follow(door,landing) && follow(landing,foot),
                       "both sides of the dressed tavern approach remain walkable in both directions");
             }
+            const auto ramp=support->Query(83.15f,125.2f);
+            check(ramp.found && ramp.walkable &&
+                  !support->NonWalkableVolumeClear(83.15f,125.2f,83.85f,125.2f,
+                      ramp.worldY+.85f,ramp.worldY+.90f,.025f) &&
+                  support->NonWalkableVolumeClear(83.15f,125.2f,83.85f,125.2f,
+                      ramp.worldY+1.18f,ramp.worldY+1.23f,.025f),
+                  "the sloping handrail has solid contact at hand height and open sight above");
             const auto& porchLight=kSquarePorchLampLight;
             check(support->NonWalkableVolumeClear(porchLight[0],porchLight[2],84.66f,120.44f,
                         porchLight[1]-.02f,porchLight[1],.014f),
