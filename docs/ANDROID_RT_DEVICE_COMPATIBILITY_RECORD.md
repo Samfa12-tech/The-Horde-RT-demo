@@ -4843,3 +4843,11 @@ reached and presented both `bellwether-square-waymarker` and
 `bellwether-square-frontage` through RayTracingPipeline. The portrait
 captures show the illuminated post beside the well and the open ramp to
 the tavern. The original campaign test saves retained their hashes.
+
+The same corrected build also loaded a copy of an earned tavern save through
+**Play → Continue → Continue Slot 1**. Tapping **Ask Kit about the treasure**
+started the conversation at the hearth. Two screenshots show Kit named as
+the speaker, first explaining that he wants a sound roof, then that he wants
+a door with his own key. The three original saves still matched their
+pre-test hashes after the private app stopped. This verifies the touch
+interaction and captions. Listening approval for the two takes remains open.
