@@ -10,6 +10,8 @@ import struct
 from analyze_android_rt_stage_profile import AnalysisError, VIEWS, analyze as admit_stages, unsigned
 
 CATEGORIES = ("other", "trace", "material", "shadow", "surface", "fire", "mist", "dust")
+HEARTH_SHADOW_CATEGORIES = ("other", "trace", "material", "other_shadow", "surface", "fire",
+                            "mist_dust", "direct_fire_shadow")
 CAPACITY = 8192
 
 
@@ -17,7 +19,7 @@ def grid_axis(extent):
     return (extent - 17)//32 + 1 if extent > 16 else 0
 
 
-def admit_clock_rows(rows, width, height):
+def admit_clock_rows(rows, width, height, *, categories=CATEGORIES):
     count = grid_axis(width)*grid_axis(height)
     if not 0 < count <= CAPACITY:
         raise AnalysisError("invalid sparse grid extent/capacity")
@@ -29,7 +31,7 @@ def admit_clock_rows(rows, width, height):
         if ticket <= last_ticket or unsigned(row.get("clock_samples"), "sample count") != count:
             raise AnalysisError("stale ticket or missing sparse samples")
         last_ticket = ticket
-        values = [unsigned(row.get("clock_"+c), c) for c in CATEGORIES]
+        values = [unsigned(row.get("clock_"+c), c) for c in categories]
         if not 0 < sum(values) <= (1 << 64)-1:
             raise AnalysisError("unavailable/overflowed clock total")
     if not rows:
@@ -37,7 +39,7 @@ def admit_clock_rows(rows, width, height):
     return count
 
 
-def admit_raw(raw, row, width, height, *, max_hit_class=26, by_primary_class=False):
+def admit_raw(raw, row, width, height, *, max_hit_class=26, by_primary_class=False, categories=CATEGORIES):
     count = grid_axis(width)*grid_axis(height)
     if len(raw) != count*80:
         raise AnalysisError("raw clock witness has missing/extra samples")
@@ -56,15 +58,15 @@ def admit_raw(raw, row, width, height, *, max_hit_class=26, by_primary_class=Fal
             raise AnalysisError("invalid raw invocation clock total")
         totals = [a+b for a, b in zip(totals, elapsed)]
         if by_primary_class:
-            group = class_ticks.setdefault(values[3], [0]*len(CATEGORIES))
+            group = class_ticks.setdefault(values[3], [0]*len(categories))
             for j, ticks in enumerate(elapsed):
                 group[j] += ticks
-    if totals != [unsigned(row["clock_"+c], c) for c in CATEGORIES]:
+    if totals != [unsigned(row["clock_"+c], c) for c in categories]:
         raise AnalysisError("raw clock totals do not match owning CSV row")
     result = {"samples": count, "primaryInstancePlusOneCounts": classes}
     if by_primary_class:
         result["sampledClockTicksByPrimaryClass"] = {
-            k: dict(zip(CATEGORIES, values)) for k, values in class_ticks.items()
+            k: dict(zip(categories, values)) for k, values in class_ticks.items()
         }
     return result
 
@@ -135,30 +137,32 @@ def analyze_hearth(directory, shader_sha256, verify_room_fire, resident_ids):
         stem = f"bellwether-westroundtrip-hearth-clock-{run_ns}-return-1-sample-{index}-{serial}"
         require(run_ns > 0 and path.stem == stem and meta["raw_file"] == stem + ".bin",
                 "Clock raw/metadata files do not belong to this run and sample")
+        categories = tuple(meta["category_order"])
+        require(number("record_size_bytes") == 80 and categories in (CATEGORIES, HEARTH_SHADOW_CATEGORIES) and
+                len(meta["category_ticks"]) == len(categories), "Clock record ABI mismatch")
         identity = (run_ns, row["scene_epoch"], row["generation"], row["backend"], row["station"],
                     number("simulation_tick") - dwell, row["glass_enabled"], row["fire_ids"],
-                    row["internal_width"], row["internal_height"], row["output_width"], row["output_height"])
+                    row["internal_width"], row["internal_height"], row["output_width"], row["output_height"], categories)
         if run_identity is None:
             run_identity = identity
-        require(identity == run_identity, "Mixed runs, room views or graphics settings")
-        require(number("record_size_bytes") == 80 and tuple(meta["category_order"]) == CATEGORIES and
-                len(meta["category_ticks"]) == len(CATEGORIES), "Clock record ABI mismatch")
+        require(identity == run_identity, "Mixed runs, room views, graphics settings or clock categories")
         totals = meta["category_ticks"]
         require(all(type(v) is int and 0 <= v < 2**64 for v in totals), "Invalid sampled ticks")
         clock = dict(clock_status="valid", clock_ticket=str(number("clock_ticket")),
                      clock_samples=str(number("record_count")))
-        clock.update({"clock_" + k: str(v) for k, v in zip(CATEGORIES, totals)})
+        clock.update({"clock_" + k: str(v) for k, v in zip(categories, totals)})
         clocks.append(clock)
         width, height = number("internal_width"), number("internal_height")
-        admit_clock_rows(clocks, width, height)
-        raw = admit_raw(path.with_suffix(".bin").read_bytes(), clock, width, height, max_hit_class=max_class, by_primary_class=True)
+        admit_clock_rows(clocks, width, height, categories=categories)
+        raw = admit_raw(path.with_suffix(".bin").read_bytes(), clock, width, height,
+                        max_hit_class=max_class, by_primary_class=True, categories=categories)
         gpu_ns = unsigned(row["gpu_ns"], "GPU time")
         dispatch_ns = unsigned(row["gpu_dispatch_ns"], "dispatch time")
         require(0 < dispatch_ns <= gpu_ns, "Invalid GPU dispatch interval")
         witnesses.append({"sample": index, "submission": serial, "simulationTick": number("simulation_tick"),
                           "dwellTicks": dwell, "clockTicket": number("clock_ticket"), **raw,
-                          "sampledClockTicks": dict(zip(CATEGORIES, totals)),
-                          "sampledClockShare": {k: v/sum(totals) for k, v in zip(CATEGORIES, totals)},
+                          "sampledClockTicks": dict(zip(categories, totals)),
+                          "sampledClockShare": {k: v/sum(totals) for k, v in zip(categories, totals)},
                           "instrumentedGpuMs": gpu_ns/1e6, "instrumentedDispatchMs": dispatch_ns/1e6})
         previous_sample, previous_serial = index, serial
 
