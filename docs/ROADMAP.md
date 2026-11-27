@@ -144,6 +144,8 @@ The [village lanes](superpowers/plans/2026-11-07-bellwether-arrival-direction.md
 
 The [church fingerboard](../assets/models/world/source/bellwether-church-waymarker-v1/README.md) points into the north-east lane from the road cache. The native movement test checks the off-centre approach that caught the player during the 24 November phone walkthrough.
 
+On that lane, an [oak writing ledge and a hooded oil cup](../assets/models/world/source/bellwether-church-station-v1/README.md) identify the record keeper's outdoor station. The ledge holds his daybook and slate against the church wall, with room to walk through to the graveyard. The cup shares Bellwether's exterior fire slot.
+
 The mapped [western kitchen plots](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#western-kitchen-plots) sit beyond the relic stall at T02. Two terrain-fitted beds show the village growing food. The aisle follows the existing ground, and the crops share the forest foliage material.
 
 The [west service-yard checkpoint](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#west-service-yard) stages the closed privy and washstand on a short detour from the west lane. After the tavern conversation, the unseen occupant's request appears as a local caption. The player can take a clean rag from the basket and leave it on the sheltered shelf. Delivery persists in the tavern save. Recording remains open.

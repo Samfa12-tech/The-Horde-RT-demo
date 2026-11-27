@@ -299,6 +299,19 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
             upload.selectedStableIds[0]==kHouseBLampEmitterId &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
         "the store room and ramp use the pinned wick with the held lantern, within the existing fire budget");
+    const auto& churchLight=horde::gameplay::bellwether::kChurchRecordStationLight;
+    auto churchLamp=MakeChurchRecordLampEmitter();
+    StepFireEmitterFixed(churchLamp,ChurchRecordLampFireInput(),kFixedDelta);
+    const std::array churchFires{hearth,candle,churchLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(64.3f,75.2f)==kChurchRecordLampRosterIndex &&
+        SelectBellwetherExteriorLamp(71.3f,75.2f)==kChurchRecordLampRosterIndex &&
+        SelectBellwetherExteriorLamp(61.7f,53.2f)!=kChurchRecordLampRosterIndex &&
+        Approx(churchLamp.worldFromLight[13],churchLight[1]) &&
+        BuildFireEmitterUpload(churchFires,{churchLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kChurchRecordLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the church approach uses its pinned oil cup alongside the held lantern within the shared exterior budget");
     return ok;
 }
 
