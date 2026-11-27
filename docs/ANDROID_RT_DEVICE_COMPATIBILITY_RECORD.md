@@ -4921,3 +4921,29 @@ save and preference check. The pose overlay was enabled by launch intent
 and may still be visible if that same process resumes. Screenshots, touch
 inputs, original hashes and thermal readings are retained locally in
 `reports/horde-android-west-trade-20261127-210346`.
+
+### 27 November 2026 — Church-fork silver, west-lane sale and hearth fitting
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17/API 37), the private ARM64 APK
+from `3c52fbc2` had SHA-256
+`bf5aafbb25208dc5b1f3f13447be96479c1cd2c036df6c3367fc97ad860c2bce`.
+RayTracingPipeline presented at 33%, tracing 475 × 980 for a 1440 × 2971
+portrait surface. **Play → Continue → Slot 1** loaded an isolated copy of
+the earned tavern save. Normal touch input took the player out the south
+door and down the ramp past the well. The return walk crossed the same door
+from the other side.
+
+At the church fork the on-screen **Take ordinary silver** action collected
+the visible cup. The player carried it back along the public lane and sold
+it at the west counter for the quoted two coins. The autosave recorded the
+cup as sold and a balance of two. Back at the hearth, **Fit lantern hinge
+(2 coins)** spent both. **Pause → Load checkpoint → Continue** returned the
+player to the hearth. Directions showed the fitted hinge, the completed sale
+and an empty purse. The register reward remained unclaimed and the reloaded
+autosave matched the post-purchase bytes.
+
+The dealer faced the customer across the counter. From the fitting mark,
+the tavern keeper offered the purchase with her back to the player. The
+private device captures, UI text, touch positions and save checksums are
+in `reports/horde-android-west-eaves-20261127-225120/`. The seven existing
+saves retained their hashes during the walkthrough.
