@@ -1,0 +1,121 @@
+{
+  "device": {
+    "sourceCommit": "ce32058fdd310b8c42c2179b7a95d661e12bbc14",
+    "model": "SM-S948B",
+    "api": "37",
+    "apkSha256": "cdc5c504e41ac9a144670d39de620df9c263f7051c342b1e92ef11a1d58337b8",
+    "priorApkSha256": "6fea3c3a1e49dc00777704c968f94c1d5fb15c3f25b030e565644af41a5f595d",
+    "inputSaveSha256": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b"
+  },
+  "walk": "Normal Play / Continue from an earned tavern save in an isolated slot. Walked through the south door to the railed approach and square. Activated the ordinary touch interaction.",
+  "interaction": {
+    "saveBefore": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b",
+    "saveAfter": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b",
+    "opened": true,
+    "dismissed": true,
+    "reread": true,
+    "lookedAwayClears": true,
+    "allFourDirections": true,
+    "speechSkipAbsent": true,
+    "inscriptionBounds": "[70,605][1370,1045]",
+    "touchLookAwayWithHud": true
+  },
+  "initialInscription": {
+    "apk": "6fea3c3a1e49dc00777704c968f94c1d5fb15c3f25b030e565644af41a5f595d",
+    "textArea": {
+      "bounds": "[70,605][1370,1469]",
+      "text": "Tankard - Tavern, up the oak-railed ramp.\r\nScales - West to the dealer and gardens.\r\nWheel - East to the mill and river fork.\r\nAnvil - Southeast to the smith yard."
+    },
+    "handsetVisualLines": 8
+  },
+  "finalInscription": {
+    "textArea": {
+      "bounds": "[70,605][1370,1045]",
+      "text": "Tankard - Up the tavern ramp\r\nScales - Dealer & gardens, west\r\nWheel - Mill & river fork, east\r\nAnvil - Smith yard, southeast"
+    },
+    "handsetVisualLines": 4
+  },
+  "capturesSha256": {
+    "square-overlay.png": "1deac33a773e7d2afdd0bdd8814295570a478c5c80fd9d6e8eed40560b3c4aa3",
+    "square-approach.png": "0673ef772862fc15fbc8f501844dba02aac5cf7d96e35f31ba5f3d365ca0e3c3",
+    "square-inscription.png": "79c361eb718ba146c4064afd18e7e9d01fac3043a60bf2c086bedb5daf5c0ffd"
+  },
+  "preservation": {
+    "matching": 22,
+    "originalSaves": 12,
+    "restored": [
+      "files/reports/vulkan_capability_report.txt",
+      "files/reports/vulkan_capability_report.json",
+      "shared_prefs/android.app.ActivityThread.IDS.xml"
+    ]
+  },
+  "windowsPrivateBuild": {
+    "sourceCommit": "ce32058fdd310b8c42c2179b7a95d661e12bbc14",
+    "executableSha256": "0bc87d2466ae77ebf78014d535578f08bd7a3fa0637378a39bb9f32f99a9da8b",
+    "sha256": "b7662fc3de6ad64c2d6ad337d8e86ef24066781c8a8024a97596f7ab2bd47eb2",
+    "bytes": 466880052,
+    "residentFiles": 25,
+    "voiceFiles": 21,
+    "pipeline": {
+      "passed": 59,
+      "routeReceiptSha256": "9c3ff5de076f8c3ab79a1c8e0201248715759add0b7a447b46a2f882e8d18bfe"
+    },
+    "query": {
+      "passed": 59,
+      "routeReceiptSha256": "a86b1b04ca3274252e862e5ea0fc38a6a162f5240a43fb28ca5736978501031c"
+    }
+  },
+  "westWalk": {
+    "gatePose": [
+      35.86,
+      142.74,
+      -1.79
+    ],
+    "roostPose": [
+      35.5,
+      141.48,
+      -1.62
+    ],
+    "returnPose": [
+      81.95,
+      131.66,
+      -6.9
+    ],
+    "saveBeforeAndAfter": "9c1a3054160c5ea722a24c3e64ad9436ad31a61e4bf8f14a266d69cb86a0c52b",
+    "onFootRoundTrip": true,
+    "fingerpostVisibleAtReturn": true,
+    "capturesSha256": {
+      "stock-gate.png": "65e719df554fd0e48fcbac73e69164d5842249cfeb881ab8b6b6b360e7b63df7",
+      "roost.png": "d4641f538e94730f486317c5ba3e60a9ac6b292b9f3f6e1c90b2dc178b171452",
+      "roost-repeat.png": "3ef816932f2cf2dfa458f44476a0a9dd4fa5819860181b6a4de8af68595f4896"
+    },
+    "measuredRenderSettings": {
+      "backend": "RayTracingPipeline",
+      "profile": "Shipping/Mobile opaque",
+      "scalePercent": 33,
+      "rtExtent": [
+        475,
+        980
+      ],
+      "swapchainExtent": [
+        1440,
+        2971
+      ]
+    },
+    "displayTiming": {
+      "surfaceFlingerLayerLatencyHistoryAvailable": false,
+      "returnPerfettoFrameTimelineSha256": "d1d13e63432ef4d22cd46cfd698379b156687c3070f70cc5ea1886736f86739c",
+      "returnTraceSeconds": 10,
+      "appSurfaceViewRows": 0,
+      "appWindowTransactionRows": 54
+    },
+    "originalsAfterReturn": {
+      "matching": 22,
+      "originalSaves": 12,
+      "restored": [
+        "files/reports/vulkan_capability_report.txt",
+        "files/reports/vulkan_capability_report.json"
+      ]
+    }
+  }
+}

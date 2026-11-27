@@ -5076,3 +5076,32 @@ includes the settings, APK and shader identities, excluded warm start, thermal
 records, screenshot hashes, and the frame and GPU clock CSV filenames with
 their uncompressed checksums. Both test packages and the temporary sampler
 were removed after the final control.
+
+### 28 November 2026 — Reading the Bellwether fingerpost on foot
+
+The private ARM64 Debug build from `ce32058f` ran on the Galaxy S26 Ultra
+(SM-S948B, Android 17). Starting from an isolated copy of an earned hearth
+save, the player walked through the south tavern door and down the ramp to
+the square. Facing the post from the tavern side offered **Read fingerpost**.
+All four arms were visible together. The player tapped **Finish reading**,
+read the inscription again, and dismissed it by swiping to look away. The
+isolated save matched its starting SHA-256 after the walk and interactions.
+
+On the 1440 × 3120 portrait handset, shorter place names reduced the measured
+inscription height from 864 to 440 pixels at the same text setting. Each arm
+occupied one line. The packaged Windows campaign replay read the sign with
+speech subtitles disabled from the opposite side of the lane. All 59 checks
+passed on each hardware RT backend. The [playtest receipt](evidence/2026-11-28-bellwether-fingerpost/receipt.json)
+records the APK and Windows archive hashes, text bounds, and save comparison.
+
+The player then followed the western lane past the gardens to the stock gate.
+From the public lane the pig was visible at its trough, with one hen in the
+roost and another on the ground. The player walked back to the square and the
+read prompt appeared again. The save stayed byte-identical throughout. The
+ordinary 33% Pipeline view rendered at 475 × 980 into a 1440 × 2971 surface.
+SurfaceFlinger supplied no layer-latency history at either animal view. A
+ten-second FrameTimeline trace on the return contained window transactions
+and no identifiable gameplay SurfaceView rows. Displayed frame pacing and
+listening acceptance at the stock yard remain open. The updated private APK
+was left installed, all 22 pre-existing files matched after restoration, and
+the phone returned to Home.
