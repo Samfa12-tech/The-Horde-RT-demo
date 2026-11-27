@@ -2046,9 +2046,19 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             "the quoted sale credits the purse exactly once and survives the native checkpoint reload");
                     }
                     if (progressed && verifiesSilver) {
+                        const auto keeperFacesCustomer = [&] {
+                            if (!state.tavernKeeper) return false;
+                            const auto& keeper = *state.tavernKeeper;
+                            const float dx = state.playerX - keeper.foot[0];
+                            const float dz = state.playerZ - keeper.foot[2];
+                            return dx * std::sin(keeper.yaw) - dz * std::cos(keeper.yaw) >
+                                .99f * std::hypot(dx, dz);
+                        };
                         progressed = check(walkTo(kBellwetherLanternFittingApproach) && state.tavernKeeper &&
                             face(state.tavernKeeper->foot[0], state.tavernKeeper->foot[2]) &&
-                            state.tavernLanternFittingAvailable && interact() && state.treasurePurse.lanternFittingPurchased &&
+                            state.tavernLanternFittingAvailable && waitFor(keeperFacesCustomer, 180) && frame() &&
+                            capture("windows-combined-keeper-fitting.png", true, true) &&
+                            interact() && state.treasurePurse.lanternFittingPurchased &&
                             state.treasurePurse.coins == 0 && savedSilver(OrdinarySilverProgress::Sold, 0, true) &&
                             reloadWithTownResidents() && state.treasurePurse == campaign::TreasurePurse{0,false,true,OrdinarySilverProgress::Sold} &&
                             campaign::storage::Read(gCampaignValidationDirectory,"slot-1-auto.hrd",stored).status == campaign::storage::Status::Read &&
