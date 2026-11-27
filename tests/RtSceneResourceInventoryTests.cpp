@@ -1719,10 +1719,15 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kBellwetherGrateSolidTriangles+
             horde::gameplay::bellwether::kMillTallySolidTriangles+
             horde::gameplay::bellwether::kBellwetherStockSolidTriangles+
-            horde::gameplay::bellwether::kMillBenchLampSolidTriangles &&
-            supportTriangles<=horde::gameplay::simulation::TriangleSupportSurface::kMaximumTriangles;
+            horde::gameplay::bellwether::kMillBenchLampSolidTriangles+
+            horde::gameplay::bellwether::kBellwetherPathGroundTriangles+
+            horde::gameplay::bellwether::kSquareFrontageSolidTriangles &&
+            support->NonWalkableTriangleCount()<=support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
         std::cout << "Combined forest and town native support: " << supportTriangles
                   << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
+        if(support)std::cout << "Static obstacle faces=" << support->NonWalkableTriangleCount()
+            << " capacity=" << support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount())
+            << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';
         bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
                   woodland->report.addedIndices==woodlandIndices &&
                   woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&

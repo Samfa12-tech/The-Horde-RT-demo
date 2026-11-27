@@ -165,7 +165,7 @@ int main() {
     const auto occupiedBefore=occupied;
     check(!AppendPreparedForestDeadwood(root,occupiedOwner,occupied,report,error)&&occupied==occupiedBefore&&
         occupiedOwner.indices==original.indices,"preexisting STEP generation fails closed without replacement");
-    const std::size_t oldContactCount=Surface::kMaximumTriangles-2-11884-20+1;
+    const std::size_t oldContactCount=Surface::NonWalkableCapacity(ground.size()+20)-11884+1;
     const std::vector<Surface::Triangle> oldContact(oldContactCount,oldWall);
     auto crowded=Surface::Build(ground,error);crowded=Surface::WithNonWalkableGeometry(*crowded,oldContact,error);
     const auto crowdedBefore=crowded;auto crowdedOwner=original;

@@ -49,8 +49,8 @@ int main()
     check(!Surface::Build({},error),"empty terrain admitted");
     invalid=ramp;invalid[0].surface=static_cast<SupportSurface>(255);
     check(!Surface::Build(invalid,error),"unknown surface classification admitted");
-    const std::vector<Surface::Triangle> tooMany(Surface::kMaximumTriangles+1,ramp[0]);
-    check(!Surface::Build(tooMany,error),"triangle intake overflow admitted");
+    const std::vector<Surface::Triangle> tooMany(Surface::NonWalkableCapacity(0)+1,ramp[0]);
+    check(!Surface::Build(std::span(tooMany).first(Surface::kMaximumTriangles+1),error),"triangle intake overflow admitted");
     const float nan=std::numeric_limits<float>::quiet_NaN();
     check(!terrain->Query(nan,0).found&&!terrain->Query(0,0,2,1).found&&
           !terrain->Query(0,0,0,nan).found,"invalid query parameters accepted");
@@ -72,6 +72,8 @@ int main()
         {{P{0,0,-.3f},P{0,2,.3f},P{0,0,.3f}},SupportSurface::Stone}}};
     const auto solid=Surface::Build(wall,error);
     const auto combined=Surface::WithNonWalkableGeometry(*terrain,wall,error);
+    check(solid && combined && combined->RetainedBytes()-terrain->RetainedBytes()+wall.size()*sizeof(P)==solid->RetainedBytes(),
+          "obstruction-only faces keep their geometry and BVH without retaining unused normals");
     check(combined && combined->TriangleCount()==terrain->TriangleCount() &&
           combined->NonWalkableTriangleCount()==2 && combined->Query(0,0).worldY==sample.worldY,
           "attaching actual nonwalkable geometry changed the admitted ground surface");
@@ -116,6 +118,17 @@ int main()
     check(roof&&!roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.8f,.1f)&&
           roof->HorizontalVolumeClear(-.3f,0,.3f,0,.25f,1.4f,.1f),
           "downward overhead face or height clipping was incorrect");
+    // Reuse the ordinary height-band sweeps on the compact obstacle lane.
+    for(const auto& faces : {ramp,oblique,ceiling}) {
+        const auto fullSurface=Surface::Build(faces,error);
+        const auto obstacles=Surface::WithNonWalkableGeometry(*terrain,faces,error);
+        bool matches=fullSurface && obstacles;
+        for(float z : {-.6f,0.f,.35f,.7f})for(float height : {.2f,.9f,1.5f,2.1f}) {
+            matches=matches && fullSurface->HorizontalVolumeClear(-1,z,1,z,height,height+.3f,.12f)==
+                obstacles->NonWalkableVolumeClear(-1,z,1,z,height,height+.3f,.12f);
+        }
+        check(matches,"an attached slope, oblique wall or ceiling changed the swept-volume result");
+    }
     check(!solid->HorizontalVolumeClear(0,0,1,0,nan,2,.1f)&&
           !solid->HorizontalVolumeClear(0,0,1,0,2,1,.1f)&&
           !solid->HorizontalVolumeClear(0,0,1,0,0,2,0)&&

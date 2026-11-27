@@ -278,10 +278,11 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     }
     report.fenceTriangles=report.fenceRuns*48+report.terminalFencePosts*12;
     report.boundaryCollisionTriangles=collision.size()-report.treeContactTriangles;
-    if(terrain->TriangleCount()+terrain->NonWalkableTriangleCount()+terrain->StepTriangleCount()+collision.size()>Surface::kMaximumTriangles)
+    const auto contactCapacity=Surface::NonWalkableCapacity(terrain->TriangleCount()+terrain->StepTriangleCount());
+    if(terrain->NonWalkableTriangleCount()+collision.size()>contactCapacity)
         return fail("boundary exceeds immutable support intake: ground="+std::to_string(terrain->TriangleCount())+
             " existingSolid="+std::to_string(terrain->NonWalkableTriangleCount())+" step="+std::to_string(terrain->StepTriangleCount())+
-            " newFence="+std::to_string(collision.size())+" limit="+std::to_string(Surface::kMaximumTriangles)+".");
+            " newContact="+std::to_string(collision.size())+" solidLimit="+std::to_string(contactCapacity)+".");
     auto combined=Surface::WithAdditionalNonWalkableGeometry(*terrain,collision,diagnostic);
     if(!combined)return false;
     for(std::size_t i=0;i<surroundings_layout::edges.size();++i) {

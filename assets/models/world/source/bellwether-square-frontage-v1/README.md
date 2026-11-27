@@ -11,12 +11,13 @@ adds 2,068 solid triangles to the original town mesh. Their render and
 contact surfaces share the same geometry. The town still uses five
 primitives and four material rows.
 
-The south approach runs close to the combined collision limit. The earlier
-2,244-triangle export exceeded the 163,840-triangle intake by 124. Splitting
-the billets and making the hoops part of the pail profile brought the final
-export, including the oil lamp, to 2,068 additional triangles. That leaves
-52 triangles at this configuration. Further streets need a more economical
-collision representation before adding comparable detail.
+With the original support representation this frontage left room for 52
+additional collision triangles. The current engine keeps normals on
+ground and step faces and stores static obstacles with their exact vertices
+and bounding-volume hierarchy. At the full forest and town intake, 41,980
+ground faces and 20 step faces leave capacity for 139,587 static obstacle
+faces. The current scene uses 121,788, leaving 17,799 for additional
+obstacles. Adding walkable ground or steps changes this allowance.
 
 To regenerate, extract `bellwether-tavern-v1.glb` and its sibling
 `asset.manifest.json` from commit `17687eed`. Supply that GLB and an unused

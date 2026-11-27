@@ -3,6 +3,7 @@
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -32,9 +33,27 @@ public:
         std::uint32_t testedTriangles=0;
     };
     static constexpr float kMaximumWalkableSlope=.65f;
-    // Static admission ceiling for the dressed forest and town together.
-    // Storage and BVH nodes are allocated for the triangles actually admitted.
+    // Ground and step faces need normals. The original full-face budget also
+    // bounds the bytes available for the remaining, obstruction-only faces.
     static constexpr std::size_t kMaximumTriangles=163840;
+    static std::size_t NonWalkableCapacity(std::size_t groundAndStepCount)
+    {
+        if(groundAndStepCount>=kMaximumTriangles)return 0;
+        const auto original=kMaximumTriangles-groundAndStepCount;
+        constexpr auto faceBytes=sizeof(Triangle)+sizeof(std::uint32_t); // Face and BVH permutation.
+        const auto saved=original*sizeof(Point);
+        const auto originalNodes=NodeCount(original);
+        // BVH storage grows in steps. Charge both extra faces and their new
+        // nodes against the same retained bytes as the previous solid lane.
+        auto low=original, high=original+saved/faceBytes;
+        while(low<high) {
+            const auto count=low+(high-low+1)/2;
+            const auto cost=(count-original)*faceBytes+(NodeCount(count)-originalNodes)*sizeof(Node);
+            if(cost<=saved) low=count;
+            else high=count-1;
+        }
+        return low;
+    }
     static constexpr std::size_t kMaximumSweepIntervals=512;
     static std::shared_ptr<const TriangleSupportSurface> Build(std::span<const Triangle> input,
                                                               std::string& diagnostic)
@@ -47,8 +66,9 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithAdditionalGroundGeometry(
         const TriangleSupportSurface& terrain,std::span<const Triangle> input,std::string& diagnostic)
     {
-        const auto retained=terrain.TriangleCount()+terrain.NonWalkableTriangleCount()+terrain.StepTriangleCount();
-        if(input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        const auto supportCount=terrain.TriangleCount()+terrain.StepTriangleCount();
+        if(input.empty() || input.size()>kMaximumTriangles-supportCount ||
+           terrain.NonWalkableTriangleCount()>NonWalkableCapacity(supportCount+input.size())) {
             diagnostic="Additional ground geometry is empty or exceeds bounded intake.";return {};
         }
         std::vector<Triangle> triangles;
@@ -70,15 +90,16 @@ public:
     }
 
 private:
+    static constexpr std::size_t kLeafTriangleLimit=8;
     static std::shared_ptr<TriangleSupportSurface> BuildSurface(std::span<const Triangle> input,
-                                                               std::string& diagnostic)
+                                                               std::string& diagnostic,bool obstructionOnly=false)
     {
-        if(input.empty() || input.size()>kMaximumTriangles) {
+        if(input.empty() || input.size()>(obstructionOnly?NonWalkableCapacity(0):kMaximumTriangles)) {
             diagnostic="Terrain support triangle count is outside bounded intake capacity.";return {};
         }
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface);
         result->triangles_.assign(input.begin(),input.end());
-        result->normals_.reserve(input.size());
+        if(!obstructionOnly)result->normals_.reserve(input.size());
         for(const auto& triangle:input) {
             for(const auto& p:triangle.points) for(float c:p)
                 if(!std::isfinite(c)||std::abs(c)>1000000.f) {
@@ -96,7 +117,7 @@ private:
             if(!std::isfinite(length)||length<=1e-10) {
                 diagnostic="Terrain support contains a degenerate triangle.";return {};
             }
-            result->normals_.push_back({float(nx/length),float(ny/length),float(nz/length)});
+            if(!obstructionOnly)result->normals_.push_back({float(nx/length),float(ny/length),float(nz/length)});
         }
         result->order_.resize(input.size());
         std::iota(result->order_.begin(),result->order_.end(),0u);
@@ -118,11 +139,10 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithNonWalkableGeometry(
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
-        const auto retained=ground.TriangleCount()+ground.StepTriangleCount();
-        if(ground.nonWalkable_ || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        if(ground.nonWalkable_ || input.size()>NonWalkableCapacity(ground.TriangleCount()+ground.StepTriangleCount())) {
             diagnostic="Nonwalkable geometry was already attached or exceeds bounded intake.";return {};
         }
-        auto contact=Build(input,diagnostic);
+        auto contact=BuildSurface(input,diagnostic,true);
         if(!contact)return {};
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
@@ -137,8 +157,8 @@ public:
     static std::shared_ptr<const TriangleSupportSurface> WithStepGeometry(
         const TriangleSupportSurface& ground,std::span<const Triangle> input,std::string& diagnostic)
     {
-        const auto retained=ground.TriangleCount()+ground.NonWalkableTriangleCount();
-        if(ground.steps_ || input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        if(ground.steps_ || input.empty() || input.size()>kMaximumTriangles-ground.TriangleCount() ||
+           ground.NonWalkableTriangleCount()>NonWalkableCapacity(ground.TriangleCount()+input.size())) {
             diagnostic="Step geometry is empty, already attached or exceeds bounded intake.";return {};
         }
         auto steps=Build(input,diagnostic);
@@ -173,15 +193,15 @@ public:
         const TriangleSupportSurface& ground, std::span<const Triangle> input, std::string& diagnostic)
     {
         const auto oldCount=ground.NonWalkableTriangleCount();
-        const auto retained=ground.TriangleCount()+oldCount+ground.StepTriangleCount();
-        if(input.empty() || retained>kMaximumTriangles || input.size()>kMaximumTriangles-retained) {
+        const auto capacity=NonWalkableCapacity(ground.TriangleCount()+ground.StepTriangleCount());
+        if(input.empty() || input.size()>capacity-oldCount) {
             diagnostic="Additional nonwalkable geometry is empty or exceeds bounded intake.";return {};
         }
         std::vector<Triangle> combined;
         combined.reserve(oldCount+input.size());
         if(ground.nonWalkable_)combined=ground.nonWalkable_->triangles_;
         combined.insert(combined.end(),input.begin(),input.end());
-        auto contact=Build(combined,diagnostic);
+        auto contact=BuildSurface(combined,diagnostic,true);
         if(!contact)return {};
         auto result=std::shared_ptr<TriangleSupportSurface>(new TriangleSupportSurface(ground));
         result->nonWalkable_=std::move(contact);diagnostic.clear();return result;
@@ -419,8 +439,12 @@ private:
         const double radiusSquared=double(radius)*radius;
         for(auto i=node.begin;i<node.begin+node.count;++i) {
             Polygon a{},b{};
-            const auto id=order_[i];const auto& triangle=triangles_[id];const auto n=normals_[id];
-            const bool walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
+            const auto id=order_[i];const auto& triangle=triangles_[id];
+            bool walkable=false;
+            if(ignoredWalkableBelow!=-std::numeric_limits<float>::infinity()) {
+                const auto& n=normals_[id];
+                walkable=n[1]>1e-7f && std::hypot(n[0],n[2])<=kMaximumWalkableSlope*n[1]+1e-7f;
+            }
             std::copy(triangle.points.begin(),triangle.points.end(),a.begin());
             const auto first=ClipHeight(a,3,walkable?std::max(minY,ignoredWalkableBelow):minY,true,b);
             const auto count=ClipHeight(b,first,maxY,false,a);
@@ -440,7 +464,11 @@ private:
     }
     static std::size_t NodeCount(std::size_t triangles)
     {
-        return triangles<=8?1:1+NodeCount(triangles/2)+NodeCount(triangles-triangles/2);
+        if(triangles<=kLeafTriangleLimit)return 1;
+        // Median splits distribute faces evenly at each depth. At the last
+        // complete level, each leaf with a ninth face splits just once more.
+        const auto leaves=std::bit_floor(triangles/kLeafTriangleLimit);
+        return 2*(leaves+std::min(leaves,triangles-kLeafTriangleLimit*leaves))-1;
     }
     bool GatherIntervals(std::uint32_t index,double x,double z,double dx,double dz,
                          Intervals& intervals,std::size_t& count) const
@@ -539,7 +567,7 @@ private:
         for(auto i=begin;i<begin+count;++i) for(const auto& p:triangles_[order_[i]].points)
             for(unsigned k=0;k<3;++k) {node.minimum[k]=std::min(node.minimum[k],p[k]);node.maximum[k]=std::max(node.maximum[k],p[k]);}
         const auto index=static_cast<std::uint32_t>(nodes_.size());nodes_.push_back(node);
-        if(count>8) {
+        if(count>kLeafTriangleLimit) {
             const unsigned axis=node.maximum[0]-node.minimum[0]>node.maximum[2]-node.minimum[2]?0:2;
             const auto middle=begin+count/2;
             const auto centroid=[&](std::uint32_t triangle) {

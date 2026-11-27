@@ -1504,21 +1504,31 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
               kTavernCandleLight[0],kTavernCandleLight[2],kTavernCandleFlame[1]+.004f,
               kTavernCandleFlame[1]+candle.height,candle.radius),
           "the candlestick publishes a flame and direct light above its authored wick");
-    const auto& forkLamp=room.fireEmitters[3];
-    bool forkLampAnchored=true;
-    for(std::size_t axis=0;axis<3;++axis)
-        forkLampAnchored &= forkLamp.worldFromFlame[12+axis]==kRiverForkLampFlame[axis] &&
-            forkLamp.worldFromLight[12+axis]==kRiverForkLampLight[axis];
+    const auto exteriorLampAt=[&](std::uint32_t id,const auto& flame,const auto& light) {
+        const auto& lamp=game.Snapshot().fireEmitters[3];
+        return lamp.stableId==id && lamp.strength>0 && lamp.zone==gameplay::ShowcaseZone::Outside &&
+            std::equal(flame.begin(),flame.end(),lamp.worldFromFlame.begin()+12) &&
+            std::equal(light.begin(),light.end(),lamp.worldFromLight.begin()+12);
+    };
+    Check(exteriorLampAt(gameplay::effects::kBellwetherPorchLampEmitterId,kSquarePorchLampFlame,kSquarePorchLampLight),
+          "the tavern approach publishes the south porch wick and light");
+    // The road surfacing sits 18 mm above the hillside used to fit the post.
+    const auto forkLampBed=terrain->Query(kRiverForkLampPostFoot[0],kRiverForkLampPostFoot[2],
+        -1000000.f,kRiverForkLampPostFoot[1]+.002f);
     const auto forkLampFloor=terrain->Query(kRiverForkLampPostFoot[0],kRiverForkLampPostFoot[2]);
+    const bool planted=forkLampBed.found && forkLampFloor.found &&
+        std::abs(kRiverForkLampPostFoot[1]-forkLampBed.worldY)<.002f &&
+        forkLampFloor.worldY-forkLampBed.worldY<=.020f;
+    if(!planted)
+        std::cerr<<"Fork lamp foot="<<kRiverForkLampPostFoot[1]<<" bed="<<forkLampBed.worldY
+                 <<" top="<<forkLampFloor.worldY<<'\n';
     const float salvagerFaceDistance=std::hypot(kRiverForkLampLight[0]-gameplay::traversal::kBellwetherSalvagerStand.x,
         kRiverForkLampLight[2]-gameplay::traversal::kBellwetherSalvagerStand.z);
-    Check(forkLamp.stableId==gameplay::effects::kBellwetherRiverForkLampEmitterId &&
-          forkLamp.strength>0 && forkLamp.zone==gameplay::ShowcaseZone::Outside && forkLampAnchored &&
-          forkLampFloor.found && std::abs(kRiverForkLampPostFoot[1]-forkLampFloor.worldY)<.002f &&
+    Check(planted &&
           std::abs(kRiverForkLampFlame[1]-kRiverForkLampPostFoot[1]-1.39f)<.002f &&
           std::abs(kRiverForkLampLight[1]-kRiverForkLampPostFoot[1]-1.52f)<.002f &&
           std::abs(salvagerFaceDistance-2.04f)<.1f,
-          "the fourth exterior emitter uses the authored fork-lamp anchors at plausible salvager-face distance");
+          "the fork lamp stands on imported ground beside the salvager");
     CompanionRouteFixture kit(true);
     Check(!kit.BeginTavernSit() && kit.PlaceForTavernSitInspection(*terrain),
           "Kit requires the real supported seat handoff before sitting");
@@ -1689,6 +1699,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             Check(dryReturn && game.Snapshot().playerGrounded,
                   "the same supported causeway lets the player leave the water and return to Bellwether");
             if(!dryReturn)return;
+            Check(exteriorLampAt(gameplay::effects::kBellwetherRiverForkLampEmitterId,kRiverForkLampFlame,kRiverForkLampLight),
+                  "returning to the salvager selects the authored fork wick and light");
             const bool visited=walkTo(mill[1]) &&
                 walkTo(kBellwetherSalvagerMark) && game.Snapshot().playerGrounded &&
                 walkTo(mill[1]) && walkStations(mill.begin()+2,mill.end()) && game.Snapshot().playerGrounded;

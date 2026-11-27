@@ -111,12 +111,29 @@ int main() {
     const auto exact=capacity?Surface::WithNonWalkableGeometry(*capacity,root,error):nullptr;
     Check(exact && exact->TriangleCount()+exact->StepTriangleCount()+exact->NonWalkableTriangleCount()==Surface::kMaximumTriangles &&
         !Surface::WithAdditionalNonWalkableGeometry(*exact,std::span(root).first(1),error),
-        "all immutable geometry lanes share the exact total intake capacity");
-    const std::vector<Surface::Triangle> overflow(Surface::kMaximumTriangles,root[0]);
+        "two obstruction-only faces cannot fund a third face at the full support budget");
+    const auto solidLimit=Surface::NonWalkableCapacity(ground->TriangleCount());
+    const std::vector<Surface::Triangle> overflow(solidLimit+1,root[0]);
     Check(!Surface::WithStepGeometry(*ground,overflow,error),"step intake cannot exceed the combined capacity");
-    const auto fullContact=Surface::WithNonWalkableGeometry(*ground,std::span(overflow).first(Surface::kMaximumTriangles-2),error);
-    Check(fullContact && !Surface::WithStepGeometry(*fullContact,std::span(root).first(1),error),
-        "existing nonwalkable contact consumes step intake capacity");
+    const auto fullContact=Surface::WithNonWalkableGeometry(*ground,std::span(overflow).first(solidLimit),error);
+    const auto originalLimit=Surface::kMaximumTriangles-ground->TriangleCount();
+    const auto originalLayout=Surface::Build(std::span(overflow).first(originalLimit),error);
+    Check(fullContact && originalLayout && solidLimit>originalLimit &&
+        fullContact->RetainedBytes()-ground->RetainedBytes()<=originalLayout->RetainedBytes() &&
+        !Surface::WithNonWalkableGeometry(*ground,overflow,error) &&
+        !Surface::WithAdditionalNonWalkableGeometry(*fullContact,std::span(root).first(1),error) &&
+        !Surface::WithStepGeometry(*fullContact,std::span(root).first(1),error) &&
+        !Surface::WithAdditionalGroundGeometry(*fullContact,std::span(fullGround).first(1),error),
+        "the expanded solid lane fits the original byte budget and rejects overflow in every lane");
+    for(std::size_t remaining : {7u,8u,9u,16u,17u,64u,65u,127u,128u,129u}) {
+        const auto fit=Surface::NonWalkableCapacity(Surface::kMaximumTriangles-remaining);
+        const auto reference=Surface::Build(std::span(overflow).first(remaining),error);
+        const auto at=Surface::WithNonWalkableGeometry(*ground,std::span(overflow).first(fit),error);
+        const auto past=Surface::WithNonWalkableGeometry(*ground,std::span(overflow).first(fit+1),error);
+        Check(reference && at && past && at->RetainedBytes()<=ground->RetainedBytes()+reference->RetainedBytes() &&
+            past->RetainedBytes()>ground->RetainedBytes()+reference->RetainedBytes(),
+            "the calculated last affordable face agrees with retained bytes across BVH splits");
+    }
     const auto floorSlope=Surface::Build(Quad(-.3f,.3f,-.5f,.5f,-.1f,.1f),error);
     Check(floorSlope && !floorSlope->HorizontalVolumeClear(-.2f,0,.2f,0,.001f,1.8f,.24f) &&
         floorSlope->HorizontalBodyVolumeClear(-.2f,0,.2f,0,0,1.8f,.24f),

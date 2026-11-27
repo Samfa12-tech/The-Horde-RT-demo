@@ -13,6 +13,17 @@
 
 ## Bellwether 1.8 performance baseline
 
+**26 November static collision storage.** The Windows native scene inventory
+loaded the complete forest and town with 163,788 collision triangles before
+and after the change. Retained CPU support arrays fell from 11,157,976 to
+9,696,520 bytes. Static obstacle sweeps use the original triangle positions
+and the same BVH. Their unused normals accounted for the entire difference.
+The obstacle intake now charges additional faces and BVH nodes against the
+bytes previously reserved for those normals. With the current ground and
+step geometry this leaves room for 17,799 static obstacle faces. The
+measurement covers retained CPU arrays. Startup peak memory, frame time
+and sustained phone performance require separate measurements.
+
 **24 November ordinary Android arrival.** The
 [seeded-lookout touch walkthrough](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--android-touch-walkthrough-from-the-lookout-to-bellwether)
 reached the hearth through the live campaign. The staffed room held
