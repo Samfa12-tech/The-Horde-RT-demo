@@ -10,6 +10,7 @@
 #include "gameplay/traversal/BellwetherMill.h"
 #include "gameplay/traversal/BellwetherResidentRoster.h"
 #include "gameplay/traversal/BellwetherSalvager.h"
+#include "gameplay/traversal/BellwetherWestRoute.h"
 #include "scene/assets/AssetManifest.h"
 #include "vulkan/raytracing/PresentableTinyRtScene.h"
 
@@ -135,6 +136,10 @@ inline bool AdvanceBellwetherCombinedResidents(PresentableTinyRtScene& scene,
     const bool westLead = hasRelicDealer && atTown &&
         ((snapshot.playerX <= 87.f && snapshot.playerZ >= 110.f) || eastReturnLead);
     const bool rampReturnLead = snapshot.playerX >= 79.f && snapshot.playerX <= 84.f && snapshot.playerZ < 124.f;
+    // The stall and gardens are west of the square. A load there returns to
+    // the hearth; walking east first passes the lane junction, where the
+    // river-side lead can take over again.
+    const bool westTownReturn = snapshot.playerX <= gameplay::traversal::kBellwetherWestApproach.front().x;
     const std::array desired{east ? artificer : keeper, west ? dealer : (east || south) ? salvager : records};
     const bool approachingHandoff = atTown && snapshot.playerX >= 68.f && snapshot.playerZ >= 100.f;
     using Publication = PresentableTinyRtScene::ResidentPublication;
@@ -143,7 +148,7 @@ inline bool AdvanceBellwetherCombinedResidents(PresentableTinyRtScene& scene,
         const bool switching = active[lane] != desired[lane].actor;
         if (!approachingHandoff && !switching && !(lane == 1 && (westLead || hasDealerInLane))) continue;
         const auto& leadIn = lane == 0 ? (active[0] == keeper.actor ? artificer : keeper) :
-            hasDealerInLane ? (rampReturnLead ? records : salvager) :
+            hasDealerInLane ? ((westTownReturn || rampReturnLead) ? records : salvager) :
             westLead ? dealer : (active[1] == records.actor ? salvager : records);
         const auto& alternate = switching ? desired[lane] : leadIn;
         if (scene.PrefetchedChapterResidentId(lane) != alternate.actor &&

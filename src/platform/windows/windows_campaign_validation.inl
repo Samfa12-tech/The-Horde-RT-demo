@@ -1974,6 +1974,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             GetWindowTextA(GetDlgItem(ctx.windowHandle,kChestPromptControlId),quote.data(),
                                 static_cast<int>(quote.size())) > 0 && std::string_view(quote.data()) == sellText &&
                             interact() && state.ordinarySilverAction == OrdinarySilverAction::Sold &&
+                            ctx.rtScene.PrefetchedChapterResidentId(1) == kRecordKeeperActorId &&
                             !state.HasChapterInteractPrompt() && frame() && !ctx.tavernInteractionPromptPresented &&
                             interact() && state.treasurePurse.coins == price &&
                             savedSilver(OrdinarySilverProgress::Sold, price, false) &&
