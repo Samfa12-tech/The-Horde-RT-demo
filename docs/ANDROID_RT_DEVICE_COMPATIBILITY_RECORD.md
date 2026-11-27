@@ -4851,3 +4851,48 @@ the speaker, first explaining that he wants a sound roof, then that he wants
 a door with his own key. The three original saves still matched their
 pre-test hashes after the private app stopped. This verifies the touch
 interaction and captions. Listening approval for the two takes remains open.
+
+### 27 November 2026 — Reading the square fingerpost on Android
+
+The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) presented the
+`bellwether-square-waymarker` checkpoint at 33% on RayTracingPipeline.
+The private ARM64 Debug APK was built from `754a06f4`; its installed
+SHA-256 was `1500a177ead8fd391a929ad3ee297ff5b4a659efa3b0cd67ce8aee3e00f56fce`.
+At the well, **Pause → Bellwether directions** opened the local sign key.
+The phone displayed the tankard, scales, wheel and anvil routes, plus the
+turnoff for the church. All five directions and both navigation buttons
+fit the portrait screen. **Back to pause menu** returned to the paused game.
+The unedited screenshot, native startup log and Android view text are in
+`reports/horde-bellwether-square-directions-20261127-195103/phone-menu-200602`.
+
+### 27 November 2026 — Outlined subtitle contrast on the Galaxy S26 Ultra
+
+The last open check in [issue #35](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
+concerned white and yellow text over different game backgrounds. The same
+private APK and SM-S948B as the fingerpost test displayed Kit's roof line
+and speaker name at 100% subtitle size, with the optional backing disabled.
+
+A separate signed Android test temporarily placed that canonical line in the
+game's own subtitle view. The RT renderer kept presenting the selected scene
+while the test held the text still and switched the game's colour preference.
+The physical captures cover torchlit stone, the bright held lantern, a dark
+tomb chamber, Keeper-room ground mist, the outdoor village square and the
+staffed tavern. Both text colours and their black outline were legible in
+the unedited 1440 × 3120 captures. The speaker and every line fit at both
+the automatic and lower placements exercised in the review.
+
+With the Keeper-room camera and pose tick 194 held fixed, switching mist
+off changed the background behind the lower caption. The visible effect
+was subtle. Of 437,307 stable non-text pixels in that box, 186,515 changed
+by at least one sRGB channel level. All seven white/yellow pairs, including
+the mist-off comparison, had 61,274 coincident fill pixels at the configured
+`#F2E9D8` and `#FFDF69` after conversion from the phone's embedded Display P3
+profile. Inspection at native pixel size showed the dark stroke around both
+colours, including where letters crossed the lit lantern.
+
+The [receipt](evidence/2026-11-27-android-subtitle-contrast/receipt.json)
+identifies the camera checkpoints, bounds and original screenshot hashes.
+The earlier ordinary tap at Kit's hearth verifies narrative delivery; the
+staged line here isolates visual readability. The temporary test APK was
+removed, the original preference-file state was restored, and all three
+original campaign test saves retained their hashes.

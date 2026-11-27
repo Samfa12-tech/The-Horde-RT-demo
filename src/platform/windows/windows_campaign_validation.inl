@@ -1739,7 +1739,9 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             std::find(lights.begin(),lights.end(),horde::gameplay::effects::kSquareWaymarkerLampEmitterId)!=lights.end() &&
                             capture("windows-combined-square-waymarker.png",true,true);
                         input.pitchRadians=previousPitch;
-                        return presented && walkTo(*square);
+                        return presented &&
+                            readDirections(campaign::PauseObjective::BellwetherShrine,"Anvil - southeast to the smith yard.") &&
+                            walkTo(*square);
                     };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };

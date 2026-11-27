@@ -272,6 +272,30 @@ int main(int argc,char** argv) {
         return cp::CurrentBellwetherDirections(snapshot);
     }();
     const auto opening=cp::PauseObjectiveText(PauseObjective::BellwetherShrine,directions);
+    {
+        SimulationSnapshot visitor{};
+        visitor.developmentRescueJourney=visitor.rescue.exteriorSide=visitor.playerGrounded=visitor.playerAlive=true;
+        constexpr auto junction=horde::gameplay::traversal::kBellwetherTavernRoute[horde::gameplay::traversal::kBellwetherWestJunction];
+        visitor.playerX=junction.x;visitor.playerZ=junction.z;
+        const auto atPost=cp::CurrentBellwetherDirections(visitor);
+        const auto local=cp::CurrentPauseObjective(visitor,std::nullopt);
+        const auto sign=cp::PauseObjectiveText(local,atPost);
+        Check(local==PauseObjective::BellwetherSquare && atPost.atSquare &&
+              sign.find("Tankard")!=sign.npos && sign.find("Scales")!=sign.npos &&
+              sign.find("Wheel")!=sign.npos && sign.find("Anvil")!=sign.npos && sign.find("CHURCH")!=sign.npos,
+              "the square offers all four physical routes and the church turn before any private service is earned");
+        const auto arrival=cp::PauseObjectiveText(PauseObjective::BellwetherArrival,atPost);
+        Check(arrival.starts_with("Take the ramp") && arrival.ends_with(sign) &&
+              cp::PauseObjectiveText(PauseObjective::BellwetherShrine,atPost).starts_with("Ask the record keeper"),
+              "the local fingerpost supplements the player's current objective");
+        visitor.playerX+=11.f;
+        Check(!cp::CurrentBellwetherDirections(visitor).atSquare && cp::CurrentPauseObjective(visitor,std::nullopt)==PauseObjective::None &&
+              cp::PauseObjectiveText(PauseObjective::BellwetherShrine,cp::CurrentBellwetherDirections(visitor))==noServices,
+              "leaving the junction removes the local sign without revealing services");
+        visitor.playerX=junction.x;visitor.rescue.equipmentStowed=true;
+        Check(cp::CurrentPauseObjective(visitor,std::nullopt)==PauseObjective::None,
+              "the local sign is unavailable during a traversal");
+    }
     for(const auto objective:{PauseObjective::BellwetherArrival,PauseObjective::BellwetherHearth}) {
         Check(cp::PauseObjectiveText(objective,directions)==cp::PauseObjectiveText(objective),
               "arrival guidance keeps services hidden until after Talk");

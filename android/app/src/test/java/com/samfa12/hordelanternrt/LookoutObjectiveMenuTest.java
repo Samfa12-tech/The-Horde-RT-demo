@@ -53,6 +53,7 @@ public final class LookoutObjectiveMenuTest {
                 case 7: return "Follow the road to the covered well in Bellwether square. At the fingerpost, take the ramp with the oak rail. The lit tankard sign hangs beside the tavern's south door.";
                 case 8: return "Meet Kit by the tavern hearth. Choose Talk when the keeper joins him and the prompt appears.";
                 case 9: return "The wayside archive is open. Stand near the opening and choose Listen to the lantern.";
+                case 10: return "The fingerpost by the covered well";
                 default: return "";
             }
         }
@@ -125,7 +126,7 @@ public final class LookoutObjectiveMenuTest {
     }
     @Test public void malformedStaleAndUnavailablePublicationsCannotOfferThePage()throws Exception {
         for(long[] value:new long[][]{null,new long[4],new long[]{1,31,81,1},new long[]{2,30,81,1},
-                new long[]{2,31,0,1},new long[]{2,31,81,10},new long[]{2,31,81,0}}) {
+                new long[]{2,31,0,1},new long[]{2,31,81,11},new long[]{2,31,81,0}}) {
             Bridge.objective=value;pause();assertNull(find("Lookout objective"));
             assertNull(find("Bellwether directions"));
             assertFalse(field("lookoutObjectiveVisible").getBoolean(a));
@@ -190,8 +191,8 @@ public final class LookoutObjectiveMenuTest {
         assertEquals(0,Bridge.campaignRequests);
         assertEquals(0,actionCount());
     }
-    @Test public void bellwetherDirectionsOpenForTheRoadHearthAndUnheardLantern()throws Exception {
-        String[] expected={"lit tankard sign","Choose Talk","Listen to the lantern"};
+    @Test public void bellwetherDirectionsOpenForTheRoadHearthLanternAndSquare()throws Exception {
+        String[] expected={"lit tankard sign","Choose Talk","Listen to the lantern","fingerpost by the covered well"};
         for(int i=0;i<expected.length;i++) {
             Bridge.objective[3]=7+i;
             pause();
