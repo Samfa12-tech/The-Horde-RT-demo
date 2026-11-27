@@ -1,0 +1,103 @@
+{
+  "model": "SM-S948B",
+  "os": "17",
+  "build": "CP2A.260605.016",
+  "apkSha256": "310a2b5eec209f08f925d980a62b5a5a9ba22583187d75cdbcaddd9095531096",
+  "sourceCommit": "bdbfefc3d872ec241d71363060c8e3c4963b6464",
+  "priorApkSha256": "591a3a50aa7d082c1409d0191bcfaf23d0e5ad547d13e7ce9cd64d10294f98c3",
+  "priorFailure": "simulation-state-not-reached",
+  "checkpoint": {
+    "id": 335,
+    "name": "bellwether-record-keeper-handoff",
+    "playerX": 69.61,
+    "playerZ": 75.2,
+    "yawRadians": 1.57,
+    "stageReached": true,
+    "presented": true
+  },
+  "renderExtent": [
+    475,
+    980
+  ],
+  "outputExtent": [
+    1440,
+    2971
+  ],
+  "sampleWindowSeconds": 36,
+  "measurement": "Periodic native reports joined by submission, completion and successful present serials. The snapshots establish presentation at the requested checkpoint and do not estimate sustained displayed FPS.",
+  "observations": [
+    {
+      "seconds": 3.094,
+      "serial": 150,
+      "tick": 6136,
+      "gpuMs": 37.993697,
+      "backend": "RayTracingPipeline",
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "tlas": 45,
+      "blas": 37,
+      "fires": 1
+    },
+    {
+      "seconds": 9.188,
+      "serial": 270,
+      "tick": 6482,
+      "gpuMs": 38.09052,
+      "backend": "RayTracingPipeline",
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "tlas": 45,
+      "blas": 37,
+      "fires": 1
+    },
+    {
+      "seconds": 16.531,
+      "serial": 390,
+      "tick": 6914,
+      "gpuMs": 80.009008,
+      "backend": "RayTracingPipeline",
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "tlas": 45,
+      "blas": 37,
+      "fires": 1
+    },
+    {
+      "seconds": 25.703,
+      "serial": 510,
+      "tick": 7463,
+      "gpuMs": 58.563228,
+      "backend": "RayTracingPipeline",
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "tlas": 45,
+      "blas": 37,
+      "fires": 1
+    },
+    {
+      "seconds": 33.891,
+      "serial": 630,
+      "tick": 7960,
+      "gpuMs": 52.388957,
+      "backend": "RayTracingPipeline",
+      "shader": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "tlas": 45,
+      "blas": 37,
+      "fires": 1
+    }
+  ],
+  "wholeRtGpuMedianMs": 52.388957,
+  "batteryCStart": 32.7,
+  "batteryCEnd": 35.5,
+  "preservedFileCount": 25,
+  "preservedSaveCount": 15,
+  "windows": {
+    "privateZipSha256": "a2191effa7d6c145959ec70895ad8e3ac02bc1119f9aa1751d2f770860e4ed95",
+    "replay": {
+      "pipeline": {
+        "passed": 59,
+        "receiptSha256": "2c4b0b9627fdbc12862bb29f079f3b6b9cf9d1315e5ef1981a4918049096b989"
+      },
+      "query": {
+        "passed": 59,
+        "receiptSha256": "2c7e61f39cae9e452a790b76961c22cdf027df4a63960bc03027131aef2b47c2"
+      }
+    }
+  }
+}

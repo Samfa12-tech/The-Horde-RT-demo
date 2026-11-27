@@ -38,7 +38,7 @@ resumption of the paused optimisation investigation.
 | 1.6.1 | Published engineering baseline; preserve receipts and deferrals. |
 | 1.6.2 | Published engine readiness and tomb/demo polish, 9 October 2026. |
 | 1.7 - Beyond the Tomb | 1.7.0 published on Windows and Android on 3 November. The [release validation](SHOWCASE_ALPHA_1_7_0_RELEASE_VALIDATION_2026-11-03.md) records the shipped builds and physical acceptance scope. |
-| 1.8 - Bellwether, NPCs and light RPG systems | Playable in private Windows and Android builds with the authored lanes, five residents and twenty-one private voice recordings. Android playtests covered arrival at the tavern, the wayside register reward, and the west-lane silver sale and lantern fitting through reload. Near-view dressing, further phone routes, audio review, sustained performance, asset clearance and production integration remain open. |
+| 1.8 - Bellwether, NPCs and light RPG systems | Playable in private Windows and Android builds with the authored lanes, five residents and twenty-three private voice recordings. Android playtests covered arrival at the tavern, the wayside register reward and air ward, and the west-lane silver sale and lantern fitting through reload. Near-view dressing, further phone routes, audio review, sustained performance, asset clearance and production integration remain open. |
 | Proposed 1.9 - Drowned Abbey | Approved theme, reflector and item-required Bellkeeper; delivery label provisional. |
 | Proposed 1.10 - Ashen Foundry | Approved theme, shuttered stand and item-required Master of Coin; delivery label provisional. |
 | Proposed 1.11 - Glass Court | Approved theme, focusing aperture and item-required keeper encounter; delivery label provisional. |

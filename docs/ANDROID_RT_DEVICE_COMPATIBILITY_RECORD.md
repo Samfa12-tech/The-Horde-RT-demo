@@ -5151,3 +5151,21 @@ RT GPU times ranged from 63.17 to 74.27 ms, with a median of 66.93 ms across
 those sampled frames. There were 45 TLAS instances, 37 BLAS owners and one
 fire emitter. These snapshots do not measure displayed frame rate, frame
 pacing across the full interval or the cost of voice playback.
+
+### 28 November 2026 — Church handoff checkpoint with the combined resident roster
+
+The Galaxy S26 Ultra reached Debug checkpoint 335 at the church service mark
+with the private APK from `bdbfefc3`. Shared staging now checks whether the
+record keeper is ready, which works when the private build selects the
+artificer as its specialist and stages the church roster. The native
+`horde_rt_forest_dressing_tests --surroundings480` regression also reached
+the interpreted register state with both town residents ready.
+
+Five native reports matched GPU completion to successful presentation over
+a 36-second sample window at 33% Pipeline (475 × 980 RT). The median GPU
+time of those frames was 52.39 ms (37.99–80.01 ms). Battery temperature
+rose from 32.7°C to 35.5°C during the session. This verifies the staging
+fix and presented frames. Sustained frame rate and the thermal comparison
+remain unmeasured. All 25 original app files checked, including 15 save files,
+matched at the end. The private Windows replay passed all 59 checks on
+each hardware RT backend. [Checkpoint retest receipt](evidence/2026-11-28-bellwether-church/handoff-retest.json)
