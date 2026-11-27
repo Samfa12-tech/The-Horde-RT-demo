@@ -146,6 +146,7 @@ if(BUILD_TESTING)
         add_test(NAME horde_rt_chapter_texture_append_payload_tests COMMAND horde_rt_texture_layer_subset_tests
             ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/runtime
             ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/source/chapter-terrain-maps-r03
+            ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/props/runtime/bellwether-roof-v1
             ${CMAKE_CURRENT_SOURCE_DIR}/assets/textures/characters/runtime/kit-warden-v1)
     endif()
 

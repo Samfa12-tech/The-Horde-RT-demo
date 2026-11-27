@@ -127,9 +127,9 @@ int main(int argc,char** argv)
     check(appendView.layers==2 && appendView.mipLevels==2 && appendView.mips[0].size()==32 &&
           appendView.mips[1].size()==8 && appendView.mips[0].data()==extraKtx.data()+208,
           "append borrows actual encoded mips without resampling or copies");
-    check(PrepareRtKtxArrayAppend(baseKtx,extraKtx,37,2,2,18,20,appendView,diagnostic),
-          "two resident layers fit after the 18-layer chapter atlas");
-    check(!PrepareRtKtxArrayAppend(ktx(19),extraKtx,37,2,2,19,21,appendView,diagnostic),
+    check(PrepareRtKtxArrayAppend(ktx(19),extraKtx,37,2,2,19,21,appendView,diagnostic),
+          "two resident layers fit after the chapter terrain, roof and Kit");
+    check(!PrepareRtKtxArrayAppend(ktx(20),extraKtx,37,2,2,20,22,appendView,diagnostic),
           "appended layers cannot exceed the new capacity");
     const auto rejectAppend=[&](std::vector<std::uint8_t> bad) {
         RtKtxArrayAppendView sentinel;sentinel.layers=77;
@@ -143,8 +143,8 @@ int main(int argc,char** argv)
     rejectAppend(std::vector<std::uint8_t>(79));
     auto overlap=extraKtx;const std::uint64_t overlapping=208;std::memcpy(overlap.data()+104,&overlapping,8);rejectAppend(std::move(overlap));
     check(!PrepareRtKtxArrayAppend(baseKtx,extraKtx,37,2,2,18,17,appendView,diagnostic),"addition cannot underflow final layer count");
-    if(argc!=1 && (argc<3 || argc>5)) {
-        std::cerr<<"Expected base, terrain and optional Kit and resident array directories.\n";return 2;
+    if(argc!=1 && (argc<3 || argc>7)) {
+        std::cerr<<"Expected base and terrain directories, optionally followed by one-layer chapter material directories.\n";return 2;
     }
     if(argc>=3) {
         const auto read=[](const std::filesystem::path& path) {
@@ -164,17 +164,17 @@ int main(int argc,char** argv)
                 static_cast<std::uint32_t>(chosen.size()),static_cast<std::uint32_t>(chosen.size()+2),view,diagnostic);
             check(valid,"actual Windows/ASTC array append admission");
             if(!valid){std::cerr<<name<<": "<<diagnostic<<'\n';continue;}
-            std::vector<std::vector<std::uint8_t>> actorBytes(argc-3);
-            std::vector<RtKtxArrayAppendView> actorViews(argc-3);
-            bool validActors=true;
-            for(std::size_t actor=0;actor<actorViews.size();++actor) {
-                actorBytes[actor]=read(std::filesystem::path(argv[3+actor])/name);
+            std::vector<std::vector<std::uint8_t>> familyBytes(argc-3);
+            std::vector<RtKtxArrayAppendView> familyViews(argc-3);
+            bool validFamilies=true;
+            for(std::size_t family=0;family<familyViews.size();++family) {
+                familyBytes[family]=read(std::filesystem::path(argv[3+family])/name);
                 const auto selected=static_cast<std::uint32_t>(chosen.size());
-                validActors &= PrepareRtKtxArrayAppend(original,actorBytes[actor],format,1024,1024,
-                    selected,selected+1,actorViews[actor],diagnostic);
+                validFamilies &= PrepareRtKtxArrayAppend(original,familyBytes[family],format,1024,1024,
+                    selected,selected+1,familyViews[family],diagnostic);
             }
-            check(validActors,"each actor contributes one layer in the base atlas's native format");
-            if(!validActors)continue;
+            check(validFamilies,"each chapter material contributes one layer in the base atlas's native format");
+            if(!validFamilies)continue;
             std::size_t total=0;
             for(std::size_t mip=0;mip<view.mipLevels;++mip) {
                 std::uint64_t offset,length;std::uint32_t layers;
@@ -199,16 +199,16 @@ int main(int argc,char** argv)
                 const auto kept=upload;
                 upload.insert(upload.end(),view.mips[mip].begin(),view.mips[mip].end());
                 check(std::equal(kept.begin(),kept.end(),upload.begin()),"appended terrain cannot alter preceding encoded mips");
-                for(const auto& actorView:actorViews) {
+                for(const auto& familyView:familyViews) {
                     const auto precedingUpload=upload;
-                    upload.insert(upload.end(),actorView.mips[mip].begin(),actorView.mips[mip].end());
+                    upload.insert(upload.end(),familyView.mips[mip].begin(),familyView.mips[mip].end());
                     check(std::equal(precedingUpload.begin(),precedingUpload.end(),upload.begin()) &&
                           upload.size()==precedingUpload.size()+length/layers,
-                          "each actor append preserves preceding encoded mips");
+                          "each chapter material append preserves preceding encoded mips");
                 }
                 total+=upload.size();
             }
-            std::cout<<name<<": "<<chosen.size()+2+actorViews.size()<<" layers, "<<view.mipLevels<<" mips, "<<total<<" upload bytes\n";
+            std::cout<<name<<": "<<chosen.size()+2+familyViews.size()<<" layers, "<<view.mipLevels<<" mips, "<<total<<" upload bytes\n";
         }
     }
     return passed ? 0 : 1;

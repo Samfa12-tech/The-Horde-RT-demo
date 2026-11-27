@@ -726,7 +726,7 @@ void TestSharedMasterPacking()
     Check(commonReady,diagnostic.empty()?"shared proof retains the unchanged non-tree dressing builders":diagnostic);
     if(!commonReady)return;
     const auto common=owner;
-    Check(common.primitives.size()==9,"common world keeps nine material groups before adding local masters");
+    Check(common.primitives.size()==10,"common world keeps ten material groups before adding local masters");
     const auto familyTriangles=[&](std::string_view family) {
         std::size_t count=0;
         for(const auto& p:common.primitives)if(common.materials[p.materialIndex].name==family)count+=p.indexCount/3u;
@@ -739,9 +739,9 @@ void TestSharedMasterPacking()
     Check(AppendPreparedForestMasters(prepared,owner,layout,diagnostic),
           diagnostic.empty()?"two local masters append once after common consolidation":diagnostic);
     if(!layout.prepared)return;
-    Check(layout.commonPrimitiveCount==9 && layout.masters[0].primitiveOffset==9 && layout.masters[0].primitiveCount==3 &&
-          layout.masters[1].primitiveOffset==12 && layout.masters[1].primitiveCount==3 && owner.primitives.size()==15,
-          "common/pine/alder ranges are disjoint, contiguous and cover all fifteen primitives");
+    Check(layout.commonPrimitiveCount==10 && layout.masters[0].primitiveOffset==10 && layout.masters[0].primitiveCount==3 &&
+          layout.masters[1].primitiveOffset==13 && layout.masters[1].primitiveCount==3 && owner.primitives.size()==16,
+          "common/pine/alder ranges are disjoint, contiguous and cover all sixteen primitives");
     Check(owner.materials.size()==common.materials.size() && owner.sockets.size()==common.sockets.size() &&
           owner.bounds.minimum==common.bounds.minimum && owner.bounds.maximum==common.bounds.maximum &&
           std::memcmp(owner.vertices.data(),common.vertices.data(),common.vertices.size()*sizeof(StaticRtVertex))==0 &&
@@ -782,15 +782,15 @@ void TestSharedMasterPacking()
         using namespace horde::vulkan::raytracing;
         const std::array<StaticRtAssetRegistration,3> ranges{{
             {0,100,pbr,0,&owner,nullptr,RtGeometryRole::Static,0,static_cast<std::uint32_t>(layout.commonPrimitiveCount)},
-            {1,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,9,3},
-            {2,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,12,3}}};
+            {1,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,static_cast<std::uint32_t>(layout.masters[0].primitiveOffset),3},
+            {2,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,static_cast<std::uint32_t>(layout.masters[1].primitiveOffset),3}}};
         RtStaticMeshSlot packed,commonPacked;
         const bool packedReady=packed.InitializeSelectedGeometry(ranges,diagnostic) &&
             commonPacked.Initialize(std::array{StaticRtAssetRegistration{0,100,pbr,0,&common}},diagnostic);
         Check(packedReady,diagnostic.empty()?"disjoint ranges pack the same static owner once":diagnostic);
         if(packedReady) {
             Check(packed.Vertices().size()==owner.vertices.size() && packed.Indices()==owner.indices &&
-                  packed.PrimitiveMetadata().size()==15 && packed.Measurements().vertexBytes==owner.vertices.size()*sizeof(StaticRtVertex) &&
+                  packed.PrimitiveMetadata().size()==16 && packed.Measurements().vertexBytes==owner.vertices.size()*sizeof(StaticRtVertex) &&
                   packed.Materials().size()==commonPacked.Materials().size() &&
                   std::memcmp(packed.Materials().data(),commonPacked.Materials().data(),packed.Measurements().materialBytes)==0 &&
                   packed.TextureArrayCounts().baseColor==commonPacked.TextureArrayCounts().baseColor &&
@@ -3341,11 +3341,11 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
                   "canonical route camera and player height retain the exact current native terrain support");
         }
     }
-    constexpr std::array<std::string_view,11> families{{
+    constexpr std::array<std::string_view,12> families{{
         "Boulder01Rock", "MedievalWall02", "TombBoneWax", "TombEarthenware", "TombCharredWick",
-        "ChapterTrailDampSand", "ChapterForestGround", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};
+        "ChapterTrailDampSand", "ChapterForestGround", "HordeVillageRoofTiles", "ForestBark", "ForestPine", "ForestMoss", "ForestAlder"}};
     Check(owner.primitives.size() == families.size(),
-          "current coalesced chapter retains eleven existing primitive rows");
+          "current coalesced chapter retains twelve primitive rows including tiled roofs");
     if (owner.primitives.size() != families.size()) return;
     Check(owner.triangleRegions.size() == owner.indices.size()/3u,
           "native material consolidation must retain explicit per-triangle region provenance");
@@ -3389,7 +3389,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
     if(selectionReady) {
         Check(selected.indices.size()+3u*taggedTomb==owner.indices.size() &&
               selected.vertices.size()<owner.vertices.size() && selected.primitives.size()==owner.primitives.size(),
-              "real tomb-only triangle omission shrinks buffers while keeping all eleven material families");
+              "real tomb-only triangle omission shrinks buffers while keeping all twelve material families");
         Check(std::count(selected.triangleRegions.begin(),selected.triangleRegions.end(),StaticTriangleRegion::ExteriorDressing)==taggedExterior,
               "graveyard offering and candle triangles cannot disappear with indoor material peers");
         std::size_t target=0;
@@ -3543,7 +3543,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
             candidate->PrimitiveMetadata().size()==complete.PrimitiveMetadata().size() &&
             std::count(candidate->TriangleRegions().begin(),candidate->TriangleRegions().end(),
                 StaticTriangleRegion::ExteriorDressing)==taggedExterior,
-            "bounded native candidate preserves all vertex bytes, eleven rows and every graveyard triangle");
+            "bounded native candidate preserves all vertex bytes, twelve rows and every graveyard triangle");
         if(candidate)for(std::size_t p=0;p<complete.PrimitiveMetadata().size();++p) {
             const auto& a=complete.PrimitiveMetadata()[p];const auto& b=candidate->PrimitiveMetadata()[p];
             std::size_t target=b.indexOffset;
@@ -3561,7 +3561,7 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
     const std::array<StaticRtAssetRegistration,3> ranges{{
         {14,101,pbr,0,&owner,nullptr,RtGeometryRole::Static,0,2},
         {15,102,pbr,0,&owner,nullptr,RtGeometryRole::Static,2,3},
-        {16,103,pbr,0,&owner,nullptr,RtGeometryRole::Static,5,6}}};
+        {16,103,pbr,0,&owner,nullptr,RtGeometryRole::Static,5,7}}};
     const bool partitionReady = partitioned.Initialize(ranges, diagnostic);
     Check(partitionReady,
           "three actual chapter ranges share one packed native asset");
@@ -3662,14 +3662,14 @@ void TestNativeChapterPrimitiveOwnership(bool f01North=false)
     // Production has no spare primitive or instance row. Disconnected source
     // families must therefore pack into the existing collapse owner, preserving
     // the same BLAS-local decode rather than inventing extra world instances.
-    const std::array<std::uint32_t,8> forestFamilies{{0,1,5,6,7,8,9,10}};
+    const std::array<std::uint32_t,9> forestFamilies{{0,1,5,6,7,8,9,10,11}};
     auto forestOwner = StaticRtAssetRegistration{21,100,pbr,0,&owner};
     forestOwner.primitiveSelection = forestFamilies;
     verifySelection(std::array{forestOwner}, "one-owner common+forest");
     auto tombOwner = StaticRtAssetRegistration{21,100,pbr,0,&owner};
     tombOwner.primitiveCount = 5;
     verifySelection(std::array{tombOwner}, "one-owner common+tomb");
-    std::cout << "Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, forest 6; "
+    std::cout << "Native chapter ownership: common 2 (includes mixed tomb masonry), tomb 3, exterior 7; "
               << "primitiveRows=" << visited << " vertexBytes=" << complete.Measurements().vertexBytes
               << " indexBytes=" << complete.Measurements().indexBytes << "; CPU admission only\n";
 }

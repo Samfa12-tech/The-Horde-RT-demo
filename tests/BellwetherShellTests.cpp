@@ -271,7 +271,9 @@ int main(int argc,char** argv) {
               kSquareWaymarkerSignTriangles==752u && kSquareWaymarkerCaskTriangles==1100u &&
               kSquareWaymarkerLampTriangles==120u,
             "the south square fingerpost and paired cask keep their authored solid triangle budgets");
-        check(world.materials.size()==before.materials.size(),"no texture layer or material row expansion");
+        check(world.materials.size()==before.materials.size()+1 &&
+              world.materials.back().name=="HordeVillageRoofTiles" && world.materials.back().deferTextureAllocation,
+              "the eight village roofs share a dedicated tile finish");
         check(support->NonWalkableTriangleCount()==kBellwetherSolidTriangles+kBellwetherGlazingTriangles &&
               support->TriangleCount()==originalTerrain->TriangleCount()+kBellwetherGroundTriangles,
             "render contact preserves the authored distinction between solids and walkable surfaces");
@@ -862,21 +864,47 @@ int main(int argc,char** argv) {
         check(!AppendBellwetherShell(root,world,support,error) && world.indices==admittedIndices &&
               support==admittedSupport,
             "repeated admission preserves the existing render owner and contact");
+        // The gables, tiled slopes and soffits form closed roofs across three material ranges.
+        double masonryAndClayVolume=0.;
+        unsigned tiledTriangles=0;
         for(std::size_t j=1;j<world.primitives.size();++j) {
-            const auto& p=world.primitives[j];double volume=0;
+            const auto& p=world.primitives[j];
+            if(world.nodeTransforms[p.nodeTransformIndex].name!="BellwetherSolid")continue;
+            const auto& finish=world.materials[p.materialIndex].name;
+            double volume=0;
             for(std::size_t k=0;k<p.indexCount;k+=3) {
                 const auto& a=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k]].position;
                 const auto& b=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+1]].position;
                 const auto& c=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+2]].position;
+                if(finish=="HordeVillageRoofTiles") {
+                    ++tiledTriangles;
+                    const auto crossY=(b[2]-a[2])*(c[0]-a[0])-(b[0]-a[0])*(c[2]-a[2]);
+                    check(crossY>0.f,"tile planes face outwards on both sides of each ridge");
+                    for(unsigned edge=0;edge<3;++edge) {
+                        const auto& from=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+edge]];
+                        const auto& to=world.vertices[p.vertexOffset+world.indices[p.indexOffset+k+(edge+1)%3]];
+                        check(from.normal[1]>0.f && from.tangent[2]>.999f && from.normal[0]*from.tangent[3]<0.f,
+                              "the tangent basis carries the upward tile normal on either slope, including at the ridge");
+                        const auto dx=to.position[0]-from.position[0], dy=to.position[1]-from.position[1];
+                        const auto dz=to.position[2]-from.position[2];
+                        const float du=to.uv0[0]-from.uv0[0], dv=to.uv0[1]-from.uv0[1];
+                        check(std::abs(std::abs(du)*2.4f-std::abs(dz))<.003f &&
+                              std::abs(std::abs(dv)*2.4f-std::hypot(dx,dy))<.003f && dy*dv>=0.f,
+                              "roof tile courses follow the ridge at the authored metre scale on both slopes");
+                    }
+                }
                 volume+=(double(a[0])*(double(b[1])*c[2]-double(b[2])*c[1])+
                     double(a[1])*(double(b[2])*c[0]-double(b[0])*c[2])+
                     double(a[2])*(double(b[0])*c[1]-double(b[1])*c[0]))/6;
             }
-            if(world.nodeTransforms[p.nodeTransformIndex].name=="BellwetherSolid")
-                check(volume>.005,"each solid town material range has outward native winding");
+            if(finish=="MedievalWall02" || finish=="TombEarthenware" || finish=="HordeVillageRoofTiles")
+                masonryAndClayVolume+=volume;
+            else check(volume>.005,"closed town fittings have outward native winding");
         }
-        check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==3,
-            "town and furniture coalesce into the three existing opaque world families");
+        check(tiledTriangles==32 && masonryAndClayVolume>.005,
+              "only the eight pitched main roofs use tiles and the combined masonry and clay encloses positive volume");
+        check(assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==4,
+            "the three original opaque families and the roof tile family consolidate separately");
         const auto withoutCrops=world.indices.size();
         check(!AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withoutCrops,
               "garden foliage cannot allocate a replacement for a missing alder family");
@@ -893,7 +921,7 @@ int main(int argc,char** argv) {
               world.triangleRegions.back()==assets::StaticTriangleRegion::Shared,
               "garden crop geometry joins the existing atlas family as shared world detail without contact");
         check(!AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withCrops &&
-              assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==3,
+              assets::ConsolidateWorldBakedMaterialFamilies(world,error) && world.primitives.size()==4,
               "garden foliage rejects duplicate admission and shares an existing consolidated primitive");
     }
     auto missing=before;missing.materials[1].name="Missing";

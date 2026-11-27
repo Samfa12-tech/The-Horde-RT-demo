@@ -285,7 +285,7 @@ int main()
                       PresentableTinyRtScene::kTlasInstanceCount == 122u &&
                       kRtInstanceMetadataCapacity == 43u &&
                       kRtStaticAssetCapacity == 26u &&
-                      kRtPrimitiveMetadataCapacity == 57u && kRtMaterialCapacity == 51u &&
+                      kRtPrimitiveMetadataCapacity == 58u && kRtMaterialCapacity == 52u &&
                       PresentableTinyRtScene::kKeeperTorchFirstTlasInstance == 23u &&
                       PresentableTinyRtScene::kKeeperTorchInstanceCount == 2u &&
                       PresentableTinyRtScene::kCollapseInstanceIndex == 21u &&

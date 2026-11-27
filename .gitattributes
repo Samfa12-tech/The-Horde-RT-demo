@@ -595,3 +595,10 @@ tools/author-bellwether-square-waymarker.py text eol=lf
 tools/author-bellwether-tavern-cask.py text eol=lf
 assets/models/world/source/bellwether-square-waymarker-v1/*.json text eol=lf
 assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h text eol=lf
+
+# Editable roof recipes and reproducible export receipts.
+assets/models/world/source/bellwether-roofline-v1/*.py text eol=lf
+assets/models/world/source/bellwether-roofline-v1/*.json text eol=lf
+assets/models/world/source/bellwether-roofline-v1/*.h text eol=lf
+assets/models/world/source/bellwether-roof-v1/*.py text eol=lf
+assets/models/world/source/bellwether-roof-v1/maps/*.json text eol=lf

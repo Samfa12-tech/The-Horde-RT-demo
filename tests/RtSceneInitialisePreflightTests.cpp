@@ -125,7 +125,7 @@ struct PresentableTinyRtScenePreflightTestAccess {
         if (!scene.chapterActorReady_ || slot.InstanceMetadata()[9].primitiveCount != 0 ||
             slot.InstanceMetadata()[25].primitiveCount != 1 ||
             slot.PrimitiveMetadata().size() > kRtPrimitiveMetadataCapacity ||
-            counts.baseColor != 18 || counts.normal != 15 || counts.orm != 15 ||
+            counts.baseColor != 19 || counts.normal != 16 || counts.orm != 16 ||
             counts.emissive != 1 || emissiveOwners != 1) {
             diagnostic = "Chapter's real native asset/material roster exceeded or misrouted the bounded admission.";
             return false;

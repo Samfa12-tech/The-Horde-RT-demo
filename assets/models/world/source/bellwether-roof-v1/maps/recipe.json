@@ -1,0 +1,76 @@
+{
+  "asset": "Bellwether hand-laid flat clay plain roof tiles v1",
+  "authoring": "Original deterministic Python/Numpy/Pillow procedural material; no external source images, assets, providers, or paid generation.",
+  "seed": 27112026,
+  "resolution": 1024,
+  "repeatMetres": [
+    2.4,
+    2.4
+  ],
+  "uv": "+U along ridge; +V uphill from eaves to ridge; lower exposed lip faces downhill. Final stored file row 0 is V=0 at eaves; rows increase toward ridge.",
+  "layout": {
+    "tilesAcross": 12,
+    "exposedCourses": 16,
+    "tilePitchWidthMetres": 0.2,
+    "tileWidthMetres": 0.194,
+    "coursePitchMetres": 0.15,
+    "tileLengthMetres": 0.244,
+    "overlapMetres": 0.094
+  },
+  "maps": {
+    "base-color": "sRGB albedo, muted iron-rich red/brown clay; no illumination or specular baked.",
+    "height": "Linear 0..20 mm source relief, bevel and lower overlapping lip; source-only, converted into normal.",
+    "normal": "OpenGL +Y tangent-space normal derived from height and physical repeat.",
+    "orm": "Linear RGBA, R=AO, G=roughness, B=metallic=0, A=255; non-metallic rough ceramic."
+  },
+  "periodicSeams": "Lattice and deterministic variation wrap at 2.4 m; output edge comparisons are included in validation receipt.",
+  "quantitativeSourceChecks": {
+    "opaqueAlpha": true,
+    "baseColorOppositeEdgeMeanAbsRgb": 1.423,
+    "heightOppositeEdgeMeanAbs": 7.916,
+    "normalVectorLengthMean": 1.0001,
+    "ormMetalMaximum": 0,
+    "roughnessRange": [
+      0.865,
+      0.94
+    ],
+    "ambientOcclusionRange": [
+      0.5806,
+      0.91
+    ]
+  },
+  "products": {
+    "base-color.png": {
+      "sha256": "cfd2ab022f4f1544de9c88ce177c8cfea93340f1dc3ff7658edf0af0d7e8e64c",
+      "bytes": 675604,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "height.png": {
+      "sha256": "721c12938e097f7c10f0d11ccb20f0525a26ebedc218f7bc9e1751d0147f3ebf",
+      "bytes": 457587,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "normal.png": {
+      "sha256": "611d63df19d0939dcbb482dce4f783c81701e0525c11a006fea8d39c5be01bbd",
+      "bytes": 1248456,
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    "orm.png": {
+      "sha256": "0d1b91fbb86f6e9799da7930737179585a67d6dd26c090f7469f7dd664f0e1e3",
+      "bytes": 383868,
+      "size": [
+        1024,
+        1024
+      ]
+    }
+  }
+}

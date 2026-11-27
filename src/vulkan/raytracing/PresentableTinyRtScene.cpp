@@ -4882,11 +4882,11 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
     const auto baseLayers = selection.baseColor;
     const auto normalOrmLayers = selection.normalOrm;
     const auto aliases = selection.aliases;
-    static_assert(kChapterBaseColorSourceLayers.size() + 3u + kAdditionalChapterActorCapacity <=
+    static_assert(kChapterBaseColorSourceLayers.size() + 4u + kAdditionalChapterActorCapacity <=
         kRtTextureLayerCapacity);
     const auto residentLayers = std::count_if(chapterResidents_.begin(), chapterResidents_.end(),
         [](const auto& resident) { return resident.hasPbrMaps; });
-    const std::size_t extraLayers = chapterLayout ? (chapterActorReady_ ? 3u : 2u) + residentLayers : 0u;
+    const std::size_t extraLayers = chapterLayout ? 3u + (chapterActorReady_ ? 1u : 0u) + residentLayers : 0u;
     if (!baseLayers.empty() &&
         (textureCounts.baseColor != baseLayers.size() + extraLayers ||
          textureCounts.normal != normalOrmLayers.size() + extraLayers ||
@@ -4913,7 +4913,10 @@ bool PresentableTinyRtScene::CreateStaticMeshResources(std::string& diagnostic)
         "characters/runtime/kit-warden-v1";
     const auto addition = [&assetDirectory,&kitTextureDirectory,chapterLayout,this](const char* name) {
         std::vector<TextureArrayAddition> additions;
-        if (chapterLayout) additions.push_back({(assetDirectory / "chapter-terrain" / name).string(), 2u});
+        if (chapterLayout) {
+            additions.push_back({(assetDirectory / "chapter-terrain" / name).string(), 2u});
+            additions.push_back({(assetDirectory / "bellwether-roof-v1" / name).string(), 1u});
+        }
         if (chapterActorReady_) additions.push_back({(kitTextureDirectory / name).string(), 1u});
         for (std::size_t lane = 0; lane < chapterResidentSources_.size(); ++lane)
             if (chapterResidents_[lane].hasPbrMaps)

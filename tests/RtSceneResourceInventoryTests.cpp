@@ -920,9 +920,9 @@ struct PresentableTinyRtSceneObservationTestAccess
             "simulation frame adapter carries the authoritative waterwheel angle");
         const auto counts=scene.staticMeshSlot_.TextureArrayCounts();
         const std::array<std::uint32_t,4> layers{{counts.baseColor,counts.normal,counts.orm,counts.emissive}};
-        // The admitted Kit maps append one family after the terrain maps;
+        // The admitted Kit maps append one family after the terrain and roof tiles;
         // Kit is the sole mapped emissive owner, replacing the unused fallback.
-        ok &= layers==std::array<std::uint32_t,4>{{18,15,15,1}};
+        ok &= layers==std::array<std::uint32_t,4>{{19,16,16,1}};
         const auto& materials=scene.staticMeshSlot_.Materials();
         const auto& primitives=scene.staticMeshSlot_.PrimitiveMetadata();
         std::cout<<"Actual development static admission materials="<<materials.size()
@@ -930,8 +930,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             <<","<<layers[2]<<","<<layers[3]<<'\n';
         ok &= materials.size()<=kRtMaterialCapacity && primitives.size()<=kRtPrimitiveMetadataCapacity;
         ok &= materials.size()+MakeRtWorldMaterialPalette(true).count<=kRtMaterialCapacity;
-        ok &= materials.size()==44u && primitives.size()==
-            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?52u:51u);
+        ok &= materials.size()==45u && primitives.size()==
+            (scene.pipelineBundle_.Request().quality==DielectricQuality::High?53u:52u);
         ok &= scene.chapterTerrainSurface_ &&
             scene.chapterTerrainSurface_->TriangleCount()==39266u+horde::scene::kBellwetherGroundTriangles;
         const auto& instances=scene.staticMeshSlot_.InstanceMetadata();
@@ -1175,6 +1175,11 @@ struct PresentableTinyRtSceneObservationTestAccess
             }
             return kRtMaterialCapacity;
         };
+        const auto tiles=row(scene.collapseStaticAsset_,PresentableTinyRtScene::kCollapseInstanceIndex,0u,"HordeVillageRoofTiles");
+        ok &= Require(tiles<materials.size() &&
+            materials[tiles].textureLayers==std::array<std::uint32_t,4>{17u,14u,14u,0u} &&
+            materials[kitMaterial].textureLayers==std::array<std::uint32_t,4>{18u,15u,15u,0u},
+            "roof tile maps follow the terrain in all three arrays and Kit retains his separate maps");
         for(const char* family:{"ChestWood","BlackIron"}) {
             const auto base=row(scene.gothicChestBaseAsset_,5u,0u,family);
             const auto lid=row(scene.gothicChestLidAsset_,6u,0u,family);
@@ -1766,7 +1771,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kWellApronSolidTriangles+
             horde::gameplay::bellwether::kWellApronGroundTriangles+
             horde::gameplay::bellwether::kTavernServiceSolidTriangles+
-            horde::gameplay::bellwether::kSquareWaymarkerSolidTriangles &&
+            horde::gameplay::bellwether::kSquareWaymarkerSolidTriangles+
+            horde::gameplay::bellwether::kVillageRoofAddedSolidTriangles &&
             support->NonWalkableTriangleCount()<=support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
         std::cout << "Combined forest and town native support: " << supportTriangles
                   << " triangles; retained CPU bytes=" << (support ? support->RetainedBytes() : 0u) << '\n';
@@ -1781,8 +1787,8 @@ struct PresentableTinyRtSceneObservationTestAccess
                   baseline.collapseStaticAsset_.bounds.maximum[1] > 12.0f &&
                   std::abs(chapterEntryTop - 6.0f) < 0.001f &&
                   tomb.collapseStaticAsset_.indices.size() == chapterEntryIndices + addedIndices + woodlandIndices &&
-                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 51u &&
-                  tomb.staticMeshSlot_.Materials().size() == 44u &&
+                  tomb.staticMeshSlot_.PrimitiveMetadata().size() == 52u &&
+                  tomb.staticMeshSlot_.Materials().size() == 45u &&
                   tomb.staticMeshSlot_.PrimitiveMetadata().size() <= kRtPrimitiveMetadataCapacity &&
                   tomb.staticMeshSlot_.Materials().size() + MakeRtWorldMaterialPalette(true).count <= kRtMaterialCapacity;
         if (!ok)
