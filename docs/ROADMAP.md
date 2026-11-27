@@ -184,7 +184,7 @@ beside the oil cup describes a delivery for the tavern and points players to
 the mill's existing tally board. Bellwether Directions points out the short
 stone fork from the square and identifies the ledger and return ramp along
 the stock-room approach. The interior selection and handset playtest remain
-open.
+open. [Windows route and Android menu evidence](evidence/2026-11-28-bellwether-stock-room-directions/receipt.json)
 
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 
