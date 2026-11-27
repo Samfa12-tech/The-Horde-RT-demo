@@ -5038,3 +5038,41 @@ python tools/analyze-chapter-route-measurement.py --android-bellwether-hearth-cl
 After testing, the temporary observer app was removed. The original
 private playtest APK, eleven saves, nine report files and one preference
 file matched their pre-test hashes. The phone was returned to Home.
+
+### 28 November 2026 — Hearth shadow-query comparison
+
+On the Galaxy S26 Ultra (SM-S948B, Android 17), two private ARM64 apps built from
+`021e29ad` exercised the first staffed-hearth hold of the western route. They
+contained the same 290 game asset entries. Both used the ordinary Shipping/Mobile
+Pipeline shaders with stage timestamps at 33% (475 × 980 RT, 1440 × 2971 output).
+The trial deferred the shadow candidate primitive-index read until an intersection
+belonged to the shared world instance. The frozen 1440 × 3120 phone screenshots
+matched byte for byte.
+
+Each admitted run supplied 91 frames in the same simulation tick window. Each
+row joined submission, GPU completion, stage timing and successful present by
+serial. All five runs had the same four fire lights, 45 TLAS instances and 38
+BLAS owners. Framework thermal status was 0 on entry. AP, battery and skin
+starting temperatures were within 1.5 °C of the opening control.
+
+| Build in run order | RT dispatch median | RT dispatch p95 | Frames bracketed by 1300 MHz / power level 0 | Median of those frames |
+| --- | ---: | ---: | ---: | ---: |
+| Control | 76.19 ms | 112.26 ms | 78 | 76.00 ms |
+| Trial | 76.30 ms | 141.48 ms | 83 | 76.22 ms |
+| Control | 76.02 ms | 77.98 ms | 91 | 76.02 ms |
+| Trial | 76.35 ms | 156.62 ms | 82 | 76.21 ms |
+| Control | 76.28 ms | 78.20 ms | 91 | 76.28 ms |
+
+Compared with the mean of the adjoining control medians, the two trial
+medians increased by 0.195 and 0.200 ms. The handset entered different lower
+clock states during three runs. For the subset with matching 5 Hz clock and
+power readings immediately before and after present return, the differences
+were +0.215 and +0.062 ms. A frequency change between readings can go
+unobserved. These short GPU intervals establish neither a repeatable gain nor
+sustained displayed FPS. The shipping shader stays in place.
+
+The [experiment receipt](evidence/2026-11-28-bellwether-hearth-primitive/receipt.json)
+includes the settings, APK and shader identities, excluded warm start, thermal
+records, screenshot hashes, and the frame and GPU clock CSV filenames with
+their uncompressed checksums. Both test packages and the temporary sampler
+were removed after the final control.

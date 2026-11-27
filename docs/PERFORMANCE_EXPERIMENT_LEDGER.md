@@ -33,6 +33,9 @@ temperature stable at 36.5 °C. This is a warmed ordinary-play observation.
 
 **28 November staffed hearth dispatch.** In [two first-room phone runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--staffed-hearth-shader-sampling-on-the-galaxy-s26-ultra), shadow visibility occupied 36.37–37.73% of sampled shader-clock ticks on the ordinary 33% Pipeline geometry layout. Most of those ticks came from pixels whose primary ray hit the shared static world. The frozen repeat-visit image matched the ordinary renderer pixel for pixel. The next experiment should distinguish local fire-emitter shadow queries from the other visibility queries on these receiving surfaces. Retain the existing shadow quality and use ordinary shader timings for the comparison.
 
+**28 November shadow candidate primitive index — closed.** A trial moved the candidate primitive-index read inside the shared-world instance check at the staffed hearth. At the same 33% Pipeline view, trial medians were 76.30 and 76.35 ms for RT dispatch. Both took 0.20 ms longer than their adjacent controls on average. Restricting the analysis to frames bracketed by matching 1300 MHz readings also showed no repeatable gain. The frozen image matched pixel for pixel. Keep the ordinary shader. [Phone comparison and raw captures](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison)
+
+
 **24 November ordinary Android hearth controls.** At the same position and
 graphics settings, the [stationary view comparison](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#24-november-2026--ordinary-bellwether-hearth-view-and-backend-timing)
 recorded median display intervals of 141.67 ms facing the hearth, 108.33 ms
