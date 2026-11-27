@@ -34,13 +34,19 @@ bool OnRiverPracticeLanding(float x,float z) {
 }
 } // namespace
 
-bool GameSimulation::SquareWaymarkerReadable(const dialogue::Context& c, float yaw) const {
-    return config_.developmentRescueJourney && config_.authoredChapterTerrain &&
+bellwether::LocalReading GameSimulation::CurrentLocalReading(const dialogue::Context& c, float yaw) const {
+    using bellwether::LocalReading;
+    const bool canRead = config_.developmentRescueJourney && config_.authoredChapterTerrain &&
         !legacyCombatCheckpoint_ && c.exterior && c.alive && !c.paused && !c.combat &&
         !c.traversing && playerSupport_.grounded && chapterTerrain_ &&
         chapterTerrainGeneration_==worldRoute_.generation &&
-        chapterDialogue_.State().line==dialogue::Line::None &&
-        bellwether::SquareWaymarkerReadableFrom(c.player.x,c.listener.y,c.player.z,yaw);
+        chapterDialogue_.State().line==dialogue::Line::None;
+    if (!canRead) return LocalReading::None;
+    if (bellwether::HouseBStockLedgerReadableFrom(c.player.x,c.listener.y,c.player.z,yaw))
+        return LocalReading::HouseBStockLedger;
+    if (bellwether::SquareWaymarkerReadableFrom(c.player.x,c.listener.y,c.player.z,yaw))
+        return LocalReading::SquareFingerpost;
+    return LocalReading::None;
 }
 
 void GameSimulation::EnsureBellwetherResidentPoses(bool requireAuthoredTerrain) {
@@ -148,11 +154,8 @@ void GameSimulation::InteractWithClaimedChapter() {
             waysideArchive_.registerRecovered?TavernGuidance::Register:TavernGuidance::Shrine;
         chapterDialogue_.ShowTavernDirections(context,guidance);
     }
-    // The physical fingerpost is a local caption, not a speech line. Keep it
-    // behind every existing campaign/service interaction in this dispatch.
-    if(SquareWaymarkerReadable(context,context.yaw))
-        squareWaymarkerTextVisible_=bellwether::StepSquareWaymarkerTextVisible(
-            true,false,false,true,squareWaymarkerTextVisible_);
+    // Written objects follow campaign and service interactions in this dispatch.
+    openLocalReading_=bellwether::StepLocalReading(CurrentLocalReading(context,context.yaw), openLocalReading_, true);
 }
 
 campaign::MillTallyAction GameSimulation::CurrentMillTallyAction(const dialogue::Context& c) const {

@@ -1303,6 +1303,11 @@ reuses the existing Horde town stone, chest timber, earthenware and char
 materials. The [editable source and receipt](assets/models/world/source/bellwether-house-b-v1/README.md)
 identify the input and runtime files.
 
+Samfa12/Codex modeled the open stock ledger and its page marks for the House B
+sorting tray. It uses existing town material rows. The [Blender source and
+export receipt](assets/models/world/source/bellwether-house-b-ledger-v1/README.md)
+pin the geometry and the reading position.
+
 ## Bellwether roadside silver - 27 November 2026
 
 Samfa12/Codex authored an original hollow handled silver cup in Blender for the west opening of the roadside cache. The single opaque metallic `WornSilver` material has no textures or emission. The [source master, recipe and receipt](assets/models/world/source/bellwether-road-silver-v1/README.md) document the local-space runtime export and placement. No external asset or third-party licence is involved.

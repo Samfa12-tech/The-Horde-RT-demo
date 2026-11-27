@@ -66,7 +66,7 @@ public final class ContextualControlsLayoutTest {
     }
 
     @Test
-    public void fingerpostUsesFreeOptionalActionDetailWithoutReplacingKitTopic() {
+    public void localReadingsUseTheirOwnOptionalActionDetail() {
         final int fingerpost = (1 << 31) | (7 << 25) | 1;
         final int finish = fingerpost | (1 << 28);
         assertEquals(R.string.read_fingerpost, MainActivity.contextualInteractLabel(fingerpost));
@@ -75,6 +75,9 @@ public final class ContextualControlsLayoutTest {
         assertEquals(R.string.finish_reading_fingerpost, MainActivity.contextualInteractLabel(finish));
         assertEquals("Finish reading", MainActivity.contextualInteractText(
                 RuntimeEnvironment.getApplication(), finish));
+        final int ledger = fingerpost | (1 << 29);
+        assertEquals(R.string.read_stock_ledger, MainActivity.contextualInteractLabel(ledger));
+        assertEquals(R.string.finish_reading_fingerpost, MainActivity.contextualInteractLabel(ledger | (1 << 28)));
         assertEquals(R.string.ask_kit_about_treasure,
                 MainActivity.contextualInteractLabel((1 << 31) | (6 << 25) | 1));
     }

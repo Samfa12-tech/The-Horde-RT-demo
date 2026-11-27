@@ -72,7 +72,7 @@ public final class ProbeBridge {
     public static native void setCombatTeachingOptions(boolean enabled, boolean slowdown);
     public static native void requestCombatTeachingSkip();
     public static native void requestCombatTeachingReplay();
-    /** Coherent immutable chapter publication: line, generation, elapsed/duration ms, paused, caption fallback, fingerpost visible. */
+    /** Coherent immutable chapter publication: line, generation, elapsed/duration ms, paused, caption fallback, local reading visible. */
     public static native long[] getChapterDialogueState();
     /** Coherent lookout availability: schema, surface generation, world generation, available. */
     public static native long[] getLookoutObjectiveState(long surfaceGeneration);

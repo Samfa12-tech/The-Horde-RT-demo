@@ -344,7 +344,7 @@ private:
     bool FlaskUpgradeEligible(const InputSnapshot&) const;
     bool TryFlaskUpgradeInteraction();
     void InteractWithClaimedChapter();
-    bool SquareWaymarkerReadable(const dialogue::Context&, float yaw) const;
+    bellwether::LocalReading CurrentLocalReading(const dialogue::Context&, float yaw) const;
     void RefreshSnapshot(const InputSnapshot& input);
     void UpdateChapterDialogue(const InputSnapshot& input,float fixedSeconds);
     dialogue::Context ChapterInteractionContext(bool paused,
@@ -454,7 +454,7 @@ private:
     horde::gameplay::dialogue::CompanionRouteFixture chapterCompanion_{};
     std::uint64_t chapterSkipFloor_=0,chapterVisibleRaise_=0;
     bool chapterFirstExterior_=false;
-    bool squareWaymarkerTextVisible_=false;
+    bellwether::LocalReading openLocalReading_=bellwether::LocalReading::None;
     InputSnapshot lastInput_{};
 
     TorchFailureSequence torchFailure_{};

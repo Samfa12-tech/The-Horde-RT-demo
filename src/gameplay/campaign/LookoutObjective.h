@@ -131,6 +131,19 @@ inline constexpr char kSquareFingerpostInscription[] =
     "Wheel - Mill & river fork, east\r\n"
     "Anvil - Smith yard, southeast";
 
+inline constexpr char kHouseBStockLedgerInscription[] =
+    "Grain for the tavern: two sacks set aside.\r\n"
+    "Return the mill tally stamp at the board by the mill's west door.";
+
+inline constexpr const char* LocalReadingText(bellwether::LocalReading reading) {
+    switch (reading) {
+    case bellwether::LocalReading::SquareFingerpost: return kSquareFingerpostInscription;
+    case bellwether::LocalReading::HouseBStockLedger: return kHouseBStockLedgerInscription;
+    case bellwether::LocalReading::None: return "";
+    }
+    return "";
+}
+
 inline const char* PauseObjectiveText(PauseObjective objective)
 {
     switch (objective)

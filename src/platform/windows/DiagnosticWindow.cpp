@@ -2750,14 +2750,14 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
     if (subtitle == nullptr) return;
     const auto& snapshot = context.simulation.Snapshot();
     const auto& dialogue = snapshot.chapterDialogue;
-    const bool readingSign = snapshot.squareWaymarkerTextVisible &&
+    const bool readingLocally = snapshot.openLocalReading != horde::gameplay::bellwether::LocalReading::None &&
         dialogue.line == horde::gameplay::dialogue::Line::None;
     const bool voicePlaying = context.playingDialogueLine == static_cast<unsigned>(dialogue.line) &&
         context.playingDialogueGeneration == dialogue.generation && context.voiceVolumePercent > 0;
     const bool requiresCaption = !voicePlaying && horde::gameplay::dialogue::RequiresChapterCaption(dialogue.line);
     const bool showDialogue = dialogue.line != horde::gameplay::dialogue::Line::None &&
         (context.subtitlesEnabled || requiresCaption);
-    if ((!readingSign && !showDialogue) || dialogue.paused ||
+    if ((!readingLocally && !showDialogue) || dialogue.paused ||
         !context.controlsEnabled || MeasurementPausedByUi(context))
     {
         SetControlVisible(context.windowHandle, kChapterSubtitleId, false);
@@ -2789,8 +2789,8 @@ void RefreshChapterSubtitle(VulkanSurfaceContext& context)
         }
     }
     std::string text;
-    if (readingSign) {
-        text = horde::gameplay::campaign::kSquareFingerpostInscription;
+    if (readingLocally) {
+        text = horde::gameplay::campaign::LocalReadingText(snapshot.openLocalReading);
     } else {
         const auto& spec = horde::gameplay::dialogue::Spec(dialogue.line);
         text = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
@@ -3840,8 +3840,12 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
             case RecordKeeperAction::CollectReward: text = "LEFT-CLICK / A TO COLLECT REGISTER REWARD"; break;
             case RecordKeeperAction::LearnAirWard: text = "LEFT-CLICK / A TO LEARN THE AIR WARD"; break;
             default:
-                if (snapshot.squareWaymarkerReadable && !snapshot.tavernConversationAvailable && !snapshot.tavernDirectionsAvailable) {
-                    text = snapshot.squareWaymarkerTextVisible ? "LEFT-CLICK / A TO FINISH READING" : "LEFT-CLICK / A TO READ THE FINGERPOST";
+                using horde::gameplay::bellwether::LocalReading;
+                if (snapshot.localReadingTarget != LocalReading::None &&
+                    !snapshot.tavernConversationAvailable && !snapshot.tavernDirectionsAvailable) {
+                    if (snapshot.openLocalReading != LocalReading::None) text = "LEFT-CLICK / A TO FINISH READING";
+                    else text = snapshot.localReadingTarget == LocalReading::HouseBStockLedger
+                        ? "LEFT-CLICK / A TO READ THE STOCK LEDGER" : "LEFT-CLICK / A TO READ THE FINGERPOST";
                 } else {
                     text = snapshot.tavernDirectionsAvailable ? "LEFT-CLICK / A FOR DIRECTIONS" : "LEFT-CLICK / A TO TALK TO KIT";
                 }

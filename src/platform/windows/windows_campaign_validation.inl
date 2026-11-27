@@ -1729,6 +1729,13 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             walkTo({kWellApronView[0], kWellApronView[1]}) && walkTo(*square),
                             "the player crosses the well paving and returns to the south tavern approach");
                     };
+                    const auto controlText = [&](int control, std::string_view expected) {
+                        std::array<char, 512> text{};
+                        const HWND widget = GetDlgItem(ctx.windowHandle, control);
+                        return (GetWindowLongPtrA(widget, GWL_STYLE) & WS_VISIBLE) &&
+                            GetWindowTextA(widget, text.data(), static_cast<int>(text.size())) > 0 &&
+                            expected == text.data();
+                    };
                     const auto presentSquareWaymarker = [&] {
                         if (!walkTo({kSquareWaymarkerView[0],kSquareWaymarkerView[1]})) return false;
                         const float previousPitch=input.pitchRadians;
@@ -1743,25 +1750,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const auto lineGeneration = state.chapterDialogue.generation;
                         const auto subtitles = ctx.subtitlesEnabled;
                         ctx.subtitlesEnabled = false;
-                        const auto controlText = [&](int control, std::string_view expected) {
-                            std::array<char, 512> text{};
-                            const HWND widget = GetDlgItem(ctx.windowHandle, control);
-                            return (GetWindowLongPtrA(widget, GWL_STYLE) & WS_VISIBLE) &&
-                                GetWindowTextA(widget, text.data(), static_cast<int>(text.size())) > 0 &&
-                                expected == text.data();
-                        };
-                        const bool readOnFoot = presented && state.squareWaymarkerReadable &&
+                        const bool readOnFoot = presented && state.localReadingTarget == LocalReading::SquareFingerpost &&
                             controlText(kChestPromptControlId, "LEFT-CLICK / A TO READ THE FINGERPOST") &&
-                            interact() && frame() && state.squareWaymarkerTextVisible &&
+                            interact() && frame() && state.openLocalReading == LocalReading::SquareFingerpost &&
                             controlText(kChapterSubtitleId, campaign::kSquareFingerpostInscription) &&
                             controlText(kChestPromptControlId, "LEFT-CLICK / A TO FINISH READING") &&
                             state.chapterDialogue.line == Line::None &&
-                            interact() && frame() && !state.squareWaymarkerTextVisible &&
+                            interact() && frame() && state.openLocalReading == LocalReading::None &&
                             !(GetWindowLongPtrA(GetDlgItem(ctx.windowHandle, kChapterSubtitleId), GWL_STYLE) & WS_VISIBLE) &&
-                            interact() && frame() && state.squareWaymarkerTextVisible &&
+                            interact() && frame() && state.openLocalReading == LocalReading::SquareFingerpost &&
                             face(2.f * state.playerX - kSquareWaymarkerPost[0],
                                  2.f * state.playerZ - kSquareWaymarkerPost[2]) &&
-                            !state.squareWaymarkerReadable && !state.squareWaymarkerTextVisible &&
+                            state.localReadingTarget == LocalReading::None && state.openLocalReading == LocalReading::None &&
                             state.chapterDialogue.generation == lineGeneration &&
                             ctx.simulation.CampaignBoundaryRevision() == boundary && state.treasurePurse == purse;
                         ctx.subtitlesEnabled = subtitles;
@@ -1781,10 +1781,29 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         const auto previousPitch = input.pitchRadians;
                         const auto previousPose = state.interaction.heldLightPose;
                         const auto boundary = ctx.simulation.CampaignBoundaryRevision();
+                        const auto purse = state.treasurePurse;
                         const auto lampPresented = [&] {
                             const auto& ids=ctx.rtScene.UploadedFireEmitters().selectedStableIds;
                             return ctx.rtScene.HasUploadedFireEmitters() &&
                                 std::find(ids.begin(),ids.end(),horde::gameplay::effects::kHouseBLampEmitterId)!=ids.end();
+                        };
+                        const auto readStockLedger = [&] {
+                            const auto [x, y, z] = kHouseBLedgerPosition;
+                            const auto subtitles = ctx.subtitlesEnabled;
+                            ctx.subtitlesEnabled = false;
+                            input.pitchRadians = -.43f;
+                            const bool read = walkTo({x, z-1.18f}) && face(x,z) &&
+                                state.localReadingTarget == LocalReading::HouseBStockLedger &&
+                                controlText(kChestPromptControlId, "LEFT-CLICK / A TO READ THE STOCK LEDGER") &&
+                                interact() && frame() && state.openLocalReading == LocalReading::HouseBStockLedger &&
+                                controlText(kChapterSubtitleId, campaign::kHouseBStockLedgerInscription) &&
+                                capture("windows-combined-house-b-stock-ledger.png", false, true) &&
+                                interact() && frame() && state.openLocalReading == LocalReading::None &&
+                                interact() && frame() && state.openLocalReading == LocalReading::HouseBStockLedger &&
+                                face(x,z-4.f) && state.openLocalReading == LocalReading::None &&
+                                state.chapterDialogue.line == Line::None;
+                            ctx.subtitlesEnabled = subtitles;
+                            return read;
                         };
                         input.pitchRadians = -.10f;
                         const bool visited =
@@ -1797,12 +1816,12 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                             face(34.95f,102.15f) && lampPresented() &&
                             capture("windows-combined-house-b-room.png",false,true) &&
                             face(kHouseBLampLight[0]-.55f,kHouseBLampLight[2]) &&
-                            capture("windows-combined-house-b-lamp.png",false,true) &&
+                            capture("windows-combined-house-b-lamp.png",false,true) && readStockLedger() &&
                             setInspectionLight(previousPose) &&
                             std::all_of(std::next(kHouseBStations.rbegin()), kHouseBStations.rend(), walkStation);
                         input.pitchRadians = previousPitch;
                         return visited && std::all_of(std::next(entranceBranch),std::next(square),walkTo) && !lampPresented() &&
-                            ctx.simulation.CampaignBoundaryRevision()==boundary;
+                            ctx.simulation.CampaignBoundaryRevision()==boundary && state.treasurePurse==purse;
                     };
                     const auto presentSmith = [&] {
                         const auto station = [](const auto& point) { return BellwetherStation{point[0], point[1]}; };
@@ -2003,7 +2022,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                         std::all_of(std::next(kBellwetherWestApproach.rbegin()), kBellwetherWestApproach.rend(), walkTo) &&
                         walkTo(*square) && fork() && presentWell() && fork() &&
                         check(presentSquareWaymarker() && fork(), "the square fingerpost can be read, dismissed and reread on foot with speech subtitles off, then cleared by looking away") &&
-                        check(presentHouse() && fork(), "the lower lane leads through House B's east doorway to its store room and back to the square") &&
+                        check(presentHouse() && fork(), "House B's stock ledger can be read with subtitles off and the player can return to the square without changing progress") &&
                         check(presentSmith() && fork(), "the southeast smith yard presents its wick and the west door approach is walkable from the square and back") &&
                         check(presentPrivy() && fork(), "the west service yard presents the local closed-privy caption and rejoins the square") &&
                         std::all_of(std::next(square), kBellwetherTavernRoute.end(), walkTo) &&
