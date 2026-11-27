@@ -1,0 +1,46 @@
+--- a/shaders/raytracing/include/rt_lighting.glsl
++++ b/shaders/raytracing/include/rt_lighting.glsl
+@@ -871 +871,2 @@
+-float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
++float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask,
++                     bool stopAtOpaqueBlocker)
+@@ -890 +891,10 @@
+-        if (!transparentWorldPane) rayQueryConfirmIntersectionEXT(query);
++        if (!transparentWorldPane)
++        {
++            // Only the binary fire-shadow answer is needed once a blocker is found.
++            if (stopAtOpaqueBlocker)
++            {
++                rayQueryTerminateEXT(query);
++                return 0.0;
++            }
++            rayQueryConfirmIntersectionEXT(query);
++        }
+@@ -893,0 +904,5 @@
++}
++
++float visibilityMask(vec3 origin, vec3 direction, float maxDistance, uint mask)
++{
++    return visibilityMask(origin, direction, maxDistance, mask, false);
+@@ -903 +918 @@
+-    return vec3(visibilityMask(origin, direction, maxDistance, mask));
++    return vec3(visibilityMask(origin, direction, maxDistance, mask, false));
+@@ -993 +1008,2 @@
+-vec3 areaLightTransmittance(HitInfo h, vec3 lightPosition, bool primaryReceiver)
++vec3 areaLightTransmittance(HitInfo h, vec3 lightPosition, bool primaryReceiver,
++                            bool directFire)
+@@ -1003,0 +1020 @@
++#if HORDE_GENERIC_TRANSMISSION_VARIANT
+@@ -1005,0 +1023,4 @@
++#else
++        result += vec3(visibilityMask(offsetRayOrigin(h, direction),
++            direction, distance - 0.02, 0x35u, directFire));
++#endif
+@@ -1141 +1162 @@
+-        vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver);
++        vec3 lightTransmittance = areaLightTransmittance(h, lightPosition, primaryReceiver, true);
+--- a/shaders/raytracing/include/rt_dielectric_common.glsl
++++ b/shaders/raytracing/include/rt_dielectric_common.glsl
+@@ -232 +232 @@
+-            ? areaLightTransmittance(h, localPosition, true)
++            ? areaLightTransmittance(h, localPosition, true, false)

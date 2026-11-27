@@ -1,0 +1,364 @@
+{
+  "baseSourceCommit": "28e48da63d26ab21a7ed372541ae7d0778f553ec",
+  "device": "Galaxy S26 Ultra (SM-S948B), Android 17",
+  "backend": "RayTracingPipeline",
+  "settings": "Shipping/Mobile OpaqueFast, 33%, 475x980 internal, 1440x2971 output, glass off",
+  "candidate": "For fire area visibility in the opaque path, terminate on the existing opaque triangle classification and return a blocked sample without confirmation.",
+  "episode": "Initial staffed hearth hold. Main route continuation intentionally stopped for each screening arm.",
+  "tickWindowInclusive": [
+    12546,
+    12906
+  ],
+  "gpuClockJoin": "Both nearest 5 Hz device CLOCK_MONOTONIC reads around return from present must be 1300 MHz/power level 0, with no gap above 250 ms. Frequency changes between samples are possible.",
+  "apks": {
+    "controlApk": "Horde-Bellwether-Hearth-Shadow-Control-ARM64.apk",
+    "controlApkSha256": "b9573911a430e046b3b3a2beb682452c8a76d809905bc0ec5182a1cf30d70491",
+    "trialApk": "Horde-Hearth-Blocker-Trial-ARM64.apk",
+    "trialApkSha256": "e106111d3f1c484d9bd4d22b3c9868450795476e6a4981f5f5a3d8fa7f19a875",
+    "controlShaderSha256": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "trialShaderSha256": "b075ed7e0361be31311d1a41142e3fa74ad26c27edf64d5aa43132d940283ccd",
+    "compiledUntrimmedShaderSha256": "15c9bfe6d50c576b1557e4cd9e0a7ce02d8d0fbd19ecc99fb94e164766ae6719",
+    "trialLibrarySha256": "e4a2fd40995a2846e6a45706bb492cfc1d22889a089a524d8c81e9fdc6a2286c",
+    "unchangedZipEntries": 307,
+    "matchedDebugSigner": true
+  },
+  "shaderValidation": {
+    "environment": "Vulkan 1.2",
+    "pipelineValidated": true,
+    "computeCompiledAndValidated": true,
+    "onlyPipelinePackagedAndMeasured": true,
+    "binarySizeNormalization": "Removed only OpName and OpMemberName instructions after compilation",
+    "computeShaderSha256": "23db84387f99f230a704ae02988ab9c8fbde22801ee2aab116f38ca700f81fff"
+  },
+  "frozenRgb": {
+    "dimensions": [
+      1440,
+      3120
+    ],
+    "differentPixelBounds": null,
+    "controlRgbSha256": "09d76943718a403bc388a0e017d87134935e8beae92ca33bb804e2426094a1f9",
+    "trialRgbSha256": "09d76943718a403bc388a0e017d87134935e8beae92ca33bb804e2426094a1f9"
+  },
+  "arms": [
+    {
+      "arm": "1-A",
+      "dispatch": {
+        "frames": 91,
+        "medianMs": 76.025675,
+        "p95Ms": 157.508746
+      },
+      "gpu": {
+        "frames": 91,
+        "medianMs": 76.532186,
+        "p95Ms": 158.313746
+      },
+      "cpuCycle": {
+        "frames": 91,
+        "medianMs": 87.273542,
+        "p95Ms": 124.9680725
+      },
+      "matchedClockDispatch": {
+        "frames": 85,
+        "medianMs": 75.893852,
+        "p95Ms": 77.4131646
+      },
+      "startThermal": {
+        "frameworkStatus": 0,
+        "celsius": {
+          "AP": 43.0,
+          "BAT": 35.6,
+          "SKIN": 37.9
+        }
+      },
+      "endThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 46.0,
+          "BAT": 37.0,
+          "SKIN": 40.0
+        }
+      },
+      "raw": {
+        "file": "1-A-route.gz",
+        "uncompressedSha256": "ed719bd327fc5fbd74f862b4a38ef2d3b37299691cdbaf39b3454cac10bce5ee"
+      }
+    },
+    {
+      "arm": "2-B",
+      "dispatch": {
+        "frames": 90,
+        "medianMs": 61.5913005,
+        "p95Ms": 62.78664655000001
+      },
+      "gpu": {
+        "frames": 90,
+        "medianMs": 62.1293735,
+        "p95Ms": 63.330418
+      },
+      "cpuCycle": {
+        "frames": 90,
+        "medianMs": 72.29737,
+        "p95Ms": 74.38316635
+      },
+      "matchedClockDispatch": {
+        "frames": 90,
+        "medianMs": 61.5913005,
+        "p95Ms": 62.78664655000001
+      },
+      "startThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 43.7,
+          "BAT": 36.4,
+          "SKIN": 38.6
+        }
+      },
+      "endThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 47.7,
+          "BAT": 37.8,
+          "SKIN": 40.8
+        }
+      },
+      "raw": {
+        "file": "2-B-route.gz",
+        "uncompressedSha256": "d2c8165d65a0e868b786db8e2c9efeff70356017f4634cc884575503d64ae44a"
+      }
+    },
+    {
+      "arm": "3-A",
+      "dispatch": {
+        "frames": 91,
+        "medianMs": 76.006873,
+        "p95Ms": 77.430988
+      },
+      "gpu": {
+        "frames": 91,
+        "medianMs": 76.528019,
+        "p95Ms": 77.937967
+      },
+      "cpuCycle": {
+        "frames": 91,
+        "medianMs": 87.154167,
+        "p95Ms": 88.72015599999999
+      },
+      "matchedClockDispatch": {
+        "frames": 91,
+        "medianMs": 76.006873,
+        "p95Ms": 77.430988
+      },
+      "startThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 44.3,
+          "BAT": 37.2,
+          "SKIN": 39.2
+        }
+      },
+      "endThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 47.8,
+          "BAT": 38.3,
+          "SKIN": 41.1
+        }
+      },
+      "raw": {
+        "file": "3-A-route.gz",
+        "uncompressedSha256": "6e05f9bccbe5bd26e55e17314cfca104951e789d0354ecc3e02c95e1df1179fe"
+      }
+    },
+    {
+      "arm": "4-B",
+      "dispatch": {
+        "frames": 90,
+        "medianMs": 61.6845815,
+        "p95Ms": 64.60127965
+      },
+      "gpu": {
+        "frames": 90,
+        "medianMs": 62.213228,
+        "p95Ms": 65.14656344999999
+      },
+      "cpuCycle": {
+        "frames": 90,
+        "medianMs": 71.9390625,
+        "p95Ms": 74.64583839999999
+      },
+      "matchedClockDispatch": {
+        "frames": 90,
+        "medianMs": 61.6845815,
+        "p95Ms": 64.60127965
+      },
+      "startThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 44.2,
+          "BAT": 37.8,
+          "SKIN": 39.5
+        }
+      },
+      "endThermal": {
+        "frameworkStatus": 1,
+        "celsius": {
+          "AP": 46.8,
+          "BAT": 38.3,
+          "SKIN": 40.8
+        }
+      },
+      "raw": {
+        "file": "4-B-route.gz",
+        "uncompressedSha256": "705ce5feb91ff9229258eb2c078035bbd8df11dfcfc218551257d46d14227237"
+      }
+    }
+  ],
+  "restoration": {
+    "apkSha256": "310a2b5eec209f08f925d980a62b5a5a9ba22583187d75cdbcaddd9095531096",
+    "matching": 25,
+    "originalSaves": 15
+  },
+  "sceneIdentity": {
+    "backend": [
+      "RayTracingPipeline"
+    ],
+    "internal_width": [
+      "475"
+    ],
+    "internal_height": [
+      "980"
+    ],
+    "output_width": [
+      "1440"
+    ],
+    "output_height": [
+      "2971"
+    ],
+    "glass_enabled": [
+      "0"
+    ],
+    "fire_count": [
+      "4"
+    ],
+    "fire_ids": [
+      "1110454595;1110454600;1110454608;1279348308"
+    ],
+    "tlas_instances": [
+      "45"
+    ],
+    "blas_owners": [
+      "38"
+    ],
+    "resident_slot0_id": [
+      "1110454603"
+    ],
+    "resident_slot1_id": [
+      "1110454866"
+    ],
+    "stock_head_instances": [
+      "3"
+    ],
+    "device_local_bytes": [
+      "247947712"
+    ],
+    "host_visible_bytes": [
+      "87779776"
+    ],
+    "window_mask": [
+      "0"
+    ],
+    "kit_mask": [
+      "1"
+    ],
+    "tavern_door_mask": [
+      "1"
+    ]
+  },
+  "rawPhoneClock": {
+    "file": "phone-clock.gz",
+    "uncompressedSha256": "2a55fab83960f6e06209ac3360f074b6854389600ac51c5ce91b65bdf4ee4c16"
+  },
+  "fullRoute": {
+    "scope": "A private check for route completion and a regression screen. No matched-clock frame pool was collected for the full route.",
+    "attemptOrder": [
+      "B",
+      "A"
+    ],
+    "roundTripDeadlineSeconds": 240,
+    "requiredTicksInFinalHearthHold": 600,
+    "failures": [
+      {
+        "label": "full-B-route",
+        "error": " reason=route readiness, walk or deadline failed"
+      },
+      {
+        "label": "full-A-route",
+        "error": " reason=route readiness, walk or deadline failed"
+      }
+    ],
+    "arms": [],
+    "incompleteArms": [
+      {
+        "arm": "B",
+        "rows": 3396,
+        "file": "full-B-incomplete-route.csv.gz",
+        "csvSha256": "8d36cb6eb42a77b7b3863dd6af48f32cd4e4851bba6e3073ebd903a781fb41b1",
+        "lastPhase": "room",
+        "lastTick": 25945,
+        "recordedSpanSeconds": 239.989463814,
+        "recordedReturns": 2,
+        "secondArrivalSeconds": 237.986650742,
+        "secondArrivalTick": 25857,
+        "thermalStart": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 40.1,
+            "BAT": 35.7,
+            "SKIN": 37.4
+          }
+        },
+        "thermalEnd": {
+          "frameworkStatus": 1,
+          "celsius": {
+            "AP": 44.4,
+            "BAT": 38.3,
+            "SKIN": 40.0
+          }
+        }
+      },
+      {
+        "arm": "A",
+        "rows": 2884,
+        "file": "full-A-incomplete-route.csv.gz",
+        "csvSha256": "4d0ab5af962449323f878c3812da68c391920782d20368342c58e2e5c6f0c6b8",
+        "lastPhase": "doorway-inbound",
+        "lastTick": 23898,
+        "recordedSpanSeconds": 239.988579492,
+        "recordedReturns": 1,
+        "secondArrivalSeconds": null,
+        "secondArrivalTick": null,
+        "thermalStart": {
+          "frameworkStatus": 0,
+          "celsius": {
+            "AP": 39.7,
+            "BAT": 36.8,
+            "SKIN": 37.8
+          }
+        },
+        "thermalEnd": {
+          "frameworkStatus": 1,
+          "celsius": {
+            "AP": 44.1,
+            "BAT": 38.4,
+            "SKIN": 40.0
+          }
+        }
+      }
+    ],
+    "originalRestored": {
+      "apkSha256": "310a2b5eec209f08f925d980a62b5a5a9ba22583187d75cdbcaddd9095531096",
+      "saves": 15,
+      "protectedFiles": 25
+    }
+  }
+}
