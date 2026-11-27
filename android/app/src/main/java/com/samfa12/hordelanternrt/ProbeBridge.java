@@ -83,6 +83,8 @@ public final class ProbeBridge {
     public static native long getChapterDialogueStereoGains(long generation);
     /** Distinct monotonic gameplay command; never aliases attack/interact. */
     public static native void requestChapterDialogueSkip();
+    /** Publishes the voice mute preference for the shared audio mix. */
+    public static native void setChapterVoiceEnabled(boolean enabled);
     /** Packed immutable teaching snapshot published by the simulation owner. */
     public static native long getCombatTeachingState();
     public static native long getCombatTeachingCard();

@@ -97,6 +97,7 @@ struct InputSnapshot
     bool tutorialCardsEnabled = false;
     std::uint64_t tutorialCardResponse = 0;
     std::uint64_t tutorialCardResponseSequence = 0;
+    bool chapterVoiceEnabled = true;
     std::uint32_t dialogueCompletionLine = 0;
     std::uint64_t dialogueCompletionGeneration = 0;
     SimulationCommandSequences commands{};
