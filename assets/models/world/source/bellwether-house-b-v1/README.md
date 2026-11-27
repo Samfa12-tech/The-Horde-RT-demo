@@ -5,15 +5,20 @@ stone fork leaves the lower road at the bend below the church junction.
 The east entrance matches the mapped B04 door. A shallow ramp and oak rail
 bring the lane up to the threshold. The open leaf leaves room to turn and
 return outside. Inside are grain bins, a sorting table and an earthenware rack.
+A clay oil cup on the sorting table lights the work surface and the open entry.
 
 The patch retains the surveyed footprint, floor elevation, north shutter
 and existing tiled roof. It replaces the solid wall block and the old north
 door surround. The east foundation stops beside the entrance, where the
 upper landing joins the floor. The floor, lane and ramp use the shared walkable mesh.
 The walls, rail, jambs and furnishings use the same geometry for rendering
-and contact. The patch adds 1,592 solid triangles after removals and
+and contact. The patch adds 1,784 solid triangles after removals and
 76 walkable triangles. It reuses the town stone, timber, earthenware and char
 finishes. The room is an optional detour with no new services or save state.
+
+The wick and light positions are exported with the town's geometry. Near the
+entrance and room, the lamp is selected through Bellwether's existing exterior
+lamp slot. The fixed renderer fire capacity remains four.
 
 The editable `house-b.blend` contains the authored patch. The previous town
 asset, shell master, connected map and terrain are pinned in

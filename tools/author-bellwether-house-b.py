@@ -152,7 +152,7 @@ def author_room(site, entrance, ground):
         for z in (z0+.15,z1-.15):
             box("Bin face upright", bin_front-.01, bin_front+.095, z-.062, z+.062, floor+.02, floor+1.14, oak)
 
-    bench_x, bench_z = ex-4.35, south-2.05
+    bench_x, bench_z = ex-3.55, ez+2.65
     for x in (bench_x-.83,bench_x+.83):
         for z in (bench_z-.30,bench_z+.30):
             box("Sorting table leg", x-.058, x+.058, z-.06,z+.06, floor,floor+.84,oak,.012)
@@ -165,6 +165,27 @@ def author_room(site, entrance, ground):
         box("Sorting tray end",x-.024,x+.024,bench_z-.30,bench_z+.24,floor+.95,floor+1.07,oak)
     for z in (bench_z-.28,bench_z+.22):
         box("Sorting tray rim",bench_x-.70,bench_x+.27,z-.024,z+.024,floor+.95,floor+1.07,oak)
+
+    # A low oil cup sits on an iron plate beside the sorting tray. The bowl
+    # connects the visible wick to the shared world-fire flame and light.
+    lamp_x, lamp_z = bench_x+.61, bench_z-.21
+    lamp_y = floor+.91
+    box("Oil lamp spill plate",lamp_x-.16,lamp_x+.16,lamp_z-.155,lamp_z+.155,
+        floor+.885,lamp_y,iron,.011)
+    rings = ((.059,0.),(.094,.026),(.115,.080),(.104,.104),(.079,.101),(.053,.047))
+    count = 12
+    angle = 2*np.pi*np.arange(count)/count
+    points = [(lamp_x+r*np.cos(a),lamp_y+h,lamp_z+r*np.sin(a)) for r,h in rings for a in angle]
+    faces = [(r*count+i,(r+1)*count+i,(r+1)*count+(i+1)%count,r*count+(i+1)%count)
+             for r in range(len(rings)-1) for i in range(count)]
+    faces += [tuple(range(count)),tuple(reversed(range((len(rings)-1)*count,len(rings)*count)))]
+    solids.append(mesh_tools["mesh"]("Earthenware oil cup",points,faces,clay))
+    box("Oil lamp wick holder",lamp_x-.022,lamp_x+.022,lamp_z-.019,lamp_z+.019,
+        lamp_y+.035,lamp_y+.110,iron)
+    box("Oil lamp wick",lamp_x-.006,lamp_x+.006,lamp_z-.006,lamp_z+.006,
+        lamp_y+.104,lamp_y+.142,iron)
+    lamp_flame = (lamp_x,lamp_y+.142,lamp_z)
+    lamp_light = (lamp_x,lamp_y+.208,lamp_z)
 
     shelf_x = ex - 5.05
     shelf_z = north + .65
@@ -191,7 +212,7 @@ def author_room(site, entrance, ground):
     slab = [(west,floor,north),(west,floor,south),(ex,floor,south),(ex,floor,north)]
     walkable = [mesh_tools["mesh"]("Dressed stone floor", slab, [(0,1,2,3)], stone),
                 mesh_tools["mesh"]("East entry ramp", landing, steps, stone)]
-    return solids, walkable, (lip_x, lip_heights[len(across)//2], ez), stone
+    return solids, walkable, (lip_x, lip_heights[len(across)//2], ez), stone, lamp_flame, lamp_light
 
 
 def export_layer(parts, name, file):
@@ -218,7 +239,7 @@ def main(root, original, output):
     ground = town["terrain_probe"](survey)
     shell = output / "house-b-open-shell.glb"
     ownership = open_shell(root/MASTER, original, shell)
-    solids, walkable, lip, stone = author_room(site, (ex,ez), ground)
+    solids, walkable, lip, stone, flame, light = author_room(site, (ex,ez), ground)
     branch = {"name": "Lower road to House B", "stations": [
         [48.3,92.2,.85], [45.2,92.35,.88], [43.7,93.85,.86], [42.8,96.0,.84], [lip[0]-.06,ez,.82],
     ]}
@@ -238,7 +259,7 @@ def main(root, original, output):
     ground_triangles, vertices, primitives = town["join_town"](
         with_solids,floor_patch,runtime,node_name="BellwetherWalkable")
     removed = sum(ownership.values())
-    if not 0 < solid_triangles-removed <= 1600 or not 4 < ground_triangles <= 180 or primitives != 6:
+    if not 0 < solid_triangles-removed <= 1800 or not 4 < ground_triangles <= 180 or primitives != 6:
         raise ValueError(f"B04 exceeds its bounded patch: {solid_triangles}, {ground_triangles}, {primitives}")
     manifest = json.loads((original.parent/"asset.manifest.json").read_bytes())
     triangles = manifest["lods"][0]["maxTriangles"] + solid_triangles - removed + ground_triangles
@@ -248,6 +269,8 @@ def main(root, original, output):
 
     stations = [(x,z) for x,z,_ in branch["stations"]] + [(ex-.6,ez), (ex-4.3,ez), (ex-7.0,ez+.75)]
     station_lines = ", ".join(f"{{{{{x:.3f}f,{z:.3f}f}}}}" for x,z in stations)
+    flame_values = ", ".join(f"{value:.7f}f" for value in flame)
+    light_values = ", ".join(f"{value:.7f}f" for value in light)
     header = output / "geometry.generated.h"
     header.write_text(
         "#pragma once\n#include <array>\n#include <cstddef>\n\n"
@@ -257,12 +280,14 @@ def main(root, original, output):
         f"inline constexpr std::size_t kHouseBGroundTriangles={ground_triangles};\n"
         f"inline constexpr float kHouseBFloorY={site['actualFloorY']:.8f}f;\n"
         f"inline constexpr std::array<float,2> kHouseBEastDoorXZ{{{{{ex:.3f}f,{ez:.3f}f}}}};\n"
+        f"inline constexpr std::array<float,3> kHouseBLampFlame{{{{{flame_values}}}}};\n"
+        f"inline constexpr std::array<float,3> kHouseBLampLight{{{{{light_values}}}}};\n"
         f"inline constexpr std::array<std::array<float,2>,{len(stations)}> kHouseBStations"
         f"{{{{{station_lines}}}}};\n"
         "} // namespace horde::gameplay::bellwether\n",
         encoding="utf-8",newline="\n")
     town["save_json"](output/"authoring-receipt.json",dict(
-        building="B04",eastEntranceXZ=(ex,ez),floorY=site["actualFloorY"],rampToe=lip,
+        building="B04",eastEntranceXZ=(ex,ez),floorY=site["actualFloorY"],rampToe=lip,lampFlame=flame,lampLight=light,
         removedSolidTriangles=ownership,addedSolidTriangles=solid_triangles,addedGroundTriangles=ground_triangles,
         runtimeTownSha256=sha(runtime),originalTownSha256=PARENT,blender=bpy.app.version_string,
         townVertices=vertices,townTriangles=triangles,recipeSha256=sha(RECIPE),

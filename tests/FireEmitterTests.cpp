@@ -281,6 +281,24 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
             upload.selectedStableIds[0]==kBellwetherMillBenchLampEmitterId &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
         "the mill wick replaces the distant fork lamp locally and still fits the held lantern in the fire budget");
+    const auto& houseLight=horde::gameplay::bellwether::kHouseBLampLight;
+    const auto& houseFlame=horde::gameplay::bellwether::kHouseBLampFlame;
+    auto houseLamp=MakeHouseBLampEmitter();
+    StepFireEmitterFixed(houseLamp,HouseBLampFireInput(),kFixedDelta);
+    bool houseAnchor=true;
+    for(std::size_t axis=0;axis<3;++axis)
+        houseAnchor &= Approx(houseLamp.worldFromFlame[12+axis],houseFlame[axis]) &&
+            Approx(houseLamp.worldFromLight[12+axis],houseLight[axis]);
+    const std::array houseFires{hearth,candle,houseLamp};
+    ok &= Require(houseAnchor &&
+        SelectBellwetherExteriorLamp(houseLight[0],houseLight[2])==kHouseBLampRosterIndex &&
+        SelectBellwetherExteriorLamp(42.8f,96.f)==kHouseBLampRosterIndex &&
+        SelectBellwetherExteriorLamp(31.3f,82.2f)!=kHouseBLampRosterIndex &&
+        BuildFireEmitterUpload(houseFires,{houseLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+            upload.selectedStableIds[0]==kHouseBLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the store room and ramp use the pinned wick with the held lantern, within the existing fire budget");
     return ok;
 }
 

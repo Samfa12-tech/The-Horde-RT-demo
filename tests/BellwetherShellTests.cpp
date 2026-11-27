@@ -292,6 +292,13 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(houseX,houseZ,houseX,105.f,
                       kHouseBFloorY+.12f,kHouseBFloorY+1.78f,radius),
                   "House B has a real room floor inside its original solid perimeter");
+            const auto [lampX,lampY,lampZ]=kHouseBLampLight;
+            const auto [approachX,approachZ]=kHouseBStations[3];
+            check(!support->NonWalkableVolumeClear(lampX,lampZ,lampX,lampZ,
+                      kHouseBLampFlame[1]-.147f,kHouseBLampFlame[1]-.138f,.025f) &&
+                  support->NonWalkableVolumeClear(lampX,lampZ,approachX,approachZ,
+                      lampY-.005f,lampY+.005f,.015f),
+                  "the oil cup has solid contact and its light can reach the ramp through the open door");
             constexpr std::array pathCentres{
                 BellwetherStation{41.f,87.9f},        // Lower road
                 BellwetherStation{45.f,74.75f},       // Church lane

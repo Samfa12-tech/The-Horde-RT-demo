@@ -1275,7 +1275,7 @@ Samfa12/Codex modeled the four carved destination boards, oil bracket and cooper
 
 ## Bellwether House B
 
-Samfa12/Codex authored the east entry, ramp, stone room and store furnishings
+Samfa12/Codex authored the east entry, ramp, stone room, oil cup and store furnishings
 in Blender using the original B04 survey and shell. The project-owned geometry
 reuses the existing Horde town stone, chest timber, earthenware and char
 materials. The [editable source and receipt](assets/models/world/source/bellwether-house-b-v1/README.md)
