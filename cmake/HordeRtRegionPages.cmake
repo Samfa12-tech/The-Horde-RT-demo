@@ -1,5 +1,46 @@
 # Explicit experimental storage profile, shared by Windows/Android. Empty is
 # production. Private shaders/catalogs never replace the repository artifacts.
+function(horde_rt_verify_clock_file root relative expected)
+    set(file "${root}/${relative}")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${file}")
+    file(SHA256 "${file}" actual)
+    if(NOT actual STREQUAL expected)
+        message(FATAL_ERROR "Private clock shader dependency changed: ${relative}. Regenerate the observer.")
+    endif()
+endfunction()
+
+function(horde_rt_verify_ordinary_clock root marker_json)
+    set(repo "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/..")
+    file(GLOB_RECURSE base_shaders CONFIGURE_DEPENDS LIST_DIRECTORIES FALSE RELATIVE "${repo}" "${repo}/shaders/raytracing/*")
+    list(LENGTH base_shaders actual_count)
+    string(JSON expected_count LENGTH "${marker_json}" baseShaderFiles)
+    if(NOT actual_count EQUAL expected_count)
+        message(FATAL_ERROR "Private clock shader source inventory differs from the current renderer.")
+    endif()
+    foreach(file IN LISTS base_shaders)
+        string(JSON expected GET "${marker_json}" baseShaderFiles "${file}")
+        horde_rt_verify_clock_file("${repo}" "${file}" "${expected}")
+    endforeach()
+
+    foreach(file src/vulkan/raytracing/RtSceneAbi.def src/vulkan/raytracing/RtSceneAbi.generated.h)
+        string(JSON expected GET "${marker_json}" baseAbiFiles "${file}")
+        horde_rt_verify_clock_file("${repo}" "${file}" "${expected}")
+    endforeach()
+
+    set(compiled "${root}/dispatch-clock-compiled.json")
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${compiled}")
+    file(READ "${compiled}" receipt)
+    string(JSON expected GET "${receipt}" markerSha256)
+    horde_rt_verify_clock_file("${root}" "dispatch-clock-probe.json" "${expected}")
+    foreach(file RtPipelineVariantCatalog.generated.h RtRayQueryVariantCatalog.generated.h
+                 variants/shipping_mobile_opaque_fast.inc variants/shipping_mobile_generic_dielectric.inc
+                 variants/rayquery_compute_shipping_mobile_opaque_fast.inc variants/rayquery_compute_shipping_mobile_generic_dielectric.inc)
+        set(path "src/vulkan/raytracing/${file}")
+        string(JSON expected GET "${receipt}" files "${path}")
+        horde_rt_verify_clock_file("${root}" "${path}" "${expected}")
+    endforeach()
+endfunction()
+
 function(horde_rt_attach_private_region_pages target)
     # Check command-line spelling before CACHE PATH normalizes a relative value.
     if(DEFINED HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT AND
@@ -25,6 +66,24 @@ function(horde_rt_attach_private_region_pages target)
     file(READ "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/shaders/raytracing/include/rt_scene_abi.generated.glsl" page_abi)
     file(READ "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../src/vulkan/raytracing/RtSceneAbi.def" runtime_abi)
     string(JSON instance_capacity GET "${runtime_abi}" capacities instanceMetadata)
+    set(marker "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/dispatch-clock-probe.json")
+    if(EXISTS "${marker}")
+        file(READ "${marker}" clock_abi)
+        string(JSON clock_layout ERROR_VARIABLE layout_error GET "${clock_abi}" layout)
+        # Historical flat-table observers have no layout field.
+        if(NOT layout_error AND clock_layout STREQUAL "ordinary")
+            if(NOT ANDROID OR NOT HORDE_RT_DISPATCH_CLOCK_PROBE OR NOT HORDE_RT_FRAME_STAGE_PROBE)
+                message(FATAL_ERROR "Ordinary-layout clock shaders require the private Android stage and clock observers.")
+            endif()
+            if(NOT page_abi MATCHES "RtInstanceMetadata values\\[${instance_capacity}\\];[ \t\r\n]+uvec4 clockControl;" OR
+               page_abi MATCHES "uvec4 pages\\[")
+                message(FATAL_ERROR "Ordinary clock shaders must append control directly to the instance metadata array.")
+            endif()
+            horde_rt_verify_ordinary_clock("${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}" "${clock_abi}")
+            target_include_directories(${target} BEFORE PRIVATE "${HORDE_RT_REGION_PAGE_PROTOTYPE_ROOT}/src")
+            return()
+        endif()
+    endif()
     if(NOT page_abi MATCHES "uvec4 pages\\[8\\]" OR
        NOT page_abi MATCHES "RtInstanceMetadata values\\[${instance_capacity}\\]")
         message(FATAL_ERROR "Private shaders do not contain the admitted region address table.")

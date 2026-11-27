@@ -1,0 +1,179 @@
+{
+  "observerSourceCommit": "c20f764a7c942d5a69ec6bb2b0553ba68e53c2bc",
+  "observerApkSha256": "5bc2eaf2af17e8f20443cb9db1896bbb801c2578f0364bdde6b4eee35b57cbfc",
+  "controlApkSha256": "ba3e93262e202c524307b26fb162a44057c7b73ee32d09f74f3ac128cb48ceb3",
+  "matchedRuntimeAssets": 290,
+  "shaderHashes": {
+    "shipping_mobile_opaque_fast": "1749361a52315f9db913c45ed1474bd9fb2975075bc58322fa90b4247f7855a1",
+    "rayquery_compute_shipping_mobile_opaque_fast": "b4a0740ab85d43efc2146918816628145f461706540c5ef05259529ac3c82569",
+    "shipping_mobile_generic_dielectric": "9fad6508dcfec45b3a5443ab1198f52cdd3c8129346914a0bc7213ecd686c1e4",
+    "rayquery_compute_shipping_mobile_generic_dielectric": "902b1efd16d2cb7bfae54d2ab054f3a447738348c56650c297489b0dddf317c5"
+  },
+  "frozenFrame": {
+    "checkpoint": "bellwether-repeat-visit",
+    "renderScale": 0.33,
+    "pngSha256": [
+      "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32",
+      "f5b56ec7426dda3ae2512efd2af986bf3aa34c25e4e67d41481f89b114e54d32"
+    ],
+    "decodedRgbSha256": "09d76943718a403bc388a0e017d87134935e8beae92ca33bb804e2426094a1f9",
+    "width": 1440,
+    "height": 3120,
+    "changedPixels": 0
+  },
+  "control": {
+    "samples": 38,
+    "medianGpuMs": 76.905519,
+    "medianDispatchMs": 76.374425,
+    "shaderSha256": "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "deviceLocalBytes": 247343424,
+    "roster": {
+      "internal_width": "475",
+      "internal_height": "980",
+      "output_width": "1440",
+      "output_height": "2971",
+      "backend": "RayTracingPipeline",
+      "glass_enabled": "0",
+      "fire_ids": "1110454595;1110454600;1110454608;1279348308",
+      "tlas_instances": "45",
+      "blas_owners": "38",
+      "resident_slot0_id": "1110454603",
+      "resident_slot1_id": "1110454866",
+      "kit_mask": "1",
+      "stock_head_instances": "3"
+    },
+    "before": {
+      "status": 0,
+      "BAT": 31.2,
+      "SKIN": 33.1,
+      "AP": 33.5
+    },
+    "after": {
+      "status": 0,
+      "BAT": 33.8,
+      "SKIN": 36.9,
+      "AP": 41.6
+    }
+  },
+  "observer": {
+    "samples": 38,
+    "medianGpuMs": 89.5181485,
+    "medianDispatchMs": 89.010779,
+    "shaderSha256": "1749361a52315f9db913c45ed1474bd9fb2975075bc58322fa90b4247f7855a1",
+    "deviceLocalBytes": 247998784,
+    "roster": {
+      "internal_width": "475",
+      "internal_height": "980",
+      "output_width": "1440",
+      "output_height": "2971",
+      "backend": "RayTracingPipeline",
+      "glass_enabled": "0",
+      "fire_ids": "1110454595;1110454600;1110454608;1279348308",
+      "tlas_instances": "45",
+      "blas_owners": "38",
+      "resident_slot0_id": "1110454603",
+      "resident_slot1_id": "1110454866",
+      "kit_mask": "1",
+      "stock_head_instances": "3"
+    },
+    "before": {
+      "status": 0,
+      "BAT": 32.7,
+      "SKIN": 36.6,
+      "AP": 43.1
+    },
+    "after": {
+      "status": 0,
+      "BAT": 35.4,
+      "SKIN": 38.1,
+      "AP": 43.6
+    }
+  },
+  "runs": {
+    "first": {
+      "recordedRowsSha256": "da61c47156f19d425bdc5c779b86055b5392cfb2109c4819fd51f217473c77bf",
+      "retainedRoomRowsSha256": "eb2048df7dd4543b415976e211947a6b98f369f70b104117dd7f40d7bc3d7a56",
+      "thermalBeforeC": {
+        "status": 0,
+        "BAT": 32.7,
+        "SKIN": 36.6,
+        "AP": 43.1
+      },
+      "thermalAfterC": {
+        "status": 0,
+        "BAT": 35.4,
+        "SKIN": 38.1,
+        "AP": 43.6
+      },
+      "frames": [
+        77,
+        92,
+        107
+      ]
+    },
+    "repeat": {
+      "recordedRowsSha256": "2051fbad7a65472258b45a9f447e61247eaca0e2d88338685cb5c7a932cc5ecc",
+      "retainedRoomRowsSha256": "bab5893495b9e3ccdd4a0d8a4bac96b041dc0a384c328fee4b4f22b5f04c9abc",
+      "thermalBeforeC": {
+        "status": 0,
+        "BAT": 35.3,
+        "SKIN": 37.8,
+        "AP": 42.6
+      },
+      "thermalAfterC": {
+        "status": 0,
+        "BAT": 35.8,
+        "SKIN": 38.6,
+        "AP": 44.2
+      },
+      "frames": [
+        77,
+        92,
+        107
+      ]
+    }
+  },
+  "sampledPercentRanges": {
+    "other": [
+      5.01,
+      6.55
+    ],
+    "trace": [
+      16.51,
+      16.9
+    ],
+    "material": [
+      15.45,
+      18.0
+    ],
+    "shadow": [
+      36.37,
+      37.73
+    ],
+    "surface": [
+      15.21,
+      16.47
+    ],
+    "fire": [
+      0.33,
+      0.51
+    ],
+    "mist": [
+      2.12,
+      2.79
+    ],
+    "dust": [
+      4.51,
+      5.67
+    ]
+  },
+  "sharedWorldPrimarySamples": [
+    390,
+    392
+  ],
+  "sharedWorldPrimaryShareOfShadowPercent": [
+    76.86,
+    79.48
+  ],
+  "sampling": "First room of the normal west-route probe, three sparse 32-pixel grids per fresh process. The shares describe device-clock ticks of sampled shader invocations."
+}

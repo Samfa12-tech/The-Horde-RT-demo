@@ -8,9 +8,15 @@
 #include <fstream>
 #include <locale>
 #include <optional>
+#include <string>
+#include <string_view>
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+#include <vector>
+#endif
 
 #include "gameplay/dialogue/RecordKeeperPlacement.h"
 #include "gameplay/dialogue/TavernKeeperPlacement.h"
+#include "gameplay/campaign/CampaignCheckpoint.h"
 #include "gameplay/validation/BellwetherDoorwayProbe.h"
 #include "gameplay/validation/BellwetherRoomFireContract.h"
 #include "gameplay/validation/ChapterRouteMeasurementClock.h"
@@ -39,6 +45,12 @@ public:
         frames_.imbue(std::locale::classic());
         if (!frames_ || !probe.Start(state, route_)) return false;
         start_ = now;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        report_ = report;
+        runStartSteadyNs_ = static_cast<std::uint64_t>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count());
+        initialRoomTick_ = state.tickIndex;
+#endif
         frames_ << "phase,station,returns,elapsed_ns,present_return_ns,scene_epoch,generation,record_serial,"
                    "submission_serial,tick,completion_serial,present_serial,gpu_serial,gpu_ns,cpu_cycle_ns,"
                    "backend,shader_sha256,internal_width,internal_height,output_width,output_height,glass_enabled,"
@@ -60,7 +72,11 @@ public:
 
     bool Bind(const telemetry::RtSubmittedFrameIdentity& identity, TimePoint presentReturned,
               const vulkan::raytracing::PresentableTinyRtScene& scene,
-              const gameplay::simulation::SimulationSnapshot& state) {
+              const gameplay::simulation::SimulationSnapshot& state
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+              , std::uint32_t clockTicket
+#endif
+              ) {
         if (pending_ || !identity.submissionSerial || !identity.frame.recordSerial ||
             (lastSerial_ && (identity.submissionSerial != lastSerial_ + 1 ||
                              identity.frame.sceneEpoch != epoch_ ||
@@ -68,6 +84,25 @@ public:
         epoch_ = identity.frame.sceneEpoch;
         generation_ = identity.frame.measurementGeneration;
         using Scene = vulkan::raytracing::PresentableTinyRtScene;
+        const auto phase = probe.PhaseName();
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        bool captureHearthClock = false;
+        std::uint8_t clockSampleIndex = 0;
+        std::uint64_t roomDwellTicks = 0;
+        if (probe.West() && phase == "room" && probe.Returns() == 0 &&
+            state.tickIndex >= initialRoomTick_) {
+            roomDwellTicks = state.tickIndex - initialRoomTick_;
+            for (std::size_t i = 0; i < clockCaptureWindows_.size(); ++i) {
+                const auto [begin, end] = clockCaptureWindows_[i];
+                if (!clockCaptureSaved_[i] && roomDwellTicks >= begin && roomDwellTicks <= end) {
+                    clockCaptureSaved_[i] = true;
+                    captureHearthClock = true;
+                    clockSampleIndex = static_cast<std::uint8_t>(i + 1);
+                    break;
+                }
+            }
+        }
+#endif
         pending_ = Frame{
             identity,
             std::chrono::duration_cast<std::chrono::nanoseconds>(presentReturned - start_).count(),
@@ -79,11 +114,47 @@ public:
              scene.SubmittedInstanceMask(Scene::kFirstResidentMetadataIndex + 1)},
             scene.SubmittedInstanceMask(Scene::kTavernDoorMetadataIndex),
             ResidentRoundTrip() ? scene.ChapterResidentSourceIds() : std::array<std::uint32_t, 2>{},
-            probe.PhaseName(), probe.Station(), probe.Returns(),
+            phase, probe.Station(), probe.Returns(),
             probe.West() ? scene.SubmittedStockHeadCount() : 0u,
-            probe.West() ? gameplay::validation::BellwetherStockPoseMask(state) : 0u};
+            probe.West() ? gameplay::validation::BellwetherStockPoseMask(state) : 0u
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+            , captureHearthClock ? clockTicket : 0u, roomDwellTicks, clockSampleIndex
+#endif
+            };
         return true;
     }
+
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    // The clock observer is a shared buffer. Copy only selected settled-view
+    // records after their owning fence and before a later dispatch can replace
+    // the ticketed samples.
+    bool CapturePendingDispatchClock(VkDevice device, VkFence fence,
+                                     const vulkan::raytracing::PresentableTinyRtScene& scene,
+                                     std::string& diagnostic) {
+        if (!pending_) {
+            diagnostic = "Selected dispatch clock has no pending submitted frame.";
+            return false;
+        }
+        if (!pending_->clockSampleIndex) return true;
+        if (!pending_->clockTicket) {
+            diagnostic = "Selected dispatch clock has no nonzero shader ticket.";
+            return false;
+        }
+        const VkResult waitResult = vkWaitForFences(device, 1, &fence, VK_TRUE, UINT64_MAX);
+        if (waitResult != VK_SUCCESS) {
+            diagnostic = "Selected dispatch clock frame fence failed with VkResult " + std::to_string(waitResult) + ".";
+            return false;
+        }
+        std::string error;
+        if (!scene.CollectDispatchClocks(pending_->clockTicket, pending_->clockSamples,
+                pending_->clockTotals, error)) {
+            diagnostic = "Selected dispatch clock ticket/grid validation failed: " + error;
+            return false;
+        }
+        pending_->clockCaptured = true;
+        return true;
+    }
+#endif
 
     bool AwaitingFrame() const { return pending_.has_value(); }
     Route MeasurementRoute() const { return route_; }
@@ -93,7 +164,9 @@ public:
 #if HORDE_RT_FRAME_STAGE_PROBE
                        , const vulkan::raytracing::RtSceneGpuStageCompletedObservation& gpuStages
 #endif
+                       , std::string& diagnostic
                        ) {
+        diagnostic.clear();
         using namespace telemetry;
         const auto& tag = *pending_;
         const auto& frame = sample.identity.submitted;
@@ -114,7 +187,10 @@ public:
             (ResidentRoundTrip() && (tag.masks[2] != 1 ||
                 ((phase == "room" || phase == "complete" || phase == "east-fork" || phase == "stock-yard") &&
                  tag.residentSourceIds != ExpectedResidentSourceIds(phase)))) ||
-            (phase == "stock-yard" && tag.stockHeadInstances != 3u)) return false;
+            (phase == "stock-yard" && tag.stockHeadInstances != 3u)) {
+            diagnostic = "Completed Bellwether evidence did not match its submitted, presented frame or workload.";
+            return false;
+        }
 
         const auto& resources = sample.scene.resources;
         const auto& dimensions = *sample.scene.dimensions;
@@ -153,6 +229,16 @@ public:
         }
 #endif
         frames_ << '\n';
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        if (tag.clockSampleIndex) {
+            frames_.flush();
+            if (!frames_) {
+                diagnostic = "Bellwether CSV row flush failed before clock witness publication.";
+                return false;
+            }
+            if (!WriteDispatchClockWitness(tag, sample, diagnostic)) return false;
+        }
+#endif
         lastSerial_ = serial;
         pending_.reset();
         if (probe.Complete()) frames_.close();
@@ -200,11 +286,137 @@ private:
         std::string_view phase;
         std::size_t station;
         unsigned returns, stockHeadInstances, stockPoseMask;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+        std::uint32_t clockTicket;
+        std::uint64_t roomDwellTicks;
+        std::uint8_t clockSampleIndex = 0;
+        bool clockCaptured = false;
+        std::vector<vulkan::raytracing::RtDispatchClockSample> clockSamples;
+        std::array<std::uint64_t,8> clockTotals{};
+#endif
     };
 
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    bool WriteDispatchClockWitness(const Frame& tag,
+            const telemetry::RtPerformanceEvidenceSnapshot& sample, std::string& diagnostic) const {
+        using namespace telemetry;
+        if (!tag.clockCaptured || tag.clockSamples.empty() || !sample.scene.dimensions) {
+            diagnostic = "Completed hearth row has no retained clock payload or dimensions.";
+            return false;
+        }
+        const auto& frame = sample.identity.submitted;
+        const auto& dimensions = *sample.scene.dimensions;
+        const auto stem = std::string("bellwether-westroundtrip-hearth-clock-") +
+            std::to_string(runStartSteadyNs_) + "-return-1-sample-" +
+            std::to_string(tag.clockSampleIndex) + "-" + std::to_string(frame.submissionSerial);
+        const auto rawPath = report_.parent_path() / (stem + ".bin");
+        const auto metadataPath = report_.parent_path() / (stem + ".json");
+        auto rawTempPath = rawPath;
+        rawTempPath += ".tmp";
+        auto metadataTempPath = metadataPath;
+        metadataTempPath += ".tmp";
+        std::error_code error;
+        if (std::filesystem::exists(rawPath, error) || error || std::filesystem::exists(metadataPath, error) || error ||
+            std::filesystem::exists(rawTempPath, error) || error || std::filesystem::exists(metadataTempPath, error) || error) {
+            diagnostic = "Dispatch clock witness path already exists or cannot be checked; refusing overwrite.";
+            return false;
+        }
+        std::ofstream raw(rawTempPath, std::ios::binary | std::ios::out | std::ios::trunc);
+        if (!raw) {
+            diagnostic = "Dispatch clock raw witness could not be opened.";
+            std::filesystem::remove(rawTempPath, error);
+            return false;
+        }
+        raw.write(reinterpret_cast<const char*>(tag.clockSamples.data()),
+            static_cast<std::streamsize>(tag.clockSamples.size() * sizeof(tag.clockSamples.front())));
+        raw.flush();
+        bool saved = static_cast<bool>(raw);
+        raw.close();
+        saved = saved && !raw.fail();
+        if (!saved) {
+            diagnostic = "Dispatch clock raw witness write or close failed.";
+            std::filesystem::remove(rawTempPath, error);
+            return false;
+        }
+        std::ofstream metadata(metadataTempPath, std::ios::out | std::ios::trunc);
+        if (!metadata) {
+            diagnostic = "Dispatch clock metadata temporary file could not be opened.";
+            std::filesystem::remove(rawTempPath, error);
+            std::filesystem::remove(metadataTempPath, error);
+            return false;
+        }
+        metadata.imbue(std::locale::classic());
+        metadata << "{\"format\":\"horde-rt-dispatch-clock-v1\","
+            << "\"raw_file\":\"" << rawPath.filename().string() << "\","
+            << "\"record_size_bytes\":" << sizeof(vulkan::raytracing::RtDispatchClockSample) << ','
+            << "\"record_count\":" << tag.clockSamples.size() << ','
+            << "\"room_id\":\"bellwether_tavern_staffed_hearth\","
+            << "\"checkpoint_id\":" << static_cast<std::uint32_t>(gameplay::campaign::CheckpointId::BellwetherTavern) << ','
+            << "\"measurement_checkpoint_id\":349,\"route\":\"west-roundtrip\",\"phase\":\"room\","
+            << "\"return_index\":1,\"sample_index\":" << static_cast<unsigned>(tag.clockSampleIndex) << ','
+            << "\"room_dwell_ticks\":" << tag.roomDwellTicks << ','
+            << "\"scene_epoch\":" << frame.frame.sceneEpoch << ','
+            << "\"measurement_generation\":" << frame.frame.measurementGeneration << ','
+            << "\"record_serial\":" << frame.frame.recordSerial << ','
+            << "\"submission_serial\":" << frame.submissionSerial << ','
+            << "\"completion_serial\":" << sample.identity.completionSerial << ','
+            << "\"presented_serial\":" << sample.presentation.lastSuccessfulPresentSubmissionSerial << ','
+            << "\"simulation_tick\":" << frame.frame.simulationTick << ','
+            << "\"clock_ticket\":" << tag.clockTicket << ','
+            << "\"internal_width\":" << dimensions.internalWidth << ','
+            << "\"internal_height\":" << dimensions.internalHeight << ','
+            << "\"output_width\":" << dimensions.outputWidth << ','
+            << "\"output_height\":" << dimensions.outputHeight << ','
+            << "\"pipeline_sha256\":\"" << RtFixedTextView(sample.scene.pipeline.active.sha256) << "\","
+            << "\"execution_mode\":\"" << RtExecutionModeName(sample.scene.pipeline.executionMode) << "\","
+            << "\"category_order\":[\"other\",\"trace\",\"material\",\"shadow\",\"surface\",\"fire\",\"mist\",\"dust\"],"
+            << "\"category_ticks\":[";
+        for (std::size_t i = 0; i < tag.clockTotals.size(); ++i) {
+            if (i) metadata << ',';
+            metadata << tag.clockTotals[i];
+        }
+        metadata << "]}\n";
+        metadata.flush();
+        saved = static_cast<bool>(metadata);
+        metadata.close();
+        saved = saved && !metadata.fail();
+        if (!saved) {
+            diagnostic = "Dispatch clock metadata write or close failed.";
+            std::filesystem::remove(rawTempPath, error);
+            std::filesystem::remove(metadataTempPath, error);
+            return false;
+        }
+        std::filesystem::rename(rawTempPath, rawPath, error);
+        if (error) {
+            diagnostic = "Dispatch clock raw witness publish failed: " + error.message();
+            std::filesystem::remove(rawTempPath, error);
+            std::filesystem::remove(metadataTempPath, error);
+            return false;
+        }
+        std::filesystem::rename(metadataTempPath, metadataPath, error);
+        if (error) {
+            diagnostic = "Dispatch clock metadata publish failed: " + error.message();
+            std::filesystem::remove(rawPath, error);
+            std::filesystem::remove(metadataTempPath, error);
+            return false;
+        }
+        return true;
+    }
+#endif
+
     std::ofstream frames_;
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    std::filesystem::path report_;
+    std::uint64_t runStartSteadyNs_ = 0;
+    std::uint64_t initialRoomTick_ = 0;
+#endif
     gameplay::validation::ChapterRouteMeasurementClock clock_;
     TimePoint start_{};
+#if HORDE_RT_DISPATCH_CLOCK_PROBE
+    static constexpr std::array<std::array<std::uint64_t,2>,3> clockCaptureWindows_{{
+        {{300u,330u}}, {{360u,390u}}, {{420u,450u}}}};
+    std::array<bool,3> clockCaptureSaved_{};
+#endif
     std::optional<Frame> pending_;
     std::uint64_t epoch_ = 0;
     std::uint64_t generation_ = 0;

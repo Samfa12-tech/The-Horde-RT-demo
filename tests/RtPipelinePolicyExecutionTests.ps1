@@ -187,6 +187,14 @@ file(GENERATE OUTPUT "`$`{CMAKE_BINARY_DIR}/treewide-definitions-`$<CONFIG>.txt"
     Write-Utf8NoBom (Join-Path $privateFixture 'dispatch-clock-probe.json') '{"schema":1}'
     $privateClockResult = Invoke-GradlePolicyCase 'private-clock-configuration' ($privateStages + '-PhordeDispatchClockProbe=true')
     Assert-True ($privateClockResult.Contains('-DHORDE_RT_FRAME_STAGE_PROBE=ON|-DHORDE_RT_DISPATCH_CLOCK_PROBE=ON')) 'Explicit private clock profile must retain both native observers.'
+    $ordinaryRoot = "-PhordeDispatchClockShaderRoot=$privateFixture"
+    $ordinaryClock = $stages + @($ordinaryRoot, '-PhordeDispatchClockProbe=true')
+    Invoke-GradlePolicyCase 'ordinary-clock-missing-opt-in' ($stages + $ordinaryRoot) $true 'requires the clock probe'
+    Invoke-GradlePolicyCase 'ordinary-clock-legacy-marker' $ordinaryClock $true 'for ordinary metadata'
+    Write-Utf8NoBom (Join-Path $privateFixture 'dispatch-clock-probe.json') '{"schema":1,"layout":"ordinary"}'
+    Invoke-GradlePolicyCase 'ordinary-clock-duplicate-root' ($ordinaryClock + "-PhordeRegionPagePrototypeRoot=$privateFixture") $true 'cannot be combined'
+    $ordinaryResult = Invoke-GradlePolicyCase 'ordinary-clock-profile' $ordinaryClock
+    Assert-True ($ordinaryResult.Contains('-DHORDE_RT_FRAME_STAGE_PROBE=ON|-DHORDE_RT_DISPATCH_CLOCK_PROBE=ON')) 'Ordinary-layout clock shaders need both observers.'
 
 }
 finally {

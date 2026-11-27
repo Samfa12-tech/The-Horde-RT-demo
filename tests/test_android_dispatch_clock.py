@@ -1,10 +1,13 @@
 from pathlib import Path
+import csv
+import json
 import struct
+import tempfile
 import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"tools"))
-from analyze_android_dispatch_clock import AnalysisError, CATEGORIES, admit_clock_rows, admit_raw
+from analyze_android_dispatch_clock import AnalysisError, CATEGORIES, admit_clock_rows, admit_raw, analyze_hearth
 
 
 def fixture():
@@ -42,6 +45,50 @@ class ClockAdmissionTests(unittest.TestCase):
         with self.assertRaises(AnalysisError): admit_raw(raw,changed,64,32)
         corrupt = bytearray(raw);struct.pack_into("<I",corrupt,12,27)
         with self.assertRaises(AnalysisError): admit_raw(corrupt,row,64,32)
+
+
+    def test_hearth_witness_belongs_to_one_completed_room_frame(self):
+        generic, raw = fixture()
+        digest = "f" * 64
+        ids = {"TavernKeeper": 11, "RecordKeeper": 12}
+        row = dict(phase="room", returns=0, station=13, elapsed_ns=100, present_return_ns=1100,
+                   scene_epoch=2, generation=3, record_serial=4, submission_serial=5,
+                   completion_serial=5, present_serial=5, gpu_serial=5, gpu_stage_serial=5,
+                   shader_sha256=digest, backend="RayTracingPipeline", tick=9300,
+                   internal_width=64, internal_height=32, output_width=192, output_height=96,
+                   kit_mask=1, resident_mask=1, record_keeper_mask=1, tavern_door_mask=1,
+                   glass_enabled=0, window_mask=0, resident_slot0_id=11, resident_slot1_id=12,
+                   fire_ids="1;2;3;4", gpu_ns=10000, gpu_dispatch_ns=9000)
+        stem = "bellwether-westroundtrip-hearth-clock-1000-return-1-sample-1-5"
+        receipt = dict(format="horde-rt-dispatch-clock-v1", route="west-roundtrip",
+                       room_id="bellwether_tavern_staffed_hearth", phase="room", measurement_checkpoint_id=349,
+                       checkpoint_id=4, return_index=1, sample_index=1, room_dwell_ticks=300,
+                       record_size_bytes=80, record_count=2, clock_ticket=7, category_order=CATEGORIES,
+                       category_ticks=[int(generic["clock_"+k]) for k in CATEGORIES], raw_file=stem+".bin",
+                       scene_epoch=2, measurement_generation=3, record_serial=4, submission_serial=5,
+                       completion_serial=5, presented_serial=5, simulation_tick=9300, internal_width=64,
+                       internal_height=32, output_width=192, output_height=96, execution_mode=row["backend"],
+                       pipeline_sha256=digest)
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            with (folder/"bellwether-west-roundtrip.csv").open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=row)
+                writer.writeheader()
+                writer.writerow(row)
+            (folder/(stem+".bin")).write_bytes(raw)
+            sidecar = folder/(stem+".json")
+            sidecar.write_text(json.dumps(receipt))
+            def verify_room(frame):
+                self.assertEqual(frame["fire_ids"], "1;2;3;4")
+            result = analyze_hearth(folder, digest, verify_room, ids)
+            self.assertFalse(result["completeSampleSet"])
+            self.assertEqual(result["witnesses"][0]["samples"], 2)
+            for key, value in (("completion_serial", 6), ("scene_epoch", 3), ("clock_ticket", 9),
+                               ("record_count", 1), ("sample_index", 2), ("room_dwell_ticks", 299),
+                               ("pipeline_sha256", "d"*64), ("raw_file", "../other.bin")):
+                sidecar.write_text(json.dumps(dict(receipt, **{key: value})))
+                with self.subTest(key=key), self.assertRaises(AnalysisError):
+                    analyze_hearth(folder, digest, verify_room, ids)
 
 
 if __name__ == "__main__": unittest.main()

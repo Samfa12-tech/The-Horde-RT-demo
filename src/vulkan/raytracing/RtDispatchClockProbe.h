@@ -1,5 +1,8 @@
 #pragma once
+#include "vulkan/raytracing/RtSceneAbi.generated.h"
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
 #include "world/streaming/GeometryPageTable.h"
+#endif
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -9,7 +12,11 @@ namespace horde::vulkan::raytracing {
 // Private observer tail of the existing metadata allocation; no new descriptor,
 // geometry page, actor, shader budget or resource-lifetime owner is introduced.
 inline constexpr std::uint32_t kDispatchClockCapacity=8192;
+#if HORDE_RT_REGION_PAGE_PROTOTYPE
 inline constexpr std::size_t kDispatchClockControlOffset=sizeof(horde::world::streaming::GeometryPageTable);
+#else
+inline constexpr std::size_t kDispatchClockControlOffset=kRtInstanceMetadataCapacity*sizeof(RtInstanceMetadata);
+#endif
 inline constexpr std::size_t kDispatchClockSamplesOffset=kDispatchClockControlOffset+16;
 struct alignas(16) RtDispatchClockSample {
     std::array<std::uint32_t,4> tag{}; // recording ticket, x, y, primary instance+1 (0=miss)
