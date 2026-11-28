@@ -72,6 +72,8 @@ final class ControllerNavigation {
     static void navigate(View root,int horizontal,int vertical) {
         if(horizontal==0 && vertical==0)return;
         View focus=ensureFocus(root); if(focus==null)return;
+        if (vertical != 0 && focus instanceof MenuReadingHeading &&
+                ((MenuReadingHeading) focus).scrollForNavigation(Integer.signum(vertical))) return;
         if(horizontal!=0 && focus instanceof SeekBar) {
             int key=horizontal<0?KeyEvent.KEYCODE_DPAD_LEFT:KeyEvent.KEYCODE_DPAD_RIGHT;
             // Native keyboard route emits fromUser=true, preserving saved audio/look sliders.
