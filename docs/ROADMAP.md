@@ -194,6 +194,14 @@ The stock-room oil cup now casts a brighter pool across the threshold and
 sorting tray. Both Windows hardware RT backends passed the stock-room route
 with the existing two lights in the captured views. [Matched lighting captures](evidence/2026-11-28-bellwether-stock-room-lamp/receipt.json)
 
+The ordinary Windows 1.8 package also passed the stock-room round trip on
+RayTracingPipeline. From Kit's hearth the player read the square fingerpost,
+followed the fork below the church sign, and walked up the railed ramp through
+House B's lit east entrance. The ledger pointed to the board by the mill's
+west door and closed both through **Finish reading** and on turning away. The
+player returned to Kit with the save unchanged. The open tavern doorway took
+a small sideways adjustment on the return. [Foreground route and ledger receipt](evidence/2026-11-28-bellwether-ordinary-stock-room/receipt.json)
+
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 
 On the Galaxy S26 Ultra, [the timed west route](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#27-november-2026--church-fork-silver-west-lane-sale-and-hearth-fitting) reached the stock yard twice and the tavern once before the 240-second deadline. The staffed hearth had the highest median GPU time at 95.64 ms, with 95.01 ms in RT dispatch. At the same scale, [two hearth sampling runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--staffed-hearth-shader-sampling-on-the-galaxy-s26-ultra) identified shadow visibility as the largest sampled shader category. [Five ordinary-shader runs](ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#28-november-2026--hearth-shadow-query-comparison) found no GPU time saving from postponing a primitive-index read. The shipping shaders retain their existing shadow queries.

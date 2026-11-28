@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "scope": "Stock-room round trip using the normal foreground Windows mouse and keyboard controls",
+  "packageSourceCommit": "d8a0feb2130089296b064639f9f65fb0037e6288",
+  "windowsZipSha256": "3b57e104258681715cc76baa2a3d4ec7c89e2f12389864ecd1b8e27293614ea4",
+  "windowsExeSha256": "8e607d8249769cbc3a49f71a6869f6c242cc2e1f4a1089b2ea16f354bd106003",
+  "backend": "RayTracingPipeline",
+  "shaderBundle": "shipping_high_pair",
+  "internalAndOutputExtent": [
+    1232,
+    803
+  ],
+  "visibleClientCaptureExtent": [
+    1232,
+    752
+  ],
+  "earnedTavernSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+  "isolatedAndOriginalSavesUnchanged": true,
+  "returnApproach": "The first direct approach stopped at the open tavern doorway. A small sideways adjustment allowed entry without moving the door.",
+  "gameExitCode": 0,
+  "routeReceiptSha256": "339f133735a109d80542729ce21837474fb019b2625678fd4c879f0b5470f893",
+  "milestones": [
+    {
+      "description": "Loaded the earned Bellwether tavern slot through the native menu",
+      "capture": "frame-000.jpg",
+      "imageSha256": "c0240bb987075005b371a625fba050a78afcd59903e556f22d996179802ae77d",
+      "recordSha256": "8af9929d039c43695311a7692e2bb7f3318357b8c15dc5fc2561a09be472b23a",
+      "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+      "reading": "",
+      "stockRoomLampUploaded": null
+    },
+    {
+      "description": "Read the square fingerpost",
+      "capture": "frame-004.jpg",
+      "imageSha256": "fb7eb93b80e61d8d30e24b127db59728889dfe714f11b41e6eaa6d62e532172d",
+      "recordSha256": "d8d235f94d0a7cb06fb6aa5c2fc27376bdfa44eb4833a586bbd0ef523ae98343",
+      "prompt": "LEFT-CLICK / A TO FINISH READING",
+      "reading": "Tankard - Up the tavern ramp\r\nScales - Dealer & gardens, west\r\nWheel - Mill & river fork, east\r\nAnvil - Smith yard, southeast",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "Reached the stock-room fork below the church sign",
+      "capture": "frame-009.jpg",
+      "imageSha256": "7aab99541cf43e3864d6f6f2a8fffc958b74a30e7066198fb4179e503bc3c74d",
+      "recordSha256": "5400e311a77f1e2d8f779b27d91e8f2d7cbd4eee8e58fa2f101f71d597a5f4b2",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "Followed the stone fork to the railed ramp and lit east entrance",
+      "capture": "frame-010.jpg",
+      "imageSha256": "b995f3a903153b548319b4f9448106459ebc072783c298ca17041bb9f803cc4c",
+      "recordSha256": "b684fc2b847923e4e0779e0ff50c5264db6d805cc8082b29528653b7dea833b9",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Walked into House B and reached the ledger beside the sorting table",
+      "capture": "frame-012.jpg",
+      "imageSha256": "36ea87ce356f55b7bdb8a1f96f90e83283949c434db84a66d22c4e9f8a71f9ea",
+      "recordSha256": "3a3d66aa43a784c845665f2bdba6f0693187f67d6bc94f295c943e239c6dabb0",
+      "prompt": "LEFT-CLICK / A TO READ THE STOCK LEDGER",
+      "reading": "",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Read the ledger's clue about the tally board at the mill's west door",
+      "capture": "frame-013.jpg",
+      "imageSha256": "40332b5ee5172b5fe18f7c8f79f2558a68e5520edf873ab0685bc608387244e7",
+      "recordSha256": "a72d2def6b4d5e3466cca8a9fc714a2a5f558a4461f7bc19c3dccda1203d18bf",
+      "prompt": "LEFT-CLICK / A TO FINISH READING",
+      "reading": "Grain for the tavern: two sacks set aside.\r\nReturn the mill tally stamp at the board by the mill's west door.",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Closed the ledger by selecting Finish reading",
+      "capture": "frame-014.jpg",
+      "imageSha256": "9c578b0c385875bb4262cbe4d66da5bc524dd64aa83cc7ac96aa548abca767fe",
+      "recordSha256": "28774b507ec7a1aa6e2f23f65590d3537b7ea77bfa057b68a30e234289e6eede",
+      "prompt": "LEFT-CLICK / A TO READ THE STOCK LEDGER",
+      "reading": "",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Reopened the ledger",
+      "capture": "frame-015.jpg",
+      "imageSha256": "6b6075f4eadd39b904f438ad23a94efc9761a290c7edd08ad0dc2037c5fc8ded",
+      "recordSha256": "15a6634fdfc897b3ef84ef0a71b9b5de41199e5ccb262efa08c6e0a2cf06afa0",
+      "prompt": "LEFT-CLICK / A TO FINISH READING",
+      "reading": "Grain for the tavern: two sacks set aside.\r\nReturn the mill tally stamp at the board by the mill's west door.",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Closed the ledger by turning away",
+      "capture": "frame-016.jpg",
+      "imageSha256": "83c1d211e14748f56f81dff6f8508d3a6ca79b9889d3839d6b3292c67f30d5ad",
+      "recordSha256": "8d74e0b1f3b9afc088d733c48a7b231a3ee4f1a7fb72e0982da96416195b90fe",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": true
+    },
+    {
+      "description": "Left through the same ramp and returned to the church road",
+      "capture": "frame-018.jpg",
+      "imageSha256": "5b5308ffc600eb1a59ff9618c5ae16b4e6b1d0d581088d9605744dba1f7d767e",
+      "recordSha256": "b222eb9daa5501e78403c36035bc8a663148cf7bfe027a13fac8c418e08b6772",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "Reached the square and faced the tavern ramp",
+      "capture": "frame-021.jpg",
+      "imageSha256": "07221018d8eadad64483875fe6ad6345708ca42856811a40c667fd2588cf0ae7",
+      "recordSha256": "c4093376166282120b2d7a2f7863d143fc3198688df1f1d169a7495183fae269",
+      "prompt": "LEFT-CLICK / A TO READ THE FINGERPOST",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "First approach stopped at the open tavern doorway",
+      "capture": "frame-023.jpg",
+      "imageSha256": "456d413948f56b32df2b5bd2dcfa87594e8fa220852412aedbe12f218375445b",
+      "recordSha256": "08baea6abba363a30f76b734a6975fc474ffcb74435bb89280c5ace33609404b",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "Backed up, adjusted sideways, and crossed the threshold",
+      "capture": "frame-024.jpg",
+      "imageSha256": "489bd95889c157bb98bae934b1548a8911b6d17e3fe0cc8eedf2b943dd6a373a",
+      "recordSha256": "23077d4d53a234638bb92ef54a604ae35a45ab15495c3d53336bad8ecbcb735a",
+      "prompt": "",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    },
+    {
+      "description": "Reached Kit at the same hearth on foot",
+      "capture": "frame-025.jpg",
+      "imageSha256": "73c5cb534be049dd87731fd7d4d47bafe4959e804ae39ad5d8844ddf8cdbf689",
+      "recordSha256": "3ee6a5ab2d6bcfac60beacd355a8f7003f9b5ba425cac53718b3d61d1f2b806c",
+      "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+      "reading": "",
+      "stockRoomLampUploaded": false
+    }
+  ],
+  "phoneTested": false,
+  "published": false
+}
