@@ -1,0 +1,93 @@
+{
+  "sourceCommit": "a587c2795b93baab66ec9470fe493081725b3e45",
+  "executableSha256": "dfd6aab9e9100e3ec4b4cb7900e556e3ee5d4a97599e77f88af6230d20a64ae3",
+  "townSha256": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+  "residentCount": 5,
+  "voiceCount": 26,
+  "buildProfile": "Windows Debug playtest with Shipping/High shaders on RTX 5050 Laptop GPU",
+  "cases": [
+    {
+      "case": "full-preparation",
+      "backend": "RayTracingPipeline",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-ankle-restore",
+        "--bellwether-verify-preparations"
+      ],
+      "passedChecks": 63,
+      "receiptSha256": "d49b4ec469151cd64c4b3dc0f739fdb14757175bc2e341eec9f837339826399d",
+      "capabilityReportSha256": "6afcee95e1273f96ce43b80b2d3dc3d6c645b1f51e3a5ec5faa29bdb81190566",
+      "presentedStockRoomFrameSha256": "6250ec29ed873ba0d936290513a6ac92126b7ff4bed58be8f3e58e5d3dfdd859",
+      "presentationSource": "completed RT frame"
+    },
+    {
+      "case": "full-preparation",
+      "backend": "RayQueryCompute",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-ankle-restore",
+        "--bellwether-verify-preparations"
+      ],
+      "passedChecks": 63,
+      "receiptSha256": "294dc5af149cfb1b4fbe6fcee22d28afe4c41618386d4bce7aff8d4a134b048e",
+      "capabilityReportSha256": "4ebd4e03a5ceac421dab5595edf8c8a424c41e1960874c6c25c68518139fe053",
+      "presentedStockRoomFrameSha256": "a55e62a8ed3428d8625b99cf883c96fe41f7cc63898880100d46ca7582f120de",
+      "presentationSource": "completed RT frame"
+    },
+    {
+      "case": "hearth-rest",
+      "backend": "RayTracingPipeline",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-hearth-rest",
+        "--bellwether-verify-expedition-leads"
+      ],
+      "passedChecks": 30,
+      "receiptSha256": "b5db2ef2377eacb2ef066a923cea07f681477f15b81803dc1185f4055931bc71",
+      "capabilityReportSha256": "6afcee95e1273f96ce43b80b2d3dc3d6c645b1f51e3a5ec5faa29bdb81190566",
+      "presentationSource": "native campaign validation assertions"
+    },
+    {
+      "case": "hearth-rest",
+      "backend": "RayQueryCompute",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-hearth-rest",
+        "--bellwether-verify-expedition-leads"
+      ],
+      "passedChecks": 30,
+      "receiptSha256": "fe6806fe6ebc8dcc75b11eacda4e5e2dbe771f73e9ffcd8cc08e2b2ae3e110e4",
+      "capabilityReportSha256": "4ebd4e03a5ceac421dab5595edf8c8a424c41e1960874c6c25c68518139fe053",
+      "presentationSource": "native campaign validation assertions"
+    },
+    {
+      "case": "new-game",
+      "backend": "RayTracingPipeline",
+      "args": [
+        "--route-validate-hidden",
+        "--route-from-new-game"
+      ],
+      "passedChecks": 28,
+      "receiptSha256": "4870c9343decdda7a8810aa6234704194430fe316449a2dc8edc990638c8697c",
+      "capabilityReportSha256": "6afcee95e1273f96ce43b80b2d3dc3d6c645b1f51e3a5ec5faa29bdb81190566",
+      "presentedMilestoneCount": 12,
+      "postTombVitality": 3
+    },
+    {
+      "case": "new-game",
+      "backend": "RayQueryCompute",
+      "args": [
+        "--route-validate-hidden",
+        "--route-from-new-game"
+      ],
+      "passedChecks": 28,
+      "receiptSha256": "b1599d1b3f8f3b0b91e2993c0be8ca3ea29a027a4a2e21af9645d45d44f1e3f8",
+      "capabilityReportSha256": "4ebd4e03a5ceac421dab5595edf8c8a424c41e1960874c6c25c68518139fe053",
+      "presentedMilestoneCount": 12,
+      "postTombVitality": 3
+    }
+  ],
+  "physicalAndroidTest": false,
+  "sustainedPerformanceTest": false,
+  "manualListeningTest": false
+}

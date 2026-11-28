@@ -88,6 +88,7 @@ void SanitizeAuthoredState(FireEmitterState& state)
     state.stableId = std::max(1u, state.stableId);
     state.strength = std::clamp(FiniteOr(state.strength, 0.0f), 0.0f, 1.0f);
     state.fuel = std::clamp(FiniteOr(state.fuel, 0.0f), 0.0f, 1.0f);
+    state.authoredStrengthScale = std::clamp(FiniteOr(state.authoredStrengthScale, 1.0f), 0.0f, 4.0f);
     state.phase = std::clamp(FiniteOr(state.phase, 0.0f), 0.0f, 0.999999f);
     state.colourTemperatureKelvin = std::clamp(
         FiniteOr(state.colourTemperatureKelvin, 1850.0f), 1000.0f, 4000.0f);
@@ -135,6 +136,7 @@ void ResetFireEmitter(FireEmitterState& state)
     const FireEmitterParentObject parentObject = state.parentObject;
     const FireEmitterSocket flameSocket = state.flameSocket;
     const FireEmitterSocket lightSocket = state.lightSocket;
+    const float strengthScale = state.authoredStrengthScale;
     const float temperature = state.colourTemperatureKelvin;
     const auto tint = state.artTint;
     const float radius = state.radius;
@@ -150,6 +152,7 @@ void ResetFireEmitter(FireEmitterState& state)
     state.parentObject = parentObject;
     state.flameSocket = flameSocket;
     state.lightSocket = lightSocket;
+    state.authoredStrengthScale = strengthScale;
     state.colourTemperatureKelvin = temperature;
     state.artTint = tint;
     state.radius = radius;
