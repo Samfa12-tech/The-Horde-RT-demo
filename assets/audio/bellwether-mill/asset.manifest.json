@@ -11,9 +11,9 @@
       "id": "wheel_creak",
       "runtimeFile": "runtime/wheel_creak.wav",
       "frames": 36480,
-      "runtimeSha256": "f885cfe1d3332d0fce88e3b17804866a8917bcafb4f59550162b1a6bd29aaf65",
+      "runtimeSha256": "5d49a102abed34be4cee6426d1801e1670bdee17d56106d7d541c8048cf1f195",
       "runtimeBytes": 73004,
-      "peakSample": 6300,
+      "peakSample": 12600,
       "loop": false
     }
   ]

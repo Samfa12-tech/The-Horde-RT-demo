@@ -12,6 +12,7 @@ from pathlib import Path
 
 RATE = 48000
 FRAMES = 36480
+PEAK_SAMPLE = 12600
 WAV = Path("runtime/wheel_creak.wav")
 
 
@@ -44,8 +45,8 @@ def encode_contact():
         edge = min(1.0, t / .012, (FRAMES - 1 - i) / (RATE * .13))
         mix.append((load * (friction + strains) + .23 * release) * edge)
 
-    # Fit the compact contact to the chapter one-shot headroom.
-    scale = 6300 / max(map(abs, mix))
+    # Keep the wood contact present under the default score at the dry footway.
+    scale = PEAK_SAMPLE / max(map(abs, mix))
     pcm = [round(sample * scale) for sample in mix]
     target = io.BytesIO()
     with wave.open(target, "wb") as out:
@@ -71,7 +72,7 @@ def main():
         "assets": [{
             "id": "wheel_creak", "runtimeFile": WAV.as_posix(), "frames": FRAMES,
             "runtimeSha256": hashlib.sha256(audio).hexdigest(), "runtimeBytes": len(audio),
-            "peakSample": 6300, "loop": False,
+            "peakSample": PEAK_SAMPLE, "loop": False,
         }],
     }
     for relative, expected in ((WAV, audio), (Path("asset.manifest.json"),
