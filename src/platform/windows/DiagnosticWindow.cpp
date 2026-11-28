@@ -3753,6 +3753,7 @@ void UpdateChestPrompt(VulkanSurfaceContext& context)
     else if(chapterInteract && snapshot.tavernDoorAction!=horde::gameplay::bellwether::DoorAction::None) {
         text = snapshot.tavernDoorAction==horde::gameplay::bellwether::DoorAction::Open
             ? "LEFT-CLICK / A TO OPEN THE TAVERN DOOR" : "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR";
+        context.tavernInteractionPromptPresented=visible;
     }
     else if(chapterInteract && snapshot.kitTreasureTalkAvailable) {
         text = "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE";
