@@ -200,6 +200,8 @@ Eighteen pines and alders now frame the west lane and kitchen plots on the surve
 
 The regional haze now takes on the colour of the sky along the same world-space ray between 800 metres and 2.4 kilometres. The Windows replay showed a smooth transition in the sky gaps at the square and relic stall. The nearer slope at the garden still reads against the sky. [Horizon evidence](evidence/2026-11-28-bellwether-horizon/receipt.json)
 
+The refreshed private 1.8.0 package set includes resident attention, west woodland and the horizon fix. The Windows ZIP matches the payload used in the square-to-gardens walkthrough. The ordinary Android APK is unsigned and includes four ABIs. The ARM64 phone playtest uses the established development signature. Both APKs match all 295 runtime assets and four Shipping/Mobile shader modules. Android lint passed and Gradle reused its passing unit-test results. Physical handset and sustained performance checks remain open. [Refreshed package receipt](evidence/2026-11-28-bellwether-horizon-packages/receipt.json)
+
 A short stone fork from the lower road leads to the mapped east door of
 [House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
 private store-room candidate gives the village a second walk-in building,
