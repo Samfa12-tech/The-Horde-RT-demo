@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "testedWindowsBuild": "Private Debug, Shipping/High shaders",
+  "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+  "driver": "610.47",
+  "sourceCommit": "bcdd64ffdc38903f7c06f00e64c59e8c0e919d93",
+  "executableSha256": "4645a34caf6514091fc4f0277b954ed5580d2f50fcfa245e863b8a99cea9f5b8",
+  "townSha256": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+  "residentCount": 5,
+  "voiceCount": 26,
+  "results": [
+    {
+      "case": "full-preparation",
+      "requestedBackend": "RayTracingPipeline",
+      "observedBackend": "RayTracingPipeline",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-preparations"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "checks": 63,
+      "capturedTavernRtFramePresented": true,
+      "failedChecks": [],
+      "receiptSha256": "0e2fc8cd3648a650b1d5fc6e39b4ed5639fc3281fdc94f284a0b241b580fe011",
+      "reportSha256": "6afcee95e1273f96ce43b80b2d3dc3d6c645b1f51e3a5ec5faa29bdb81190566"
+    },
+    {
+      "case": "full-preparation",
+      "requestedBackend": "RayQueryCompute",
+      "observedBackend": "RayQueryCompute",
+      "args": [
+        "--lookout-validate-hidden",
+        "--bellwether-verify-preparations"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "checks": 63,
+      "capturedTavernRtFramePresented": true,
+      "failedChecks": [],
+      "receiptSha256": "f1612d2580ad6cb0dc770a7ce9cf93fd63d55d20d95b56d02666446b1bf8e145",
+      "reportSha256": "4ebd4e03a5ceac421dab5595edf8c8a424c41e1960874c6c25c68518139fe053"
+    },
+    {
+      "case": "new-game",
+      "requestedBackend": "RayTracingPipeline",
+      "observedBackend": "RayTracingPipeline",
+      "args": [
+        "--route-validate-hidden",
+        "--route-from-new-game"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "checks": 28,
+      "capturedTavernRtFramePresented": true,
+      "failedChecks": [],
+      "receiptSha256": "62c975ed3444f544013ae7f1643c42330e0c02b8c13ad565a21f9c493de2f3bd",
+      "reportSha256": "6afcee95e1273f96ce43b80b2d3dc3d6c645b1f51e3a5ec5faa29bdb81190566",
+      "startedFromNewGame": true,
+      "packagedBellwetherContinuation": true
+    },
+    {
+      "case": "new-game",
+      "requestedBackend": "RayQueryCompute",
+      "observedBackend": "RayQueryCompute",
+      "args": [
+        "--route-validate-hidden",
+        "--route-from-new-game"
+      ],
+      "exitCode": 0,
+      "passed": true,
+      "checks": 28,
+      "capturedTavernRtFramePresented": true,
+      "failedChecks": [],
+      "receiptSha256": "34c01f6df04f41ed613a2448643f4e4d58b3f3f7cc4574a2a335f0e8fdfec46f",
+      "reportSha256": "4ebd4e03a5ceac421dab5595edf8c8a424c41e1960874c6c25c68518139fe053",
+      "startedFromNewGame": true,
+      "packagedBellwetherContinuation": true
+    }
+  ],
+  "hostSuitesPassed": [
+    "CampaignSession",
+    "CompanionActing",
+    "ForestDressing"
+  ],
+  "androidArm64DebugNativeBuildPassed": true,
+  "physicalPhoneRun": false,
+  "audioListeningRun": false,
+  "evidence": "Hidden Windows gameplay replays. Presentation is verified against completed tavern frames for each run."
+}

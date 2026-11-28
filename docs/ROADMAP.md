@@ -212,6 +212,8 @@ three preparations, and verified that hearth rest and the expedition leads
 persist together. Handset routes, sustained timing and listening review are
 still pending for this checkpoint.
 
+The integrated Windows Debug build presents the keeper turning toward Kit at the south door and Kit looking down at the table before offering to help. Both hardware RT backends verified that the welcome and all three Talk lines remain readable with playback unavailable and optional subtitles off. Each backend passed the 28-check run from New Game to the earned tavern save, and a separate 63-check run from a lookout fixture through Magic, Tech and Constitution preparation and the final reload. Physical play and listening coverage remain open. [Integrated arrival evidence](evidence/2026-11-28-bellwether-integrated-arrival/receipt.json)
+
 **Acceptance gates:** first accept one arrival-to-tavern stress slice with representative actors/fire/glass, exchange, checkpoint, return outdoors and repeat visits, using the six-gate contract's hub gate. Expand only after combined residency/LOD/RT relevance and phone/Windows budgets pass. Then prove admitted interiors and NPC interactions, subtitle/audio fallbacks, progress-aware returns, spending/reward/save integrity and viable alternative progression. Final service selection, cast/interiors, quest details, injury staging and numeric budgets must be scoped before acceptance. 1.8 release acceptance remains pending.
 
 ## Proposed 1.9 - Drowned Abbey
