@@ -1,0 +1,61 @@
+{
+  "scope": "Host-verified Android ARM64 timing pair for the current Bellwether checkpoint",
+  "shaderDonorCommit": "3ccb46702aedff3d921351c59364cb855717240e",
+  "profiles": {
+    "control": {
+      "sourceCommit": "4cd539522daecbccb68f8d427b8ef93be889e304",
+      "applicationId": "com.samfa12.hordelanternrt.debug.bellwether.playtest",
+      "artifact": "Horde-Bellwether-Fire-control-ARM64.apk",
+      "sha256": "b2cad40a222e3745b5a4df5d388d5e19c846c9380769a0bdee2a232e81cef3da",
+      "nativeLibrarySha256": "960f9df4c91c1541d03938e1f5caba405a9ed5d32d938a95c869c3ef87c92189",
+      "shippingMobileShaderHashes": {
+        "RayQueryCompute": [
+          "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+          "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe"
+        ],
+        "RayTracingPipeline": [
+          "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+          "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+        ]
+      }
+    },
+    "trial": {
+      "sourceCommit": "1c2c298115f68ac43232a7c3fe903fcdc2380222",
+      "applicationId": "com.samfa12.hordelanternrt.debug.bellwether.playtest",
+      "artifact": "Horde-Bellwether-Fire-trial-ARM64.apk",
+      "sha256": "6533dc2e2cbbe0aef72c4fcdfa278c3ea2b0caa41e0bea29012cc3d9ca1d42ca",
+      "nativeLibrarySha256": "e11f0685c27e8f164258f4b0a7509d2dc4087b52db5508795811046eb98b2918",
+      "shippingMobileShaderHashes": {
+        "RayQueryCompute": [
+          "23db84387f99f230a704ae02988ab9c8fbde22801ee2aab116f38ca700f81fff",
+          "dc68c5562c82e5fe8698a340050aef02003462c74464a2666734649f283324ca"
+        ],
+        "RayTracingPipeline": [
+          "15c9bfe6d50c576b1557e4cd9e0a7ce02d8d0fbd19ecc99fb94e164766ae6719",
+          "9ebdba5ff6ed665854137bf5c5df97d207a410aa69094c6685fa14f233f73b32"
+        ]
+      }
+    }
+  },
+  "identicalApkEntries": 312,
+  "onlyChangedEntry": "lib/arm64-v8a/libhorde_rt_probe_android.so",
+  "identicalAssetEntries": 295,
+  "residentCount": 5,
+  "voiceCount": 26,
+  "sharedDebugSigner": true,
+  "nextDeviceEvidence": {
+    "route": "bellwether-west-roundtrip-measurement",
+    "comparisonMetric": "Median RT dispatch milliseconds at matched staffed-hearth simulation ticks",
+    "requiredBackends": [
+      "RayTracingPipeline",
+      "RayQueryCompute"
+    ],
+    "requiredJoins": [
+      "Two completed tavern returns on each measured run",
+      "Matching graphics settings, scene and admitted thermal state",
+      "Completed GPU stages joined to successful RT presentations"
+    ]
+  },
+  "physicalDeviceRun": false,
+  "sustainedPerformanceResult": null
+}
