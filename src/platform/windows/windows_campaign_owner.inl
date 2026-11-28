@@ -72,7 +72,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     using Scene=horde::vulkan::raytracing::PresentableTinyRtScene;
     if(ctx.rtScene.Profile()==horde::vulkan::raytracing::RtSceneProfile::Showcase &&
        ctx.simulation.Snapshot().developmentRescueJourney && ctx.rtScene.IsReady() &&
-#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_PACKAGED_BELLWETHER
        (gBellwetherCampaignActors.empty() || ctx.rtScene.ChapterResidentSourceCount()==horde::vulkan::raytracing::kBellwetherResidentCount) &&
 #endif
        ctx.rtScene.StaticGeometryHasCompleteContributors())return true;
@@ -85,7 +85,7 @@ bool PrepareCampaignResources(VulkanSurfaceContext& ctx)
     scene.SetDevelopmentSupportFixture(false);
     const auto root=ResolveAssetRoot();
     std::string diagnostic;
-#if defined(_DEBUG) || HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE
+#if defined(_DEBUG) || HORDE_RT_WINDOWS_PACKAGED_BELLWETHER
     if(!gBellwetherCampaignActors.empty() &&
        !SetBellwetherCampaignResidentSources(scene,gBellwetherCampaignActors,diagnostic))
         return CampaignPreparationFailure(ctx,"bellwether-residents",diagnostic);
