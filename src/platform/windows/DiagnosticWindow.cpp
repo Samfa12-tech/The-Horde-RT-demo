@@ -6835,7 +6835,8 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, const WindowsSwapchainOutput& ou
         VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
         ctx.graphicsQueueFamilyIndex};
 
-    if (vkCreateCommandPool(ctx.device, &commandPoolCreateInfo, nullptr, &ctx.commandPool) != VK_SUCCESS)
+    if (ctx.commandPool == VK_NULL_HANDLE &&
+        vkCreateCommandPool(ctx.device, &commandPoolCreateInfo, nullptr, &ctx.commandPool) != VK_SUCCESS)
     {
         return false;
     }
@@ -6989,7 +6990,7 @@ bool SaveGraphicsRecord(const VulkanSurfaceContext& context,
     return horde::platform::windows::SaveGraphicsPersistenceRecord(SettingsPath(), record);
 }
 
-bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
+bool ReleaseSwapchainOutputResources(VulkanSurfaceContext& ctx)
 {
     if (ctx.device == VK_NULL_HANDLE)
     {
@@ -7028,22 +7029,14 @@ bool ReleaseSwapchainResources(VulkanSurfaceContext& ctx)
         }
     }
     ctx.campaignPreparedScene.reset();
-    ctx.simulation.InvalidateWorldZoneReadiness();
-    (void)ctx.simulation.ConfigureSkeletonRevivalPresentation(++ctx.privateRevivalAudio.resourceGeneration,0,0,false);
-    ctx.rtScene.Destroy();
 
-    if (ctx.commandPool != VK_NULL_HANDLE)
+    // The active scene uses this pool for its own streaming and acceleration
+    // structure work. Only the command buffers owned by the swapchain retire.
+    if (!ctx.commandBuffers.empty())
     {
-        if (!ctx.commandBuffers.empty())
-        {
-            vkFreeCommandBuffers(ctx.device,
-                                 ctx.commandPool,
-                                 static_cast<uint32_t>(ctx.commandBuffers.size()),
-                                 ctx.commandBuffers.data());
-            ctx.commandBuffers.clear();
-        }
-        vkDestroyCommandPool(ctx.device, ctx.commandPool, nullptr);
-        ctx.commandPool = VK_NULL_HANDLE;
+        vkFreeCommandBuffers(ctx.device, ctx.commandPool,
+                             static_cast<uint32_t>(ctx.commandBuffers.size()), ctx.commandBuffers.data());
+        ctx.commandBuffers.clear();
     }
 
     for (VkFramebuffer framebuffer : ctx.swapchainFramebuffers)
@@ -7474,7 +7467,7 @@ bool RecreateSwapchain(VulkanSurfaceContext& ctx)
         ctx.swapchainRecreationPending = true;
         return true;
     }
-    if (ctx.swapchain != VK_NULL_HANDLE && !ReleaseSwapchainResources(ctx)) return false;
+    if (ctx.swapchain != VK_NULL_HANDLE && !ReleaseSwapchainOutputResources(ctx)) return false;
 
     VkResult creationResult = VK_NOT_READY;
     if (!CreateSwapchain(ctx, output, creationResult))
@@ -7484,7 +7477,16 @@ bool RecreateSwapchain(VulkanSurfaceContext& ctx)
         return ctx.swapchainRecreationPending;
     }
     ctx.swapchainRecreationPending = false;
-    return InitialiseRtSceneForSwapchain(ctx);
+    if (!ctx.rtScene.IsReady()) return InitialiseRtSceneForSwapchain(ctx);
+
+    const VkExtent2D targetExtent = ScaledRenderExtent(ctx.swapchainExtent, ctx.appliedRenderScale);
+    const VkExtent2D currentExtent = ctx.rtScene.DispatchExtent();
+    if ((targetExtent.width != currentExtent.width || targetExtent.height != currentExtent.height) &&
+        !ctx.rtScene.ResizeOutputAfterDeviceIdle(targetExtent, ctx.lastRtFrameError))
+        return false;
+    ctx.rtScene.SetPresentationFormat(ctx.swapchainFormat);
+    RefreshGpuTimingTelemetry(ctx);
+    return true;
 }
 
 void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
