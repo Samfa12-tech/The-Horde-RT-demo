@@ -36,6 +36,33 @@ bool Near(double a, double b, double tolerance=.00001) { return std::abs(a-b) <=
 void Ticks(DialogueDucking& duck, bool speaking, unsigned count) {
     for (unsigned i=0; i<count; ++i) duck.Step(speaking,kTick);
 }
+void HearthSpeechSpatial() {
+    constexpr auto domain=SpatialAudioDomain::ExteriorRoute;
+    dlg::Snapshot s;
+    s.source={1.25f,.3f,-2.f};
+    s.listener={0,0,0};
+    s.listenerYaw=.3f;
+    s.line=dlg::Line::TavernWelcome;
+    const auto doorway=ChapterDialogueSpatial(s,domain);
+    const auto standard=CalculateSpatialAudio({1.25f,-2.f,.36f,1.f,14.f,.3f},
+        {0,0,s.listenerYaw,0},domain);
+    Check(doorway.left==standard.left && doorway.right==standard.right,
+          "the door greeting keeps its original gain");
+    for (const auto line : {dlg::Line::TavernLimit,dlg::Line::TavernHordeArmy,
+                            dlg::Line::TavernLanternSeals,dlg::Line::KitTreasureKey}) {
+        s.line=line;
+        const auto atTable=ChapterDialogueSpatial(s,domain);
+        Check(Near(std::hypot(atTable.left,atTable.right),.50f) && atTable.pan==doorway.pan &&
+              atTable.distance==doorway.distance && atTable.obstructed==doorway.obstructed,
+              "hearth speech gains presence at the table without moving the source or changing pan");
+    }
+    s.source={0,.3f,-5.f};
+    const auto distant=ChapterDialogueSpatial(s,domain);
+    Check(Near(std::hypot(distant.left,distant.right),.25f), "hearth speech still falls off beyond the table distance");
+    s.source={0,.3f,-14.f};
+    const auto limit=ChapterDialogueSpatial(s,domain);
+    Check(limit.left==0 && limit.right==0, "hearth speech keeps the existing maximum range");
+}
 void RescueSpeechSpatial() {
     dlg::Snapshot s; s.line=dlg::Line::RescueRope; s.source={0,2.8f,-8}; s.listener={0,0,0};
     const auto rescue=ChapterDialogueSpatial(s,SpatialAudioDomain::ExteriorRoute);
@@ -368,7 +395,7 @@ void OutputWiring(const std::filesystem::path& root) {
 } // namespace
 int main(int argc,char** argv) {
     if (argc!=2) { std::cerr<<"usage: DialogueDuckingTests <source-root>\n"; return 2; }
-    RescueSpeechSpatial(); Envelope(); SnapshotGuard(); SharedDialogueChain(); SharedGrateFinalization(); RealGrateAndLifecycle(); MusicOutputOnly();
+    RescueSpeechSpatial(); HearthSpeechSpatial(); Envelope(); SnapshotGuard(); SharedDialogueChain(); SharedGrateFinalization(); RealGrateAndLifecycle(); MusicOutputOnly();
     const auto directory=std::filesystem::path(argv[1])/"assets/models/world/runtime/chapter-terrain-v1";
     horde::scene::assets::AssetManifest manifest; horde::scene::assets::StaticMeshAsset mesh; std::string diagnostic;
     if (!horde::scene::assets::AssetManifest::Load(directory/"asset.manifest.json",manifest,diagnostic) ||
