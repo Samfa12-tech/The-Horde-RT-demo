@@ -218,26 +218,50 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             return fail("Bellwether copse assets changed the reviewed render or contact counts.");
         report.bellwetherBackdropTriangles=addedIndices/3;
     }
-    for(const auto& p:surroundings_layout::understory) {
-        const auto& a=sources[5];const auto centre=terrain->Query(p.x,p.z);
+    const auto appendUnderstory=[&](float x,float z,float yaw,float scale,auto permitsFootprint) {
+        const auto& a=sources[5];const auto centre=terrain->Query(x,z);
         if(!centre.found)return fail("understory lacks ground");
-        const float co=std::cos(p.yaw),si=std::sin(p.yaw);
-        float fitted=centre.worldY-a.bounds.minimum[1]-.03f;
+        const float co=std::cos(yaw),si=std::sin(yaw);
+        float fitted=centre.worldY-scale*a.bounds.minimum[1]-.03f;
         for(const auto& v:a.vertices) {
-            const float x=p.x+co*v.position[0]+si*v.position[2],z=p.z-si*v.position[0]+co*v.position[2];
-            const auto under=terrain->Query(x,z);
+            const float px=scale*v.position[0],pz=scale*v.position[2];
+            const float vx=x+co*px+si*pz,vz=z-si*px+co*pz;
+            const auto under=terrain->Query(vx,vz);
             if(!under.found)return fail("understory full footprint leaves imported ground");
-            if(v.position[1]<=a.bounds.minimum[1]+.03f)fitted=std::min(fitted,under.worldY-v.position[1]-.03f);
-            if(gameplay::simulation::ProjectWorldRoute(x,z).distance<1.35f ||
-               std::hypot(x+33.7f,z+17.f)<4.1f || std::hypot(x+28.7f,z+5.8f)<3.f || std::hypot(x-13.3f,z-36.2f)<3.2f)
-                return fail("actual understory footprint obstructs route or protected pocket");
+            if(v.position[1]<=a.bounds.minimum[1]+.03f)fitted=std::min(fitted,under.worldY-scale*v.position[1]-.03f);
+            if(!permitsFootprint(vx,vz,under))return fail("understory footprint enters a protected route near "+
+                std::to_string(x)+", "+std::to_string(z));
         }
         if(!append(a,[&](auto v,bool){
-            auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
+            const auto rotate=[&](auto& f){const float vx=f[0],vz=f[2];f[0]=co*vx+si*vz;f[2]=-si*vx+co*vz;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
-            v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
+            v.position[0]=x+scale*v.position[0];v.position[1]=fitted+scale*v.position[1];
+            v.position[2]=z+scale*v.position[2];return v;
         },false))return fail("invalid understory basis");
+        return true;
+    };
+    const auto clearsForestRoute=[](float x,float z,const Surface::Sample&) {
+        return gameplay::simulation::ProjectWorldRoute(x,z).distance>=1.35f &&
+            std::hypot(x+33.7f,z+17.f)>=4.1f && std::hypot(x+28.7f,z+5.8f)>=3.f &&
+            std::hypot(x-13.3f,z-36.2f)>=3.2f;
+    };
+    for(const auto& p:surroundings_layout::understory) {
+        if(!appendUnderstory(p.x,p.z,p.yaw,1.f,clearsForestRoute))return false;
         ++report.understoryClumps;report.understoryTriangles+=kTriangles[5];
+    }
+    if(roadEnd==ForestRoadEnd::Bellwether) {
+        for(const auto& p:bellwether_woodland::kSouthUnderstory) {
+            const auto ground=terrain->Query(p.x,p.z);
+            if(!ground.found || ground.surface!=gameplay::simulation::SupportSurface::Earth ||
+               !terrain->NonWalkableVolumeClear(p.x,p.z,p.x,p.z,ground.worldY+.03f,ground.worldY+.45f,.12f))
+                return fail("Bellwether planting base overlaps a built surface near "+
+                    std::to_string(p.x)+", "+std::to_string(p.z));
+            if(!appendUnderstory(p.x,p.z,p.yaw,p.scale,[](float,float,const Surface::Sample& under) {
+                return under.surface==gameplay::simulation::SupportSurface::Earth;
+            }))return false;
+            ++report.bellwetherUnderstoryClumps;
+            report.bellwetherUnderstoryTriangles+=kTriangles[5];
+        }
     }
     // Resolve visible natural boundaries before assembling runs. A short fence
     // ending at a bank or the arrival portal owns its terminal post; joined

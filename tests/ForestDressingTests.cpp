@@ -3035,7 +3035,8 @@ void TestFullSurroundings()
           r.fenceRuns+r.naturalBankRuns+r.rockRuns==surroundings_layout::edges.size() && r.openWoodlandRuns==0 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8+r.rockTriangles,
           "full study owns exact additional trees and closed rendered boundary and temporary endpoint after mapped arrival approach");
     Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560 &&
-          r.bellwetherBackdropTrees==0,"the closed forest study keeps its real lower tree contact and original roster");
+          r.bellwetherBackdropTrees==0 && r.bellwetherUnderstoryClumps==0,
+          "the closed forest study keeps its real lower tree contact and original roster");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
           "full study reuses all existing material/primitive/asset roles without capacity growth");
@@ -3133,6 +3134,11 @@ void TestFullSurroundings()
                   road.bellwetherBackdropTriangles==bellwether_woodland::kTreeTriangles &&
                   road.treeContactTriangles==r.treeContactTriangles+bellwether_woodland::kTreeContactTriangles,
                   "the live chapter admits every surveyed tree with its lower trunk and existing material families");
+            Check(road.bellwetherUnderstoryClumps==bellwether_woodland::kSouthUnderstory.size() &&
+                  road.bellwetherUnderstoryTriangles==bellwether_woodland::kUnderstoryTriangles &&
+                  recreatedTerrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+
+                      road.treeContactTriangles+road.boundaryCollisionTriangles,
+                  "Bellwether's low planting shares the existing families and adds no obstacle faces");
             for(const auto& tree:bellwether_woodland::kSouthCopses) {
                 const auto mark=gameplay::traversal::BellwetherMapStation(tree.east,tree.north);
                 const auto ground=recreatedTerrain->Query(mark.x,mark.z);

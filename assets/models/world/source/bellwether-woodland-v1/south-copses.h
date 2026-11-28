@@ -42,4 +42,39 @@ inline constexpr std::size_t kTreeTriangles=[] {
     return total;
 }();
 inline constexpr std::size_t kTreeContactTriangles=kSouthCopses.size()*10;
+
+struct Understory {
+    float x, z, yaw, scale;
+};
+
+// Registered engine X/Z metres. The small pockets follow plot edges and
+// glimpses of the woodland from the lanes. Keep the surveyed paths open.
+inline constexpr std::array<Understory,39> kSouthUnderstory{{
+    // West entrance and the back of the market wall.
+    {68.10f,134.43f,.18f,.78f}, {67.95f,136.75f,3.18f,1.03f},
+    {68.82f,138.22f,5.57f,.99f}, {70.02f,138.91f,1.98f,.87f},
+    {72.48f,139.84f,2.49f,.78f}, {73.62f,138.67f,3.82f,1.13f},
+    {74.95f,140.04f,.91f,.89f}, {76.54f,138.84f,4.22f,1.04f},
+    // Shoulders on the bend and around the store yard.
+    {75.81f,144.49f,4.31f,.96f}, {72.39f,146.39f,.52f,1.15f},
+    {71.24f,147.68f,1.58f,1.02f}, {70.69f,149.40f,5.80f,.79f},
+    {67.85f,151.70f,4.43f,.91f}, {66.88f,154.68f,2.86f,.85f},
+    {65.50f,156.33f,.77f,.91f}, {61.96f,147.87f,1.12f,.71f},
+    {63.96f,148.49f,4.01f,.95f}, {60.76f,161.68f,.21f,1.13f},
+    // Uneven groups at the foot of the two copses.
+    {38.89f,155.86f,.59f,.98f}, {36.08f,157.80f,3.04f,1.23f},
+    {41.23f,156.60f,4.68f,.83f}, {43.45f,161.43f,5.55f,1.12f},
+    {47.50f,162.70f,1.29f,1.18f}, {49.36f,165.65f,2.68f,.97f},
+    {54.72f,163.76f,3.72f,1.19f}, {58.37f,169.53f,4.92f,.87f},
+    {61.98f,171.34f,1.65f,1.21f}, {66.59f,173.45f,3.62f,1.06f},
+    {69.38f,169.30f,5.22f,.96f}, {72.16f,171.33f,2.19f,1.09f},
+    {78.66f,177.63f,1.02f,1.12f}, {81.11f,176.16f,3.93f,.93f},
+    {89.92f,172.03f,5.72f,1.18f}, {90.17f,179.19f,.58f,.93f},
+    // Tavern delivery wall and the far side of the common yard.
+    {89.36f,125.65f,4.36f,.79f}, {92.14f,125.46f,1.04f,.87f},
+    {94.64f,125.17f,2.07f,1.02f}, {97.03f,142.72f,5.01f,.95f},
+    {100.39f,141.29f,3.32f,.97f},
+}};
+
+inline constexpr std::size_t kUnderstoryTriangles=kSouthUnderstory.size()*588;
 }

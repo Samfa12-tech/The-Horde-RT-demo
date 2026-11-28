@@ -1751,7 +1751,7 @@ struct PresentableTinyRtSceneObservationTestAccess
         // The full woodland retains the same trees/ferns/rocks and opens two
         // rail spans, keeping the end post of the adjoining retained span.
         constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u+
-            horde::scene::bellwether_woodland::kTreeTriangles)*3u;
+            horde::scene::bellwether_woodland::kTreeTriangles+horde::scene::bellwether_woodland::kUnderstoryTriangles)*3u;
         const auto& woodland=tomb.forestSurroundingsPrototype_;
         const auto& support=tomb.chapterTerrainSurface_;
         const auto supportTriangles=support ? support->TriangleCount()+
@@ -1794,6 +1794,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';
         bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
                   woodland->report.bellwetherBackdropTrees==horde::scene::bellwether_woodland::kSouthCopses.size() &&
+                  woodland->report.bellwetherUnderstoryClumps==horde::scene::bellwether_woodland::kSouthUnderstory.size() &&
                   woodland->report.addedIndices==woodlandIndices &&
                   woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&
                   woodland->report.bellwetherRoadRuns==2u &&

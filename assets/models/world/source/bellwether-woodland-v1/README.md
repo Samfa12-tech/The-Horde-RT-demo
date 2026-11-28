@@ -1,5 +1,7 @@
-# Bellwether south woodland
+# Bellwether south woodland and verges
 
 Pine and alder copses beyond the west garden and store and behind the south outbuilding break up the open slope visible from the market and tavern approach. The [terrain survey](../../../../../docs/references/horde-1.7/d37f1638/docs/design/world/connected/02a-bellwether-terrain-1-8.webp) fixes the land and building positions. The [use plan](../../../../../docs/references/horde-1.7/d37f1638/docs/design/world/connected/02b-bellwether-use-1-8.webp) keeps the central approach and southeast road open.
 
 The [survey placements](south-copses.h) record species, east and north metres, yaw, scale and crown detail. The native woodland preparation fits each root into the registered terrain with the same ground and render geometry used elsewhere in the chapter. The placements reuse the existing pine and alder masters, materials and ray-tracing ownership. Nine trees with clear views from the village use the middle-detail crowns on the fitted far trunks. The rendered lower trunk faces supply contact. Admission also checks the existing world contact limit with room for the two refill basins.
+
+Thirty-nine fern clumps grow in pockets behind the market wall, along the store track and at the foot of the southern trees. Smaller groups sit outside the tavern delivery wall and the common. They reuse the existing woodland fern master at several scales and rotations. The native pass checks each root against the existing solid geometry and samples the rendered footprint against the registered ground to keep stone paths clear. These soft plants share the existing material families and use no obstacle faces.

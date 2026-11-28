@@ -1282,6 +1282,7 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
        <<",\"surroundingsOpenWoodlandRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.openWoodlandRuns:0u)
        <<",\"surroundingsTreeContactTriangles\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.treeContactTriangles:0u)
        <<",\"surroundingsUnderstoryClumps\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.understoryClumps:0u)
+       <<",\"bellwetherUnderstoryClumps\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.bellwetherUnderstoryClumps:0u)
        <<",\"surroundingsArrivalPortalRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.arrivalPortalRuns:0u)
        <<",\"surroundingsBellwetherRoadRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.bellwetherRoadRuns:0u)
        <<",\"surroundingsBoundarySectionsContained\":"<<(forestSurroundingsPrototype_&&forestSurroundingsPrototype_->report.boundarySectionsContained?"true":"false")
