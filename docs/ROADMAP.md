@@ -200,7 +200,12 @@ followed the fork below the church sign, and walked up the railed ramp through
 House B's lit east entrance. The ledger pointed to the board by the mill's
 west door and closed both through **Finish reading** and on turning away. The
 player returned to Kit with the save unchanged. The open tavern doorway took
-a small sideways adjustment on the return. [Foreground route and ledger receipt](evidence/2026-11-28-bellwether-ordinary-stock-room/receipt.json)
+a small sideways adjustment on the return. A collision check on the same
+packaged meshes found standing clearance along the center of the ramp and
+contact at the east edge of the frame while the leaf was open. A new shared
+simulation test reproduces that stop and the recovery through the center. The
+foreground capture did not record the player's position at the original stop.
+[Foreground route, ledger and doorway evidence](evidence/2026-11-28-bellwether-ordinary-stock-room/receipt.json)
 
 The eight main village buildings have [tiled roof slopes and masonry gables](../assets/models/world/source/bellwether-roofline-v1/README.md). From the square and smith lane, the oak frames and clay ridges pick out the roof shapes above the surrounding houses. The [hand-laid clay finish](../assets/models/world/source/bellwether-roof-v1/README.md) follows the pitch at the same scale on each building.
 

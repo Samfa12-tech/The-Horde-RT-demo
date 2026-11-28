@@ -2959,6 +2959,38 @@ void TestBellwetherRepeatVisitCheckpoint(
     input.commands.interact=state.lastConsumedInteractSequence+1;
     step(100);
     Check(state.tavernDoor.opening==1.f,"the same interaction reopens the door from inside");
+
+    using gameplay::traversal::BellwetherStation;
+    const auto sill=gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation];
+    const auto walkTo=[&](BellwetherStation point) {
+        for(unsigned tick=0;tick<300;++tick) {
+            const float dx=point.x-state.playerX,dz=point.z-state.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.012f) {
+                input.moveForward=0.f;
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            step(1);
+        }
+        return false;
+    };
+    const BellwetherStation eastApproach{sill.x+.88f,sill.z+1.85f};
+    const bool linedUp=walkTo({sill.x,state.playerZ}) && walkTo({sill.x,eastApproach.z}) && walkTo(eastApproach);
+    Check(linedUp,"a player returning from the square can approach the east side of the open doorway");
+    if(!linedUp)return;
+
+    input.yawRadians=0.f;
+    input.moveForward=1.f;
+    step(100);
+    Check(state.playerGrounded && state.playerZ>=sill.z && state.playerZ<sill.z+.28f &&
+              state.tavernDoor.opening==1.f,
+          "the east jamb catches an off-center approach while the open leaf stays parked");
+
+    const bool recentered=walkTo({eastApproach.x,sill.z+.9f}) && walkTo({sill.x,sill.z+.9f});
+    Check(recentered && walkTo({sill.x,sill.z-1.5f}) && state.playerGrounded && state.tavernDoor.opening==1.f,
+          "backing up and stepping toward the center lets the player return through the same open door");
 }
 
 void TestFullSurroundings()

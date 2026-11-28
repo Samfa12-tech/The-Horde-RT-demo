@@ -18,6 +18,33 @@
   "earnedTavernSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
   "isolatedAndOriginalSavesUnchanged": true,
   "returnApproach": "The first direct approach stopped at the open tavern doorway. A small sideways adjustment allowed entry without moving the door.",
+  "thresholdFollowUp": {
+    "packageGeometryMatchesSourceByHash": {
+      "chapterTerrain": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+      "townAndTavern": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+      "southDoor": "65e78893ef1a5cf5ebd572ffa1dc67507526948fa3fce7a73796b2eaac239fb9"
+    },
+    "collisionSample": {
+      "scope": "Town and terrain collision plus the exact fully open leaf. Separate sweep from the real shared-simulation test.",
+      "mappedCenterX": 82.3,
+      "playerRadiusMetres": 0.24,
+      "laneSpacingMetres": 0.05,
+      "successfulStraightLanesPerMotor": 30,
+      "sampledClearXRange": [81.6, 83.05],
+      "sampledEastStop": {
+        "x": 83.15,
+        "z": 119.24474,
+        "groundSupported": true,
+        "staticCollisionClear": false,
+        "openLeafClear": true
+      },
+      "localCsvSha256": "899ac25de1e67946965059ac4383e8b5bffaeb8800c42317d637eb6f7dd9585e"
+    },
+    "sharedSimulation": "With the door open, a forward approach near the east jamb stops on grounded support. Backing up and moving toward the center clears the same entrance without operating the leaf.",
+    "originalForegroundPlayerPositionMeasured": false,
+    "hostReleaseSuitesPassed": ["horde_rt_bellwether_shell_tests", "horde_rt_forest_dressing_tests"],
+    "hostTestLogSha256": "a2793bfc1ad35947fe1eb0d1b50e4fc17796288de2c4d89427cae5064b88a161"
+  },
   "gameExitCode": 0,
   "routeReceiptSha256": "339f133735a109d80542729ce21837474fb019b2625678fd4c879f0b5470f893",
   "milestones": [
