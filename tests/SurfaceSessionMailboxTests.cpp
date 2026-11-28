@@ -502,6 +502,20 @@ enum class WakeAction
     Close,
 };
 
+void TestExpiringWorkerWaitPreservesAction()
+{
+    Mailbox mailbox;
+    using Clock = std::chrono::steady_clock;
+    Check(!mailbox.WaitForActionUntil(Clock::now()), "idle wait expires without creating a lifecycle action");
+    auto ledger = std::make_shared<ReleaseLedger>();
+    const auto generation = mailbox.Start(FakeWindow{ledger, 15});
+    Check(mailbox.WaitForActionUntil(Clock::now()), "a pending action takes precedence over expiration");
+    const auto action = mailbox.Take();
+    Check(action && action->request && action->generation == generation, "expiration wait leaves request ownership for Take");
+    mailbox.Close();
+    Check(mailbox.WaitForActionUntil(Clock::now()) && !mailbox.Take(), "closed mailbox wakes either worker wait");
+}
+
 void TestLifecycleChangeWakesBothWaiters(const WakeAction wakeAction, const char* label, const int newId)
 {
     auto ledger = std::make_shared<ReleaseLedger>();
@@ -561,6 +575,7 @@ int main()
     TestColdPendingGenerationCanBeSuspended();
     TestSameGenerationSuspendResumePreservesPresentedState();
     TestStaleGenerationCannotResumeReplacement();
+    TestExpiringWorkerWaitPreservesAction();
     TestLifecycleChangeWakesBothWaiters(WakeAction::Stop,
         "Stop wakes render and Take waiters", 20);
     TestLifecycleChangeWakesBothWaiters(WakeAction::Replace,

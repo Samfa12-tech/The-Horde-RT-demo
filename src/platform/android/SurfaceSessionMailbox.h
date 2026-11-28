@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <limits>
@@ -77,6 +78,14 @@ public:
         Action action{generation_, std::move(pending_)};
         pending_.reset(); // Only the moved-from request is destroyed here.
         return action;
+    }
+
+    // A worker with expiring resources can wait without consuming an action.
+    // Close also wakes this wait, so Take can distinguish process shutdown.
+    bool WaitForActionUntil(std::chrono::steady_clock::time_point deadline)
+    {
+        std::unique_lock lock(mutex_);
+        return ready_.wait_until(lock, deadline, [this] { return closed_ || changed_; });
     }
 
     bool IsCurrent(const std::uint64_t generation) const

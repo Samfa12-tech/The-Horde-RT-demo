@@ -366,10 +366,8 @@ std::atomic<bool> gMotionReleaseRequested{false};
 std::atomic<bool> gMotionValidationRequested{false};
 #endif
 
-struct SwapchainContext
+struct AndroidDeviceContext
 {
-    std::uint64_t surfaceGeneration = 0u;
-    ANativeWindow* window = nullptr;
     VkInstance instance = VK_NULL_HANDLE;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     VkDevice device = VK_NULL_HANDLE;
@@ -379,6 +377,16 @@ struct SwapchainContext
     std::unique_ptr<AndroidCompiledPipelineCacheOwner> compiledPipelineCache;
     VkQueue graphicsQueue = VK_NULL_HANDLE;
     uint32_t graphicsQueueFamilyIndex = 0u;
+    horde::vulkan::PresentSurfaceSupport presentSurfaceSupport{};
+    horde::vulkan::PresentCompletionMode presentCompletionMode = horde::vulkan::PresentCompletionMode::Unextended;
+    bool presentTimingExtensionEnabled = false;
+    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
+};
+
+struct SwapchainContext : AndroidDeviceContext
+{
+    std::uint64_t surfaceGeneration = 0u;
+    ANativeWindow* window = nullptr;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkSwapchainKHR swapchain = VK_NULL_HANDLE;
     VkFormat swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
@@ -434,10 +442,7 @@ struct SwapchainContext
     VkSemaphore imageAvailableSemaphores[kMaxFramesInFlight] = {};
     // Present waits belong to swapchain images, not graphics fence slots.
     std::vector<VkSemaphore> renderFinishedSemaphores;
-    horde::vulkan::PresentSurfaceSupport presentSurfaceSupport{};
-    horde::vulkan::PresentCompletionMode presentCompletionMode = horde::vulkan::PresentCompletionMode::Unextended;
     horde::vulkan::PresentCompletionFences presentCompletionFences;
-    bool presentTimingExtensionEnabled = false;
 #if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     std::unique_ptr<horde::vulkan::PresentTimingEvidence> presentTiming;
     std::uint64_t presentTimingPollCpuNs = 0u;
@@ -529,7 +534,6 @@ struct SwapchainContext
     std::optional<std::size_t> benchmarkExpectedFrame;
     std::string reportDirectory;
     bool useRtPath = false;
-    horde::vulkan::RtExecutionBackend executionBackend = horde::vulkan::RtExecutionBackend::Unsupported;
     uint32_t currentFrame = 0u;
 };
 
@@ -537,10 +541,17 @@ SwapchainContext gSwapchainContext{};
 #if HORDE_RT_ANDROID_MOTION_VALIDATION
 void FailAndroidMotion(SwapchainContext& context, std::string_view reason);
 #endif
-// CPU bytes only. NativeSurfaceOwner joins the retiring render owner before
-// starting the next generation, so cache read/replacement is serialized.
-// No Vulkan object or background rendering survives normal surface teardown.
+// NativeSurfaceOwner joins the retiring render owner before inspecting its
+// idle-device handoff. Only device-scoped pipeline state crosses generations.
 horde::vulkan::PipelineCacheSeed gPipelineCacheSeed;
+struct RetiredAndroidDevice
+{
+    AndroidDeviceContext handles;
+    std::chrono::steady_clock::time_point expires;
+    std::uint64_t surfaceGeneration = 0u;
+};
+RetiredAndroidDevice gRetiredDevice;
+constexpr auto kRetiredDeviceLifetime = std::chrono::seconds(15);
 // Failed retirement retains exactly one context; a later lifecycle action may
 // retry its proof, but can never overwrite it with another device/swapchain.
 std::atomic<bool> gSurfaceRetirementBlocked{false};
@@ -4267,7 +4278,7 @@ horde::vulkan::PipelineCacheSeed::DeviceIdentity PipelineCacheDeviceIdentity(
     return identity;
 }
 
-void RetainPipelineCacheSeedAfterIdle(const SwapchainContext& context)
+void RetainPipelineCacheSeedAfterIdle(const AndroidDeviceContext& context, std::uint64_t generation)
 {
     // Called only after successful device idle, presentation retirement and
     // compiled-pipeline lease retirement. Vulkan returns the exact opaque
@@ -4308,12 +4319,45 @@ void RetainPipelineCacheSeedAfterIdle(const SwapchainContext& context)
     __android_log_print(ANDROID_LOG_INFO, kTag,
         "HORDE_PIPELINE_CACHE_SEED_STORE generation=%llu query_result=%d read_result=%d "
         "requested_bytes=%zu returned_bytes=%zu admitted=%d retained_bytes=%zu cpu_wall_ms=%.3f",
-        static_cast<unsigned long long>(context.surfaceGeneration), static_cast<int>(queryResult),
+        static_cast<unsigned long long>(generation), static_cast<int>(queryResult),
         static_cast<int>(readResult), requestedBytes, returnedBytes, admitted ? 1 : 0,
         gPipelineCacheSeed.Size(), std::chrono::duration<double, std::milli>(elapsed).count());
 }
 
-bool DestroySwapchainContext(SwapchainContext& context)
+bool DestroyAndroidPipelineState(AndroidDeviceContext& device, std::uint64_t generation)
+{
+    if (device.compiledPipelineCache != nullptr)
+    {
+        if (!device.compiledPipelineCache->cache.DestroyAfterDeviceIdle(true))
+        {
+            __android_log_print(ANDROID_LOG_ERROR, kTag,
+                "Compiled pipeline cache retirement failed after scene lease release; device resources retained.");
+            return false;
+        }
+        device.compiledPipelineCache.reset();
+    }
+    if (device.pipelineCache != VK_NULL_HANDLE)
+    {
+        RetainPipelineCacheSeedAfterIdle(device, generation);
+        vkDestroyPipelineCache(device.device, device.pipelineCache, nullptr);
+        device.pipelineCache = VK_NULL_HANDLE;
+    }
+    return true;
+}
+
+void ExpireRetiredAndroidDevice(const char* reason)
+{
+    auto& retired = gRetiredDevice;
+    if (retired.handles.device == VK_NULL_HANDLE) return;
+    if (!DestroyAndroidPipelineState(retired.handles, retired.surfaceGeneration)) return;
+    vkDestroyDevice(retired.handles.device, nullptr);
+    vkDestroyInstance(retired.handles.instance, nullptr);
+    __android_log_print(ANDROID_LOG_INFO, kTag, "HORDE_RT_IDLE_DEVICE_RELEASE generation=%llu reason=%s",
+        static_cast<unsigned long long>(retired.surfaceGeneration), reason);
+    retired = {};
+}
+
+bool DestroySwapchainContext(SwapchainContext& context, bool allowDeviceReuse = false)
 {
     if (context.device == VK_NULL_HANDLE)
     {
@@ -4358,27 +4402,20 @@ bool DestroySwapchainContext(SwapchainContext& context)
             "Presentation retirement could not be proved; renderer resources retained.");
         return false;
     }
+    // Evidence teardown publishes a stopped surface. Evaluate eligibility
+    // against the last live state, before that publication clears presented.
+    const bool liveShowcase = allowDeviceReuse && !context.environmentSurvey && !context.motionValidationRun &&
+        context.sceneProfile == horde::vulkan::raytracing::RtSceneProfile::Showcase &&
+        context.capabilities.rtScene.presented;
     if(!context.environmentSurvey)CancelActiveInAppBenchmark(context);
     DestroyRtEvidenceOnOwnerThread(context);
     if(!context.environmentSurvey)gGameSimulation.InvalidateWorldZoneReadiness();
     (void)gGameSimulation.ConfigureSkeletonRevivalPresentation(++gPrivateRevivalResourceGeneration,0,0,false);
     context.rtScene.Destroy();
-    if (context.compiledPipelineCache != nullptr)
-    {
-        if (!context.compiledPipelineCache->cache.DestroyAfterDeviceIdle(true))
-        {
-            __android_log_print(ANDROID_LOG_ERROR, kTag,
-                "Compiled pipeline cache retirement failed after scene lease release; device resources retained.");
-            return false;
-        }
-        context.compiledPipelineCache.reset();
-    }
-    if (context.pipelineCache != VK_NULL_HANDLE)
-    {
-        RetainPipelineCacheSeedAfterIdle(context);
-        vkDestroyPipelineCache(context.device, context.pipelineCache, nullptr);
-        context.pipelineCache = VK_NULL_HANDLE;
-    }
+    const bool keepDevice = liveShowcase && gRetiredDevice.handles.device == VK_NULL_HANDLE &&
+        context.compiledPipelineCache != nullptr && !context.compiledPipelineCache->cache.Empty() &&
+        !context.compiledPipelineCache->cache.HasLiveLeases();
+    if (!keepDevice && !DestroyAndroidPipelineState(context, context.surfaceGeneration)) return false;
     context.gpuFrameTimer.Destroy();
 #if HORDE_RT_FRAME_STAGE_PROBE
     for(auto& timer:context.frameStageTimers)timer.Destroy();
@@ -4442,14 +4479,9 @@ bool DestroySwapchainContext(SwapchainContext& context)
 #endif
         vkDestroySwapchainKHR(context.device, context.swapchain, nullptr);
     }
-    vkDestroyDevice(context.device, nullptr);
     if (context.surface != VK_NULL_HANDLE && context.instance != VK_NULL_HANDLE)
     {
         vkDestroySurfaceKHR(context.instance, context.surface, nullptr);
-    }
-    if (context.instance != VK_NULL_HANDLE)
-    {
-        vkDestroyInstance(context.instance, nullptr);
     }
     if (context.window != nullptr)
     {
@@ -4457,6 +4489,22 @@ bool DestroySwapchainContext(SwapchainContext& context)
         context.window = nullptr;
     }
 
+    if (keepDevice)
+    {
+        auto& retired = gRetiredDevice;
+        retired.surfaceGeneration = context.surfaceGeneration;
+        retired.expires = std::chrono::steady_clock::now() + kRetiredDeviceLifetime;
+        std::swap(retired.handles, static_cast<AndroidDeviceContext&>(context));
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "HORDE_RT_IDLE_DEVICE_RETAIN generation=%llu pipeline_pairs=%zu timeout_ms=%lld",
+            static_cast<unsigned long long>(retired.surfaceGeneration), retired.handles.compiledPipelineCache->cache.Size(),
+            static_cast<long long>(std::chrono::duration_cast<std::chrono::milliseconds>(kRetiredDeviceLifetime).count()));
+    }
+    else
+    {
+        vkDestroyDevice(context.device, nullptr);
+        vkDestroyInstance(context.instance, nullptr);
+    }
     context = {};
     return true;
 }
@@ -6531,7 +6579,8 @@ void SwapchainRenderLoop()
     FailAndroidMotion(gSwapchainContext, "Motion interrupted by surface/lifecycle retirement.");
     RestoreAndroidMotionEquipmentSeed(gSwapchainContext);
 #endif
-    const bool retired = campaignRetired && DestroySwapchainContext(gSwapchainContext);
+    const bool retired = campaignRetired && DestroySwapchainContext(gSwapchainContext,
+        !gSurfaceSessions.IsCurrent(retiredGeneration));
     {
         std::lock_guard lock(gOpeningBenchmarkMutex);
         gOpeningBenchmarkOwner.SurfaceRetired(retiredGeneration,retired);
@@ -6545,6 +6594,48 @@ void SwapchainRenderLoop()
     if (!retired) {
         PublishCompatibilityFailure(retiredGeneration,horde::reporting::CompatibilityStage::RenderLoop);
         gSurfaceSessions.Publish(retiredGeneration, 3);
+    }
+}
+
+void CreateAndroidPipelineCaches(SwapchainContext& context)
+{
+    const auto generation = context.surfaceGeneration;
+    const auto cacheSeed = context.useRtPath
+        ? gPipelineCacheSeed.ForDevice(PipelineCacheDeviceIdentity(context.physicalDevice))
+        : std::span<const std::byte>{};
+    VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
+    pipelineCacheInfo.initialDataSize = cacheSeed.size();
+    pipelineCacheInfo.pInitialData = cacheSeed.empty() ? nullptr : cacheSeed.data();
+    VkResult pipelineCacheResult = context.useRtPath
+        ? vkCreatePipelineCache(context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache)
+        : VK_NOT_READY;
+    const VkResult seedAttemptResult = pipelineCacheResult;
+    const bool fallbackToEmpty = pipelineCacheResult != VK_SUCCESS && !cacheSeed.empty();
+    if (fallbackToEmpty)
+    {
+        context.pipelineCache = VK_NULL_HANDLE;
+        pipelineCacheInfo.initialDataSize = 0u;
+        pipelineCacheInfo.pInitialData = nullptr;
+        pipelineCacheResult = vkCreatePipelineCache(
+            context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache);
+    }
+    if (pipelineCacheResult != VK_SUCCESS) context.pipelineCache = VK_NULL_HANDLE;
+    __android_log_print(pipelineCacheResult == VK_SUCCESS || !context.useRtPath
+            ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
+        "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu "
+        "seed_bytes=%zu seed_attempt_result=%d fallback_empty=%d seed_limit_bytes=%zu",
+        context.useRtPath ? 1 : 0, static_cast<int>(pipelineCacheResult), context.pipelineCache != VK_NULL_HANDLE ? 1 : 0,
+        static_cast<unsigned long long>(generation), cacheSeed.size(), static_cast<int>(seedAttemptResult),
+        fallbackToEmpty ? 1 : 0, horde::vulkan::PipelineCacheSeed::kMaximumSize);
+    if (context.executionBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline)
+    {
+        auto* cacheOwner = new (std::nothrow) AndroidCompiledPipelineCacheOwner(context.device);
+        if (cacheOwner != nullptr)
+            context.compiledPipelineCache.reset(cacheOwner);
+        __android_log_print(cacheOwner != nullptr ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
+            "HORDE_COMPILED_PIPELINE_CACHE_CREATE generation=%llu available=%d capacity=%zu",
+            static_cast<unsigned long long>(generation), cacheOwner != nullptr ? 1 : 0,
+            AndroidCompiledPipelineCache::kCapacity);
     }
 }
 
@@ -6626,8 +6717,27 @@ bool StartSurfaceInternal(ANativeWindow* window,
             PublishInputLocked();}
     }
 
+    std::uint64_t previousDeviceGeneration = 0u;
+    if (gRetiredDevice.handles.device != VK_NULL_HANDLE)
+    {
+        if (std::chrono::steady_clock::now() >= gRetiredDevice.expires)
+            ExpireRetiredAndroidDevice("expired");
+        else if (environmentSurvey || requireRayQueryCompute)
+            ExpireRetiredAndroidDevice("different-mode");
+        else
+        {
+            previousDeviceGeneration = gRetiredDevice.surfaceGeneration;
+            std::swap(static_cast<AndroidDeviceContext&>(context), gRetiredDevice.handles);
+            gRetiredDevice = {};
+        }
+    }
+    const auto previousPhysicalDevice = context.physicalDevice;
+    const auto previousQueueFamily = context.graphicsQueueFamilyIndex;
+    const auto previousBackend = context.executionBackend;
+
     failure.stage=horde::reporting::CompatibilityStage::VulkanInstance;
-    if (!CreateInstance(context.instance, context.presentSurfaceSupport) || !gSurfaceSessions.IsCurrent(generation))
+    if ((context.instance == VK_NULL_HANDLE && !CreateInstance(context.instance, context.presentSurfaceSupport)) ||
+        !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
             horde::reporting::CompatibilityStage::VulkanInstance,horde::reporting::CompatibilityOutcome::StartupFailure);
@@ -6691,15 +6801,34 @@ bool StartSurfaceInternal(ANativeWindow* window,
     gSurfaceSessions.Publish(generation, context.useRtPath ? 0 : 2);
 
     failure.stage=horde::reporting::CompatibilityStage::LogicalDevice;
-    if (!CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex, context.executionBackend,
-        context.device, context.graphicsQueue, context.presentSurfaceSupport, context.presentCompletionMode,
-        context.presentTimingExtensionEnabled) ||
+    if (context.device != VK_NULL_HANDLE && (context.physicalDevice != previousPhysicalDevice ||
+        context.graphicsQueueFamilyIndex != previousQueueFamily || context.executionBackend != previousBackend))
+    {
+        // Keep the new surface's instance but retire the incompatible idle device.
+        const auto selectedPhysicalDevice = std::exchange(context.physicalDevice, previousPhysicalDevice);
+        if (!DestroyAndroidPipelineState(context, previousDeviceGeneration)) return false;
+        vkDestroyDevice(context.device, nullptr);
+        context.device = VK_NULL_HANDLE;
+        context.graphicsQueue = VK_NULL_HANDLE;
+        context.physicalDevice = selectedPhysicalDevice;
+    }
+    const bool reuseDevice = context.device != VK_NULL_HANDLE;
+    if ((!reuseDevice && !CreateLogicalDevice(context.physicalDevice, context.instance, context.graphicsQueueFamilyIndex,
+         context.executionBackend, context.device, context.graphicsQueue, context.presentSurfaceSupport,
+         context.presentCompletionMode, context.presentTimingExtensionEnabled)) ||
         !gSurfaceSessions.IsCurrent(generation))
     {
         if (!context.environmentSurvey) PublishCompatibilityStage(generation,
             horde::reporting::CompatibilityStage::LogicalDevice,horde::reporting::CompatibilityOutcome::StartupFailure);
         DestroySwapchainContext(context);
         return false;
+    }
+    if (reuseDevice)
+    {
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "HORDE_RT_IDLE_DEVICE_REUSE generation=%llu from_generation=%llu pipeline_pairs=%zu",
+            static_cast<unsigned long long>(generation), static_cast<unsigned long long>(previousDeviceGeneration),
+            context.compiledPipelineCache->cache.Size());
     }
 #if HORDE_RT_ANDROID_PRESENT_TIMING_VALIDATION || HORDE_RT_ANDROID_CHAPTER_ROUTE_TIMING
     if (context.presentTimingExtensionEnabled)
@@ -6717,43 +6846,7 @@ bool StartSurfaceInternal(ANativeWindow* window,
         "HORDE_PRESENT_TIMING extension_enabled=%d collector_enabled=%d desired_present_time_ns=0",
         context.presentTimingExtensionEnabled ? 1 : 0, context.presentTiming && context.presentTiming->Enabled() ? 1 : 0);
 #endif
-    const auto cacheSeed = context.useRtPath
-        ? gPipelineCacheSeed.ForDevice(PipelineCacheDeviceIdentity(context.physicalDevice))
-        : std::span<const std::byte>{};
-    VkPipelineCacheCreateInfo pipelineCacheInfo{VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO};
-    pipelineCacheInfo.initialDataSize = cacheSeed.size();
-    pipelineCacheInfo.pInitialData = cacheSeed.empty() ? nullptr : cacheSeed.data();
-    VkResult pipelineCacheResult = context.useRtPath
-        ? vkCreatePipelineCache(context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache)
-        : VK_NOT_READY;
-    const VkResult seedAttemptResult = pipelineCacheResult;
-    const bool fallbackToEmpty = pipelineCacheResult != VK_SUCCESS && !cacheSeed.empty();
-    if (fallbackToEmpty)
-    {
-        context.pipelineCache = VK_NULL_HANDLE;
-        pipelineCacheInfo.initialDataSize = 0u;
-        pipelineCacheInfo.pInitialData = nullptr;
-        pipelineCacheResult = vkCreatePipelineCache(
-            context.device, &pipelineCacheInfo, nullptr, &context.pipelineCache);
-    }
-    if (pipelineCacheResult != VK_SUCCESS) context.pipelineCache = VK_NULL_HANDLE;
-    __android_log_print(pipelineCacheResult == VK_SUCCESS || !context.useRtPath
-            ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
-        "HORDE_PIPELINE_CACHE_CREATE attempted=%d result=%d available=%d generation=%llu "
-        "seed_bytes=%zu seed_attempt_result=%d fallback_empty=%d seed_limit_bytes=%zu",
-        context.useRtPath ? 1 : 0, static_cast<int>(pipelineCacheResult), context.pipelineCache != VK_NULL_HANDLE ? 1 : 0,
-        static_cast<unsigned long long>(generation), cacheSeed.size(), static_cast<int>(seedAttemptResult),
-        fallbackToEmpty ? 1 : 0, horde::vulkan::PipelineCacheSeed::kMaximumSize);
-    if (context.executionBackend == horde::vulkan::RtExecutionBackend::RayTracingPipeline)
-    {
-        auto* cacheOwner = new (std::nothrow) AndroidCompiledPipelineCacheOwner(context.device);
-        if (cacheOwner != nullptr)
-            context.compiledPipelineCache.reset(cacheOwner);
-        __android_log_print(cacheOwner != nullptr ? ANDROID_LOG_INFO : ANDROID_LOG_WARN, kTag,
-            "HORDE_COMPILED_PIPELINE_CACHE_CREATE generation=%llu available=%d capacity=%zu",
-            static_cast<unsigned long long>(generation), cacheOwner != nullptr ? 1 : 0,
-            AndroidCompiledPipelineCache::kCapacity);
-    }
+    if (!reuseDevice) CreateAndroidPipelineCaches(context);
     context.capabilities.diagnostics.push_back(horde::vulkan::PresentCompletionDiagnostic(context.presentCompletionMode));
 
     failure.stage=horde::reporting::CompatibilityStage::Swapchain;
@@ -6862,8 +6955,15 @@ public:
 private:
     void Run()
     {
-        while (auto action = gSurfaceSessions.Take())
+        for (;;)
         {
+            // Once the render owner has been joined, an idle device has no
+            // remaining window or submission. Release it even without a new request.
+            if (!gSwapchainThread.joinable() && gRetiredDevice.handles.device != VK_NULL_HANDLE &&
+                !gSurfaceSessions.WaitForActionUntil(gRetiredDevice.expires))
+                ExpireRetiredAndroidDevice("expired");
+            auto action = gSurfaceSessions.Take();
+            if (!action) break;
             StopSurfaceInternal(action->request && action->request->environmentSurvey);
             if (gSurfaceRetirementBlocked.load(std::memory_order_acquire))
             {
@@ -6931,6 +7031,7 @@ private:
             }
         }
         StopSurfaceInternal();
+        ExpireRetiredAndroidDevice("owner-shutdown");
     }
     std::thread thread_;
 };
