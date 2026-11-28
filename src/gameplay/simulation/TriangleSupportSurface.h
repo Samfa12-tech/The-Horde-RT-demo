@@ -40,8 +40,8 @@ public:
     {
         if(groundAndStepCount>=kMaximumTriangles)return 0;
         const auto original=kMaximumTriangles-groundAndStepCount;
-        constexpr auto faceBytes=sizeof(Triangle)+sizeof(std::uint32_t); // Face and BVH permutation.
-        const auto saved=original*sizeof(Point);
+        constexpr auto faceBytes=sizeof(Triangle);
+        const auto saved=original*(sizeof(Point)+sizeof(std::uint32_t));
         const auto originalNodes=NodeCount(original);
         // BVH storage grows in steps. Charge both extra faces and their new
         // nodes against the same retained bytes as the previous solid lane.
@@ -123,7 +123,29 @@ private:
         std::iota(result->order_.begin(),result->order_.end(),0u);
         result->nodes_.reserve(NodeCount(input.size()));
         result->BuildNode(0,static_cast<std::uint32_t>(input.size()));
+        if(obstructionOnly)result->StoreNonWalkableFacesInLeafOrder();
         diagnostic.clear();return result;
+    }
+
+    void StoreNonWalkableFacesInLeafOrder()
+    {
+        // Leaf ranges already refer to positions in the permutation. Apply it
+        // in place and release it. Obstruction queries have no source-face ID.
+        for(std::uint32_t start=0;start<order_.size();++start) {
+            if(order_[start]==start)continue;
+            const auto first=triangles_[start];
+            auto destination=start;
+            auto source=order_[destination];
+            while(source!=start) {
+                triangles_[destination]=triangles_[source];
+                order_[destination]=destination;
+                destination=source;
+                source=order_[destination];
+            }
+            triangles_[destination]=first;
+            order_[destination]=destination;
+        }
+        std::vector<std::uint32_t>{}.swap(order_);
     }
 
 public:
@@ -439,7 +461,7 @@ private:
         const double radiusSquared=double(radius)*radius;
         for(auto i=node.begin;i<node.begin+node.count;++i) {
             Polygon a{},b{};
-            const auto id=order_[i];const auto& triangle=triangles_[id];
+            const auto id=order_.empty()?i:order_[i];const auto& triangle=triangles_[id];
             bool walkable=false;
             if(ignoredWalkableBelow!=-std::numeric_limits<float>::infinity()) {
                 const auto& n=normals_[id];
