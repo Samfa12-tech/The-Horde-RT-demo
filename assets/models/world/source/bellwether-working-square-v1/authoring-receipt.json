@@ -1,0 +1,27 @@
+{
+  "parents": {
+    "bellwether-tavern-v1.glb": "b6e87a722f0697b049b5cb42c9226cfb7284470e02044f1765f1cfae56e61fa0",
+    "asset.manifest.json": "a17a5049cda4593a896b7fb920e60183ed6796847782dd375c0fa3d71c8aeb81",
+    "garden-crops.glb": "ea55200b061adcab443b7859cd7874f3552c94b908bef808509f371b8287cf8e",
+    "garden-crops.manifest.json": "4312b85a97302f39935d10d3b2cac1f4ceba7412344ddca82293610cfa6bb9b3"
+  },
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "mapSha256": {
+    "02a-bellwether-terrain-1-8.webp": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
+    "02b-bellwether-use-1-8.webp": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49"
+  },
+  "layoutSha256": "b72a1b19e3a5210881d4b6a4d7bcc697ee5f43ed18752d7df816337a4986bc63",
+  "recipeSha256": "7ee4f3c49801a334ca073fcfe307189b0df82f96d8519e9ec05e9b6a4502bb40",
+  "blender": "5.2.0 LTS",
+  "addedSolidTriangles": 2504,
+  "addedGroundTriangles": 18,
+  "addedLeafTriangles": 768,
+  "files": {
+    "working-square.blend": "d22d38c1d553615ca30e99449297bef5e39e6e63b1c2e94d776169bb19f65f92",
+    "geometry.generated.h": "f777c68f5c97364d056537f3a4b6512328825719cb1097a4cf5182ff8005e4c3",
+    "bellwether-tavern-v1.glb": "73147c3f15d6ff788aeb82caa72d93eba5eea24b129b1d0403eff45d8f818b71",
+    "garden-crops.glb": "2a90b580a1ecc0c5ee2f1c56a5630a4d495493158f687505546856e888c70c82",
+    "asset.manifest.json": "23202dfb36653be110990c97659810bca82bc3c904bdfa0ecead5fa75dff91cb",
+    "garden-crops.manifest.json": "d47358047edd4c3fc8bb816ac87fa0ebfe58fbf373fededa7ba14add7f41673e"
+  }
+}

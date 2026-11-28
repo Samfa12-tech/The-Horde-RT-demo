@@ -30,6 +30,7 @@
 #include "gameplay/simulation/SimulationSnapshot.h"
 #include "gameplay/simulation/ForestBirdAmbience.h"
 #include "gameplay/simulation/ChapterLocalAmbience.h"
+#include "gameplay/dialogue/ResidentYaw.h"
 #include "audio/DialogueDucking.h"
 #include "gameplay/simulation/DevelopmentSupportFixture.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
@@ -437,6 +438,10 @@ private:
     std::optional<bellwether::ArtificerPose> artificer_;
     std::optional<bellwether::SalvagerPose> salvager_;
     std::optional<bellwether::RelicDealerPose> relicDealer_;
+    dialogue::ResidentAttentionState recordKeeperAttention_{};
+    dialogue::ResidentAttentionState artificerAttention_{};
+    dialogue::ResidentAttentionState salvagerAttention_{};
+    dialogue::ResidentAttentionState relicDealerAttention_{};
     bellwether::WaysideArchive waysideArchive_;
     campaign::TreasurePurse treasurePurse_;
     bellwether::MillPreparation millPreparation_{};

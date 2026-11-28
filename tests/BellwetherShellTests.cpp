@@ -419,6 +419,19 @@ int main(int argc,char** argv) {
                   follow(square,apronView) && follow(apronView,square) &&
                   follow(apronView,rampLane) && follow(rampLane,apronView),
                   "a grounded player can walk from the lane view to the pail, back, and toward the ramp toe");
+            const BellwetherStation marketWest{71.f,134.85f}, marketEast{76.15f,135.15f};
+            check(follow(marketWest,marketEast) && follow(marketEast,marketWest),
+                  "both market pitches open onto a continuous pedestrian apron");
+            const auto marketWall=support->Query(72.f,141.f);
+            check(marketWall.found &&
+                  !support->NonWalkableVolumeClear(72.f,140.50f,72.f,141.50f,
+                      marketWall.worldY+.16f,marketWall.worldY+1.8f,radius),
+                  "the low market wall stops a grounded capsule crossing the yard boundary");
+            const BellwetherStation supplyTurn{87.32f,138.05f}, supplyBend{92.5f,137.74f},
+                                    supplyYard{94.7f,138.17f};
+            check(follow(supplyTurn,supplyBend) && follow(supplyBend,supplyYard) &&
+                  follow(supplyYard,supplyBend) && follow(supplyBend,supplyTurn),
+                  "the smith lane spur remains grounded and clear in both directions");
             for (float side : {-1.f,1.f}) {
                 const BellwetherStation foot{82.3f+side*.85f,131.7f};
                 const BellwetherStation landing{82.3f+side*.85f,120.4f};
@@ -961,7 +974,7 @@ int main(int argc,char** argv) {
         world.materials.push_back(alder);
         const auto alderRow=world.materials.size()-1;
         world.primitives.front().materialIndex=static_cast<std::uint32_t>(alderRow);
-        const auto withCrops=withoutCrops+3*kBellwetherGardenCropTriangles;
+        const auto withCrops=withoutCrops+3*kBellwetherFoliageTriangles;
         check(AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withCrops &&
               world.primitives.back().materialIndex==alderRow && world.materials.size()==alderRow+1 &&
               world.triangleRegions.back()==assets::StaticTriangleRegion::Shared,

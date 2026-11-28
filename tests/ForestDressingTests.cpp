@@ -1807,6 +1807,16 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const auto& state=game.Snapshot();
             const float dx=kBellwetherRecordKeeperMark.x-state.playerX,dz=kBellwetherRecordKeeperMark.z-state.playerZ;
             const float expectedFacing=std::atan2(-dx,dz);
+            const auto initialAttentionError=std::abs(std::remainder(expectedFacing-restYaw,6.28318530718f));
+            const auto sideLook=state.recordKeeper ? std::abs(std::remainder(
+                expectedFacing-state.recordKeeper->yaw,6.28318530718f)):100.f;
+            Check(state.recordKeeper && state.recordKeeperAction==RecordKeeperAction::None &&
+                  sideLook<initialAttentionError,
+                  "a visible side approach makes the record keeper glance over without opening the prompt");
+            for(unsigned tick=0;tick<180;++tick)step();
+            Check(state.recordKeeper && state.recordKeeperAction==RecordKeeperAction::None &&
+                  std::abs(std::remainder(state.recordKeeper->yaw-restYaw,6.28318530718f))<.03f,
+                  "the record keeper returns to the authored stance after a brief glance while the player remains nearby");
             input.yawRadians=std::atan2(dx,-dz);step();
             const auto recordKeeper=game.Snapshot().recordKeeper;
             Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&

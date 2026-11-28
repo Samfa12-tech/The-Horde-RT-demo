@@ -1,0 +1,36 @@
+{
+  "coordinates": "Engine X/Z in metres. X = survey East + 78.3, Z = 126.2 - survey North. Use the identical native terrain mesh for every foundation.",
+  "walls": [
+    ["West garden plot edge", [45.8, 139.0], [53.4, 139.8]],
+    ["Store yard edge", [57.7, 146.5], [64.3, 147.1]],
+    ["Square market retaining edge", [68.2, 140.8], [76.5, 141.25]],
+    ["Common south edge", [93.1, 140.8], [98.2, 141.0]],
+    ["Common east return", [98.2, 141.0], [98.9, 136.3]],
+    ["Tavern delivery yard edge", [87.6, 124.2], [94.7, 123.45]]
+  ],
+  "marketStalls": [
+    ["Vegetable stall", 71.0, 136.55, 2.75],
+    ["Travelling supply stall", 76.15, 136.95, 2.40]
+  ],
+  "loadingPlaces": [
+    ["Tavern delivery", 90.7, 121.78],
+    ["Store frontage", 60.0, 147.23],
+    ["Common fuel and supplies", 95.9, 139.15],
+    ["Smith fuel", 103.2, 146.65]
+  ],
+  "verges": [
+    ["Garden verge", 46.75, 138.55, 0.55, 0.47],
+    ["Garden boundary", 50.54, 140.26, 0.63, 0.58],
+    ["Garden yard gap", 55.1, 140.5, 0.54, 0.46],
+    ["Store boundary", 62.25, 145.84, 0.62, 0.63],
+    ["Market wall end", 69.2, 140.08, 0.68, 0.71],
+    ["Market back lane", 76.5, 140.33, 0.55, 0.47],
+    ["Common wall base", 98.78, 141.67, 0.72, 0.74],
+    ["Tavern yard toe", 93.74, 124.53, 0.61, 0.51]
+  ],
+  "commonTree": [96.8, 136.4],
+  "marketSpur": {
+    "name": "Smith lane to common supply yard",
+    "stations": [[87.32, 138.05, 0.60], [90.3, 137.87, 0.66], [92.5, 137.74, 0.64], [94.7, 138.17, 0.66]]
+  }
+}

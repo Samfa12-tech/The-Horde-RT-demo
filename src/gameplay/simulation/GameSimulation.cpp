@@ -980,7 +980,7 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;openLocalReading_=bellwether::LocalReading::None;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();recordKeeperAttention_={};artificerAttention_={};salvagerAttention_={};relicDealerAttention_={};waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;openLocalReading_=bellwether::LocalReading::None;
     privyRagState_=bellwether::PrivyRagState::Available;
     treasurePurse_={};
     millPreparation_={};
