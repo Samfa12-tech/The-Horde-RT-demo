@@ -629,9 +629,11 @@ if(HORDE_RT_BUILD_VULKAN_TARGETS AND HORDE_RT_BUILD_WINDOWS_DIAGNOSTIC_WINDOW AN
         target_compile_definitions(horde_rt_diagnostic_window PRIVATE HORDE_RT_FLASK_CANDIDATE=1)
     endif()
     if(HORDE_RT_SHIPPING17_CONTENT)
-        if(NOT HORDE_RT_PACKAGE_VERSION STREQUAL "1.7.0" OR HORDE_RT_WINDOWS_ACCEPTANCE OR
+        if(NOT (HORDE_RT_PACKAGE_VERSION STREQUAL "1.7.0" OR
+               (HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE AND HORDE_RT_PACKAGE_VERSION STREQUAL "1.8.0")) OR
+           HORDE_RT_WINDOWS_ACCEPTANCE OR
            HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_FLASK_CANDIDATE)
-            message(FATAL_ERROR "Shipping 1.7 content requires ordinary 1.7.0 without private acceptance gates")
+            message(FATAL_ERROR "The pinned flask and revival foundation requires its ordinary package or the isolated Bellwether candidate.")
         endif()
         target_compile_definitions(horde_rt_diagnostic_window PRIVATE HORDE_RT_SHIPPING17_CONTENT=1)
     endif()
