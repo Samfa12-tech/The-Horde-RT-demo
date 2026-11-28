@@ -231,7 +231,7 @@ background/resume remain separate checks. [Device record](../docs/ANDROID_RT_DEV
 
 ### Bellwether 1.8 ordinary Android package
 
-For a local unsigned build of the ordinary Android app, set
+For a local unsigned build of the ordinary 1.8.0 Android app, set
 `HORDE_VALIDATION_UNSIGNED=1` in the build process and run this from `android/`.
 
 ```powershell
