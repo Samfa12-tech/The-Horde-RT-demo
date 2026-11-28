@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "evidenceClass": "Physical handset, isolated optimized ARM64 ordinary New Game and Home return",
+  "device": {
+    "model": "Samsung Galaxy S26 Ultra",
+    "reportedModel": "SM-S948B",
+    "androidRelease": "17",
+    "apiLevel": 37
+  },
+  "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+  "versionName": "1.8.0-bellwether-candidate",
+  "build": {
+    "sourceCommit": "6242f22c42ee8f5722daac02978c910c1ead8586",
+    "apkSha256": "9d83278b6bb09c7fc69f52a27f31a5a81ff4b2b9bb6b02e39f9fe6dcaf488399",
+    "baselineApkSha256": "a838e52682cbabf0525d8aef84e30217cf117c66a6f0810b5a55d1974ef572e3",
+    "nativeLibrarySha256": "bc4b7484b764a88652afdbacdd7231b2cef22cf82f03341f884f6b5f37f77687",
+    "matchedRuntimeAssets": 295
+  },
+  "installedApkHashVerified": true,
+  "package16KiBAlignmentVerified": true,
+  "developmentSignerMatchedBaseline": true,
+  "shippingMobileModuleHashes": [
+    "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+    "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+    "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+  ],
+  "baseline": {
+    "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+    "requestToPresentSeconds": [
+      19.26,
+      19.761
+    ]
+  },
+  "setup": {
+    "scene": "Opening ruin, first doorway",
+    "backend": "RayTracingPipeline",
+    "scalePercent": 33,
+    "internalResolution": [
+      475,
+      980
+    ],
+    "outputResolution": [
+      1440,
+      2971
+    ],
+    "deviceRetentionSeconds": 15
+  },
+  "candidateHomeReturns": [
+    {
+      "generationBefore": 1,
+      "generationAfter": 3,
+      "sameProcess": true,
+      "requestToPresentSeconds": 1.241,
+      "pipelineBundleSetupMs": null,
+      "compiledPairReused": true,
+      "expiredAfterSeconds": null,
+      "restartSucceeded": true,
+      "before": {
+        "batteryC": 36.5,
+        "androidThermalStatus": 0,
+        "usbPowered": true
+      },
+      "after": {
+        "batteryC": 36.9,
+        "androidThermalStatus": 1,
+        "usbPowered": true
+      }
+    },
+    {
+      "generationBefore": 3,
+      "generationAfter": 5,
+      "sameProcess": true,
+      "requestToPresentSeconds": 1.116,
+      "pipelineBundleSetupMs": null,
+      "compiledPairReused": true,
+      "expiredAfterSeconds": null,
+      "restartSucceeded": true,
+      "before": {
+        "batteryC": 36.9,
+        "androidThermalStatus": 1,
+        "usbPowered": true
+      },
+      "after": {
+        "batteryC": 37.5,
+        "androidThermalStatus": 1,
+        "usbPowered": true
+      }
+    },
+    {
+      "generationBefore": 5,
+      "generationAfter": 7,
+      "sameProcess": true,
+      "requestToPresentSeconds": 20.551,
+      "pipelineBundleSetupMs": 19361.425,
+      "compiledPairReused": false,
+      "expiredAfterSeconds": 15.007,
+      "restartSucceeded": true,
+      "before": {
+        "batteryC": 37.5,
+        "androidThermalStatus": 1,
+        "usbPowered": true
+      },
+      "after": {
+        "batteryC": 38.3,
+        "androidThermalStatus": 1,
+        "usbPowered": true
+      }
+    }
+  ],
+  "openingPositionAndHudRetainedInCaptures": true,
+  "productionPackageVersion": "1.7.0",
+  "productionPackageInstallAndUpdateTimesMatched": true,
+  "hostTestsPassed": [
+    "horde_rt_surface_session_mailbox_tests",
+    "horde_rt_compiled_pipeline_cache_tests"
+  ],
+  "androidUnitTests": {
+    "passed": 611,
+    "skipped": 6,
+    "failed": 0
+  },
+  "captureSha256": {
+    "beforeFirstHome": "3e5c1aa65b47d9afd2492279a9ee0bbbdfaf963929217cafc27239e4b8a85147",
+    "warm-first": "9709453b176e6f0e15e83e1a7ad8979bdeb37f10e451dd926a19131290639f08",
+    "warm-second": "8a3f53912265cb5059817facae05cba86a1326ab2f09ed66747369cac701d655",
+    "expired": "e53aff9e57dcde895778663d34cafe554383c8452139c0915677401b15134a70"
+  },
+  "logSha256": {
+    "expired-native.log": "5b453e0122d10dfa9defc6554e54b9b5cf14c81e0695709647bd62e6b0505001",
+    "warm-first-native.log": "b59569d813bf6673769e0edc927a70dd903fdfa5835ee446910d8b3d0169f71b",
+    "warm-second-native.log": "5d32b0ea27f46c7077a198dcf869b1876d5d1bbe258894281a68844cb331faf1"
+  }
+}
