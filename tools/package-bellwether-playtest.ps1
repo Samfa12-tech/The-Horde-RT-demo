@@ -4,7 +4,8 @@ param(
     [Parameter(Mandatory)][string]$BaseWindowsZip,
     [Parameter(Mandatory)][string]$ResidentDirectory,
     [string]$VoiceDirectory,
-    [switch]$OptimizedCandidate
+    [switch]$OptimizedCandidate,
+    [switch]$ArchiveOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -79,12 +80,30 @@ if ($voices) {
 $profile = if ($OptimizedCandidate) { 'Candidate' } else { 'Playtest' }
 $output = (New-Item -ItemType Directory -Path (Join-Path $repo (
     "reports/horde-bellwether-$($profile.ToLowerInvariant())-" + (Get-Date -Format 'yyyyMMdd-HHmmss')))).FullName
-$package = (New-Item -ItemType Directory -Path (Join-Path $output "Bellwether $profile")).FullName
-$assetRoot = (New-Item -ItemType Directory -Path (Join-Path $package 'assets')).FullName
+$archive = Join-Path $output "Horde-Bellwether-Private-$profile-Windows-x64.zip"
+$pending = "$archive.pending"
+$entryNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+$compression = [IO.Compression.CompressionLevel]::Fastest
 
-function Copy-PlaytestInput([string]$source, [string]$target) {
-    $null = New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force
-    Copy-Item -LiteralPath $source -Destination $target
+function Register-PlaytestEntry([string]$relative) {
+    if (!$relative -or $relative.Contains('\') -or $relative.Contains(':') -or
+        $relative.StartsWith('/') -or $relative.EndsWith('/') -or
+        $relative -match '(^|/)(\.|\.\.)(/|$)' -or !$entryNames.Add($relative)) {
+        throw "Invalid or duplicate Bellwether archive entry: $relative"
+    }
+}
+
+function Add-PlaytestFile([string]$source, [string]$relative) {
+    Register-PlaytestEntry $relative
+    $null = [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $source, $relative, $compression)
+}
+
+function Add-PlaytestText([string]$relative, [string]$content) {
+    Register-PlaytestEntry $relative
+    $entry = $zip.CreateEntry($relative, $compression)
+    $writer = [IO.StreamWriter]::new($entry.Open(), [Text.UTF8Encoding]::new($false))
+    try { $writer.WriteLine($content) }
+    finally { $writer.Dispose() }
 }
 
 $activeRoster = @(
@@ -92,50 +111,56 @@ $activeRoster = @(
     Get-HordeNightAudioRuntimeFiles
     Get-HordeMusicRuntimeFiles -RepositoryRoot $repo
 )
-$baseArchive = [IO.Compression.ZipFile]::OpenRead($base)
+$zip = [IO.Compression.ZipFile]::Open($pending, [IO.Compression.ZipArchiveMode]::Create)
 try {
-    foreach ($entry in $baseArchive.Entries) {
-        $relative = $entry.FullName
-        if ($relative.EndsWith('/')) { continue }
-        # The 1.8 town GLB in the current roster replaces this 1.7 skyline.
-        if ($relative.StartsWith('assets/models/world/runtime/bellwether-shell-v4/')) { continue }
-        if ($relative.StartsWith('assets/')) {
-            if ($relative.Substring(7) -in $activeRoster) { continue }
-            Copy-PlaytestInput (Join-Path $repo $relative) (Join-Path $package $relative)
-        } elseif ($relative -in $script:Horde17ReleaseFiles.Keys) {
-            $target = Join-Path $package $relative
-            $null = New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force
-            [IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $target)
+    $baseArchive = [IO.Compression.ZipFile]::OpenRead($base)
+    try {
+        foreach ($entry in $baseArchive.Entries) {
+            $relative = $entry.FullName
+            if ($relative.EndsWith('/')) { continue }
+            # The 1.8 town GLB in the current roster replaces this 1.7 skyline.
+            if ($relative.StartsWith('assets/models/world/runtime/bellwether-shell-v4/')) { continue }
+            if ($relative.StartsWith('assets/')) {
+                if ($relative.Substring(7) -in $activeRoster) { continue }
+                Add-PlaytestFile (Join-Path $repo $relative) $relative
+            } elseif ($relative -in $script:Horde17ReleaseFiles.Keys) {
+                Register-PlaytestEntry $relative
+                $source = $entry.Open()
+                try {
+                    $destination = $zip.CreateEntry($relative, $compression).Open()
+                    try { $source.CopyTo($destination) }
+                    finally { $destination.Dispose() }
+                } finally { $source.Dispose() }
+            }
+        }
+    } finally { $baseArchive.Dispose() }
+
+    foreach ($relative in $activeRoster) {
+        Add-PlaytestFile (Join-Path $repo "assets/$relative") "assets/$relative"
+    }
+    foreach ($notice in Get-HordeSoftwarePackageNotices) {
+        Add-PlaytestFile (Join-Path $repo $notice.Source) $notice.Destination
+    }
+    Add-PlaytestFile (Join-Path $repo 'ASSET_LICENSES.md') 'ASSET_LICENSES.md'
+
+    foreach ($role in @('tavern-keeper','record-keeper','artificer','salvager','relic-dealer')) {
+        foreach ($leaf in @('asset.manifest.json','resident.glb','base-color.windows.ktx2','normal.windows.ktx2','orm.windows.ktx2')) {
+            $relative = "$role/$leaf"
+            Add-PlaytestFile (Join-Path $residents $relative) "assets/private_bellwether/$relative"
         }
     }
-} finally {
-    $baseArchive.Dispose()
-}
-
-$null = Copy-Horde162RuntimeAssets -RepositoryRoot $repo -AssetRoot $assetRoot -Platform Windows
-Copy-HordeNightAudioRuntimeAssets -RepositoryRoot $repo -AssetRoot $assetRoot
-$null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repo -AssetRoot $assetRoot
-Copy-HordeThirdPartyNotices -RepositoryRoot $repo -PackageRoot $package
-Copy-PlaytestInput (Join-Path $repo 'ASSET_LICENSES.md') (Join-Path $package 'ASSET_LICENSES.md')
-
-foreach ($role in @('tavern-keeper','record-keeper','artificer','salvager','relic-dealer')) {
-    foreach ($leaf in @('asset.manifest.json','resident.glb','base-color.windows.ktx2','normal.windows.ktx2','orm.windows.ktx2')) {
-        $relative = "$role/$leaf"
-        Copy-PlaytestInput (Join-Path $residents $relative) (Join-Path $assetRoot "private_bellwether/$relative")
+    foreach ($line in $voiceLines) {
+        Add-PlaytestFile (Join-Path $voices "$line.wav") "assets/private_bellwether_voice/$line.wav"
     }
-}
-foreach ($line in $voiceLines) {
-    Copy-PlaytestInput (Join-Path $voices "$line.wav") (Join-Path $assetRoot "private_bellwether_voice/$line.wav")
-}
-Copy-PlaytestInput $executable (Join-Path $package 'HordeLanternRT.exe')
-if ($OptimizedCandidate) {
-    Set-Content -LiteralPath (Join-Path $package 'Bellwether.candidate') -Encoding ascii -Value 'horde-bellwether-optimized-v1'
-    $saveLocation = 'The candidate saves in state/campaign-v1 beside the game.'
-} else {
-    Set-Content -LiteralPath (Join-Path $package 'Bellwether.playtest') -Value 'Private Bellwether playtest'
-    $saveLocation = 'The playtest saves in Local AppData under HordeLanternRT/bellwether-playtest/campaign-v1.'
-}
-@"
+    Add-PlaytestFile $executable 'HordeLanternRT.exe'
+    if ($OptimizedCandidate) {
+        Add-PlaytestText 'Bellwether.candidate' 'horde-bellwether-optimized-v1'
+        $saveLocation = 'The candidate saves in state/campaign-v1 beside the game.'
+    } else {
+        Add-PlaytestText 'Bellwether.playtest' 'Private Bellwether playtest'
+        $saveLocation = 'The playtest saves in Local AppData under HordeLanternRT/bellwether-playtest/campaign-v1.'
+    }
+    Add-PlaytestText 'PLAYTEST.txt' @"
 Horde Lantern RT — private Bellwether 1.8 $($profile.ToLowerInvariant()) (Windows x64)
 
 Extract the whole ZIP to a writable folder, then open HordeLanternRT.exe.
@@ -144,14 +169,17 @@ Settings live beside the game.
 
 A Vulkan hardware ray-tracing GPU and driver are required.
 This build and its resident and voice assets are for private playtesting.
-"@ | Set-Content -LiteralPath (Join-Path $package 'PLAYTEST.txt') -Encoding utf8
+"@
+} finally { $zip.Dispose() }
 
-$archive = Join-Path $output "Horde-Bellwether-Private-$profile-Windows-x64.zip"
-[IO.Compression.ZipFile]::CreateFromDirectory($package, $archive, [IO.Compression.CompressionLevel]::Fastest, $false)
-Assert-Horde17ReleasePackage -ArchivePath $archive -Platform Windows
-Assert-Horde162Package -RepositoryRoot $repo -ArchivePath $archive -Platform Windows
-$null = Assert-HordeMusicPackage -RepositoryRoot $repo -ArchivePath $archive
-Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $archive -Platform Windows
+Assert-Horde17ReleasePackage -ArchivePath $pending -Platform Windows
+Assert-Horde162Package -RepositoryRoot $repo -ArchivePath $pending -Platform Windows
+$null = Assert-HordeMusicPackage -RepositoryRoot $repo -ArchivePath $pending
+Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $pending -Platform Windows
+if (!$ArchiveOnly) {
+    [IO.Compression.ZipFile]::ExtractToDirectory($pending, (Join-Path $output "Bellwether $profile"))
+}
+Move-Item -LiteralPath $pending -Destination $archive
 [ordered]@{
     sourceCommit = $revision
     profile = $profile.ToLowerInvariant()
@@ -163,5 +191,6 @@ Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repo -ArchivePath $archive
     bytes = (Get-Item -LiteralPath $archive).Length
     residentFiles = 25
     voiceFiles = $voiceLines.Count
+    archiveOnly = [bool]$ArchiveOnly
 } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'windows-package.json')
 Write-Output $output
