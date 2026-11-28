@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "scope": "Native Windows foreground entry and short idle, no sustained performance measurement",
+  "hardware": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "windowsBuild": "26300.9974"
+  },
+  "package": {
+    "sourceCommit": "d8a0feb2130089296b064639f9f65fb0037e6288",
+    "zipSha256": "3b57e104258681715cc76baa2a3d4ec7c89e2f12389864ecd1b8e27293614ea4",
+    "exeSha256": "8e607d8249769cbc3a49f71a6869f6c242cc2e1f4a1089b2ea16f354bd106003",
+    "byteIdenticalNonExecutableEntries": 296,
+    "shippingHighShaderModules": [
+      "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+    ]
+  },
+  "stockQueryIdle": {
+    "localReportDirectory": "bellwether-query-menu-idle-20261128",
+    "actualBackend": "RayQueryCompute",
+    "presentedToSwapchain": true,
+    "gameExitCode": "0xc0000005",
+    "runReceiptSha256": "89bb16b99dd3d4f619542b822026369889129327b9dc61b01eb4f216a5a0f3bc",
+    "capabilityReportSha256": "273ddd7c604c5db795a189044accc960425ba5d91edc2ab06343cff000d37062",
+    "playerInput": false
+  },
+  "stockQueryWithThreadStackCapture": {
+    "localReportDirectory": "bellwether-query-stack-20261128",
+    "actualBackend": "RayQueryCompute",
+    "presentedToSwapchain": true,
+    "gameExitCode": "0xc0000005",
+    "runReceiptSha256": "3cb2d43e4d47aaae61a1d58de06945b7e445d37e49627607a82225ef9edbbb73",
+    "capabilityReportSha256": "273ddd7c604c5db795a189044accc960425ba5d91edc2ab06343cff000d37062",
+    "loadDispatched": false,
+    "faultOnWindowThread": false,
+    "faultModule": "nvgpucomp64.dll",
+    "faultOffset": "0x1fe4266",
+    "unwoundDriverFrames": [
+      "0x1fe4266",
+      "0x9a60f6",
+      "0xfd88d6",
+      "0x3d2d51a",
+      "0x3d2d16d",
+      "0x3d2dc77",
+      "0xfd8e96",
+      "0xfd8473",
+      "0x3ff6e25",
+      "0x3ff2b31",
+      "0x4003d3b",
+      "0x3ff5b36",
+      "0x3fa21c7",
+      "0x3fa206c",
+      "0x3fa1ca1",
+      "0x1deb7f4",
+      "0x1de87b3",
+      "0x1de7f5e",
+      "0x1e40da3",
+      "0x1de86ca"
+    ],
+    "stackSha256": "28cb8adf0379394af93b6ca73ed1fd1acd45c3d1a3d5c933e357dbbddaa6fcfd",
+    "memoryDumpWritten": false
+  },
+  "stockQueryWithValidationLayer": {
+    "localReportDirectory": "bellwether-query-vulkan-validation-20261128",
+    "actualBackend": "RayQueryCompute",
+    "presentedToSwapchain": true,
+    "gameExitCode": "0xc0000005",
+    "runReceiptSha256": "f8d1def5fb2a3e7a6406194dea3bc7dbde3e969b0ff70100d9049780359eb7bd",
+    "capabilityReportSha256": "0ea88ea8fe684c95c40e23ddeac36eaa56533612e340d98876f576e51b8bc7fc",
+    "validationLayer": "VK_LAYER_KHRONOS_validation",
+    "sdkVersion": "1.4.350.0",
+    "observedValidationErrorMessages": 0,
+    "scope": "Normal load and attempted first movement",
+    "stderrSha256": "dfa155865de285ffc9514a2214cfff6e8ce1fe29a0ffa3bd66e33ac91fd59ec2",
+    "stdoutSha256": "2ab2a3430a3c9e9b3890b64f0af06cd355a1eb493933783dee18007373522f3a"
+  },
+  "queryDisableOptimizationTrial": {
+    "localReportDirectory": "bellwether-query-no-opt-20261128",
+    "actualBackend": "RayQueryCompute",
+    "presentedToSwapchain": true,
+    "gameExitCode": "0xc0000005",
+    "runReceiptSha256": "bd6e8e6e3218ee32752c355383a3e64d24354128c47554535a850d483a268e30",
+    "capabilityReportSha256": "273ddd7c604c5db795a189044accc960425ba5d91edc2ab06343cff000d37062",
+    "trialSourceBase": "076319de9c1e639e20bc76d49a8dc8344696689e",
+    "trialExeSha256": "c0a4e32c60654dac2af55b24579facaa0fbad5ef3f93b3abbadc0a4e39d6e27d",
+    "trialPatchSha256": "065a4fa80064674c499541ac70ff3022ede18b0c9cc32487eba61f3d76021872",
+    "pipelineFlag": "VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT",
+    "secondsInPresentedMenu": 5.797,
+    "playerInput": false,
+    "retainedInSource": false
+  },
+  "stockPipelineIdleControl": {
+    "localReportDirectory": "bellwether-pipeline-menu-control-20261128",
+    "actualBackend": "RayTracingPipeline",
+    "presentedToSwapchain": true,
+    "gameExitCode": "0x00000000",
+    "runReceiptSha256": "e024b54eca0983f48b688f0f08171016280df72b32606731a9e7cc66e84c0d5f",
+    "capabilityReportSha256": "04da13b2cd07565793689b45febaef7b6d04feba41f45962f9067263f38f5bc4",
+    "playerInput": false,
+    "secondsInPresentedMenu": 40.0,
+    "closedNormally": true
+  },
+  "allIsolatedAndOriginalSavesUnchanged": true,
+  "underlyingCauseEstablished": false,
+  "phoneTested": false,
+  "published": false
+}
