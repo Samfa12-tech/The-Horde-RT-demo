@@ -659,6 +659,7 @@ struct VulkanSurfaceContext
     uint32_t graphicsQueueFamilyIndex = 0u;
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkSwapchainKHR swapchain = VK_NULL_HANDLE;
+    bool swapchainRecreationPending = false;
     VkFormat swapchainFormat = VK_FORMAT_B8G8R8A8_UNORM;
     VkColorSpaceKHR swapchainColorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
     VkPresentModeKHR swapchainPresentMode = VK_PRESENT_MODE_FIFO_KHR;
@@ -6598,15 +6599,33 @@ VkExtent2D ClampExtent(const VkSurfaceCapabilitiesKHR& capabilities, uint32_t de
         std::clamp(desiredHeight, minExtent.height, maxExtent.height)};
 }
 
-bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
+struct WindowsSwapchainOutput
 {
     VkSurfaceCapabilitiesKHR capabilities{};
-    if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(ctx.physicalDevice, ctx.surface, &capabilities) != VK_SUCCESS)
+    VkExtent2D extent{};
+
+    bool Drawable() const { return extent.width != 0u && extent.height != 0u; }
+};
+
+bool QuerySwapchainOutput(const VulkanSurfaceContext& ctx, HWND hwnd, WindowsSwapchainOutput& output)
+{
+    RECT clientRect{};
+    if (!GetClientRect(hwnd, &clientRect)) return false;
+    const auto width = clientRect.right - clientRect.left;
+    const auto height = clientRect.bottom - clientRect.top;
+    if (IsIconic(hwnd) || width <= 0 || height <= 0) return true;
+    if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(ctx.physicalDevice, ctx.surface, &output.capabilities) != VK_SUCCESS)
     {
         std::cerr << "Failed to query Vulkan surface capabilities.\n";
         return false;
     }
+    output.extent = ClampExtent(output.capabilities, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+    return true;
+}
 
+bool CreateSwapchain(VulkanSurfaceContext& ctx, const WindowsSwapchainOutput& output, VkResult& creationResult)
+{
+    const auto& capabilities = output.capabilities;
     uint32_t formatCount = 0u;
     if (vkGetPhysicalDeviceSurfaceFormatsKHR(ctx.physicalDevice, ctx.surface, &formatCount, nullptr) != VK_SUCCESS ||
         formatCount == 0u)
@@ -6654,11 +6673,7 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
         }
     }
 
-    RECT clientRect{};
-    GetClientRect(hwnd, &clientRect);
-    const uint32_t requestedWidth = static_cast<uint32_t>(std::max<long>(1, clientRect.right - clientRect.left));
-    const uint32_t requestedHeight = static_cast<uint32_t>(std::max<long>(1, clientRect.bottom - clientRect.top));
-    ctx.swapchainExtent = ClampExtent(capabilities, requestedWidth, requestedHeight);
+    ctx.swapchainExtent = output.extent;
     ctx.swapchainFormat = chosenFormat.format;
     ctx.swapchainColorSpace = chosenFormat.colorSpace;
     ctx.swapchainPresentMode = chosenPresentMode;
@@ -6689,11 +6704,15 @@ bool CreateSwapchain(VulkanSurfaceContext& ctx, HWND hwnd)
         VK_TRUE,
         VK_NULL_HANDLE};
 
-    if (vkCreateSwapchainKHR(ctx.device, &createInfo, nullptr, &ctx.swapchain) != VK_SUCCESS)
+    VkSwapchainKHR createdSwapchain = VK_NULL_HANDLE;
+    creationResult = vkCreateSwapchainKHR(ctx.device, &createInfo, nullptr, &createdSwapchain);
+    if (creationResult != VK_SUCCESS)
     {
-        std::cerr << "Failed to create swapchain.\n";
+        if (creationResult != VK_ERROR_OUT_OF_DATE_KHR)
+            std::cerr << "Failed to create swapchain: " << creationResult << '\n';
         return false;
     }
+    ctx.swapchain = createdSwapchain;
 
     uint32_t imageArraySize = 0u;
     if (vkGetSwapchainImagesKHR(ctx.device, ctx.swapchain, &imageArraySize, nullptr) != VK_SUCCESS || imageArraySize == 0u)
@@ -7447,17 +7466,25 @@ bool InitialiseRtSceneForSwapchain(VulkanSurfaceContext& ctx, const bool startup
 
 bool RecreateSwapchain(VulkanSurfaceContext& ctx)
 {
-    if (!ReleaseSwapchainResources(ctx))
+    WindowsSwapchainOutput output;
+    if (!QuerySwapchainOutput(ctx, ctx.windowHandle, output)) return false;
+    if (!output.Drawable())
     {
-        return false;
+        // Keep the current owner intact while Win32 or Vulkan has no drawable surface.
+        ctx.swapchainRecreationPending = true;
+        return true;
     }
-    if (ctx.windowHandle == nullptr)
-    {
-        return false;
-    }
+    if (ctx.swapchain != VK_NULL_HANDLE && !ReleaseSwapchainResources(ctx)) return false;
 
-    return CreateSwapchain(ctx, ctx.windowHandle) &&
-           InitialiseRtSceneForSwapchain(ctx);
+    VkResult creationResult = VK_NOT_READY;
+    if (!CreateSwapchain(ctx, output, creationResult))
+    {
+        // The window can change again between querying and creating the swapchain.
+        ctx.swapchainRecreationPending = creationResult == VK_ERROR_OUT_OF_DATE_KHR;
+        return ctx.swapchainRecreationPending;
+    }
+    ctx.swapchainRecreationPending = false;
+    return InitialiseRtSceneForSwapchain(ctx);
 }
 
 void DetachRenderContextHost(VulkanSurfaceContext& context) noexcept
@@ -7898,6 +7925,8 @@ bool RenderFrame(VulkanSurfaceContext& ctx, const VkClearColorValue& clearColor,
             ctx.benchmarkEvidence.Cancel();
     }
     rtFramePresented = false;
+    if (IsIconic(ctx.windowHandle)) return true;
+    if (ctx.swapchainRecreationPending) return RecreateSwapchain(ctx);
     if (ctx.commandBuffers.empty())
     {
         return false;
@@ -10919,7 +10948,10 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
         (void)renderOwner.Retire();return horde::platform::windows::WindowsStartupGate::kCancelledResult;
     }
     SetCompatibilityAttemptStage(hWnd,horde::reporting::CompatibilityStage::Swapchain);
-    if (!CreateSwapchain(context, hWnd))
+    WindowsSwapchainOutput initialOutput;
+    VkResult swapchainCreationResult = VK_NOT_READY;
+    if (!QuerySwapchainOutput(context, hWnd, initialOutput) || !initialOutput.Drawable() ||
+        !CreateSwapchain(context, initialOutput, swapchainCreationResult))
     {
         (void)renderOwner.Retire();
         return 1;
@@ -11275,6 +11307,18 @@ int RunDiagnosticSwapchainWindow(HWND hWnd,
                     (void)openingBenchmark->owner.CancelQueued();
                 }
             }
+        }
+        const bool outputMinimized = IsIconic(hWnd);
+        if (!outputMinimized && context.swapchainRecreationPending && !RecreateSwapchain(context))
+        {
+            renderFailed = true;
+            break;
+        }
+        if (outputMinimized || context.swapchainRecreationPending)
+        {
+            context.lastControlSteadyNs = horde::vulkan::raytracing::ReadRtSceneSteadyClock(nullptr);
+            (void)MsgWaitForMultipleObjectsEx(0u, nullptr, 20u, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+            continue;
         }
         PumpCampaign(context);
         if(context.entryMenuVisible && context.entryMoreVisible && !context.benchmarkChooserVisible)
