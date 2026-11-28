@@ -60,10 +60,10 @@ RtFireEmitterGpu PackFireEmitterGpu(
     const float parentStrengthScale = emitter.parentObject ==
         horde::gameplay::effects::FireEmitterParentObject::OriginalTorch
             ? tuning.originalTorchStrengthScale : 1.0f;
-    // Clamp the combined scale once, preserving the carried torch's previous
-    // intensity/fade path even when gameplay intensity exceeds one.
+    // The authored output and graphics tuning share the existing scale limit.
+    // The fixed-step strength and fuel still control the flame's fade.
     const float strengthScale = FiniteClamped(
-        tuning.strengthScale * parentStrengthScale, 0.0f, 4.0f, 1.0f);
+        tuning.strengthScale * parentStrengthScale * emitter.authoredStrengthScale, 0.0f, 4.0f, 1.0f);
     const float turbulenceScale = FiniteClamped(tuning.turbulenceScale, 0.0f, 2.0f, 1.0f);
     const float smokeScale = FiniteClamped(tuning.smokeScale, 0.0f, 2.0f, 1.0f);
     const float baseStrength = FiniteClamped(emitter.strength, 0.0f, 1.0f, 0.0f) *

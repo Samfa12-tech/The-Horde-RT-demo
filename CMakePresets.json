@@ -21,6 +21,17 @@
       "generator": "Visual Studio 17 2022",
       "architecture": "x64",
       "binaryDir": "${sourceDir}/build/presets/windows-x64-release"
+    },
+    {
+      "name": "windows-x64-bellwether-candidate",
+      "displayName": "Private Bellwether Windows x64 candidate",
+      "description": "Configure the isolated optimized candidate with the shipping foundation.",
+      "inherits": "windows-x64-release",
+      "binaryDir": "${sourceDir}/build/bellwether-windows-candidate",
+      "cacheVariables": {
+        "HORDE_RT_SHIPPING17_CONTENT": "ON",
+        "HORDE_RT_WINDOWS_BELLWETHER_CANDIDATE": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -35,6 +46,15 @@
       "displayName": "Build Windows x64 Release",
       "configurePreset": "windows-x64-release",
       "configuration": "Release"
+    },
+    {
+      "name": "windows-x64-bellwether-candidate",
+      "displayName": "Build the private Bellwether Windows x64 candidate",
+      "description": "Use one MSBuild worker to preserve the inherited Git configuration for the source stamp.",
+      "configurePreset": "windows-x64-bellwether-candidate",
+      "configuration": "Release",
+      "jobs": 1,
+      "targets": ["horde_rt_diagnostic_window"]
     }
   ],
   "testPresets": [

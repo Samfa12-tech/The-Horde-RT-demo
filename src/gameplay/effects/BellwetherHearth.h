@@ -204,12 +204,13 @@ inline FireEmitterState MakeHouseBLampEmitter()
     emitter.stableId=kHouseBLampEmitterId;
     emitter.seed=0x53544f52u;
     emitter.colourTemperatureKelvin=2110.f;
+    emitter.authoredStrengthScale=1.6f;
     return emitter;
 }
 
 inline FireEmitterFixedStepInput HouseBLampFireInput()
 {
-    return BellwetherFireInput(bellwether::kHouseBLampFlame,bellwether::kHouseBLampLight,1.28f);
+    return BellwetherFireInput(bellwether::kHouseBLampFlame,bellwether::kHouseBLampLight,1.f);
 }
 
 inline FireEmitterState MakeChurchRecordLampEmitter()

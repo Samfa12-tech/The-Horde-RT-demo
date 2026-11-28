@@ -35,6 +35,7 @@ struct FireEmitterState
     std::uint32_t seed = 0x484f5244u;
     float strength = 1.0f;
     float fuel = 1.0f;
+    float authoredStrengthScale = 1.0f; // Output at full flame, independent of the fixed-step fade.
     float phase = 0.0f;
     float colourTemperatureKelvin = 1850.0f;
     std::array<float, 3u> artTint{{1.0f, 0.94f, 0.82f}};
