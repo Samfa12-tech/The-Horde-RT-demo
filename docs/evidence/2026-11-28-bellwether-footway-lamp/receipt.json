@@ -1,0 +1,100 @@
+{
+  "contentCommit": "0030a36b14cde5adbe82f007feb7b2b3309ce442",
+  "baseline": "../2026-11-28-bellwether-footway-junction/receipt.json",
+  "authoring": "../../../assets/models/world/source/bellwether-footway-lamp-v1/authoring-receipt.json",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "townGlbSha256": "518ae34348dd2d8deba2ceaf3d34ad72bfd535b2a4bff329d9b5e27edf133783",
+  "townManifestSha256": "caa96d8746c4af9fe5fa5e8e86f7e416202ba418c453660d5eeafe638513a502",
+  "addedSolidTriangles": 184,
+  "reproducibleBlenderRuntimeAndManifest": true,
+  "gltfValidator": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "ordinaryWindows": {
+    "executableSha256": "1030172485f7271c042543ee57a3ea8a9aef3aadf2b9f369f6a7b0c1077c2b12",
+    "host": "NVIDIA GeForce RTX 5050 Laptop GPU, driver 610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "shadowQuality": "higher",
+    "lampStableId": 1111906124,
+    "lampWorldPosition": [
+      134.333,
+      -20.291251098632813,
+      121.552
+    ],
+    "route": "Load the earned tavern save. Walk to the causeway, cross the junction, return, then turn and enter the footway.",
+    "approach": {
+      "frameSha256": "c6914ac84f3fd1e23bc1566b1d02f155bad6cbc5278c77d8ee933397f5b574b1",
+      "selectedEmitterIds": [
+        1111906124,
+        1279348308
+      ],
+      "heldLanternWorldPosition": [
+        133.07814,
+        -19.3151016,
+        122.287476
+      ]
+    },
+    "viewOfLamp": {
+      "frameSha256": "5105474bdc2101666f7469ef3e3643a6180d780cdd0223045a4d301320b2a009",
+      "selectedEmitterIds": [
+        1111906124,
+        1279348308
+      ],
+      "heldLanternWorldPosition": [
+        132.369949,
+        -19.2791996,
+        121.884506
+      ]
+    },
+    "beyondJunction": {
+      "frameSha256": "b5be6a102f1359750af238e548dcfacb00622a9719b33e7270e0680dcca97edc",
+      "selectedEmitterIds": [
+        1111906124,
+        1279348308
+      ],
+      "heldLanternWorldPosition": [
+        138.280136,
+        -22.2234707,
+        122.043823
+      ]
+    },
+    "turnOntoFootway": {
+      "frameSha256": "89b54471c75e010947bb87d34a0b2366e93a79e3e56b724f4e3aa1f8e59153ab",
+      "selectedEmitterIds": [
+        1111906124,
+        1279348308
+      ],
+      "heldLanternWorldPosition": [
+        134.784286,
+        -20.9734154,
+        122.298485
+      ]
+    },
+    "insideFootway": {
+      "frameSha256": "b2a8d2da1906ab58ff27739af7e886b78022fc0969233e7a958eeac4112c046e",
+      "selectedEmitterIds": [
+        1111906124,
+        1279348308
+      ],
+      "heldLanternWorldPosition": [
+        135.182556,
+        -20.4072914,
+        117.718063
+      ]
+    },
+    "previousUnlitTurnFrameSha256": "513a247b8ef3f0943fb492335195dc8297fca16b94b788f4900e1b86ea56e359",
+    "visualObservation": "The hood, flame and near stone tread are visible in the live turn. The earlier turn is a nearby ordinary play view from the previous build.",
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true,
+    "gameExitCode": 0
+  },
+  "passingHostTests": [
+    "horde_rt_fire_emitter_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_forest_surroundings_native_tests"
+  ],
+  "remaining": "Handset play and sustained frame pacing have not been measured for this candidate."
+}
