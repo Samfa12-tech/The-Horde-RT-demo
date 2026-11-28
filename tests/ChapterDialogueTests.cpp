@@ -678,8 +678,9 @@ int main() {
         room.paused=false;
         room.companionSource->y-=.27f;
         hearth.Step(.05f,room);
-        Check(hearth.State().line==Line::TavernSit && hearth.State().source.y==room.companionSource->y &&
-              hearth.Complete(sit.line,sit.generation),"the settling caption follows Kit down into the chair");
+        Check(hearth.State().line==Line::TavernSit && hearth.State().source.y==room.companionSource->y,
+              "the settling caption follows Kit down into the chair");
+        hearth.Skip();
         hearth.Step(.05f,room);const auto limit=hearth.State();
         Check(limit.line==Line::TavernLimit && hearth.ExportProgress().hearthLinesResolved==1,
               "the seated line follows the sit without repeating it");
@@ -788,6 +789,29 @@ int main() {
         records.Skip();records.Step(.05f,church);
         Check(records.State().line==Line::RecordKeeperTwoRoads,
               "turning away ends interaction reach while the audible reading continues");
+        Director voicedReading = records;
+        voicedReading.Skip();
+        voicedReading.Step(.05f, church);
+        Check(voicedReading.State().line == Line::RecordKeeperRoadOrder,
+              "the prepared record keeper reaches the voiced directions");
+        const auto& cuts = horde::audio::kBellwetherFollowOnAuditionCuts;
+        const auto cut = std::find_if(cuts.begin(), cuts.end(), [](const auto& entry) {
+            return entry.line == Line::RecordKeeperRoadOrder;
+        });
+        Check(cut != cuts.end(), "the directions use an admitted recorded take");
+        constexpr float dt = 1.f / 60.f;
+        const float takeSeconds = static_cast<float>(cut->frames) / 24000.f;
+        const unsigned takeTicks = static_cast<unsigned>(std::ceil(takeSeconds / dt));
+        for (unsigned tick = 0; tick < takeTicks; ++tick) voicedReading.Step(dt, church);
+        const auto playing = voicedReading.State();
+        Check(playing.line == Line::RecordKeeperRoadOrder && playing.elapsed < playing.duration &&
+              !voicedReading.Complete(playing.line, playing.generation) &&
+              voicedReading.State().line == playing.line && voicedReading.State().generation == playing.generation,
+              "a matching voice completion preserves the authored time to read the directions");
+        const unsigned readingTicks = static_cast<unsigned>(std::ceil((playing.duration - playing.elapsed) / dt));
+        for (unsigned tick = 0; tick <= readingTicks; ++tick) voicedReading.Step(dt, church);
+        Check(voicedReading.State().line == Line::RecordKeeperWardOffer,
+              "the next line begins after the authored caption deadline");
         church.paused=true;records.Step(.05f,church);
         Check(records.State().elapsed==0.f,"pausing holds the next record keeper caption");
         church.paused=false;church.recordKeeperSource.reset();records.Step(.05f,church);

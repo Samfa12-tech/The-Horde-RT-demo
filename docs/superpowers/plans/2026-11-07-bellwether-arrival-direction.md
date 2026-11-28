@@ -846,6 +846,8 @@ The follow-on group adds six exact archive takes to the private playtest. The re
 
 The Windows ZIP and signed Android ARM64 APK from `0eab2912` contain the same nineteen WAVs. Each Windows hardware RT backend admitted the overlay and passed all 51 campaign checks, including dealer trade and the lantern conversation at Kit's chair. The Android suite ran 610 tests with six skips and no failures. A modified record keeper WAV failed Windows startup, and Android rejected a partial group. In-game listening on the exact builds and handset play remain open.
 
+The shared dialogue clock now holds each Bellwether line for its authored duration on Windows and Android. Windows retires the audio when the take ends, and the conversation advances at the authored deadline. Skipping a line or leaving its hearing area still follows the existing dialogue rules. The private packages with 26 voices matched byte for byte and included eleven takes with at least a quarter-second of reading time after the audio. The record keeper’s shrine directions, for example, leave about 1.79 seconds after the take ends. In-game timing and mix on the updated packages still need listening checks.
+
 The private Horde audio archive retains the original MP3s, per-line review WAVs and exact text, voice and cost manifests. The Debug audition uses byte-for-byte copies, and its review receipt pins the local reel and the five source WAVs.
 
 ### Background level during Bellwether speech
