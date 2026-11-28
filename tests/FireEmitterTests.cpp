@@ -328,6 +328,19 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
         upload.selectedStableIds[0]==kWorkingSquareLampEmitterId &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
         "the market oil lamp covers both approaches alongside the held lantern within the exterior budget");
+    const auto& storeLight=horde::gameplay::bellwether::kWorkingSquareStoreLight;
+    const auto& storePath=horde::gameplay::bellwether::kWorkingSquareStorePath;
+    auto storeLamp=MakeWorkingSquareStoreLampEmitter();
+    StepFireEmitterFixed(storeLamp,WorkingSquareStoreLampFireInput(),kFixedDelta);
+    const std::array storeFires{hearth,candle,storeLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(storePath[3][0],storePath[3][1])==kWorkingSquareStoreLampRosterIndex &&
+        SelectBellwetherExteriorLamp(storePath.back()[0],storePath.back()[1])==kWorkingSquareStoreLampRosterIndex &&
+        Approx(storeLamp.worldFromLight[13],storeLight[1]) &&
+        BuildFireEmitterUpload(storeFires,{storeLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kWorkingSquareStoreLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the store lamp lights the final lane and loading yard alongside the held lantern within the exterior budget");
     return ok;
 }
 

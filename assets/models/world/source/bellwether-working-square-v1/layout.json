@@ -19,6 +19,7 @@
   },
   "storeLoadingBench": [64.20, 151.44],
   "storeCasks": [[65.15, 150.86, 1.0], [65.17, 151.64, 0.84]],
+  "storeFrontage": {"wallX": 62.80, "doorZ": 154.20, "lampZ": 152.86, "loftZ": 154.36},
   "loadingPlaces": [
     ["Tavern delivery", 90.7, 121.78],
     ["Store frontage", 60.0, 147.23],

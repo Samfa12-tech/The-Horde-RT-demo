@@ -440,6 +440,13 @@ int main(int argc,char** argv) {
                   !support->NonWalkableVolumeClear(65.70f,150.86f,65.15f,150.86f,
                       barrelGround.worldY+.27f,barrelGround.worldY+.75f,radius),
                   "the loaded cask uses the visible barrel faces for contact");
+            const auto& storeFlame=horde::gameplay::bellwether::kWorkingSquareStoreFlame;
+            const auto& storeLight=horde::gameplay::bellwether::kWorkingSquareStoreLight;
+            check(support->NonWalkableVolumeClear(storeFlame[0],storeFlame[2],storeLight[0],storeLight[2],
+                      storeFlame[1]-.008f,storeLight[1]+.008f,.012f) &&
+                  support->NonWalkableVolumeClear(storeLight[0],storeLight[2],65.45f,151.62f,
+                      storeLight[1]-.018f,storeLight[1]+.018f,.012f),
+                  "the sheltered store flame and light have a clear opening toward the casks");
             const auto& lampFlame=horde::gameplay::bellwether::kWorkingSquareLampFlame;
             const auto& lampLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
             check(support->NonWalkableVolumeClear(lampFlame[0],lampFlame[2],lampLight[0],lampLight[2],

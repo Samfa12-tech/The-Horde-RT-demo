@@ -179,6 +179,42 @@ def author(layout, ground):
             waymarker["turned"](solid,"Cask iron hoop",(x,y+scale*height,z),
                 ((-.021,radius*scale),(.021,radius*scale)),12,dark)
 
+    front = layout["storeFrontage"]
+    wall, door_z, lamp_z, loft_z = (front[key] for key in ("wallX","doorZ","lampZ","loftZ"))
+    y = ground(wall+.18,door_z)
+    box("Store worn doorstep",wall+.15,door_z,.32,1.42,y-.13,y+.125,stone,.031)
+    for side in (-1,1):
+        box("Store door jamb",wall+.064,door_z+side*.645,.17,.17,y+.09,y+2.36,oak,.026)
+    box("Store door lintel",wall+.080,door_z,.20,1.45,y+2.19,y+2.40,oak,.033)
+    for n in range(7):
+        base = y+.124+(n%3)*.005
+        box("Store door plank",wall+.064,door_z+(n-3)*.158,.116,.151,base,y+2.226,oak)
+    for height in (.61,1.72):
+        box("Store door strap",wall+.134,door_z+.095,.048,.92,y+height,y+height+.062,dark)
+    box("Store latch",wall+.176,door_z-.315,.075,.178,y+1.14,y+1.203,dark)
+
+    for side in (-1,1):
+        box("Store loft shutter stile",wall+.058,loft_z+side*.408,.13,.10,y+3.19,y+3.99,oak)
+    for n in range(6):
+        box("Store loft shutter plank",wall+.063,loft_z+(n-2.5)*.126,.116,.121,y+3.24,y+3.94,oak)
+    for height in (3.19,3.94):
+        box("Store loft shutter rail",wall+.116,loft_z,.20,.944,y+height,y+height+.069,oak,.013)
+
+    # Place the oil cup just outside the wall and under a small rain hood.
+    cup_x = wall+.71
+    box("Store lamp wall plate",wall+.028,lamp_z,.12,.176,y+1.84,y+2.63,dark)
+    timber("Store lamp arm",(wall+.068,y+2.09,lamp_z),(cup_x,y+2.09,lamp_z),.034,.032,dark,sides=4)
+    timber("Store lamp brace",(wall+.074,y+1.87,lamp_z),(cup_x-.021,y+2.07,lamp_z),.026,.028,dark,sides=4)
+    hood_ring = [(wall+.18,lamp_z-.235),(wall+.18,lamp_z+.235),
+                 (wall+.99,lamp_z+.235),(wall+.99,lamp_z-.235)]
+    hood = [(x,y+height+(.08 if x<cup_x else 0.),z) for height in (2.47,2.52) for x,z in hood_ring]
+    solid.append(mesh_tools["mesh"]("Store lamp rain hood",hood,BOX_FACES,dark))
+    waymarker["turned"](solid,"Store clay oil cup",(cup_x,y+2.14,lamp_z),
+        ((-.058,.058),(-.03,.101),(.041,.093),(.021,.063)),9,clay)
+    waymarker["turned"](solid,"Store lamp wick",(cup_x,y+2.196,lamp_z),((-.026,.017),(.019,.014)),6,dark)
+    store_flame = (cup_x,y+2.234,lamp_z)
+    store_light = (cup_x+.029,y+2.322,lamp_z-.033)
+
     def spray(name, x, y, z, spread, rise, count):
         for i in range(count):
             yaw = i*2.39996+rng.uniform(-.4,.4)
@@ -205,7 +241,7 @@ def author(layout, ground):
         spray(f"Pollard canopy {index+1}", *tip, .87, .60, 12)
     for x,y,z in sprouts:
         spray("Market root greens",x,y-.004,z,.095,.083,1)
-    return solid, planting, stone, flame, light
+    return solid, planting, stone, (flame,light), (store_flame,store_light)
 
 
 def market_pavers(layout, ground, stone):
@@ -235,7 +271,7 @@ def main(root, parent, output):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     ground = town["terrain_probe"](terrain)
     bpy.data.orphans_purge(do_recursive=True)
-    solid, planting, stone, flame, light = author(layout, ground)
+    solid, planting, stone, (flame,light), (store_flame,store_light) = author(layout, ground)
     previous_paths = json.loads((root/"assets/models/world/source/bellwether-paths-v1/layout.json").read_bytes())["routes"]
     routes = [layout["marketSpur"],layout["storePath"]]
     footprints = paths["fit_routes"](terrain,previous_paths+routes)[-len(routes):]
@@ -255,7 +291,7 @@ def main(root, parent, output):
     foliage = output/"garden-crops.glb"
     leaf_count, leaf_vertices, leaf_primitives = town["join_town"](parent/foliage.name, planting_glb, foliage,
                                                                   node_name="BellwetherGardenCrops")
-    if not 0 < solid_count <= 4700 or not 0 < ground_count <= 720 or not 0 < leaf_count <= 850:
+    if not 0 < solid_count <= 5100 or not 0 < ground_count <= 720 or not 0 < leaf_count <= 850:
         raise ValueError((solid_count, ground_count, leaf_count))
     if (primitive_count,leaf_primitives) != (6,1) or leaf_vertices > 8192:
         raise ValueError("Unexpected town primitive or foliage vertex counts.")
@@ -269,6 +305,8 @@ def main(root, parent, output):
     header = output/"geometry.generated.h"
     flame_coordinates = ", ".join(f"{value:.6f}f" for value in flame)
     light_coordinates = ", ".join(f"{value:.6f}f" for value in light)
+    store_flame_coordinates = ", ".join(f"{value:.6f}f" for value in store_flame)
+    store_light_coordinates = ", ".join(f"{value:.6f}f" for value in store_light)
     store_stations = layout["storePath"]["stations"]
     store_coordinates = ",\n    ".join(f"{{{{{x:.6f}f, {z:.6f}f}}}}" for x,z,_ in store_stations)
     header.write_text("#pragma once\n#include <array>\n#include <cstddef>\n\n"
@@ -279,6 +317,8 @@ def main(root, parent, output):
                       f"inline constexpr std::size_t kWorkingSquareLeafTriangles={leaf_count};\n"
                       f"inline constexpr std::array<float,3> kWorkingSquareLampFlame{{{{{flame_coordinates}}}}};\n"
                       f"inline constexpr std::array<float,3> kWorkingSquareLampLight{{{{{light_coordinates}}}}};\n"
+                      f"inline constexpr std::array<float,3> kWorkingSquareStoreFlame{{{{{store_flame_coordinates}}}}};\n"
+                      f"inline constexpr std::array<float,3> kWorkingSquareStoreLight{{{{{store_light_coordinates}}}}};\n"
                       f"inline constexpr std::array<std::array<float,2>,{len(store_stations)}> kWorkingSquareStorePath{{{{\n"
                       f"    {store_coordinates}\n}}}};\n"
                       "}\n", encoding="utf-8", newline="\n")
@@ -286,7 +326,7 @@ def main(root, parent, output):
         mapSha256={name:town["sha"](root/MAP/name) for name in ("02a-bellwether-terrain-1-8.webp","02b-bellwether-use-1-8.webp")},
         layoutSha256=town["sha"](layout_path), recipeSha256=town["sha"](RECIPE), blender=bpy.app.version_string,
         addedSolidTriangles=solid_count, addedGroundTriangles=ground_count, addedLeafTriangles=leaf_count,
-        marketLampFlame=flame, marketLampLight=light,
+        marketLampFlame=flame, marketLampLight=light, storeLampFlame=store_flame, storeLampLight=store_light,
         files={p.name:town["sha"](p) for p in (blend,header,runtime,foliage,output/"asset.manifest.json",output/"garden-crops.manifest.json")}))
 
 
