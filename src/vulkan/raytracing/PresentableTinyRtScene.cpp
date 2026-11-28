@@ -1673,7 +1673,7 @@ bool PresentableTinyRtScene::InitialiseWithOrchestration(
     commandPool_ = commandPool;
     pipelineCache_ = pipelineCache;
     dispatchExtent_ = dispatchExtent;
-    presentationUsesBgra_ = presentationFormat == VK_FORMAT_B8G8R8A8_UNORM || presentationFormat == VK_FORMAT_B8G8R8A8_SRGB;
+    SetPresentationFormat(presentationFormat);
     if (instance_ == VK_NULL_HANDLE || physicalDevice_ == VK_NULL_HANDLE || device_ == VK_NULL_HANDLE || queue_ == VK_NULL_HANDLE || commandPool_ == VK_NULL_HANDLE)
     {
         diagnostic = "Invalid Vulkan handles supplied to presentable RT scene.";
