@@ -1,0 +1,32 @@
+{
+  "candidateContentCommit": "6a056d1736b04ab2e0e2129a9d8f57a13c8835d2",
+  "baseline": "../2026-11-28-bellwether-market-lamp/receipt.json",
+  "launch": "Release executable staged over the verified market-lamp payload. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "c177ceedd347b9de0babbb405bf410cd6114ac579a2b74dcf1927c314aaf442c",
+  "woodland": {"pines": 9, "alders": 5, "middleDetailCrowns": 9, "renderTriangles": 11400, "trunkContactTriangles": 140},
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "capturePixels": [1232, 803]
+  },
+  "normalPlay": {
+    "route": "Repeat the isolated tavern save and south ramp, fingerpost and market walk from the previous candidate",
+    "hardwareRtPresented": true,
+    "fingerpostViewSha256": "ed94bb34efcb84f3a3a5e6ac7d8a01d81d98e48bd0e57a513ac2afd3cfd72115",
+    "apronViewSha256": "96352c1dbdfdf6e3113acd3b5ff62bd96b1d33b964ae16f12666b67227c01dff",
+    "marketViewSha256": "0baee35ef18deda5deae4788a0d1e7d4db77b6a0ce34a075583fac33d733cd30",
+    "observed": "Silhouettes break up the horizon behind the store and outbuilding. The market apron remains accessible. Clearings still have open ground at the foot of the trees.",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "hostContactBudget": {"baseObstacleTriangles": 139212, "refillBasinReservedTriangles": 216, "obstacleLimit": 139434},
+  "passingHostTests": [
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "remaining": "Ground-level planting and dressing remain open. No connected Android device or sustained performance run for this candidate."
+}
