@@ -861,6 +861,14 @@ hold and release, and the caption continues on the same clock.
 Audio/haptic manual revalidation required — YES, for speech intelligibility
 and the background level during ordinary play.
 
+The packaged Windows 1.8 build played all three Talk recordings at the
+hearth in a foreground run. A process-only capture matched each packaged
+WAV to the live mix. A second run with music muted also matched both lines
+of Kit's treasure exchange and the hearth crackle before and after speech.
+The default recording retains the background score for listening review.
+Both recordings stay in local storage. Default-mix intelligibility and
+physical handset audio still need review. [Windows playback receipt](../../evidence/2026-11-28-bellwether-windows-hearth-listening/receipt.json)
+
 ## Animation and gameplay acceptance gate
 
 First author a short test on the real Kit rig: loose-ground step/catch, protective standing assessment, several injured steps, turn and sit. Keep editable sources. Review normal first-person, front and side views for weight, planted feet, contact and coherent transitions before expanding into the complete scene. A flattering render is insufficient.
