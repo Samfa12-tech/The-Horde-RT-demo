@@ -1449,7 +1449,34 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             }
             progressed = progressed &&
                 std::all_of(afterRoadDirections, kBellwetherTavernRoute.end(), walkTo) &&
-                walkTo({target.x, target.z}) && waitFor([&] { return state.tavernConversationAvailable; }, hearthWaitTicks);
+                walkTo({target.x, target.z});
+            if (progressed && gBellwetherCombinedRelicDealer && !gBellwetherAnkleRestoreValidation) {
+                const auto& chair = horde::gameplay::bellwether::kChairSitRoot;
+                input.yawRadians = std::atan2(chair[0] - state.playerX, state.playerZ - chair[2]);
+                input.pitchRadians = -.22f;
+                const auto& kit = state.chapterCompanion;
+                const auto captureKit = [&](const char* name) {
+                    Scene::StorageImageCapture image;
+                    std::string error;
+                    if (frame() && CompleteRtEvidenceAfterDeviceIdle(ctx, vkDeviceWaitIdle(ctx.device)) &&
+                        ctx.rtScene.CaptureStorageImage(image, error) &&
+                        WriteRgbaPng(gCampaignValidationDirectory / name, image, error)) return true;
+                    std::cerr << "Bellwether seated capture failed for " << name << ": " << error << '\n';
+                    return false;
+                };
+                const bool limitPresented = step() && waitFor([&] {
+                    return state.chapterDialogue.line == Line::TavernLimit;
+                }, hearthWaitTicks) && kit.bellwetherArrival == BellwetherArrivalStage::Seated &&
+                    std::abs(kit.acting.headYaw) < .04f && captureKit("windows-combined-kit-before-table-glance.png");
+                const bool glancePresented = limitPresented && waitFor([&] {
+                    return state.chapterDialogue.line == Line::None &&
+                        state.chapterDialogue.hearthLinesResolved == kHearthLines.size() - 1 &&
+                        kit.acting.headYaw > .55f;
+                }, hearthWaitTicks) && kit.bellwetherArrival == BellwetherArrivalStage::Seated &&
+                    kit.acting.headPitch > .20f && captureKit("windows-combined-kit-table-glance.png");
+                progressed = check(glancePresented, "Kit looks down at the table between his seated lines");
+            }
+            progressed = progressed && waitFor([&] { return state.tavernConversationAvailable; }, hearthWaitTicks);
             if (gBellwetherAnkleRestoreValidation)
                 progressed = check(progressed && ankleReloaded && !ankleReplayed,
                     "the resumed walk reaches the hearth without replaying the injury, captions or foley");

@@ -42,15 +42,21 @@ public:
         if(state_.motion.mode==CompanionMotionMode::Sitting || state_.bellwetherArrival==BellwetherArrivalStage::AnkleAssessment ||
            state_.bellwetherArrival==BellwetherArrivalStage::ProtectiveApproach)return;
         const bool seated=state_.bellwetherArrival==BellwetherArrivalStage::Seated;
-        std::optional<Tuple> lanternFromHead;
-        if(seated && lantern) {
-            const float dx=lantern->x-state_.x,dz=lantern->z-state_.z;
+        auto lookTarget = lantern;
+        if (seated && HearthTableBeat(speech)) {
+            const auto& top = bellwether::kTableTop;
+            // Use the near corner on the aisle side of the authored tabletop.
+            lookTarget = Tuple{top[0] + .42f, top[1], top[2] + .25f};
+        }
+        std::optional<Tuple> lookTargetFromHead;
+        if(seated && lookTarget) {
+            const float dx=lookTarget->x-state_.x,dz=lookTarget->z-state_.z;
             const float s=std::sin(state_.yaw),c=std::cos(state_.yaw);
             // Imported +Z faces forward and imported +X faces to Kit's left.
-            lanternFromHead=Tuple{-c*dx-s*dz-kTavernSeatedHead.x,lantern->y-state_.y-kTavernSeatedHead.y,
-                                  s*dx-c*dz-kTavernSeatedHead.z};
+            lookTargetFromHead=Tuple{-c*dx-s*dz-kTavernSeatedHead.x,lookTarget->y-state_.y-kTavernSeatedHead.y,
+                                     s*dx-c*dz-kTavernSeatedHead.z};
         }
-        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof,seated,lanternFromHead);
+        acting_.Step(seconds,speech,exterior,alive,state_.grounded,state_.walking,freshVisibleProof,seated,lookTargetFromHead);
         state_.acting=acting_.State();
     }
     void RestoreCampaignReunion(bool exterior, float playerX, float playerZ,
