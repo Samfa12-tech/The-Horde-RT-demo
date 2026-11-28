@@ -1237,6 +1237,7 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
             "ordinary Lookout load prepares both Bellwether residents with its presented scene");
         if (gBellwetherEarnTavernValidation) {
             using namespace horde::gameplay::dialogue;
+            using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
             using horde::gameplay::bellwether::kBellwetherStockHeadMounts;
             using horde::gameplay::traversal::BellwetherStation;
             using horde::gameplay::traversal::kBellwetherTavernRoute;
@@ -1563,7 +1564,6 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 (!gBellwetherExpeditionValidation || gBellwetherPreparationsValidation)) {
                 using namespace horde::gameplay::traversal;
                 using namespace horde::gameplay::bellwether;
-                using Scene = horde::vulkan::raytracing::PresentableTinyRtScene;
                 const auto junction = kBellwetherTavernRoute.begin() + kBellwetherMillJunction;
                 auto sceneEpoch = ctx.rtFrameEvidence.PublishedStateByValue().sceneEpoch;
                 auto geometryGeneration = ctx.rtScene.StaticGeometryGeneration();
