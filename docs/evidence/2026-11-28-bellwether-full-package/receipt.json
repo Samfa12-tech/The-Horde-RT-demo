@@ -89,5 +89,26 @@
   "mainMergeCommit": "2a88a9c803b97eb8a48b815afcb9f5360808c653",
   "githubPr": 73,
   "releaseGradleLintPassed": true,
-  "published": false
+  "published": false,
+  "isolatedAndroidPlaytest": {
+    "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+    "versionName": "1.8.0-bellwether-candidate",
+    "versionCode": 12,
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "abi": "arm64-v8a",
+    "apkSha256": "a838e52682cbabf0525d8aef84e30217cf117c66a6f0810b5a55d1974ef572e3",
+    "apkBytes": 277447204,
+    "nativeLibrarySha256": "a45958e01113503295ddce65b202a260f36abcc7a8dc87f166a4473a7baac054",
+    "sameDevelopmentSignerAsPriorCandidate": true,
+    "ordinaryPackageSha256": "56338e992c3ce79f159aa704a48839c10e465a56212cd70641ea2fed8c89ddf3",
+    "byteIdenticalRuntimeAssets": 295,
+    "shippingMobileModuleHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "16KiBAlignment": true,
+    "deviceRun": false
+  }
 }
