@@ -15,6 +15,7 @@ namespace {
 using Asset=assets::StaticMeshAsset;
 using Surface=gameplay::simulation::TriangleSupportSurface;
 using Point=Surface::Point;
+enum class TreePart { All, Bark, Crown };
 constexpr std::array<const char*,6> kNames{
     "pine-middle.glb","alder-middle.glb","pine-far.glb","alder-far.glb","boundary-panel.glb","woodland-low-fern.glb"};
 constexpr std::array<std::size_t,6> kTriangles{1474,1390,164,180,60,588};
@@ -107,9 +108,11 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     auto& report=prepared->report;
     // One source primitive at a time, preserving local indices and every basis
     // attribute. All temporary geometry stays CPU-side until final validation.
-    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false,bool rockContact=false) {
+    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false,
+                         bool rockContact=false,TreePart part=TreePart::All) {
         for(const auto& p:a.primitives) {
             const auto family=rockContact?4:std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
+            if((part==TreePart::Bark && family!=0) || (part==TreePart::Crown && family==0))continue;
             auto& v=vertices[family];auto& ix=indices[family];
             std::size_t end=a.vertices.size();
             for(const auto& next:a.primitives)if(next.vertexOffset>p.vertexOffset)end=std::min(end,std::size_t(next.vertexOffset));
@@ -160,8 +163,9 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         }
         return true;
     };
-    const auto appendTree=[&](unsigned asset,float x,float z,float yaw,float scale,std::optional<float> expectedY) {
-        if(asset>=4)return fail("invalid tree asset selection.");
+    const auto appendTree=[&](unsigned asset,float x,float z,float yaw,float scale,std::optional<float> expectedY,
+                              bool middleCrown=false) {
+        if(asset>=4 || (middleCrown && asset<2))return fail("invalid tree asset selection.");
         const auto& a=sources[asset];const auto support=terrain->Query(x,z);
         if(!support.found)return fail("missing tree support.");
         const float co=std::cos(yaw),si=std::sin(yaw);
@@ -177,12 +181,16 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         if(tips<4 || burial>.6501f || (expectedY && std::abs(fitted-*expectedY)>.001f))
             return fail("tree roots exceed the authored ground fit.");
         report.maximumRootBurial=std::max(report.maximumRootBurial,burial);
-        if(!append(a,[&](auto v,bool){
+        const auto transform=[&](auto v,bool){
             const auto rotate=[&](auto& f){const float vx=f[0],vz=f[2];f[0]=co*vx+si*vz;f[2]=-si*vx+co*vz;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
             v.position[0]=x+scale*v.position[0];v.position[1]=fitted+scale*v.position[1];
             v.position[2]=z+scale*v.position[2];return v;
-        },false,false,true))return fail("invalid transformed tree basis.");
+        };
+        if(!append(a,transform,false,false,true,false,middleCrown?TreePart::Bark:TreePart::All))
+            return fail("invalid transformed tree basis.");
+        if(middleCrown && !append(sources[asset-2],transform,false,false,false,false,TreePart::Crown))
+            return fail("invalid transformed tree crown.");
         return true;
     };
     for(const auto& p:surroundings_layout::trees) {
@@ -192,16 +200,23 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     if(roadEnd==ForestRoadEnd::Bellwether) {
         using namespace bellwether_woodland;
         const auto startingTreeContact=report.treeContactTriangles;
+        const auto indexCount=[&] {
+            std::size_t count=0;
+            for(const auto& family:indices)count+=family.size();
+            return count;
+        };
+        const auto startingIndices=indexCount();
         for(const auto& p:kSouthCopses) {
             const auto mark=gameplay::traversal::BellwetherMapStation(p.east,p.north);
             const unsigned asset=p.species==Species::Pine?2:3;
-            if(!appendTree(asset,mark.x,mark.z,p.yaw,p.scale,std::nullopt))return false;
+            if(!appendTree(asset,mark.x,mark.z,p.yaw,p.scale,std::nullopt,p.middleCrown))return false;
             ++report.bellwetherBackdropTrees;
-            report.bellwetherBackdropTriangles+=kTriangles[asset];
         }
-        if(report.bellwetherBackdropTriangles!=kTreeTriangles ||
+        const auto addedIndices=indexCount()-startingIndices;
+        if(addedIndices!=kTreeTriangles*3 ||
            report.treeContactTriangles-startingTreeContact!=kTreeContactTriangles)
             return fail("Bellwether copse assets changed the reviewed render or contact counts.");
+        report.bellwetherBackdropTriangles=addedIndices/3;
     }
     for(const auto& p:surroundings_layout::understory) {
         const auto& a=sources[5];const auto centre=terrain->Query(p.x,p.z);

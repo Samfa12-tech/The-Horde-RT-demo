@@ -1333,6 +1333,10 @@ for the garden. The [layout, editable source and receipt](assets/models/world/so
 identify the assets and original Bellwether surveys. The owner's *Moonlit Village
 Hub Map.png* guided the composition.
 
+The [south woodland placements](assets/models/world/source/bellwether-woodland-v1/README.md)
+reuse the original Horde pine and alder meshes and materials recorded above
+under the 1.7 whole-route woodland sources.
+
 ## Bellwether lantern archival audition — 28 November 2026
 
 The [Mureka archive receipt](docs/evidence/2026-11-28-bellwether-owner-intake/lantern-archive.json)
