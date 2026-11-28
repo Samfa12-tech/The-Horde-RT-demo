@@ -1,0 +1,405 @@
+{
+  "candidateSource": "36287d0c6ada5cb90d1300c638ee7db1e376aaa9",
+  "baseline": "../2026-11-28-bellwether-footway-lamp/receipt.json",
+  "testedWindowsExeSha256": "1030172485f7271c042543ee57a3ea8a9aef3aadf2b9f369f6a7b0c1077c2b12",
+  "backend": "RayTracingPipeline",
+  "captureMethod": "WASAPI process loopback includes only the owned game process tree. Stereo PCM16 at 44.1 kHz with fresh default Windows audio settings.",
+  "comparisonMethod": "Fit the staged wheel PCM to the live mix in a 75\u20131900 Hz band. Check about 6.283 s contact intervals and cue pan in both view directions. The residual includes score and other game audio.",
+  "wheelSourceSha256": "f885cfe1d3332d0fce88e3b17804866a8917bcafb4f59550162b1a6bd29aaf65",
+  "wheelSourceRegenerationVerified": true,
+  "ordinaryWalk": "Load a separate earned tavern save through the normal menu and walk past the causeway turn up the dry footway.",
+  "captureStartApproximateDistanceMetresBetweenRunsFromLantern": 0.399,
+  "operating": {
+    "stage": "RigTested",
+    "seedSha256": "e24aeebaca5893aaba99d10d64ba31a5c24b4ea24fc5bfdc75d7134cd5c9c4aa",
+    "footwayBeforeCapture": {
+      "frameSha256": "8a7a67130443f1e35102de0e9f8e55a5fc5fb75210de08e9e5d8d3c93c7c70fc",
+      "heldLanternWorldPosition": [
+        135.093597,
+        -19.5717354,
+        113.577347
+      ]
+    },
+    "facingNorth": {
+      "frameSha256": "a1f86508458dbfbe89395c8b0e49442f5deb9618bc15f4f4219ab9df32523507",
+      "heldLanternWorldPosition": [
+        135.096359,
+        -19.5740585,
+        113.572014
+      ]
+    },
+    "facingSouth": {
+      "frameSha256": "022a3d7c6dc8802f08ce7054717b2af675e6d1da8bfb8aad5999006c6a671257",
+      "heldLanternWorldPosition": [
+        135.635101,
+        -19.5996742,
+        114.571266
+      ]
+    },
+    "northCapture": {
+      "captureSha256": "4db1d99908a652b37646431162ffc7c64ffd07a7db39d1f7198f9f39b0f4755c",
+      "captureSeconds": 25.98,
+      "captureLogSha256": "38b5f902e1e643f3135ff35124bd98be6c91da6afa8de07b26ad255d4cd59346",
+      "frames": 1145718,
+      "peakDbfs": -16.21,
+      "clippedSamples": 0,
+      "discontinuities": 0,
+      "strongestMatches": [
+        {
+          "seconds": 1.8659,
+          "correlation": 0.84145,
+          "fittedRmsDbfs": -47.97,
+          "fittedToResidualDb": 3.85,
+          "rightMinusLeftDb": 5.04
+        },
+        {
+          "seconds": 14.4359,
+          "correlation": 0.25493,
+          "fittedRmsDbfs": -47.77,
+          "fittedToResidualDb": -11.58,
+          "rightMinusLeftDb": 4.92
+        },
+        {
+          "seconds": 8.1559,
+          "correlation": 0.15839,
+          "fittedRmsDbfs": -48.71,
+          "fittedToResidualDb": -15.9,
+          "rightMinusLeftDb": 4.53
+        },
+        {
+          "seconds": 20.716,
+          "correlation": 0.1323,
+          "fittedRmsDbfs": -50.19,
+          "fittedToResidualDb": -17.49,
+          "rightMinusLeftDb": 3.88
+        },
+        {
+          "seconds": 18.2437,
+          "correlation": 0.09563,
+          "fittedRmsDbfs": -54.59,
+          "fittedToResidualDb": -20.35,
+          "rightMinusLeftDb": 2.62
+        }
+      ]
+    },
+    "southCapture": {
+      "captureSha256": "f75dec6cc67509fd62386ce510a32a66a52e7b3772035b863e80d8dbf8ec734c",
+      "captureSeconds": 18.99,
+      "captureLogSha256": "2e3e0e8349314d6c80633709c3d9fba21961be4ced2c332d2df34b898d6afbf3",
+      "frames": 837459,
+      "peakDbfs": -15.09,
+      "clippedSamples": 0,
+      "discontinuities": 0,
+      "strongestMatches": [
+        {
+          "seconds": 11.5359,
+          "correlation": 0.31408,
+          "fittedRmsDbfs": -47.86,
+          "fittedToResidualDb": -9.61,
+          "rightMinusLeftDb": -4.96
+        },
+        {
+          "seconds": 5.2559,
+          "correlation": 0.17721,
+          "fittedRmsDbfs": -48.99,
+          "fittedToResidualDb": -14.89,
+          "rightMinusLeftDb": -4.22
+        },
+        {
+          "seconds": 16.4671,
+          "correlation": 0.1187,
+          "fittedRmsDbfs": -53.59,
+          "fittedToResidualDb": -18.45,
+          "rightMinusLeftDb": 2.21
+        },
+        {
+          "seconds": 0.2137,
+          "correlation": 0.11526,
+          "fittedRmsDbfs": -54.5,
+          "fittedToResidualDb": -18.71,
+          "rightMinusLeftDb": 2.48
+        },
+        {
+          "seconds": 17.8159,
+          "correlation": 0.10556,
+          "fittedRmsDbfs": -50.72,
+          "fittedToResidualDb": -19.48,
+          "rightMinusLeftDb": -5.21
+        }
+      ]
+    },
+    "northVerifiedContacts": [
+      {
+        "seconds": 1.8659,
+        "correlation": 0.84145,
+        "fittedRmsDbfs": -47.97,
+        "fittedToResidualDb": 3.85,
+        "rightMinusLeftDb": 5.04
+      },
+      {
+        "seconds": 8.1559,
+        "correlation": 0.15839,
+        "fittedRmsDbfs": -48.71,
+        "fittedToResidualDb": -15.9,
+        "rightMinusLeftDb": 4.53
+      },
+      {
+        "seconds": 14.4359,
+        "correlation": 0.25493,
+        "fittedRmsDbfs": -47.77,
+        "fittedToResidualDb": -11.58,
+        "rightMinusLeftDb": 4.92
+      },
+      {
+        "seconds": 20.716,
+        "correlation": 0.1323,
+        "fittedRmsDbfs": -50.19,
+        "fittedToResidualDb": -17.49,
+        "rightMinusLeftDb": 3.88
+      }
+    ],
+    "southVerifiedContacts": [
+      {
+        "seconds": 5.2559,
+        "correlation": 0.17721,
+        "fittedRmsDbfs": -48.99,
+        "fittedToResidualDb": -14.89,
+        "rightMinusLeftDb": -4.22
+      },
+      {
+        "seconds": 11.5359,
+        "correlation": 0.31408,
+        "fittedRmsDbfs": -47.86,
+        "fittedToResidualDb": -9.61,
+        "rightMinusLeftDb": -4.96
+      },
+      {
+        "seconds": 17.8159,
+        "correlation": 0.10556,
+        "fittedRmsDbfs": -50.72,
+        "fittedToResidualDb": -19.48,
+        "rightMinusLeftDb": -5.21
+      }
+    ],
+    "gameExitCode": 0
+  },
+  "stoppedControl": {
+    "stage": "BearingNeeded",
+    "seedSha256": "7cc071a1a076b6d6c933cc939c422d14574e9fdb49f1707f7b53dcc968086452",
+    "footwayBeforeCapture": {
+      "frameSha256": "8833e1423b80dc60c706f147cf2a13acdd9a8f9e5821f69d08778f06d12abb4c",
+      "heldLanternWorldPosition": [
+        134.716827,
+        -19.5126514,
+        113.45903
+      ]
+    },
+    "facingNorth": {
+      "frameSha256": "ba525ede1f196d40bc62ba9580658afa2d0ea6a7cbfd7e37e17d843b288ec074",
+      "heldLanternWorldPosition": [
+        134.719269,
+        -19.514246,
+        113.449608
+      ]
+    },
+    "capture": {
+      "captureSha256": "f99afbb7543c612404537784a7941f504e2c80ede05ef73d5e5e785da2906552",
+      "captureSeconds": 25.98,
+      "captureLogSha256": "b483cc93382bf16cc9200a54b582cc3c0ca5f468bff2fa98569c8b0fe7b8e597",
+      "frames": 1145718,
+      "peakDbfs": -16.25,
+      "clippedSamples": 0,
+      "discontinuities": 0,
+      "strongestMatches": [
+        {
+          "seconds": 12.5871,
+          "correlation": 0.1153,
+          "fittedRmsDbfs": -54.5,
+          "fittedToResidualDb": -18.71,
+          "rightMinusLeftDb": 2.45
+        },
+        {
+          "seconds": 2.5871,
+          "correlation": 0.09587,
+          "fittedRmsDbfs": -54.57,
+          "fittedToResidualDb": -20.33,
+          "rightMinusLeftDb": 2.58
+        },
+        {
+          "seconds": 17.4094,
+          "correlation": 0.08649,
+          "fittedRmsDbfs": -56.24,
+          "fittedToResidualDb": -21.23,
+          "rightMinusLeftDb": 0.0
+        },
+        {
+          "seconds": 5.7222,
+          "correlation": 0.08189,
+          "fittedRmsDbfs": -57.37,
+          "fittedToResidualDb": -21.71,
+          "rightMinusLeftDb": 2.57
+        },
+        {
+          "seconds": 22.4133,
+          "correlation": 0.06891,
+          "fittedRmsDbfs": -59.26,
+          "fittedToResidualDb": -23.21,
+          "rightMinusLeftDb": 2.44
+        }
+      ]
+    },
+    "wheelContactTrainIdentified": false,
+    "gameExitCode": 0
+  },
+  "bothIsolatedSavesUnchanged": true,
+  "normalSaveProfileUnchanged": true,
+  "passingHostTests": [
+    "horde_rt_chapter_local_ambience_tests"
+  ],
+  "remaining": "The adjusted cue has more presence. Relative mix varies with the score. Subjective listening approval and the physical handset check remain open.",
+  "mixAdjustment": {
+    "contentCommit": "9589fe2d22cec60ef3a83f6418deda6d89aa3ff1",
+    "changedLayer": "Wheel PCM only in the exact sealed Windows payload",
+    "newWheelSourceSha256": "5d49a102abed34be4cee6426d1801e1670bdee17d56106d7d541c8048cf1f195",
+    "newPeakSample": 12600,
+    "sourceGainDb": 6.02,
+    "capturePositionDistanceMetresFromLantern": 0.465,
+    "defaultMixMedianFittedWheelBeforeDbfs": -48.34,
+    "defaultMixMedianFittedWheelAfterDbfs": -43.54,
+    "defaultMixMedianFittedWheelChangeDb": 4.8,
+    "verifiedContacts": [
+      {
+        "seconds": 0.7159,
+        "correlation": 0.39928,
+        "fittedRmsDbfs": -42.51,
+        "fittedToResidualDb": -7.22,
+        "rightMinusLeftDb": 7.04
+      },
+      {
+        "seconds": 6.9859,
+        "correlation": 0.28691,
+        "fittedRmsDbfs": -44.57,
+        "fittedToResidualDb": -10.47,
+        "rightMinusLeftDb": 6.68
+      },
+      {
+        "seconds": 13.2759,
+        "correlation": 0.29865,
+        "fittedRmsDbfs": -42.19,
+        "fittedToResidualDb": -10.09,
+        "rightMinusLeftDb": 6.72
+      },
+      {
+        "seconds": 19.5559,
+        "correlation": 0.14661,
+        "fittedRmsDbfs": -45.3,
+        "fittedToResidualDb": -16.58,
+        "rightMinusLeftDb": 7.48
+      }
+    ],
+    "footwayCapture": {
+      "frameSha256": "258e121581d4afa9a096d3b2f815b05506c21290484aaee9dae045c4744202e4",
+      "heldLanternWorldPosition": [
+        134.645935,
+        -19.5248508,
+        113.465439
+      ],
+      "captureSha256": "cbe1f0eadbd6ba3153b59665fb25337d773a7c1c6d86b941277513bcc38d55f2",
+      "captureLogSha256": "cd321b9e4d43b8ca39e176a085d9828ef2ca0dcb183ff6ef09d6b99772700478",
+      "frames": 1145718,
+      "peakDbfs": -15.42,
+      "clippedSamples": 0,
+      "discontinuities": 0,
+      "strongestMatches": [
+        {
+          "seconds": 0.7159,
+          "correlation": 0.39928,
+          "fittedRmsDbfs": -42.51,
+          "fittedToResidualDb": -7.22,
+          "rightMinusLeftDb": 7.04
+        },
+        {
+          "seconds": 13.2759,
+          "correlation": 0.29865,
+          "fittedRmsDbfs": -42.19,
+          "fittedToResidualDb": -10.09,
+          "rightMinusLeftDb": 6.72
+        },
+        {
+          "seconds": 6.9859,
+          "correlation": 0.28691,
+          "fittedRmsDbfs": -44.57,
+          "fittedToResidualDb": -10.47,
+          "rightMinusLeftDb": 6.68
+        },
+        {
+          "seconds": 19.5559,
+          "correlation": 0.14661,
+          "fittedRmsDbfs": -45.3,
+          "fittedToResidualDb": -16.58,
+          "rightMinusLeftDb": 7.48
+        },
+        {
+          "seconds": 17.1116,
+          "correlation": 0.09156,
+          "fittedRmsDbfs": -50.07,
+          "fittedToResidualDb": -20.73,
+          "rightMinusLeftDb": -1.05
+        }
+      ]
+    },
+    "closerToWheelCapture": {
+      "frameSha256": "9728f2e5e853580992e8c7d9e7e6e2fbdceac4ea38d8b193c0e05dd8844c23ad",
+      "heldLanternWorldPosition": [
+        134.713898,
+        -18.1182251,
+        109.804611
+      ],
+      "captureSha256": "d9d9809ac31dce272414cf427c355a989d48e885c9881bbffeecb4bc26ad2bd1",
+      "captureLogSha256": "4e7f798bb1a272a5ed75cba382f835a544aedcbfd8f5a9957d0a44618715ea04",
+      "frames": 661059,
+      "peakDbfs": -17.96,
+      "clippedSamples": 0,
+      "discontinuities": 0,
+      "strongestMatches": [
+        {
+          "seconds": 8.3059,
+          "correlation": 0.97026,
+          "fittedRmsDbfs": -39.77,
+          "fittedToResidualDb": 12.06,
+          "rightMinusLeftDb": 1.84
+        },
+        {
+          "seconds": 2.0259,
+          "correlation": 0.69634,
+          "fittedRmsDbfs": -42.3,
+          "fittedToResidualDb": -0.26,
+          "rightMinusLeftDb": 1.87
+        },
+        {
+          "seconds": 13.6784,
+          "correlation": 0.09179,
+          "fittedRmsDbfs": -50.1,
+          "fittedToResidualDb": -20.71,
+          "rightMinusLeftDb": -1.05
+        },
+        {
+          "seconds": 0.9401,
+          "correlation": 0.06168,
+          "fittedRmsDbfs": -60.23,
+          "fittedToResidualDb": -24.18,
+          "rightMinusLeftDb": 2.76
+        },
+        {
+          "seconds": 11.7856,
+          "correlation": 0.05565,
+          "fittedRmsDbfs": -59.27,
+          "fittedToResidualDb": -25.08,
+          "rightMinusLeftDb": -1.35
+        }
+      ]
+    },
+    "normalAndIsolatedSaveUnchanged": true,
+    "chapterLocalAmbienceRetestPassed": true
+  }
+}
