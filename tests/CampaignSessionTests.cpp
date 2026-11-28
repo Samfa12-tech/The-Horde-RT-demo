@@ -148,7 +148,17 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     const auto partial=Read(directory.path,1,cp::SaveKind::Autosave).checkpoint;
     Check(partial.schema==cp::kHearthSpeechSchema && partial.dialogue.hearthLinesResolved==2 &&
           partial.dialogue.activeLine==Line::None,"dated autosave retains only the resolved hearth beats");
-    for(unsigned tick=0;tick<50;++tick)fresh.StepFixed(input,1.f/60.f,++publication);
+    for(unsigned tick=0;tick<30;++tick)fresh.StepFixed(input,1.f/60.f,++publication);
+    const auto tableLook = fresh.Snapshot().chapterCompanion;
+    Check(fresh.Snapshot().chapterDialogue.line == Line::None && seated() &&
+          tableLook.acting.headYaw > .30f && tableLook.acting.headPitch > .17f && tableLook.acting.chestPitch == 0.f,
+          "Kit turns down toward the real table during the quiet beat and keeps the seated pose");
+    input.paused = true;
+    fresh.StepFixed(input,1.f/60.f,++publication);
+    Check(fresh.Snapshot().chapterCompanion.acting == tableLook.acting,
+          "pausing the quiet beat holds Kit's gaze");
+    input.paused = false;
+    for(unsigned tick=0;tick<20;++tick)fresh.StepFixed(input,1.f/60.f,++publication);
     Check(fresh.Snapshot().chapterDialogue.line==Line::TavernWork,"Kit's offer follows the seated pause");
     const auto previousSave=play.State().operationRevision;
     ++input.commands.dialogueSkip;
@@ -160,11 +170,16 @@ void CheckTavernRoundTrip(const std::shared_ptr<const sim::TriangleSupportSurfac
     sim::InputSnapshot resumedInput;resumedInput.yawRadians=record.yaw;resumedInput.pitchRadians=record.pitch;
     resumed.StepFixed(resumedInput,1.f/60.f,1);
     Check(resumed.Snapshot().chapterDialogue.line==Line::TavernWork,"partial restore resumes the first unresolved caption");
+    for (unsigned tick = 2; tick <= 45; ++tick) resumed.StepFixed(resumedInput, 1.f / 60.f, tick);
+    Check(resumed.Snapshot().chapterCompanion.acting.headYaw > .45f,
+          "resuming the unfinished offer keeps its opening table glance");
     Check(complete.dialogue.hearthLinesResolved==3 && Seed(resumed,complete,terrain),"completed dialogue restores from disk");
-    resumed.StepFixed(resumedInput,1.f/60.f,2);
-    Check(resumed.Snapshot().chapterDialogue.line==Line::None,"completed hearth captions remain quiet on reload");
+    resumed.StepFixed(resumedInput,1.f/60.f,46);
+    Check(resumed.Snapshot().chapterDialogue.line==Line::None &&
+          resumed.Snapshot().chapterCompanion.acting==CompanionActingPose{},
+          "completed hearth captions and acting remain quiet on reload");
     ++resumedInput.commands.interact;
-    resumed.StepFixed(resumedInput,1.f/60.f,3);
+    resumed.StepFixed(resumedInput,1.f/60.f,47);
     Check(!resumed.Snapshot().tavernConversationAvailable && resumed.Snapshot().chapterDialogue.line==Line::None,
           "the real tavern remains quiet on Interact until a keeper is admitted");
 

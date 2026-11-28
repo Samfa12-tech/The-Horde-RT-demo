@@ -12,6 +12,11 @@ struct CompanionActingPose {
 // Model-space inclination at the last frame of Kit|hearth_sit.
 inline constexpr float kTavernSeatedHeadRestPitch=.105f;
 
+inline bool HearthTableBeat(const Snapshot& speech) {
+    return speech.line == Line::TavernLimit || speech.line == Line::TavernWork ||
+        (speech.line == Line::None && speech.hearthLinesResolved == kHearthLines.size() - 1);
+}
+
 // Transient 60 Hz presentation state. Story, route, speech completion and saves
 // remain authoritative elsewhere; an animation can never accept lantern proof.
 class CompanionActing {
@@ -20,7 +25,7 @@ public:
     void Reset() {state_={};recognitionSeconds_=-1;}
     void Step(float seconds,const Snapshot& speech,bool exterior,bool alive,
               bool grounded,bool walking,bool freshVisibleProof,bool seated=false,
-              std::optional<Tuple> lanternFromHead={}) {
+              std::optional<Tuple> lookTargetFromHead={}) {
         if(speech.paused || !std::isfinite(seconds) || seconds<=0)return;
         const float dt=std::min(seconds,.05f);
         const bool body=exterior && alive && grounded;
@@ -42,6 +47,11 @@ public:
             speech.line==Line::TavernIntroduce || speech.line==Line::TavernHoardAnswer || IsKitTreasureTalkLine(speech.line) ||
             (IsTavernLanternLine(speech.line) && !IsTavernLanternVoice(speech.line)));
         const bool listening=seated && IsTavernLanternVoice(speech.line);
+        const bool tableBeat = seated && HearthTableBeat(speech);
+        float glance = tableBeat && speech.line == Line::None ? 1.f : 0.f;
+        const auto ease=[](float value) {
+            const float x=std::clamp(value,0.f,1.f);return x*x*(3.f-2.f*x);
+        };
         if(body && (standingLine || seatedLine || listening) &&
            std::isfinite(speech.elapsed) && std::isfinite(speech.duration) && speech.duration>0) {
             const float t=std::clamp(speech.elapsed,0.0f,speech.duration);
@@ -50,20 +60,21 @@ public:
             headPitch=listening?0.f:static_cast<float>(.035*std::sin(double(t)*5)*envelope);
             headYaw=listening?0.f:static_cast<float>(.025*std::sin(double(t)*2.3)*envelope);
             chestPitch=walking || seated ? 0 : static_cast<float>(.012*std::sin(double(t)*3.1)*envelope);
-            if((speech.line==Line::TavernIntroduce || IsTavernLanternLine(speech.line)) && lanternFromHead &&
-               std::isfinite(lanternFromHead->x) && std::isfinite(lanternFromHead->y) &&
-               std::isfinite(lanternFromHead->z) && lanternFromHead->z>.1f) {
-                // During "something worth the climb", look toward the prop.
-                // The shoulders and contact pose remain on the seated clip.
-                const float progress=t/speech.duration;
-                const auto ease=[](float value) {
-                    const float x=std::clamp(value,0.f,1.f);return x*x*(3.f-2.f*x);
-                };
-                const float glance=ease((progress-.35f)/.20f)*ease((.88f-progress)/.19f);
-                const auto& target=*lanternFromHead;
-                const float pitch=std::atan2(-target.y,std::hypot(target.x,target.z));
-                headPitch=std::lerp(headPitch,std::clamp(pitch-kTavernSeatedHeadRestPitch,-.24f,.35f),glance);
-                headYaw=std::lerp(headYaw,std::clamp(std::atan2(target.x,target.z),-.47f,.47f),glance);
+            const float progress = t / speech.duration;
+            if (speech.line == Line::TavernLimit && tableBeat)
+                glance = ease((progress - .82f) / .18f);
+            else if (speech.line == Line::TavernWork && tableBeat)
+                glance = ease((.45f - progress) / .28f);
+            else if (speech.line == Line::TavernIntroduce || IsTavernLanternLine(speech.line))
+                glance = ease((progress - .35f) / .20f) * ease((.88f - progress) / .19f);
+        }
+        if (body && seated && glance > 0.f && lookTargetFromHead) {
+            const auto& target = *lookTargetFromHead;
+            if (std::isfinite(target.x) && std::isfinite(target.y) && std::isfinite(target.z) && target.z > .1f) {
+                const float pitch = std::atan2(-target.y, std::hypot(target.x, target.z));
+                const float yawLimit = tableBeat ? .67f : .47f;
+                headPitch = std::lerp(headPitch, std::clamp(pitch - kTavernSeatedHeadRestPitch, -.24f, .35f), glance);
+                headYaw = std::lerp(headYaw, std::clamp(std::atan2(target.x, target.z), -yawLimit, yawLimit), glance);
             }
         }
         headPitch+=.14f*recognition;chestPitch+=.035f*recognition;
