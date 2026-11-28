@@ -284,6 +284,7 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
     const auto& houseLight=horde::gameplay::bellwether::kHouseBLampLight;
     const auto& houseFlame=horde::gameplay::bellwether::kHouseBLampFlame;
     auto houseLamp=MakeHouseBLampEmitter();
+    ResetFireEmitter(houseLamp);
     StepFireEmitterFixed(houseLamp,HouseBLampFireInput(),kFixedDelta);
     bool houseAnchor=true;
     for(std::size_t axis=0;axis<3;++axis)
@@ -297,8 +298,11 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
         BuildFireEmitterUpload(houseFires,{houseLight,ShowcaseZone::Outside,8.f},{},
             FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
             upload.selectedStableIds[0]==kHouseBLampEmitterId &&
+        Approx(houseLamp.strength,1.f) && Approx(houseLamp.authoredStrengthScale,1.6f) &&
+        Approx(upload.emitters[0].lightPositionStrength[3],1.6f*(.88f+.12f*houseLamp.lowPassNoise)) &&
+        Approx(upload.emitters[0].colourIntensity[3],upload.emitters[0].lightPositionStrength[3]) &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
-        "the store room and ramp use the pinned wick with the held lantern, within the existing fire budget");
+        "the stock-room wick keeps its authored output through reset and uploads beside the held lantern");
     const auto& churchLight=horde::gameplay::bellwether::kChurchRecordStationLight;
     auto churchLamp=MakeChurchRecordLampEmitter();
     StepFireEmitterFixed(churchLamp,ChurchRecordLampFireInput(),kFixedDelta);

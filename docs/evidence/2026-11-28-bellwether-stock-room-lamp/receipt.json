@@ -1,0 +1,147 @@
+{
+  "candidateSourceCommit": "a587c2795b93baab66ec9470fe493081725b3e45",
+  "baselineCaptureSourceCommit": "ddcc206d3f87b3adc7339cd39c59e537523599f8",
+  "backendComparisons": {
+    "pipeline": {
+      "nativeChecksPassed": 36,
+      "views": {
+        "approach": {
+          "simulationTick": 18069,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.871820271,
+          "wickStrengthAfter": 1.39491248,
+          "luminanceRegion": [
+            350,
+            345,
+            650,
+            650
+          ],
+          "mean8BitLuminanceBefore": 18.39,
+          "mean8BitLuminanceAfter": 19.12,
+          "beforeSha256": "9148c176ad9e0a6632a6034f4cbc9b474f96a5900dbfd0803782368352ddae0b",
+          "afterSha256": "0b196132cb3b3e0a6855823cb9b1e76c55df22cd668fb3ee6e6c3705cd6d5962"
+        },
+        "room": {
+          "simulationTick": 18332,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.813400865,
+          "wickStrengthAfter": 1.30144143,
+          "luminanceRegion": [
+            100,
+            470,
+            298,
+            696
+          ],
+          "mean8BitLuminanceBefore": 5.96,
+          "mean8BitLuminanceAfter": 8.66,
+          "beforeSha256": "8023fccf52f73acb702357024577d7a8783cc9abda85995f2e431ad23d25fefe",
+          "afterSha256": "4c6c92f4c61f8f6f7dd71711336d3be1f052239a453a80fd12ab67ce55ba880a"
+        },
+        "stock-ledger": {
+          "simulationTick": 18403,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.848192394,
+          "wickStrengthAfter": 1.35710788,
+          "luminanceRegion": [
+            489,
+            450,
+            733,
+            535
+          ],
+          "mean8BitLuminanceBefore": 10.53,
+          "mean8BitLuminanceAfter": 14.43,
+          "beforeSha256": "0ffa34e8aac37c5e06dd0383081f1f7136c31556bdcf6f512b9291dbd51048f6",
+          "afterSha256": "4240aac4c932e46a0ad790bdc2314b21868bfc523e4713eb3e5780ca1c5c1f6a"
+        }
+      },
+      "unchangedControlFrames": {
+        "windows-combined-square-waymarker.png": "e757b9baae69c5ebbdb0ec9c84246f785fb7c41cec2a7cbd42366c8a4c3a8191",
+        "windows-combined-west-trade.png": "0fb2588fb60fdaed1157fa353b351b7d586285c03c0adc4de2f82ba4dd288be2"
+      }
+    },
+    "query": {
+      "nativeChecksPassed": 36,
+      "views": {
+        "approach": {
+          "simulationTick": 18069,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.871820271,
+          "wickStrengthAfter": 1.39491248,
+          "luminanceRegion": [
+            350,
+            345,
+            650,
+            650
+          ],
+          "mean8BitLuminanceBefore": 18.39,
+          "mean8BitLuminanceAfter": 19.12,
+          "beforeSha256": "1da386704abf928d5d8f7b7e3a2117c4e17dfe5d7df5d5d34b6de7e2f19697c1",
+          "afterSha256": "b249bde5e6b1f6efd5e8c250eabfeef2e7a980ed7492983e59e9989bea01805f"
+        },
+        "room": {
+          "simulationTick": 18332,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.813400865,
+          "wickStrengthAfter": 1.30144143,
+          "luminanceRegion": [
+            100,
+            470,
+            298,
+            696
+          ],
+          "mean8BitLuminanceBefore": 5.96,
+          "mean8BitLuminanceAfter": 8.66,
+          "beforeSha256": "45ce91677bb9f318ce4bed90c1b595db69aae46ee6141b74a17b10bf7a976b86",
+          "afterSha256": "864c8fe57f05ce16682ae88acb1d8d6af0f24e4aad2d82981b817d075eb8076e"
+        },
+        "stock-ledger": {
+          "simulationTick": 18403,
+          "resolution": [
+            1232,
+            803
+          ],
+          "lightCount": 2,
+          "wickStrengthBefore": 0.848192394,
+          "wickStrengthAfter": 1.35710788,
+          "luminanceRegion": [
+            489,
+            450,
+            733,
+            535
+          ],
+          "mean8BitLuminanceBefore": 10.53,
+          "mean8BitLuminanceAfter": 14.43,
+          "beforeSha256": "3b92f10ca40743054891ca4c74fb9b27b0a35cdb2a27ab4ad8695c7be98ce8c9",
+          "afterSha256": "293ccc1d8aec6e2efd984fa4d9192041b28ae035eb9bbe8d485f8654534fc818"
+        }
+      },
+      "unchangedControlFrames": {
+        "windows-combined-square-waymarker.png": "955575e9b0e3282303436fe4920d830eec1f9f1a221804c17c2a30e4b7be7267",
+        "windows-combined-west-trade.png": "1c1d89bad2b2a4f62c98600c4dd49d88073db5277266bbf05148249c76760bdc"
+      }
+    }
+  },
+  "windowsFireEmitterSuitePassed": true,
+  "androidArm64NativeBuildPassed": true,
+  "androidDeviceRun": false
+}
