@@ -37,6 +37,23 @@ public:
     static constexpr float kBodyHeight = 1.78f;
     const std::optional<TavernKeeperPose>& Pose() const { return pose_; }
 
+    void TurnAtDoor(float seconds, const std::optional<Tuple>& visitor) {
+        if (!pose_ || pose_->stage != TavernKeeperStage::AtDoor) return;
+        constexpr float fullTurn = 6.28318530718f;
+        constexpr float attentionArc = .65f;
+        float target = bellwether::kKeeperDoorFacingRadians;
+        if (visitor && std::isfinite(visitor->x) && std::isfinite(visitor->z)) {
+            const float dx = visitor->x - pose_->foot[0];
+            const float dz = visitor->z - pose_->foot[2];
+            if (std::hypot(dx, dz) > .001f) {
+                // Keep the keeper oriented toward the threshold as Kit passes her.
+                const float offset = std::remainder(std::atan2(dx, -dz) - target, fullTurn);
+                target += std::clamp(offset, -attentionArc, attentionArc);
+            }
+        }
+        pose_->yaw = TurnResidentYaw(pose_->yaw, target, seconds, 1.5f);
+    }
+
     void TurnAtHearth(float seconds,bool attending,float visitorX,float visitorZ) {
         if(!pose_ || pose_->stage!=TavernKeeperStage::AtHearth || !std::isfinite(visitorX) ||
            !std::isfinite(visitorZ))return;

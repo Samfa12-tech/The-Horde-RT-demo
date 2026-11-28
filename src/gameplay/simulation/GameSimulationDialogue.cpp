@@ -737,7 +737,9 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         };
         if(approaching || chapterDialogue_.State().line==Line::TavernWelcome)
             c.tavernDoorInReach=playerSupport_.grounded && audibleFromDoor(c.listener);
-        c.kitAtSouthDoor=c.tavernDoorInReach && approaching && audibleFromDoor(*c.companionSource);
+        const bool kitAtDoor = approaching && audibleFromDoor(*c.companionSource);
+        c.kitAtSouthDoor = c.tavernDoorInReach && kitAtDoor;
+        tavernKeeper_.TurnAtDoor(seconds, kitAtDoor ? c.companionSource : std::nullopt);
     }
     if(c.exterior&&!c.traversing&&!chapterFirstExterior_) {
         chapterFirstExterior_=true;
