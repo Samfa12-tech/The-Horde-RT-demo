@@ -184,6 +184,8 @@ The [market and working yards](../assets/models/world/source/bellwether-working-
 
 Two lines of worn flagstones link the public lane to the market's open vegetable trays and earthenware jars. An east-side track skirts the market wall to the store's loading bench and two casks. The Windows playtest came back past the market wall to the well from the loading yard. This pass leaves space for 2,747 obstacle triangles with both refill basins reserved. [Market and store route evidence](evidence/2026-11-28-bellwether-market-yard/receipt.json)
 
+A hooded oil lamp picks out the store's plank door, step and loading yard as the player rounds the bend. A shutter marks the loft above the door. The Windows build selected the store lamp alongside the held lantern and passed the return walk to the well. The two refill basins are reserved with 2,227 obstacle triangles to spare. [Store approach evidence](evidence/2026-11-28-bellwether-store-frontage/receipt.json)
+
 [Fern clumps](../assets/models/world/source/bellwether-woodland-v1/README.md) grow along the market wall, store track and southern woodland, with smaller pockets by the tavern delivery wall and common. They clear the existing stone paths and take no obstacle faces. Fresh Windows profiles and graphics Reset now select **Higher**, the highest shadow setting. A private Windows run confirmed four local and two sky shadow samples on the tavern-to-store round trip, and a second launch rendered with its saved **Current** setting. [Planting route and shadow-setting evidence](evidence/2026-11-28-bellwether-understory/receipt.json)
 
 A short stone fork from the lower road leads to the mapped east door of
