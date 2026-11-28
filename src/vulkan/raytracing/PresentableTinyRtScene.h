@@ -1098,6 +1098,10 @@ public:
     // re-record command buffers invalidated by the descriptor update.
     // Allocation/preflight failure leaves the previous output resources intact.
     bool ResizeOutputAfterDeviceIdle(VkExtent2D extent, std::string& diagnostic);
+    void SetPresentationFormat(VkFormat format) noexcept
+    {
+        presentationUsesBgra_ = format == VK_FORMAT_B8G8R8A8_UNORM || format == VK_FORMAT_B8G8R8A8_SRGB;
+    }
 
     // Submit a successfully recorded frame before calling. Synchronously reads
     // the last RT-produced storage image; rejects a new output with no frame.
