@@ -198,6 +198,8 @@ A hooded oil lamp picks out the store's plank door, step and loading yard as the
 
 Eighteen pines and alders now frame the west lane and kitchen plots on the surveyed slope. The ordinary Windows replay reached the relic dealer and stock pen at **Higher** shadows. The distant ground-to-sky colour transition is still visible between trees. Handset validation remains open. [West woodland evidence](evidence/2026-11-28-bellwether-west-woodland/receipt.json)
 
+The regional haze now takes on the colour of the sky along the same world-space ray between 800 metres and 2.4 kilometres. The Windows replay showed a smooth transition in the sky gaps at the square and relic stall. The nearer slope at the garden still reads against the sky. [Horizon evidence](evidence/2026-11-28-bellwether-horizon/receipt.json)
+
 A short stone fork from the lower road leads to the mapped east door of
 [House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
 private store-room candidate gives the village a second walk-in building,

@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "sourceCommit": "167a153b05346bba841896fad8f2cf801734c575",
+  "baselineCommit": "c9b17ff71dccc331ea58a3a06c87f345e42cfa08",
+  "evidenceClass": "Ordinary foreground Windows Release play on RayTracingPipeline",
+  "launch": {
+    "executableSha256": "44d565a0ad8ba0ffa2d83e5f0bc3e560db44e9c13251ae17e2110f7720a32a55",
+    "baselineExecutableSha256": "004894f68b132bb13ace165a721a7ed9b025573ba5c19a8c220b4f73e2d25b91",
+    "baseArchiveSha256": "aaa602f56cc64387b42c028a8735c7cf9602a1cb7330c97a73c4877939efd3c3",
+    "byteIdenticalNonExecutableEntries": 296,
+    "saveSeedSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "isolatedAndOriginalSavesUnchanged": true,
+    "gameExitCode": 0
+  },
+  "comparison": {
+    "baselineReceipt": "../2026-11-28-bellwether-west-woodland/receipt.json",
+    "method": "Same mouse and keyboard route and resolution with small movement and framing differences. Gap samples are crop-based observations from ordinary play.",
+    "renderExtent": [
+      1232,
+      803
+    ],
+    "shadowSetting": "Higher",
+    "activeShaderSha256": "275216b13a0bb5678fa73d52a15c3153d3d05a7df00d7da4d175f5ebc076b429",
+    "markers": [
+      {
+        "view": "Square fingerpost",
+        "filename": "frame-003.png",
+        "baselineSha256": "e6c2c55d10a8862e3757990eb6e25ac9f9f4969601e1453b7814b9e04446cbea",
+        "candidateSha256": "ea41769e5c492de8d8496d97786309ee23320d0cedb598d715a966d674d35c5d",
+        "gapMeasurement": {
+          "exclusiveCropXYXY": [
+            420,
+            204,
+            521,
+            246
+          ],
+          "maximumAdjacentRowMedianChannelStep": {
+            "baseline": 23.0,
+            "candidate": 2.0
+          }
+        }
+      },
+      {
+        "view": "Relic dealer",
+        "filename": "frame-008.png",
+        "baselineSha256": "a83e6a8872a47b736d3b0d28d87b91173e57214c21ec02ad82835ce163212836",
+        "candidateSha256": "ac9da5374a269a9791ebd1e21222da8b3bc6a0b5d700cc2b0551c18d06dcaf18",
+        "gapMeasurement": {
+          "exclusiveCropXYXY": [
+            167,
+            204,
+            206,
+            246
+          ],
+          "maximumAdjacentRowMedianChannelStep": {
+            "baseline": 32.0,
+            "candidate": 3.0
+          }
+        }
+      },
+      {
+        "view": "West lane during trade line",
+        "filename": "frame-010.png",
+        "baselineSha256": "1e50ac5276ebe4a7fb7711d13b7e9ca2412b75f6116c86b6739dd8183dbf9141",
+        "candidateSha256": "62d7ea01f16d59096d7f51d4e7781d6e832cbeb098ed4241af68a5cbab658ac9"
+      },
+      {
+        "view": "Kitchen plots and stock pen",
+        "filename": "frame-012.png",
+        "baselineSha256": "58ccab53d263d9831af98c67f1eb82948c21f2b2700495215429379532d4b7f4",
+        "candidateSha256": "eaa515c5a08275da47538fd6f4238fbcea9017271d64a88703ec8f1b1c3b971e"
+      }
+    ],
+    "observed": "The open sky gaps at the square and dealer no longer show the hard horizontal far-land seam. A nearer slope remains distinct from the sky above the kitchen plots."
+  },
+  "renderContract": {
+    "startMetres": 800,
+    "fullSkyColorMetres": 2400,
+    "scope": "Primary opaque distance fog converges to directional sky colour. No new rays and no change to RT range, geometry or the nearer fog calculation.",
+    "frozenBudgetsUnchanged": true
+  },
+  "validation": [
+    "windowsPipelineArtifacts",
+    "windowsRuntimeContracts",
+    "rayQueryComputeArtifacts",
+    "compatibilityShaders"
+  ],
+  "pending": "Physical Android and sustained performance. The Windows walkthrough uses the hardware pipeline. RayQueryCompute was independently rebuilt and validated as SPIR-V."
+}
