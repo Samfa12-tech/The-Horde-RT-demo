@@ -1,0 +1,56 @@
+{
+  "sourceCommit": "1b94e71501fda973f940619d16585369009902ee",
+  "scope": "Unpublished paired optimized candidates with stock-room lighting and Android Directions",
+  "windows": {
+    "artifact": "Horde-Bellwether-Private-Candidate-Windows-x64.zip",
+    "sha256": "cf4e1ca758ff68633162cc1535e90b0ee2b1ef95cf1a2c9726dfe4a646d16626",
+    "executableSha256": "2cc2d13dda9e3b50d845116f01716158a1090996f5762ce4d2dca1687d6c8c36",
+    "archiveOnly": true,
+    "archiveEntries": 297,
+    "entriesMatchingPriorCandidate": 296,
+    "changedEntries": [
+      "HordeLanternRT.exe"
+    ],
+    "stagingBytesAvoided": 721995150,
+    "initialPipelineLoadProbe": "Timed out before the native Load button became available. A retry passed.",
+    "ordinaryMenuChecks": [
+      {
+        "backend": "RayTracingPipeline",
+        "entry": "load",
+        "rtPresented": true,
+        "resultSha256": "56b0f9d5c6106415bd4b670457b93aebff8ec987fe0f00ddd369d07bcb6ebeac",
+        "existingSavePreserved": true,
+        "directionsOpened": true
+      },
+      {
+        "backend": "RayQueryCompute",
+        "entry": "load",
+        "rtPresented": true,
+        "resultSha256": "1fccd3d50e006e6de8cd4100e8d6c6056af1f0d86351235a72258715688a1b75",
+        "existingSavePreserved": true,
+        "directionsOpened": true
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "entry": "new",
+        "rtPresented": true,
+        "resultSha256": "f57d1bf0f230c31f5e82b778aa8fa5b620e6bc6e4e5b43008f3028471c6e42b4"
+      }
+    ]
+  },
+  "android": {
+    "artifact": "Horde-Bellwether-Private-Lamp-Candidate-ARM64.apk",
+    "sha256": "6f91b491fa4cf0dec6b32eca312c25e94452bee44c70844959a2d18a5bd9f47f",
+    "nativeLibrarySha256": "8cbb0f881dc6d9ff79140374d56c8e9d76c612713820592354052b532a3d37a3",
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "versionName": "1.7.0-bellwether-candidate",
+    "versionCode": 11,
+    "verifiedV2Signature": true,
+    "shippingMobileSpirvModules": 4,
+    "matchingPriorCandidateAssets": 295,
+    "residentCount": 5,
+    "voiceTakes": 26,
+    "unitTestInputsUnchanged": true,
+    "deviceRun": false
+  }
+}
