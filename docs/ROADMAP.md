@@ -122,6 +122,8 @@ The [Bellwether voice mix](superpowers/plans/2026-11-07-bellwether-arrival-direc
 
 The ordinary Windows package played the three hearth Talk lines with the default score. A game-process capture matched the recordings to the actual output. A music-off control also confirmed Kit's two follow-up lines and the hearth crackle before and after speech. Listening review of the default mix remains open. [Windows playback receipt](evidence/2026-11-28-bellwether-windows-hearth-listening/receipt.json)
 
+The next private package pair brings the hearth voices forward through the shared spatial mixer. At the same Windows hearth mark and default settings, all three Talk lines measured about 7–9 dB higher relative to the residual mix. Windows tavern reload passed on both hardware RT backends. The unsigned Android package passed release lint and contains the same 26 voice assets. The revised mix still needs listening acceptance and a handset check. [Mix comparison and package receipt](evidence/2026-11-28-bellwether-hearth-clarity/receipt.json)
+
 The Android campaign now pauses for one short card before each opening combat lesson. Continue returns to the same encounter and the practice follows immediately. Skip practice uses the existing protected exit. Replaying the opening practice starts the lessons again. [Combat tutorial and subtitle follow-up](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/35)
 
 The first working tavern service is [Rest by the hearth](superpowers/plans/2026-11-07-bellwether-arrival-direction.md#rest-by-the-hearth), earned through the opening Talk. It reuses the existing flask recovery and tavern autosave. The service economy and Kit's recovery remain open.

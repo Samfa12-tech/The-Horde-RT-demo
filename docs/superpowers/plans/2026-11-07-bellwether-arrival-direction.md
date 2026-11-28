@@ -869,6 +869,16 @@ The default recording retains the background score for listening review.
 Both recordings stay in local storage. Default-mix intelligibility and
 physical handset audio still need review. [Windows playback receipt](../../evidence/2026-11-28-bellwether-windows-hearth-listening/receipt.json)
 
+Hearth dialogue now uses a 2.5 m reference distance and 0.50 source gain
+through the shared spatial mixer. The early chapter and south-door greeting
+use their existing levels. Two Windows captures at the same hearth mark and
+default settings measured a 7.0–9.4 dB improvement in the fitted voice-to-
+residual ratio for the three Talk lines. The revised capture also includes
+both lines of Kit's treasure exchange and has no clipped samples or capture
+gaps. The Windows ZIP and unsigned Android APK include this adjustment.
+Audio/haptic manual revalidation required — YES for the new dialogue level.
+[Mix comparison and package receipt](../../evidence/2026-11-28-bellwether-hearth-clarity/receipt.json)
+
 ## Animation and gameplay acceptance gate
 
 First author a short test on the real Kit rig: loose-ground step/catch, protective standing assessment, several injured steps, turn and sit. Keep editable sources. Review normal first-person, front and side views for weight, planted feet, contact and coherent transitions before expanding into the complete scene. A flattering render is insufficient.

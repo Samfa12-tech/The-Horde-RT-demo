@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "sourceCommit": "b9ddc3d5a6c311fdffde08bc644386314364ba69",
+  "scope": "Seated Bellwether voice groups use source gain 0.50 and reference distance 2.5 m",
+  "baselineSourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+  "baselineCaptureSha256": "80bbf9069a08d1de0c13b82430eab498ebac400a0d4f55b9b7bdd330e8ce8c2a",
+  "windows": {
+    "sourceCommit": "b9ddc3d5a6c311fdffde08bc644386314364ba69",
+    "zipSha256": "e9ab74479dece2e3796f6183dcb7a2785af13dba94f02c98be32803c58e0ff5f",
+    "exeSha256": "bb6899cae1ded40a81a1feaadcab494bc79c30623c2fe386d96a9ed66b9b84cf",
+    "byteIdenticalNonExecutableEntries": 296,
+    "packagePolicyChecksPassed": true,
+    "runtimeValidation": [
+      {
+        "backend": "RayTracingPipeline",
+        "earnedTavernResizeReloads": 2,
+        "receiptSha256": "0c9284423a85009ba76ed3be8e81bc6b6e45399664adc6a8c6b986b8b50b04b4"
+      },
+      {
+        "backend": "RayQueryCompute",
+        "earnedTavernResizeReloads": 2,
+        "receiptSha256": "1cdef5d863451247750c352c4f2385204c20f3f3ab8e785b4a067030ee145741"
+      }
+    ],
+    "shaderModuleHashes": [
+      "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+    ]
+  },
+  "android": {
+    "sourceCommit": "b9ddc3d5a6c311fdffde08bc644386314364ba69",
+    "apkSha256": "a45868460c7fc077ea4f054f643107a00dd26f094809d8f7a869548d7704e0a3",
+    "originalAndroidApkSha256": "56338e992c3ce79f159aa704a48839c10e465a56212cd70641ea2fed8c89ddf3",
+    "apkBytes": 294454869,
+    "runtimeAssetsMatchingOriginal": 295,
+    "nativeLibrariesByAbi": {
+      "arm64-v8a": "ad7dc48f8a8a1a9deef05cc2029d53bbbf334dfe02ecead5151320250ac7857e",
+      "armeabi-v7a": "7e9db028259424c670bb22386fb8366c61ec92c0aedc746a50b1dd39f34a479e",
+      "x86": "71d5882c57c12cdef89462b6cf404442c42909d8220d9831a9f5cfb26d49bb0c",
+      "x86_64": "1693cf19aff6351fb226acc71eafcfae2cc71ddc9847abf32d3a4dc869b0b573"
+    },
+    "unsigned": true,
+    "16KiBAlignment": true,
+    "deviceRun": false,
+    "releaseLintPassed": true,
+    "arm64ShaderModuleHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ]
+  },
+  "hostTests": [
+    "horde_rt_dialogue_ducking_tests",
+    "horde_rt_chapter_dialogue_tests"
+  ],
+  "windowsForegroundCapture": {
+    "backend": "RayTracingPipeline",
+    "fixtureSha256": "c3dc0611b9d2e15f728f979f5df6a7386ed8b63ec665ef65893e82c2b257ffab",
+    "resolution": [
+      1232,
+      803
+    ],
+    "musicVolumePercent": 70,
+    "captureSha256": "313fe72147dd0df8e775e6b0fd661463ac0fd70cd631c0a1f6f8889244d92ae7",
+    "captureDiscontinuities": 0,
+    "formatAndLevels": {
+      "channels": 2,
+      "rateHz": 44100,
+      "frames": 1763559,
+      "samplePeakDbfs": -10.97,
+      "clippedSamples": 0,
+      "rmsDbfs": -32.1
+    },
+    "dialogueWaveformMatches": [
+      {
+        "asset": "hub.kit_introduce",
+        "offsetSeconds": 4.316,
+        "referenceSeconds": 4.099,
+        "correlation": 0.879,
+        "fittedVoiceToResidualDb": 5.31,
+        "fittedVoiceRmsDbfs": -29.23,
+        "residualRmsDbfs": -34.55
+      },
+      {
+        "asset": "hub.horde_army",
+        "offsetSeconds": 8.406,
+        "referenceSeconds": 5.579,
+        "correlation": 0.8044,
+        "fittedVoiceToResidualDb": 2.63,
+        "fittedVoiceRmsDbfs": -31.01,
+        "residualRmsDbfs": -33.65
+      },
+      {
+        "asset": "hub.hoard_answer",
+        "offsetSeconds": 13.986,
+        "referenceSeconds": 3.939,
+        "correlation": 0.872,
+        "fittedVoiceToResidualDb": 5.02,
+        "fittedVoiceRmsDbfs": -30.28,
+        "residualRmsDbfs": -35.29
+      },
+      {
+        "asset": "hub.kit_stake",
+        "offsetSeconds": 21.136,
+        "referenceSeconds": 5.699,
+        "correlation": 0.8616,
+        "fittedVoiceToResidualDb": 4.6,
+        "fittedVoiceRmsDbfs": -30.34,
+        "residualRmsDbfs": -34.94
+      },
+      {
+        "asset": "kit.personal_stake.key",
+        "offsetSeconds": 26.806,
+        "referenceSeconds": 4.739,
+        "correlation": 0.959,
+        "fittedVoiceToResidualDb": 10.59,
+        "fittedVoiceRmsDbfs": -28.34,
+        "residualRmsDbfs": -38.93
+      }
+    ],
+    "matchedDefaultMixComparison": [
+      {
+        "asset": "hub.kit_introduce",
+        "baselineVoiceToResidualDb": -3.18,
+        "adjustedVoiceToResidualDb": 5.31,
+        "separationChangeDb": 8.49,
+        "nativeSpatialGainChangeDb": 9.28
+      },
+      {
+        "asset": "hub.horde_army",
+        "baselineVoiceToResidualDb": -4.34,
+        "adjustedVoiceToResidualDb": 2.63,
+        "separationChangeDb": 6.97,
+        "nativeSpatialGainChangeDb": 8.03
+      },
+      {
+        "asset": "hub.hoard_answer",
+        "baselineVoiceToResidualDb": -4.41,
+        "adjustedVoiceToResidualDb": 5.02,
+        "separationChangeDb": 9.43,
+        "nativeSpatialGainChangeDb": 9.28
+      }
+    ],
+    "comparisonMethod": "Same tavern save and listener heading in two separate real game runs. A fitted voice waveform is compared to the residual of the speech-band capture. The residual also contains resampling and phase mismatch."
+  },
+  "ownerListeningPending": true,
+  "physicalPhoneAudioPending": true,
+  "published": false
+}
