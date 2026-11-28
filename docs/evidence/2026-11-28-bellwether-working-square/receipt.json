@@ -1,0 +1,31 @@
+{
+  "candidateContentCommit": "fec01c7452f4259acd84d8a92a6609fdad0bc089",
+  "launch": "Release executable and four refreshed village assets staged over the previously verified ordinary Windows payload. Built before the content commit. No new installer or release archive.",
+  "assetReceipt": "../../../assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
+  "executableSha256": "05379a2062744518397ff3ec9e3000100f71dba379898cb289d199e9d19dfaa2",
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "capturePixels": [1232, 803]
+  },
+  "normalPlay": {
+    "route": "Load Bellwether tavern, walk down the south ramp, pass the fingerpost, approach both market pitches",
+    "hardwareRtPresented": true,
+    "fingerpostViewSha256": "5eedc604967f60a9f8efa4f78fabe063242f18d396d13621d2454aa1a09e6ef8",
+    "apronViewSha256": "ea9eacd87dfa709dab8159df922f1de7418b96424e320c76e56914d56833f169",
+    "marketViewSha256": "31ed08177f9008e47577b71e85add335b42e14a3500d5f64b06142180acc6aba",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "hostContactBudget": {"baseObstacleTriangles": 138944, "refillBasinReservedTriangles": 216, "obstacleLimit": 139434},
+  "passingHostTests": [
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "gltfValidator": {"town": {"errors": 0, "warnings": 0}, "foliage": {"errors": 0, "warnings": 0}},
+  "remaining": "Stall surfaces and yards are dark in the player views. The backdrop has open gaps between buildings. Android and sustained performance were not checked on this candidate."
+}
