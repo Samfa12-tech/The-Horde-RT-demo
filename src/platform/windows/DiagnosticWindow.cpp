@@ -4250,7 +4250,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                         ? "RETRY ENCOUNTER"
                         : (context.endingOverlayVisible
                                ? "CONTINUE"
-                               : (context.entryMenuVisible ? "PLAY" : "ENTER THE RUIN / RESUME")));
+                               : (context.entryMenuVisible ? "PLAY" : "RESUME")));
     }
     if (HWND restart = GetDlgItem(context.windowHandle, kRestartButtonId))
     {
@@ -14403,7 +14403,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                  SS_CENTER | SS_NOPREFIX);
     createButton(kEntryMoreButtonId, "MORE / BENCHMARK");
     createButton(kEntryBackButtonId, "BACK");
-    createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
+    createButton(kResumeButtonId, "RESUME");
     createButton(kLookoutObjectiveButtonId,"LOOKOUT OBJECTIVE");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kCampaignSaveButtonId,"SAVE CHECKPOINT...");
