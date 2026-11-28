@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "sourceCommit": "5e527318bcee6e2025a81ec989cc66ff978e9dcb",
+  "distribution": "private local playtest",
+  "sharedExactPayload": {
+    "tavernGlb": 1,
+    "residentGlbs": 5,
+    "voiceTakes": 26
+  },
+  "windows": {
+    "sourceCommit": "5e527318bcee6e2025a81ec989cc66ff978e9dcb",
+    "archiveSha256": "f31351f84b11f0727ad4ee5a6d1100788f446b382b380679274b7986bab0d117",
+    "baselineArchiveSha256": "f668a4d6888482e72922302cfb0fea37d23d449f324c63df17846f265967ee2e",
+    "identicalPayloadEntries": 296,
+    "executableSha256": "21ed72be02c30ea880ed9ab352cb896be805ba5c33b0720f215625ee8d873fbd",
+    "voiceTakes": 26,
+    "residentModels": 5,
+    "hardwareBackends": [
+      {
+        "backend": "RayTracingPipeline",
+        "reportSha256": "b724c67259323e8a7b5fb2344602827f9b547dc10e2b319df3af97533f9711c0",
+        "cycles": 2,
+        "presented": true,
+        "savePreserved": true,
+        "newGameLiveControl": true,
+        "newGameReportSha256": "f57d1bf0f230c31f5e82b778aa8fa5b620e6bc6e4e5b43008f3028471c6e42b4"
+      },
+      {
+        "backend": "RayQueryCompute",
+        "reportSha256": "a6331352aa2654522a19c19237ca7f78cef93c25149aaf1facf2cec08b6e08b4",
+        "cycles": 2,
+        "presented": true,
+        "savePreserved": true,
+        "newGameLiveControl": true,
+        "newGameReportSha256": "a11527003ea0eeda77d8a854230a38a7b8e6ec89578913b8ea151363c3e18214"
+      }
+    ],
+    "archiveBytes": 466166049
+  },
+  "android": {
+    "sourceCommit": "5e527318bcee6e2025a81ec989cc66ff978e9dcb",
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "buildMode": "Private optimized BellwetherCandidate with development signing",
+    "versionName": "1.7.0-bellwether-candidate",
+    "versionCode": 11,
+    "apkSha256": "d17be04507fe5a3f6f3842782edbbee0a87b306aab2042899cca2c334720bd7b",
+    "apkBytes": 277447204,
+    "nativeLibrarySha256": "11e1d87fe2cd6ce9a6c10e53e5991c66f790f97d7154f5ac66737bf5d1552295",
+    "fiveResidents": [
+      "artificer",
+      "record-keeper",
+      "relic-dealer",
+      "salvager",
+      "tavern-keeper"
+    ],
+    "voiceTakes": 26,
+    "runtimeAssetEntries": 295,
+    "runtimeEntriesMatchPriorCandidate": true,
+    "referenceApkSha256": "3e68f7c1dee6ceaa48219c62b288f1c0c0bbfdd355fa7eea7587b6afb5bf19cc",
+    "assetInventorySha256": "35ba296fd07c1ec67dfafb1e016b77113714e6cca5fb998f43e069ce32738f54",
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "packagedSpirv": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "apkSignatureV2Verified": true,
+    "deviceRun": false,
+    "sameDevelopmentSignerAsPriorCandidate": true,
+    "unitTestTaskReused": true
+  },
+  "pending": [
+    "In-game listening on the updated packages",
+    "Handset play and sustained performance on the updated APK"
+  ]
+}

@@ -218,6 +218,8 @@ The private optimized Windows ZIP and ARM64 APK use the same integrated source. 
 
 The refreshed private Windows candidate fixes a renderer stop during minimize and resize in the staffed tavern. The window waits for a drawable surface and the output rebuild retains the loaded RT scene. Each hardware RT backend completed two minimize, restore, resize and pause-menu Load cycles with the prepared tavern save intact. [Windows lifecycle and replacement ZIP receipt](evidence/2026-11-28-bellwether-windows-lifecycle/receipt.json)
 
+The updated private pair includes that Windows fix and the shared Bellwether caption clock. Both Windows hardware RT backends reached live control from New Game and passed two resize and reload cycles. The matching development-signed ARM64 APK retains the same town, five residents and 26 voice takes. On-device play, sustained timing and the in-game mix still need checking on this pair. [Exact candidate receipt](evidence/2026-11-28-bellwether-integrated-dialogue-clock/receipt.json)
+
 **Acceptance gates:** first accept one arrival-to-tavern stress slice with representative actors/fire/glass, exchange, checkpoint, return outdoors and repeat visits, using the six-gate contract's hub gate. Expand only after combined residency/LOD/RT relevance and phone/Windows budgets pass. Then prove admitted interiors and NPC interactions, subtitle/audio fallbacks, progress-aware returns, spending/reward/save integrity and viable alternative progression. Final service selection, cast/interiors, quest details, injury staging and numeric budgets must be scoped before acceptance. 1.8 release acceptance remains pending.
 
 ## Proposed 1.9 - Drowned Abbey
