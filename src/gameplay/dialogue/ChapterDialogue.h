@@ -520,7 +520,8 @@ public:
         if(IsRoadLine(state_.line))roadLinesResolved_=kRoadLines.size();
         Cancel(); pending_=Line::None; }
     bool Complete(Line line,std::uint64_t generation) {
-        if(line==Line::None || state_.line!=line || state_.generation!=generation) return false;
+        // Bellwether's authored clock includes reading time after shorter takes.
+        if(IsBellwetherLine(line) || line==Line::None || state_.line!=line || state_.generation!=generation) return false;
         Finish(); return true;
     }
     void Skip() { if(state_.line!=Line::None) Finish(); }
