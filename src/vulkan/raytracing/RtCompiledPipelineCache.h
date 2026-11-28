@@ -242,12 +242,17 @@ class RtCompiledPipelineCache
     // proof. False means the caller must keep the device alive and retry later.
     bool DestroyAfterDeviceIdle(const bool deviceIdleProven) noexcept
     {
-        if (!deviceIdleProven) return false;
-        for (const auto& entry : entries_)
-            if (entry.valid && entry.leaseCount != 0u) return false;
+        if (!deviceIdleProven || HasLiveLeases()) return false;
         for (auto& entry : entries_)
             if (entry.valid) DestroyEntry(entry);
         return true;
+    }
+
+    bool HasLiveLeases() const noexcept
+    {
+        for (const auto& entry : entries_)
+            if (entry.valid && entry.leaseCount != 0u) return true;
+        return false;
     }
 
     bool Empty() const noexcept
