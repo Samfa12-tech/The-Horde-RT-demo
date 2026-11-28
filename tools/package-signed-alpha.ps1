@@ -3,6 +3,9 @@ param(
     [string]$KeyStorePath,
     [string]$KeyAlias = "horde-lantern-rt",
     [string]$Horde17AssetRoot,
+    [string]$BellwetherWindowsResidents,
+    [string]$BellwetherAndroidResidents,
+    [string]$BellwetherVoices,
     [Parameter(Mandatory = $true)]
     [string]$Version,
     [Parameter(Mandatory = $true)]
@@ -12,10 +15,17 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "release-version-policy.ps1")
 Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
-if($Version -eq '1.7.0') {
+if ($Version -in @('1.7.0', '1.8.0')) {
     . (Join-Path $PSScriptRoot 'horde-1.7-release-asset-policy.ps1')
-    if([string]::IsNullOrWhiteSpace($Horde17AssetRoot)) { throw 'Signed 1.7 packaging requires the pinned local Horde17AssetRoot before reading signing material.' }
+    if ([string]::IsNullOrWhiteSpace($Horde17AssetRoot)) { throw 'This package requires the pinned local Horde17AssetRoot before reading signing material.' }
     $Horde17AssetRoot=Assert-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot
+}
+if ($Version -eq '1.8.0') {
+    if (!$BellwetherWindowsResidents -or !$BellwetherAndroidResidents) { throw 'Ordinary Bellwether packaging requires both pinned resident directories.' }
+    . (Join-Path $PSScriptRoot 'horde-1.8-release-asset-policy.ps1')
+    $null = Get-Horde18ReleaseInputs -WindowsResidents $BellwetherWindowsResidents -AndroidResidents $BellwetherAndroidResidents -Voices $BellwetherVoices
+} elseif ($BellwetherWindowsResidents -or $BellwetherAndroidResidents -or $BellwetherVoices) {
+    throw 'Ordinary Bellwether assets require version 1.8.0.'
 }
 $expectedCertificateSha256 = "8245277a11bca5576f116724507f799d6f4c178ce5fbb7e3981415c9e6b3c245"
 $repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
@@ -34,7 +44,9 @@ try {
     $env:HORDE_RELEASE_KEY_ALIAS = $KeyAlias
     $env:HORDE_RELEASE_KEY_PASSWORD = $keyPassword
 
-    & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version $Version -VersionCode $VersionCode -Horde17AssetRoot $Horde17AssetRoot
+    & (Join-Path $PSScriptRoot "package-alpha.ps1") -Version $Version -VersionCode $VersionCode `
+        -Horde17AssetRoot $Horde17AssetRoot -BellwetherWindowsResidents $BellwetherWindowsResidents `
+        -BellwetherAndroidResidents $BellwetherAndroidResidents -BellwetherVoices $BellwetherVoices
     if ($LASTEXITCODE -ne 0) { throw "Signed alpha packaging failed." }
 
     $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'

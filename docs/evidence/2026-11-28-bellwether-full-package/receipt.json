@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+  "distribution": "private local validation",
+  "hostPackagerTestsPassed": 266,
+  "sharedPayload": {
+    "tavernGlb": 1,
+    "residentGlbs": 5,
+    "voiceTakes": 26
+  },
+  "windows": {
+    "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+    "archiveSha256": "b6a12943b2f48de82c8e0d1d4c87f82fdff0465b25f7865d56ac529d627ee81b",
+    "archiveBytes": 351582912,
+    "executableSha256": "cb0ee35d5c29698386d4c71b22c1076eb81324b53b6e04a22e20d2aa72bda29f",
+    "checkedArchiveEntries": 297,
+    "byteIdenticalFilesReusedForTest": 294,
+    "ordinaryWindowsHardwareChecks": [
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "new",
+        "passed": true,
+        "receiptSha256": "9af7c9d032f19325eda9a852b3faa88ad30ce4f5f0e21aca915f882e44df508e"
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "load",
+        "passed": true,
+        "receiptSha256": "974a59789049157f5a6c11c5e82cdc3b0f71ea96fd69acd31f17668f96eb2cf3",
+        "resizeReloadCycles": 2,
+        "saveBytesPreserved": true
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "new",
+        "passed": true,
+        "receiptSha256": "4d51ff6afb1e7cf38d170429942077b3ec797a8465f9ab71884138573afdf80d"
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "load",
+        "passed": true,
+        "receiptSha256": "ec780207e98d4abb651fc263447bf20bd76a62ecd979afd286612f1cb56f59e5",
+        "resizeReloadCycles": 2,
+        "saveBytesPreserved": true
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "legacy",
+        "passed": true,
+        "receiptSha256": "6e5609ba2dabd086daeefbf97d0f00523d2bc25b77d7abac07a82d927a654a39",
+        "saveBytesPreserved": true
+      }
+    ],
+    "missingResidentRejected": true,
+    "existingLocalSaveFilesPreserved": true,
+    "shippingHighModuleHashes": [
+      "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+    ]
+  },
+  "android": {
+    "apkSha256": "56338e992c3ce79f159aa704a48839c10e465a56212cd70641ea2fed8c89ddf3",
+    "apkBytes": 294436069,
+    "variant": "ordinary release",
+    "unsigned": true,
+    "16KiBAlignment": true,
+    "librarySha256ByAbi": {
+      "arm64-v8a": "0ab8fbe85a7f5ffa29ced1208b5e22a5cf234457e776aab9849c99c8e678b18c",
+      "armeabi-v7a": "f2a07c981ff1ab49c9abc0ba8f6db562b6a62dcef28ae93fcb65a05aa27575db",
+      "x86": "1c85a354cba1c908472d1307241275767f248544aabe72d6da8e59b1d0f453ed",
+      "x86_64": "d34cf5eeb26d4c43ef854140fb260c50bcc082140b9380c0ac2e1bb4f87c2861"
+    },
+    "byteIdenticalRuntimeAssets": 295,
+    "arm64ShippingMobileModuleHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "deviceRun": false
+  },
+  "pending": [
+    "Handset play and sustained performance",
+    "In-game listening acceptance"
+  ],
+  "mainMergeCommit": "2a88a9c803b97eb8a48b815afcb9f5360808c653",
+  "githubPr": 73,
+  "releaseGradleLintPassed": true,
+  "published": false
+}

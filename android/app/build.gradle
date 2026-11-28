@@ -57,8 +57,13 @@ if (!(bellwetherCandidateValue in ['true', 'false'])) {
     throw new GradleException('hordeBellwetherCandidate must be true or false.')
 }
 def bellwetherCandidateEnabled = bellwetherCandidateValue == 'true'
-if (bellwetherCandidateEnabled && bellwetherPlaytest) {
-    throw new GradleException('Select either the optimized Bellwether candidate or the Debug playtest.')
+def bellwetherReleaseValue = providers.gradleProperty('hordeBellwetherRelease').orElse('false').get()
+if (!(bellwetherReleaseValue in ['true', 'false'])) {
+    throw new GradleException('hordeBellwetherRelease must be true or false.')
+}
+def bellwetherReleaseEnabled = bellwetherReleaseValue == 'true'
+if ([bellwetherCandidateEnabled, bellwetherPlaytest, bellwetherReleaseEnabled].count { it } > 1) {
+    throw new GradleException('Select only one Bellwether package profile.')
 }
 def verifyBellwetherOverlay = { File root, Map pinned, String label ->
     if (!root.isDirectory()) throw new GradleException("Bellwether ${label} root is missing.")
@@ -240,6 +245,13 @@ def bellwetherAssetFields = [
     BELLWETHER_FOLLOW_ON_AUDITION: bellwetherFollowOnAudition,
     BELLWETHER_HEARTH_AUDITION: bellwetherHearthAudition
 ]
+def configureBellwetherAssetFields = { buildType ->
+    bellwetherAssetFields.each { name, present ->
+        buildType.buildConfigField 'boolean', name, present ? 'true' : 'false'
+    }
+    buildType.buildConfigField 'String', 'BELLWETHER_OPTIONAL_VOICE_IDS',
+        '"' + bellwetherOptionalVoiceIds.join(',') + '"'
+}
 def bellwetherNativeArguments = [
     "-DHORDE_RT_FLASK_CANDIDATE=${flaskCandidateDirectory ? 'ON' : 'OFF'}",
     "-DHORDE_RT_PRIVATE_REVIVAL=${privateRevivalDirectory ? 'ON' : 'OFF'}",
@@ -294,9 +306,15 @@ def hordeVersionCode = hordeVersionCodeMap?.androidVersionCodes?[(hordeVersionNa
 if (!(hordeVersionCode instanceof Integer) || hordeVersionCode < 1) {
     throw new GradleException("Android version-code map has no positive integer for ${hordeVersionName}.")
 }
+if (bellwetherReleaseEnabled && (hordeVersionName != '1.8.0' ||
+        !bellwetherCombinedResidents || !bellwetherRelicDealer || !hordeShipping17AssetDirectory)) {
+    throw new GradleException('Ordinary Bellwether requires 1.8.0, the five pinned residents and the pinned flask and revival foundation.')
+}
 if (hordeShipping17AssetDirectory) {
-    if (hordeVersionName != '1.7.0' || privateRevivalDirectory || flaskCandidateDirectory || bellwetherResidentDirectory)
-        throw new GradleException('Ordinary 1.7 assets cannot share a private Debug admission or another version.')
+    if ((!bellwetherReleaseEnabled && hordeVersionName != '1.7.0') || privateRevivalDirectory || flaskCandidateDirectory ||
+            bellwetherCandidateEnabled || bellwetherPlaytest || (bellwetherResidentDirectory && !bellwetherReleaseEnabled)) {
+        throw new GradleException('Ordinary flask and revival assets cannot share a private package profile.')
+    }
     def assetRoot=file(hordeShipping17AssetDirectory)
     if (!assetRoot.isDirectory()) throw new GradleException('Ordinary 1.7 asset root is missing.')
     def actual=[]
@@ -551,10 +569,11 @@ def hordeRtDebugStagedPrimaryArguments = hordeStagedPrimaryDebugValidation ? [
 // this overlay, and its separate application id prevents stale private-file assets.
 def viewmodelCandidatePath = providers.gradleProperty('hordeViewmodelCandidateDir').orNull
 def viewmodelCandidate = viewmodelCandidatePath ? file(viewmodelCandidatePath).canonicalFile : null
-if (bellwetherCandidateEnabled && (hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation ||
-        hordeRtOverridePresent(hordeRtInstrumentationOverride) || chapterRouteTiming || frameStageProbe ||
+if ((bellwetherCandidateEnabled || bellwetherReleaseEnabled) && (hordeBenchmarkValidation || hordeStagedPrimaryDebugValidation ||
+        hordeRtOverridePresent(hordeRtInstrumentationOverride) || hordeRtOverridePresent(hordeRtDielectricQualityOverride) ||
+        chapterRouteTiming || frameStageProbe ||
         hordeRegionPagePrototypeRootProperty != null || actorWorkerExperiment || viewmodelCandidate)) {
-    throw new GradleException('The optimized Bellwether candidate uses the standard Shipping/Mobile policy.')
+    throw new GradleException('Optimized Bellwether packages use the standard Shipping/Mobile policy.')
 }
 if (bellwetherResidentDirectory && (actorWorkerExperiment || hordeStagedPrimaryDebugValidation ||
         viewmodelCandidate || (privateRevivalDirectory && !bellwetherPlaytest && !bellwetherCandidateEnabled))) {
@@ -1022,12 +1041,8 @@ android {
 
     buildTypes {
         debug {
-            bellwetherAssetFields.each { name, present ->
-                buildConfigField 'boolean', name, present ? 'true' : 'false'
-            }
-            buildConfigField 'String', 'BELLWETHER_OPTIONAL_VOICE_IDS',
-                '"' + bellwetherOptionalVoiceIds.join(',') + '"'
-            if (bellwetherResidentDirectory) {
+            if (!bellwetherReleaseEnabled) configureBellwetherAssetFields(delegate)
+            if (bellwetherResidentDirectory && !bellwetherReleaseEnabled) {
                 def rosterSuffix = bellwetherCombinedResidents ? '.debug.bellwether.combined' :
                     bellwetherRelicDealer ? '.debug.bellwether.dealer' :
                     (bellwetherSalvager ? '.debug.bellwether.shore' :
@@ -1055,7 +1070,7 @@ android {
             externalNativeBuild {
                 cmake {
                     arguments '-DHORDE_RT_SHIPPING17_CONTENT=OFF', '-DHORDE_RT_DEBUG_CHECKPOINTS=ON',
-                        *bellwetherNativeArguments,
+                        *(bellwetherReleaseEnabled ? [] : bellwetherNativeArguments),
                         *hordeRtDebugObservationArguments,
                         "-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=${viewmodelCandidate ? 'ON' : 'OFF'}",
                         *hordeRtNativePolicyArguments('Diagnostic'),
@@ -1067,12 +1082,15 @@ android {
         release {
             minifyEnabled false
             buildConfigField 'boolean', 'SHIPPING17_CONTENT', hordeShipping17AssetDirectory ? 'true' : 'false'
+            if (bellwetherReleaseEnabled) configureBellwetherAssetFields(delegate)
             externalNativeBuild {
                 cmake {
-                    arguments '-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF',
-                        "-DHORDE_RT_SHIPPING17_CONTENT=${hordeShipping17AssetDirectory ? 'ON' : 'OFF'}",
+                    arguments "-DHORDE_RT_SHIPPING17_CONTENT=${hordeShipping17AssetDirectory ? 'ON' : 'OFF'}",
                         '-DHORDE_RT_DEBUG_CHECKPOINTS=OFF', '-DHORDE_RT_DEBUG_VIEWMODEL_CANDIDATE=OFF',
                         '-DHORDE_RT_ACTOR_WORKER_EXPERIMENT=OFF',
+                        "-DHORDE_RT_ANDROID_BELLWETHER_RELEASE=${bellwetherReleaseEnabled ? 'ON' : 'OFF'}",
+                        *(bellwetherReleaseEnabled ? bellwetherNativeArguments :
+                            ['-DHORDE_RT_PRIVATE_REVIVAL=OFF', '-DHORDE_RT_FLASK_CANDIDATE=OFF']),
                         *hordeRtNativePolicyArguments('Shipping')
                 }
             }
@@ -1087,11 +1105,7 @@ android {
                 debuggable false
                 signingConfig signingConfigs.debug
                 resValue 'string', 'app_name', 'Horde RT Bellwether 1.8 Candidate'
-                bellwetherAssetFields.each { name, present ->
-                    buildConfigField 'boolean', name, present ? 'true' : 'false'
-                }
-                buildConfigField 'String', 'BELLWETHER_OPTIONAL_VOICE_IDS',
-                    '"' + bellwetherOptionalVoiceIds.join(',') + '"'
+                configureBellwetherAssetFields(delegate)
                 externalNativeBuild {
                     cmake {
                         arguments '-DHORDE_RT_ANDROID_BELLWETHER_CANDIDATE=ON',
@@ -1141,8 +1155,13 @@ android {
         if (viewmodelCandidate) debug.assets.srcDir(viewmodelOverlayDir)
         if (privateRevivalDirectory) debug.assets.srcDir(file(privateRevivalDirectory))
         if (flaskCandidateDirectory) debug.assets.srcDir(file(flaskCandidateDirectory))
-        if (bellwetherResidentDirectory) debug.assets.srcDir(bellwetherResidentDirectory)
-        if (bellwetherVoiceDirectory) debug.assets.srcDir(bellwetherVoiceDirectory)
+        if (bellwetherReleaseEnabled) {
+            release.assets.srcDir(bellwetherResidentDirectory)
+            if (bellwetherVoiceDirectory) release.assets.srcDir(bellwetherVoiceDirectory)
+        } else {
+            if (bellwetherResidentDirectory) debug.assets.srcDir(bellwetherResidentDirectory)
+            if (bellwetherVoiceDirectory) debug.assets.srcDir(bellwetherVoiceDirectory)
+        }
         if (bellwetherCandidateEnabled) {
             bellwetherCandidate.assets.srcDirs = [bellwetherResidentDirectory,
                 file(flaskCandidateDirectory), file(privateRevivalDirectory)]
@@ -1164,12 +1183,15 @@ dependencies {
 }
 
 gradle.taskGraph.whenReady { graph ->
-    if (bellwetherResidentDirectory &&
-        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+    def releasePackage = graph.allTasks.any { it.project == project &&
+        it.name in ['assembleRelease','bundleRelease','packageRelease','packageReleaseBundle','assemble','bundle'] }
+    if (releasePackage && hordeVersionName == '1.8.0' && !bellwetherReleaseEnabled) {
+        throw new GradleException('Ordinary 1.8 Android packaging requires the pinned Bellwether release inputs.')
+    }
+    if (releasePackage && bellwetherResidentDirectory && !bellwetherReleaseEnabled) {
         throw new GradleException('Select the isolated Bellwether build task for resident assets.')
     }
-    if (hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory &&
-        graph.allTasks.any { it.project == project && it.name in ['assembleRelease','bundleRelease','packageRelease','assemble','bundle'] }) {
+    if (releasePackage && hordeVersionName == '1.7.0' && !hordeShipping17AssetDirectory) {
         throw new GradleException('Ordinary 1.7 Android release requires the pinned hordeShipping17AssetDir; refusing an incomplete package.')
     }
 }

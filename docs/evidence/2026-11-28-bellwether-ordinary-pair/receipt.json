@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "distribution": "private local package validation",
+  "codeIdenticalAcrossBuildSources": true,
+  "docsOnlyChangesBetweenBuilds": [
+    "README.md",
+    "android/README.md"
+  ],
+  "sharedPayload": {
+    "tavernGlb": 1,
+    "residentGlbs": 5,
+    "voiceTakes": 26
+  },
+  "windows": {
+    "sourceCommit": "17d53710be087f63f99810712e7d44b11cdfba29",
+    "archiveSha256": "fa56a6e0cd059628c55fc9c3babfcf9a60f4aebad5c069d0b36eb993597a1007",
+    "archiveBytes": 351582922,
+    "executableSha256": "8f128bcb527d85a4ad6133aa5c5d31354bc6fb499a12d4a4cc401f145211adcc",
+    "archiveStage": "ordinary packager Windows assembly and archive guards",
+    "normalSaveProfileVerifiedInIsolation": true,
+    "priorUserSavesUntouched": true,
+    "missingResidentRejected": true,
+    "hardwareEvidence": [
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "new",
+        "reportSha256": "9af7c9d032f19325eda9a852b3faa88ad30ce4f5f0e21aca915f882e44df508e",
+        "presented": true,
+        "resizeReloadCycles": 0
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "load",
+        "reportSha256": "06d5e59cc76040028f5ad11a30f2fa0f78de790729c024fec17d509ec9d5b20b",
+        "presented": true,
+        "resizeReloadCycles": 2
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "new",
+        "reportSha256": "4d51ff6afb1e7cf38d170429942077b3ec797a8465f9ab71884138573afdf80d",
+        "presented": true,
+        "resizeReloadCycles": 0
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "load",
+        "reportSha256": "42f484a3e892597930d888ec908a4f185f7f9d584e652460ce49ca7a04f9f3ec",
+        "presented": true,
+        "resizeReloadCycles": 2
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "legacy",
+        "reportSha256": "6e5609ba2dabd086daeefbf97d0f00523d2bc25b77d7abac07a82d927a654a39",
+        "presented": true,
+        "resizeReloadCycles": 0
+      }
+    ],
+    "shippingHighModuleHashes": [
+      "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+    ]
+  },
+  "android": {
+    "sourceCommit": "38f6f9f002c7e87c890fe2aba53a23fc32831a5e",
+    "apkSha256": "b1355b7bd09f9f1c99f0d95cb2f248da5a5139d3abf13cef6887b7dd32a530e9",
+    "apkBytes": 294436069,
+    "ordinaryAndroidIdentity": "com.samfa12.hordelanternrt 1.8.0 / 12",
+    "byteIdenticalRuntimeAssets": 295,
+    "librarySha256ByAbi": {
+      "arm64-v8a": "d1525da8e09eb3e23d580a888636d8fbdae9256fcf25d53a352a18acc14476d4",
+      "armeabi-v7a": "b37aac11517bc7cf38833b16b00b1dfb5515b3d846b29f339866d27bcb8ad09d",
+      "x86": "1a0c898d561cb92a0a2c486705f02b9f631ff2b7510285c98911a74e67519707",
+      "x86_64": "754e5ad85f7a209074e6910bd5afc85fc547e966678cbce496c1526e0a7e9725"
+    },
+    "16KiBAlignment": true,
+    "unsigned": true,
+    "deviceRun": false,
+    "arm64ShippingMobileModuleHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ]
+  },
+  "pending": [
+    "Successful end-to-end packager run with the corrected host test environment",
+    "Handset play and sustained performance",
+    "In-game listening acceptance"
+  ]
+}

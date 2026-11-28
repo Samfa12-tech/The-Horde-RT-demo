@@ -170,6 +170,15 @@ residents and does not enable Debug automation.
 For the Windows packager, pass the directory containing the individual WAV
 files to `-VoiceDirectory`.
 
+For ordinary 1.8 package validation, run `tools/package-alpha.ps1` with
+`-Version 1.8.0 -VersionCode 12` and set `HORDE_VALIDATION_UNSIGNED=1` in the
+build process. Pass the pinned flask and revival root to `-Horde17AssetRoot`,
+the flat Windows resident root to `-BellwetherWindowsResidents`, and the
+Android asset root containing `private_bellwether/` to
+`-BellwetherAndroidResidents`. If supplying voices, `-BellwetherVoices` selects
+the shared asset root containing `private_bellwether_voice/` and the 26 pinned
+WAVs. The ordinary Windows package keeps the Local AppData campaign profile.
+
 For the packaged Windows campaign continuity check, create an empty
 `reports/horde-campaign-fixtures-<label>` directory in the build's source
 checkout. Pass its absolute path to `horde_rt_campaign_play_session_tests.exe

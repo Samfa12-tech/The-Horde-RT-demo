@@ -1,10 +1,10 @@
-HORDE LANTERN RT - SHOWCASE ALPHA 1.7.0 CANDIDATE
+HORDE LANTERN RT - SHOWCASE ALPHA 1.8.0 CANDIDATE
 =======================================
 
 This is a native Vulkan hardware-ray-tracing technology demo from Samfa12.
 There is no raster, browser, or fake-RT fallback.
-Package version: 1.7.0; proposed Android companion versionCode: 11.
-This candidate is not the published 1.6.2 download. Hardware ray tracing is required.
+Package version: 1.8.0; Android companion versionCode: 12.
+Campaign saves are stored under %LOCALAPPDATA%\HordeLanternRT\campaign-v1.
 Published downloads and current availability: https://samfa12.itch.io/the-horde
 
 WINDOWS REQUIREMENTS
@@ -46,6 +46,8 @@ If the required hardware RT path is unavailable, the demo shows diagnostics
 and does not silently start a fallback renderer.
 
 SHOWCASE CONTENT
+- A walk from the lookout to Bellwether with tavern, church, garden and riverside routes
+- Five authored residents and local preparations, with captions throughout the village
 - Two distinct guards in the waterfall room and a three-turn shadow corridor
 - Shared 60 Hz combat, timed parry, attacker stagger and immediate riposte; hit detection remains forgiving
 - Textured PBR sword and hand torch with shared held-item sockets
