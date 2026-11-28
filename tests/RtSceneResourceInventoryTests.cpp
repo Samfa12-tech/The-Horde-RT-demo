@@ -16,6 +16,7 @@
 #include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
+#include "../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -1749,7 +1750,8 @@ struct PresentableTinyRtSceneObservationTestAccess
         constexpr std::size_t addedIndices = 46140u + (2u*664u + 960u + 12u + 323264u + 39266u + 656u + 6184u + 17712u + townTriangles + cropTriangles + 6168u + 11904u + 72u + 144u)*3u;
         // The full woodland retains the same trees/ferns/rocks and opens two
         // rail spans, keeping the end post of the adjoining retained span.
-        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u)*3u;
+        constexpr std::size_t woodlandIndices=(190784u+70560u+58486u+1104u+
+            horde::scene::bellwether_woodland::kTreeTriangles)*3u;
         const auto& woodland=tomb.forestSurroundingsPrototype_;
         const auto& support=tomb.chapterTerrainSurface_;
         const auto supportTriangles=support ? support->TriangleCount()+
@@ -1779,7 +1781,8 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kChurchRecordStationTriangles+
             horde::gameplay::bellwether::kHouseBLedgerSolidTriangles+
             horde::gameplay::bellwether::kWorkingSquareSolidTriangles+
-            horde::gameplay::bellwether::kWorkingSquareGroundTriangles;
+            horde::gameplay::bellwether::kWorkingSquareGroundTriangles+
+            horde::scene::bellwether_woodland::kTreeContactTriangles;
         const bool supportFits=support && supportTriangles==expectedSupportTriangles &&
             support->NonWalkableTriangleCount()+horde::scene::kFlaskRestBasinsContactTriangles<=
                 support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount());
@@ -1790,6 +1793,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             << " capacity=" << support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount())
             << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';
         bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
+                  woodland->report.bellwetherBackdropTrees==horde::scene::bellwether_woodland::kSouthCopses.size() &&
                   woodland->report.addedIndices==woodlandIndices &&
                   woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&
                   woodland->report.bellwetherRoadRuns==2u &&

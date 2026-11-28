@@ -1,10 +1,13 @@
 #include "scene/ForestSurroundings.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
 #include "../../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <string_view>
 
 namespace horde::scene {
@@ -157,26 +160,48 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         }
         return true;
     };
-    for(const auto& p:surroundings_layout::trees) {
-        if(p.asset>=4)return fail("invalid asset selection.");
-        const auto& a=sources[p.asset];const auto support=terrain->Query(p.x,p.z);
+    const auto appendTree=[&](unsigned asset,float x,float z,float yaw,float scale,std::optional<float> expectedY) {
+        if(asset>=4)return fail("invalid tree asset selection.");
+        const auto& a=sources[asset];const auto support=terrain->Query(x,z);
         if(!support.found)return fail("missing tree support.");
-        const float co=std::cos(p.yaw),si=std::sin(p.yaw);
-        float fitted=support.worldY-a.bounds.minimum[1];std::size_t tips=0;
+        const float co=std::cos(yaw),si=std::sin(yaw);
+        const float naturalBase=support.worldY-scale*a.bounds.minimum[1];
+        float fitted=naturalBase;std::size_t tips=0;
         for(const auto& v:a.vertices)if(v.position[1]<=a.bounds.minimum[1]+.03f) {
-            const auto g=terrain->Query(p.x+co*v.position[0]+si*v.position[2],p.z-si*v.position[0]+co*v.position[2]);
+            const float vx=scale*v.position[0],vz=scale*v.position[2];
+            const auto g=terrain->Query(x+co*vx+si*vz,z-si*vx+co*vz);
             if(!g.found)return fail("root footprint lacks imported ground.");
-            fitted=std::min(fitted,g.worldY-v.position[1]-.02f);++tips;
+            fitted=std::min(fitted,g.worldY-scale*v.position[1]-.02f);++tips;
         }
-        const float burial=support.worldY-a.bounds.minimum[1]-fitted;
-        if(tips<4 || burial>.6501f || std::abs(fitted-p.y)>.001f)return fail("actual root fitting differs from source receipt.");
+        const float burial=naturalBase-fitted;
+        if(tips<4 || burial>.6501f || (expectedY && std::abs(fitted-*expectedY)>.001f))
+            return fail("tree roots exceed the authored ground fit.");
         report.maximumRootBurial=std::max(report.maximumRootBurial,burial);
         if(!append(a,[&](auto v,bool){
-            const auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
+            const auto rotate=[&](auto& f){const float vx=f[0],vz=f[2];f[0]=co*vx+si*vz;f[2]=-si*vx+co*vz;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
-            v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
+            v.position[0]=x+scale*v.position[0];v.position[1]=fitted+scale*v.position[1];
+            v.position[2]=z+scale*v.position[2];return v;
         },false,false,true))return fail("invalid transformed tree basis.");
+        return true;
+    };
+    for(const auto& p:surroundings_layout::trees) {
+        if(!appendTree(p.asset,p.x,p.z,p.yaw,1.f,p.y))return false;
         ++report.extraTrees;report.addedTreeTriangles+=kTriangles[p.asset];
+    }
+    if(roadEnd==ForestRoadEnd::Bellwether) {
+        using namespace bellwether_woodland;
+        const auto startingTreeContact=report.treeContactTriangles;
+        for(const auto& p:kSouthCopses) {
+            const auto mark=gameplay::traversal::BellwetherMapStation(p.east,p.north);
+            const unsigned asset=p.species==Species::Pine?2:3;
+            if(!appendTree(asset,mark.x,mark.z,p.yaw,p.scale,std::nullopt))return false;
+            ++report.bellwetherBackdropTrees;
+            report.bellwetherBackdropTriangles+=kTriangles[asset];
+        }
+        if(report.bellwetherBackdropTriangles!=kTreeTriangles ||
+           report.treeContactTriangles-startingTreeContact!=kTreeContactTriangles)
+            return fail("Bellwether copse assets changed the reviewed render or contact counts.");
     }
     for(const auto& p:surroundings_layout::understory) {
         const auto& a=sources[5];const auto centre=terrain->Query(p.x,p.z);

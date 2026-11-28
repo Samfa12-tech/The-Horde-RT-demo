@@ -1264,14 +1264,17 @@ std::string PresentableTinyRtScene::ForestRouteProofJson() const
         ++registrations;if(row.assetIndex>=assetUsed.size())fits=false;else assetUsed[row.assetIndex]=true;
     }
     const auto assetCount=std::count(assetUsed.begin(),assetUsed.end(),true);
+    const auto woodlandRoots=forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.extraTrees:0u;
+    const auto bellwetherRoots=forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.bellwetherBackdropTrees:0u;
     out<<"{\"mode\":\""<<(forestRouteProofMode_==ForestRouteProofMode::Disabled?(SelectForestSurroundingsPrototype()?"normal-woodland480":"normal-shared64"):retention?"shared-retention64":grouped?"shared-f01-grouped-r4-76":sector?"shared-f01-sector76":shared?"shared-existing64":SelectForestSurroundingsPrototype()?"baked-surroundings480":north?"baked-f01-north68":"baked-resident")
        <<"\",\"defaultEnabled\":"<<((forestRouteProofMode_==ForestRouteProofMode::Disabled && SelectForestSurroundingsPrototype())?"true":"false")
        <<",\"requestedSharedGeometry\":"<<(sharedForestGeometryEnabled_?"true":"false")
        <<",\"activeSharedGeometry\":"<<(sharedForestGeometryActive_?"true":"false")
-       <<",\"totalTreePlacements\":"<<(64u+(forestSurroundingsPrototype_?416u:forestF01NorthPrototype_?4u:sector?12u:0u))
+       <<",\"totalTreePlacements\":"<<(64u+woodlandRoots+bellwetherRoots+(forestF01NorthPrototype_?4u:sector?12u:0u))
        <<",\"northPrototypeExtraRoots\":"<<(forestF01NorthPrototype_?4u:0u)
        <<",\"northPrototypeCollisionTriangles\":"<<(forestF01NorthPrototype_?forestF01NorthPrototype_->CollisionTriangles():0u)
-       <<",\"surroundingsExtraRoots\":"<<(forestSurroundingsPrototype_?416u:0u)
+       <<",\"surroundingsExtraRoots\":"<<woodlandRoots
+       <<",\"bellwetherBackdropRoots\":"<<bellwetherRoots
        <<",\"surroundingsRockRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.rockRuns:0u)
        <<",\"surroundingsFenceRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.fenceRuns:0u)
        <<",\"surroundingsNaturalBankRuns\":"<<(forestSurroundingsPrototype_?forestSurroundingsPrototype_->report.naturalBankRuns:0u)

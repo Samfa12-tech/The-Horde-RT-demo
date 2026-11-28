@@ -10,6 +10,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
 #include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
+#include "../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
@@ -3033,7 +3034,8 @@ void TestFullSurroundings()
     Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && r.boundaryContained && r.arrivalPortalRuns==0 &&
           r.fenceRuns+r.naturalBankRuns+r.rockRuns==surroundings_layout::edges.size() && r.openWoodlandRuns==0 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8+r.rockTriangles,
           "full study owns exact additional trees and closed rendered boundary and temporary endpoint after mapped arrival approach");
-    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560,"every candidate includes real lower tree contact and bounded understory");
+    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560 &&
+          r.bellwetherBackdropTrees==0,"the closed forest study keeps its real lower tree contact and original roster");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
           "full study reuses all existing material/primitive/asset roles without capacity growth");
@@ -3127,6 +3129,21 @@ void TestFullSurroundings()
                   road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
                   road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
                   "the live forest opens only the two road spans and retains the closed sections and full tree roster");
+            Check(road.bellwetherBackdropTrees==bellwether_woodland::kSouthCopses.size() &&
+                  road.bellwetherBackdropTriangles==bellwether_woodland::kTreeTriangles &&
+                  road.treeContactTriangles==r.treeContactTriangles+bellwether_woodland::kTreeContactTriangles,
+                  "the live chapter admits every surveyed tree with its lower trunk and existing material families");
+            for(const auto& tree:bellwether_woodland::kSouthCopses) {
+                const auto mark=gameplay::traversal::BellwetherMapStation(tree.east,tree.north);
+                const auto ground=recreatedTerrain->Query(mark.x,mark.z);
+                for(float height:{.75f,1.8f})for(float dx:{-1.2f,1.2f})for(float dz:{-1.2f,1.2f}) {
+                    const float bottom=ground.worldY+.05f,top=ground.worldY+height;
+                    Check(ground.found &&
+                          baselineTerrain->NonWalkableVolumeClear(mark.x+dx,mark.z+dz,mark.x,mark.z,bottom,top,.22f) &&
+                          !recreatedTerrain->NonWalkableVolumeClear(mark.x+dx,mark.z+dz,mark.x,mark.z,bottom,top,.22f),
+                          "the fitted Bellwether trunk blocks new standing and crouched contact from each side");
+                }
+            }
             TestBellwetherTavernRoute(recreatedTerrain,true);
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);

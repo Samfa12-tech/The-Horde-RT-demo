@@ -12,6 +12,7 @@ struct ForestSurroundingsReport {
     std::size_t rockRuns=0, rockTriangles=0;
     std::size_t bellwetherRoadRuns=0;
     std::size_t treeContactTriangles=0, understoryClumps=0, understoryTriangles=0;
+    std::size_t bellwetherBackdropTrees=0, bellwetherBackdropTriangles=0;
     std::size_t fenceTriangles=0, boundaryCollisionTriangles=0, boundaryProbes=0, addedVertices=0, addedIndices=0;
     float maximumRootBurial=0;
     // All retained boundary sections require rendered contact proof.
