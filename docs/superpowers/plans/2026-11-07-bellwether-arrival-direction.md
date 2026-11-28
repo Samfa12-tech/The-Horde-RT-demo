@@ -88,6 +88,23 @@ Protect the northwest return to the lookout, northern church/shrine routes and s
 
 The Windows host fixture drives the shared player motor from a completed 1.7 lookout checkpoint, through the fully populated forest, down the mapped road, past the square and into the south tavern entrance. It then returns to the lookout without replaying Kit’s reveal. The normal scene opens the two rail spans on the Bellwether road. The rest of the forest boundary retains its rendered collision, and the explicit historical forest proof still uses the closed turnaround.
 
+A foreground Windows run from an earned tavern slot followed the south
+ramp to the square, read the fingerpost, asked the relic dealer about trade,
+reached the kitchen plots and saw the pig and a hen from the public side of
+the stock fence. It then followed the lane back into the tavern and reached
+Kit. The save remained byte-identical. This covered the packaged game with
+ordinary mouse and keyboard actions.
+
+The walk found a Windows mouse input error at the tavern door. The visible
+Open and Close prompts now enable the context action. In the rebuilt ZIP,
+RayTracingPipeline showed the door close after a click and withdrawing
+from the swing. The closed leaf blocked movement. A second click opened
+the door and the player walked back to Kit. RayQueryCompute launched and
+presented the tavern, then exited with access violations during the approach
+in both the previous and rebuilt packages. One Windows crash event identified
+the NVIDIA compiler module, and the underlying cause remains open.
+[Exact town-walk and door receipt](../../evidence/2026-11-28-bellwether-windows-town-walk/receipt.json)
+
 Private playtest builds can enter through the ordinary campaign menus. The separate Android Bellwether app uses its own files directory. Windows Debug accepts `--bellwether-campaign-dir <local two-resident fixture>`, which checks the pinned models and texture arrays and uses `HordeLanternRT/bellwether-debug/campaign-v1` under Local AppData. New Game and Load prepare both residents with the authored scene before play begins. The lookout and tavern use the existing checkpoint format and camera/presentation barrier.
 
 The hidden Windows test picked New Game and a seeded 1.7-format lookout save through the current native slot menus on the RTX 5050 Laptop GPU. Both reached live control after hardware RT presentation with the two resident sources mounted. Returning from the lookout to the title retired those sources and preserved the test save bytes. RayTracingPipeline and RayQueryCompute each passed two New Game and four lookout assertions on the same Debug executable (SHA-256 `132814ac72207d17f45dd89c4d5a63c7f3090352824ce741818dcbdabddfa043`). The Android package and host menu checks passed. Device validation of the ordinary Android campaign route is still open.
