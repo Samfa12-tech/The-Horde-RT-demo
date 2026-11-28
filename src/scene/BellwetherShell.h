@@ -29,6 +29,7 @@
 #include "../../assets/models/world/source/bellwether-house-b-ledger-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-church-station-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-working-square-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-footway-junction-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
@@ -46,7 +47,7 @@ inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kTavernServiceSolidTriangles+gameplay::bellwether::kSquareWaymarkerSolidTriangles+
     gameplay::bellwether::kVillageRoofAddedSolidTriangles+gameplay::bellwether::kHouseBSolidTriangles+
     gameplay::bellwether::kChurchRecordStationTriangles+gameplay::bellwether::kHouseBLedgerSolidTriangles+
-    gameplay::bellwether::kWorkingSquareSolidTriangles;
+    gameplay::bellwether::kWorkingSquareSolidTriangles+gameplay::bellwether::kFootwayJunctionSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=
@@ -54,7 +55,7 @@ inline constexpr std::size_t kBellwetherGroundTriangles=
     gameplay::bellwether::kBellwetherGraveyardGroundTriangles+gameplay::bellwether::kBellwetherSmithGroundTriangles+
     gameplay::bellwether::kBellwetherPathGroundTriangles+gameplay::bellwether::kGardenHousePathTriangles+
     gameplay::bellwether::kWellApronGroundTriangles+gameplay::bellwether::kHouseBGroundTriangles+
-    gameplay::bellwether::kWorkingSquareGroundTriangles;
+    gameplay::bellwether::kWorkingSquareGroundTriangles+gameplay::bellwether::kFootwayJunctionGroundTriangles;
 inline constexpr std::size_t kBellwetherFoliageTriangles=
     gameplay::bellwether::kBellwetherGardenCropTriangles+gameplay::bellwether::kWorkingSquareLeafTriangles;
 inline constexpr std::size_t kBellwetherGlazingTriangles=12;

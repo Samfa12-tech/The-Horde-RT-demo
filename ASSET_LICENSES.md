@@ -1198,6 +1198,9 @@ The footway, crossing, rails and turnout are original Horde geometry using
 those same Bellwether timber and masonry materials. The editable source and
 receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
 
+The original Horde [footway junction revision](assets/models/world/source/bellwether-footway-junction-v1/README.md)
+reuses the existing Bellwether masonry and retains the surveyed terrain.
+
 ## Bellwether waterwheel contact audio - 23 November 2026
 
 The finite oak journal cue in assets/audio/bellwether-mill/ is original Horde

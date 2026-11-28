@@ -760,9 +760,9 @@ int main(int argc,char** argv) {
             auto point=kBellwetherMillApproach[1];
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
             float foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
-            const auto follow=[&](BellwetherStation target, bool dry=false) {
+            const auto follow=[&](BellwetherStation target, bool dry=false, float stride=.05f) {
                 const auto start=point;
-                const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/.05f)));
+                const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/stride)));
                 for(int i=1;i<=steps;++i) {
                     const float t=static_cast<float>(i)/steps;
                     const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
@@ -792,6 +792,15 @@ int main(int argc,char** argv) {
                   std::all_of(kBellwetherMillCrossing.begin(),kBellwetherMillCrossing.end(),dry) &&
                   std::all_of(kBellwetherMillCrossing.rbegin(),kBellwetherMillCrossing.rend(),dry),
                   "the ordinary standing capsule walks dry from the old causeway to the wheel and across the millrace in both directions");
+            for(float offset:{-.55f,-.35f,0.f,.35f,.55f}) {
+                const float z=kBellwetherRiverDryMark.z+offset;
+                const BellwetherStation upstream{132.5f,z}, downstream{137.5f,z};
+                for(const auto& [start,end]:{std::pair{upstream,downstream},std::pair{downstream,upstream}}) {
+                    point=start;
+                    foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
+                    check(follow(end,false,.032f),"the standing capsule crosses the footway junction at walking speed in the causeway lane");
+                }
+            }
             const auto turnout=kBellwetherMillCrossing.back();
             const auto turnoutGround=support->Query(turnout.x,turnout.z);
             check(!support->NonWalkableVolumeClear(turnout.x,turnout.z,turnout.x+1.f,turnout.z,
