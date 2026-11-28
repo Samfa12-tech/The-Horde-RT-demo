@@ -1321,6 +1321,7 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     std::uint64_t welcomeGeneration=0;
     unsigned welcomes=0;
     bool welcomeAtDoor=true,kitWalkedDuringWelcome=false;
+    bool keeperAddressedKit = false, keeperDoorTurnBounded = true;
     std::vector<horde::audio::KitAnkleCue> ankleCues;
     bool ankleCuesMatchContact=true, anklePausedBeforeCue=false;
     unsigned hearthCues=0;
@@ -1342,10 +1343,24 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
     const auto step=[&] {
         using horde::gameplay::dialogue::BellwetherRoadStoneWorldFromModel;
         const auto before=game.Snapshot().chapterCompanion;
+        const auto beforeKeeper = game.Snapshot().tavernKeeper;
         game.StepFixed(input);
         const auto& after=game.Snapshot();const auto& kit=after.chapterCompanion;
         if(const auto& keeper=after.tavernKeeper) {
             keeperAtDoor|=keeper->stage==TavernKeeperStage::AtDoor;
+            if (keeper->stage == TavernKeeperStage::AtDoor && beforeKeeper &&
+                beforeKeeper->stage == TavernKeeperStage::AtDoor) {
+                constexpr float fullTurn = 6.28318530718f;
+                keeperDoorTurnBounded &= keeper->foot == beforeKeeper->foot &&
+                    std::abs(std::remainder(keeper->yaw - beforeKeeper->yaw, fullTurn)) <= 1.5f / 60.f + .00001f;
+                if (after.chapterDialogue.line == Line::TavernWelcome) {
+                    const float kitHeading = std::atan2(kit.x - keeper->foot[0], keeper->foot[2] - kit.z);
+                    const float restingError = std::abs(std::remainder(
+                        kitHeading - gameplay::bellwether::kKeeperDoorFacingRadians, fullTurn));
+                    const float currentError = std::abs(std::remainder(kitHeading - keeper->yaw, fullTurn));
+                    keeperAddressedKit |= currentError + .04f < restingError;
+                }
+            }
             if(keeper->travelled>0.f) {
                 keeperWalkedAfterSeat&=kit.bellwetherArrival==Stage::Seated;
                 keeperTravel+=keeper->travelled;
@@ -1596,6 +1611,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
           "an admitted keeper starts clear of Kit, walks the real aisle and reaches the hearth before Talk appears");
     Check(stayAtIncident ? (welcomes==1 && welcomeAtDoor && kitWalkedDuringWelcome) : welcomes==0,
           "the welcome plays once at the mapped door while Kit keeps walking, and requires the keeper");
+    Check(!stayAtIncident || (keeperAddressedKit && keeperDoorTurnBounded),
+          "the keeper turns smoothly toward Kit during the welcome with her feet planted at the door");
     if(stayAtIncident) {
         const auto previousHearthCues=hearthCues;
         for(unsigned tick=0;tick<sim::ChapterLocalAmbience::kHearthIntervalTicks &&

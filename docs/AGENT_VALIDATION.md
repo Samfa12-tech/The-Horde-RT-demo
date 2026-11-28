@@ -142,7 +142,10 @@ Build the Windows Debug executable from a clean commit with
 the five Windows resident folders and the thirteen base audition WAVs. The
 six follow-on takes and the two Kit hearth takes form separate optional groups. The record keeper’s individual shrine-errand and directions takes can each be supplied by its stable ID and pinned WAV hash. The packager stages
 the current runtime roster and existing flask and revival assets in a ZIP under
-`reports/`. Extract the entire ZIP and open `HordeLanternRT.exe`. The executable
+`reports/`. Pass `-ArchiveOnly` when you only need the ZIP and verification
+receipt. By default, the packager also extracts a runnable copy beside the ZIP.
+To move the playtest to another folder, extract the entire ZIP and open
+`HordeLanternRT.exe`. The executable
 detects the local playtest marker, validates the packaged overlays, and uses the
 separate `bellwether-playtest/campaign-v1` save profile.
 
