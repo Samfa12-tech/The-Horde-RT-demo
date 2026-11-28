@@ -5231,3 +5231,29 @@ was left installed and the handset returned to Home. This run covers the
 opening and a repeatable delay on return from Home. The staffed-village
 route, sustained moving performance and listening still need a run on
 this candidate. [Exact handset receipt](evidence/2026-11-28-bellwether-full-package/phone-opening.json)
+
+### 28 November 2026 — Short Home returns reuse compiled hardware RT pipelines
+
+The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the isolated optimized
+ARM64 build from `6242f22c42ee8f5722daac02978c910c1ead8586`. The installed APK
+hash matched the local candidate. Its 295 runtime assets and four
+Shipping/Mobile shader modules matched the previous playtest byte for byte.
+New Game reached the opening ruin at the same 33% scale (475 × 980 internal,
+1440 × 2971 output) on RayTracingPipeline. A touch gesture moved the player
+to the doorway used for the Home-return checks.
+
+| Same-process Home return | New surface request to first RT present |
+| --- | ---: |
+| Previous build, two quick returns | 19.260 s, 19.761 s |
+| Updated build, two quick returns | 1.241 s, 1.116 s |
+| Updated build, after cache expiration | 20.551 s |
+
+Both quick returns revalidated the device and graphics/present queue for
+the new surface and reused one compiled pipeline pair. The third return
+confirmed the idle device was released 15.007 seconds after retention and
+then rebuilt the pipelines. Its pipeline-bundle setup took 19.361 seconds.
+The doorway view and HUD were visible after all three returns. USB remained
+connected, battery temperature moved from 36.5°C to 38.3°C, and Android
+thermal status moved from 0 to 1. This checks Home return on one handset
+and backend. The staffed village and sustained moving performance are
+still separate acceptance checks. [Exact Home-return receipt](evidence/2026-11-28-android-home-return/receipt.json)
