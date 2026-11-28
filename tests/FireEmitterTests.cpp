@@ -316,6 +316,18 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
         upload.selectedStableIds[0]==kChurchRecordLampEmitterId &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
         "the church approach uses its pinned oil cup alongside the held lantern within the shared exterior budget");
+    const auto& marketLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
+    auto marketLamp=MakeWorkingSquareLampEmitter();
+    StepFireEmitterFixed(marketLamp,WorkingSquareLampFireInput(),kFixedDelta);
+    const std::array marketFires{hearth,candle,marketLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(71.f,134.85f)==kWorkingSquareLampRosterIndex &&
+        SelectBellwetherExteriorLamp(76.15f,135.15f)==kWorkingSquareLampRosterIndex &&
+        Approx(marketLamp.worldFromLight[13],marketLight[1]) &&
+        BuildFireEmitterUpload(marketFires,{marketLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kWorkingSquareLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the market oil lamp covers both approaches alongside the held lantern within the exterior budget");
     return ok;
 }
 

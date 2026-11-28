@@ -10,18 +10,28 @@
     "02a-bellwether-terrain-1-8.webp": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
     "02b-bellwether-use-1-8.webp": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49"
   },
-  "layoutSha256": "b72a1b19e3a5210881d4b6a4d7bcc697ee5f43ed18752d7df816337a4986bc63",
-  "recipeSha256": "7ee4f3c49801a334ca073fcfe307189b0df82f96d8519e9ec05e9b6a4502bb40",
+  "layoutSha256": "cca4f5ffea547752e438e1b8676a57eaa01fea57cd729cc13c94918e998a3f21",
+  "recipeSha256": "f067280e9cc346fcb78c9dc5c88c6755b5e43a74bdb1214c126259108d4ea727",
   "blender": "5.2.0 LTS",
-  "addedSolidTriangles": 2504,
+  "addedSolidTriangles": 2632,
   "addedGroundTriangles": 18,
   "addedLeafTriangles": 768,
+  "marketLampFlame": [
+    73.45,
+    -10.102513671875,
+    135.59
+  ],
+  "marketLampLight": [
+    73.45,
+    -9.966513671875,
+    135.565
+  ],
   "files": {
-    "working-square.blend": "d22d38c1d553615ca30e99449297bef5e39e6e63b1c2e94d776169bb19f65f92",
-    "geometry.generated.h": "f777c68f5c97364d056537f3a4b6512328825719cb1097a4cf5182ff8005e4c3",
-    "bellwether-tavern-v1.glb": "73147c3f15d6ff788aeb82caa72d93eba5eea24b129b1d0403eff45d8f818b71",
+    "working-square.blend": "832204825472ac581c698da3f85129810ceec1464d55dc3defc4135614235f5b",
+    "geometry.generated.h": "c0172dab9087e6f6c76b09d5aa63af2bbf1b9fc23a3b4a5f0fa528f84cb8fafc",
+    "bellwether-tavern-v1.glb": "5bb12749a579f3ba3387c5e0feea83dee8024685c623dd8983f327c45272a26f",
     "garden-crops.glb": "2a90b580a1ecc0c5ee2f1c56a5630a4d495493158f687505546856e888c70c82",
-    "asset.manifest.json": "23202dfb36653be110990c97659810bca82bc3c904bdfa0ecead5fa75dff91cb",
+    "asset.manifest.json": "48c8fddc6ec07fe1fdda3ba901ee057e097423317a89c6fdf7b6be42235b970d",
     "garden-crops.manifest.json": "d47358047edd4c3fc8bb816ac87fa0ebfe58fbf373fededa7ba14add7f41673e"
   }
 }

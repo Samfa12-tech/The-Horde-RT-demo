@@ -1,7 +1,7 @@
 {
   "candidateContentCommit": "fec01c7452f4259acd84d8a92a6609fdad0bc089",
   "launch": "Release executable and four refreshed village assets staged over the previously verified ordinary Windows payload. Built before the content commit. No new installer or release archive.",
-  "assetReceipt": "../../../assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
+  "assetReceipt": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/fec01c7452f4259acd84d8a92a6609fdad0bc089/assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
   "executableSha256": "05379a2062744518397ff3ec9e3000100f71dba379898cb289d199e9d19dfaa2",
   "host": {
     "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",

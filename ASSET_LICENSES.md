@@ -1326,8 +1326,8 @@ in private storage, with ownership recorded in the 28 November intake.
 
 ## Bellwether market and working yards - 28 November 2026
 
-Samfa12/Codex authored the market stalls, stone plot edges, loading piles,
-pollard and verge plants in Blender for Horde. They use the existing town
+Samfa12/Codex authored the market stalls, clay oil lamp, stone plot edges,
+loading piles, pollard and verge plants in Blender for Horde. They use the existing town
 masonry and clay, Horde chest wood and the ForestAlder atlas already admitted
 for the garden. The [layout, editable source and receipt](assets/models/world/source/bellwether-working-square-v1/README.md)
 identify the assets and original Bellwether surveys. The owner's *Moonlit Village

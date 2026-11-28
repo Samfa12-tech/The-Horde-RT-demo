@@ -13,6 +13,7 @@
 #include "../../../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-house-b-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-church-station-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-working-square-v1/geometry.generated.h"
 
 namespace horde::gameplay::effects
 {
@@ -30,6 +31,8 @@ inline constexpr std::uint32_t kHouseBLampEmitterId=0x4230344cu;
 inline constexpr std::size_t kHouseBLampRosterIndex=10;
 inline constexpr std::uint32_t kChurchRecordLampEmitterId=0x4243524cu;
 inline constexpr std::size_t kChurchRecordLampRosterIndex=11;
+inline constexpr std::uint32_t kWorkingSquareLampEmitterId=0x424d4b4cu;
+inline constexpr std::size_t kWorkingSquareLampRosterIndex=12;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -227,6 +230,22 @@ inline FireEmitterFixedStepInput ChurchRecordLampFireInput()
     return BellwetherFireInput(bellwether::kChurchRecordStationFlame,bellwether::kChurchRecordStationLight,1.45f);
 }
 
+inline FireEmitterState MakeWorkingSquareLampEmitter()
+{
+    auto emitter=MakeBellwetherPorchLampFireEmitter();
+    emitter.stableId=kWorkingSquareLampEmitterId;
+    emitter.seed=0x4d41524bu;
+    emitter.colourTemperatureKelvin=2225.f;
+    emitter.height=.21f;
+    emitter.authoredStrengthScale=2.2f;
+    return emitter;
+}
+
+inline FireEmitterFixedStepInput WorkingSquareLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kWorkingSquareLampFlame,bellwether::kWorkingSquareLampLight,1.f);
+}
+
 inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noexcept
 {
     struct LampZone {
@@ -242,6 +261,7 @@ inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noex
         LampZone{bellwether::kSquarePorchLampLight,12.5f,7},
         LampZone{bellwether::kHouseBLampLight,14.f,kHouseBLampRosterIndex},
         LampZone{bellwether::kChurchRecordStationLight,13.f,kChurchRecordLampRosterIndex},
+        LampZone{bellwether::kWorkingSquareLampLight,9.f,kWorkingSquareLampRosterIndex},
     };
     float nearest=std::numeric_limits<float>::max();
     std::size_t slot=2; // River fork is the existing exterior default.

@@ -12,6 +12,7 @@
     ["Vegetable stall", 71.0, 136.55, 2.75],
     ["Travelling supply stall", 76.15, 136.95, 2.40]
   ],
+  "marketLamp": [73.45, 136.04],
   "loadingPlaces": [
     ["Tavern delivery", 90.7, 121.78],
     ["Store frontage", 60.0, 147.23],

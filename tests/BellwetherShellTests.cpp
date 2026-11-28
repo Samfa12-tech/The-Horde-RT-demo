@@ -422,6 +422,11 @@ int main(int argc,char** argv) {
             const BellwetherStation marketWest{71.f,134.85f}, marketEast{76.15f,135.15f};
             check(follow(marketWest,marketEast) && follow(marketEast,marketWest),
                   "both market pitches open onto a continuous pedestrian apron");
+            const auto& lampFlame=horde::gameplay::bellwether::kWorkingSquareLampFlame;
+            const auto& lampLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
+            check(support->NonWalkableVolumeClear(lampFlame[0],lampFlame[2],lampLight[0],lampLight[2],
+                      lampFlame[1]-.01f,lampLight[1]+.01f,.014f),
+                  "the market flame and light sample sit clear of the cup and its timber bracket");
             const auto marketWall=support->Query(72.f,141.f);
             check(marketWall.found &&
                   !support->NonWalkableVolumeClear(72.f,140.50f,72.f,141.50f,
