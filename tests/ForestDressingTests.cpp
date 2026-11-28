@@ -10,7 +10,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
 #include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
-#include "../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
+#include "../assets/models/world/source/bellwether-woodland-v1/placements.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
@@ -3182,7 +3182,7 @@ void TestFullSurroundings()
                   road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
                   road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
                   "the live forest opens only the two road spans and retains the closed sections and full tree roster");
-            Check(road.bellwetherBackdropTrees==bellwether_woodland::kSouthCopses.size() &&
+            Check(road.bellwetherBackdropTrees==bellwether_woodland::kBellwetherCopses.size() &&
                   road.bellwetherBackdropTriangles==bellwether_woodland::kTreeTriangles &&
                   road.treeContactTriangles==r.treeContactTriangles+bellwether_woodland::kTreeContactTriangles,
                   "the live chapter admits every surveyed tree with its lower trunk and existing material families");
@@ -3191,7 +3191,7 @@ void TestFullSurroundings()
                   recreatedTerrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+
                       road.treeContactTriangles+road.boundaryCollisionTriangles,
                   "Bellwether's low planting shares the existing families and adds no obstacle faces");
-            for(const auto& tree:bellwether_woodland::kSouthCopses) {
+            for(const auto& tree:bellwether_woodland::kBellwetherCopses) {
                 const auto mark=gameplay::traversal::BellwetherMapStation(tree.east,tree.north);
                 const auto ground=recreatedTerrain->Query(mark.x,mark.z);
                 for(float height:{.75f,1.8f})for(float dx:{-1.2f,1.2f})for(float dz:{-1.2f,1.2f}) {

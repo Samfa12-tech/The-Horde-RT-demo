@@ -16,7 +16,7 @@
 #include "vulkan/raytracing/BellwetherWaterwheelRenderData.h"
 #include "vulkan/raytracing/SimulationFrameAdapter.h"
 #include "../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
-#include "../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
+#include "../assets/models/world/source/bellwether-woodland-v1/placements.h"
 
 #ifdef _MSC_VER
 #include <crtdbg.h>
@@ -1796,7 +1796,7 @@ struct PresentableTinyRtSceneObservationTestAccess
             << " capacity=" << support->NonWalkableCapacity(support->TriangleCount()+support->StepTriangleCount())
             << " ground=" << support->TriangleCount() << " step=" << support->StepTriangleCount() << '\n';
         bool ok = supportFits && woodland && woodland->report.extraTrees==416u &&
-                  woodland->report.bellwetherBackdropTrees==horde::scene::bellwether_woodland::kSouthCopses.size() &&
+                  woodland->report.bellwetherBackdropTrees==horde::scene::bellwether_woodland::kBellwetherCopses.size() &&
                   woodland->report.bellwetherUnderstoryClumps==horde::scene::bellwether_woodland::kSouthUnderstory.size() &&
                   woodland->report.addedIndices==woodlandIndices &&
                   woodland->report.boundarySectionsContained && !woodland->report.boundaryContained &&

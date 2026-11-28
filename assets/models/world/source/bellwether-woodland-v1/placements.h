@@ -12,9 +12,9 @@ struct Tree {
     bool middleCrown;
 };
 
-// Survey metres. The two copses sit beyond the west garden and store, and
-// behind the outbuilding. The smith lane and the southeast road stay open.
-inline constexpr std::array<Tree,14> kSouthCopses{{
+// East and north metres from the Bellwether terrain survey.
+inline constexpr std::array<Tree,32> kBellwetherCopses{{
+    // South woodland.
     {Species::Alder,-42.f,-27.f,.35f,1.02f,true},
     {Species::Pine,-47.f,-32.f,2.12f,1.08f,false},
     {Species::Pine,-42.f,-37.f,4.63f,.94f,false},
@@ -29,11 +29,32 @@ inline constexpr std::array<Tree,14> kSouthCopses{{
     {Species::Pine,-3.f,-54.f,5.27f,1.08f,false},
     {Species::Alder,4.f,-55.f,3.32f,1.07f,true},
     {Species::Pine,10.f,-51.f,4.75f,.97f,true},
+
+    // West slope below the gardens. Stagger the taller crowns and keep
+    // the garden terraces and House A lane on the village side of the grove.
+    {Species::Pine,-55.f,-24.f,1.18f,1.04f,true},
+    {Species::Alder,-58.f,-12.f,4.03f,1.15f,true},
+    {Species::Pine,-60.f,-33.f,2.71f,1.12f,true},
+    {Species::Alder,-62.f,-21.f,1.20f,0.89f,false},
+    {Species::Pine,-64.f,-15.f,5.33f,1.18f,false},
+    {Species::Pine,-63.f,-27.f,3.17f,0.86f,false},
+    {Species::Alder,-64.f,-41.f,3.42f,1.10f,true},
+    {Species::Pine,-67.f,-35.f,5.62f,1.06f,false},
+    {Species::Pine,-69.f,-23.f,0.28f,1.20f,false},
+    {Species::Alder,-54.f,-47.f,2.88f,1.04f,false},
+    {Species::Pine,-71.f,-45.f,4.66f,1.17f,false},
+    {Species::Alder,-56.f,-52.f,0.91f,1.12f,false},
+    {Species::Pine,-74.f,-28.f,4.32f,1.09f,false},
+    {Species::Pine,-74.f,-37.f,2.74f,0.95f,false},
+    {Species::Alder,-58.f,-57.f,1.44f,1.08f,false},
+    {Species::Pine,-60.f,-52.f,5.24f,1.12f,false},
+    {Species::Pine,-79.f,-34.f,3.71f,1.19f,false},
+    {Species::Pine,-65.f,-50.f,0.83f,1.08f,false},
 }};
 
 inline constexpr std::size_t kTreeTriangles=[] {
     std::size_t total=0;
-    for(const auto& tree:kSouthCopses) {
+    for(const auto& tree:kBellwetherCopses) {
         const bool pine=tree.species==Species::Pine;
         const std::size_t bark=pine?20:84;
         const std::size_t crown=tree.middleCrown?1120:(pine?144:96);
@@ -41,7 +62,7 @@ inline constexpr std::size_t kTreeTriangles=[] {
     }
     return total;
 }();
-inline constexpr std::size_t kTreeContactTriangles=kSouthCopses.size()*10;
+inline constexpr std::size_t kTreeContactTriangles=kBellwetherCopses.size()*10;
 
 struct Understory {
     float x, z, yaw, scale;

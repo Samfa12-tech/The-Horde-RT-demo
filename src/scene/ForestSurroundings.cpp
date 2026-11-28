@@ -2,7 +2,7 @@
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
 #include "gameplay/traversal/BellwetherTavernRoute.h"
-#include "../../assets/models/world/source/bellwether-woodland-v1/south-copses.h"
+#include "../../assets/models/world/source/bellwether-woodland-v1/placements.h"
 #include "../../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include <algorithm>
 #include <cmath>
@@ -206,7 +206,7 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
             return count;
         };
         const auto startingIndices=indexCount();
-        for(const auto& p:kSouthCopses) {
+        for(const auto& p:kBellwetherCopses) {
             const auto mark=gameplay::traversal::BellwetherMapStation(p.east,p.north);
             const unsigned asset=p.species==Species::Pine?2:3;
             if(!appendTree(asset,mark.x,mark.z,p.yaw,p.scale,std::nullopt,p.middleCrown))return false;
