@@ -15,6 +15,7 @@ town = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-works.py")))
 mesh_tools = runpy.run_path(str(RECIPE.with_name("author-bellwether-mill-crossing.py")))
 paths = runpy.run_path(str(RECIPE.with_name("author-bellwether-paths.py")))
 waymarker = runpy.run_path(str(RECIPE.with_name("author-bellwether-square-waymarker.py")))
+paving = runpy.run_path(str(RECIPE.with_name("author-bellwether-well-apron.py")))
 SOURCE = Path("assets/models/world/source/bellwether-working-square-v1")
 MAP = Path("docs/references/horde-1.7/d37f1638/docs/design/world/connected")
 PARENTS = {
@@ -42,8 +43,9 @@ def author(layout, ground):
     stone = town["material"]("HordeTownStone", (.28, .25, .20), .93)
     oak = town["material"]("HordeTavernTimber", (.27, .16, .085), .88)
     clay = town["material"]("HordeTownRoofClay", (.34, .22, .12), .93)
+    dark = town["material"]("HordeHearthChar", (.065, .045, .036), .88)
     leaf = town["material"]("HordeGardenLeaf", (.16, .25, .087), .9)
-    solid, planting = [], []
+    solid, planting, sprouts = [], [], []
 
     def box(name, x, z, width, depth, bottom, top, finish, chamfer=0.):
         solid.append(town["block"](name, x-width/2, x+width/2, z-depth/2, z+depth/2,
@@ -84,13 +86,23 @@ def author(layout, ground):
                           for x, z in outline]
                 solid.append(mesh_tools["mesh"](f"{name} stone {course:.2f}/{i+1}", points, BOX_FACES, stone))
 
-    def crate(name, x, z, width, depth, base, market_display=False):
-        box(name, x, z, width, depth, base, base+.40, oak, .025 if market_display else 0.)
-        if market_display:
-            for side in (-1, 1):
-                box(f"{name} lid batten", x+side*width*.33, z, .065, depth+.02, base+.39, base+.448, oak)
+    def crate(name, x, z, width, depth, base):
+        box(name, x, z, width, depth, base, base+.40, oak)
 
-    for name, x, z, width in layout["marketStalls"]:
+    def produce_tray(x, y, z):
+        box("Vegetable tray base", x,z,.60,.34,y,y+.034,oak)
+        for side in (-1,1):
+            box("Vegetable tray long slat", x,z+side*.157,.61,.034,y+.030,y+.095,oak)
+            box("Vegetable tray end slat", x+side*.284,z,.036,.30,y+.030,y+.092,oak)
+        for row in (-1,1):
+            for i, dx in enumerate((-.173, -.006, .162)):
+                px, pz = x+dx+row*.012,z+row*.063
+                top = y+.155-(i%2)*.018
+                bulb = ((-.012,.030),(.032,.067),(.071,.061),(top-y-.035,.025))
+                waymarker["turned"](solid,"Root vegetable",(px,y+.035,pz),bulb,6,clay if (i+row)%2 else stone)
+                sprouts.append((px,top,pz))
+
+    for index, (name, x, z, width) in enumerate(layout["marketStalls"]):
         y = ground(x, z)
         front, back = z-.72, z+.74
         for side in (-1, 1):
@@ -108,8 +120,14 @@ def author(layout, ground):
                 box(f"{name} counter leg", x+side*width*.35, z-.24+end*.26, .11, .11, y-.12, y+.83, oak)
         for plank in range(4):
             box(f"{name} counter plank", x, z-.53+plank*.18, width*.83, .176, y+.78, y+.87, oak)
-        for i, offset in enumerate((-.49, .24)):
-            crate(f"{name} produce box {i+1}", x+offset, z-.14, .51, .35, y+.85, market_display=True)
+        if index == 0:
+            for offset in (-.61, .29):
+                produce_tray(x+offset,y+.868,z-.31)
+        else:
+            for offset, size in ((-.65,.83),(-.25,.68),(.32,1.0)):
+                profile = ((0.,.087),(.033,.133),(.18,.169),(.29,.136),(.34,.085),(.365,.093),(.366,.071),(.22,.066))
+                waymarker["turned"](solid,"Travelling supplier's earthenware jar",(x+offset,y+.866,z-.30),
+                    tuple((h*size,r*size) for h,r in profile),10,clay)
         crate(f"{name} packed stock", x+.40, z+.47, .70, .51, ground(x+.40,z+.47))
 
     # The post sits in the gap between the pitches. The bracket carries the
@@ -138,6 +156,29 @@ def author(layout, ground):
                 timber(f"{name} split fuel", (px,py,pz-.34), (px+.028,py+.018,pz+.31+rng.uniform(-.055,.10)),
                        .124,.105,sides=5)
 
+    x, z = layout["storeLoadingBench"]
+    y = ground(x,z)
+    for dx in (-.53,.53):
+        for dz in (-.22,.22):
+            px,pz=x+dx,z+dz
+            box("Store loading bench leg",px,pz,.14,.14,ground(px,pz)-.08,y+.53,oak)
+    for dz in (-.20,0.,.20):
+        box("Store loading bench plank",x,z+dz,1.43,.192,y+.49,y+.57,oak)
+    crate("Store bench parcel",x-.28,z+.02,.48,.37,y+.57)
+
+    for x,z,scale in layout["storeCasks"]:
+        y = ground(x,z)+.021
+        for dx in (-.17,.17):
+            px=x+dx
+            box("Cask dunnage",px,z,.11,.64,ground(px,z)-.025,y+.095,oak)
+        y += .091
+        profile = ((0.,.228),(.07,.254),(.23,.30),(.45,.315),(.62,.290),(.78,.251),(.82,.229))
+        waymarker["turned"](solid,"Store staved cask",(x,y,z),
+            tuple((h*scale,r*scale) for h,r in profile),12,oak)
+        for height, radius in ((.09,.262),(.41,.321),(.75,.265)):
+            waymarker["turned"](solid,"Cask iron hoop",(x,y+scale*height,z),
+                ((-.021,radius*scale),(.021,radius*scale)),12,dark)
+
     def spray(name, x, y, z, spread, rise, count):
         for i in range(count):
             yaw = i*2.39996+rng.uniform(-.4,.4)
@@ -162,7 +203,25 @@ def author(layout, ground):
         tip = (x+dx,y+ht,z+dz)
         timber(f"Pollard branch {index+1}",(x+.07,y+1.99,z),tip,.087,.024)
         spray(f"Pollard canopy {index+1}", *tip, .87, .60, 12)
+    for x,y,z in sprouts:
+        spray("Market root greens",x,y-.004,z,.095,.083,1)
     return solid, planting, stone, flame, light
+
+
+def market_pavers(layout, ground, stone):
+    rng = random.Random(15351)
+    paving_layout = layout["marketPaving"]
+    centres = [(x+pitch*i+rng.uniform(-.023,.023), z+rng.uniform(-.023,.023))
+               for x,z,count,pitch in paving_layout["rows"] for i in range(count)]
+    centres.extend(paving_layout["steps"])
+    parts = []
+    for i, centre in enumerate(centres):
+        slab = {"name": f"Market apron slab {i+1}", "centre": centre,
+                "size": (rng.uniform(.62,.68),rng.uniform(.53,.58)),
+                "shape": "east-west" if i%4 != 3 else "north-south"}
+        part, _ = paving["build_stone"](slab,ground,stone,.017,.008,.008,.075)
+        parts.append(part)
+    return parts
 
 
 def main(root, parent, output):
@@ -178,9 +237,10 @@ def main(root, parent, output):
     bpy.data.orphans_purge(do_recursive=True)
     solid, planting, stone, flame, light = author(layout, ground)
     previous_paths = json.loads((root/"assets/models/world/source/bellwether-paths-v1/layout.json").read_bytes())["routes"]
-    spur = layout["marketSpur"]
-    footprint = paths["fit_routes"](terrain, previous_paths+[spur])[-1]
-    road = [paths["make_part"](spur["name"], footprint, stone)]
+    routes = [layout["marketSpur"],layout["storePath"]]
+    footprints = paths["fit_routes"](terrain,previous_paths+routes)[-len(routes):]
+    road = [paths["make_part"](route["name"],footprint,stone) for route,footprint in zip(routes,footprints)]
+    road.extend(market_pavers(layout,ground,stone))
     output.mkdir(parents=True)
     blend = output/"working-square.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(blend), compress=True)
@@ -195,7 +255,7 @@ def main(root, parent, output):
     foliage = output/"garden-crops.glb"
     leaf_count, leaf_vertices, leaf_primitives = town["join_town"](parent/foliage.name, planting_glb, foliage,
                                                                   node_name="BellwetherGardenCrops")
-    if not 0 < solid_count <= 2660 or not 0 < ground_count < 600 or not 0 < leaf_count <= 850:
+    if not 0 < solid_count <= 4700 or not 0 < ground_count <= 720 or not 0 < leaf_count <= 850:
         raise ValueError((solid_count, ground_count, leaf_count))
     if (primitive_count,leaf_primitives) != (6,1) or leaf_vertices > 8192:
         raise ValueError("Unexpected town primitive or foliage vertex counts.")
@@ -209,6 +269,8 @@ def main(root, parent, output):
     header = output/"geometry.generated.h"
     flame_coordinates = ", ".join(f"{value:.6f}f" for value in flame)
     light_coordinates = ", ".join(f"{value:.6f}f" for value in light)
+    store_stations = layout["storePath"]["stations"]
+    store_coordinates = ",\n    ".join(f"{{{{{x:.6f}f, {z:.6f}f}}}}" for x,z,_ in store_stations)
     header.write_text("#pragma once\n#include <array>\n#include <cstddef>\n\n"
                       "// Generated by tools/author-bellwether-working-square.py.\n"
                       "namespace horde::gameplay::bellwether {\n"
@@ -217,6 +279,8 @@ def main(root, parent, output):
                       f"inline constexpr std::size_t kWorkingSquareLeafTriangles={leaf_count};\n"
                       f"inline constexpr std::array<float,3> kWorkingSquareLampFlame{{{{{flame_coordinates}}}}};\n"
                       f"inline constexpr std::array<float,3> kWorkingSquareLampLight{{{{{light_coordinates}}}}};\n"
+                      f"inline constexpr std::array<std::array<float,2>,{len(store_stations)}> kWorkingSquareStorePath{{{{\n"
+                      f"    {store_coordinates}\n}}}};\n"
                       "}\n", encoding="utf-8", newline="\n")
     town["save_json"](output/"authoring-receipt.json", dict(parents=PARENTS, terrainSha256=town["sha"](terrain),
         mapSha256={name:town["sha"](root/MAP/name) for name in ("02a-bellwether-terrain-1-8.webp","02b-bellwether-use-1-8.webp")},

@@ -10,12 +10,12 @@
     "02a-bellwether-terrain-1-8.webp": "8c463d0d87a2b0fe5aa1f16f934671819ac7f8954d0dc65744d509fb146d3135",
     "02b-bellwether-use-1-8.webp": "d88f4c11b3e224cdb2e641afadb4524ff705eecf9dbaaa067bddb94206d18f49"
   },
-  "layoutSha256": "cca4f5ffea547752e438e1b8676a57eaa01fea57cd729cc13c94918e998a3f21",
-  "recipeSha256": "f067280e9cc346fcb78c9dc5c88c6755b5e43a74bdb1214c126259108d4ea727",
+  "layoutSha256": "b77b391930516f1e3b07c501bafc71192a17e740a4634a1c45517a875fe00c4a",
+  "recipeSha256": "35f4a187f650af2cbc221683e5479081f0a4c4fc6bb79b2f1ad7fb4d1f632a25",
   "blender": "5.2.0 LTS",
-  "addedSolidTriangles": 2632,
-  "addedGroundTriangles": 18,
-  "addedLeafTriangles": 768,
+  "addedSolidTriangles": 4276,
+  "addedGroundTriangles": 581,
+  "addedLeafTriangles": 840,
   "marketLampFlame": [
     73.45,
     -10.102513671875,
@@ -27,11 +27,11 @@
     135.565
   ],
   "files": {
-    "working-square.blend": "832204825472ac581c698da3f85129810ceec1464d55dc3defc4135614235f5b",
-    "geometry.generated.h": "c0172dab9087e6f6c76b09d5aa63af2bbf1b9fc23a3b4a5f0fa528f84cb8fafc",
-    "bellwether-tavern-v1.glb": "5bb12749a579f3ba3387c5e0feea83dee8024685c623dd8983f327c45272a26f",
-    "garden-crops.glb": "2a90b580a1ecc0c5ee2f1c56a5630a4d495493158f687505546856e888c70c82",
-    "asset.manifest.json": "48c8fddc6ec07fe1fdda3ba901ee057e097423317a89c6fdf7b6be42235b970d",
-    "garden-crops.manifest.json": "d47358047edd4c3fc8bb816ac87fa0ebfe58fbf373fededa7ba14add7f41673e"
+    "working-square.blend": "54bad1027ade1aadb9bd3fab28ce78d163d2ddfe885c8385b3de11b52383c51d",
+    "geometry.generated.h": "ef17fe4d1ad00c66a1a1b97051d01fe915d70cd861ed5465d94865392d1ede6b",
+    "bellwether-tavern-v1.glb": "7e6eddae117366ce889d9495c006da9014bcf8e00fc11a5162402a517439c6d6",
+    "garden-crops.glb": "f55c859abd1d8a7c86028ae98f8534873d371ebc011a679bae963b8244beeae3",
+    "asset.manifest.json": "19299ab0b2bc4ddd95d81ea48c81feca61f3ece46c5cfcd6217a5e6fc64a4a50",
+    "garden-crops.manifest.json": "46f3ced145886b04c5a3761336792946fa72a541d04d9647841ab8e3cb68e2a9"
   }
 }

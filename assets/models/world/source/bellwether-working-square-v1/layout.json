@@ -13,6 +13,12 @@
     ["Travelling supply stall", 76.15, 136.95, 2.40]
   ],
   "marketLamp": [73.45, 136.04],
+  "marketPaving": {
+    "rows": [[69.87, 134.84, 10, 0.80], [70.22, 135.55, 9, 0.78]],
+    "steps": [[76.98, 133.27], [76.98, 134.01]]
+  },
+  "storeLoadingBench": [64.20, 151.44],
+  "storeCasks": [[65.15, 150.86, 1.0], [65.17, 151.64, 0.84]],
   "loadingPlaces": [
     ["Tavern delivery", 90.7, 121.78],
     ["Store frontage", 60.0, 147.23],
@@ -33,5 +39,9 @@
   "marketSpur": {
     "name": "Smith lane to common supply yard",
     "stations": [[87.32, 138.05, 0.60], [90.3, 137.87, 0.66], [92.5, 137.74, 0.64], [94.7, 138.17, 0.66]]
+  },
+  "storePath": {
+    "name": "Market lane to the east side of the store",
+    "stations": [[78.63, 132.44, 0.80], [78.71, 137.48, 0.81], [77.79, 141.50, 0.81], [68.82, 146.22, 0.79], [65.85, 151.96, 0.76], [63.55, 154.18, 0.68]]
   }
 }

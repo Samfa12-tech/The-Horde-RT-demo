@@ -422,6 +422,24 @@ int main(int argc,char** argv) {
             const BellwetherStation marketWest{71.f,134.85f}, marketEast{76.15f,135.15f};
             check(follow(marketWest,marketEast) && follow(marketEast,marketWest),
                   "both market pitches open onto a continuous pedestrian apron");
+            const auto marketPaving=support->Query(71.47f,134.84f);
+            check(marketPaving.found && marketPaving.walkable && marketPaving.surface==
+                      horde::gameplay::simulation::SupportSurface::Stone,
+                  "the market apron paving supplies actual walkable stone contact");
+            const auto& storePath=horde::gameplay::bellwether::kWorkingSquareStorePath;
+            check(follow({storePath.front()[0],131.7f},{storePath.front()[0],storePath.front()[1]}),
+                  "the store lane opens directly from the public lane beside the square");
+            for(std::size_t station=1;station<storePath.size();++station) {
+                const auto& a=storePath[station-1];
+                const auto& b=storePath[station];
+                check(follow({a[0],a[1]},{b[0],b[1]}) && follow({b[0],b[1]},{a[0],a[1]}),
+                      "the store lane stays clear in both directions beside the market wall and loading gear");
+            }
+            const auto barrelGround=support->Query(65.15f,150.86f);
+            check(barrelGround.found &&
+                  !support->NonWalkableVolumeClear(65.70f,150.86f,65.15f,150.86f,
+                      barrelGround.worldY+.27f,barrelGround.worldY+.75f,radius),
+                  "the loaded cask uses the visible barrel faces for contact");
             const auto& lampFlame=horde::gameplay::bellwether::kWorkingSquareLampFlame;
             const auto& lampLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
             check(support->NonWalkableVolumeClear(lampFlame[0],lampFlame[2],lampLight[0],lampLight[2],

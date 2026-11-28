@@ -1333,6 +1333,10 @@ for the garden. The [layout, editable source and receipt](assets/models/world/so
 identify the assets and original Bellwether surveys. The owner's *Moonlit Village
 Hub Map.png* guided the composition.
 
+The worn market pavers, root vegetables, jars, loading bench and staved
+casks are original Horde meshes built in the same Blender source. They reuse
+the town stone, timber, clay, char and ForestAlder foliage finishes.
+
 The [south woodland placements](assets/models/world/source/bellwether-woodland-v1/README.md)
 reuse the original Horde pine and alder meshes and materials recorded above
 under the 1.7 whole-route woodland sources.
