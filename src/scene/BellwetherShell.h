@@ -30,6 +30,7 @@
 #include "../../assets/models/world/source/bellwether-church-station-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-working-square-v1/geometry.generated.h"
 #include "../../assets/models/world/source/bellwether-footway-junction-v1/geometry.generated.h"
+#include "../../assets/models/world/source/bellwether-footway-lamp-v1/geometry.generated.h"
 #include <filesystem>
 
 namespace horde::scene {
@@ -47,7 +48,8 @@ inline constexpr std::size_t kBellwetherSolidTriangles=
     gameplay::bellwether::kTavernServiceSolidTriangles+gameplay::bellwether::kSquareWaymarkerSolidTriangles+
     gameplay::bellwether::kVillageRoofAddedSolidTriangles+gameplay::bellwether::kHouseBSolidTriangles+
     gameplay::bellwether::kChurchRecordStationTriangles+gameplay::bellwether::kHouseBLedgerSolidTriangles+
-    gameplay::bellwether::kWorkingSquareSolidTriangles+gameplay::bellwether::kFootwayJunctionSolidTriangles;
+    gameplay::bellwether::kWorkingSquareSolidTriangles+gameplay::bellwether::kFootwayJunctionSolidTriangles+
+    gameplay::bellwether::kFootwayLampSolidTriangles;
 inline constexpr std::size_t kWaysideCoverTriangles=24;
 inline constexpr std::size_t kWaysideRegisterTriangles=48;
 inline constexpr std::size_t kBellwetherGroundTriangles=

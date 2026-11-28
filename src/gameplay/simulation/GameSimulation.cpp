@@ -104,7 +104,8 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeHouseBLampEmitter(),
                            effects::MakeChurchRecordLampEmitter(),
                            effects::MakeWorkingSquareLampEmitter(),
-                           effects::MakeWorkingSquareStoreLampEmitter()};
+                           effects::MakeWorkingSquareStoreLampEmitter(),
+                           effects::MakeFootwayLampEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -2272,6 +2273,8 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             effects::WorkingSquareLampFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kWorkingSquareStoreLampRosterIndex],
             effects::WorkingSquareStoreLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kFootwayLampRosterIndex],
+            effects::FootwayLampFireInput(),fixedDeltaSeconds);
     }
 }
 

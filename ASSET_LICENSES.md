@@ -1200,6 +1200,8 @@ receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
 
 The original Horde [footway junction revision](assets/models/world/source/bellwether-footway-junction-v1/README.md)
 reuses the existing Bellwether masonry and retains the surveyed terrain.
+The original Horde [hooded footway lamp](assets/models/world/source/bellwether-footway-lamp-v1/README.md)
+uses the existing town stone, oak, char and clay finishes.
 
 ## Bellwether waterwheel contact audio - 23 November 2026
 

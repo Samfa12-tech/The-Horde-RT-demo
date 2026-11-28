@@ -1697,6 +1697,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 walkDry(crossing.rbegin(),crossing.rend());
             Check(crossed,"the shared player motor reaches the millrace turnout and returns dry with no water steps");
             if(!crossed)return;
+            Check(exteriorLampAt(gameplay::effects::kFootwayLampEmitterId,kFootwayLampFlame,kFootwayLampLight),
+                  "returning to the footway junction selects the authored lamp without adding an exterior light slot");
             const bool reachedShallows=walkStations(landing.end()-3,landing.end());
             Check(reachedShallows && game.Snapshot().playerGrounded && game.Snapshot().waterContact.wetGround,
                   "the normal motor can descend from the salvager's shore path into the river shallows");
