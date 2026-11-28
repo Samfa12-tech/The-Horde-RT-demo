@@ -104,6 +104,30 @@
     "secondsInPresentedMenu": 40.0,
     "closedNormally": true
   },
+  "published17QueryControl": {
+    "sourceCommit": "d1c6d152d18c7002c41638d51dc9d9bcceea1bd4",
+    "archiveSha256": "e06a7a9d67607586447fbaaa46e60d5465de3c19fc99d22aefffd5d1f28dd277",
+    "exeSha256": "1b7378096f60bfe16082f29c2245215e6cacc5a2f829a763258479a615e6aebf",
+    "sameGpuAndDriver": true,
+    "presentedToSwapchain": true,
+    "isolatedProfileEmptyWithoutPlayerInput": true,
+    "stockLaunch": {
+      "localReportDirectory": "windows-official-17-query-control-20261128",
+      "secondsInPresentedMenu": 6.015,
+      "gameExitCode": "0xc0000005",
+      "runReceiptSha256": "71234441ae0765e100eb4e1ef9018f86fc2618c2f0be150788fadc4f207ff7e2"
+    },
+    "processScopedTrace": {
+      "localReportDirectory": "windows-official-17-query-stack-20261128",
+      "secondsInPresentedMenu": 6.125,
+      "gameExitCode": "0xc0000005",
+      "runReceiptSha256": "44f7a620114ffd2de83a77f78a548ae2566ae4d596d8dfb121885ebd9ace87ee",
+      "faultModule": "nvgpucomp64.dll",
+      "faultOffset": "0x1fe4266",
+      "unwoundDriverFramesMatch18": true,
+      "stackSha256": "dba19bc2132d65b644ef05eda0b20ccb14eafd5eb178b46003cb88a74746ca74"
+    }
+  },
   "allIsolatedAndOriginalSavesUnchanged": true,
   "underlyingCauseEstablished": false,
   "phoneTested": false,
