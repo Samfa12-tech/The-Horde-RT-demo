@@ -1,0 +1,36 @@
+{
+  "candidateContentCommit": "3c5a15563b98b024d204a74baef9c642b19e88e7",
+  "windowsDefaultCommit": "46ec6cfbaf932f900741ece5de0b780830a7077c",
+  "baseline": "../2026-11-28-bellwether-market-yard/receipt.json",
+  "launch": "Release executable staged over the verified market-yard assets. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "400d787669506d5f9c766176a94bd18cfe27eb872e908157c475685181aac603",
+  "host": {"gpu": "NVIDIA GeForce RTX 5050 Laptop GPU", "driver": "610.47", "backend": "RayTracingPipeline", "shaderBundle": "shipping_high_pair"},
+  "understory": {"fernClumps": 39, "renderTriangles": 22932, "newObstacleTriangles": 0, "remainingObstacleTrianglesWithBasins": 2747},
+  "freshWindowsProfile": {
+    "initialSettingsFile": "Absent",
+    "liveShadowQuality": {"mode": "higher", "localPrimarySamples": 4, "skyPrimarySamples": 2},
+    "route": "The tavern to market, around the market wall to the store casks, and back to the well",
+    "hardwareRtPresented": true,
+    "marketViewSha256": "49bb0f8cf2039cf0a1824058b85663525c426b2ad210965939f0712e90c9563c",
+    "storeTrackViewSha256": "bd6e1f24a5606e3a2cadfb24c9146aaf58bcf4e98a2672a99df043cdb3e05f5a",
+    "returnViewSha256": "1807c45acd6d3272adcd0a380d807b0994642b585b4ae5eefcb837bdd97045d9",
+    "gameExitCode": 0
+  },
+  "savedWindowsProfile": {
+    "initialSettingsFile": "Isolated schema 5 INI with confirmed Current shadows",
+    "liveShadowQuality": {"mode": "current", "localPrimarySamples": 1, "skyPrimarySamples": 1},
+    "hardwareRtPresented": true,
+    "tavernViewSha256": "4d562691b8784e6c3c4841eb09a662e4562c1b5c395241adc8dfe7a5b4ccc98b",
+    "gameExitCode": 0
+  },
+  "savesUnchangedInBothRuns": true,
+  "passingHostTests": [
+    "horde_rt_graphics_settings_tests",
+    "horde_rt_graphics_windows_persistence_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_forest_surroundings_native_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "remaining": "Service-yard lighting, handset play and sustained performance remain open."
+}
