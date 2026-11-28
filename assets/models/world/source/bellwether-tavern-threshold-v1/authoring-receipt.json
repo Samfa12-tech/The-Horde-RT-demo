@@ -1,0 +1,14 @@
+{
+  "inputSha256": {
+    "bellwether-tavern-v1.glb": "518ae34348dd2d8deba2ceaf3d34ad72bfd535b2a4bff329d9b5e27edf133783",
+    "bellwether-south-door.glb": "65e78893ef1a5cf5ebd572ffa1dc67507526948fa3fce7a73796b2eaac239fb9"
+  },
+  "recipeSha256": "0fe6d5fd85e8549b395fa72e24722a9c095d943e5983c8e199abe595d3394dcb",
+  "addedWidthMetres": 0.24,
+  "clearDoorWidthMetres": 2.304,
+  "files": {
+    "bellwether-tavern-v1.glb": "0460b6372a3c56d73cdc91351493e0dbe5a54ae7c542fa1aee386e01ceed0d46",
+    "bellwether-south-door.glb": "bbab267a6643b9a06353ce203c9e115032480c523ab010b48b764fe1950dadb9",
+    "geometry.generated.h": "cc903a0f15b9ae0818f7dea200c1706fd180de728bcd7334e697ffa3457e61b0"
+  }
+}

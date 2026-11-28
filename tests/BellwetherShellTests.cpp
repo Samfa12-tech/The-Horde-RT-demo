@@ -849,28 +849,42 @@ int main(int argc,char** argv) {
         check(bare.found && after.found && after.walkable && after.triangle>=originalTerrain->TriangleCount() &&
               std::abs(after.worldY-(-8.70955f))<.001f && after.worldY-bare.worldY>2.5f,
             "real ramp and floor meet at the original tavern floor height above current ground");
-        check(support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,after.worldY+.01f,after.worldY+1.8f,.24f) &&
-             !support->NonWalkableVolumeClear(southDoorX+1.5f,121.f,southDoorX+1.5f,118.8f,
-                 after.worldY+.01f,after.worldY+1.8f,.24f),
-             "the mapped south opening admits the capsule while the adjacent wall stays solid");
+        const auto clearsFrame=[&](float offset) {
+            const float x=southDoorX+offset;
+            return support->NonWalkableVolumeClear(x,121.f,x,118.8f,after.worldY+.01f,after.worldY+1.8f,
+                horde::gameplay::kPlayerCollisionRadius);
+        };
+        check(clearsFrame(0.f) && clearsFrame(.88f) && !clearsFrame(1.10f),
+              "the widened opening clears both approach lanes while the east jamb stays solid");
         const auto& hinge=kSouthDoorHinge;
         const auto* doorContact=support->HingedContact(
             horde::gameplay::simulation::TriangleSupportSurface::HingedPart::TavernDoor);
         check(doorContact && doorContact->TriangleCount()==kSouthDoorTriangles &&
               door.indices.size()==kSouthDoorTriangles*3 && door.bounds.minimum[0]>-.05f &&
-              door.bounds.maximum[0]<kSouthDoorSwingRadius && door.bounds.minimum[1]>=0.f,
+              door.bounds.maximum[0]<TavernDoor::kSwingRadius && door.bounds.minimum[1]>=0.f,
               "the dedicated render leaf and contact have identical hinge-local geometry");
         if(doorContact) {
             const auto open=TavernDoor::PoseAt(1.f);
             const auto closed=TavernDoor::PoseAt(0.f);
-            const auto central=[&](const auto& pose) {
-                return pose.VolumeClear(*doorContact,southDoorX,121.f,southDoorX,116.1f,
+            const auto clearsLeaf=[&](const auto& pose,float offset) {
+                const float x=southDoorX+offset;
+                return pose.VolumeClear(*doorContact,x,121.f,x,116.1f,
                     after.worldY+.01f,after.worldY+1.8f,.28f);
             };
-            check(central(open) && !central(closed) &&
+            check(clearsLeaf(open,0.f) && clearsLeaf(open,.88f) && !clearsLeaf(closed,0.f) && !clearsLeaf(closed,.88f) &&
                   !open.VolumeClear(*doorContact,hinge[0]-.43f,hinge[2]-1.1f,hinge[0]+.42f,hinge[2]-1.1f,
                       after.worldY+.9f,after.worldY+1.22f,.07f),
                   "the same leaf blocks the mapped threshold closed and swings clear when open");
+            const auto beforeArc=TavernDoor::PoseAt(.40f);
+            const auto afterArc=TavernDoor::PoseAt(.60f);
+            const float midAngle=kSouthDoorOpenRadians*.5f;
+            const float arcX=hinge[0]+1.6f*std::cos(midAngle),arcZ=hinge[2]-1.6f*std::sin(midAngle);
+            const float feet=after.worldY+.01f,head=after.worldY+1.8f;
+            check(beforeArc.VolumeClear(*doorContact,arcX,arcZ,arcX,arcZ,feet,head,.12f) &&
+                  afterArc.VolumeClear(*doorContact,arcX,arcZ,arcX,arcZ,feet,head,.12f) &&
+                  !beforeArc.RotatingVolumeClear(*doorContact,afterArc,kSouthDoorOpenRadians*.20f,
+                      arcX,arcZ,feet,head,.12f),
+                  "the continuous swing detects a body in the arc with both endpoint poses clear");
         }
         using namespace horde::gameplay::bellwether;
         const auto exactHorizontalFace=[&](const auto& mark) {

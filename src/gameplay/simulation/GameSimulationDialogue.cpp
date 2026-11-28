@@ -520,10 +520,13 @@ bellwether::DoorAction GameSimulation::TavernDoorAction(const dialogue::Context&
         return DoorAction::None;
     const auto pose=TavernDoor::PoseAt(tavernDoor_.opening);
     const auto& m=pose.worldFromModel;
-    constexpr float pullX=1.82f,pullY=1.12f;
+    constexpr float pullX=TavernDoor::kPullX,pullY=1.12f;
     const float x=m[3]+m[0]*pullX,y=m[7]+pullY,z=m[11]+m[8]*pullX;
     const float dx=x-c.player.x,dz=z-c.player.z,distance=std::hypot(dx,dz);
-    if(distance>3.f || std::abs(c.listener.y-y)>1.25f ||
+    // An open leaf puts the wider door's pull deeper inside the room.
+    // Keep it operable from the same landing outside the sill.
+    const float reach=3.f+tavernDoor_.opening*kSouthDoorAddedWidth;
+    if(distance>reach || std::abs(c.listener.y-y)>1.25f ||
        std::sin(c.yaw)*dx-std::cos(c.yaw)*dz<.65f*distance ||
        !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,x,z,y-.02f,y+.02f,.02f))
         return DoorAction::None;
@@ -540,10 +543,10 @@ void GameSimulation::AdvanceTavernDoor(float seconds) {
     const float delta=tavernDoor_.destination-tavernDoor_.opening;
     const float step=seconds/duration;
     const float next=std::abs(delta)<=step?tavernDoor_.destination:tavernDoor_.opening+std::copysign(step,delta);
-    const float travel=std::abs(next-tavernDoor_.opening)*kSouthDoorOpenRadians*kSouthDoorSwingRadius;
-    if(UsesRescueExterior() && !TavernDoor::PoseAt(next).VolumeClear(*contact,
-            playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY+.001f,
-            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+travel))return;
+    const float angleDelta=(next-tavernDoor_.opening)*kSouthDoorOpenRadians;
+    if(UsesRescueExterior() && !TavernDoor::PoseAt(tavernDoor_.opening).RotatingVolumeClear(*contact,
+            TavernDoor::PoseAt(next),angleDelta,playerX_,playerZ_,playerSupport_.worldY+.001f,
+            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius))return;
     tavernDoor_.opening=next;
 }
 

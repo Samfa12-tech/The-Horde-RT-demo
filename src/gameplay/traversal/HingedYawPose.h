@@ -16,10 +16,30 @@ struct HingedYawPose {
 
     bool VolumeClear(const simulation::TriangleSupportSurface& contact,
                      float x0,float z0,float x1,float z1,float y0,float y1,float radius) const {
+        const auto from=ModelXZ(x0,z0);
+        const auto to=ModelXZ(x1,z1);
+        return contact.HorizontalVolumeClear(from[0],from[1],to[0],to[1],
+            y0-worldFromModel[7],y1-worldFromModel[7],radius);
+    }
+
+    // The poses share a hinge and differ by at most a half turn. In model
+    // space the stationary body traces the inverse arc. The chord plus its
+    // maximum deviation encloses that sweep without a tip-speed margin.
+    bool RotatingVolumeClear(const simulation::TriangleSupportSurface& contact,const HingedYawPose& end,
+                            float angleDelta,float x,float z,float y0,float y1,float radius) const {
+        const auto from=ModelXZ(x,z);
+        const auto to=end.ModelXZ(x,z);
+        const float quarterSine=std::sin(angleDelta*.25f);
+        const float arcDeviation=2.f*std::hypot(from[0],from[1])*quarterSine*quarterSine;
+        return contact.HorizontalVolumeClear(from[0],from[1],to[0],to[1],
+            y0-worldFromModel[7],y1-worldFromModel[7],radius+arcDeviation);
+    }
+
+private:
+    std::array<float,2> ModelXZ(float x,float z) const {
         const auto& m=worldFromModel;
-        const float dx0=x0-m[3],dz0=z0-m[11],dx1=x1-m[3],dz1=z1-m[11];
-        return contact.HorizontalVolumeClear(m[0]*dx0+m[8]*dz0,m[2]*dx0+m[10]*dz0,
-            m[0]*dx1+m[8]*dz1,m[2]*dx1+m[10]*dz1,y0-m[7],y1-m[7],radius);
+        const float dx=x-m[3],dz=z-m[11];
+        return {m[0]*dx+m[8]*dz,m[2]*dx+m[10]*dz};
     }
 };
 

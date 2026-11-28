@@ -1171,12 +1171,13 @@ void TestBellwetherWelcomeClearance(const gameplay::simulation::TriangleSupportS
         Check(ground.found && ground.walkable,"welcome clearance probe has grounded listener support");
         return Tuple{x,gameplay::simulation::PlayerEyeWorldY(ground.worldY),z};
     };
-    // The oblique line from the keeper crosses the east jamb from farther down
-    // the ramp. The grounded sill and upper ramp give a clear path to the room.
+    // The oblique line from the keeper crosses the east jamb farther down the
+    // ramp. The widened sill and upper ramp give a clear path to the room.
     Check(TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z)) &&
-          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)),
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)) &&
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)),
           "the welcome carries through the real south aperture as the player approaches the sill");
-    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)) &&
+    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+3.f)) &&
           !TavernWelcomeAudible(terrain,source,listenerAt(keeper[0],door.z+.5f)),
           "the south jamb and adjacent wall occlude the welcome away from the open path");
 }
@@ -2955,7 +2956,7 @@ void TestBellwetherRepeatVisitCheckpoint(
           "the inward swing stops at the player and never pushes them");
     // Exit around the tip of the halted leaf. Walking north along the door's
     // centreline would require passing through the solid door.
-    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::kSouthDoorSwingRadius+
+    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::TavernDoor::kSwingRadius+
         gameplay::kPlayerCollisionRadius+.10f;
     input.yawRadians=0.f;input.moveStrafe=1.f;
     for(unsigned tick=0;tick<140 && state.playerX<clearX;++tick)step(1);
@@ -2996,12 +2997,34 @@ void TestBellwetherRepeatVisitCheckpoint(
 
     input.yawRadians=0.f;
     input.moveForward=1.f;
+    step(120);
+    const bool crossed=state.playerGrounded && state.playerZ<sill.z-1.5f &&
+        std::abs(state.playerX-eastApproach.x)<.015f && state.tavernDoor.opening==1.f;
+    if(!crossed)
+        std::cerr<<"East approach ended at "<<state.playerX<<','<<state.playerZ
+                 <<" grounded="<<state.playerGrounded<<" door="<<state.tavernDoor.opening<<'\n';
+    Check(crossed,"the direct east-side approach clears the open doorway without a sidestep");
+    if(!crossed)return;
+
+    // The handrail starts farther down the ramp. Use the landing to approach
+    // the east jamb independently of the rail's contact.
+    const float landingZ=sill.z+.55f;
+    const bool exited=walkTo({eastApproach.x,landingZ});
+    Check(exited,"the same east-side lane clears the exit");
+    if(!exited)return;
+    const BellwetherStation jambApproach{sill.x+1.10f,landingZ};
+    const bool atJamb=walkTo(jambApproach);
+    Check(atJamb,"the landing admits a separate approach to the east jamb");
+    if(!atJamb)return;
+
+    input.yawRadians=0.f;
+    input.moveForward=1.f;
     step(100);
     Check(state.playerGrounded && state.playerZ>=sill.z && state.playerZ<sill.z+.28f &&
               state.tavernDoor.opening==1.f,
-          "the east jamb catches an off-center approach while the open leaf stays parked");
+          "walking into the east jamb still meets solid contact while the leaf stays parked");
 
-    const bool recentered=walkTo({eastApproach.x,sill.z+.9f}) && walkTo({sill.x,sill.z+.9f});
+    const bool recentered=walkTo(jambApproach) && walkTo({sill.x,landingZ});
     Check(recentered && walkTo({sill.x,sill.z-1.5f}) && state.playerGrounded && state.tavernDoor.opening==1.f,
           "backing up and stepping toward the center lets the player return through the same open door");
 }
