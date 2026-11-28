@@ -741,10 +741,12 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         else
             dialogue::StepResidentAttention(recordKeeperAttention_,false,seconds,kResidentAttentionDuration);
 
-        if(artificer_)
+        if(artificer_) {
+            const bool offeringRig=visibleArtificer && millPreparation_==bellwether::MillPreparation::GearingVerified &&
+                CurrentMillAction(c)==bellwether::MillAction::TakeRig;
             turnOutdoorResident(artificer_->yaw,artificer_->foot,bellwether::kArtificerRestYaw,
-                artificerAttention_,visibleArtificer.has_value(),false);
-        else
+                artificerAttention_,visibleArtificer.has_value(),offeringRig);
+        } else
             dialogue::StepResidentAttention(artificerAttention_,false,seconds,kResidentAttentionDuration);
 
         const bool salvagerVisible=salvager_ && c.salvagerSource.has_value();
@@ -759,7 +761,8 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
         const bool dealerVisible=relicDealer_ && c.relicDealerSource.has_value();
         if(relicDealer_)
             turnOutdoorResident(relicDealer_->yaw,relicDealer_->foot,bellwether::kRelicDealerRestYaw,
-                relicDealerAttention_,dealerVisible,line==Line::RelicDealerOrdinarySale);
+                relicDealerAttention_,dealerVisible,chapterDialogue_.CanStartRelicDealer(c) ||
+                    line==Line::RelicDealerOrdinarySale);
         else
             dialogue::StepResidentAttention(relicDealerAttention_,false,seconds,kResidentAttentionDuration);
     }

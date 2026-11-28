@@ -2466,17 +2466,35 @@ void TestBellwetherRelicDealerVisit(
 
     sim::InputSnapshot input;
     input.damageEnabled=false;input.tutorialEnabled=false;
-    input.yawRadians=visit->yaw+3.14159265359f;
+    input.yawRadians=visit->yaw;
     input.pitchRadians=visit->pitch;
-    input.commands.interact=state.lastConsumedInteractSequence+1;
-    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    input.commands.interact=state.lastConsumedInteractSequence;
+    const auto advance=[&] {game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);};
+    const auto dealerFoot=state.relicDealer->foot;
+    // Leave the authored centerline so the work stance and customer-facing
+    // stance are distinct while the player stays at the counter.
+    input.moveStrafe=-1.f;
+    for(unsigned tick=0;tick<20;++tick)advance();
+    input.moveStrafe=0.f;
+    for(unsigned tick=0;tick<240;++tick)advance();
+    const float expectedDealerYaw=std::atan2(state.playerX-dealerFoot[0],dealerFoot[2]-state.playerZ);
+    Check(state.relicDealer && state.relicDealerTradeAvailable && state.relicDealer->foot==dealerFoot &&
+          std::abs(expectedDealerYaw-gameplay::bellwether::kRelicDealerRestYaw)>.12f &&
+          std::abs(std::remainder(state.relicDealer->yaw-expectedDealerYaw,6.28318530718f))<.03f,
+          "the dealer keeps facing a customer waiting at the counter after the first glance expires");
+    input.yawRadians=visit->yaw+3.14159265359f;
+    ++input.commands.interact;
+    advance();
     Check(!state.relicDealerTradeAvailable && state.chapterDialogue.line==Line::None,
           "a player facing away cannot start the dealer's trade caption");
+    for(unsigned tick=0;tick<150;++tick)advance();
+    Check(state.relicDealer && std::abs(state.relicDealer->yaw-gameplay::bellwether::kRelicDealerRestYaw)<.03f,
+          "the dealer returns to the work stance when the customer looks away after the first glance");
     input.yawRadians=visit->yaw;
     const auto revision=game.CampaignBoundaryRevision();
     const auto purse=state.treasurePurse;
     ++input.commands.interact;
-    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    advance();
     Check(state.chapterDialogue.line==Line::RelicDealerOrdinarySale &&
           gameplay::dialogue::RequiresChapterCaption(state.chapterDialogue.line) &&
           state.chapterDialogue.source.x==state.relicDealer->foot[0] &&
@@ -2772,6 +2790,15 @@ void TestBellwetherMillRepairAndLeakTrial(
     };
     const auto interact=[&] {++input.commands.interact;step();};
     const auto repairRevision=game.CampaignBoundaryRevision();
+    if(!state.artificer){Check(false,"the rig handoff presents the artificer");return;}
+    const auto artificerFoot=state.artificer->foot;
+    for(unsigned tick=0;tick<240;++tick)step();
+    const float expectedArtificerYaw=std::atan2(state.playerX-artificerFoot[0],artificerFoot[2]-state.playerZ);
+    Check(state.artificer && state.artificer->foot==artificerFoot && state.millAction==MillAction::TakeRig &&
+          std::abs(expectedArtificerYaw-gameplay::bellwether::kArtificerRestYaw)>.12f &&
+          std::abs(std::remainder(state.artificer->yaw-expectedArtificerYaw,6.28318530718f))<.03f &&
+          game.CampaignBoundaryRevision()==repairRevision,
+          "the artificer keeps facing a player waiting to take the rig after the first glance expires");
     interact();
     interact();
     Check(state.millPreparation==MillPreparation::RigTrialReady && state.millAction==MillAction::None &&
