@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+  "evidenceClass": "Physical handset, isolated optimized ARM64 playtest, ordinary New Game",
+  "device": {
+    "model": "Samsung Galaxy S26 Ultra",
+    "reportedModel": "SM-S948B",
+    "androidRelease": "17",
+    "apiLevel": 37
+  },
+  "package": {
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "versionName": "1.8.0-bellwether-candidate",
+    "versionCode": 12,
+    "installedBaseApkSha256": "a838e52682cbabf0525d8aef84e30217cf117c66a6f0810b5a55d1974ef572e3",
+    "installedHashMatchesLocalCandidate": true,
+    "productionPackageVersionBeforeAndAfter": "1.7.0",
+    "productionPackageInstallAndUpdateTimesMatched": true,
+    "productionAppLaunchedOrModifiedByTest": false
+  },
+  "play": {
+    "entry": "Play > New game in Slot 1",
+    "firstScene": "Opening ruin",
+    "successfulRtPresent": true,
+    "backend": "RayTracingPipeline",
+    "shaderProfile": "Shipping/Mobile",
+    "renderScalePercent": 33,
+    "internalResolution": [475, 980],
+    "outputResolution": [1440, 2971],
+    "pauseAndResumeThenTouchMovementVerified": true,
+    "bellwetherReached": false
+  },
+  "stationaryOpening": {
+    "startLocal": "2026-11-28T14:34:52+11:00",
+    "timestampSource": "Actual-present column from the game's SurfaceFlinger BLAST layer, deduplicated across overlapping rings",
+    "sampledRings": 39,
+    "displayIntervals": 549,
+    "displaySpanSeconds": 42.242,
+    "displayMedianMs": 75.0,
+    "displayP95Ms": 83.33,
+    "nativeTimingWindows": 4,
+    "nativeFramesPerWindow": 120,
+    "nativeWindowMeanFrameMsRange": [76.553, 77.117],
+    "nativeWindowMeanFenceMsRange": [69.036, 69.210],
+    "nativeCumulativeGpuMeansMsRange": [68.800, 68.817],
+    "batteryStartC": 35.2,
+    "batteryEndC": 36.7,
+    "androidThermalStatuses": [0],
+    "usbPowered": true
+  },
+  "homeAndReturn": [
+    {
+      "surfaceGeneration": 3,
+      "sameAppProcess": true,
+      "successfulRtPresent": true,
+      "requestToPresentSeconds": 19.260,
+      "pipelineBundleSeconds": 17.922,
+      "genericDielectricPipelineSeconds": 14.230,
+      "driverPipelineCacheSeedBytes": 32
+    },
+    {
+      "surfaceGeneration": 5,
+      "sameAppProcess": true,
+      "successfulRtPresent": true,
+      "requestToPresentSeconds": 19.761,
+      "pipelineBundleSeconds": 18.550,
+      "genericDielectricPipelineSeconds": 14.691,
+      "driverPipelineCacheSeedBytes": 32
+    }
+  ],
+  "evidenceSha256": {
+    "04-opening.png": "53f1ad874014b66767af43084cba80e155b2060cb87c3dc0f26b3844516756c3",
+    "09-touch.png": "b376447d1994c4b632ed4a96c14e5f3af0f86091ec852d7a350325e6d9cf72ff",
+    "04-ruin-stationary/summary.json": "52c1b10fd649b8dac38fb47774f7b013b463e79f44b1d1ffa85ae07808afa78a",
+    "11-resume-stall-logcat.txt": "26236c57fdd0b101cdfc91d84ad446c8594de7123a5c7d1cabbaeb087af4d732",
+    "12-repeat-native.log": "a3fd63aa840b1bf4790aaba349c2c091d9566e44b2348b7fac9dd5f9d4daf569"
+  }
+}

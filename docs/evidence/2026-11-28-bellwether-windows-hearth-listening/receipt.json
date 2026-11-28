@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "evidenceClass": "Actual foreground XAudio2 playback in the ordinary Windows release package",
+  "sourceCommit": "97a4eb7965a539fe1100a939438e1e39863715e1",
+  "windowsZipSha256": "b6a12943b2f48de82c8e0d1d4c87f82fdff0465b25f7865d56ac529d627ee81b",
+  "executedProgramSha256": "cb0ee35d5c29698386d4c71b22c1076eb81324b53b6e04a22e20d2aa72bda29f",
+  "executedPayloadVerifiedAgainstArchive": true,
+  "rendering": {
+    "backend": "RayTracingPipeline",
+    "dispatchResolution": [
+      1232,
+      803
+    ],
+    "renderScalePercent": 100
+  },
+  "fixture": {
+    "sourceEarnedTavernSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "replayCopySha256": "c3dc0611b9d2e15f728f979f5df6a7386ed8b63ec665ef65893e82c2b257ffab",
+    "change": "Reset resolved Talk line count from three to zero in an isolated copy using the campaign codec",
+    "menu": "Load > Bellwether tavern in Slot 1"
+  },
+  "captureMethod": "Windows WASAPI process loopback including only the verified Horde process tree. Stereo PCM at 44.1 kHz retained without level or timing edits.",
+  "captureReference": "https://learn.microsoft.com/en-us/samples/microsoft/windows-classic-samples/applicationloopbackaudio-sample/",
+  "matchingMethod": "Normalized waveform correlation on mono samples bandpassed 110 to 3400 Hz and resampled to 8 kHz. Fitted voice-to-residual estimates also include channel and resampling mismatch.",
+  "defaultMix": {
+    "musicVolumePercent": 70,
+    "interactions": [
+      "LOAD...",
+      "Slot 1  |  Continue\nBellwether tavern | 3 / 3 hearts\n22/11/2026  1:58:24 AM",
+      "LEFT-CLICK / A TO TALK TO KIT",
+      "Talk clicked"
+    ],
+    "dialogueAdmissionCount": 3,
+    "formatAndLevels": {
+      "channels": 2,
+      "rateHz": 44100,
+      "frames": 1234359,
+      "samplePeakDbfs": -16.49,
+      "clippedSamples": 0,
+      "rmsDbfs": -35.04
+    },
+    "dialogueWaveformMatches": [
+      {
+        "asset": "hub.kit_introduce",
+        "offsetSeconds": 4.346,
+        "referenceSeconds": 4.099,
+        "correlation": 0.5699,
+        "fittedVoiceToResidualDb": -3.18
+      },
+      {
+        "asset": "hub.horde_army",
+        "offsetSeconds": 8.436,
+        "referenceSeconds": 5.579,
+        "correlation": 0.5186,
+        "fittedVoiceToResidualDb": -4.34
+      },
+      {
+        "asset": "hub.hoard_answer",
+        "offsetSeconds": 14.016,
+        "referenceSeconds": 3.939,
+        "correlation": 0.5157,
+        "fittedVoiceToResidualDb": -4.41
+      }
+    ],
+    "postTalkIsolatedSavePersisted": true,
+    "sourceSaveAndProductionProfileUntouched": true,
+    "captureDiscontinuities": 0,
+    "captureSha256": "80bbf9069a08d1de0c13b82430eab498ebac400a0d4f55b9b7bdd330e8ce8c2a",
+    "nativeAudioLogSha256": "7b830108e95f481e56a0153059e0269f3b9458ef71d934061cc1609159418405"
+  },
+  "musicOffControl": {
+    "musicVolumePercent": 0,
+    "interactions": [
+      "LOAD...",
+      "Slot 1  |  Continue\nBellwether tavern | 3 / 3 hearts\n22/11/2026  1:58:24 AM",
+      "LEFT-CLICK / A TO TALK TO KIT",
+      "Talk clicked",
+      "Ask about the treasure clicked"
+    ],
+    "dialogueAdmissionCount": 5,
+    "formatAndLevels": {
+      "channels": 2,
+      "rateHz": 44100,
+      "frames": 1763559,
+      "samplePeakDbfs": -10.31,
+      "clippedSamples": 0,
+      "rmsDbfs": -43.18
+    },
+    "dialogueWaveformMatches": [
+      {
+        "asset": "hub.kit_introduce",
+        "offsetSeconds": 4.296,
+        "referenceSeconds": 4.099,
+        "correlation": 0.9853,
+        "fittedVoiceToResidualDb": 15.21
+      },
+      {
+        "asset": "hub.horde_army",
+        "offsetSeconds": 8.366,
+        "referenceSeconds": 5.579,
+        "correlation": 0.9537,
+        "fittedVoiceToResidualDb": 10.02
+      },
+      {
+        "asset": "hub.hoard_answer",
+        "offsetSeconds": 13.956,
+        "referenceSeconds": 3.939,
+        "correlation": 0.982,
+        "fittedVoiceToResidualDb": 14.31
+      },
+      {
+        "asset": "hub.kit_stake",
+        "offsetSeconds": 21.076,
+        "referenceSeconds": 5.699,
+        "correlation": 0.9811,
+        "fittedVoiceToResidualDb": 14.1
+      },
+      {
+        "asset": "kit.personal_stake.key",
+        "offsetSeconds": 26.756,
+        "referenceSeconds": 4.739,
+        "correlation": 0.9838,
+        "fittedVoiceToResidualDb": 14.79
+      }
+    ],
+    "postTalkIsolatedSavePersisted": true,
+    "sourceSaveAndProductionProfileUntouched": true,
+    "captureDiscontinuities": 0,
+    "captureSha256": "3e53f091eb26d68d84281f2eb3276c658db84772528ed2b24d994b6c20afaa83",
+    "nativeAudioLogSha256": "d1c1d7e5fcfb2158bde378b806a15007983ec3eec46777add52628c396ee4842"
+  },
+  "hearthMatchesInMusicOffControl": [
+    {
+      "segment": "beforeTalk",
+      "templateOffsetSeconds": 0.25,
+      "offsetSeconds": 1.976,
+      "correlation": 0.9976
+    },
+    {
+      "segment": "afterTreasureQuestion",
+      "templateOffsetSeconds": 0.25,
+      "offsetSeconds": 33.486,
+      "correlation": 0.9977
+    },
+    {
+      "segment": "afterTreasureQuestion",
+      "templateOffsetSeconds": 1.5,
+      "offsetSeconds": 34.736,
+      "correlation": 0.9966
+    },
+    {
+      "segment": "afterTreasureQuestion",
+      "templateOffsetSeconds": 2.75,
+      "offsetSeconds": 35.986,
+      "correlation": 0.9969
+    },
+    {
+      "segment": "afterTreasureQuestion",
+      "templateOffsetSeconds": 4.0,
+      "offsetSeconds": 37.236,
+      "correlation": 0.9979
+    }
+  ],
+  "acceptance": {
+    "actualTavernSpeechAndHearthPlaybackVerified": true,
+    "subjectiveDefaultMixAccepted": false,
+    "physicalPhoneAudioVerified": false,
+    "arrivalWalkCoveredByThisCapture": false
+  }
+}

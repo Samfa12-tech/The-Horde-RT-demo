@@ -5204,6 +5204,34 @@ remain unmeasured. All 25 original app files checked, including 15 save files,
 matched at the end. The private Windows replay passed all 59 checks on
 each hardware RT backend. [Checkpoint retest receipt](evidence/2026-11-28-bellwether-church/handoff-retest.json)
 
+### 28 November 2026 — Optimized 1.8 opening and Android Home return
+
+The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the isolated optimized
+ARM64 playtest from `97a4eb7965a539fe1100a939438e1e39863715e1`. The installed
+APK hash matched the candidate in the full package receipt. From empty slots,
+**Play → New game in Slot 1** reached the opening ruin. The pause menu returned
+to live control, and a forward touch gesture moved the player towards the
+first doorway. The production app stayed at version 1.7.0 with the same
+installation and update timestamps.
+
+At the candidate's default 33% scale (475 × 980 RT, 1440 × 2971 output),
+RayTracingPipeline presented with Shipping/Mobile shaders. The stationary
+opening view recorded 549 actual inter-present intervals in 42.24 seconds,
+with a median of 75.00 ms and p95 of 83.33 ms. Four separate native windows
+of 120 frames reported mean frame times of 76.55–77.12 ms and mean fence
+waits of 69.04–69.21 ms. Battery temperature rose from 35.2°C to 36.7°C
+while connected by USB. Android thermal status remained 0 during the sample.
+
+Two Home-and-return cycles rebuilt the surface in the same process. Native
+logs put the first successful RT frame 19.26 and 19.76 seconds after the
+new surface request. Pipeline-bundle setup took 17.92 and 18.55 seconds,
+including 14.23 and 14.69 seconds for the generic dielectric pipeline.
+The 32-byte driver cache seed was reused on both returns. The candidate
+was left installed and the handset returned to Home. This run covers the
+opening and a repeatable delay on return from Home. The staffed-village
+route, sustained moving performance and listening still need a run on
+this candidate. [Exact handset receipt](evidence/2026-11-28-bellwether-full-package/phone-opening.json)
+
 ### 28 November 2026 — Short Home returns reuse compiled hardware RT pipelines
 
 The Galaxy S26 Ultra (SM-S948B, Android 17/API 37) ran the isolated optimized

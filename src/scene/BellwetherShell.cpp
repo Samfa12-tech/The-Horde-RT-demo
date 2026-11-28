@@ -394,7 +394,7 @@ bool AppendBellwetherGardenCrops(const std::filesystem::path& root, assets::Stat
     std::string& diagnostic) {
     static constexpr std::string_view nodeName="BellwetherGardenCrops";
     constexpr std::string_view materialName="HordeGardenLeaf";
-    constexpr auto triangleCount=gameplay::bellwether::kBellwetherGardenCropTriangles;
+    constexpr auto triangleCount=kBellwetherFoliageTriangles;
     constexpr std::array identity{1.f,0.f,0.f,0.f, 0.f,1.f,0.f,0.f, 0.f,0.f,1.f,0.f, 0.f,0.f,0.f,1.f};
     constexpr auto allowedFlags=static_cast<std::uint32_t>(horde::vulkan::raytracing::RtMaterialFlag::DoubleSided);
     constexpr std::uint32_t maximumManifestIndices=4096u*3u;

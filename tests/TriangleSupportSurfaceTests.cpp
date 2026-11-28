@@ -72,8 +72,9 @@ int main()
         {{P{0,0,-.3f},P{0,2,.3f},P{0,0,.3f}},SupportSurface::Stone}}};
     const auto solid=Surface::Build(wall,error);
     const auto combined=Surface::WithNonWalkableGeometry(*terrain,wall,error);
-    check(solid && combined && combined->RetainedBytes()-terrain->RetainedBytes()+wall.size()*sizeof(P)==solid->RetainedBytes(),
-          "obstruction-only faces keep their geometry and BVH without retaining unused normals");
+    check(solid && combined && combined->RetainedBytes()-terrain->RetainedBytes()+
+          wall.size()*(sizeof(P)+sizeof(std::uint32_t))==solid->RetainedBytes(),
+          "obstruction-only leaves retain their faces without normals or a permutation");
     check(combined && combined->TriangleCount()==terrain->TriangleCount() &&
           combined->NonWalkableTriangleCount()==2 && combined->Query(0,0).worldY==sample.worldY,
           "attaching actual nonwalkable geometry changed the admitted ground surface");
@@ -94,6 +95,31 @@ int main()
     auto brokenWall=anotherWall;brokenWall[0].points[0][0]=std::numeric_limits<float>::quiet_NaN();
     check(!Surface::WithAdditionalNonWalkableGeometry(*combined,brokenWall,error) && combined->NonWalkableTriangleCount()==2,
         "malformed extension altered the accepted contact owner");
+    std::vector<Surface::Triangle> walls;
+    for(unsigned i=0;i<13;++i) {
+        const float x=(static_cast<int>((i*7)%13)-6)*.8f;
+        for(auto face:wall) {
+            for(auto& point:face.points)point[0]+=x;
+            walls.push_back(face);
+        }
+    }
+    const auto originalWalls=Surface::Build(walls,error);
+    const auto firstWalls=Surface::WithNonWalkableGeometry(*terrain,std::span(walls).first(16),error);
+    const auto allWalls=firstWalls?Surface::WithAdditionalNonWalkableGeometry(*firstWalls,
+        std::span(walls).subspan(16),error):nullptr;
+    if(originalWalls && allWalls) {
+        bool matches=true;
+        unsigned hits=0,clear=0;
+        for(int i=-22;i<=22;++i)for(float z:{-.4f,0.f,.4f,.8f}) {
+            const float x=i*.25f;
+            const bool reference=originalWalls->HorizontalVolumeClear(x,z,x+.28f,z,.25f,1.8f,.12f);
+            matches=matches && allWalls->NonWalkableVolumeClear(x,z,x+.28f,z,.25f,1.8f,.12f)==reference;
+            if(reference)++clear;
+            else ++hits;
+        }
+        check(matches && hits>0 && clear>0 && allWalls->NonWalkableTriangleCount()==walls.size(),
+              "reordered obstacle leaves match indexed sweeps across several leaves after an immutable append");
+    }else check(false,"could not build the reordered and indexed obstacle comparison");
     check(solid&&!solid->HorizontalVolumeClear(-1,0,1,0,.25f,1.8f,.1f),
           "elevated volume skipped a vertical wall with no support projection");
     check(solid&&!solid->HorizontalVolumeClear(1,0,-1,0,.25f,1.8f,.1f),

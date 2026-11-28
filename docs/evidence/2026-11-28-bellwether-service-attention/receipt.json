@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "sourceCommit": "12030dfc8d802849f57d23f0ac905edc0751c195",
+  "scope": "Resident yaw while the player can ask about trade or accept the breathing rig.",
+  "host": {
+    "baseFailedBothSustainedFacingChecks": true,
+    "confirmedPassing": [
+      "horde_rt_forest_dressing_tests",
+      "horde_rt_bellwether_hearth_rest_tests",
+      "horde_rt_forest_surroundings_native_tests"
+    ],
+    "observations": [
+      "Dealer faces an off-centre player after four seconds and returns to the work stance after the player looks away.",
+      "Artificer faces a waiting player after four seconds and the normal interaction still hands over the rig."
+    ]
+  },
+  "windows": {
+    "executableSha256": "24e2bccc8e45e77cc2dbbf2c016b2d74c8f1aeda2e84b7c2d1ceeb1244c93beb",
+    "basePayloadArchiveSha256": "aaa602f56cc64387b42c028a8735c7cf9602a1cb7330c97a73c4877939efd3c3",
+    "distribution": "Local ordinary Release staging with all 296 non-executable files verified against the previous private ZIP.",
+    "rayTracingPipelinePresented": true,
+    "shadowSetting": "Higher",
+    "restoredSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "originalAndIsolatedSavesPreserved": true,
+    "gameExitCode": 0,
+    "routeReceiptSha256": "89058628fb7caee32387e0b9645a68663dac07b2aaaf05cce9fb6e1a0b84198e",
+    "dealerLineAdmissionAccepted": true,
+    "frames": [
+      {
+        "moment": "Reached the dealer",
+        "capture": "reports/bellwether-service-attention-20261128/foreground/frame-007.png",
+        "imageSha256": "4438c751482e79709248bbc41f6257d82d8bdc83b6ab93fcf3ad5fa5fc7c9b19",
+        "prompt": "LEFT-CLICK / A TO ASK ABOUT TRADE"
+      },
+      {
+        "moment": "Waited off-centre with Ask about trade available",
+        "capture": "reports/bellwether-service-attention-20261128/foreground/frame-008.png",
+        "imageSha256": "871ada3393e7fe0d9608f3aa998bc45a2a2bc1835d02946378ffef951cc71cf9",
+        "prompt": "LEFT-CLICK / A TO ASK ABOUT TRADE"
+      },
+      {
+        "moment": "Selected Ask about trade",
+        "capture": "reports/bellwether-service-attention-20261128/foreground/frame-009.png",
+        "imageSha256": "372984f718da34ec79813f0d267994fdb91c655b3e7dfe1d53174c998870b52c",
+        "prompt": ""
+      }
+    ]
+  },
+  "androidDeviceRun": false,
+  "published": false
+}

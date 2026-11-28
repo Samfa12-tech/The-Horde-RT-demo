@@ -1,0 +1,41 @@
+{
+  "parentTownSha256": "d38c9ce94bc559050b722cd2118a98ae175d5c8d730b4f48345c2eee090ee192",
+  "parentTerrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "recipeSha256": "a4c4bf2fd339f6af599ff3f58114bf93bf700b8a2899f768236d2974d4aebb33",
+  "blender": "5.2.0 LTS",
+  "grade": [
+    [
+      134.7,
+      -21.81,
+      0
+    ],
+    [
+      136.02,
+      -22.597285714285725,
+      0
+    ],
+    [
+      137.4,
+      -23.055,
+      0.195
+    ],
+    [
+      138.11,
+      -23.48,
+      0.195
+    ],
+    [
+      138.55,
+      -23.48,
+      0
+    ]
+  ],
+  "addedSolidTriangles": 5,
+  "addedGroundTriangles": 12,
+  "files": {
+    "footway-junction.blend": "21e364b3b5f4bfa9cd45b5940d9e0379053136a11626850c8f7b5f648fb5dba9",
+    "geometry.generated.h": "8dbe82480041c9a410b666d4174038ead78f97c52447eec113d311075c4bd8f0",
+    "bellwether-tavern-v1.glb": "8ab300d12555b3413b94a0d22c907bf4776413693e989f96a624ce7313c0f61a",
+    "asset.manifest.json": "df7319cea5e53d845ef2e7aefa6d5f5e97189fd3b7c8d05d2a25b90ca73e6844"
+  }
+}

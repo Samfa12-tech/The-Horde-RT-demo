@@ -1339,6 +1339,23 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     if (!step()) return false;
                 return ready();
             };
+            const auto requiredCaption = [&](Line line) {
+                const auto& spec = Spec(line);
+                const auto expected = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
+                const bool previous = ctx.subtitlesEnabled;
+                ctx.subtitlesEnabled = false;
+                const bool presented = frame();
+                const HWND control = GetDlgItem(ctx.windowHandle, kChapterSubtitleId);
+                std::array<char, 512> text{};
+                const bool readable = presented && control &&
+                    (GetWindowLongPtrA(control, GWL_STYLE) & WS_VISIBLE) &&
+                    GetWindowTextA(control, text.data(), static_cast<int>(text.size())) > 0 &&
+                    expected == text.data();
+                ctx.subtitlesEnabled = previous;
+                if (!readable)
+                    std::cerr << "Required Bellwether caption missing for " << spec.stableId << '\n';
+                return readable;
+            };
             const auto reloadCheckpoint = [&] {
                 const auto generation = state.worldRoute.generation;
                 const auto operation = ctx.campaign->State().operationRevision;
@@ -1448,8 +1465,18 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     readDirections(campaign::PauseObjective::BellwetherArrival, "lit tankard sign"),
                     "the ordinary pause menu identifies the lit tankard sign on the approach to the south tavern door");
             }
-            progressed = progressed &&
-                std::all_of(afterRoadDirections, kBellwetherTavernRoute.end(), walkTo) &&
+            const auto southDoor = kBellwetherTavernRoute.begin() + horde::gameplay::traversal::kBellwetherSouthDoorStation;
+            progressed = progressed && std::all_of(afterRoadDirections, southDoor + 1, walkTo);
+            if (progressed && gBellwetherCombinedRelicDealer && !gBellwetherAnkleRestoreValidation) {
+                const auto greetedKit = [&] {
+                    return state.chapterDialogue.line == Line::TavernWelcome &&
+                        state.tavernKeeper && state.tavernKeeper->stage == TavernKeeperStage::AtDoor &&
+                        std::abs(state.tavernKeeper->yaw - horde::gameplay::bellwether::kKeeperDoorFacingRadians) > .04f;
+                };
+                progressed = check(waitFor(greetedKit, hearthWaitTicks) && requiredCaption(Line::TavernWelcome),
+                    "the keeper turns to Kit and the welcome stays readable at the south door without playback");
+            }
+            progressed = progressed && std::all_of(southDoor + 1, kBellwetherTavernRoute.end(), walkTo) &&
                 walkTo({target.x, target.z});
             if (progressed && gBellwetherCombinedRelicDealer && !gBellwetherAnkleRestoreValidation) {
                 const auto& chair = horde::gameplay::bellwether::kChairSitRoot;
@@ -1519,7 +1546,13 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                     return boundary && boundary->id == campaign::CheckpointId::BellwetherTavern &&
                         boundary->dialogue.tavernConversationLinesResolved == kTavernConversation.size();
                 };
-                progressed = check(step() && waitFor(conversationComplete, 1800) &&
+                const bool started = step();
+                const bool readable = started && std::all_of(kTavernConversation.begin(), kTavernConversation.end(),
+                    [&](Line line) {
+                        return waitFor([&] { return state.chapterDialogue.line == line; }, 600) && requiredCaption(line);
+                    });
+                progressed = check(readable, "all three Talk lines stay readable without voice playback or optional subtitles") &&
+                    check(waitFor(conversationComplete, 1800) &&
                     exchangeLines == kTavernConversation.size() && savedTavern(),
                     "one Talk input earns a tavern boundary carrying the complete three-line exchange");
             }
@@ -2581,23 +2614,6 @@ int RunHiddenBellwetherCampaignValidation(VulkanSurfaceContext& ctx, horde::vulk
                 const auto interact = [&] {
                     input.commands.interact = state.lastConsumedInteractSequence + 1;
                     return step();
-                };
-                const auto requiredCaption = [&](Line line) {
-                    const auto& spec = Spec(line);
-                    const auto expected = horde::platform::windows::WindowsSubtitleCaption(spec.speaker, spec.text);
-                    const bool previous = ctx.subtitlesEnabled;
-                    ctx.subtitlesEnabled = false;
-                    const bool presented = frame();
-                    const HWND control = GetDlgItem(ctx.windowHandle, kChapterSubtitleId);
-                    std::array<char, 512> text{};
-                    const bool readable = presented && control &&
-                        (GetWindowLongPtrA(control, GWL_STYLE) & WS_VISIBLE) &&
-                        GetWindowTextA(control, text.data(), static_cast<int>(text.size())) > 0 &&
-                        expected == text.data();
-                    ctx.subtitlesEnabled = previous;
-                    if (!readable)
-                        std::cerr << "Required Bellwether caption missing for " << spec.stableId << '\n';
-                    return readable;
                 };
                 const auto dialogue = [&](std::span<const Line> lines, std::span<const Line> captionLines = {}) {
                     for (const auto line : lines) {

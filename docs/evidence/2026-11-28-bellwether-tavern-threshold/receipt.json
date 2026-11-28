@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "sourceCommit": "967130ce5714b5e13a5f72e7e798078fe7c44e0e",
+  "executableSha256": "dfc0fc44d21a4dc7b0e5d6e321fc2cfc14012e780456b0809389774f5647447a",
+  "baseArchiveSha256": "254638b5b2ef07a248bf0232c559b7e7052af00b0c07dca587566b3c5fe8b98e",
+  "updatedAssets": {
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "0460b6372a3c56d73cdc91351493e0dbe5a54ae7c542fa1aee386e01ceed0d46",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb": "bbab267a6643b9a06353ce203c9e115032480c523ab010b48b764fe1950dadb9"
+  },
+  "scope": "Widen the east side of the surveyed B01 south entrance and preserve solid contact during the door swing.",
+  "clearOpeningMetres": {
+    "before": 2.064,
+    "after": 2.304
+  },
+  "assetAudit": {
+    "bellwether-tavern-v1.glb": [
+      {
+        "material": "HordeTownStone",
+        "verticesMoved": 24,
+        "touchedTriangles": 20
+      },
+      {
+        "material": "HordeTavernTimber",
+        "verticesMoved": 36,
+        "touchedTriangles": 22
+      }
+    ],
+    "bellwether-south-door.glb": [
+      {
+        "material": "HordeTavernTimber",
+        "verticesMoved": 240,
+        "touchedTriangles": 120
+      },
+      {
+        "material": "HordeHearthChar",
+        "verticesMoved": 192,
+        "touchedTriangles": 96
+      }
+    ]
+  },
+  "khronosValidation": {
+    "shellErrors": 0,
+    "shellWarnings": 0,
+    "leafErrors": 0,
+    "leafWarnings": 0
+  },
+  "reexportIdentical": true,
+  "ordinaryPackagePinsPassed": true,
+  "sharedHostTests": {
+    "baseline": "The previous town assets stopped the straight east-side re-entry regression at the open jamb.",
+    "candidate": "The same lane crosses in both directions. The farther east landing still meets the jamb. The closed leaf blocks entry, opens away from the player without a retreat step, and pauses before contacting a player in its swing.",
+    "CTestNames": [
+      "horde_rt_bellwether_shell_tests",
+      "horde_rt_forest_dressing_tests",
+      "horde_rt_bellwether_hearth_rest_tests",
+      "horde_rt_forest_surroundings_native_tests",
+      "horde_rt_scene_resource_inventory_tests",
+      "horde_rt_final_windows_bundle_containment"
+    ]
+  },
+  "windowsForeground": {
+    "distribution": "Local ordinary Release executable with the two revised GLBs and assets from the verified base archive.",
+    "backend": "RayTracingPipeline",
+    "shadowSetting": "Higher",
+    "shippingHighShaderValidationPassed": true,
+    "routeReceiptSha256": "2da044a8a8beb916f31d6c1bd256acfe04952685a3a9b9b468f29228ce638fc6",
+    "initialSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "productionProfileUnchanged": true,
+    "frames": [
+      {
+        "moment": "Read the square fingerpost prompt",
+        "imageSha256": "739a51fe2c5d562b489b365f4d1d5ad825b9fb2def688703d0027b21ff6ec374",
+        "prompt": "LEFT-CLICK / A TO READ THE FINGERPOST"
+      },
+      {
+        "moment": "Offered to close the open door",
+        "imageSha256": "57733e3c305dad78d85152f7d640bb5e4f69696f2ad7a01fc70f902cde1b31dd",
+        "prompt": "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR"
+      },
+      {
+        "moment": "Walking forward met the closed leaf",
+        "imageSha256": "a5a0e7aaba27d8f9d5c987d815da9dbaea1ac5bf2c1ab8b8891d99c009896899",
+        "prompt": ""
+      },
+      {
+        "moment": "Backed away and reached the open prompt",
+        "imageSha256": "5c4b998f93bdbd48dc0152f2c9ff1be8b463adc04bf14245238c9ed2e4fea30b",
+        "prompt": "LEFT-CLICK / A TO OPEN THE TAVERN DOOR"
+      },
+      {
+        "moment": "Opened the door",
+        "imageSha256": "810e591debb2f28729c2380c1c1272c1899ef1af075888028fe8513c29aaacdc",
+        "prompt": ""
+      },
+      {
+        "moment": "Returned to the hearth with forward input",
+        "imageSha256": "e398a05ae2d02cb4ed07a4ee14e3f64e1b5023eb465c1f93e8f3b376f7b4e81b",
+        "prompt": ""
+      },
+      {
+        "moment": "Reached Kit and the treasure question",
+        "imageSha256": "dd5851143cde822e16434624db5a74a859ee342a4304e5bb10a9b6e3e8351ee1",
+        "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE"
+      }
+    ]
+  },
+  "androidDeviceRun": false,
+  "published": false
+}

@@ -1,0 +1,91 @@
+{
+  "schema": 1,
+  "sourceCommit": "967130ce5714b5e13a5f72e7e798078fe7c44e0e",
+  "distribution": "Private local validation",
+  "published": false,
+  "scope": "Incremental package refresh after the Bellwether south threshold change",
+  "changedRuntimeAssetSha256": {
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "0460b6372a3c56d73cdc91351493e0dbe5a54ae7c542fa1aee386e01ceed0d46",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb": "bbab267a6643b9a06353ce203c9e115032480c523ab010b48b764fe1950dadb9"
+  },
+  "windows": {
+    "path": "reports/bellwether-threshold-packages-20261128/Horde-Lantern-RT-Alpha-1.8.0-Windows-x64.zip",
+    "sourceCommit": "967130ce5714b5e13a5f72e7e798078fe7c44e0e",
+    "archiveSha256": "aaa602f56cc64387b42c028a8735c7cf9602a1cb7330c97a73c4877939efd3c3",
+    "archiveBytes": 351882183,
+    "baseArchiveSha256": "254638b5b2ef07a248bf0232c559b7e7052af00b0c07dca587566b3c5fe8b98e",
+    "runtimeMatchesPlayedPayload": true,
+    "exactReplacementsSha256": {
+      "HordeLanternRT.exe": "dfc0fc44d21a4dc7b0e5d6e321fc2cfc14012e780456b0809389774f5647447a",
+      "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "0460b6372a3c56d73cdc91351493e0dbe5a54ae7c542fa1aee386e01ceed0d46",
+      "assets/models/world/runtime/bellwether-tavern-v1/bellwether-south-door.glb": "bbab267a6643b9a06353ce203c9e115032480c523ab010b48b764fe1950dadb9"
+    },
+    "unmodifiedEntriesVerifiedByHash": 294,
+    "packagePoliciesPassed": true,
+    "shaderValidationPassed": true,
+    "runtimeEvidence": "../2026-11-28-bellwether-tavern-threshold/receipt.json"
+  },
+  "ordinaryAndroid": {
+    "path": "reports/bellwether-threshold-packages-20261128/Horde-Lantern-RT-Alpha-1.8.0-Android-UNSIGNED-DO-NOT-PUBLISH.apk",
+    "versionName": "1.8.0",
+    "versionCode": 12,
+    "applicationId": "com.samfa12.hordelanternrt",
+    "sha256": "513907eecae9e2e1fa63a06e7c4815929361f4926b87e46d33fcc1a9c1789326",
+    "bytes": 294686777,
+    "archiveEntries": 316,
+    "nativeSha256ByAbi": {
+      "armeabi-v7a": "cbf38400bad4f90aedcadd32407c74303f0c9d9285fc08d1a81ba24bc14572d0",
+      "x86_64": "6b1462c6db5681403024d9c244911ee7eeaee614c71ee4ed8dbd6bf88a7f05f4",
+      "arm64-v8a": "5408ce5114b804d5f7a59ffe115ef97e59ebc587b27d110c9337ec134d50e629",
+      "x86": "5276c0ce26a75a156e007baa6f564603fd287e7dcf1e997aa4f8bc92a9d75880"
+    },
+    "shippingMobileShaderHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "zipAligned16KiB": true,
+    "runtimeAssetCount": 295,
+    "runtimeAssetInventorySha256": "66c614a8d07980fb9a329d9c69d597b61fc78aef8dfce5c62d3c13b33e25b776",
+    "unsigned": true,
+    "releaseLintPassed": true,
+    "packagePoliciesPassed": true,
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "deviceRun": false
+  },
+  "arm64Playtest": {
+    "path": "reports/bellwether-threshold-packages-20261128/Horde-Bellwether-1.8.0-Phone-Playtest-ARM64.apk",
+    "versionName": "1.8.0-bellwether-candidate",
+    "versionCode": 12,
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "sha256": "d248f9f7d1b6f9377c5017d2b58b6f7cdf9e1f83c547f326aec2520276c623c5",
+    "bytes": 277647208,
+    "archiveEntries": 313,
+    "nativeSha256ByAbi": {
+      "arm64-v8a": "d09b65969e7b9150736ce429625cef89b9ff96c88d26d78eb98763f5d2417403"
+    },
+    "shippingMobileShaderHashes": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "zipAligned16KiB": true,
+    "runtimeAssetCount": 295,
+    "runtimeAssetInventorySha256": "66c614a8d07980fb9a329d9c69d597b61fc78aef8dfce5c62d3c13b33e25b776",
+    "developmentSignatureMatchesPrevious": true,
+    "deviceRun": false,
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    }
+  }
+}

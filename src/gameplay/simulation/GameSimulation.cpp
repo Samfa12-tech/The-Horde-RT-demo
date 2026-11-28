@@ -102,7 +102,10 @@ GameSimulation::GameSimulation(GameSimulationConfig config)
                            effects::MakeGardenHouseWindowEmitter(),
                            effects::MakeSquareWaymarkerLampEmitter(),
                            effects::MakeHouseBLampEmitter(),
-                           effects::MakeChurchRecordLampEmitter()};
+                           effects::MakeChurchRecordLampEmitter(),
+                           effects::MakeWorkingSquareLampEmitter(),
+                           effects::MakeWorkingSquareStoreLampEmitter(),
+                           effects::MakeFootwayLampEmitter()};
     combatTeaching_.Reset(config_.combatFoundation1_7);
     skeletonRevival_.Reset(config_.skeletonRevival1_7 && config_.combatFoundation1_7 &&
                           config_.waterfallSkeletonEncounter);
@@ -980,7 +983,7 @@ void GameSimulation::ResetRoute()
     DiscardFlaskRequests();
     campaignInputPublicationFloor_.reset();
     chapterTerrain_.reset();
-    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;openLocalReading_=bellwether::LocalReading::None;
+    chapterDialogue_.Reset();dialogueDucking_.Reset();chapterCompanion_.Reset();tavernKeeper_={};recordKeeper_.reset();artificer_.reset();recordKeeperAttention_={};artificerAttention_={};salvagerAttention_={};relicDealerAttention_={};waysideArchive_={};tavernDoor_={};chapterFirstExterior_=false;chapterVisibleRaise_=0;openLocalReading_=bellwether::LocalReading::None;
     privyRagState_=bellwether::PrivyRagState::Available;
     treasurePurse_={};
     millPreparation_={};
@@ -2266,6 +2269,12 @@ void GameSimulation::ResolveFireEmitters(const float fixedDeltaSeconds)
             effects::HouseBLampFireInput(),fixedDeltaSeconds);
         effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kChurchRecordLampRosterIndex],
             effects::ChurchRecordLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kWorkingSquareLampRosterIndex],
+            effects::WorkingSquareLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kWorkingSquareStoreLampRosterIndex],
+            effects::WorkingSquareStoreLampFireInput(),fixedDeltaSeconds);
+        effects::StepFireEmitterFixed(bellwetherFireEmitters_[effects::kFootwayLampRosterIndex],
+            effects::FootwayLampFireInput(),fixedDeltaSeconds);
     }
 }
 

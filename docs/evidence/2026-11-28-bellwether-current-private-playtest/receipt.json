@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "sourceCommit": "1daa1a74825c4e8736f13857acbfb7b234ee96d0",
+  "distribution": "Private local playtest",
+  "published": false,
+  "android": {
+    "path": "reports/bellwether-current-android-playtest-20261128/Horde-Bellwether-1.8.0-Phone-Playtest-ARM64.apk",
+    "sha256": "ece61183ede50ad216f7f3e7295aa5c82148de237b788da4bd8ea20ac0a183e7",
+    "bytes": 277646864,
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "versionName": "1.8.0-bellwether-candidate",
+    "versionCode": 12,
+    "debuggable": false,
+    "librarySha256": "58fbfc0182559184d7d4ee9d7239d78b0e0d03b7ddccbcb19a377dd49b72feb8",
+    "16KiBAlignment": true,
+    "signatureV2Verified": true,
+    "sameDevelopmentSignerAsPriorPlaytest": true,
+    "ordinaryUnsignedApkSha256": "194e6a53b8dbe907297eb102a03a960f925f8e3fcf222c6b3057821002c263b2",
+    "identicalRuntimeAssets": 295,
+    "runtimeAssetInventorySha256": "d5531aec9a40bd18a8232c3bea6ab9b58bf9b6e6676ab90a90f58c3b8f7d8a3b",
+    "residents": 5,
+    "voiceTakes": 26,
+    "identicalShippingMobileShaderModules": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "deviceRun": false
+  },
+  "windowsHearthAudio": {
+    "archiveSha256": "254638b5b2ef07a248bf0232c559b7e7052af00b0c07dca587566b3c5fe8b98e",
+    "executableSha256": "59e69dd1005b2dc4d354750c7801aa1c515f4387d60da52bfb896944376846da",
+    "executionBackend": "RayTracingPipeline",
+    "fixtureSha256": "c3dc0611b9d2e15f728f979f5df6a7386ed8b63ec665ef65893e82c2b257ffab",
+    "recording": "reports/bellwether-current-windows-listening-20261128/hearth-live-loopback.wav",
+    "recordingSha256": "e4ac54db62fd0d5a1467fcf5ebe53752be226a26d2ba4c1dac58e245037d6059",
+    "capture": "WASAPI include target process tree only",
+    "captureDiscontinuities": 0,
+    "levels": {
+      "channels": 2,
+      "rateHz": 44100,
+      "frames": 1763559,
+      "samplePeakDbfs": -10.2,
+      "clippedSamples": 0,
+      "rmsDbfs": -32.1
+    },
+    "matchResults": [
+      {
+        "asset": "hub.kit_introduce",
+        "offsetSeconds": 4.326,
+        "referenceSeconds": 4.099,
+        "correlation": 0.8789,
+        "fittedVoiceToResidualDb": 5.31,
+        "fittedVoiceRmsDbfs": -29.23,
+        "residualRmsDbfs": -34.54
+      },
+      {
+        "asset": "hub.horde_army",
+        "offsetSeconds": 8.406,
+        "referenceSeconds": 5.579,
+        "correlation": 0.8058,
+        "fittedVoiceToResidualDb": 2.67,
+        "fittedVoiceRmsDbfs": -30.99,
+        "residualRmsDbfs": -33.66
+      },
+      {
+        "asset": "hub.hoard_answer",
+        "offsetSeconds": 13.996,
+        "referenceSeconds": 3.939,
+        "correlation": 0.872,
+        "fittedVoiceToResidualDb": 5.02,
+        "fittedVoiceRmsDbfs": -30.28,
+        "residualRmsDbfs": -35.29
+      },
+      {
+        "asset": "hub.kit_stake",
+        "offsetSeconds": 21.086,
+        "referenceSeconds": 5.699,
+        "correlation": 0.8619,
+        "fittedVoiceToResidualDb": 4.61,
+        "fittedVoiceRmsDbfs": -30.29,
+        "residualRmsDbfs": -34.9
+      },
+      {
+        "asset": "kit.personal_stake.key",
+        "offsetSeconds": 26.786,
+        "referenceSeconds": 4.739,
+        "correlation": 0.9582,
+        "fittedVoiceToResidualDb": 10.49,
+        "fittedVoiceRmsDbfs": -28.36,
+        "residualRmsDbfs": -38.86
+      }
+    ],
+    "existingSavesPreserved": true,
+    "subjectiveListeningAccepted": false
+  }
+}

@@ -167,6 +167,8 @@ The pinned voice overlay is optional. Extract the candidate ZIP to a writable
 folder and start from the ordinary menu. Each extraction keeps its own
 `state/campaign-v1` and settings. The candidate admits only its packaged
 residents and does not enable Debug automation.
+For the Windows packager, pass the directory containing the individual WAV
+files to `-VoiceDirectory`.
 
 For ordinary 1.8 package validation, run `tools/package-alpha.ps1` with
 `-Version 1.8.0 -VersionCode 12` and set `HORDE_VALIDATION_UNSIGNED=1` in the
@@ -237,7 +239,9 @@ evidence. Keep these packages and their private inputs in local storage.
 Use the optimized candidate for Android acceptance through the ordinary menus.
 Build `:app:assembleBellwetherCandidate` with `-PhordeBellwetherCandidate=true`,
 the same resident, flask and revival inputs, and the optional pinned voice
-directory. Omitting the Bellwether voice directory leaves the village dialogue
+overlay. Point `hordeBellwetherVoiceDir` at the Android asset root containing
+`private_bellwether_voice/` with the pinned WAV files inside it. Omitting
+the Bellwether voice directory leaves the village dialogue
 captioned. The candidate uses standard Shipping/Mobile shaders, the local
 development key and the isolated app ID
 `com.samfa12.hordelanternrt.bellwether.candidate`. Its package version derives

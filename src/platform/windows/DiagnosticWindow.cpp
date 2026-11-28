@@ -794,7 +794,7 @@ struct VulkanSurfaceContext
         horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
     horde::graphics::GraphicsSettings graphicsBeforeApply = savedGraphics;
     horde::graphics::FireDetail fireDetail = horde::graphics::FireDetail::High;
-    horde::graphics::ShadowQuality shadowQuality = horde::graphics::ShadowQuality::Current;
+    horde::graphics::ShadowQuality shadowQuality = savedGraphics.shadowQuality;
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
     bool requestedMistEnabled = true;
@@ -4250,7 +4250,7 @@ void ApplyOverlayState(VulkanSurfaceContext& context)
                         ? "RETRY ENCOUNTER"
                         : (context.endingOverlayVisible
                                ? "CONTINUE"
-                               : (context.entryMenuVisible ? "PLAY" : "ENTER THE RUIN / RESUME")));
+                               : (context.entryMenuVisible ? "PLAY" : "RESUME")));
     }
     if (HWND restart = GetDlgItem(context.windowHandle, kRestartButtonId))
     {
@@ -14403,7 +14403,7 @@ int CreateAndShowWindow(const std::string& diagnosticText,
                  SS_CENTER | SS_NOPREFIX);
     createButton(kEntryMoreButtonId, "MORE / BENCHMARK");
     createButton(kEntryBackButtonId, "BACK");
-    createButton(kResumeButtonId, "ENTER THE RUIN / RESUME");
+    createButton(kResumeButtonId, "RESUME");
     createButton(kLookoutObjectiveButtonId,"LOOKOUT OBJECTIVE");
     createButton(kRestartButtonId, "RESTART ROUTE");
     createButton(kCampaignSaveButtonId,"SAVE CHECKPOINT...");

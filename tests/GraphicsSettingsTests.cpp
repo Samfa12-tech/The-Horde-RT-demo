@@ -334,8 +334,8 @@ void TestPlatformDefaultsAndMist()
     const auto desktop = PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows);
     Check(mobile == GraphicsSettings{33, WaterQuality::Mobile, FireDetail::Mobile, 30, false, ShadowQuality::Current, false, DustQuality::Low},
           "fresh mobile defaults keep approved33/Mobile/Mobile/30/GlassOff/Current/MistOff/DustLow");
-    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Current, true, DustQuality::Standard},
-          "fresh desktop defaults preserve High appearance and MistOn with owner-approved DustLow");
+    Check(desktop == GraphicsSettings{100, WaterQuality::High, FireDetail::High, 30, true, ShadowQuality::Higher, true, DustQuality::Standard},
+          "fresh desktop defaults select the highest production shadows with the existing display and effects settings");
     Check(MatchGraphicsPreset(mobile, GraphicsPlatform::Android) == GraphicsPreset::PlatformDefault &&
           GraphicsPresetName(GraphicsPreset::PlatformDefault) == "Platform defaults" &&
           MatchGraphicsPreset(desktop, GraphicsPlatform::Windows) == GraphicsPreset::PlatformDefault,

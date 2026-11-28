@@ -1,10 +1,13 @@
 #include "scene/ForestSurroundings.h"
 #include "scene/assets/StaticPrimitiveGrouping.h"
 #include "gameplay/simulation/DevelopmentWorldRoute.h"
+#include "gameplay/traversal/BellwetherTavernRoute.h"
+#include "../../assets/models/world/source/bellwether-woodland-v1/placements.h"
 #include "../../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <string_view>
 
 namespace horde::scene {
@@ -12,6 +15,7 @@ namespace {
 using Asset=assets::StaticMeshAsset;
 using Surface=gameplay::simulation::TriangleSupportSurface;
 using Point=Surface::Point;
+enum class TreePart { All, Bark, Crown };
 constexpr std::array<const char*,6> kNames{
     "pine-middle.glb","alder-middle.glb","pine-far.glb","alder-far.glb","boundary-panel.glb","woodland-low-fern.glb"};
 constexpr std::array<std::size_t,6> kTriangles{1474,1390,164,180,60,588};
@@ -104,9 +108,11 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
     auto& report=prepared->report;
     // One source primitive at a time, preserving local indices and every basis
     // attribute. All temporary geometry stays CPU-side until final validation.
-    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false,bool rockContact=false) {
+    const auto append=[&](const Asset& a,auto transform,bool fence,bool keepEndingPost=false,bool treeContact=false,
+                         bool rockContact=false,TreePart part=TreePart::All) {
         for(const auto& p:a.primitives) {
             const auto family=rockContact?4:std::find(kSourceFamilies.begin(),kSourceFamilies.end(),a.materials[p.materialIndex].name)-kSourceFamilies.begin();
+            if((part==TreePart::Bark && family!=0) || (part==TreePart::Crown && family==0))continue;
             auto& v=vertices[family];auto& ix=indices[family];
             std::size_t end=a.vertices.size();
             for(const auto& next:a.primitives)if(next.vertexOffset>p.vertexOffset)end=std::min(end,std::size_t(next.vertexOffset));
@@ -157,47 +163,105 @@ bool AppendPreparedForestSurroundings(const std::filesystem::path& root,
         }
         return true;
     };
-    for(const auto& p:surroundings_layout::trees) {
-        if(p.asset>=4)return fail("invalid asset selection.");
-        const auto& a=sources[p.asset];const auto support=terrain->Query(p.x,p.z);
+    const auto appendTree=[&](unsigned asset,float x,float z,float yaw,float scale,std::optional<float> expectedY,
+                              bool middleCrown=false) {
+        if(asset>=4 || (middleCrown && asset<2))return fail("invalid tree asset selection.");
+        const auto& a=sources[asset];const auto support=terrain->Query(x,z);
         if(!support.found)return fail("missing tree support.");
-        const float co=std::cos(p.yaw),si=std::sin(p.yaw);
-        float fitted=support.worldY-a.bounds.minimum[1];std::size_t tips=0;
+        const float co=std::cos(yaw),si=std::sin(yaw);
+        const float naturalBase=support.worldY-scale*a.bounds.minimum[1];
+        float fitted=naturalBase;std::size_t tips=0;
         for(const auto& v:a.vertices)if(v.position[1]<=a.bounds.minimum[1]+.03f) {
-            const auto g=terrain->Query(p.x+co*v.position[0]+si*v.position[2],p.z-si*v.position[0]+co*v.position[2]);
+            const float vx=scale*v.position[0],vz=scale*v.position[2];
+            const auto g=terrain->Query(x+co*vx+si*vz,z-si*vx+co*vz);
             if(!g.found)return fail("root footprint lacks imported ground.");
-            fitted=std::min(fitted,g.worldY-v.position[1]-.02f);++tips;
+            fitted=std::min(fitted,g.worldY-scale*v.position[1]-.02f);++tips;
         }
-        const float burial=support.worldY-a.bounds.minimum[1]-fitted;
-        if(tips<4 || burial>.6501f || std::abs(fitted-p.y)>.001f)return fail("actual root fitting differs from source receipt.");
+        const float burial=naturalBase-fitted;
+        if(tips<4 || burial>.6501f || (expectedY && std::abs(fitted-*expectedY)>.001f))
+            return fail("tree roots exceed the authored ground fit.");
         report.maximumRootBurial=std::max(report.maximumRootBurial,burial);
-        if(!append(a,[&](auto v,bool){
-            const auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
+        const auto transform=[&](auto v,bool){
+            const auto rotate=[&](auto& f){const float vx=f[0],vz=f[2];f[0]=co*vx+si*vz;f[2]=-si*vx+co*vz;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
-            v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
-        },false,false,true))return fail("invalid transformed tree basis.");
+            v.position[0]=x+scale*v.position[0];v.position[1]=fitted+scale*v.position[1];
+            v.position[2]=z+scale*v.position[2];return v;
+        };
+        if(!append(a,transform,false,false,true,false,middleCrown?TreePart::Bark:TreePart::All))
+            return fail("invalid transformed tree basis.");
+        if(middleCrown && !append(sources[asset-2],transform,false,false,false,false,TreePart::Crown))
+            return fail("invalid transformed tree crown.");
+        return true;
+    };
+    for(const auto& p:surroundings_layout::trees) {
+        if(!appendTree(p.asset,p.x,p.z,p.yaw,1.f,p.y))return false;
         ++report.extraTrees;report.addedTreeTriangles+=kTriangles[p.asset];
     }
-    for(const auto& p:surroundings_layout::understory) {
-        const auto& a=sources[5];const auto centre=terrain->Query(p.x,p.z);
+    if(roadEnd==ForestRoadEnd::Bellwether) {
+        using namespace bellwether_woodland;
+        const auto startingTreeContact=report.treeContactTriangles;
+        const auto indexCount=[&] {
+            std::size_t count=0;
+            for(const auto& family:indices)count+=family.size();
+            return count;
+        };
+        const auto startingIndices=indexCount();
+        for(const auto& p:kBellwetherCopses) {
+            const auto mark=gameplay::traversal::BellwetherMapStation(p.east,p.north);
+            const unsigned asset=p.species==Species::Pine?2:3;
+            if(!appendTree(asset,mark.x,mark.z,p.yaw,p.scale,std::nullopt,p.middleCrown))return false;
+            ++report.bellwetherBackdropTrees;
+        }
+        const auto addedIndices=indexCount()-startingIndices;
+        if(addedIndices!=kTreeTriangles*3 ||
+           report.treeContactTriangles-startingTreeContact!=kTreeContactTriangles)
+            return fail("Bellwether copse assets changed the reviewed render or contact counts.");
+        report.bellwetherBackdropTriangles=addedIndices/3;
+    }
+    const auto appendUnderstory=[&](float x,float z,float yaw,float scale,auto permitsFootprint) {
+        const auto& a=sources[5];const auto centre=terrain->Query(x,z);
         if(!centre.found)return fail("understory lacks ground");
-        const float co=std::cos(p.yaw),si=std::sin(p.yaw);
-        float fitted=centre.worldY-a.bounds.minimum[1]-.03f;
+        const float co=std::cos(yaw),si=std::sin(yaw);
+        float fitted=centre.worldY-scale*a.bounds.minimum[1]-.03f;
         for(const auto& v:a.vertices) {
-            const float x=p.x+co*v.position[0]+si*v.position[2],z=p.z-si*v.position[0]+co*v.position[2];
-            const auto under=terrain->Query(x,z);
+            const float px=scale*v.position[0],pz=scale*v.position[2];
+            const float vx=x+co*px+si*pz,vz=z-si*px+co*pz;
+            const auto under=terrain->Query(vx,vz);
             if(!under.found)return fail("understory full footprint leaves imported ground");
-            if(v.position[1]<=a.bounds.minimum[1]+.03f)fitted=std::min(fitted,under.worldY-v.position[1]-.03f);
-            if(gameplay::simulation::ProjectWorldRoute(x,z).distance<1.35f ||
-               std::hypot(x+33.7f,z+17.f)<4.1f || std::hypot(x+28.7f,z+5.8f)<3.f || std::hypot(x-13.3f,z-36.2f)<3.2f)
-                return fail("actual understory footprint obstructs route or protected pocket");
+            if(v.position[1]<=a.bounds.minimum[1]+.03f)fitted=std::min(fitted,under.worldY-scale*v.position[1]-.03f);
+            if(!permitsFootprint(vx,vz,under))return fail("understory footprint enters a protected route near "+
+                std::to_string(x)+", "+std::to_string(z));
         }
         if(!append(a,[&](auto v,bool){
-            auto rotate=[&](auto& f){const float x=f[0],z=f[2];f[0]=co*x+si*z;f[2]=-si*x+co*z;};
+            const auto rotate=[&](auto& f){const float vx=f[0],vz=f[2];f[0]=co*vx+si*vz;f[2]=-si*vx+co*vz;};
             rotate(v.position);rotate(v.normal);rotate(v.tangent);
-            v.position[0]+=p.x;v.position[1]+=fitted;v.position[2]+=p.z;return v;
+            v.position[0]=x+scale*v.position[0];v.position[1]=fitted+scale*v.position[1];
+            v.position[2]=z+scale*v.position[2];return v;
         },false))return fail("invalid understory basis");
+        return true;
+    };
+    const auto clearsForestRoute=[](float x,float z,const Surface::Sample&) {
+        return gameplay::simulation::ProjectWorldRoute(x,z).distance>=1.35f &&
+            std::hypot(x+33.7f,z+17.f)>=4.1f && std::hypot(x+28.7f,z+5.8f)>=3.f &&
+            std::hypot(x-13.3f,z-36.2f)>=3.2f;
+    };
+    for(const auto& p:surroundings_layout::understory) {
+        if(!appendUnderstory(p.x,p.z,p.yaw,1.f,clearsForestRoute))return false;
         ++report.understoryClumps;report.understoryTriangles+=kTriangles[5];
+    }
+    if(roadEnd==ForestRoadEnd::Bellwether) {
+        for(const auto& p:bellwether_woodland::kSouthUnderstory) {
+            const auto ground=terrain->Query(p.x,p.z);
+            if(!ground.found || ground.surface!=gameplay::simulation::SupportSurface::Earth ||
+               !terrain->NonWalkableVolumeClear(p.x,p.z,p.x,p.z,ground.worldY+.03f,ground.worldY+.45f,.12f))
+                return fail("Bellwether planting base overlaps a built surface near "+
+                    std::to_string(p.x)+", "+std::to_string(p.z));
+            if(!appendUnderstory(p.x,p.z,p.yaw,p.scale,[](float,float,const Surface::Sample& under) {
+                return under.surface==gameplay::simulation::SupportSurface::Earth;
+            }))return false;
+            ++report.bellwetherUnderstoryClumps;
+            report.bellwetherUnderstoryTriangles+=kTriangles[5];
+        }
     }
     // Resolve visible natural boundaries before assembling runs. A short fence
     // ending at a bank or the arrival portal owns its terminal post; joined

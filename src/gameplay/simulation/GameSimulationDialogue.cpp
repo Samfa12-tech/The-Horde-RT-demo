@@ -9,6 +9,7 @@
 #include "../../../assets/models/world/source/bellwether-privy-rag-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-grate-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-tally-v1/geometry.generated.h"
+#include <algorithm>
 #include <cmath>
 namespace horde::gameplay::simulation {
 namespace {
@@ -31,6 +32,21 @@ bool OnRiverPracticeLanding(float x,float z) {
     constexpr auto wet=traversal::kBellwetherRiverLanding.back();
     constexpr auto dry=traversal::kBellwetherRiverDryMark;
     return x>=dry.x-.75f && x<=wet.x+.5f && std::abs(z-dry.z)<=.6f;
+}
+
+std::optional<dialogue::Tuple> VisibleResidentMouth(const dialogue::Context& c,
+    const std::array<float,3>& foot,const TriangleSupportSurface& terrain) {
+    auto mouth=foot;
+    mouth[1]+=dialogue::kCompanionSpeechHeight;
+    if(!std::all_of(mouth.begin(),mouth.end(),[](float value){return std::isfinite(value);}) ||
+       !std::isfinite(c.player.x) || !std::isfinite(c.player.z) || !std::isfinite(c.listener.y))
+        return std::nullopt;
+    const float distance=std::hypot(mouth[0]-c.player.x,mouth[2]-c.player.z);
+    const float height=std::min(mouth[1],c.listener.y);
+    if(distance>4.f || std::abs(mouth[1]-c.listener.y)>1.2f ||
+       !terrain.NonWalkableVolumeClear(c.player.x,c.player.z,mouth[0],mouth[2],
+           height-.025f,height+.025f,.025f))return std::nullopt;
+    return dialogue::Tuple{mouth[0],mouth[1],mouth[2]};
 }
 } // namespace
 
@@ -504,10 +520,13 @@ bellwether::DoorAction GameSimulation::TavernDoorAction(const dialogue::Context&
         return DoorAction::None;
     const auto pose=TavernDoor::PoseAt(tavernDoor_.opening);
     const auto& m=pose.worldFromModel;
-    constexpr float pullX=1.82f,pullY=1.12f;
+    constexpr float pullX=TavernDoor::kPullX,pullY=1.12f;
     const float x=m[3]+m[0]*pullX,y=m[7]+pullY,z=m[11]+m[8]*pullX;
     const float dx=x-c.player.x,dz=z-c.player.z,distance=std::hypot(dx,dz);
-    if(distance>3.f || std::abs(c.listener.y-y)>1.25f ||
+    // An open leaf puts the wider door's pull deeper inside the room.
+    // Keep it operable from the same landing outside the sill.
+    const float reach=3.f+tavernDoor_.opening*kSouthDoorAddedWidth;
+    if(distance>reach || std::abs(c.listener.y-y)>1.25f ||
        std::sin(c.yaw)*dx-std::cos(c.yaw)*dz<.65f*distance ||
        !chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,x,z,y-.02f,y+.02f,.02f))
         return DoorAction::None;
@@ -524,10 +543,10 @@ void GameSimulation::AdvanceTavernDoor(float seconds) {
     const float delta=tavernDoor_.destination-tavernDoor_.opening;
     const float step=seconds/duration;
     const float next=std::abs(delta)<=step?tavernDoor_.destination:tavernDoor_.opening+std::copysign(step,delta);
-    const float travel=std::abs(next-tavernDoor_.opening)*kSouthDoorOpenRadians*kSouthDoorSwingRadius;
-    if(UsesRescueExterior() && !TavernDoor::PoseAt(next).VolumeClear(*contact,
-            playerX_,playerZ_,playerX_,playerZ_,playerSupport_.worldY+.001f,
-            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius+travel))return;
+    const float angleDelta=(next-tavernDoor_.opening)*kSouthDoorOpenRadians;
+    if(UsesRescueExterior() && !TavernDoor::PoseAt(tavernDoor_.opening).RotatingVolumeClear(*contact,
+            TavernDoor::PoseAt(next),angleDelta,playerX_,playerZ_,playerSupport_.worldY+.001f,
+            playerSupport_.worldY+posture_.Height(),kPlayerCollisionRadius))return;
     tavernDoor_.opening=next;
 }
 
@@ -607,14 +626,10 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused,std::opt
     if(recordKeeper_ && IsBellwetherResidentReady(traversal::kRecordKeeperResident) &&
        c.exterior && c.kitSeated && playerSupport_.grounded && chapterTerrain_ &&
        chapterTerrainGeneration_==worldRoute_.generation) {
-        const auto& foot=recordKeeper_->foot;
-        const Tuple source{foot[0],foot[1]+kCompanionSpeechHeight,foot[2]};
-        const float dx=source.x-c.player.x,dz=source.z-c.player.z;
-        const float distance=std::hypot(dx,dz),height=std::min(source.y,c.listener.y);
-        if(distance<=4.f && std::abs(source.y-c.listener.y)<=1.2f &&
-           chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,source.x,source.z,
-               height-.025f,height+.025f,.025f)) {
-            c.recordKeeperSource=source;
+        if(const auto source=VisibleResidentMouth(c,recordKeeper_->foot,*chapterTerrain_)) {
+            const float dx=source->x-c.player.x,dz=source->z-c.player.z;
+            const float distance=std::hypot(dx,dz);
+            c.recordKeeperSource=*source;
             c.recordKeeperInReach=distance<=2.5f &&
                 (std::sin(c.yaw)*dx-std::cos(c.yaw)*dz)>=.65f*distance;
         }
@@ -623,16 +638,11 @@ dialogue::Context GameSimulation::ChapterInteractionContext(bool paused,std::opt
             std::optional<Tuple>& source,bool& inReach) {
         if(!c.exterior || !c.kitSeated || !playerSupport_.grounded || !chapterTerrain_ ||
            chapterTerrainGeneration_!=worldRoute_.generation)return;
-        auto mouth=foot;
-        mouth[1]+=kCompanionSpeechHeight;
-        const float distance=std::hypot(mouth[0]-c.player.x,mouth[2]-c.player.z);
-        const float height=std::min(mouth[1],c.listener.y);
-        if(distance<=4.f && std::abs(mouth[1]-c.listener.y)<=1.2f &&
-           chapterTerrain_->NonWalkableVolumeClear(c.player.x,c.player.z,mouth[0],mouth[2],
-               height-.025f,height+.025f,.025f)) {
-            source=Tuple{mouth[0],mouth[1],mouth[2]};
+        if(const auto mouth=VisibleResidentMouth(c,foot,*chapterTerrain_)) {
+            const float distance=std::hypot(mouth->x-c.player.x,mouth->z-c.player.z);
+            source=*mouth;
             inReach=distance<=2.1f &&
-                std::sin(c.yaw)*(mouth[0]-c.player.x)-std::cos(c.yaw)*(mouth[2]-c.player.z)>=.65f*distance;
+                std::sin(c.yaw)*(mouth->x-c.player.x)-std::cos(c.yaw)*(mouth->z-c.player.z)>=.65f*distance;
         }
     };
     if(salvager_ && IsBellwetherResidentReady(traversal::kSalvagerResident))
@@ -703,26 +713,58 @@ void GameSimulation::UpdateChapterDialogue(const InputSnapshot& input,float seco
        !c.traversing && !c.combat &&
        chapterDialogue_.State().tavernConversationLinesResolved==kTavernConversation.size())
         tavernKeeper_.TurnAtHearth(seconds,c.tavernFittingInReach,c.player.x,c.player.z);
-    if(salvager_ && c.salvagerSource && !c.paused && c.alive && !c.traversing) {
-        auto& pose=*salvager_;
-        pose.idleSeconds+=seconds;
-        const auto line=chapterDialogue_.State().line;
-        const bool attending=!c.combat &&
-            ((line==Line::None && c.salvagerInReach) || IsSalvagerLine(line));
-        const float dx=c.player.x-pose.foot[0],dz=c.player.z-pose.foot[2];
-        const float target=attending && std::hypot(dx,dz)>.001f?
-            std::atan2(dx,-dz):bellwether::kSalvagerRestYaw;
-        pose.yaw=TurnResidentYaw(pose.yaw,target,seconds,1.5f);
-    }
-    if(recordKeeper_ && !c.paused && c.alive && !c.traversing) {
-        auto& keeper=*recordKeeper_;
-        if(c.recordKeeperSource)keeper.idleSeconds+=seconds;
-        const auto line=chapterDialogue_.State().line;
-        const bool attending=c.recordKeeperSource && !c.combat &&
-            ((line==Line::None && c.recordKeeperInReach) || IsRecordKeeperLine(line));
-        const float dx=c.player.x-keeper.foot[0],dz=c.player.z-keeper.foot[2];
-        const float target=attending && std::hypot(dx,dz)>.001f?std::atan2(dx,-dz):kRecordKeeperRestYaw;
-        keeper.yaw=TurnResidentYaw(keeper.yaw,target,seconds,1.5f);
+    constexpr float kResidentTurnRate=1.5f;
+    constexpr float kResidentAttentionDuration=2.5f;
+    const auto turnOutdoorResident=[&](float& yaw,const std::array<float,3>& foot,float restYaw,
+            dialogue::ResidentAttentionState& attention,bool visible,bool engaged) {
+        const bool glance=dialogue::StepResidentAttention(attention,visible && !c.combat,
+            seconds,kResidentAttentionDuration);
+        const float dx=c.player.x-foot[0],dz=c.player.z-foot[2];
+        const bool attending=visible && !c.combat && (glance || engaged);
+        const float target=attending && std::hypot(dx,dz)>.001f?std::atan2(dx,-dz):restYaw;
+        yaw=TurnResidentYaw(yaw,target,seconds,kResidentTurnRate);
+    };
+    const auto line=chapterDialogue_.State().line;
+    const bool updateResidentAttention=!c.paused && c.alive && !c.traversing;
+    std::optional<Tuple> visibleArtificer;
+    if(updateResidentAttention && artificer_ && IsBellwetherResidentReady(traversal::kArtificerResident) &&
+       c.exterior && c.kitSeated && playerSupport_.grounded &&
+       chapterTerrain_ && chapterTerrainGeneration_==worldRoute_.generation)
+        visibleArtificer=VisibleResidentMouth(c,artificer_->foot,*chapterTerrain_);
+    if(updateResidentAttention) {
+        const bool recordVisible=recordKeeper_ && c.recordKeeperSource.has_value();
+        if(recordKeeper_ && recordVisible)recordKeeper_->idleSeconds+=seconds;
+        if(recordKeeper_)
+            turnOutdoorResident(recordKeeper_->yaw,recordKeeper_->foot,kRecordKeeperRestYaw,
+                recordKeeperAttention_,recordVisible,
+                (line==Line::None && c.recordKeeperInReach) || IsRecordKeeperLine(line));
+        else
+            dialogue::StepResidentAttention(recordKeeperAttention_,false,seconds,kResidentAttentionDuration);
+
+        if(artificer_) {
+            const bool offeringRig=visibleArtificer && millPreparation_==bellwether::MillPreparation::GearingVerified &&
+                CurrentMillAction(c)==bellwether::MillAction::TakeRig;
+            turnOutdoorResident(artificer_->yaw,artificer_->foot,bellwether::kArtificerRestYaw,
+                artificerAttention_,visibleArtificer.has_value(),offeringRig);
+        } else
+            dialogue::StepResidentAttention(artificerAttention_,false,seconds,kResidentAttentionDuration);
+
+        const bool salvagerVisible=salvager_ && c.salvagerSource.has_value();
+        if(salvager_ && salvagerVisible)salvager_->idleSeconds+=seconds;
+        if(salvager_)
+            turnOutdoorResident(salvager_->yaw,salvager_->foot,bellwether::kSalvagerRestYaw,
+                salvagerAttention_,salvagerVisible,
+                (line==Line::None && c.salvagerInReach) || IsSalvagerLine(line));
+        else
+            dialogue::StepResidentAttention(salvagerAttention_,false,seconds,kResidentAttentionDuration);
+
+        const bool dealerVisible=relicDealer_ && c.relicDealerSource.has_value();
+        if(relicDealer_)
+            turnOutdoorResident(relicDealer_->yaw,relicDealer_->foot,bellwether::kRelicDealerRestYaw,
+                relicDealerAttention_,dealerVisible,chapterDialogue_.CanStartRelicDealer(c) ||
+                    line==Line::RelicDealerOrdinarySale);
+        else
+            dialogue::StepResidentAttention(relicDealerAttention_,false,seconds,kResidentAttentionDuration);
     }
     if(terrain && c.tavernKeeperSource && tavernKeeper_.Pose()->stage==TavernKeeperStage::AtDoor &&
        !c.paused && c.alive && !c.traversing && !c.combat) {

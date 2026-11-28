@@ -13,6 +13,7 @@ namespace horde::scene {
 struct FlaskRestBasinPlacement {
     gameplay::traversal::Vec3 anchor{}, centre{};
 };
+inline constexpr std::size_t kFlaskRestBasinsContactTriangles=2u*9u*12u;
 inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
     std::shared_ptr<const gameplay::simulation::TriangleSupportSurface>& terrain,
     std::array<FlaskRestBasinPlacement,2>& placements,std::string& diagnostic)
@@ -34,6 +35,7 @@ inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
         {{end.x,ground.worldY,end.z},{end.x,ground.worldY,end.z}}}};
     std::vector<assets::StaticRtVertex> vertices;std::vector<std::uint32_t> indices;
     std::vector<Surface::Triangle> contact;
+    contact.reserve(kFlaskRestBasinsContactTriangles);
     for(std::size_t site=0;site<placements.size();++site) {
         auto& p=placements[site];p.centre=gameplay::healing::FlaskRestBasinCentre(p.anchor,site==1);
         float bottom=-INFINITY;
@@ -80,6 +82,9 @@ inline bool AppendFlaskRestBasins(assets::StaticMeshAsset& owner,
         box(-.195f,.47f,0,.025f,.05f,.22f);box(.195f,.47f,0,.025f,.05f,.22f);
         box(0,.47f,-.195f,.17f,.05f,.025f);box(0,.47f,.195f,.17f,.05f,.025f);
         box(0,.58f,.165f,.085f,.10f,.035f);box(0,.715f,.165f,.035f,.035f,.035f);
+    }
+    if(contact.size()!=kFlaskRestBasinsContactTriangles) {
+        diagnostic="Rest basin geometry disagrees with its contact triangle count.";return false;
     }
     auto support=Surface::WithAdditionalNonWalkableGeometry(*terrain,contact,diagnostic);
     if(!support)return false;

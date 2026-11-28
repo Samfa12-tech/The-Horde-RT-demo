@@ -13,6 +13,8 @@
 #include "../../../assets/models/world/source/bellwether-square-waymarker-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-house-b-v1/geometry.generated.h"
 #include "../../../assets/models/world/source/bellwether-church-station-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-working-square-v1/geometry.generated.h"
+#include "../../../assets/models/world/source/bellwether-footway-lamp-v1/geometry.generated.h"
 
 namespace horde::gameplay::effects
 {
@@ -30,6 +32,12 @@ inline constexpr std::uint32_t kHouseBLampEmitterId=0x4230344cu;
 inline constexpr std::size_t kHouseBLampRosterIndex=10;
 inline constexpr std::uint32_t kChurchRecordLampEmitterId=0x4243524cu;
 inline constexpr std::size_t kChurchRecordLampRosterIndex=11;
+inline constexpr std::uint32_t kWorkingSquareLampEmitterId=0x424d4b4cu;
+inline constexpr std::size_t kWorkingSquareLampRosterIndex=12;
+inline constexpr std::uint32_t kWorkingSquareStoreLampEmitterId=0x4253544cu;
+inline constexpr std::size_t kWorkingSquareStoreLampRosterIndex=13;
+inline constexpr std::uint32_t kFootwayLampEmitterId=0x4246574cu;
+inline constexpr std::size_t kFootwayLampRosterIndex=14;
 // The B01 west-wall recess spans x=79.72 to 80.85 and opens east.
 // Both anchors sit inside the masonry mouth, over the imported tavern floor.
 inline constexpr std::array<float,3> kBellwetherHearthFlame{{80.62f,-8.53f,109.90f}};
@@ -227,6 +235,53 @@ inline FireEmitterFixedStepInput ChurchRecordLampFireInput()
     return BellwetherFireInput(bellwether::kChurchRecordStationFlame,bellwether::kChurchRecordStationLight,1.45f);
 }
 
+inline FireEmitterState MakeWorkingSquareLampEmitter()
+{
+    auto emitter=MakeBellwetherPorchLampFireEmitter();
+    emitter.stableId=kWorkingSquareLampEmitterId;
+    emitter.seed=0x4d41524bu;
+    emitter.colourTemperatureKelvin=2225.f;
+    emitter.height=.21f;
+    emitter.authoredStrengthScale=2.2f;
+    return emitter;
+}
+
+inline FireEmitterFixedStepInput WorkingSquareLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kWorkingSquareLampFlame,bellwether::kWorkingSquareLampLight,1.f);
+}
+
+inline FireEmitterState MakeWorkingSquareStoreLampEmitter()
+{
+    auto emitter=MakeWorkingSquareLampEmitter();
+    emitter.stableId=kWorkingSquareStoreLampEmitterId;
+    emitter.seed=0x53545245u;
+    emitter.colourTemperatureKelvin=2170.f;
+    emitter.height=.17f;
+    emitter.authoredStrengthScale=2.4f;
+    return emitter;
+}
+
+inline FireEmitterFixedStepInput WorkingSquareStoreLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kWorkingSquareStoreFlame,bellwether::kWorkingSquareStoreLight,1.f);
+}
+
+inline FireEmitterState MakeFootwayLampEmitter()
+{
+    auto emitter=MakeBellwetherPorchLampFireEmitter();
+    emitter.stableId=kFootwayLampEmitterId;
+    emitter.seed=0x464f4f54u;
+    emitter.colourTemperatureKelvin=2150.f;
+    emitter.authoredStrengthScale=2.35f;
+    return emitter;
+}
+
+inline FireEmitterFixedStepInput FootwayLampFireInput()
+{
+    return BellwetherFireInput(bellwether::kFootwayLampFlame,bellwether::kFootwayLampLight,1.f);
+}
+
 inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noexcept
 {
     struct LampZone {
@@ -242,6 +297,9 @@ inline constexpr std::size_t SelectBellwetherExteriorLamp(float x, float z) noex
         LampZone{bellwether::kSquarePorchLampLight,12.5f,7},
         LampZone{bellwether::kHouseBLampLight,14.f,kHouseBLampRosterIndex},
         LampZone{bellwether::kChurchRecordStationLight,13.f,kChurchRecordLampRosterIndex},
+        LampZone{bellwether::kWorkingSquareLampLight,9.f,kWorkingSquareLampRosterIndex},
+        LampZone{bellwether::kWorkingSquareStoreLight,11.5f,kWorkingSquareStoreLampRosterIndex},
+        LampZone{bellwether::kFootwayLampLight,11.f,kFootwayLampRosterIndex},
     };
     float nearest=std::numeric_limits<float>::max();
     std::size_t slot=2; // River fork is the existing exterior default.

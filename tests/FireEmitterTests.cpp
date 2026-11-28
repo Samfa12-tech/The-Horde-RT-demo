@@ -316,6 +316,45 @@ bool TestBellwetherFiresUseTheOrdinaryFireBudget()
         upload.selectedStableIds[0]==kChurchRecordLampEmitterId &&
         AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
         "the church approach uses its pinned oil cup alongside the held lantern within the shared exterior budget");
+    const auto& marketLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
+    auto marketLamp=MakeWorkingSquareLampEmitter();
+    StepFireEmitterFixed(marketLamp,WorkingSquareLampFireInput(),kFixedDelta);
+    const std::array marketFires{hearth,candle,marketLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(71.f,134.85f)==kWorkingSquareLampRosterIndex &&
+        SelectBellwetherExteriorLamp(76.15f,135.15f)==kWorkingSquareLampRosterIndex &&
+        Approx(marketLamp.worldFromLight[13],marketLight[1]) &&
+        BuildFireEmitterUpload(marketFires,{marketLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kWorkingSquareLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the market oil lamp covers both approaches alongside the held lantern within the exterior budget");
+    const auto& storeLight=horde::gameplay::bellwether::kWorkingSquareStoreLight;
+    const auto& storePath=horde::gameplay::bellwether::kWorkingSquareStorePath;
+    auto storeLamp=MakeWorkingSquareStoreLampEmitter();
+    StepFireEmitterFixed(storeLamp,WorkingSquareStoreLampFireInput(),kFixedDelta);
+    const std::array storeFires{hearth,candle,storeLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(storePath[3][0],storePath[3][1])==kWorkingSquareStoreLampRosterIndex &&
+        SelectBellwetherExteriorLamp(storePath.back()[0],storePath.back()[1])==kWorkingSquareStoreLampRosterIndex &&
+        Approx(storeLamp.worldFromLight[13],storeLight[1]) &&
+        BuildFireEmitterUpload(storeFires,{storeLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kWorkingSquareStoreLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the store lamp lights the final lane and loading yard alongside the held lantern within the exterior budget");
+    const auto& footwayLight=horde::gameplay::bellwether::kFootwayLampLight;
+    auto footwayLamp=MakeFootwayLampEmitter();
+    StepFireEmitterFixed(footwayLamp,FootwayLampFireInput(),kFixedDelta);
+    const std::array footwayFires{hearth,candle,footwayLamp};
+    ok &= Require(SelectBellwetherExteriorLamp(131.5f,122.55f)==kFootwayLampRosterIndex &&
+        SelectBellwetherExteriorLamp(135.3f,116.9f)==kFootwayLampRosterIndex &&
+        SelectBellwetherExteriorLamp(114.3f,126.2f)==2u &&
+        SelectBellwetherExteriorLamp(116.1f,115.74f)==6u &&
+        Approx(footwayLamp.worldFromLight[13],footwayLight[1]) &&
+        BuildFireEmitterUpload(footwayFires,{footwayLight,ShowcaseZone::Outside,8.f},{},
+            FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==1u &&
+        upload.selectedStableIds[0]==kFootwayLampEmitterId &&
+        AppendFireEmitterUpload(lantern,{},FireEmitterQuality::Mobile,upload,diagnostic) && upload.activeCount==2u,
+        "the causeway and first footway stretch share a lit turn while the salvager and workbench keep their lamps");
     return ok;
 }
 

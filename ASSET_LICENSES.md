@@ -1198,6 +1198,11 @@ The footway, crossing, rails and turnout are original Horde geometry using
 those same Bellwether timber and masonry materials. The editable source and
 receipt are under assets/models/world/source/bellwether-mill-crossing-v1/.
 
+The original Horde [footway junction revision](assets/models/world/source/bellwether-footway-junction-v1/README.md)
+reuses the existing Bellwether masonry and retains the surveyed terrain.
+The original Horde [hooded footway lamp](assets/models/world/source/bellwether-footway-lamp-v1/README.md)
+uses the existing town stone, oak, char and clay finishes.
+
 ## Bellwether waterwheel contact audio - 23 November 2026
 
 The finite oak journal cue in assets/audio/bellwether-mill/ is original Horde
@@ -1323,6 +1328,25 @@ records the source and runtime hashes, frame counts and sample comparison.
 The uncut audition for the preceding road-mark inspection contains two lines.
 The inspection uses its existing caption. The masters and playable WAVs stay
 in private storage, with ownership recorded in the 28 November intake.
+
+## Bellwether market and working yards - 28 November 2026
+
+Samfa12/Codex authored the market stalls, clay oil lamp, stone plot edges,
+loading piles, pollard and verge plants in Blender for Horde. They use the existing town
+masonry and clay, Horde chest wood and the ForestAlder atlas already admitted
+for the garden. The [layout, editable source and receipt](assets/models/world/source/bellwether-working-square-v1/README.md)
+identify the assets and original Bellwether surveys. The owner's *Moonlit Village
+Hub Map.png* guided the composition.
+
+The worn market pavers, root vegetables, jars, loading bench and staved
+casks are original Horde meshes built in the same Blender source. They reuse
+the town stone, timber, clay, char and ForestAlder foliage finishes.
+The store's door framing, loft shutter and hooded oil lamp use the same
+original town materials and are included in that editable master.
+
+The [south woodland placements](assets/models/world/source/bellwether-woodland-v1/README.md)
+reuse the original Horde pine and alder meshes and materials recorded above
+under the 1.7 whole-route woodland sources.
 
 ## Bellwether lantern archival audition — 28 November 2026
 

@@ -10,6 +10,7 @@
 #include "scene/ForestDressing.h"
 #include "scene/ForestSurroundings.h"
 #include "../assets/models/world/source/forest-surroundings-v1/native-layout.generated.h"
+#include "../assets/models/world/source/bellwether-woodland-v1/placements.h"
 #include "../assets/models/world/source/bellwether-tavern-v1/staging.generated.h"
 #include "scene/CorridorRegionalWaterClosure.h"
 #include "scene/ForestUnderstory.h"
@@ -1170,12 +1171,13 @@ void TestBellwetherWelcomeClearance(const gameplay::simulation::TriangleSupportS
         Check(ground.found && ground.walkable,"welcome clearance probe has grounded listener support");
         return Tuple{x,gameplay::simulation::PlayerEyeWorldY(ground.worldY),z};
     };
-    // The oblique line from the keeper crosses the east jamb from farther down
-    // the ramp. The grounded sill and upper ramp give a clear path to the room.
+    // The oblique line from the keeper crosses the east jamb farther down the
+    // ramp. The widened sill and upper ramp give a clear path to the room.
     Check(TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z)) &&
-          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)),
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+.5f)) &&
+          TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)),
           "the welcome carries through the real south aperture as the player approaches the sill");
-    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+1.f)) &&
+    Check(!TavernWelcomeAudible(terrain,source,listenerAt(door.x,door.z+3.f)) &&
           !TavernWelcomeAudible(terrain,source,listenerAt(keeper[0],door.z+.5f)),
           "the south jamb and adjacent wall occlude the welcome away from the open path");
 }
@@ -1696,6 +1698,8 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
                 walkDry(crossing.rbegin(),crossing.rend());
             Check(crossed,"the shared player motor reaches the millrace turnout and returns dry with no water steps");
             if(!crossed)return;
+            Check(exteriorLampAt(gameplay::effects::kFootwayLampEmitterId,kFootwayLampFlame,kFootwayLampLight),
+                  "returning to the footway junction selects the authored lamp without adding an exterior light slot");
             const bool reachedShallows=walkStations(landing.end()-3,landing.end());
             Check(reachedShallows && game.Snapshot().playerGrounded && game.Snapshot().waterContact.wetGround,
                   "the normal motor can descend from the salvager's shore path into the river shallows");
@@ -1807,6 +1811,16 @@ void TestBellwetherTavernRoute(std::shared_ptr<const gameplay::simulation::Trian
             const auto& state=game.Snapshot();
             const float dx=kBellwetherRecordKeeperMark.x-state.playerX,dz=kBellwetherRecordKeeperMark.z-state.playerZ;
             const float expectedFacing=std::atan2(-dx,dz);
+            const auto initialAttentionError=std::abs(std::remainder(expectedFacing-restYaw,6.28318530718f));
+            const auto sideLook=state.recordKeeper ? std::abs(std::remainder(
+                expectedFacing-state.recordKeeper->yaw,6.28318530718f)):100.f;
+            Check(state.recordKeeper && state.recordKeeperAction==RecordKeeperAction::None &&
+                  sideLook<initialAttentionError,
+                  "a visible side approach makes the record keeper glance over without opening the prompt");
+            for(unsigned tick=0;tick<180;++tick)step();
+            Check(state.recordKeeper && state.recordKeeperAction==RecordKeeperAction::None &&
+                  std::abs(std::remainder(state.recordKeeper->yaw-restYaw,6.28318530718f))<.03f,
+                  "the record keeper returns to the authored stance after a brief glance while the player remains nearby");
             input.yawRadians=std::atan2(dx,-dz);step();
             const auto recordKeeper=game.Snapshot().recordKeeper;
             Check(recordKeeper && recordKeeper->foot[0]==kBellwetherRecordKeeperMark.x &&
@@ -2452,17 +2466,35 @@ void TestBellwetherRelicDealerVisit(
 
     sim::InputSnapshot input;
     input.damageEnabled=false;input.tutorialEnabled=false;
-    input.yawRadians=visit->yaw+3.14159265359f;
+    input.yawRadians=visit->yaw;
     input.pitchRadians=visit->pitch;
-    input.commands.interact=state.lastConsumedInteractSequence+1;
-    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    input.commands.interact=state.lastConsumedInteractSequence;
+    const auto advance=[&] {game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);};
+    const auto dealerFoot=state.relicDealer->foot;
+    // Leave the authored centerline so the work stance and customer-facing
+    // stance are distinct while the player stays at the counter.
+    input.moveStrafe=-1.f;
+    for(unsigned tick=0;tick<20;++tick)advance();
+    input.moveStrafe=0.f;
+    for(unsigned tick=0;tick<240;++tick)advance();
+    const float expectedDealerYaw=std::atan2(state.playerX-dealerFoot[0],dealerFoot[2]-state.playerZ);
+    Check(state.relicDealer && state.relicDealerTradeAvailable && state.relicDealer->foot==dealerFoot &&
+          std::abs(expectedDealerYaw-gameplay::bellwether::kRelicDealerRestYaw)>.12f &&
+          std::abs(std::remainder(state.relicDealer->yaw-expectedDealerYaw,6.28318530718f))<.03f,
+          "the dealer keeps facing a customer waiting at the counter after the first glance expires");
+    input.yawRadians=visit->yaw+3.14159265359f;
+    ++input.commands.interact;
+    advance();
     Check(!state.relicDealerTradeAvailable && state.chapterDialogue.line==Line::None,
           "a player facing away cannot start the dealer's trade caption");
+    for(unsigned tick=0;tick<150;++tick)advance();
+    Check(state.relicDealer && std::abs(state.relicDealer->yaw-gameplay::bellwether::kRelicDealerRestYaw)<.03f,
+          "the dealer returns to the work stance when the customer looks away after the first glance");
     input.yawRadians=visit->yaw;
     const auto revision=game.CampaignBoundaryRevision();
     const auto purse=state.treasurePurse;
     ++input.commands.interact;
-    game.StepFixed(input,1.f/60.f,state.inputPublicationSequence+1);
+    advance();
     Check(state.chapterDialogue.line==Line::RelicDealerOrdinarySale &&
           gameplay::dialogue::RequiresChapterCaption(state.chapterDialogue.line) &&
           state.chapterDialogue.source.x==state.relicDealer->foot[0] &&
@@ -2758,6 +2790,15 @@ void TestBellwetherMillRepairAndLeakTrial(
     };
     const auto interact=[&] {++input.commands.interact;step();};
     const auto repairRevision=game.CampaignBoundaryRevision();
+    if(!state.artificer){Check(false,"the rig handoff presents the artificer");return;}
+    const auto artificerFoot=state.artificer->foot;
+    for(unsigned tick=0;tick<240;++tick)step();
+    const float expectedArtificerYaw=std::atan2(state.playerX-artificerFoot[0],artificerFoot[2]-state.playerZ);
+    Check(state.artificer && state.artificer->foot==artificerFoot && state.millAction==MillAction::TakeRig &&
+          std::abs(expectedArtificerYaw-gameplay::bellwether::kArtificerRestYaw)>.12f &&
+          std::abs(std::remainder(state.artificer->yaw-expectedArtificerYaw,6.28318530718f))<.03f &&
+          game.CampaignBoundaryRevision()==repairRevision,
+          "the artificer keeps facing a player waiting to take the rig after the first glance expires");
     interact();
     interact();
     Check(state.millPreparation==MillPreparation::RigTrialReady && state.millAction==MillAction::None &&
@@ -2942,7 +2983,7 @@ void TestBellwetherRepeatVisitCheckpoint(
           "the inward swing stops at the player and never pushes them");
     // Exit around the tip of the halted leaf. Walking north along the door's
     // centreline would require passing through the solid door.
-    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::kSouthDoorSwingRadius+
+    constexpr float clearX=gameplay::bellwether::kSouthDoorHinge[0]+gameplay::bellwether::TavernDoor::kSwingRadius+
         gameplay::kPlayerCollisionRadius+.10f;
     input.yawRadians=0.f;input.moveStrafe=1.f;
     for(unsigned tick=0;tick<140 && state.playerX<clearX;++tick)step(1);
@@ -2959,6 +3000,60 @@ void TestBellwetherRepeatVisitCheckpoint(
     input.commands.interact=state.lastConsumedInteractSequence+1;
     step(100);
     Check(state.tavernDoor.opening==1.f,"the same interaction reopens the door from inside");
+
+    using gameplay::traversal::BellwetherStation;
+    const auto sill=gameplay::traversal::kBellwetherTavernRoute[gameplay::traversal::kBellwetherSouthDoorStation];
+    const auto walkTo=[&](BellwetherStation point) {
+        for(unsigned tick=0;tick<300;++tick) {
+            const float dx=point.x-state.playerX,dz=point.z-state.playerZ;
+            const float distance=std::hypot(dx,dz);
+            if(distance<.012f) {
+                input.moveForward=0.f;
+                return true;
+            }
+            input.yawRadians=std::atan2(dx,-dz);
+            input.moveForward=std::min(1.f,distance/.055f);
+            step(1);
+        }
+        return false;
+    };
+    const BellwetherStation eastApproach{sill.x+.88f,sill.z+1.85f};
+    const bool linedUp=walkTo({sill.x,state.playerZ}) && walkTo({sill.x,eastApproach.z}) && walkTo(eastApproach);
+    Check(linedUp,"a player returning from the square can approach the east side of the open doorway");
+    if(!linedUp)return;
+
+    input.yawRadians=0.f;
+    input.moveForward=1.f;
+    step(120);
+    const bool crossed=state.playerGrounded && state.playerZ<sill.z-1.5f &&
+        std::abs(state.playerX-eastApproach.x)<.015f && state.tavernDoor.opening==1.f;
+    if(!crossed)
+        std::cerr<<"East approach ended at "<<state.playerX<<','<<state.playerZ
+                 <<" grounded="<<state.playerGrounded<<" door="<<state.tavernDoor.opening<<'\n';
+    Check(crossed,"the direct east-side approach clears the open doorway without a sidestep");
+    if(!crossed)return;
+
+    // The handrail starts farther down the ramp. Use the landing to approach
+    // the east jamb independently of the rail's contact.
+    const float landingZ=sill.z+.55f;
+    const bool exited=walkTo({eastApproach.x,landingZ});
+    Check(exited,"the same east-side lane clears the exit");
+    if(!exited)return;
+    const BellwetherStation jambApproach{sill.x+1.10f,landingZ};
+    const bool atJamb=walkTo(jambApproach);
+    Check(atJamb,"the landing admits a separate approach to the east jamb");
+    if(!atJamb)return;
+
+    input.yawRadians=0.f;
+    input.moveForward=1.f;
+    step(100);
+    Check(state.playerGrounded && state.playerZ>=sill.z && state.playerZ<sill.z+.28f &&
+              state.tavernDoor.opening==1.f,
+          "walking into the east jamb still meets solid contact while the leaf stays parked");
+
+    const bool recentered=walkTo(jambApproach) && walkTo({sill.x,landingZ});
+    Check(recentered && walkTo({sill.x,sill.z-1.5f}) && state.playerGrounded && state.tavernDoor.opening==1.f,
+          "backing up and stepping toward the center lets the player return through the same open door");
 }
 
 void TestFullSurroundings()
@@ -2991,7 +3086,9 @@ void TestFullSurroundings()
     Check(r.extraTrees==416 && r.addedTreeTriangles==190784 && r.boundarySectionsContained && r.boundaryContained && r.arrivalPortalRuns==0 &&
           r.fenceRuns+r.naturalBankRuns+r.rockRuns==surroundings_layout::edges.size() && r.openWoodlandRuns==0 && r.terminalFencePosts>0 && r.fenceTriangles==r.fenceRuns*48+r.terminalFencePosts*12 && r.boundaryCollisionTriangles==r.fenceRuns*20+r.terminalFencePosts*8+r.rockTriangles,
           "full study owns exact additional trees and closed rendered boundary and temporary endpoint after mapped arrival approach");
-    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560,"every candidate includes real lower tree contact and bounded understory");
+    Check(r.treeContactTriangles==10648 && r.understoryClumps==120 && r.understoryTriangles==70560 &&
+          r.bellwetherBackdropTrees==0 && r.bellwetherUnderstoryClumps==0,
+          "the closed forest study keeps its real lower tree contact and original roster");
     Check(owner.materials.size()==baseline.materials.size() && owner.primitives.size()==baseline.primitives.size() &&
           owner.indices.size()==baseline.indices.size()+r.addedIndices && owner.HasValidTriangleProvenance(),
           "full study reuses all existing material/primitive/asset roles without capacity growth");
@@ -3085,6 +3182,26 @@ void TestFullSurroundings()
                   road.extraTrees==r.extraTrees && road.rockRuns==r.rockRuns &&
                   road.fenceRuns+2==r.fenceRuns && road.fenceTriangles+84==r.fenceTriangles,
                   "the live forest opens only the two road spans and retains the closed sections and full tree roster");
+            Check(road.bellwetherBackdropTrees==bellwether_woodland::kBellwetherCopses.size() &&
+                  road.bellwetherBackdropTriangles==bellwether_woodland::kTreeTriangles &&
+                  road.treeContactTriangles==r.treeContactTriangles+bellwether_woodland::kTreeContactTriangles,
+                  "the live chapter admits every surveyed tree with its lower trunk and existing material families");
+            Check(road.bellwetherUnderstoryClumps==bellwether_woodland::kSouthUnderstory.size() &&
+                  road.bellwetherUnderstoryTriangles==bellwether_woodland::kUnderstoryTriangles &&
+                  recreatedTerrain->NonWalkableTriangleCount()==baselineTerrain->NonWalkableTriangleCount()+
+                      road.treeContactTriangles+road.boundaryCollisionTriangles,
+                  "Bellwether's low planting shares the existing families and adds no obstacle faces");
+            for(const auto& tree:bellwether_woodland::kBellwetherCopses) {
+                const auto mark=gameplay::traversal::BellwetherMapStation(tree.east,tree.north);
+                const auto ground=recreatedTerrain->Query(mark.x,mark.z);
+                for(float height:{.75f,1.8f})for(float dx:{-1.2f,1.2f})for(float dz:{-1.2f,1.2f}) {
+                    const float bottom=ground.worldY+.05f,top=ground.worldY+height;
+                    Check(ground.found &&
+                          baselineTerrain->NonWalkableVolumeClear(mark.x+dx,mark.z+dz,mark.x,mark.z,bottom,top,.22f) &&
+                          !recreatedTerrain->NonWalkableVolumeClear(mark.x+dx,mark.z+dz,mark.x,mark.z,bottom,top,.22f),
+                          "the fitted Bellwether trunk blocks new standing and crouched contact from each side");
+                }
+            }
             TestBellwetherTavernRoute(recreatedTerrain,true);
             TestBellwetherTavernRoute(recreatedTerrain,false);
             TestBellwetherRepeatVisitCheckpoint(recreatedTerrain);

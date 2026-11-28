@@ -1,0 +1,86 @@
+{
+  "contentCommit": "6440b41691206a06e54fd45ce8a6a12518bf1ec2",
+  "baseline": "../2026-11-28-bellwether-mill-playthrough/receipt.json",
+  "authoring": "../../../assets/models/world/source/bellwether-footway-junction-v1/authoring-receipt.json",
+  "reproducibleBlenderRuntimeAndManifest": true,
+  "townGlbSha256": "8ab300d12555b3413b94a0d22c907bf4776413693e989f96a624ce7313c0f61a",
+  "terrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "gltfValidator": {
+    "errors": 0,
+    "warnings": 0
+  },
+  "collision": {
+    "before": "The north-side line 0.35 m from centre caught at the footway retaining corner and the river-bank face in the opposite direction.",
+    "after": "Standing capsule completed both directions on all five lines at walking stride, and the dry crossing and wet platform checks passed.",
+    "metresFromCentre": [
+      -0.55,
+      -0.35,
+      0,
+      0.35,
+      0.55
+    ],
+    "maximumTestStrideMetres": 0.032,
+    "addedObstacleTriangles": 5,
+    "addedWalkableTriangles": 12
+  },
+  "ordinaryWindows": {
+    "hardware": "NVIDIA GeForce RTX 5050 Laptop GPU, driver 610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "shadowQuality": "higher",
+    "executableSha256": "8fabaa9444ccfac6ad03a73c94749df0a5e9b73f9efe18d9f4f998eafaee7f6a",
+    "seed": "Isolated copy of the earned tavern autosave with the rig seal recorded.",
+    "seedSha256": "e24aeebaca5893aaba99d10d64ba31a5c24b4ea24fc5bfdc75d7134cd5c9c4aa",
+    "crossingInput": "One forward hold across the junction, followed by one backward hold to return across it, with the same view direction.",
+    "approach": {
+      "frameSha256": "78376bd115aba11a4c0abedc9c98e83087c2f1356cd847f15b516ac384a015e4",
+      "heldLanternWorldPosition": [
+        132.174332,
+        -18.8173084,
+        121.886414
+      ]
+    },
+    "beyondJunction": {
+      "frameSha256": "3245cf57184a7c6f1007e3179e3d0e49999bf2a4e5b7299501ac5f4880afd322",
+      "heldLanternWorldPosition": [
+        138.231735,
+        -22.1041374,
+        121.204788
+      ]
+    },
+    "returnFromJunction": {
+      "frameSha256": "e48d3d541a769caec0cce7b6da15f2aa6943e93f7567291ff53c75987107b3f0",
+      "heldLanternWorldPosition": [
+        132.907242,
+        -19.2533665,
+        121.875351
+      ]
+    },
+    "viewUpFootway": {
+      "frameSha256": "513a247b8ef3f0943fb492335195dc8297fca16b94b788f4900e1b86ea56e359",
+      "heldLanternWorldPosition": [
+        134.391998,
+        -20.6197414,
+        121.454056
+      ]
+    },
+    "afterEnteringFootway": {
+      "frameSha256": "6218433a2e8b401eac28d391e8c379a9608f066cd209bd16940e804963c0e70e",
+      "heldLanternWorldPosition": [
+        135.342987,
+        -20.2462025,
+        116.994644
+      ]
+    },
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true,
+    "gameExitCode": 0
+  },
+  "passingHostTests": [
+    "horde_rt_campaign_session_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_forest_surroundings_native_tests"
+  ],
+  "remaining": "The footway entrance was dark in the first-person capture. The handset route and sustained performance have not been measured for this candidate."
+}

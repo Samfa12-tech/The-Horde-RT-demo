@@ -1,0 +1,31 @@
+{
+  "candidateContentCommit": "9c8f185fee475e2cb75c16eed1311088686fa21c",
+  "assetReceipt": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/9c8f185fee475e2cb75c16eed1311088686fa21c/assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
+  "baseline": "../2026-11-28-bellwether-understory/receipt.json",
+  "launch": "Release executable and refreshed town GLB and manifest staged over the verified Bellwether payload. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "a9609fc218570b6ce05b58da4d1b6c6c4dd66ac68e1a910e0064d237274806aa",
+  "host": {"gpu": "NVIDIA GeForce RTX 5050 Laptop GPU", "driver": "610.47", "backend": "RayTracingPipeline", "shaderBundle": "shipping_high_pair", "shadowQuality": "higher"},
+  "normalPlay": {
+    "route": "Load the isolated tavern save, round the market wall, reach the store casks and front door, and return to the well",
+    "hardwareRtPresented": true,
+    "storeLampStableId": 1112757324,
+    "lampSelectedOnApproachAndAtDoor": true,
+    "heldLanternSelectedAlongsideStoreLamp": true,
+    "storeApproachViewSha256": "83dcc3b1fd750b3c7eff08419ab6fea814a6bb284202581558e6869ac36abbe5",
+    "storeFrontageViewSha256": "0012611b406b0d045afcbd36e6db93cea1dab3ee7dc3a195bb7a2d39c64e1114",
+    "publicLaneReturnSha256": "8c5374edbe2d8817f7e7e92841d3de5d57f983866a87f165762ce06ceca48c23",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "hostContactBudget": {"baseObstacleTriangles": 141376, "refillBasinReservedTriangles": 216, "obstacleLimit": 143819, "remainingObstacleTriangles": 2227},
+  "passingHostTests": [
+    "horde_rt_fire_emitter_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_forest_surroundings_native_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "gltfValidator": {"town": {"errors": 0, "warnings": 0}},
+  "remaining": "Handset play and sustained performance were not measured for this candidate."
+}

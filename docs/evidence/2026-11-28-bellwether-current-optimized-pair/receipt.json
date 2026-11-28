@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "sourceCommit": "d08a636032cb2252e72841711c7ad5c130088251",
+  "distribution": "private local playtest",
+  "sharedFilesVerified": {
+    "townGlb": 1,
+    "residentGlbs": 5,
+    "voiceTakes": 26
+  },
+  "windows": {
+    "sourceCommit": "d08a636032cb2252e72841711c7ad5c130088251",
+    "archiveSha256": "89c56a20648b49a5c0f9b9fc3917802a896bac0463a8c038e1a6c4b6d0096cee",
+    "windowsExecutableSha256": "97a91bc9fd61ae2a3d702fcac92ae39106612dcd5c0d1cbb1c23bc2f55e3455a",
+    "archiveBytes": 466165497,
+    "archiveEntriesVerified": 297,
+    "priorByteIdenticalFilesReused": 295,
+    "residentCount": 5,
+    "voiceFiles": 26,
+    "results": [
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "new",
+        "actions": [
+          "PLAY",
+          "Slot 2  |  New game\nEmpty"
+        ],
+        "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+        "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+        "rtScene": {
+          "status": "Presented via swapchain",
+          "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+          "dispatchWidth": 1232,
+          "dispatchHeight": 803,
+          "presented": true
+        },
+        "reportedBackend": "RayTracingPipeline",
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "exitCode": 0,
+        "workerDesktopStayedSeparate": true,
+        "receiptSha256": "f57d1bf0f230c31f5e82b778aa8fa5b620e6bc6e4e5b43008f3028471c6e42b4"
+      },
+      {
+        "backend": "RayTracingPipeline",
+        "mode": "load",
+        "actions": [
+          "LOAD...",
+          "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM"
+        ],
+        "seedSha256": "e6dcfbeef6fd652991f325c3914178201a4e9c935401aa236c84e9a5ecc3a5a4",
+        "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+        "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+        "rtScene": {
+          "status": "Presented via swapchain",
+          "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+          "dispatchWidth": 1232,
+          "dispatchHeight": 803,
+          "presented": true
+        },
+        "reportedBackend": "RayTracingPipeline",
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "exitCode": 0,
+        "loadPreservedSave": true,
+        "workerDesktopStayedSeparate": true,
+        "receiptSha256": "5b303b5d83a9b98e6d80277dd5d61a3bf90a79a3a64b12c7345d65b9a60819e8"
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "new",
+        "actions": [
+          "PLAY",
+          "Slot 2  |  New game\nEmpty"
+        ],
+        "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+        "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+        "rtScene": {
+          "status": "Presented via swapchain",
+          "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+          "dispatchWidth": 1232,
+          "dispatchHeight": 803,
+          "presented": true
+        },
+        "reportedBackend": "RayQueryCompute",
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "exitCode": 0,
+        "workerDesktopStayedSeparate": true,
+        "receiptSha256": "a11527003ea0eeda77d8a854230a38a7b8e6ec89578913b8ea151363c3e18214"
+      },
+      {
+        "backend": "RayQueryCompute",
+        "mode": "load",
+        "actions": [
+          "LOAD...",
+          "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM"
+        ],
+        "seedSha256": "e6dcfbeef6fd652991f325c3914178201a4e9c935401aa236c84e9a5ecc3a5a4",
+        "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+        "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+        "rtScene": {
+          "status": "Presented via swapchain",
+          "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+          "dispatchWidth": 1232,
+          "dispatchHeight": 803,
+          "presented": true
+        },
+        "reportedBackend": "RayQueryCompute",
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "exitCode": 0,
+        "loadPreservedSave": true,
+        "workerDesktopStayedSeparate": true,
+        "receiptSha256": "af898aa99895e094cf012bc09eeae04dc80eb5ee6cb4194a11d1ddbe36234264"
+      }
+    ]
+  },
+  "android": {
+    "sourceCommit": "d08a636032cb2252e72841711c7ad5c130088251",
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "buildMode": "Private optimized BellwetherCandidate with development signing",
+    "versionName": "1.7.0-bellwether-candidate",
+    "versionCode": 11,
+    "apkSha256": "3e68f7c1dee6ceaa48219c62b288f1c0c0bbfdd355fa7eea7587b6afb5bf19cc",
+    "apkBytes": 277446932,
+    "nativeLibrarySha256": "32eb2ac1ec2cc65dfa313d01f7a1c918910c7fc984d303c762f092b59db1b688",
+    "fiveResidents": [
+      "artificer",
+      "record-keeper",
+      "relic-dealer",
+      "salvager",
+      "tavern-keeper"
+    ],
+    "voiceTakes": 26,
+    "runtimeAssetEntries": 295,
+    "runtimeEntriesMatchPriorCandidate": true,
+    "referenceApkSha256": "6f91b491fa4cf0dec6b32eca312c25e94452bee44c70844959a2d18a5bd9f47f",
+    "assetInventorySha256": "35ba296fd07c1ec67dfafb1e016b77113714e6cca5fb998f43e069ce32738f54",
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6
+    },
+    "packagedSpirv": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "apkSignatureV2Verified": true,
+    "deviceRun": false,
+    "sameDevelopmentSignerAsPriorCandidate": true,
+    "unitTestTaskUpToDate": true
+  }
+}

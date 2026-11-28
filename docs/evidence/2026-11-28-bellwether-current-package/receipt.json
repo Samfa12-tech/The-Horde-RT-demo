@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "distribution": "Private local validation",
+  "published": false,
+  "localCandidateDirectory": "releases/candidates/private-1.8-1daa1a74-verified-20261128",
+  "sourceCommit": "1daa1a74825c4e8736f13857acbfb7b234ee96d0",
+  "windowsArchiveSha256": "254638b5b2ef07a248bf0232c559b7e7052af00b0c07dca587566b3c5fe8b98e",
+  "windowsArchiveBytes": 351779439,
+  "windowsExecutableSha256": "59e69dd1005b2dc4d354750c7801aa1c515f4387d60da52bfb896944376846da",
+  "windowsFilesVerified": 297,
+  "androidApkSha256": "194e6a53b8dbe907297eb102a03a960f925f8e3fcf222c6b3057821002c263b2",
+  "androidApkBytes": 294686449,
+  "androidEntriesVerified": 316,
+  "androidNativeSha256ByAbi": {
+    "arm64-v8a": "b3583f29ceff6db9bb008a9d4e7fed1c2eded99ebef139bd34d5173f5cd15bd3",
+    "armeabi-v7a": "2ede19479a097ef7b62a2c2ecb1f458e5f1e7cf62dd4446d1a31bbf452dce081",
+    "x86": "5cafa1fb33b8baecbf0a71c67ca1ec858280ea3e92e07a21333887d2492420b3",
+    "x86_64": "a037ce9434afdd04faef78033f5bb6d7c68de00380feb9243a74e5e7e3e538b3"
+  },
+  "sharedUpdatedPayloadSha256": {
+    "assets/models/world/runtime/bellwether-tavern-v1/asset.manifest.json": "caa96d8746c4af9fe5fa5e8e86f7e416202ba418c453660d5eeafe638513a502",
+    "assets/models/world/runtime/bellwether-tavern-v1/bellwether-tavern-v1.glb": "518ae34348dd2d8deba2ceaf3d34ad72bfd535b2a4bff329d9b5e27edf133783",
+    "assets/models/world/runtime/bellwether-tavern-v1/garden-crops.manifest.json": "46f3ced145886b04c5a3761336792946fa72a541d04d9647841ab8e3cb68e2a9",
+    "assets/models/world/runtime/bellwether-tavern-v1/garden-crops.glb": "f55c859abd1d8a7c86028ae98f8534873d371ebc011a679bae963b8244beeae3",
+    "assets/audio/bellwether-mill/runtime/wheel_creak.wav": "5d49a102abed34be4cee6426d1801e1670bdee17d56106d7d541c8048cf1f195"
+  },
+  "residentMeshCount": 5,
+  "archivedVoiceCount": 26,
+  "host": {
+    "passed": 266,
+    "packagerLogSha256": "4cf03fc192b451fb0271d1cd2d9935541d830736e032991836d061822cedbd80",
+    "successfulRecheck": "Two CTest workers. Process-scoped Git configuration preserved empty values when Windows launched the tests.",
+    "contactTriangles": 184479,
+    "staticObstacleFaces": 141565,
+    "staticObstacleCapacity": 143813,
+    "refillBasinReservation": 216
+  },
+  "windows": {
+    "shaderQuality": "Shipping/High",
+    "shaderModuleSha256": [
+      "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+      "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+      "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+      "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+    ],
+    "shaderValidationPassed": true,
+    "executionBackend": "RayTracingPipeline",
+    "existingLocalSavesPreserved": true,
+    "cases": [
+      {
+        "mode": "new",
+        "receiptSha256": "9af7c9d032f19325eda9a852b3faa88ad30ce4f5f0e21aca915f882e44df508e",
+        "capabilityReportSha256": "2b8d14f1084b61408fdfd56ccd5c70c208f017b6c2575b776c8a8e33692fc762",
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488
+      },
+      {
+        "mode": "load",
+        "receiptSha256": "4b207fbda9c26a7c2d0beac9e82f74cddfeb2caedea5788b71673b1d748e9ec0",
+        "capabilityReportSha256": "18c576ce10532d85b138350652bcf22e0fb2d09c05713cebb4766a549eb5e665",
+        "shadowQuality": {
+          "mode": "higher",
+          "localPrimarySamples": 4,
+          "skyPrimarySamples": 2,
+          "reserved": 0
+        },
+        "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+        "driverVersion": 2559295488
+      }
+    ],
+    "resizeReloadCycles": 2,
+    "earnedSaveSha256": "e24aeebaca5893aaba99d10d64ba31a5c24b4ea24fc5bfdc75d7134cd5c9c4aa",
+    "earnedSavePreserved": true,
+    "rayQueryComputeDeviceRun": false
+  },
+  "android": {
+    "applicationId": "com.samfa12.hordelanternrt",
+    "versionName": "1.8.0",
+    "versionCode": 12,
+    "lintReleasePassed": true,
+    "unsigned": true,
+    "zipAlignment16KiB": true,
+    "arm64ShaderQuality": "Shipping/Mobile",
+    "arm64ShaderModuleSha256": [
+      "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+      "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+      "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+      "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+    ],
+    "shaderValidationPassed": true,
+    "deviceRun": false
+  },
+  "remaining": [
+    "Play the latest village routes and measure sustained hardware RT performance on Android.",
+    "Review the in-game voice and environment mix by ear.",
+    "Windows RayQueryCompute stability remains open on the tested driver."
+  ]
+}

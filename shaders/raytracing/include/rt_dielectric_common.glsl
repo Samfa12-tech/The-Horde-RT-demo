@@ -326,23 +326,6 @@ vec3 shadeThinWater(HitInfo h, vec3 rayDirection)
 
 vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
 {
-    if (!h.hit)
-    {
-        vec3 nightSky = skyColor(rayDirection);
-        bool cameraInFinale = controls.cameraX >= -36.9 && controls.cameraX <= -30.5 &&
-                              controls.cameraZ >= -18.4 && controls.cameraZ <= -12.0;
-        float dawn = cameraInFinale ? smoothstep(0.0, 1.0, controls.finaleDawnReveal) : 0.0;
-        vec3 dawnSky = tunedLightColor(
-            mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
-                smoothstep(-0.12, 0.52, rayDirection.y)),
-            kLightSkylight);
-        return mix(nightSky, dawnSky, dawn);
-    }
-    if (h.emissive > 0.0)
-    {
-        return h.base * h.emissive;
-    }
-
     bool leanWorkload = controls.workloadPreset < 0.5;
     bool maxWorkload = controls.workloadPreset >= 1.5;
     float reflective = max(h.metallic, h.reflectivity);
@@ -393,6 +376,15 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
         mix(vec3(0.028, 0.034, 0.046), vec3(0.052, 0.064, 0.086),
             skyVisibility * skyDiffuse * 0.55),
         kLightSkylight);
+    // At regional distances, the air seen in front of terrain converges
+    // to the same directional night sky as an unobstructed primary ray.
+    // Keep the existing haze through the mapped chapter and leave nearby
+    // room, reflection and transmission rays on their existing paths.
+    if (h.t > 800.0 && fog > 0.0)
+    {
+        fogColor = mix(fogColor, skyColor(rayDirection),
+                       smoothstep(800.0, 2400.0, h.t));
+    }
     color = mix(color, fogColor, fog);
     // Local-emitter surface radiance is already visibility-tested above.
     // A camera-distance colour floor here would light even a fully occluded
@@ -402,9 +394,21 @@ vec3 shadeOpaquePrimary(HitInfo h, vec3 rayDirection)
 
 vec3 shadePrimary(HitInfo h, vec3 rayDirection)
 {
-    if (!h.hit || h.emissive > 0.0)
+    if (!h.hit)
     {
-        return shadeOpaquePrimary(h, rayDirection);
+        vec3 nightSky = skyColor(rayDirection);
+        bool cameraInFinale = controls.cameraX >= -36.9 && controls.cameraX <= -30.5 &&
+                              controls.cameraZ >= -18.4 && controls.cameraZ <= -12.0;
+        float dawn = cameraInFinale ? smoothstep(0.0, 1.0, controls.finaleDawnReveal) : 0.0;
+        vec3 dawnSky = tunedLightColor(
+            mix(vec3(0.34, 0.14, 0.09), vec3(1.05, 0.52, 0.22),
+                smoothstep(-0.12, 0.52, rayDirection.y)),
+            kLightSkylight);
+        return mix(nightSky, dawnSky, dawn);
+    }
+    if (h.emissive > 0.0)
+    {
+        return h.base * h.emissive;
     }
 
     if (genericTransmissionEnabled() && h.transmission > 0.001 &&

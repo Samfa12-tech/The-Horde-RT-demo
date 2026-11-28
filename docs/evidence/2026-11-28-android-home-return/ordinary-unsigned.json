@@ -1,0 +1,29 @@
+{
+  "sourceCommit": "63db8497aea45a3469b806d33645604f2f0c3baa",
+  "apkSha256": "015c12f518d99c93698a96ea674bd607b96ff5f01ec7f65bf2baef8a46220eb2",
+  "originalAndroidApkSha256": "56338e992c3ce79f159aa704a48839c10e465a56212cd70641ea2fed8c89ddf3",
+  "apkBytes": 294454821,
+  "runtimeAssetsMatchingOriginal": 295,
+  "nativeLibrariesByAbi": {
+    "arm64-v8a": "d61d923a3709d526f2cb5686ed4e6cbc9b425fe1e974abc8bc48ff9633d9821a",
+    "armeabi-v7a": "01a5991d1ee723d1a63d3acf59a39e743376323fd2103e0a5f658b66d62da192",
+    "x86": "8150fcb21e034f50fe646b4516d6daa97ef20f4593aa311a5e203ec828128f89",
+    "x86_64": "c7ac36d1e1b66d5b32878aa5469ba00cad79acea71b9878ab1168b00d92c8da8"
+  },
+  "unsigned": true,
+  "16KiBAlignment": true,
+  "deviceRun": false,
+  "schema": 1,
+  "releaseLintPassed": true,
+  "buildVersion": "1.8.0",
+  "versionCode": 12,
+  "applicationId": "com.samfa12.hordelanternrt",
+  "published": false,
+  "relatedIsolatedDeviceTestApkSha256": "9d83278b6bb09c7fc69f52a27f31a5a81ff4b2b9bb6b02e39f9fe6dcaf488399",
+  "arm64ShippingMobileModuleHashes": [
+    "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+    "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+    "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+  ]
+}

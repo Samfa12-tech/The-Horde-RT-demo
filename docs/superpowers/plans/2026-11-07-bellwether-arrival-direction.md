@@ -88,6 +88,23 @@ Protect the northwest return to the lookout, northern church/shrine routes and s
 
 The Windows host fixture drives the shared player motor from a completed 1.7 lookout checkpoint, through the fully populated forest, down the mapped road, past the square and into the south tavern entrance. It then returns to the lookout without replaying Kit’s reveal. The normal scene opens the two rail spans on the Bellwether road. The rest of the forest boundary retains its rendered collision, and the explicit historical forest proof still uses the closed turnaround.
 
+A foreground Windows run from an earned tavern slot followed the south
+ramp to the square, read the fingerpost, asked the relic dealer about trade,
+reached the kitchen plots and saw the pig and a hen from the public side of
+the stock fence. It then followed the lane back into the tavern and reached
+Kit. The save remained byte-identical. This covered the packaged game with
+ordinary mouse and keyboard actions.
+
+The walk found a Windows mouse input error at the tavern door. The visible
+Open and Close prompts now enable the context action. In the rebuilt ZIP,
+RayTracingPipeline showed the door close after a click and withdrawing
+from the swing. The closed leaf blocked movement. A second click opened
+the door and the player walked back to Kit. RayQueryCompute launched and
+presented the tavern, then exited with access violations during the approach
+in both the previous and rebuilt packages. One Windows crash event identified
+the NVIDIA compiler module, and the underlying cause remains open.
+[Exact town-walk and door receipt](../../evidence/2026-11-28-bellwether-windows-town-walk/receipt.json)
+
 Private playtest builds can enter through the ordinary campaign menus. The separate Android Bellwether app uses its own files directory. Windows Debug accepts `--bellwether-campaign-dir <local two-resident fixture>`, which checks the pinned models and texture arrays and uses `HordeLanternRT/bellwether-debug/campaign-v1` under Local AppData. New Game and Load prepare both residents with the authored scene before play begins. The lookout and tavern use the existing checkpoint format and camera/presentation barrier.
 
 The hidden Windows test picked New Game and a seeded 1.7-format lookout save through the current native slot menus on the RTX 5050 Laptop GPU. Both reached live control after hardware RT presentation with the two resident sources mounted. Returning from the lookout to the title retired those sources and preserved the test save bytes. RayTracingPipeline and RayQueryCompute each passed two New Game and four lookout assertions on the same Debug executable (SHA-256 `132814ac72207d17f45dd89c4d5a63c7f3090352824ce741818dcbdabddfa043`). The Android package and host menu checks passed. Device validation of the ordinary Android campaign route is still open.
@@ -586,7 +603,7 @@ With the artificer present, **Seat the bearing** installs the replacement drive 
 
 Follow the lower river causeway and turn north before the seal-trial platform. The stone footway reaches a standing view beside the wheel and continues to a 7 m crossing upstream. The span slopes down to a fenced service turnout on the river side of the headrace. The crossing is available before the repair and requires no equipment or progression. The terrain and the finite water course retain their original shapes. [Mill crossing source and fit](../../../assets/models/world/source/bellwether-mill-crossing-v1/README.md)
 
-After the drive test, the dry footway is within range of the new positional oak journal cue. The cue uses the wheel's fixed-step phase and shares the existing finite ambience voice. Exact-build listening and physical handset performance remain open. Audio/haptic manual revalidation required — YES, for the new cue and its spatial mix.
+After the drive test, the dry footway is within range of the positional oak journal cue. The cue uses the wheel's fixed-step phase and shares the existing finite ambience voice. The [ordinary Windows recordings](../../evidence/2026-11-28-bellwether-wheel-audio/receipt.json) identify the repeated contact after repair and opposite stereo weighting when the player turns around. The pre-repair control has no matching contact pattern. The wheel WAV is now 6 dB louder so the contact carries better under the default score. Subjective listening and the physical handset check remain open. Audio/haptic manual revalidation required — YES, for the cue's spatial mix.
 
 At `6e133a54` the combined Windows preparation replay passed 51 checks on each hardware RT backend. It walked to the dry witness, observed a positional axle event and presented the wheel on that simulation tick. The private signed ARM64 Debug APK contains the same cue bytes as the Windows package staging. The Android suite ran 609 tests with six skips and no failures.
 
@@ -860,6 +877,24 @@ zero. Muting during speech follows the existing
 hold and release, and the caption continues on the same clock.
 Audio/haptic manual revalidation required — YES, for speech intelligibility
 and the background level during ordinary play.
+
+The packaged Windows 1.8 build played all three Talk recordings at the
+hearth in a foreground run. A process-only capture matched each packaged
+WAV to the live mix. A second run with music muted also matched both lines
+of Kit's treasure exchange and the hearth crackle before and after speech.
+The default recording retains the background score for listening review.
+Both recordings stay in local storage. Default-mix intelligibility and
+physical handset audio still need review. [Windows playback receipt](../../evidence/2026-11-28-bellwether-windows-hearth-listening/receipt.json)
+
+Hearth dialogue now uses a 2.5 m reference distance and 0.50 source gain
+through the shared spatial mixer. The early chapter and south-door greeting
+use their existing levels. Two Windows captures at the same hearth mark and
+default settings measured a 7.0–9.4 dB improvement in the fitted voice-to-
+residual ratio for the three Talk lines. The revised capture also includes
+both lines of Kit's treasure exchange and has no clipped samples or capture
+gaps. The Windows ZIP and unsigned Android APK include this adjustment.
+Audio/haptic manual revalidation required — YES for the new dialogue level.
+[Mix comparison and package receipt](../../evidence/2026-11-28-bellwether-hearth-clarity/receipt.json)
 
 ## Animation and gameplay acceptance gate
 

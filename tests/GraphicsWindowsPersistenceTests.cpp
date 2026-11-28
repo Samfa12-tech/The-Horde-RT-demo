@@ -15,8 +15,9 @@ int main()
         if (!condition) { std::cerr << message << '\n'; passed = false; }
     };
     const auto fallback=horde::platform::windows::WindowsGraphicsStartupFallback(path,{100,2});
-    check(fallback==PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows) && fallback.dustQuality==DustQuality::Standard,
-          "absent graphics/display preferences select Reset-equivalent LOW particles");
+    check(fallback==PlatformDefaultGraphicsSettings(GraphicsPlatform::Windows) && fallback.dustQuality==DustQuality::Standard &&
+          fallback.shadowQuality==ShadowQuality::Higher,
+          "absent graphics/display preferences select the highest supported shadows and Reset-equivalent LOW particles");
     WritePrivateProfileStringA("display","renderScale","75",filename.c_str());
     check(horde::platform::windows::WindowsGraphicsStartupFallback(path,{75,2}).dustQuality==DustQuality::Off,
           "actual legacy preferences retain historical particle OFF migration");
@@ -25,8 +26,9 @@ int main()
     record.confirmed = BaselineGraphicsSettings(GraphicsPlatform::Windows);
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path,record),"explicit OFF saved");
     const auto savedOff=horde::platform::windows::LoadGraphicsPersistenceRecord(path,fallback);
-    check(savedOff && RecoverGraphicsSettings(*savedOff,GraphicsPlatform::Windows).startup.dustQuality==DustQuality::Off,
-          "fresh LOW fallback never overwrites explicit saved OFF");
+    check(savedOff && RecoverGraphicsSettings(*savedOff,GraphicsPlatform::Windows).startup == record.confirmed &&
+          record.confirmed.shadowQuality==ShadowQuality::Current && record.confirmed.dustQuality==DustQuality::Off,
+          "an explicit saved Current shadow and Off particle choice survives the fresh-profile defaults");
     record.confirmed.dustQuality=DustQuality::Standard;
     check(horde::platform::windows::SaveGraphicsPersistenceRecord(path,record),"explicit Standard saved");
     const auto savedStandard=horde::platform::windows::LoadGraphicsPersistenceRecord(path,fallback);

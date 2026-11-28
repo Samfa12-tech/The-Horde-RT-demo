@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "dateLocal": "2026-11-28",
+  "evidenceClass": "Foreground ordinary Windows play with stock mouse and keyboard messages",
+  "townWalk": {
+    "sourceCommit": "b9ddc3d5a6c311fdffde08bc644386314364ba69",
+    "windowsZipSha256": "e9ab74479dece2e3796f6183dcb7a2785af13dba94f02c98be32803c58e0ff5f",
+    "earnedTavernSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "isolatedAndOriginalSavesUnchanged": true,
+    "markers": [
+      {
+        "description": "Loaded the earned tavern through the normal menu",
+        "observerCapture": "frame-000.png",
+        "sha256": "d2e12aabf2a197007c58cc8cf158e62f19ea957ba8382ee25337d7d6a6abc384",
+        "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Read sign directions at the foot of the tavern ramp",
+        "observerCapture": "frame-004.png",
+        "sha256": "fb2bec27db8ad0c2a876cc29d28f5331447328908b74c71bbf2fd37c38adc430",
+        "prompt": "LEFT-CLICK / A TO FINISH READING",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Reached the relic dealer on foot and asked about trade",
+        "observerCapture": "frame-008.png",
+        "sha256": "fc91b2b70273a5d78aa3e839b6b1da2760c5fe0f7665f7ececa24549b563d512",
+        "prompt": "",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Followed the lane to the kitchen plots",
+        "observerCapture": "frame-010.png",
+        "sha256": "61480591f4ae61fb3fb696273fea9f9ac02d167d2747a42d43db0af906319b63",
+        "prompt": "",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Saw the pig and a hen from outside the stock fence",
+        "observerCapture": "frame-011.png",
+        "sha256": "5f426fe3c6d75cd5cdcb4cbffe84fe73537b2e88e16f8860a82ce0f734aaa567",
+        "prompt": "",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Returned to the square and faced the tavern ramp",
+        "observerCapture": "frame-015.png",
+        "sha256": "9f9d70fa634107c9e2b320448958739b6ed3eb1fbe60a082eeeaf783fc2f662b",
+        "prompt": "LEFT-CLICK / A TO READ THE FINGERPOST",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Returned to Kit at the hearth through the south doorway",
+        "observerCapture": "frame-021.png",
+        "sha256": "e1838b9797e50e8789113a7846e20aa84c7efbf16d0eba928d7eae30ab636c91",
+        "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+        "hardwareRtBackend": "RayTracingPipeline"
+      }
+    ],
+    "relicDealerVoiceAdmission": "Line 55 accepted with nonzero stereo gains"
+  },
+  "windowsDoorFix": {
+    "source": "The visible tavern door prompt now sets the contextual mouse input flag",
+    "package": {
+      "sourceCommit": "d8a0feb2130089296b064639f9f65fb0037e6288",
+      "zipSha256": "3b57e104258681715cc76baa2a3d4ec7c89e2f12389864ecd1b8e27293614ea4",
+      "exeSha256": "8e607d8249769cbc3a49f71a6869f6c242cc2e1f4a1089b2ea16f354bd106003",
+      "byteIdenticalNonExecutableEntries": 296,
+      "shippingHighShaderModules": [
+        "85e8094ef959d9853d44f60d8260cac87cb3623e3883041cb50bbcd2272861ed",
+        "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+        "92e68ddc922c6e080f65c76097aecf75d0e86ac1f779e683e2ab39c224a0be7e",
+        "107302b4536293791e5e70b74dab0b25cf6efd591c0badcde2fc1a78412a651f"
+      ]
+    },
+    "backend": "RayTracingPipeline",
+    "markers": [
+      {
+        "description": "Selected Close at the south door from the ramp",
+        "observerCapture": "frame-004.png",
+        "sha256": "506800477449bd351c9778587c67bedb6b409e75746fdffab0874d6af670a3a6",
+        "prompt": "LEFT-CLICK / A TO CLOSE THE TAVERN DOOR",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Backed out of the swing and reached a visibly closed door with Open available",
+        "observerCapture": "frame-006.png",
+        "sha256": "01d7cc70a8fc7396607cac757d8ceb39556dcde258893d42cc4c8fc19f955755",
+        "prompt": "LEFT-CLICK / A TO OPEN THE TAVERN DOOR",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Walking into the closed door did not carry the player through it",
+        "observerCapture": "frame-007.png",
+        "sha256": "56a4dda34bd0d39a4aa5614f137f0895fb021cdc1346acc2b9b0c802aed44239",
+        "prompt": "",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Backed up to the Open prompt",
+        "observerCapture": "frame-008.png",
+        "sha256": "f1232bca53efd1c1abc27593f802005536bae91e9b7d5b7414e006e8bfdc6c99",
+        "prompt": "LEFT-CLICK / A TO OPEN THE TAVERN DOOR",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Left-click reopened the doorway and restored the view into the tavern",
+        "observerCapture": "frame-009.png",
+        "sha256": "c7922eb28ffa9b6c893279e9fc6be243c516011f5d3e611f575267c8b20dbc98",
+        "prompt": "",
+        "hardwareRtBackend": "RayTracingPipeline"
+      },
+      {
+        "description": "Walked through the reopened door and returned to Kit",
+        "observerCapture": "frame-011.png",
+        "sha256": "c360d5a6a936ccca9c6292bc113158fc939c27f11bd5e2387824afdb51ba7b0d",
+        "prompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+        "hardwareRtBackend": "RayTracingPipeline"
+      }
+    ],
+    "isolatedAndOriginalSavesUnchanged": true
+  },
+  "rayQueryCompute": {
+    "playtests": [
+      {
+        "run": "bellwether-ordinary-door-query-20261128",
+        "archiveSha256": "3b57e104258681715cc76baa2a3d4ec7c89e2f12389864ecd1b8e27293614ea4",
+        "sourceCommit": "d8a0feb2130089296b064639f9f65fb0037e6288",
+        "exitCode": 3221225477,
+        "completedInputCheckpoints": 3,
+        "lastCapturePrompt": "",
+        "doorReached": false,
+        "isolatedAndOriginalSavesUnchanged": true,
+        "runReceiptSha256": "9d08a47b087b969ac51af871804550866b84398102a332f627fe73d02a98a280"
+      },
+      {
+        "run": "bellwether-query-door-baseline-20261128",
+        "archiveSha256": "e9ab74479dece2e3796f6183dcb7a2785af13dba94f02c98be32803c58e0ff5f",
+        "sourceCommit": "b9ddc3d5a6c311fdffde08bc644386314364ba69",
+        "exitCode": 3221225477,
+        "completedInputCheckpoints": 0,
+        "lastCapturePrompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+        "doorReached": false,
+        "isolatedAndOriginalSavesUnchanged": true,
+        "runReceiptSha256": "156eee3d3596ab187f6ce58e076d248fa5f1ea432ad25ceeb1e6362ad6acc381"
+      },
+      {
+        "run": "bellwether-query-door-retry-20261128",
+        "archiveSha256": "3b57e104258681715cc76baa2a3d4ec7c89e2f12389864ecd1b8e27293614ea4",
+        "sourceCommit": "d8a0feb2130089296b064639f9f65fb0037e6288",
+        "exitCode": 3221225477,
+        "completedInputCheckpoints": 0,
+        "lastCapturePrompt": "LEFT-CLICK / A TO ASK KIT ABOUT THE TREASURE",
+        "doorReached": false,
+        "isolatedAndOriginalSavesUnchanged": true,
+        "runReceiptSha256": "f8d1def5fb2a3e7a6406194dea3bc7dbde3e969b0ff70100d9049780359eb7bd"
+      }
+    ],
+    "windowsApplicationErrorEvents": [
+      {
+        "run": "bellwether-ordinary-door-query-20261128",
+        "occurred": "2026-11-28T15:55:24.3249154+11:00",
+        "module": "nvgpucomp64.dll",
+        "exception": "c0000005",
+        "offset": "0000000001fe4266"
+      }
+    ]
+  },
+  "hostTests": [
+    "horde_rt_windows_campaign_menu_tests",
+    "horde_rt_chapter_dialogue_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_bellwether_hearth_rest_tests"
+  ],
+  "published": false
+}

@@ -1,0 +1,23 @@
+{
+  "parentTownSha256": "8ab300d12555b3413b94a0d22c907bf4776413693e989f96a624ce7313c0f61a",
+  "parentTerrainSha256": "f031a850a7e8e661cebe64dadd221e514cf466ac80b9e9ab757b393fecf65a2d",
+  "recipeSha256": "62ed539b6069caa358e385cff7860641d6d31e39d430e9ae5720b249794b8300",
+  "blender": "5.2.0 LTS",
+  "addedSolidTriangles": 184,
+  "flame": [
+    134.302,
+    -20.376251098632814,
+    121.378
+  ],
+  "light": [
+    134.333,
+    -20.291251098632813,
+    121.552
+  ],
+  "files": {
+    "footway-lamp.blend": "61ef60a5e61aac3b5ec756167912fa689c86799d0ffab5aeca2f6b2ccb1ca444",
+    "bellwether-tavern-v1.glb": "518ae34348dd2d8deba2ceaf3d34ad72bfd535b2a4bff329d9b5e27edf133783",
+    "geometry.generated.h": "97e95575440e5f89ac29ab70be54511071c0940a9327e6c69b24749e3918c9d3",
+    "asset.manifest.json": "caa96d8746c4af9fe5fa5e8e86f7e416202ba418c453660d5eeafe638513a502"
+  }
+}

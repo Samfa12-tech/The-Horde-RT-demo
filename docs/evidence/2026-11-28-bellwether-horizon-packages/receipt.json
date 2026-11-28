@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "scope": "Private 1.8.0 package refresh with resident attention, west woodland and horizon changes",
+  "published": false,
+  "windows": {
+    "path": "reports/bellwether-horizon-phone-candidate-20261128/Horde-Lantern-RT-Alpha-1.8.0-Windows-x64.zip",
+    "sourceCommit": "167a153b05346bba841896fad8f2cf801734c575",
+    "sha256": "f355a597d30958532efce52bd025183d5041ccbbca115bc3ae4669e64d94c978",
+    "bytes": 351822684,
+    "executableSha256": "44d565a0ad8ba0ffa2d83e5f0bc3e560db44e9c13251ae17e2110f7720a32a55",
+    "fileCount": 297,
+    "unchangedPayloadEntries": 296,
+    "matchesWindowsReplay": true,
+    "packagePoliciesPassed": true,
+    "shippingHighShaderHashes": [
+      "275216b13a0bb5678fa73d52a15c3153d3d05a7df00d7da4d175f5ebc076b429",
+      "538496d334341efac30fe7f3ae3f9969d273f58cd570705a11c262abc8e75803",
+      "d3f513c70b54bcacfed7706295d63cae49353691501ad4e3aacd261a8e826bb3",
+      "ea3a42b7fea1c22bf9a5f792159a9d98b5df5954b292afb90867fdba88d62950"
+    ],
+    "runtimeSourceDiffComparedToAndroid": [
+      "docs/ROADMAP.md",
+      "docs/evidence/2026-11-28-bellwether-horizon/receipt.json",
+      "tests/RaygenVariantArtifactTests.ps1"
+    ],
+    "windowsRuntimeEvidence": "../2026-11-28-bellwether-horizon/receipt.json"
+  },
+  "ordinaryAndroid": {
+    "path": "reports/bellwether-horizon-phone-candidate-20261128/Horde-Lantern-RT-Alpha-1.8.0-Android-UNSIGNED-DO-NOT-PUBLISH.apk",
+    "bytes": 294009561,
+    "sha256": "71a746e7997ba0726c5340b471c0b8d19aac88eed17d01d0982728b86a011c47",
+    "sourceCommit": "50f8c728beaac9139dac72bc1d2f81e66719e77c",
+    "applicationId": "com.samfa12.hordelanternrt",
+    "versionName": "1.8.0",
+    "versionCode": 12,
+    "fileCount": 316,
+    "nativeSha256ByAbi": {
+      "arm64-v8a": "998ff74ea76f1176d7788a033cf170a8609ff953cb135c72e1f3639dd91fa35c",
+      "armeabi-v7a": "88d93c33da954ea2ee9cd8192b3a700983b9876ae67a0c1c1fb4de980f57585c",
+      "x86": "65968e9d5f273af84b75b44492e0e2f23dacce2e83e5b949d7df1368f92fa044",
+      "x86_64": "ff10d9609908f2fd62a2324310e7eff5cc053bf275a2005bd73d77cea1873080"
+    },
+    "shippingMobileShaderHashes": [
+      "62795d833c26b2d4d167cab0b0432222d8b6f514144f537d927cb8b6c90ce920",
+      "74d480245fa514d577d9dbc1de2a09a7d3e7b3f93b22d3cf00b01dfc90e020ea",
+      "942e1de52b62d7c0f1e959462a3b9341cfbfe378442e7fc21220cd82dcf23dda",
+      "95c2bfe4f888cbeade7c7ddb917dd2bf8c984b4e7402b5d5a1aad6483cca0980"
+    ],
+    "runtimeAssetsMatchPriorPackage": 295,
+    "alignment16KiBVerified": true,
+    "deviceRun": false,
+    "unsigned": true,
+    "lintReleasePassed": true,
+    "packagePoliciesPassed": true,
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "reusedByGradle": true
+    }
+  },
+  "arm64Playtest": {
+    "path": "reports/bellwether-horizon-phone-candidate-20261128/Horde-Bellwether-1.8.0-Phone-Playtest-ARM64.apk",
+    "bytes": 277477896,
+    "sha256": "65197d92d1eb2c69304f0f0a1493e90cae576f5ec884196a288d1c8ce1e70aad",
+    "sourceCommit": "50f8c728beaac9139dac72bc1d2f81e66719e77c",
+    "applicationId": "com.samfa12.hordelanternrt.bellwether.candidate",
+    "versionName": "1.8.0-bellwether-candidate",
+    "versionCode": 12,
+    "fileCount": 313,
+    "nativeSha256ByAbi": {
+      "arm64-v8a": "1313cadbf187761e40007d437dd62c31bcb0f203e35592b3e3ac4fc6588c5eee"
+    },
+    "shippingMobileShaderHashes": [
+      "62795d833c26b2d4d167cab0b0432222d8b6f514144f537d927cb8b6c90ce920",
+      "74d480245fa514d577d9dbc1de2a09a7d3e7b3f93b22d3cf00b01dfc90e020ea",
+      "942e1de52b62d7c0f1e959462a3b9341cfbfe378442e7fc21220cd82dcf23dda",
+      "95c2bfe4f888cbeade7c7ddb917dd2bf8c984b4e7402b5d5a1aad6483cca0980"
+    ],
+    "runtimeAssetsMatchPriorPackage": 295,
+    "alignment16KiBVerified": true,
+    "deviceRun": false,
+    "developmentSignerMatchesPrior": true,
+    "unitTests": {
+      "tests": 617,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 6,
+      "reusedByGradle": true
+    }
+  },
+  "pending": "Physical handset run, sustained performance and listening checks for these exact files."
+}

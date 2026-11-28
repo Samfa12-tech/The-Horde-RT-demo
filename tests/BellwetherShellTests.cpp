@@ -419,6 +419,49 @@ int main(int argc,char** argv) {
                   follow(square,apronView) && follow(apronView,square) &&
                   follow(apronView,rampLane) && follow(rampLane,apronView),
                   "a grounded player can walk from the lane view to the pail, back, and toward the ramp toe");
+            const BellwetherStation marketWest{71.f,134.85f}, marketEast{76.15f,135.15f};
+            check(follow(marketWest,marketEast) && follow(marketEast,marketWest),
+                  "both market pitches open onto a continuous pedestrian apron");
+            const auto marketPaving=support->Query(71.47f,134.84f);
+            check(marketPaving.found && marketPaving.walkable && marketPaving.surface==
+                      horde::gameplay::simulation::SupportSurface::Stone,
+                  "the market apron paving supplies actual walkable stone contact");
+            const auto& storePath=horde::gameplay::bellwether::kWorkingSquareStorePath;
+            check(follow({storePath.front()[0],131.7f},{storePath.front()[0],storePath.front()[1]}),
+                  "the store lane opens directly from the public lane beside the square");
+            for(std::size_t station=1;station<storePath.size();++station) {
+                const auto& a=storePath[station-1];
+                const auto& b=storePath[station];
+                check(follow({a[0],a[1]},{b[0],b[1]}) && follow({b[0],b[1]},{a[0],a[1]}),
+                      "the store lane stays clear in both directions beside the market wall and loading gear");
+            }
+            const auto barrelGround=support->Query(65.15f,150.86f);
+            check(barrelGround.found &&
+                  !support->NonWalkableVolumeClear(65.70f,150.86f,65.15f,150.86f,
+                      barrelGround.worldY+.27f,barrelGround.worldY+.75f,radius),
+                  "the loaded cask uses the visible barrel faces for contact");
+            const auto& storeFlame=horde::gameplay::bellwether::kWorkingSquareStoreFlame;
+            const auto& storeLight=horde::gameplay::bellwether::kWorkingSquareStoreLight;
+            check(support->NonWalkableVolumeClear(storeFlame[0],storeFlame[2],storeLight[0],storeLight[2],
+                      storeFlame[1]-.008f,storeLight[1]+.008f,.012f) &&
+                  support->NonWalkableVolumeClear(storeLight[0],storeLight[2],65.45f,151.62f,
+                      storeLight[1]-.018f,storeLight[1]+.018f,.012f),
+                  "the sheltered store flame and light have a clear opening toward the casks");
+            const auto& lampFlame=horde::gameplay::bellwether::kWorkingSquareLampFlame;
+            const auto& lampLight=horde::gameplay::bellwether::kWorkingSquareLampLight;
+            check(support->NonWalkableVolumeClear(lampFlame[0],lampFlame[2],lampLight[0],lampLight[2],
+                      lampFlame[1]-.01f,lampLight[1]+.01f,.014f),
+                  "the market flame and light sample sit clear of the cup and its timber bracket");
+            const auto marketWall=support->Query(72.f,141.f);
+            check(marketWall.found &&
+                  !support->NonWalkableVolumeClear(72.f,140.50f,72.f,141.50f,
+                      marketWall.worldY+.16f,marketWall.worldY+1.8f,radius),
+                  "the low market wall stops a grounded capsule crossing the yard boundary");
+            const BellwetherStation supplyTurn{87.32f,138.05f}, supplyBend{92.5f,137.74f},
+                                    supplyYard{94.7f,138.17f};
+            check(follow(supplyTurn,supplyBend) && follow(supplyBend,supplyYard) &&
+                  follow(supplyYard,supplyBend) && follow(supplyBend,supplyTurn),
+                  "the smith lane spur remains grounded and clear in both directions");
             for (float side : {-1.f,1.f}) {
                 const BellwetherStation foot{82.3f+side*.85f,131.7f};
                 const BellwetherStation landing{82.3f+side*.85f,120.4f};
@@ -717,9 +760,9 @@ int main(int argc,char** argv) {
             auto point=kBellwetherMillApproach[1];
             constexpr float radius=horde::gameplay::kPlayerCollisionRadius;
             float foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
-            const auto follow=[&](BellwetherStation target, bool dry=false) {
+            const auto follow=[&](BellwetherStation target, bool dry=false, float stride=.05f) {
                 const auto start=point;
-                const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/.05f)));
+                const int steps=std::max(1,static_cast<int>(std::ceil(std::hypot(target.x-start.x,target.z-start.z)/stride)));
                 for(int i=1;i<=steps;++i) {
                     const float t=static_cast<float>(i)/steps;
                     const BellwetherStation next{std::lerp(start.x,target.x,t),std::lerp(start.z,target.z,t)};
@@ -749,6 +792,15 @@ int main(int argc,char** argv) {
                   std::all_of(kBellwetherMillCrossing.begin(),kBellwetherMillCrossing.end(),dry) &&
                   std::all_of(kBellwetherMillCrossing.rbegin(),kBellwetherMillCrossing.rend(),dry),
                   "the ordinary standing capsule walks dry from the old causeway to the wheel and across the millrace in both directions");
+            for(float offset:{-.55f,-.35f,0.f,.35f,.55f}) {
+                const float z=kBellwetherRiverDryMark.z+offset;
+                const BellwetherStation upstream{132.5f,z}, downstream{137.5f,z};
+                for(const auto& [start,end]:{std::pair{upstream,downstream},std::pair{downstream,upstream}}) {
+                    point=start;
+                    foot=ChapterExteriorStepSupport(*support,point.x,point.z,radius,1.8f).worldY;
+                    check(follow(end,false,.032f),"the standing capsule crosses the footway junction at walking speed in the causeway lane");
+                }
+            }
             const auto turnout=kBellwetherMillCrossing.back();
             const auto turnoutGround=support->Query(turnout.x,turnout.z);
             check(!support->NonWalkableVolumeClear(turnout.x,turnout.z,turnout.x+1.f,turnout.z,
@@ -797,28 +849,42 @@ int main(int argc,char** argv) {
         check(bare.found && after.found && after.walkable && after.triangle>=originalTerrain->TriangleCount() &&
               std::abs(after.worldY-(-8.70955f))<.001f && after.worldY-bare.worldY>2.5f,
             "real ramp and floor meet at the original tavern floor height above current ground");
-        check(support->NonWalkableVolumeClear(southDoorX,121.f,southDoorX,118.8f,after.worldY+.01f,after.worldY+1.8f,.24f) &&
-             !support->NonWalkableVolumeClear(southDoorX+1.5f,121.f,southDoorX+1.5f,118.8f,
-                 after.worldY+.01f,after.worldY+1.8f,.24f),
-             "the mapped south opening admits the capsule while the adjacent wall stays solid");
+        const auto clearsFrame=[&](float offset) {
+            const float x=southDoorX+offset;
+            return support->NonWalkableVolumeClear(x,121.f,x,118.8f,after.worldY+.01f,after.worldY+1.8f,
+                horde::gameplay::kPlayerCollisionRadius);
+        };
+        check(clearsFrame(0.f) && clearsFrame(.88f) && !clearsFrame(1.10f),
+              "the widened opening clears both approach lanes while the east jamb stays solid");
         const auto& hinge=kSouthDoorHinge;
         const auto* doorContact=support->HingedContact(
             horde::gameplay::simulation::TriangleSupportSurface::HingedPart::TavernDoor);
         check(doorContact && doorContact->TriangleCount()==kSouthDoorTriangles &&
               door.indices.size()==kSouthDoorTriangles*3 && door.bounds.minimum[0]>-.05f &&
-              door.bounds.maximum[0]<kSouthDoorSwingRadius && door.bounds.minimum[1]>=0.f,
+              door.bounds.maximum[0]<TavernDoor::kSwingRadius && door.bounds.minimum[1]>=0.f,
               "the dedicated render leaf and contact have identical hinge-local geometry");
         if(doorContact) {
             const auto open=TavernDoor::PoseAt(1.f);
             const auto closed=TavernDoor::PoseAt(0.f);
-            const auto central=[&](const auto& pose) {
-                return pose.VolumeClear(*doorContact,southDoorX,121.f,southDoorX,116.1f,
+            const auto clearsLeaf=[&](const auto& pose,float offset) {
+                const float x=southDoorX+offset;
+                return pose.VolumeClear(*doorContact,x,121.f,x,116.1f,
                     after.worldY+.01f,after.worldY+1.8f,.28f);
             };
-            check(central(open) && !central(closed) &&
+            check(clearsLeaf(open,0.f) && clearsLeaf(open,.88f) && !clearsLeaf(closed,0.f) && !clearsLeaf(closed,.88f) &&
                   !open.VolumeClear(*doorContact,hinge[0]-.43f,hinge[2]-1.1f,hinge[0]+.42f,hinge[2]-1.1f,
                       after.worldY+.9f,after.worldY+1.22f,.07f),
                   "the same leaf blocks the mapped threshold closed and swings clear when open");
+            const auto beforeArc=TavernDoor::PoseAt(.40f);
+            const auto afterArc=TavernDoor::PoseAt(.60f);
+            const float midAngle=kSouthDoorOpenRadians*.5f;
+            const float arcX=hinge[0]+1.6f*std::cos(midAngle),arcZ=hinge[2]-1.6f*std::sin(midAngle);
+            const float feet=after.worldY+.01f,head=after.worldY+1.8f;
+            check(beforeArc.VolumeClear(*doorContact,arcX,arcZ,arcX,arcZ,feet,head,.12f) &&
+                  afterArc.VolumeClear(*doorContact,arcX,arcZ,arcX,arcZ,feet,head,.12f) &&
+                  !beforeArc.RotatingVolumeClear(*doorContact,afterArc,kSouthDoorOpenRadians*.20f,
+                      arcX,arcZ,feet,head,.12f),
+                  "the continuous swing detects a body in the arc with both endpoint poses clear");
         }
         using namespace horde::gameplay::bellwether;
         const auto exactHorizontalFace=[&](const auto& mark) {
@@ -961,7 +1027,7 @@ int main(int argc,char** argv) {
         world.materials.push_back(alder);
         const auto alderRow=world.materials.size()-1;
         world.primitives.front().materialIndex=static_cast<std::uint32_t>(alderRow);
-        const auto withCrops=withoutCrops+3*kBellwetherGardenCropTriangles;
+        const auto withCrops=withoutCrops+3*kBellwetherFoliageTriangles;
         check(AppendBellwetherGardenCrops(root,world,error) && world.indices.size()==withCrops &&
               world.primitives.back().materialIndex==alderRow && world.materials.size()==alderRow+1 &&
               world.triangleRegions.back()==assets::StaticTriangleRegion::Shared,
