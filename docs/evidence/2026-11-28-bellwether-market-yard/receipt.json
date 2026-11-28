@@ -1,0 +1,27 @@
+{
+  "candidateContentCommit": "27607ac68b98bb2cde0ace18645a1636a743a296",
+  "assetReceipt": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/27607ac68b98bb2cde0ace18645a1636a743a296/assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
+  "baseline": "../2026-11-28-bellwether-contact-storage/receipt.json",
+  "launch": "Release executable and refreshed town and crop assets staged over the verified ordinary Windows payload. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "bf58a67bfad0057eadc5bdd0e5f1e5f0f85d44665455ec1613bf072493499766",
+  "host": {"gpu": "NVIDIA GeForce RTX 5050 Laptop GPU", "driver": "610.47", "backend": "RayTracingPipeline", "shaderBundle": "shipping_high_pair"},
+  "normalPlay": {
+    "route": "Load the isolated tavern save, walk through the paved market and around the market wall to the store casks, then return past the wall to the public lane by the well",
+    "hardwareRtPresented": true,
+    "marketViewSha256": "b73bfe2fbebbc3816921e7ea7285cf96dcf088a8185ad1a3de51b9019fcfab5a",
+    "storeLaneViewSha256": "613a734df409bea05f30b81232f3cde4123b95dc90f51f3da3731b371a383ccd",
+    "loadingYardViewSha256": "65db421fd494df14d07df4109c76da92fda8bdb48cf65500aff70735c9476ed4",
+    "publicLaneReturnSha256": "f44d9e1136661c4b377317b6cc33f86f976639dbba7c55086fab8e6ea07bfe4e",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "hostContactBudget": {"baseObstacleTriangles": 140856, "refillBasinReservedTriangles": 216, "obstacleLimit": 143819, "remainingObstacleTriangles": 2747},
+  "passingHostTests": [
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "gltfValidator": {"town": {"errors": 0, "warnings": 0}, "foliage": {"errors": 0, "warnings": 0}},
+  "remaining": "The store loading gear is visible at lantern distance and the return lane stays clear. Additional planting and lighting around the service yards, handset play and sustained performance remain open."
+}

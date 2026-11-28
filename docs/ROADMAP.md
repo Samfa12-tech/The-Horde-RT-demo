@@ -182,6 +182,8 @@ The [market and working yards](../assets/models/world/source/bellwether-working-
 
 [South woodland](../assets/models/world/source/bellwether-woodland-v1/README.md) frames the store and outbuilding with pine and alder. The [woodland route](evidence/2026-11-28-bellwether-south-woodland/receipt.json) passed again from the tavern to the market on Windows hardware RT. The shared collision engine now stores obstacle faces in the order its queries read them. The exact woodland and town geometry uses 556,848 fewer retained CPU bytes, leaving room for 4,653 more obstacle triangles with both refill basins reserved. Ground-level planting, further street dressing and handset performance remain open. [Collision and route evidence](evidence/2026-11-28-bellwether-contact-storage/receipt.json)
 
+Two lines of worn flagstones link the public lane to the market's open vegetable trays and earthenware jars. An east-side track skirts the market wall to the store's loading bench and two casks. The Windows playtest came back past the market wall to the well from the loading yard. This pass leaves space for 2,747 obstacle triangles with both refill basins reserved. [Market and store route evidence](evidence/2026-11-28-bellwether-market-yard/receipt.json)
+
 A short stone fork from the lower road leads to the mapped east door of
 [House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
 private store-room candidate gives the village a second walk-in building,
