@@ -1915,16 +1915,21 @@ int main()
                        ? complete < sceneDestroy && sceneDestroy < recreate && recreate < timerReset
                        : complete < recreate && recreate < timerReset && timerReset < sceneDestroy);
         };
-        ok &= Require(
-                      resourceResetOrdered(
-                          windowsSource,
-                          "bool ReleaseSwapchainResources(",
-                          "VkExtent2D ScaledRenderExtent(") &&
-                      resourceResetOrdered(
-                          androidBridgeSource,
-                          "bool ReleaseSwapchainResources(",
-                          "void RefreshGpuTimingTelemetry("),
-                      "both swapchain integrations must complete owned work, invalidate the epoch, then reset timer/scene resources");
+        constexpr std::string_view windowsOutputRelease = "bool ReleaseSwapchainOutputResources(";
+        constexpr std::string_view windowsOutputReleaseEnd = "VkExtent2D ScaledRenderExtent(";
+        const std::size_t releaseBegin = windowsSource.find(windowsOutputRelease);
+        const std::size_t releaseEnd = windowsSource.find(windowsOutputReleaseEnd, releaseBegin);
+        const std::string_view releaseBody = releaseEnd != std::string::npos
+            ? std::string_view(windowsSource).substr(releaseBegin, releaseEnd - releaseBegin) : std::string_view{};
+        ok &= Require(resourceResetOrdered(windowsSource, windowsOutputRelease, windowsOutputReleaseEnd,
+                                          "vkFreeCommandBuffers") &&
+                      releaseBody.find("rtScene.Destroy") == std::string_view::npos &&
+                      releaseBody.find("vkDestroyCommandPool") == std::string_view::npos &&
+                      releaseBody.find("InvalidateWorldZoneReadiness") == std::string_view::npos,
+                      "Windows output retirement must complete owned work and reset the epoch before freeing swapchain buffers while retaining the active world and command pool");
+        ok &= Require(resourceResetOrdered(androidBridgeSource, "bool ReleaseSwapchainResources(",
+                                          "void RefreshGpuTimingTelemetry("),
+                      "Android swapchain retirement must complete owned work, invalidate the epoch, then reset timer/scene resources");
         const std::size_t windowsResizeBegin = windowsSource.find("bool ApplyPendingOutputResize(");
         const std::size_t windowsResizeEnd = windowsSource.find("bool RenderFrame(", windowsResizeBegin);
         const bool windowsResizeMarkersValid = windowsResizeBegin != std::string::npos &&
