@@ -1,0 +1,34 @@
+{
+  "candidateContentCommit": "0e49191991c25ead2a28b972586e985896b71bbe",
+  "assetReceipt": "https://github.com/Samfa12-tech/The-Horde-RT-demo/blob/0e49191991c25ead2a28b972586e985896b71bbe/assets/models/world/source/bellwether-working-square-v1/authoring-receipt.json",
+  "baseline": "../2026-11-28-bellwether-working-square/receipt.json",
+  "launch": "Release executable and refreshed town GLB and manifest staged over the verified ordinary Windows payload. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "38037f522416103c8b342faecb2f43912c681ee382381a4d3483a177c34f692b",
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "capturePixels": [1232, 803]
+  },
+  "normalPlay": {
+    "route": "Repeat the isolated tavern save and ordinary south ramp, fingerpost and market walk from the baseline",
+    "hardwareRtPresented": true,
+    "fingerpostViewSha256": "31f8296be334ce92d05b463c68ec0b22ec1d68c95f2c1aaf1b74d0cc26218202",
+    "apronViewSha256": "9944fcd68f217abcebeaaac3a64405bbda52bf4ad71a03bc29b441ea210c6ccb",
+    "marketViewSha256": "05261e338a7b31daf258de410362061cef7d26f2a8c7080057c40456d870b7b4",
+    "visualComparison": "Comparable views from repeated ordinary input, with small camera differences. The glowing wick, warmer post and counter edges and lit ground across the apron are visible in the candidate captures. The town background remains sparse.",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "hostContactBudget": {"baseObstacleTriangles": 139072, "refillBasinReservedTriangles": 216, "obstacleLimit": 139434},
+  "passingHostTests": [
+    "horde_rt_fire_emitter_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "gltfValidator": {"town": {"errors": 0, "warnings": 0}, "foliage": {"errors": 0, "warnings": 0}},
+  "remaining": "Handset play, sustained performance and validation of the background tree dressing remain open."
+}
