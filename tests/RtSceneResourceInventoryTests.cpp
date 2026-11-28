@@ -1782,6 +1782,9 @@ struct PresentableTinyRtSceneObservationTestAccess
             horde::gameplay::bellwether::kHouseBLedgerSolidTriangles+
             horde::gameplay::bellwether::kWorkingSquareSolidTriangles+
             horde::gameplay::bellwether::kWorkingSquareGroundTriangles+
+            horde::gameplay::bellwether::kFootwayJunctionSolidTriangles+
+            horde::gameplay::bellwether::kFootwayJunctionGroundTriangles+
+            horde::gameplay::bellwether::kFootwayLampSolidTriangles+
             horde::scene::bellwether_woodland::kTreeContactTriangles;
         const bool supportFits=support && supportTriangles==expectedSupportTriangles &&
             support->NonWalkableTriangleCount()+horde::scene::kFlaskRestBasinsContactTriangles<=
