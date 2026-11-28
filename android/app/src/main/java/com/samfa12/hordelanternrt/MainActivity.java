@@ -1613,8 +1613,9 @@ public class MainActivity extends Activity {
         final long epoch=lookoutObjectiveEpoch;
         menuScrim.removeAllViews();
         final boolean lookout = expected.isLookout();
+        final MenuReadingHeading reading = lookout ? null : new MenuReadingHeading(this);
         final LinearLayout panel=lookout ? createPanel("The road ahead","FOREST LOOKOUT") :
-                createPanel("Directions","BELLWETHER");
+                createPanel("Directions","BELLWETHER",reading);
         lookoutObjectivePanel=panel;
         addBody(panel,text);
         final Button exploring=createMenuButton("Continue exploring",() -> finishLookoutObjective(epoch,expected,this::hideMenu));
@@ -1624,7 +1625,8 @@ public class MainActivity extends Activity {
         else
             addMenuButton(panel,"Back to pause menu",() -> finishLookoutObjective(epoch,expected,() -> showMainMenu(false)));
         attachPanel(panel);
-        if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
+        if (reading != null) reading.requestFocus();
+        else if(controllerMode)ControllerNavigation.ensureFocus(menuScrim);
         else exploring.requestFocus();
     }
 
@@ -8372,6 +8374,12 @@ public class MainActivity extends Activity {
     }
 
     private LinearLayout createPanel(final String title, final String eyebrow) {
+        final TextView titleView = new TextView(this);
+        titleView.setTextColor(HordeUiTokens.PARCHMENT);
+        return createPanel(title, eyebrow, titleView);
+    }
+
+    private LinearLayout createPanel(final String title, final String eyebrow, final TextView titleView) {
         final LinearLayout panel = new LinearLayout(this);
         panel.setOrientation(LinearLayout.VERTICAL);
         panel.setPadding(dp(28), dp(24), dp(28), dp(28));
@@ -8389,9 +8397,7 @@ public class MainActivity extends Activity {
         eyebrowView.setLetterSpacing(0.12f);
         panel.addView(eyebrowView, matchWrap());
 
-        final TextView titleView = new TextView(this);
         titleView.setText(title);
-        titleView.setTextColor(HordeUiTokens.PARCHMENT);
         titleView.setTextSize(22);
         titleView.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD));
         titleView.setPadding(0, dp(5), 0, dp(14));
