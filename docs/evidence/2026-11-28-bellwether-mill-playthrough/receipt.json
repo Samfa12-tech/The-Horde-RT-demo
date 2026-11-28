@@ -1,0 +1,100 @@
+{
+  "candidateContentCommit": "9c8f185fee475e2cb75c16eed1311088686fa21c",
+  "baseline": "../2026-11-28-bellwether-store-frontage/receipt.json",
+  "launch": "Sealed copy of the existing private Release payload. The ordinary Load menu and player controls were used in two isolated profiles.",
+  "executableSha256": "a9609fc218570b6ce05b58da4d1b6c6c4dd66ac68e1a910e0064d237274806aa",
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driver": "610.47",
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "shadowQuality": "higher"
+  },
+  "shadowSamples": {
+    "local": 4,
+    "sky": 2
+  },
+  "seed": {
+    "checkpoint": "Bellwether tavern",
+    "schema": 16,
+    "millPreparation": "BearingNeeded",
+    "origin": "Autosave earned through Inspect mill gearing in the preceding ordinary Windows playthrough.",
+    "sha256": "7cc071a1a076b6d6c933cc939c422d14574e9fdb49f1707f7b53dcc968086452",
+    "inspectionPromptFrameSha256": "e0d4ff7e42ba26b48cf0cdb32464b6469a4771cf3daaa71ab73933d7898fdee2"
+  },
+  "play": {
+    "orderedSavedStages": [
+      {
+        "action": "Take a spare bearing",
+        "promptFrameSha256": "7500cc1a85c31eb0e7b80fc1ef9684c948da1e470abf7a806703354adc0d96f4",
+        "savedStage": "BearingRecovered",
+        "isolatedSaveSha256": "d9f427df25e44cd5113b47b2b0bfec935c7f766d1e6278588c5161231d781ee9"
+      },
+      {
+        "action": "Check bearing fit",
+        "promptFrameSha256": "21ffb4ca51812090870326c387246b9911365e2b9ed1d68288446028f6b4c395",
+        "savedStage": "FitChecked",
+        "isolatedSaveSha256": "37fe176a5f8fe638c10d4549d13bc760d258a8e30b55dff1606e394fe53db813"
+      },
+      {
+        "action": "Seat the bearing",
+        "promptFrameSha256": "c318cb154eed06a8c79284417cb7fd3eb7d58197cf5301ee44aa0ca48e0d71fe",
+        "savedStage": "BearingSeated",
+        "isolatedSaveSha256": "05c4aab5a7006aefe6f6836a56354d95a959df509b63b1ac4f35cf00ae3412d1"
+      },
+      {
+        "action": "Turn the drive",
+        "promptFrameSha256": "688b18693052ca0594a1be4eadc7e88083d1e69c697dc7b8b51f7af8d40e4242",
+        "savedStage": "GearingVerified",
+        "isolatedSaveSha256": "21405fd0781cc0e7d80d91a0c811a9937d01a92692ecbecb2e69693c669578aa"
+      },
+      {
+        "action": "Take the breathing rig",
+        "promptFrameSha256": "fd83b8ba70a9714d293f77daa3a218e28f55ac60156d515d2e4aa9b692e1e003",
+        "savedStage": "RigTrialReady",
+        "isolatedSaveSha256": "8fa3c195d41a080b8e78e3ab1077ccf96b340158b31622c37eadc9e07acd936a"
+      },
+      {
+        "action": "Confirm seal",
+        "promptFrameSha256": "9d6344564d1247fbf8a8633b735fe49cb3751d44b2f48eb23c197d16f59d0412",
+        "savedStage": "RigTested",
+        "isolatedSaveSha256": "e24aeebaca5893aaba99d10d64ba31a5c24b4ea24fc5bfdc75d7134cd5c9c4aa"
+      }
+    ],
+    "wetTrial": [
+      {
+        "prompt": "LEFT-CLICK / A TO START LEAK TEST",
+        "frameSha256": "01f5f9697b8c006382152f539db5586a8c822dc6470377d0c54e812302347e2a"
+      },
+      {
+        "prompt": "LEAK TEST | STAY IN THE SHALLOWS",
+        "frameSha256": "fd510cb7ef7f529af8e1301fb4272ed31534048069ffe954e7a275fa62152560"
+      },
+      {
+        "prompt": "RETURN TO DRY STONE",
+        "frameSha256": "c38fe2cc99807611e1b26f2de7414b7ee098faae834cc530abcd1a31c89afd3f"
+      }
+    ],
+    "sealedSaveKeptZeroCoinsAndNoAirWard": true,
+    "normalSaveProfileUnchanged": true,
+    "gameExitCode": 0
+  },
+  "reload": {
+    "objectivePanel": "Breathing rig passed its shallow-water seal test.",
+    "frameSha256": "d11cd9b010e78a8bb9494d408daf7f81c610e2d83ebb5c67f8cdf346a8211527",
+    "isolatedSaveSha256": "e24aeebaca5893aaba99d10d64ba31a5c24b4ea24fc5bfdc75d7134cd5c9c4aa",
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true,
+    "gameExitCode": 0
+  },
+  "passingHostTests": [
+    "horde_rt_campaign_session_tests",
+    "horde_rt_campaign_codec_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_forest_surroundings_native_tests"
+  ],
+  "observations": [
+    "A small lateral adjustment at the footway junction let the player continue down the causeway.",
+    "The handset route and sustained performance were outside this Windows playthrough."
+  ]
+}
