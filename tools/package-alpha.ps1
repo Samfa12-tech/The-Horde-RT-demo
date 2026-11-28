@@ -6,6 +6,9 @@ param(
     [ValidateSet("Release", "Debug")]
     [string]$WindowsConfiguration = "Release",
     [string]$Horde17AssetRoot,
+    [string]$BellwetherWindowsResidents,
+    [string]$BellwetherAndroidResidents,
+    [string]$BellwetherVoices,
     [string]$OutputRoot = (Join-Path $PSScriptRoot "..\releases\candidates")
 )
 
@@ -14,11 +17,22 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "horde-night-audio-policy.ps1")
 . (Join-Path $PSScriptRoot "horde-1.7-release-asset-policy.ps1")
 Assert-HordeReleaseVersionIsMutable -Version $Version -VersionCode $VersionCode
-if($Version -eq '1.7.0') {
-    if([string]::IsNullOrWhiteSpace($Horde17AssetRoot)) { throw 'Ordinary 1.7 packaging requires the pinned local Horde17AssetRoot.' }
+$bellwetherRelease = $Version -eq '1.8.0'
+$includeFoundation = $Version -in @('1.7.0', '1.8.0')
+if ($includeFoundation) {
+    if ([string]::IsNullOrWhiteSpace($Horde17AssetRoot)) { throw 'This package requires the pinned local Horde17AssetRoot.' }
     $Horde17AssetRoot=Assert-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot
-} elseif(-not [string]::IsNullOrWhiteSpace($Horde17AssetRoot)) {
-    throw 'Pinned 1.7 assets may only enter the 1.7.0 package.'
+} elseif ($Horde17AssetRoot) {
+    throw 'The pinned flask and revival foundation is scoped to 1.7 and 1.8 packages.'
+}
+if ($bellwetherRelease) {
+    if ($WindowsConfiguration -ne 'Release' -or !$BellwetherWindowsResidents -or !$BellwetherAndroidResidents) {
+        throw 'Ordinary Bellwether packaging requires Windows Release and both pinned resident directories.'
+    }
+    . (Join-Path $PSScriptRoot 'horde-1.8-release-asset-policy.ps1')
+    $bellwetherInputs = Get-Horde18ReleaseInputs -WindowsResidents $BellwetherWindowsResidents -AndroidResidents $BellwetherAndroidResidents -Voices $BellwetherVoices
+} elseif ($BellwetherWindowsResidents -or $BellwetherAndroidResidents -or $BellwetherVoices) {
+    throw 'Ordinary Bellwether assets require version 1.8.0.'
 }
 
 function Find-LatestVersionedTool {
@@ -64,13 +78,16 @@ if (-not (Test-Path -LiteralPath $cmake)) {
 
 $safeVersion = $Version -replace '[^0-9A-Za-z.-]', '-'
 $baseName = "Horde-Lantern-RT-Alpha-$safeVersion"
-$releaseSigningValues = @(
-    $env:HORDE_RELEASE_STORE_FILE,
-    $env:HORDE_RELEASE_STORE_PASSWORD,
-    $env:HORDE_RELEASE_KEY_ALIAS,
-    $env:HORDE_RELEASE_KEY_PASSWORD
-)
-$releaseSigningConfigured = @($releaseSigningValues | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -eq 0
+$releaseSigningConfigured = $false
+if ($env:HORDE_VALIDATION_UNSIGNED -ne '1') {
+    $releaseSigningValues = @(
+        $env:HORDE_RELEASE_STORE_FILE,
+        $env:HORDE_RELEASE_STORE_PASSWORD,
+        $env:HORDE_RELEASE_KEY_ALIAS,
+        $env:HORDE_RELEASE_KEY_PASSWORD
+    )
+    $releaseSigningConfigured = @($releaseSigningValues | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -eq 0
+}
 $stageRoot = Join-Path $outputFull "stage"
 $windowsStage = Join-Path $stageRoot "$baseName-Windows-x64"
 $candidateFiles = @(
@@ -99,7 +116,11 @@ foreach ($candidateFile in $candidateFiles) {
 }
 New-Item -ItemType Directory -Force -Path $windowsStage | Out-Null
 
-& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF -DHORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=OFF "-DHORDE_RT_SHIPPING17_CONTENT=$(if($Version -eq '1.7.0'){'ON'}else{'OFF'})"
+& $cmake -S $repoRoot -B (Join-Path $repoRoot "build") -G "Visual Studio 17 2022" -A x64 `
+    -DHORDE_RT_PRIVATE_REVIVAL=OFF -DHORDE_RT_FLASK_CANDIDATE=OFF -DHORDE_RT_WINDOWS_ACCEPTANCE=OFF `
+    -DHORDE_RT_WINDOWS_BELLWETHER_CANDIDATE=OFF `
+    "-DHORDE_RT_WINDOWS_BELLWETHER_RELEASE=$(if($bellwetherRelease){'ON'}else{'OFF'})" `
+    "-DHORDE_RT_SHIPPING17_CONTENT=$(if($includeFoundation){'ON'}else{'OFF'})"
 if ($LASTEXITCODE -ne 0) { throw "CMake configure failed." }
 & $cmake --build (Join-Path $repoRoot "build") --config $WindowsConfiguration
 if ($LASTEXITCODE -ne 0) { throw "Windows build failed." }
@@ -219,7 +240,8 @@ Copy-Item -LiteralPath (Join-Path $repoRoot "assets\audio\filmcow\forest-distant
 Copy-HordeNightAudioRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage 'assets')
 $null = Copy-Horde162RuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets") -Platform Windows
 $null = Copy-HordeMusicRuntimeAssets -RepositoryRoot $repoRoot -AssetRoot (Join-Path $windowsStage "assets")
-if($Version -eq '1.7.0') { Copy-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot -DestinationRoot $windowsStage }
+if ($includeFoundation) { Copy-Horde17ReleaseAssets -AssetRoot $Horde17AssetRoot -DestinationRoot $windowsStage }
+if ($bellwetherRelease) { Copy-Horde18WindowsAssets -Inputs $bellwetherInputs -PackageRoot $windowsStage }
 
 $windowsZip = Join-Path $outputFull "$baseName-Windows-x64.zip"
 if (Test-Path -LiteralPath $windowsZip) { Remove-Item -LiteralPath $windowsZip -Force }
@@ -227,32 +249,41 @@ Compress-Archive -Path (Join-Path $windowsStage "*") -DestinationPath $windowsZi
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
 Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $windowsZip -Platform Windows
-if($Version -eq '1.7.0') { Assert-Horde17ReleasePackage -ArchivePath $windowsZip -Platform Windows }
+if ($includeFoundation) { Assert-Horde17ReleasePackage -ArchivePath $windowsZip -Platform Windows }
+if ($bellwetherRelease) { Assert-Horde18ReleasePackage -ArchivePath $windowsZip -Platform Windows -IncludeVoices:([bool]$bellwetherInputs.Voices) }
 
+$androidAssetArguments = @("-PhordeShipping17AssetDir=$Horde17AssetRoot")
+if ($bellwetherRelease) {
+    $androidAssetArguments += @('-PhordeBellwetherRelease=true',
+        "-PhordeBellwetherResidentDir=$($bellwetherInputs.AndroidResidents)",
+        "-PhordeBellwetherVoiceDir=$($bellwetherInputs.Voices)")
+}
 Push-Location (Join-Path $repoRoot "android")
 try {
-    .\gradlew.bat assembleDebug assembleRelease lintRelease -PhordePrivateRevivalDir= -PhordeFlaskCandidateDir= "-PhordeShipping17AssetDir=$Horde17AssetRoot" --console=plain
+    .\gradlew.bat assembleDebug assembleRelease lintRelease -PhordePrivateRevivalDir= -PhordeFlaskCandidateDir= @androidAssetArguments --console=plain
     if ($LASTEXITCODE -ne 0) { throw "Android build or lint failed." }
 } finally {
     Pop-Location
 }
 
-$debugApk = Join-Path $repoRoot "android\app\build\outputs\apk\debug\app-debug.apk"
+$resolveApk = Join-Path $PSScriptRoot 'resolve-android-apk.ps1'
+$androidRoot = Join-Path $repoRoot 'android'
+$debugApk = & $resolveApk -AndroidRoot $androidRoot -Variant debug
 $debugCandidate = Join-Path $outputFull "$baseName-Android-preview-debug-signed.apk"
 Copy-Item -LiteralPath $debugApk -Destination $debugCandidate -Force
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $debugCandidate -Platform Android
 Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $debugCandidate -Platform Android
 
-$signedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release.apk"
-$unsignedRelease = Join-Path $repoRoot "android\app\build\outputs\apk\release\app-release-unsigned.apk"
-if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
+$releaseApk = & $resolveApk -AndroidRoot $androidRoot -Variant release
+$releaseApkName = Split-Path -Leaf $releaseApk
+if ($releaseSigningConfigured -and $releaseApkName -eq 'app-release.apk') {
     $androidCandidate = Join-Path $outputFull "$baseName-Android.apk"
-    Copy-Item -LiteralPath $signedRelease -Destination $androidCandidate -Force
+    Copy-Item -LiteralPath $releaseApk -Destination $androidCandidate -Force
     $androidStatus = "SIGNED"
-} elseif (-not $releaseSigningConfigured -and (Test-Path -LiteralPath $unsignedRelease)) {
+} elseif (!$releaseSigningConfigured -and $releaseApkName -eq 'app-release-unsigned.apk') {
     $androidCandidate = Join-Path $outputFull "$baseName-Android-UNSIGNED-DO-NOT-PUBLISH.apk"
-    Copy-Item -LiteralPath $unsignedRelease -Destination $androidCandidate -Force
+    Copy-Item -LiteralPath $releaseApk -Destination $androidCandidate -Force
     $androidStatus = "UNSIGNED - DO NOT PUBLISH"
 } elseif ($releaseSigningConfigured) {
     throw "Release signing was configured, but no signed release APK was produced."
@@ -262,7 +293,8 @@ if ($releaseSigningConfigured -and (Test-Path -LiteralPath $signedRelease)) {
 $null = Assert-HordeMusicPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate
 Assert-HordeThirdPartyNoticesPackage -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
 Assert-Horde162Package -RepositoryRoot $repoRoot -ArchivePath $androidCandidate -Platform Android
-if($Version -eq '1.7.0') { Assert-Horde17ReleasePackage -ArchivePath $androidCandidate -Platform Android }
+if ($includeFoundation) { Assert-Horde17ReleasePackage -ArchivePath $androidCandidate -Platform Android }
+if ($bellwetherRelease) { Assert-Horde18ReleasePackage -ArchivePath $androidCandidate -Platform Android -IncludeVoices:([bool]$bellwetherInputs.Voices) }
 
 $androidSdkRoot = if (-not [string]::IsNullOrWhiteSpace($env:ANDROID_HOME)) {
     $env:ANDROID_HOME

@@ -4,9 +4,10 @@ project(horde_rt_probe_android)
 
 option(HORDE_RT_FLASK_CANDIDATE "Pinned flask application candidate" OFF)
 option(HORDE_RT_PRIVATE_REVIVAL "Private pinned owner revival candidate" OFF)
-option(HORDE_RT_SHIPPING17_CONTENT "Ordinary 1.7 pinned flask and revival content" OFF)
+option(HORDE_RT_SHIPPING17_CONTENT "Pinned flask and revival foundation for ordinary packages" OFF)
 option(HORDE_RT_DEBUG_CHECKPOINTS "Enable debug-only showcase checkpoint and replay commands" OFF)
 option(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE "Optimized private Bellwether candidate application" OFF)
+option(HORDE_RT_ANDROID_BELLWETHER_RELEASE "Ordinary Bellwether release content" OFF)
 option(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE "Use the privately packaged Bellwether residents" OFF)
 option(HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE "Use the mill specialist in the private resident roster" OFF)
 option(HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE "Use the shore specialist in the private resident roster" OFF)
@@ -30,27 +31,36 @@ option(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE "Use the explicitly packaged viewmodel
 if(HORDE_RT_DEBUG_VIEWMODEL_CANDIDATE AND (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
     message(FATAL_ERROR "The viewmodel candidate is restricted to Debug checkpoint-enabled builds.")
 endif()
-if(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE)
+if(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE AND HORDE_RT_ANDROID_BELLWETHER_RELEASE)
+    message(FATAL_ERROR "Select only one optimized Bellwether profile.")
+endif()
+if(HORDE_RT_ANDROID_BELLWETHER_CANDIDATE OR HORDE_RT_ANDROID_BELLWETHER_RELEASE)
     if(NOT CMAKE_BUILD_TYPE MATCHES "^(Release|RelWithDebInfo)$" OR HORDE_RT_DEBUG_CHECKPOINTS OR
        NOT HORDE_RT_BELLWETHER_COMBINED_RESIDENTS OR NOT HORDE_RT_BELLWETHER_RELIC_DEALER_CANDIDATE OR
-       NOT HORDE_RT_FLASK_CANDIDATE OR NOT HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_SHIPPING17_CONTENT)
-        message(FATAL_ERROR "The optimized Bellwether candidate requires the five residents, flask and revival without debug checkpoints.")
+       NOT HORDE_RT_BELLWETHER_ARTIFICER_CANDIDATE OR NOT HORDE_RT_BELLWETHER_SALVAGER_CANDIDATE)
+        message(FATAL_ERROR "Optimized Bellwether requires all five residents without debug checkpoints.")
+    endif()
+    if((HORDE_RT_ANDROID_BELLWETHER_RELEASE AND NOT HORDE_RT_SHIPPING17_CONTENT) OR
+       (HORDE_RT_ANDROID_BELLWETHER_CANDIDATE AND
+        (NOT HORDE_RT_FLASK_CANDIDATE OR NOT HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_SHIPPING17_CONTENT)))
+        message(FATAL_ERROR "Optimized Bellwether requires the flask and revival foundation for its profile.")
     endif()
     if(NOT HORDE_RT_ANDROID_DEFAULT_INSTRUMENTATION STREQUAL "Shipping" OR
        NOT HORDE_RT_ANDROID_DEFAULT_DIELECTRIC_QUALITY STREQUAL "Mobile")
-        message(FATAL_ERROR "The optimized Bellwether candidate requires Shipping/Mobile.")
+        message(FATAL_ERROR "Optimized Bellwether requires Shipping/Mobile.")
     endif()
 elseif(HORDE_RT_BELLWETHER_RESIDENT_CANDIDATE AND
        (NOT HORDE_RT_DEBUG_CHECKPOINTS OR NOT CMAKE_BUILD_TYPE STREQUAL "Debug"))
-    message(FATAL_ERROR "Bellwether residents require an isolated optimized candidate or Debug build.")
+    message(FATAL_ERROR "Bellwether residents require an optimized Bellwether profile or Debug build.")
 endif()
 
 get_filename_component(HORDE_RT_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../../../.." ABSOLUTE)
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtVersion.cmake")
 if(HORDE_RT_SHIPPING17_CONTENT AND
-   (NOT HORDE_RT_PACKAGE_VERSION STREQUAL "1.7.0" OR
+   ((HORDE_RT_ANDROID_BELLWETHER_RELEASE AND NOT HORDE_RT_PACKAGE_VERSION STREQUAL "1.8.0") OR
+    (NOT HORDE_RT_ANDROID_BELLWETHER_RELEASE AND NOT HORDE_RT_PACKAGE_VERSION STREQUAL "1.7.0") OR
     HORDE_RT_DEBUG_CHECKPOINTS OR HORDE_RT_PRIVATE_REVIVAL OR HORDE_RT_FLASK_CANDIDATE))
-    message(FATAL_ERROR "Shipping 1.7 content requires ordinary 1.7.0 without private Debug gates")
+    message(FATAL_ERROR "The pinned flask and revival foundation requires its ordinary release profile.")
 endif()
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenArtifacts.cmake")
 include("${HORDE_RT_REPO_ROOT}/cmake/HordeRtRaygenPolicy.cmake")

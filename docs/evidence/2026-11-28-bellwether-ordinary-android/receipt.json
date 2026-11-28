@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "sourceCommit": "fd82320754e142c56f7d637c70b5d6cf473520f0",
+  "distribution": "local unsigned validation",
+  "applicationId": "com.samfa12.hordelanternrt",
+  "buildType": "release",
+  "versionName": "1.8.0",
+  "versionCode": 12,
+  "apkSha256": "ed6ac7c16bd355e136f01210090dd8000ad495fe56915ff73c242ad1aa6e1a8e",
+  "apkBytes": 277443072,
+  "nativeLibrarySha256": "99d5d7ba7ae044b4ae3aec7944661ce71d39c1d43cec137efee6b8c02080e37c",
+  "privateCandidateAssetSourceApkSha256": "d17be04507fe5a3f6f3842782edbbee0a87b306aab2042899cca2c334720bd7b",
+  "byteIdenticalRuntimeAssets": 295,
+  "residentModels": 5,
+  "voiceTakes": 26,
+  "unitTests": {
+    "tests": 617,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 6
+  },
+  "packagedSpirv": [
+    "874d28018db59ad4ff3261254c77180b5778273c6adf3441507edb61d78b96fe",
+    "80b54364a51152f14aa69cb9fdcf62d4db0f38eae57cc206792bd13cec886440",
+    "0d6404827749d1e9e6195e80ab7cfbf2eab60b370e6009e30039ee8f32ff152f",
+    "f86d0428e605d81f547ec2e730753ea1a0420eb9293d24e9a50fc0c7d0cc1fba"
+  ],
+  "unsigned": true,
+  "zipAlignmentVerified": true,
+  "deviceRun": false,
+  "releaseLintPassed": true,
+  "guardChecks": {
+    "missingReleaseInputsRejected": true,
+    "missingFoundationRejected": true,
+    "conflictingProfilesRejected": true,
+    "captionOnlyTaskGraphAccepted": true
+  },
+  "privateWindowsCandidateConfigurePassed": true
+}

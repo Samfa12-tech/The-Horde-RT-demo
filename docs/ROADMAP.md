@@ -212,6 +212,8 @@ three preparations, and verified that hearth rest and the expedition leads
 persist together. Handset routes, sustained timing and listening review are
 still pending for this checkpoint.
 
+A local ordinary-package checkpoint identifies the game as 1.8.0 on Windows and Android. Both Windows hardware RT backends reached live control from New Game, then loaded and reloaded Bellwether from isolated Local AppData profiles. The same archive loaded an older seeded 1.7 save. The unsigned Android APK contains all four native libraries and matches the Windows tavern model, five resident models and 26 voice takes. The complete packaging run, handset performance and listening review remain open. [Ordinary package validation](evidence/2026-11-28-bellwether-ordinary-pair/receipt.json)
+
 **Acceptance gates:** first accept one arrival-to-tavern stress slice with representative actors/fire/glass, exchange, checkpoint, return outdoors and repeat visits, using the six-gate contract's hub gate. Expand only after combined residency/LOD/RT relevance and phone/Windows budgets pass. Then prove admitted interiors and NPC interactions, subtitle/audio fallbacks, progress-aware returns, spending/reward/save integrity and viable alternative progression. Final service selection, cast/interiors, quest details, injury staging and numeric budgets must be scoped before acceptance. 1.8 release acceptance remains pending.
 
 ## Proposed 1.9 - Drowned Abbey
