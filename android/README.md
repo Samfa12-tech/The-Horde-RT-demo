@@ -229,6 +229,25 @@ tests. The Galaxy S26 Ultra also passed results → system Back → main menu �
 Stay/Quit after completing the Standard benchmark. Cancellation, sharing and
 background/resume remain separate checks. [Device record](../docs/ANDROID_RT_DEVICE_COMPATIBILITY_RECORD.md#android-back-after-benchmark-results) · [Issue #40](https://github.com/Samfa12-tech/The-Horde-RT-demo/issues/40)
 
+### Bellwether 1.8 ordinary Android package
+
+For a local unsigned build of the ordinary Android app, set
+`HORDE_VALIDATION_UNSIGNED=1` in the build process and run this from `android/`.
+
+```powershell
+.\gradlew.bat :app:assembleRelease :app:testReleaseUnitTest -PhordeBellwetherRelease=true `
+  "-PhordeShipping17AssetDir=<pinned flask and revival runtime root>" `
+  "-PhordeBellwetherResidentDir=<five-resident Android runtime root>" `
+  "-PhordeBellwetherVoiceDir=<archived voice runtime root>" `
+  -Pandroid.injected.build.abi=arm64-v8a --console=plain
+```
+
+The roots use the same runtime files as the private candidate and the shipped
+flask and revival foundation. Gradle validates their file lists and hashes
+before packaging. The voice root is optional for caption-only builds.
+The release profile uses the ordinary application ID, the version in `VERSION`,
+and Shipping/Mobile shaders. It keeps the existing campaign save location.
+
 ### Debug diagnostics
 
 For a focused Debug validation of the alternate hardware backend, force-stop only the Debug package and append `--ez horde_require_rayquery_compute true` to its launch intent. Omit the flag on a fresh launch to restore normal backend preference. The native Release build ignores this private flag; RayQuery-only supported devices select compute automatically. Do not change system settings or clear app data for this check.
