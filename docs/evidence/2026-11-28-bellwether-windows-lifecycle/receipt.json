@@ -1,0 +1,356 @@
+{
+  "sourceCommit": "c62c6a0fb9501afae5f556a3bac5aaf66e8f82e8",
+  "assetDonorArchiveSha256": "89c56a20648b49a5c0f9b9fc3917802a896bac0463a8c038e1a6c4b6d0096cee",
+  "windowsExecutableSha256": "cc4980d0953d00228bdf01b8a707be3a203e5888bc5dbb4978e6e459ce2d12df",
+  "results": [
+    {
+      "backend": "RayTracingPipeline",
+      "mode": "load",
+      "actions": [
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM",
+        "BELLWETHER DIRECTIONS",
+        "BACK TO PAUSE MENU",
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM",
+        "BELLWETHER DIRECTIONS",
+        "BACK TO PAUSE MENU",
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM"
+      ],
+      "seedSha256": "e6dcfbeef6fd652991f325c3914178201a4e9c935401aa236c84e9a5ecc3a5a4",
+      "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+      "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+      "rtScene": {
+        "status": "Presented via swapchain",
+        "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+        "dispatchWidth": 1232,
+        "dispatchHeight": 803,
+        "presented": true
+      },
+      "reportedBackend": "RayTracingPipeline",
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "lifecycle": [
+        {
+          "event": "initial tavern present",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 0
+        },
+        {
+          "event": "minimized",
+          "client": [
+            0,
+            0
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 94
+        },
+        {
+          "event": "restored",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 203
+        },
+        {
+          "event": "presented after resize",
+          "client": [
+            1088,
+            695
+          ],
+          "dispatch": [
+            1088,
+            695
+          ],
+          "elapsedMs": 422
+        },
+        {
+          "event": "presented at original extent",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 1125
+        },
+        {
+          "event": "earned tavern reloaded with identical save",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3750
+        },
+        {
+          "event": "minimized",
+          "client": [
+            0,
+            0
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3844
+        },
+        {
+          "event": "restored",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3953
+        },
+        {
+          "event": "presented after resize",
+          "client": [
+            1024,
+            695
+          ],
+          "dispatch": [
+            1024,
+            695
+          ],
+          "elapsedMs": 4188
+        },
+        {
+          "event": "presented at original extent",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 4391
+        },
+        {
+          "event": "earned tavern reloaded with identical save",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 6500
+        }
+      ],
+      "exitCode": 0,
+      "loadPreservedSave": true,
+      "workerDesktopStayedSeparate": true
+    },
+    {
+      "backend": "RayQueryCompute",
+      "mode": "load",
+      "actions": [
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM",
+        "BELLWETHER DIRECTIONS",
+        "BACK TO PAUSE MENU",
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM",
+        "BELLWETHER DIRECTIONS",
+        "BACK TO PAUSE MENU",
+        "LOAD...",
+        "Slot 1  |  Continue\nBellwether tavern | 2 / 3 hearts\n28/11/2026  12:05:19 PM"
+      ],
+      "seedSha256": "e6dcfbeef6fd652991f325c3914178201a4e9c935401aa236c84e9a5ecc3a5a4",
+      "title": "Horde Lantern RT - Showcase Alpha 1.7.0 [Bellwether 1.8 candidate]",
+      "firstGameplay": "RT ACTIVE | DIAGNOSTICS",
+      "rtScene": {
+        "status": "Presented via swapchain",
+        "geometry": "Complete Horde showcase route with sequential animated skeleton and staff-lit lich",
+        "dispatchWidth": 1232,
+        "dispatchHeight": 803,
+        "presented": true
+      },
+      "reportedBackend": "RayQueryCompute",
+      "gpuName": "NVIDIA GeForce RTX 5050 Laptop GPU",
+      "lifecycle": [
+        {
+          "event": "initial tavern present",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 0
+        },
+        {
+          "event": "minimized",
+          "client": [
+            0,
+            0
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 109
+        },
+        {
+          "event": "restored",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 203
+        },
+        {
+          "event": "presented after resize",
+          "client": [
+            1088,
+            695
+          ],
+          "dispatch": [
+            1088,
+            695
+          ],
+          "elapsedMs": 437
+        },
+        {
+          "event": "presented at original extent",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 640
+        },
+        {
+          "event": "earned tavern reloaded with identical save",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3265
+        },
+        {
+          "event": "minimized",
+          "client": [
+            0,
+            0
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3359
+        },
+        {
+          "event": "restored",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 3468
+        },
+        {
+          "event": "presented after resize",
+          "client": [
+            1024,
+            695
+          ],
+          "dispatch": [
+            1024,
+            695
+          ],
+          "elapsedMs": 4172
+        },
+        {
+          "event": "presented at original extent",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 4406
+        },
+        {
+          "event": "earned tavern reloaded with identical save",
+          "client": [
+            1232,
+            803
+          ],
+          "dispatch": [
+            1232,
+            803
+          ],
+          "elapsedMs": 7328
+        }
+      ],
+      "exitCode": 0,
+      "loadPreservedSave": true,
+      "workerDesktopStayedSeparate": true
+    }
+  ],
+  "replacementZip": {
+    "sha256": "f668a4d6888482e72922302cfb0fea37d23d449f324c63df17846f265967ee2e",
+    "bytes": 466165997,
+    "residentFiles": 25,
+    "voiceFiles": 26,
+    "archiveOnly": true,
+    "entriesChecked": 297,
+    "changedArchiveEntries": [
+      "HordeLanternRT.exe"
+    ]
+  },
+  "hostSuitesPassed": [
+    "ForegroundPauseRenderCadence",
+    "WindowsOutputResizeLaunch",
+    "RtSceneResourceInventory"
+  ],
+  "evidenceClass": "Ordinary optimized Windows executable on a separate desktop, using an isolated copy of the earned tavern save",
+  "phoneRun": false,
+  "sustainedDisplayTiming": false
+}
