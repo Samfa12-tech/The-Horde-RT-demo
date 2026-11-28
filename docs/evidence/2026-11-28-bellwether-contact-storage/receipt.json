@@ -1,0 +1,39 @@
+{
+  "candidateContentCommit": "1c1cf5c166458d7bab8e4d9fbcae5ca632df1f63",
+  "baseline": "../2026-11-28-bellwether-south-woodland/receipt.json",
+  "launch": "Release executable staged over the verified south woodland payload. Built before the content commit. No new installer or release archive.",
+  "executableSha256": "60c263e46b5281b2362053e753898bea617272a56c06b0b11f0fd924d4579ab7",
+  "hostContactBudget": {
+    "groundTriangles": 42319,
+    "stepTriangles": 20,
+    "baseObstacleTriangles": 139212,
+    "refillBasinReservedTriangles": 216,
+    "baselineObstacleLimit": 139434,
+    "candidateObstacleLimit": 144081,
+    "baselineRetainedBytes": 11133360,
+    "candidateRetainedBytes": 10576512,
+    "savedBytes": 556848,
+    "remainingObstacleTrianglesWithBasins": 4653
+  },
+  "host": {"gpu": "NVIDIA GeForce RTX 5050 Laptop GPU", "driver": "610.47", "backend": "RayTracingPipeline", "shaderBundle": "shipping_high_pair"},
+  "normalPlay": {
+    "route": "Repeat the isolated tavern save and south ramp, fingerpost and market walk against the exact existing assets",
+    "hardwareRtPresented": true,
+    "marketViewSha256": "9e16032de72f4dd0e5ce869a52fffb685e30c4046d18488945f6c08ca7374b80",
+    "gameExitCode": 0,
+    "isolatedSaveUnchanged": true,
+    "normalSaveProfileUnchanged": true
+  },
+  "passingHostTests": [
+    "horde_rt_triangle_support_surface_tests",
+    "horde_rt_character_step_geometry_tests",
+    "horde_rt_chapter_step_movement_tests",
+    "horde_rt_chapter_posture_rejection_tests",
+    "horde_rt_paused_terrain_rebind_tests",
+    "horde_rt_forest_deadwood_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "evidenceLimit": "Host CPU retained collision storage and Windows route checks. Load-time, frame-time and handset performance are unmeasured for this change."
+}
