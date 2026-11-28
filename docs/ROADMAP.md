@@ -196,6 +196,8 @@ A hooded oil lamp picks out the store's plank door, step and loading yard as the
 
 [Fern clumps](../assets/models/world/source/bellwether-woodland-v1/README.md) grow along the market wall, store track and southern woodland, with smaller pockets by the tavern delivery wall and common. They clear the existing stone paths and take no obstacle faces. Fresh Windows profiles and graphics Reset now select **Higher**, the highest shadow setting. A private Windows run confirmed four local and two sky shadow samples on the tavern-to-store round trip, and a second launch rendered with its saved **Current** setting. [Planting route and shadow-setting evidence](evidence/2026-11-28-bellwether-understory/receipt.json)
 
+Eighteen pines and alders now frame the west lane and kitchen plots on the surveyed slope. The ordinary Windows replay reached the relic dealer and stock pen at **Higher** shadows. The distant ground-to-sky colour transition is still visible between trees. Handset validation remains open. [West woodland evidence](evidence/2026-11-28-bellwether-west-woodland/receipt.json)
+
 A short stone fork from the lower road leads to the mapped east door of
 [House B](../assets/models/world/source/bellwether-house-b-v1/README.md). The
 private store-room candidate gives the village a second walk-in building,

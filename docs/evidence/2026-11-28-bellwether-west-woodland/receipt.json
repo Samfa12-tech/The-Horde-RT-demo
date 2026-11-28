@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "sourceCommit": "c9b17ff71dccc331ea58a3a06c87f345e42cfa08",
+  "evidenceClass": "Ordinary foreground Release play with the stock Windows menu and mouse and keyboard controls",
+  "launch": {
+    "executableSha256": "004894f68b132bb13ace165a721a7ed9b025573ba5c19a8c220b4f73e2d25b91",
+    "baseArchiveSha256": "aaa602f56cc64387b42c028a8735c7cf9602a1cb7330c97a73c4877939efd3c3",
+    "byteIdenticalNonExecutableEntries": 296,
+    "earnedTavernSaveSha256": "d663366ab0ea19241ec13693874ffc53b69ff9febb708962f0f1035b5e041717",
+    "gameExitCode": 0,
+    "isolatedAndOriginalSavesUnchanged": true
+  },
+  "host": {
+    "gpu": "NVIDIA GeForce RTX 5050 Laptop GPU",
+    "driverRaw": 2559295488,
+    "backend": "RayTracingPipeline",
+    "shaderBundle": "shipping_high_pair",
+    "activeShaderSha256": "00761424005fbdd2fc4eefbee4ac278fe82779706884ebb479d5fbbd02f81bc8",
+    "renderExtent": [
+      1232,
+      803
+    ],
+    "freshWindowsShadows": {
+      "mode": "Higher",
+      "localPrimarySamples": 4,
+      "skyPrimarySamples": 2
+    }
+  },
+  "terrainProbe": {
+    "method": "CPU triangle intersection against the shipped runtime terrain from a terrain-relative eye at the authored dealer approach, approximating head height. Terrain only.",
+    "surfaceTriangles": 39266,
+    "testYawDegrees": [
+      -130,
+      -115,
+      -100
+    ],
+    "testElevationDegrees": -0.5,
+    "firstTerrainHitMetres": [
+      5357.9,
+      5148.2,
+      5139.2
+    ],
+    "nextTestElevationDegrees": -0.25,
+    "nextTestResult": "Miss within the same 10000 m primary ray range"
+  },
+  "woodlandDelta": {
+    "pines": 12,
+    "alders": 6,
+    "middleDetailCrowns": 4,
+    "renderTriangles": 7048,
+    "trunkContactTriangles": 180
+  },
+  "comparison": {
+    "baselineReceipt": "../2026-11-28-bellwether-service-attention/receipt.json",
+    "baselineCaptureSha256": "871ada3393e7fe0d9608f3aa998bc45a2a2bc1835d02946378ffef951cc71cf9",
+    "method": "Same supported route and input recipe through the dealer stop. Ordinary movement creates small framing differences.",
+    "observed": "Pines and alders now frame the west lane and plots. The flat distant ground-to-sky colour transition remains visible through the trees."
+  },
+  "markers": [
+    {
+      "description": "Read the square fingerpost",
+      "capture": "frame-004.png",
+      "sha256": "394e3a01c871d1232eec82518fddeeaf64ff03cfc6d84866e76d4f6ab6677287"
+    },
+    {
+      "description": "Reached the relic dealer and held the trade prompt",
+      "capture": "frame-008.png",
+      "sha256": "a83e6a8872a47b736d3b0d28d87b91173e57214c21ec02ad82835ce163212836"
+    },
+    {
+      "description": "Asked about trade",
+      "capture": "frame-009.png",
+      "sha256": "01f22c28f65d14ef066ed8e41a3ac2db894069e9aebb6a1b19df37a7214143e0"
+    },
+    {
+      "description": "Looked left from the stall while the trade caption played",
+      "capture": "frame-010.png",
+      "sha256": "1e50ac5276ebe4a7fb7711d13b7e9ca2412b75f6116c86b6739dd8183dbf9141"
+    },
+    {
+      "description": "Walked to the kitchen plots and stock pen",
+      "capture": "frame-012.png",
+      "sha256": "58ccab53d263d9831af98c67f1eb82948c21f2b2700495215429379532d4b7f4"
+    },
+    {
+      "description": "Walked around the plot edge",
+      "capture": "frame-013.png",
+      "sha256": "fb39900cfcb7acae908ba07f33220bb87ca7e5b9ec7841bfc874ca2a9041ffdc"
+    }
+  ],
+  "passingHostTests": [
+    "horde_rt_graphics_settings_tests",
+    "horde_rt_graphics_windows_persistence_tests",
+    "horde_rt_bellwether_shell_tests",
+    "horde_rt_forest_dressing_tests",
+    "horde_rt_scene_resource_inventory_tests"
+  ],
+  "pending": "Long-range atmosphere continuity, physical Android and sustained performance evidence for this candidate."
+}
