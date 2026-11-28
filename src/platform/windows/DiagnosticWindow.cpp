@@ -794,7 +794,7 @@ struct VulkanSurfaceContext
         horde::graphics::PlatformDefaultGraphicsSettings(horde::graphics::GraphicsPlatform::Windows);
     horde::graphics::GraphicsSettings graphicsBeforeApply = savedGraphics;
     horde::graphics::FireDetail fireDetail = horde::graphics::FireDetail::High;
-    horde::graphics::ShadowQuality shadowQuality = horde::graphics::ShadowQuality::Current;
+    horde::graphics::ShadowQuality shadowQuality = savedGraphics.shadowQuality;
     // Requested intent is distinct from the ready scene's applied geometry policy.
     bool requestedGlassEnabled = true;
     bool requestedMistEnabled = true;
